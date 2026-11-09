@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the drawing of the room as a room profile of its own kind. Delays and levels worked out from where
+// Vespertine: speaker groups: the drawing of the room as a room profile of its own kind. Delays and levels worked out from where
 // the speakers and the seat stand (`SpeakerGeometry`), no filters, so a group can be aligned without a microphone; chosen,
 // duplicated and exported like any profile. A measurement replaces it, and the two are checked against each other.
 // SPDX-License-Identifier: GPL-3.0-or-later

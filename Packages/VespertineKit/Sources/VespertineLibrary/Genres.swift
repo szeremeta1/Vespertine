@@ -1,5 +1,5 @@
 //
-// Vespertine — genres as people mean them: case and accents don't matter ("rock" = "Rock"), multi-genre
+// Vespertine: genres as people mean them: case and accents don't matter ("rock" = "Rock"), multi-genre
 // tags count under each ("Rock; Blues"), and names like "Pop/Rock" or "R&B/Soul" stay whole.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

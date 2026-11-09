@@ -1,5 +1,5 @@
 //
-// Vespertine — main window layout.
+// Vespertine: main window layout.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

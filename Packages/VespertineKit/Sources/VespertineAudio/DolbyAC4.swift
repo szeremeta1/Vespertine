@@ -1,5 +1,5 @@
 //
-// Vespertine — Dolby AC-4 (immersive stereo and Atmos Music masters in MP4).
+// Vespertine: Dolby AC-4 (immersive stereo and Atmos Music masters in MP4).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // AC-4 is Dolby's newer codec, used for its 2024 immersive-stereo masters ('ac-4' in an MP4 with the `dby1` brand).

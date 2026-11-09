@@ -1,5 +1,5 @@
 //
-// Vespertine — live spectrum and offline file analysis (true bit depth, band-limit detection).
+// Vespertine: live spectrum and offline file analysis (true bit depth, band-limit detection).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

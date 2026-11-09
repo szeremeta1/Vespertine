@@ -1,5 +1,5 @@
 //
-// Vespertine — reads technical properties and tags into Track records.
+// Vespertine: reads technical properties and tags into Track records.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

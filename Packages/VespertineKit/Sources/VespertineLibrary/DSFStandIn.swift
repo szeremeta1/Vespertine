@@ -1,5 +1,5 @@
 //
-// Vespertine — a DSF whose header total-size field is larger than the file.
+// Vespertine: a DSF whose header total-size field is larger than the file.
 // A tool that rewrites the ID3 tag at the end without fixing that field leaves the audio and the tag intact, but
 // the tag reader (TagLib) refuses the file ("File is corrupted wrong length"). The file isn't changed: its
 // header and its tag are read from a small copy whose total-size field and metadata pointer are consistent.

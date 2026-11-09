@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: what an output session on a group holds and reports. The format of a group is read back from
+// Vespertine: speaker groups: what an output session on a group holds and reports. The format of a group is read back from
 // each member, never from the aggregate: the aggregate's streams show the aggregate's rate even while a member resamples
 // to its own (checked on macOS 27), so reading them would call a silently converted path untouched.
 // SPDX-License-Identifier: GPL-3.0-or-later

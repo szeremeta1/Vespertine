@@ -1,5 +1,5 @@
 //
-// Vespertine — the filter bar of every page: format chips, the Filters panel with every facet, and a token for
+// Vespertine: the filter bar of every page: format chips, the Filters panel with every facet, and a token for
 // each choice made there.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

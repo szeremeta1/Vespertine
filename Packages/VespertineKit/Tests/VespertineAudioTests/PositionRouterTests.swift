@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: which speaker plays which channel of a song, from where the speakers really stand.
+// Vespertine: speaker groups: which speaker plays which channel of a song, from where the speakers really stand.
 // Golden coefficients for the ITU-style folds, and the properties that make the panning safe.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

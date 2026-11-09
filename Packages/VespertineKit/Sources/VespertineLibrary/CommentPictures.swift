@@ -1,5 +1,5 @@
 //
-// Vespertine — cover art stored as a METADATA_BLOCK_PICTURE Vorbis comment inside a FLAC file
+// Vespertine: cover art stored as a METADATA_BLOCK_PICTURE Vorbis comment inside a FLAC file
 // (a base64 FLAC picture structure; some taggers write art this way instead of a PICTURE block,
 // and TagLib doesn't report it for FLAC), and raw comment values the tag reader reduces to a number.
 // SPDX-License-Identifier: GPL-3.0-or-later

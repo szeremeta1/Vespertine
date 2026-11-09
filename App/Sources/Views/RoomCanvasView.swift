@@ -1,5 +1,5 @@
 //
-// Vespertine — Settings › Speaker Groups › Edit: the room drawn from above. Drag a speaker or the seat, drag the arrow to turn the
+// Vespertine: Settings › Speaker Groups › Edit: the room drawn from above. Drag a speaker or the seat, drag the arrow to turn the
 // seat, arrow keys nudge the speaker that has the focus (Shift: 50 cm), and a screen reader hears each speaker's distance and angle.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

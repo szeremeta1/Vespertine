@@ -1,5 +1,5 @@
 //
-// Vespertine — which outputs get digital volume: an output's own choice first, then the default, never one with
+// Vespertine: which outputs get digital volume: an output's own choice first, then the default, never one with
 // hardware volume.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

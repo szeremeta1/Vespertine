@@ -1,5 +1,5 @@
 //
-// Vespertine — DSD at every rate: DoP from the raw stream (DSF and DSDIFF), and conversion to PCM.
+// Vespertine: DSD at every rate: DoP from the raw stream (DSF and DSDIFF), and conversion to PCM.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

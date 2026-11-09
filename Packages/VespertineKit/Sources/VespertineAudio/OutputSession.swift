@@ -1,5 +1,5 @@
 //
-// Vespertine — owns one configured, optionally hogged, running output device.
+// Vespertine: owns one configured, optionally hogged, running output device.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — a stand-in for the device behind an `OutputSession`, for tests of the engine's state machine.
+// Vespertine: a stand-in for the device behind an `OutputSession`, for tests of the engine's state machine.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // It runs the same render context the I/O proc does, on a thread of its own at the pace of the device's clock, while the

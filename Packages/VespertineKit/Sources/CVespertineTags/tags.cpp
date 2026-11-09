@@ -1,5 +1,5 @@
 //
-// Vespertine — TagLib's property map, for what SFBAudioEngine's metadata writer can't carry.
+// Vespertine: TagLib's property map, for what SFBAudioEngine's metadata writer can't carry.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — measurement microphone calibration (miniDSP UMIK-1 style text files).
+// Vespertine: measurement microphone calibration (miniDSP UMIK-1 style text files).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // A file is an optional quoted header ("Sens Factor =-1.203dB, SERNO: 0000001"), optional comment lines, then one

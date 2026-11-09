@@ -1,5 +1,5 @@
 //
-// Vespertine — a report of what the album copies make of a real library, before (one row per song, the other copies
+// Vespertine: a report of what the album copies make of a real library, before (one row per song, the other copies
 // a tag beside it) and after (every copy listed and playable). Runs only when asked, on a read-only database:
 //   VESPERTINE_COPIES_REPORT_DB=/path/Library.sqlite VESPERTINE_COPIES_REPORT_OUT=/path/report.md \
 //     swift test --filter CopiesReportTests

@@ -1,5 +1,5 @@
 //
-// Vespertine — DTS / DTS-HD Master Audio and Dolby TrueHD files (.dts, .dtshd, .thd, .mlp), TAK, the audio of
+// Vespertine: DTS / DTS-HD Master Audio and Dolby TrueHD files (.dts, .dtshd, .thd, .mlp), TAK, the audio of
 // Matroska and WebM files (.mka, .mkv, .webm) whatever codec it is in, and the Dolby Digital modes macOS decodes
 // wrongly (DolbyModes), decoded with FFmpeg.
 // SPDX-License-Identifier: GPL-3.0-or-later

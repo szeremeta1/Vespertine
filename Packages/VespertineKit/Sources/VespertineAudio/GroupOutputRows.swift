@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups in the output list: a row for each saved group saying whether it can play and what it is made of or
+// Vespertine: speaker groups in the output list: a row for each saved group saying whether it can play and what it is made of or
 // what is missing, and the lines of the signal path for its DACs. Plain data; the lists are a thin layer.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

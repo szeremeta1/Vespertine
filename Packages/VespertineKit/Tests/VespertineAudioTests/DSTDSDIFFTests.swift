@@ -1,4 +1,4 @@
-// Vespertine — compressed DSDIFF must preserve the DSD, PCM and DoP of its uncompressed equivalent.
+// Vespertine: compressed DSDIFF must preserve the DSD, PCM and DoP of its uncompressed equivalent.
 // SPDX-License-Identifier: GPL-3.0-or-later
 import AVFAudio
 import Foundation

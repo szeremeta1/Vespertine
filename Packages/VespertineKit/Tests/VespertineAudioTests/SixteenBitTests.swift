@@ -1,5 +1,5 @@
 //
-// Vespertine — "Match 16-bit sources": 16-bit files go to a DAC's own 16-bit mode where it has one.
+// Vespertine: "Match 16-bit sources": 16-bit files go to a DAC's own 16-bit mode where it has one.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

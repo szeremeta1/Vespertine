@@ -1,5 +1,5 @@
 //
-// Vespertine — first-run setup: music, output, sound and a few extras, shown once.
+// Vespertine: first-run setup: music, output, sound and a few extras, shown once.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

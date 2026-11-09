@@ -1,5 +1,5 @@
 //
-// Vespertine — quitting never waits on a stuck device.
+// Vespertine: quitting never waits on a stuck device.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

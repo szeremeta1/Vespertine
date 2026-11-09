@@ -1,5 +1,5 @@
 //
-// Vespertine — the Mac's alert volume, kept at the loudness alerts had while the volume relay raises the sound output.
+// Vespertine: the Mac's alert volume, kept at the loudness alerts had while the volume relay raises the sound output.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

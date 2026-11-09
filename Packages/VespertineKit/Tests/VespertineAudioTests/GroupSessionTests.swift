@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: what an output session on a group reports. The format of a group is read back from each
+// Vespertine: speaker groups: what an output session on a group reports. The format of a group is read back from each
 // member, never from the aggregate (whose streams show the aggregate's rate even while a member resamples to its own), and
 // the group's numbers are the weakest member's. Pure; no device.
 // SPDX-License-Identifier: GPL-3.0-or-later

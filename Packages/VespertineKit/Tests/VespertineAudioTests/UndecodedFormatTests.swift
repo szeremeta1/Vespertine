@@ -1,5 +1,5 @@
 //
-// Vespertine — formats nothing here decodes are named, not failed on: AC-4 and MPEG-H say so when played; MQA and
+// Vespertine: formats nothing here decodes are named, not failed on: AC-4 and MPEG-H say so when played; MQA and
 // Auro-3D play as the PCM they hold, and the signal path says that.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

@@ -1,5 +1,5 @@
 //
-// Vespertine — RF64 and Sony Wave64: the WAV containers for files past 4 GB, which multichannel hi-res albums need.
+// Vespertine: RF64 and Sony Wave64: the WAV containers for files past 4 GB, which multichannel hi-res albums need.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — Phase 0 of multi-DAC speaker groups, PR 0.2: the real engine playing a quad file to a private aggregate of
+// Vespertine: Phase 0 of multi-DAC speaker groups, PR 0.2: the real engine playing a quad file to a private aggregate of
 // two virtual devices, recorded back from each member's own input.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

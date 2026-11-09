@@ -1,5 +1,5 @@
 //
-// Vespertine — DTS (DCA) decoding for DTS CDs / DTS-in-WAV, on FFmpeg's decoder.
+// Vespertine: DTS (DCA) decoding for DTS CDs / DTS-in-WAV, on FFmpeg's decoder.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 #pragma once

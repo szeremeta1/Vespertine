@@ -1,5 +1,5 @@
 //
-// Vespertine — Phase 0 speaker-group probe: the few Core Audio property reads and writes the probe tools need.
+// Vespertine: Phase 0 speaker-group probe: the few Core Audio property reads and writes the probe tools need.
 // (VespertineAudio keeps its own helpers internal; the probe only uses its public API, so this is a small copy.)
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

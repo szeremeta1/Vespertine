@@ -1,5 +1,5 @@
 //
-// Vespertine — DTS CDs and DTS-in-WAV/FLAC: a DTS 5.1 bitstream stored as 16-bit stereo PCM.
+// Vespertine: DTS CDs and DTS-in-WAV/FLAC: a DTS 5.1 bitstream stored as 16-bit stereo PCM.
 // Played as PCM it is full-scale noise; decoded, it is the 5.1 mix.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

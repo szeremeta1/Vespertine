@@ -1,5 +1,5 @@
 //
-// Vespertine — the shader for the meter designs modelled on real instruments: their cabinets (wood, brushed metal,
+// Vespertine: the shader for the meter designs modelled on real instruments: their cabinets (wood, brushed metal,
 // moulded cases), faces lit by their lamps, needles and their shadows, the light band, the glass, the peak lights.
 // Appended to VisualizerShaders.source (it uses that file's helpers and `struct U`).
 // SPDX-License-Identifier: GPL-3.0-or-later

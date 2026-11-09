@@ -1,5 +1,5 @@
 //
-// Vespertine — Room Correction profile controls: naming and labelling a profile, the strength control and the A/B
+// Vespertine: Room Correction profile controls: naming and labelling a profile, the strength control and the A/B
 // switch every listener gets, and the Advanced section (design target and limits, measured positions, every filter and
 // each speaker's trim, the microphone).
 // SPDX-License-Identifier: GPL-3.0-or-later

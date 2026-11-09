@@ -1,5 +1,5 @@
 //
-// Vespertine — SACD image playback: an area's audio frames (plain DSD or DST, which is decoded to DSD here),
+// Vespertine: SACD image playback: an area's audio frames (plain DSD or DST, which is decoded to DSD here),
 // handed on as raw DSD for DoP (RawDoPDecoder) or converted to PCM by FFmpeg's DSD decoder, the same path
 // DSDIFF files take.
 // SPDX-License-Identifier: GPL-3.0-or-later

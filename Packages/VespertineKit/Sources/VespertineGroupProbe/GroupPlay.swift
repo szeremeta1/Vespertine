@@ -1,5 +1,5 @@
 //
-// Vespertine — Phase 0 of multi-DAC speaker groups, PR 0.2: `vespertine-probe group-play`. Builds a private aggregate of
+// Vespertine: Phase 0 of multi-DAC speaker groups, PR 0.2: `vespertine-probe group-play`. Builds a private aggregate of
 // the named devices (the first is the clock leader), sets and reads back every member's own rate, plays files through the
 // real engine to the aggregate, and reports what the engine claims against what Core Audio says for each member.
 // Dev only: nothing here is in the app, the group is not saved, and the aggregate is gone when the command exits.

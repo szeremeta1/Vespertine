@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the measurement wizard on a group. The group is measured as the layout and channel map its drawing
+// Vespertine: speaker groups: the measurement wizard on a group. The group is measured as the layout and channel map its drawing
 // makes (a quad is a quad), the timing references come from a speaker on the clock leader (the one DAC that is never resampled),
 // and the group plays for 15 s before the first sweep so the followers' drift correction has settled.
 // SPDX-License-Identifier: GPL-3.0-or-later

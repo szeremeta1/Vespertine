@@ -1,5 +1,5 @@
 //
-// Vespertine — multichannel layouts and Spatial Audio rendering for headphones (AirPods, Beats, …).
+// Vespertine: multichannel layouts and Spatial Audio rendering for headphones (AirPods, Beats, …).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Multichannel music (5.1, 7.1, …) is rendered with Apple's own spatial renderer (AUSpatialMixer,

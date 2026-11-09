@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: a song put onto a group by where the speakers stand. The pure part of what `Decoding` does for a
+// Vespertine: speaker groups: a song put onto a group by where the speakers stand. The pure part of what `Decoding` does for a
 // group in place of a speaker-setup fold: which speakers a song's channels stand for, the plan that gives the ring one channel
 // for every output of the group, and the router (`PositionRouter`, with the group's stereo and LFE policies) behind it.
 // SPDX-License-Identifier: GPL-3.0-or-later

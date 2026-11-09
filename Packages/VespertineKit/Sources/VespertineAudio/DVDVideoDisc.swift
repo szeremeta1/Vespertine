@@ -1,5 +1,5 @@
 //
-// Vespertine — a DVD-Video's music as tracks: each title's programs (chapters), cut from the disc's physical cells
+// Vespertine: a DVD-Video's music as tracks: each title's programs (chapters), cut from the disc's physical cells
 // by 90 kHz presentation time, never by the IFO's rounded playback times. Menus are never read; navigation
 // previews (a short cell of another VOB tacked onto a program) are left out; a disc whose cell table disagrees with
 // its NAV packs is mapped from the NAV packs instead.

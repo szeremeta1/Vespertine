@@ -1,5 +1,5 @@
 //
-// Vespertine — which rate and format a measurement microphone records in, against simulated device format lists (no
+// Vespertine: which rate and format a measurement microphone records in, against simulated device format lists (no
 // hardware): a UMIK-1 that runs at 48 kHz measured through a DAC at 176.4 kHz was refused at the level check.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

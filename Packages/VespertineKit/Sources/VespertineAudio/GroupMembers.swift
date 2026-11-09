@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: configuring the members of a group before they play together. A group is one device made of
+// Vespertine: speaker groups: configuring the members of a group before they play together. A group is one device made of
 // several; every member has to be at the same rate, and each one's own rate has to be read back from the member, because the
 // aggregate's streams report the aggregate's rate even while a member silently resamples to its own.
 // SPDX-License-Identifier: GPL-3.0-or-later

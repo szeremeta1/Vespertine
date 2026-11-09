@@ -1,5 +1,5 @@
 //
-// Vespertine — DSD over PCM (DoP 1.1, dsd-guide.com): 16 DSD bits per channel per PCM frame behind an 8-bit
+// Vespertine: DSD over PCM (DoP 1.1, dsd-guide.com): 16 DSD bits per channel per PCM frame behind an 8-bit
 // marker that alternates 0x05 / 0xFA, as a 24-bit sample.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

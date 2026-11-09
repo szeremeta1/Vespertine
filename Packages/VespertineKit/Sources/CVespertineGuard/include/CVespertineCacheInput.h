@@ -1,5 +1,5 @@
 //
-// Vespertine — an input source for SFBAudioEngine's decoders that reads through a caller's block, so a decoder can start on a share
+// Vespertine: an input source for SFBAudioEngine's decoders that reads through a caller's block, so a decoder can start on a share
 // file that is still being copied: each read waits (inside the block) until the bytes it asks for are on disk.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

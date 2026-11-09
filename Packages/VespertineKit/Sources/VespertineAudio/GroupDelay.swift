@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the delay and level trim of each speaker, held in the room correction chain. macOS 27 accepts an aggregate's
+// Vespertine: speaker groups: the delay and level trim of each speaker, held in the room correction chain. macOS 27 accepts an aggregate's
 // extra output latency without error and reads 0 back (checked on virtual devices), so a skew measured between the DACs can't be
 // handed to Core Audio; Vespertine holds the other members' channels back instead, by whole frames, in the chain the I/O thread
 // already runs. A speaker's own delay trim goes in the same place, and so does its level trim (a level per output channel, ahead of

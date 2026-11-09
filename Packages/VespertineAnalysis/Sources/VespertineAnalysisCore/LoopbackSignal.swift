@@ -1,5 +1,5 @@
 //
-// Vespertine — the loopback test signal: what is played out to a loopback device and compared, sample for sample,
+// Vespertine: the loopback test signal: what is played out to a loopback device and compared, sample for sample,
 // with what comes back.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

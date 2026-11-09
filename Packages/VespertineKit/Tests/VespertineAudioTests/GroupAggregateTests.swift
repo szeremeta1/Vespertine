@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the private aggregate device a group plays through. What its description says (the clock
+// Vespertine: speaker groups: the private aggregate device a group plays through. What its description says (the clock
 // leader as the main sub-device, drift correction on every follower that doesn't share the leader's clock), without
 // touching an audio device.
 // SPDX-License-Identifier: GPL-3.0-or-later

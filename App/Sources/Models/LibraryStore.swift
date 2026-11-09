@@ -1,5 +1,5 @@
 //
-// Vespertine — observable view of the library database.
+// Vespertine: observable view of the library database.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

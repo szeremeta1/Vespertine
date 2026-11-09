@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: when a group's signal path stays bit-perfect. A song that only the leader plays can be, and a
+// Vespertine: speaker groups: when a group's signal path stays bit-perfect. A song that only the leader plays can be, and a
 // delay in whole frames (room correction's timing alone) only shifts the samples; a level, a band, a filter or a follower in
 // use cannot. Pure; no device.
 // SPDX-License-Identifier: GPL-3.0-or-later

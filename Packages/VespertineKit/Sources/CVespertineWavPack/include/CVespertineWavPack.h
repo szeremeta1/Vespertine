@@ -1,5 +1,5 @@
 //
-// Vespertine — the part of libwavpack (Vendor/WavPackDSD.xcframework, built with DSD support by
+// Vespertine: the part of libwavpack (Vendor/WavPackDSD.xcframework, built with DSD support by
 // scripts/build-wavpack-dsd.sh) the WavPack DSD reader uses. Declarations follow WavPack 5.8.1's wavpack.h
 // (BSD-3-Clause, Copyright (c) David Bryant); every symbol carries the build's `vtwv_` prefix.
 // SPDX-License-Identifier: GPL-3.0-or-later

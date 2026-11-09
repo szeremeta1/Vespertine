@@ -1,5 +1,5 @@
 //
-// Vespertine — "Find Music on This Mac" and "Enrich Metadata" sheets.
+// Vespertine: "Find Music on This Mac" and "Enrich Metadata" sheets.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

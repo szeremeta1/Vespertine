@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: a speaker's own level trim, played. Held in the same chain as the delays (a level per output
+// Vespertine: speaker groups: a speaker's own level trim, played. Held in the same chain as the delays (a level per output
 // channel ahead of the bands), so it lands once whether the group plays with a measured profile, the drawing's or none.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

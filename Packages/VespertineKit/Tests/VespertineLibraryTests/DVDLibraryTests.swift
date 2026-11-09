@@ -1,5 +1,5 @@
 //
-// Vespertine — DVD-Video LPCM in the library: a VIDEO_TS folder and a disc image scan into one album per title,
+// Vespertine: DVD-Video LPCM in the library: a VIDEO_TS folder and a disc image scan into one album per title,
 // a track per chapter, played as exact sample ranges; menus, other IFOs and previews add nothing; rescans keep IDs.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

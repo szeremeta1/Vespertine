@@ -1,5 +1,5 @@
 //
-// Vespertine — what rate and sample format to record a measurement microphone in. The microphone has its own limits
+// Vespertine: what rate and sample format to record a measurement microphone in. The microphone has its own limits
 // (a UMIK-1 runs at 48 kHz, some units at 44.1 kHz) and the output has its own (a DAC at 176.4 kHz), so the input is
 // never asked to follow the output: it records at a rate it supports and the measurement runs at that rate.
 // SPDX-License-Identifier: GPL-3.0-or-later

@@ -1,5 +1,5 @@
 //
-// Vespertine — sending Dolby and DTS to an AV receiver untouched ("bitstream"): the compressed frames
+// Vespertine: sending Dolby and DTS to an AV receiver untouched ("bitstream"): the compressed frames
 // wrapped in IEC 61937 data bursts, carried as 16-bit stereo PCM over HDMI or S/PDIF. The receiver
 // recognizes the bursts and decodes (Dolby Atmos included, when the receiver supports it).
 // SPDX-License-Identifier: GPL-3.0-or-later

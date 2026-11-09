@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: per-member compensation from a measured skew. The numbers are the hardware session of 2026-11-07 (Fosi ZD3
+// Vespertine: speaker groups: per-member compensation from a measured skew. The numbers are the hardware session of 2026-11-07 (Fosi ZD3
 // leader, FiiO K11 follower, drift correction at quality 127, 48 kHz): the resampler adds 53.5 frames, and the follower falls behind the
 // leader at +13.47 ppm. Pure; no device.
 // SPDX-License-Identifier: GPL-3.0-or-later

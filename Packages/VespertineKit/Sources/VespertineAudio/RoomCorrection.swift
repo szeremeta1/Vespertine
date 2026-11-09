@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction records: what was measured, with what, through which outputs, and the filters fitted from it.
+// Vespertine: room correction records: what was measured, with what, through which outputs, and the filters fitted from it.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // A session holds the raw captures of one measurement run, kept as recorded; a profile is the filter set fitted

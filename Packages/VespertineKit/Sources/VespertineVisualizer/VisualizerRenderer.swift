@@ -1,5 +1,5 @@
 //
-// Vespertine — draws the visualizer with Metal: one full-window fragment shader per style, fed each frame with the
+// Vespertine: draws the visualizer with Metal: one full-window fragment shader per style, fed each frame with the
 // newest analysis. Also renders offscreen (screenshots, recordings, timing).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

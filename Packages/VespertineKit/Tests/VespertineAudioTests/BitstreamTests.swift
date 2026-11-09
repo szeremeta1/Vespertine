@@ -1,5 +1,5 @@
 //
-// Vespertine — IEC 61937 bursts carry Dolby and DTS frames exactly.
+// Vespertine: IEC 61937 bursts carry Dolby and DTS frames exactly.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

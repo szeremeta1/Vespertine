@@ -1,5 +1,5 @@
 //
-// Vespertine — song transitions on the engine thread, before the ring: gain ramps for dips, the two-deck crossfade,
+// Vespertine: song transitions on the engine thread, before the ring: gain ramps for dips, the two-deck crossfade,
 // and the silence scan that finds where a song's music ends and the next one's begins.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

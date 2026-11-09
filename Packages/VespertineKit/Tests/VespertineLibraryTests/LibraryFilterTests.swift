@@ -1,5 +1,5 @@
 //
-// Vespertine — filters for every list: facets, chips, counts, and the album facts read from the database.
+// Vespertine: filters for every list: facets, chips, counts, and the album facts read from the database.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction filter design: a cut-dominant parametric fit to a target curve, with bounded boost,
+// Vespertine: room correction filter design: a cut-dominant parametric fit to a target curve, with bounded boost,
 // no boost below the speaker's roll-off, a correction range and a preamp that keeps the result out of clipping.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

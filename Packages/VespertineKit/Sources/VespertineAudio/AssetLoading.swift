@@ -1,5 +1,5 @@
 //
-// Vespertine — what an audio file's AVAsset says about its first audio track, loaded without the concurrency pool.
+// Vespertine: what an audio file's AVAsset says about its first audio track, loaded without the concurrency pool.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

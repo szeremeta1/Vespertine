@@ -1,5 +1,5 @@
 //
-// Vespertine — measurement microphone calibration files (miniDSP UMIK-1 style): reading them, rejecting damaged ones,
+// Vespertine: measurement microphone calibration files (miniDSP UMIK-1 style): reading them, rejecting damaged ones,
 // and turning the microphone's response into the correction a measurement needs.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

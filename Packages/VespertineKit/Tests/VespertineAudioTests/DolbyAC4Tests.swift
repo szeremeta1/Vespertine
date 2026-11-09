@@ -1,5 +1,5 @@
 //
-// Vespertine — Dolby AC-4 files are named for what they are, not "not recognized".
+// Vespertine: Dolby AC-4 files are named for what they are, not "not recognized".
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

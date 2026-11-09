@@ -1,5 +1,5 @@
 //
-// Vespertine — where the speaker groups live: one JSON file in the app's data folder, written whole and kept with its
+// Vespertine: where the speaker groups live: one JSON file in the app's data folder, written whole and kept with its
 // previous version beside it. A file that can't be read is set aside, never overwritten, and the last good version is used
 // instead. Groups from a newer Vespertine are kept as they were and written back with the rest. (The same rules as the
 // room correction library.)

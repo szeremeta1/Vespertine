@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups through the real engine with a speaker's delay: a click on both channels of the leader's pair
+// Vespertine: speaker groups through the real engine with a speaker's delay: a click on both channels of the leader's pair
 // arrives on the delayed speaker's channel exactly the delay later than on the other, in whole frames; with no delay the two
 // arrive together. The delay is a trim on the first speaker, which goes into the room chain the same way a member's measured
 // skew does (the skew's arithmetic is in GroupDelayTests).

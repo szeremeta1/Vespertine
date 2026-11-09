@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the private aggregate device a group plays through. Core Audio's aggregate puts the group's
+// Vespertine: speaker groups: the private aggregate device a group plays through. Core Audio's aggregate puts the group's
 // DACs behind one I/O callback, keeps them in step with drift correction, and lines up their reported latencies. The
 // clock leader is the aggregate's main sub-device (what Audio MIDI Setup calls the Clock Source): it is never corrected, so
 // its channels can stay bit-perfect. Every other member is corrected unless it reports the leader's own (non-zero) clock

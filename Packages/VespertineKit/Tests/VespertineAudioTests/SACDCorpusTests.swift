@@ -1,4 +1,4 @@
-// Vespertine — opt-in real-disc decode audit. No audio or private paths are checked in.
+// Vespertine: opt-in real-disc decode audit. No audio or private paths are checked in.
 // SPDX-License-Identifier: GPL-3.0-or-later
 import AVFAudio
 import CryptoKit

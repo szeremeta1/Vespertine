@@ -1,5 +1,5 @@
 //
-// Vespertine — Spatialize stereo through the engine's own pieces: when the planner upmixes (and only then), and what the
+// Vespertine: Spatialize stereo through the engine's own pieces: when the planner upmixes (and only then), and what the
 // decoding hands the ring on each kind of output, then Apple's spatial mixer for headphones.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the headroom guard. A positive level trim (up to +12 dB) on a speaker could push a loud song past full
+// Vespertine: speaker groups: the headroom guard. A positive level trim (up to +12 dB) on a speaker could push a loud song past full
 // scale; the shared preamp of the group's chain is lowered so that no channel's peak (its level plus the top of its bands) can
 // rise above 0 dB. The other channels come down with it, so the balance the trims ask for holds.
 // SPDX-License-Identifier: GPL-3.0-or-later

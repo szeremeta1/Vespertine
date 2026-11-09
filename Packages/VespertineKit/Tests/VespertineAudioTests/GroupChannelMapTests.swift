@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the channel map. Every channel of every output against the speaker role on it, edited one cell at a
+// Vespertine: speaker groups: the channel map. Every channel of every output against the speaker role on it, edited one cell at a
 // time, and the quiet tone that says which channel is which. Pure; no device.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

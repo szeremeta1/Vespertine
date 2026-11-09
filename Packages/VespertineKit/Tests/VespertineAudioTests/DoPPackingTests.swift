@@ -1,5 +1,5 @@
 //
-// Vespertine — DoP packing: whole frames only, and an odd last DSD byte padded with DSD silence rather than dropped
+// Vespertine: DoP packing: whole frames only, and an odd last DSD byte padded with DSD silence rather than dropped
 // (blind-agent finding B-04, docs/VERIFICATION-BLIND.md).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

@@ -1,5 +1,5 @@
 //
-// Vespertine — the copies of one album in the library: the same album in several folders, formats and speaker layouts
+// Vespertine: the copies of one album in the library: the same album in several folders, formats and speaker layouts
 // (a 24/192 download, a 24/96 vinyl transfer and a Dolby Atmos mix; an SACD's stereo and 5.1 areas; a WAV import beside
 // the FLAC on a share), each kept whole, and its songs matched across them so any copy of any song can be found and played.
 // SPDX-License-Identifier: GPL-3.0-or-later

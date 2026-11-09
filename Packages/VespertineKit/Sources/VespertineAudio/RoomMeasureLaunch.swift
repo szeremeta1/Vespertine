@@ -1,5 +1,5 @@
 //
-// Vespertine — launch arguments that start a room measurement without a click (so it can be started remotely, with
+// Vespertine: launch arguments that start a room measurement without a click (so it can be started remotely, with
 // `open -a … --args --room-measure <calibration file>`).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

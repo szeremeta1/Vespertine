@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: what a measured skew between the DACs means for one member, and what to hold it back by.
+// Vespertine: speaker groups: what a measured skew between the DACs means for one member, and what to hold it back by.
 // The microphone hears the sum of an electronic part (the DAC's and USB path's buffering, the drift-correction resampler's delay) and an
 // acoustic part (this speaker being nearer or farther than the leader's). Only the electronic part belongs in `Member.skewMs`: the
 // speakers' distances are already equalised from the drawing (`SpeakerGeometry.alignment`), so putting the whole number in would count the

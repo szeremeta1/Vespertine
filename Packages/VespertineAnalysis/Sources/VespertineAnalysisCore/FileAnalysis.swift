@@ -1,5 +1,5 @@
 //
-// Vespertine — file analysis: accumulates decoded samples (from any decoder) and judges the result.
+// Vespertine: file analysis: accumulates decoded samples (from any decoder) and judges the result.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

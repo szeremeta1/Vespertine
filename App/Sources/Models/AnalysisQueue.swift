@@ -1,5 +1,5 @@
 //
-// Vespertine — background file analysis: one pass per file, a couple at a time, results saved to the library.
+// Vespertine: background file analysis: one pass per file, a couple at a time, results saved to the library.
 // Shares whose server runs `vespertine-analyze` get their results from the server's index instead.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

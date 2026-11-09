@@ -1,5 +1,5 @@
 //
-// Vespertine — DSD inside WavPack plays as the DSD it was made from: the bytes, DoP and the PCM conversion are
+// Vespertine: DSD inside WavPack plays as the DSD it was made from: the bytes, DoP and the PCM conversion are
 // identical to a DSDIFF file of the same DSD.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

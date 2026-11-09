@@ -1,5 +1,5 @@
 //
-// Vespertine — Room Correction: one window for everything. The output and its on/off switch, the profiles (measured
+// Vespertine: Room Correction: one window for everything. The output and its on/off switch, the profiles (measured
 // here or imported from REW, Equalizer APO or impulse-response files), a before/after graph that morphs from the
 // measurement to the predicted result, the target and range, each speaker's delay, level and filters, and the
 // measurement wizard with its Room Portrait.

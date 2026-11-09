@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: a song routed onto a group by where the speakers stand (PositionRouter and the content policies),
+// Vespertine: speaker groups: a song routed onto a group by where the speakers stand (PositionRouter and the content policies),
 // in place of the plain "channel i to output i" and the speaker-setup fold a single device gets.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

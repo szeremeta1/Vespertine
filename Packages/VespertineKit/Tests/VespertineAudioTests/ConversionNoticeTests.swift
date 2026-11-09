@@ -1,5 +1,5 @@
 //
-// Vespertine — what the UI is told was done to the music: DSD converted to PCM, channels mixed down.
+// Vespertine: what the UI is told was done to the music: DSD converted to PCM, channels mixed down.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

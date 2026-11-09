@@ -1,5 +1,5 @@
 //
-// Vespertine — the name a format is known by, for badges: "DOLBY ATMOS", "DTS-HD MASTER AUDIO", "DSD256".
+// Vespertine: the name a format is known by, for badges: "DOLBY ATMOS", "DTS-HD MASTER AUDIO", "DSD256".
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

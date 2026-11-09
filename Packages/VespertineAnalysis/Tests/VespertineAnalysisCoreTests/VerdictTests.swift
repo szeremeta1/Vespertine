@@ -1,5 +1,5 @@
 //
-// Vespertine — verdicts, on the measurements the thresholds were calibrated on and on generated audio, so they
+// Vespertine: verdicts, on the measurements the thresholds were calibrated on and on generated audio, so they
 // are checked on Linux too (the app's ForensicsTests need AVFoundation).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

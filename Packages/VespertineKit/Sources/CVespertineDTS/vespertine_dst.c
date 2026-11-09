@@ -1,5 +1,5 @@
 //
-// Vespertine — DST (Direct Stream Transfer) decoding to raw DSD, for SACD images.
+// Vespertine: DST (Direct Stream Transfer) decoding to raw DSD, for SACD images.
 //
 // Derived from FFmpeg's DST decoder (libavcodec/dstdec.c, Copyright (c) 2014 Peter Ross <pross@xvid.org>),
 // which is free software under the GNU Lesser General Public License, version 2.1 or later. This file keeps

@@ -1,5 +1,5 @@
 //
-// Vespertine — exports multichannel music for listening elsewhere:
+// Vespertine: exports multichannel music for listening elsewhere:
 //   • Spatial stereo (binaural): rendered with Apple's spatial renderer, so it sounds spatial on any
 //     AirPods or headphones, on any device and in any player (fixed; head tracking needs live rendering).
 //   • Multichannel ALAC: every channel, losslessly, with its speaker layout, for Apple devices and players.

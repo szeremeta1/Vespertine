@@ -1,5 +1,5 @@
 //
-// Vespertine — adding music: reference in place, or copy & organize into a managed folder.
+// Vespertine: adding music: reference in place, or copy & organize into a managed folder.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

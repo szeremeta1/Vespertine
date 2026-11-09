@@ -1,5 +1,5 @@
 //
-// Vespertine — DVD-Video LPCM: de-interleaving at every width, rate and channel count DVD-Video allows; navigation
+// Vespertine: DVD-Video LPCM: de-interleaving at every width, rate and channel count DVD-Video allows; navigation
 // (titles, programs, cells) and its NAV-pack fallback; presentation-time track boundaries; menus and previews left
 // out; damaged input failing clearly; VIDEO_TS lookup inside ISO 9660 and UDF images. All synthetic.
 // SPDX-License-Identifier: GPL-3.0-or-later

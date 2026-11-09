@@ -1,5 +1,5 @@
 //
-// Vespertine — the Settings › Playback switch that brings Speaker Groups (beta) into the app, like Transitions'. Its words, what
+// Vespertine: the Settings › Playback switch that brings Speaker Groups (beta) into the app, like Transitions'. Its words, what
 // Settings shows under it, and what turning it on or off does to the groups model, kept apart from the views so they can be tested.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: a real private aggregate of two virtual devices. What Core Audio holds after creating it (the
+// Vespertine: speaker groups: a real private aggregate of two virtual devices. What Core Audio holds after creating it (the
 // main sub-device, the drift flags and quality per sub-device, a stream per member), that it stays out of the device list,
 // and that it is gone after being destroyed.
 // SPDX-License-Identifier: GPL-3.0-or-later

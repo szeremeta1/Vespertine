@@ -1,5 +1,5 @@
 //
-// Vespertine — golden PCM: what today's engine hands the device, byte for byte, rendered offline with no device.
+// Vespertine: golden PCM: what today's engine hands the device, byte for byte, rendered offline with no device.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Runs a queue through the engine's own pieces in the engine's order (PlaybackEngine.begin, fill, advance):

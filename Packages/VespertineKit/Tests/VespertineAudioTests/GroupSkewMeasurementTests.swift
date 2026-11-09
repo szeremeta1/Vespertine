@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the wizard's skew step, on recordings made by hand (the references on the leader's slots, the follower's chirp
+// Vespertine: speaker groups: the wizard's skew step, on recordings made by hand (the references on the leader's slots, the follower's chirp
 // a set number of frames behind) so no device is involved.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

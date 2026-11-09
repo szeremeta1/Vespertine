@@ -1,5 +1,5 @@
 //
-// Vespertine — the work done when the app quits, kept from holding the app up.
+// Vespertine: the work done when the app quits, kept from holding the app up.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

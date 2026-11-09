@@ -1,5 +1,5 @@
 //
-// Vespertine — value types describing sources, devices and the chosen output plan.
+// Vespertine: value types describing sources, devices and the chosen output plan.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

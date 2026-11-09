@@ -1,5 +1,5 @@
 //
-// Vespertine — real-time audio primitives.
+// Vespertine: real-time audio primitives.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Everything in this module may be called from the Core Audio I/O thread.

@@ -1,5 +1,5 @@
 //
-// Vespertine — room profiles made elsewhere: REW's Equalizer APO export (per-speaker delay, level and filters) and
+// Vespertine: room profiles made elsewhere: REW's Equalizer APO export (per-speaker delay, level and filters) and
 // impulse responses (convolution filters), and a profile written back out as Equalizer APO text.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

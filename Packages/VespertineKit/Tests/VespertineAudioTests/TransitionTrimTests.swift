@@ -1,5 +1,5 @@
 //
-// Vespertine — the silence at the ends of songs, through the same render the golden tests use: what the output holds
+// Vespertine: the silence at the ends of songs, through the same render the golden tests use: what the output holds
 // between one song's last sound and the next one's first, for each style, with realistic ends (a fade-out into
 // near-silence, dither-level noise) as well as exact zeros.
 // SPDX-License-Identifier: GPL-3.0-or-later

@@ -1,5 +1,5 @@
 //
-// Vespertine — every file in a folder of format samples (VESPERTINE_FORMAT_DIR) opens, decodes, seeks and
+// Vespertine: every file in a folder of format samples (VESPERTINE_FORMAT_DIR) opens, decodes, seeks and
 // sounds like audio (not silence, not full-scale noise). Prints a table.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

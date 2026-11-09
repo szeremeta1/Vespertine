@@ -1,5 +1,5 @@
 //
-// Vespertine — when a song on a network share starts playing: after a small prefix is on disk, or only once the whole file is.
+// Vespertine: when a song on a network share starts playing: after a small prefix is on disk, or only once the whole file is.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

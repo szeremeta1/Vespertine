@@ -1,5 +1,5 @@
 //
-// Vespertine — mini player, menu bar extra, settings.
+// Vespertine: mini player, menu bar extra, settings.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

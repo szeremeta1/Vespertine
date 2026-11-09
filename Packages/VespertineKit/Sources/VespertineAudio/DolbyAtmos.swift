@@ -1,5 +1,5 @@
 //
-// Vespertine — Dolby Atmos (Dolby Digital Plus with Joint Object Coding).
+// Vespertine: Dolby Atmos (Dolby Digital Plus with Joint Object Coding).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // macOS decodes Dolby Digital Plus to its 5.1/7.1 channel bed for any app, but renders the Atmos

@@ -1,5 +1,5 @@
 //
-// Vespertine — wraps a decoder so a codec library's exception on a damaged file is an error, not a crash.
+// Vespertine: wraps a decoder so a codec library's exception on a damaged file is an error, not a crash.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

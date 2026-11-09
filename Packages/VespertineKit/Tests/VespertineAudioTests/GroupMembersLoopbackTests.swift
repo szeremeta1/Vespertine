@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: configuring two real (virtual) devices as the members of a group: exclusive access per
+// Vespertine: speaker groups: configuring two real (virtual) devices as the members of a group: exclusive access per
 // member, each member's own rate set and read back from the member, everything put back.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

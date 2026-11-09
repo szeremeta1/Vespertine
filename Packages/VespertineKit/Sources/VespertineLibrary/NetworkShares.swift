@@ -1,5 +1,5 @@
 //
-// Vespertine — network shares (SMB, NFS, WebDAV): addresses, mounting, reachability, credentials.
+// Vespertine: network shares (SMB, NFS, WebDAV): addresses, mounting, reachability, credentials.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Works the same on a LAN, over Tailscale (MagicDNS names, 100.x addresses, subnet routes)

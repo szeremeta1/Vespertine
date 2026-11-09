@@ -1,5 +1,5 @@
 //
-// Vespertine — getting the playing song's cover onto the visualizer, reliably: decoding any picture into something the
+// Vespertine: getting the playing song's cover onto the visualizer, reliably: decoding any picture into something the
 // GPU takes, and following the song (clear the old cover at once, show the new one the moment it can be had, keep asking
 // while there is none).
 // SPDX-License-Identifier: GPL-3.0-or-later

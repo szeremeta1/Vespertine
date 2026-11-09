@@ -1,5 +1,5 @@
 //
-// Vespertine — DACs known to take DoP, so DSD plays natively on them without a trip to Settings.
+// Vespertine: DACs known to take DoP, so DSD plays natively on them without a trip to Settings.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

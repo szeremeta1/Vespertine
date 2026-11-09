@@ -1,4 +1,4 @@
-// Vespertine — byte-exact, disk-backed network playback staging.
+// Vespertine: byte-exact, disk-backed network playback staging.
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import CVespertineGuard

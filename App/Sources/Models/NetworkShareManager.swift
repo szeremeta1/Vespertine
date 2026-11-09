@@ -1,5 +1,5 @@
 //
-// Vespertine — keeps network-share sources connected: connects at launch, after sleep, when the
+// Vespertine: keeps network-share sources connected: connects at launch, after sleep, when the
 // network (or a VPN such as Tailscale) comes and goes, and when a share is unmounted; owns the
 // local cache of network files.
 // SPDX-License-Identifier: GPL-3.0-or-later

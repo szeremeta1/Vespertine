@@ -1,5 +1,5 @@
 //
-// Vespertine — a DVD-Video's LPCM music as library tracks: one album per title, a track per chapter, each a sample
+// Vespertine: a DVD-Video's LPCM music as library tracks: one album per title, a track per chapter, each a sample
 // range of its VOB's LPCM run (exact, from the disc's 90 kHz time stamps). DVD-Video carries no artist or song text,
 // so tracks are named by number and the album by the disc; edits stay in the library.
 // SPDX-License-Identifier: GPL-3.0-or-later

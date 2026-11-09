@@ -1,5 +1,5 @@
 //
-// Vespertine — room measurement capture: the reference, sweep, reference stimulus, a recording session with
+// Vespertine: room measurement capture: the reference, sweep, reference stimulus, a recording session with
 // permission and failure handling, and the raw recording file. The hardware sits behind `RoomCaptureDevice`.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

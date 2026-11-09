@@ -1,5 +1,5 @@
 //
-// Vespertine — the room measurement state machine: a level check, route identification for each speaker, then a
+// Vespertine: the room measurement state machine: a level check, route identification for each speaker, then a
 // sweep per speaker and position. Every capture is judged before it counts; a failed one never advances the run,
 // and a cancelled run can be resumed. The hardware sits behind `RoomCapturing`.
 // SPDX-License-Identifier: GPL-3.0-or-later

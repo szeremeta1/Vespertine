@@ -1,5 +1,5 @@
 //
-// Vespertine — what a speaker group may play: PCM only, no passthrough, no integer mode.
+// Vespertine: what a speaker group may play: PCM only, no passthrough, no integer mode.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

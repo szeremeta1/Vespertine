@@ -1,5 +1,5 @@
 //
-// Vespertine — the Core Audio side of room measurement capture: microphone permission, an input recorder and a
+// Vespertine: the Core Audio side of room measurement capture: microphone permission, an input recorder and a
 // one-shot player on explicitly chosen devices. Prototype: exercised against hardware by hand, not by the test suite.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

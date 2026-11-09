@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups routed by where the speakers stand, through the real engine: a stereo song on a group of two virtual
+// Vespertine: speaker groups routed by where the speakers stand, through the real engine: a stereo song on a group of two virtual
 // devices, recorded back from each member's input. Front only, the leader's pair holds the file bit for bit and the follower is
 // silent; mirrored, the follower repeats the song at the chosen level; and the path says which DACs played.
 // SPDX-License-Identifier: GPL-3.0-or-later

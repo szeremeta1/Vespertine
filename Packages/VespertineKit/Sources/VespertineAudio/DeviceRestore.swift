@@ -1,5 +1,5 @@
 //
-// Vespertine — puts devices back when Vespertine quits: as they were before Vespertine changed them,
+// Vespertine: puts devices back when Vespertine quits: as they were before Vespertine changed them,
 // or at a standard format (44.1 kHz / 16-bit, 48 kHz / 24-bit), or left as they are. After a crash,
 // puts back what the volume relay changed.
 // SPDX-License-Identifier: GPL-3.0-or-later

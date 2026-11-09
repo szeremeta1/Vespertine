@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: a member that goes away while the group plays, and comes back. Who is gone decides what
+// Vespertine: speaker groups: a member that goes away while the group plays, and comes back. Who is gone decides what
 // happens: a follower lost pauses the group or lets it carry on with the rest, as the group says; the leader lost always
 // pauses (the group never carries on silently on another clock). Pure; no device.
 // SPDX-License-Identifier: GPL-3.0-or-later

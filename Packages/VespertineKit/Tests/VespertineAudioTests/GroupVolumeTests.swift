@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: volume. A group's output is a private aggregate that has no volume of its own, so the volume keys
+// Vespertine: speaker groups: volume. A group's output is a private aggregate that has no volume of its own, so the volume keys
 // relay and the "make it the Mac's sound output" step must never be pointed at it; each DAC's own volume is set once, by hand.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

@@ -1,5 +1,5 @@
 //
-// Vespertine — where the scope's screen and the meters sit in the window, shared by the shaders (in pixels) and the
+// Vespertine: where the scope's screen and the meters sit in the window, shared by the shaders (in pixels) and the
 // labels drawn over them (in points). Points, y down, as the overlay draws.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

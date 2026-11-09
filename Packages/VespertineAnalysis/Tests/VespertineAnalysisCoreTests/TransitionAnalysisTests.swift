@@ -1,5 +1,5 @@
 //
-// Vespertine — BS.1770-4 loudness against EBU Tech 3341's test signals, and the transition profile against songs
+// Vespertine: BS.1770-4 loudness against EBU Tech 3341's test signals, and the transition profile against songs
 // made to order: silences, exponential and linear fades, cold and segue ends, click tracks at known tempos.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

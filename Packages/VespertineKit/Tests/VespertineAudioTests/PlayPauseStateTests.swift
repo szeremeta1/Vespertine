@@ -1,5 +1,5 @@
 //
-// Vespertine — play and pause pressed quickly, while a song on a share is buffering, opening or being looked ahead for:
+// Vespertine: play and pause pressed quickly, while a song on a share is buffering, opening or being looked ahead for:
 // what the engine says (state, buffering, playhead) and what comes out of the output must agree, and the last press wins.
 // A rig with the real engine thread, an output that counts the sound it is given, and a share the test slows, stalls or silences.
 // SPDX-License-Identifier: GPL-3.0-or-later

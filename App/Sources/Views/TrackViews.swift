@@ -1,5 +1,5 @@
 //
-// Vespertine — track tables: album tracklists, songs, playlists, search.
+// Vespertine: track tables: album tracklists, songs, playlists, search.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

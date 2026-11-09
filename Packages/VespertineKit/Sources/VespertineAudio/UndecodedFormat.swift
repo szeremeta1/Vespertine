@@ -1,5 +1,5 @@
 //
-// Vespertine — formats Vespertine can't decode, named plainly instead of failing with a vague error: Dolby AC-4 and
+// Vespertine: formats Vespertine can't decode, named plainly instead of failing with a vague error: Dolby AC-4 and
 // MPEG-H 3D Audio (no decoder in macOS or in the bundled FFmpeg), and MQA and Auro-3D, which are ordinary PCM to
 // Vespertine and play as exactly that. Text only: these are trademarks, and Vespertine names the file's format.
 // SPDX-License-Identifier: GPL-3.0-or-later

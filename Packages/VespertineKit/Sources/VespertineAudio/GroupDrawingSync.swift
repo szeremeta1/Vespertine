@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups and room correction, on screen: the drawn profile follows the drawing, and "use the drawing" binds a
+// Vespertine: speaker groups and room correction, on screen: the drawn profile follows the drawing, and "use the drawing" binds a
 // group to it. The drawn profile is only ever made when someone asks; once there, it is kept up to date so a speaker dragged in the
 // editor is heard (and its warning checked) with the next play. Measured and imported profiles are never touched.
 // SPDX-License-Identifier: GPL-3.0-or-later

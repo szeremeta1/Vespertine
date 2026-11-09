@@ -1,5 +1,5 @@
 //
-// Vespertine — room measurement: finds the microphone and the output, runs the measurement state machine, writes
+// Vespertine: room measurement: finds the microphone and the output, runs the measurement state machine, writes
 // everything it learns to ~/Documents/Vespertine Room Measurements/<timestamp>/ (under the data directory in isolated
 // QA runs) and designs a room correction profile
 // from the result (offered for saving; nothing plays through it until it is saved and switched on).

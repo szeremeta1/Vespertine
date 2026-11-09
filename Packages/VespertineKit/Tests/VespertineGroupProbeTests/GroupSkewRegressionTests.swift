@@ -1,5 +1,5 @@
 //
-// Vespertine — group-skew against real captures. The recordings are from the hardware session of 2026-11-07 (Fosi ZD3 leader, FiiO K11
+// Vespertine: group-skew against real captures. The recordings are from the hardware session of 2026-11-07 (Fosi ZD3 leader, FiiO K11
 // follower with drift correction, UMIK-1): the follower's chirp reaches the microphone 16 dB under the leader's and its first arrival
 // can fade below a later copy 162 frames on, which lost four runs of twenty and made two others lock onto the copy.
 // SPDX-License-Identifier: GPL-3.0-or-later

@@ -1,5 +1,5 @@
 //
-// Vespertine — thin, typed access to Core Audio HAL properties.
+// Vespertine: thin, typed access to Core Audio HAL properties.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

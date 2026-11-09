@@ -1,5 +1,5 @@
 //
-// Vespertine — room profiles made elsewhere: an Equalizer APO configuration (as REW and other measurement tools
+// Vespertine: room profiles made elsewhere: an Equalizer APO configuration (as REW and other measurement tools
 // export it) with each speaker's delay, level and filters, or impulse responses (convolution filters) from WAV, AIFF,
 // CAF or FLAC files; and a profile written back out as Equalizer APO text.
 // SPDX-License-Identifier: GPL-3.0-or-later

@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups and room correction: the drawing of the room as a room profile of its own kind (delays and levels
+// Vespertine: speaker groups and room correction: the drawing of the room as a room profile of its own kind (delays and levels
 // from where the speakers stand, no filters), which one a group plays with, and the warning when a measurement and the drawing
 // disagree by more than the measurement can explain.
 // SPDX-License-Identifier: GPL-3.0-or-later

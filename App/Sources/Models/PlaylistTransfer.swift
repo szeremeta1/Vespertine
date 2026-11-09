@@ -1,5 +1,5 @@
 //
-// Vespertine — playlists to and from other players: M3U files both ways, and a library exported from Apple Music.
+// Vespertine: playlists to and from other players: M3U files both ways, and a library exported from Apple Music.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: from where the speakers and the seat stand to each speaker's distance, angle, delay and
+// Vespertine: speaker groups: from where the speakers and the seat stand to each speaker's distance, angle, delay and
 // level, so a group can be aligned without a microphone. The sound of every speaker is made to reach the seat together:
 // the farthest speaker is the reference, and each nearer one waits for it and is turned down to match. Nothing is ever
 // boosted, so the alignment can't clip. (The rule room correction already uses; a measurement replaces this.)

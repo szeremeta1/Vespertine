@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups and room correction, on screen: the drawn profile kept up to date as the drawing changes (never made
+// Vespertine: speaker groups and room correction, on screen: the drawn profile kept up to date as the drawing changes (never made
 // by itself, never touching a measured profile), and "use the drawing" for a group, which makes it if need be and binds the group.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

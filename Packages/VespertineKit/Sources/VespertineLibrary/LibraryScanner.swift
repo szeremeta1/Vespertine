@@ -1,5 +1,5 @@
 //
-// Vespertine — incremental folder scanning.
+// Vespertine: incremental folder scanning.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

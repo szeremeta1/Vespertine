@@ -1,5 +1,5 @@
 //
-// Vespertine — album grid, album detail, artists.
+// Vespertine: album grid, album detail, artists.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

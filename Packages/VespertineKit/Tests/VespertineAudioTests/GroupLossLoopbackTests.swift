@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups through the real engine when a member goes away and comes back: the engine is shown a list of
+// Vespertine: speaker groups through the real engine when a member goes away and comes back: the engine is shown a list of
 // outputs without the follower, and then with it again (the devices are virtual and stay where they are). Pause policy: the
 // group pauses, lets go of everything, and plays on from the same position when the follower returns. Carry-on policy: the song
 // goes on on the leader alone, and moves back to the group when the follower returns.

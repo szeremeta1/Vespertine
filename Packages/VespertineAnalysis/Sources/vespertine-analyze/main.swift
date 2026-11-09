@@ -1,5 +1,5 @@
 //
-// vespertine-analyze — runs Vespertine's file analysis next to the music (e.g. on the server behind a
+// vespertine-analyze: runs Vespertine's file analysis next to the music (e.g. on the server behind a
 // network share) and writes the results where Vespertine picks them up, so the Mac never has to
 // read every file over the network.
 //

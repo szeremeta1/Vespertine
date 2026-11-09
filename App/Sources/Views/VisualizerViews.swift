@@ -1,5 +1,5 @@
 //
-// Vespertine — the visualizer window: a Metal view of the music, its controls, and a window that remembers its display.
+// Vespertine: the visualizer window: a Metal view of the music, its controls, and a window that remembers its display.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

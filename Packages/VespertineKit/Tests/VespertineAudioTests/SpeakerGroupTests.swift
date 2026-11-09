@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups, the saved description: roles and their places, validation, coding, the channel map.
+// Vespertine: speaker groups, the saved description: roles and their places, validation, coding, the channel map.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the delay of each speaker in the room correction chain. macOS 27 takes a sub-device's extra output
+// Vespertine: speaker groups: the delay of each speaker in the room correction chain. macOS 27 takes a sub-device's extra output
 // latency without error and reads 0 back, so a measured skew between the DACs is held back in Vespertine instead: the members that
 // are ahead wait for the one that is latest, and a speaker's own delay trim adds to its channel. Pure; no device.
 // SPDX-License-Identifier: GPL-3.0-or-later

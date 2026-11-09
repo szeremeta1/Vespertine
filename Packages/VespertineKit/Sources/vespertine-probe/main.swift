@@ -1,5 +1,5 @@
 //
-// vespertine-probe — verifies device handling on real hardware.
+// vespertine-probe: verifies device handling on real hardware.
 //   vespertine-probe list
 //   vespertine-probe play <device-name-or-uid> <seconds> <file> [file…]   (plays files in sequence, gapless where possible)
 //   vespertine-probe watch <seconds>          prints every device's volume and the system output whenever they change

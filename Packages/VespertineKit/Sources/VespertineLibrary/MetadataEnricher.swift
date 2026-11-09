@@ -1,5 +1,5 @@
 //
-// Vespertine — fills in missing metadata: from structured file names, then MusicBrainz + Cover Art Archive.
+// Vespertine: fills in missing metadata: from structured file names, then MusicBrainz + Cover Art Archive.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

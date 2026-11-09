@@ -1,5 +1,5 @@
 //
-// Vespertine — room measurement timing: finding the acoustic reference in a recording, estimating the clock
+// Vespertine: room measurement timing: finding the acoustic reference in a recording, estimating the clock
 // mismatch between the output and the microphone input, and correcting for it before the sweep is deconvolved.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

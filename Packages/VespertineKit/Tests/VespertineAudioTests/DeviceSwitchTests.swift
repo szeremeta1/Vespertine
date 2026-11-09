@@ -1,5 +1,5 @@
 //
-// Vespertine — switching outputs while playing (diagnostic, real hardware).
+// Vespertine: switching outputs while playing (diagnostic, real hardware).
 //   VESPERTINE_SWITCH_DEVICES="FiiO|AirPods" VESPERTINE_SWITCH_FILE=<audio file> swift test --filter DeviceSwitch
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

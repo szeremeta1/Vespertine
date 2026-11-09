@@ -1,5 +1,5 @@
 //
-// Vespertine — one song in several versions on the same album (an SACD's stereo and 5.1 layers, a
+// Vespertine: one song in several versions on the same album (an SACD's stereo and 5.1 layers, a
 // Blu-ray's stereo and surround mixes) or several copies (the same file twice, two editions): which tracks
 // they are, and which one to play when the album's copies are bundled.
 // SPDX-License-Identifier: GPL-3.0-or-later

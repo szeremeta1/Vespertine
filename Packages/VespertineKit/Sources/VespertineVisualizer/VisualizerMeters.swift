@@ -1,5 +1,5 @@
 //
-// Vespertine — the analogue meters' ballistics: a VU needle (IEC 60268-17) and a BBC peak programme meter
+// Vespertine: the analogue meters' ballistics: a VU needle (IEC 60268-17) and a BBC peak programme meter
 // (IEC 60268-10 Type IIa), sample by sample.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

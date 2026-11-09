@@ -1,5 +1,5 @@
 //
-// Vespertine — room measurement timing: the acoustic reference, and the clock mismatch between output and input.
+// Vespertine: room measurement timing: the acoustic reference, and the clock mismatch between output and input.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // The measurement plays a short chirp (the reference) before the sweep and again after it. Where the two arrive in

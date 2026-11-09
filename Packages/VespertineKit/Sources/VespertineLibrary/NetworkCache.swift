@@ -1,11 +1,11 @@
 //
-// Vespertine — local copies of files on network shares.
+// Vespertine: local copies of files on network shares.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Two kinds of copies:
-//   • cached — the playing and upcoming tracks, kept up to a size limit, least recently
+//   • cached: the playing and upcoming tracks, kept up to a size limit, least recently
 //     played first out;
-//   • offline — albums the user chose to keep; never evicted, not counted against the limit.
+//   • offline: albums the user chose to keep; never evicted, not counted against the limit.
 // A copy is used only while it matches the file on the share (same path, size and date).
 //
 

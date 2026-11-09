@@ -1,5 +1,5 @@
 //
-// Vespertine — opens any supported file as a PCM decoder suited to an output plan.
+// Vespertine: opens any supported file as a PCM decoder suited to an output plan.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

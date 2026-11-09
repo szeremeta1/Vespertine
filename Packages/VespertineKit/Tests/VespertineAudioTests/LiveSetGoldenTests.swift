@@ -1,5 +1,5 @@
 //
-// Vespertine — golden PCM for Live Set: beat-matched blends placed from the library's stored beat grids, the bass swap,
+// Vespertine: golden PCM for Live Set: beat-matched blends placed from the library's stored beat grids, the bass swap,
 // and the session's fixed output rate, through the engine's own pieces into the real ring and I/O stage. Placements and
 // mixes are checked sample by sample against references computed here from the source samples and the grids (dither
 // off; the sources are quiet enough that the limiter never acts).

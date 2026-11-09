@@ -1,5 +1,5 @@
 //
-// Vespertine — the portable analysis core matches the Accelerate one, and results don't depend on
+// Vespertine: the portable analysis core matches the Accelerate one, and results don't depend on
 // how a decoder chunks the audio.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

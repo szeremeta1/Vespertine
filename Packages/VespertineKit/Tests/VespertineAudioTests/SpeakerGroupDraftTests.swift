@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: making one. Which outputs may join and why the others may not, the order and the clock leader of the
+// Vespertine: speaker groups: making one. Which outputs may join and why the others may not, the order and the clock leader of the
 // ones chosen, and the group that comes out. Pure; no device.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

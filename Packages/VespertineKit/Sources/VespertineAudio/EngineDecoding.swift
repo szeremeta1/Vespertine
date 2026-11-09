@@ -1,5 +1,5 @@
 //
-// Vespertine — one song being decoded for the output: decoder → AVAudioConverter (format, and SRC only when needed)
+// Vespertine: one song being decoded for the output: decoder → AVAudioConverter (format, and SRC only when needed)
 // → Spatial Audio bed routing → ReplayGain, a chunk at a time. The engine writes each chunk to the ring; while a
 // crossfade runs, two of these (the outgoing and the incoming song) feed one ring (TransitionMixer.swift).
 // SPDX-License-Identifier: GPL-3.0-or-later

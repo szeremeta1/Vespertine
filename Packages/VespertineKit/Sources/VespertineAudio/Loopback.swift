@@ -1,5 +1,5 @@
 //
-// Vespertine — the loopback self-test: plays test signals through a separate engine, out to a virtual loopback
+// Vespertine: the loopback self-test: plays test signals through a separate engine, out to a virtual loopback
 // device, records them back from its input and compares every sample.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

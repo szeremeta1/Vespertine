@@ -1,5 +1,5 @@
 //
-// Vespertine — the cover of the playing song is found however the library came to lack it.
+// Vespertine: the cover of the playing song is found however the library came to lack it.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — smart playlist rules match what people type.
+// Vespertine: smart playlist rules match what people type.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

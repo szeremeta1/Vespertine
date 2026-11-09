@@ -1,5 +1,5 @@
 //
-// Vespertine — Spatialize stereo: a stereo or mono song upmixed to 5.1 (L R C LFE Ls Rs), for Spatial Audio on headphones
+// Vespertine: Spatialize stereo: a stereo or mono song upmixed to 5.1 (L R C LFE Ls Rs), for Spatial Audio on headphones
 // and for multichannel speakers. Opt-in per output; the original stays the default.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

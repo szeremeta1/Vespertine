@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: from where the speakers and the seat stand to each speaker's distance, angle, delay and level.
+// Vespertine: speaker groups: from where the speakers and the seat stand to each speaker's distance, angle, delay and level.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// vespertine-library — library operations from the command line.
+// vespertine-library: library operations from the command line.
 //   vespertine-library find [folder…]        list folders with music (read-only)
 //   vespertine-library scan --library <dir> <folder>   index a folder (local or a mounted network share)
 //   vespertine-library verify-remote <folder> [n]      check the fast network tag path against direct reads

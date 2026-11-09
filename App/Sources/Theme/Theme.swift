@@ -1,5 +1,5 @@
 //
-// Vespertine — Obsidian & Brass design tokens and shared components.
+// Vespertine: Obsidian & Brass design tokens and shared components.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -75,11 +75,11 @@ extension View {
 }
 
 enum Typeface {
-    /// New York — names of things.
+    /// New York: names of things.
     static func serif(_ size: CGFloat, weight: Font.Weight = .regular) -> Font { .system(size: size, weight: weight, design: .serif) }
-    /// SF Pro — interface.
+    /// SF Pro: interface.
     static func ui(_ size: CGFloat, weight: Font.Weight = .regular) -> Font { .system(size: size, weight: weight) }
-    /// SF Mono — every number that describes the signal. Arabic, Indic and Thai script stretch into its fixed-width
+    /// SF Mono: every number that describes the signal. Arabic, Indic and Thai script stretch into its fixed-width
     /// cells, so in those languages it's SF Pro with monospaced digits.
     static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
         Locale.spacesLetters ? .system(size: size, weight: weight, design: .monospaced) : .system(size: size, weight: weight).monospacedDigit()

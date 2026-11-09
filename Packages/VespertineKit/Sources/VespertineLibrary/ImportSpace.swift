@@ -1,5 +1,5 @@
 //
-// Vespertine — how much an Import & Organize would really write, and whether the Mac can hold it.
+// Vespertine: how much an Import & Organize would really write, and whether the Mac can hold it.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction chains: headroom for boosts. A speaker's level trim can be up to +12 dB, and a band can boost; either
+// Vespertine: room correction chains: headroom for boosts. A speaker's level trim can be up to +12 dB, and a band can boost; either
 // lets a loud song rise past full scale in the chain, and a DAC clips there. The chain's preamp is shared by every channel, so
 // it is lowered by the largest boost any channel can reach (its level plus the top of its bands): every channel then peaks at 0 dB
 // or below, and the balance between channels, which the trims ask for, holds.

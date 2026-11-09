@@ -1,5 +1,5 @@
 //
-// Vespertine — the volume relay carries the sound output's volume to a device held exclusively.
+// Vespertine: the volume relay carries the sound output's volume to a device held exclusively.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

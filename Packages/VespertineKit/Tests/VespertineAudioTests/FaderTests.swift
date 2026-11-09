@@ -1,5 +1,5 @@
 //
-// Vespertine — the real-time fader (transitions' fades on play, pause, stop, skip and seek): idle it changes nothing,
+// Vespertine: the real-time fader (transitions' fades on play, pause, stop, skip and seek): idle it changes nothing,
 // a ramp has the right shape, a fade out mutes at its end and leaves the fader at full level, and native DSD,
 // passthrough and integer words are never scaled.
 // SPDX-License-Identifier: GPL-3.0-or-later

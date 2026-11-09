@@ -1,5 +1,5 @@
 //
-// Vespertine — a DVD-Video volume's VIDEO_TS files: a VIDEO_TS folder on disk, or a disc image (.iso) read in place
+// Vespertine: a DVD-Video volume's VIDEO_TS files: a VIDEO_TS folder on disk, or a disc image (.iso) read in place
 // through its UDF file system (what DVD players use) or, failing that, its ISO 9660 one. Nothing is mounted or
 // extracted. The UDF reader follows ECMA-167 / OSTA UDF 1.02 (the DVD-Video profile); the ISO 9660 reader follows
 // ECMA-119. Both are Vespertine's own.

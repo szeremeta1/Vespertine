@@ -1,5 +1,5 @@
 //
-// Vespertine — DVD-Video program streams: 2048-byte packs, NAV packs (PCI/DSI: VOBU times, VOB and cell IDs) and
+// Vespertine: DVD-Video program streams: 2048-byte packs, NAV packs (PCI/DSI: VOBU times, VOB and cell IDs) and
 // private stream 1 LPCM audio (substreams 0xA0–0xA7). The LPCM payload is de-interleaved here, including the
 // grouped byte layout of 20- and 24-bit samples. Pack and PES syntax follow ISO/IEC 13818-1; the NAV pack and
 // LPCM header layouts follow the open-source libdvdread / dvdauthor documentation. Vespertine's own reader.

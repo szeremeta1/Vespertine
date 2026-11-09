@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction as the engine plays it: per output channel a delay, a level, parametric bands and,
+// Vespertine: room correction as the engine plays it: per output channel a delay, a level, parametric bands and,
 // optionally, a measured filter (impulse response), plus a preamp shared by every channel. Built for the device's
 // actual sample rate and run on the I/O thread ahead of the equalizer (`nrt_context_set_room`, then
 // `nrt_context_set_fir`). Off unless chosen for an output; anything that changes nothing counts as off, so bit-perfect

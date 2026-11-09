@@ -1,5 +1,5 @@
 //
-// Vespertine — a CUE sheet carried inside the audio file (FLAC's CUESHEET block, or a CUESHEET tag), which splits a
+// Vespertine: a CUE sheet carried inside the audio file (FLAC's CUESHEET block, or a CUESHEET tag), which splits a
 // single-file album into tracks as a .cue file beside it does.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

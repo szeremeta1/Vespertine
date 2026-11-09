@@ -1,5 +1,5 @@
 //
-// Vespertine — the studio evidence run's per-file device configuration check (verification/studio/). For each listed
+// Vespertine: the studio evidence run's per-file device configuration check (verification/studio/). For each listed
 // file: the plan the engine would make for this output (FormatPlanner with the engine's default settings), then the
 // engine's own configuration step (exclusive access, DeviceControl.apply: rate, physical format), then what Core Audio
 // reports for the device, read here straight from the HAL. No I/O is started and no audio is played: this is the

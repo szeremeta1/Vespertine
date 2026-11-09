@@ -1,5 +1,5 @@
 //
-// Vespertine — the Dolby Digital channel modes macOS's decoder gets wrong, read from the stream's first frame.
+// Vespertine: the Dolby Digital channel modes macOS's decoder gets wrong, read from the stream's first frame.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // macOS decodes Dolby Digital (Plus) under Dolby's licence and does it right for the usual modes: mono,

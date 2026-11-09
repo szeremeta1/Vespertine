@@ -1,5 +1,5 @@
 //
-// Vespertine — what Smart Mix knows about a song's two ends: silence, fades, how loud, how it starts and stops, and
+// Vespertine: what Smart Mix knows about a song's two ends: silence, fades, how loud, how it starts and stops, and
 // its beat where the beat is steady.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

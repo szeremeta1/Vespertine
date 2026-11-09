@@ -1,5 +1,5 @@
 //
-// Vespertine — transport bar, output device picker, queue.
+// Vespertine: transport bar, output device picker, queue.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

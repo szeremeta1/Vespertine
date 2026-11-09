@@ -1,5 +1,5 @@
 //
-// Vespertine — parametric equalizer: presets, filter design, and AutoEQ / Equalizer APO import and export.
+// Vespertine: parametric equalizer: presets, filter design, and AutoEQ / Equalizer APO import and export.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // A preset is a preamp and up to NRT_EQ_MAX_SECTIONS bands. Each band becomes one biquad section designed for the

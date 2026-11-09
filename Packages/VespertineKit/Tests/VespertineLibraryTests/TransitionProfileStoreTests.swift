@@ -1,5 +1,5 @@
 //
-// Vespertine — transition profiles in the library: stored per file like analyses, made stale by a changed file or
+// Vespertine: transition profiles in the library: stored per file like analyses, made stale by a changed file or
 // analyzer, imported from a server's index; and a playlist's own transitions.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

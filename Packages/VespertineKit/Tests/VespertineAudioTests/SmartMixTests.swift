@@ -1,5 +1,5 @@
 //
-// Vespertine — Smart Mix, the pure parts: the choice for every pair of song ends, the gains with their loudness match,
+// Vespertine: Smart Mix, the pure parts: the choice for every pair of song ends, the gains with their loudness match,
 // the limiter, a playlist's own transitions, gaps and the "transitions first" policy in the settings.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

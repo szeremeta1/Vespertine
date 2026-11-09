@@ -1,6 +1,6 @@
 // Renders the Obsidian & Brass DMG window background at 1x and 2x.
 // Usage: swift scripts/make-dmg-background.swift <version> <output-dir>
-// Layout contract (points, top-left origin) — must match scripts/dmg-settings.py:
+// Layout contract (points, top-left origin), which must match scripts/dmg-settings.py:
 //   window 660×420, icons 128 pt, app centred at (180, 212), Applications at (480, 212)
 import AppKit
 import CoreText

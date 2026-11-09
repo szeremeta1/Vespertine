@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction filter design: parametric bands fitted per speaker to bring a measured in-room
+// Vespertine: room correction filter design: parametric bands fitted per speaker to bring a measured in-room
 // response toward a target curve. Offline and deterministic: the same measurement and options give the same filters.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

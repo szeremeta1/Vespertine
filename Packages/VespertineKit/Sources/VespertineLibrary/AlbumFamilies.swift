@@ -1,5 +1,5 @@
 //
-// Vespertine — one album card for its distinct releases, with every edition kept selectable.
+// Vespertine: one album card for its distinct releases, with every edition kept selectable.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

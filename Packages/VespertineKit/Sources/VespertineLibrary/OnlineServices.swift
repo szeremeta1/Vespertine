@@ -1,5 +1,5 @@
 //
-// Vespertine — MusicBrainz / Cover Art Archive lookup and ListenBrainz scrobbling.
+// Vespertine: MusicBrainz / Cover Art Archive lookup and ListenBrainz scrobbling.
 // All services are open and free; no account is needed except a ListenBrainz token for scrobbling.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

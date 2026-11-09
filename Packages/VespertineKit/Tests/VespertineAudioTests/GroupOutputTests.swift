@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: a group as an output the engine can choose. Finding its members among the connected outputs,
+// Vespertine: speaker groups: a group as an output the engine can choose. Finding its members among the connected outputs,
 // the output it presents (a UID of its own, the members' channels and common rates), when it counts as connected, and which
 // rules decide whether it is held exclusively. Pure; no device.
 // SPDX-License-Identifier: GPL-3.0-or-later

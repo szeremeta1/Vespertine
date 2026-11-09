@@ -1,5 +1,5 @@
 //
-// Vespertine — what a room correction should do, per speaker: the measurement (sixth-octave smoothed), the target at
+// Vespertine: what a room correction should do, per speaker: the measurement (sixth-octave smoothed), the target at
 // the measurement's level, and the predicted response with the filters applied. Predicted, not measured: only a new
 // measurement with correction on shows what the room really does. Also drawn as a PNG for sharing.
 // SPDX-License-Identifier: GPL-3.0-or-later

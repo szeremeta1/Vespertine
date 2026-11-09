@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: presets that lay out the speakers (Quad, ITU 5.1, Two pairs facing), and the readout of where each
+// Vespertine: speaker groups: presets that lay out the speakers (Quad, ITU 5.1, Two pairs facing), and the readout of where each
 // speaker stands and what that asks of it. Plain data; the panel is a thin layer.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

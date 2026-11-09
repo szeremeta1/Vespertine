@@ -1,5 +1,5 @@
 //
-// Vespertine — where the speaker groups live: one file in the app's data folder, written whole and kept with its previous
+// Vespertine: where the speaker groups live: one file in the app's data folder, written whole and kept with its previous
 // version, with the room profile library's safety rules.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

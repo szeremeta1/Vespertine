@@ -1,5 +1,5 @@
 //
-// Vespertine — Settings › Playback › Speaker Groups (beta): its switch (off by default) and, while it is on, the list of saved
+// Vespertine: Settings › Playback › Speaker Groups (beta): its switch (off by default) and, while it is on, the list of saved
 // groups, to copy, remove and make. The list's own words are plain English with `verbatim` text for now.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

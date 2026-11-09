@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction the way a listener goes through it, end to end and over and over: measure (through the
+// Vespertine: room correction the way a listener goes through it, end to end and over and over: measure (through the
 // measurement controller, against a simulated room with a resonance per speaker), keep it as a profile, play it
 // (through the I/O-thread code), switch outputs, export and import, quit and start again. At every step what plays
 // has to be what was measured and saved.

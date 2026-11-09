@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: polarity played. A speaker marked inverted has its signal turned over (every sample's sign flipped) in the
+// Vespertine: speaker groups: polarity played. A speaker marked inverted has its signal turned over (every sample's sign flipped) in the
 // room correction chain the I/O thread already runs, so it lands once whichever profile the group plays with.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

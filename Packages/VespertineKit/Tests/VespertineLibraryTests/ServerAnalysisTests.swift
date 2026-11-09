@@ -1,5 +1,5 @@
 //
-// Vespertine — importing analysis results a share's server published in `.vespertine/analysis.jsonl`.
+// Vespertine: importing analysis results a share's server published in `.vespertine/analysis.jsonl`.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

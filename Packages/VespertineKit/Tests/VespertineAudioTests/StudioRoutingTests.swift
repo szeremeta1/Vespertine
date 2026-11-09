@@ -1,5 +1,5 @@
 //
-// Vespertine — the studio evidence run's offline routing render (verification/studio/). Each listed file goes through
+// Vespertine: the studio evidence run's offline routing render (verification/studio/). Each listed file goes through
 // the app's own probe and decoder, and is written twice as a float CAF labelled with its channel layout, for
 // verify_chid.py --coreaudio:
 //   decoder   what the decoder delivers, in its own layout (is every channel labelled as the speaker it holds?)

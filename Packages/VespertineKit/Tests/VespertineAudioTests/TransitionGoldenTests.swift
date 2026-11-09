@@ -1,5 +1,5 @@
 //
-// Vespertine — golden PCM with transitions on: what reaches the device, through the engine's own pieces (the planner,
+// Vespertine: golden PCM with transitions on: what reaches the device, through the engine's own pieces (the planner,
 // the silence scan, Crossfade, FrameRamp, Decoding) into the real ring and I/O stage, with no device.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction, Guided and Advanced: one strength control for the whole correction, a house target
+// Vespertine: room correction, Guided and Advanced: one strength control for the whole correction, a house target
 // curve, limits and cutoffs that are held to what playback can run, hand-edited bands, per-speaker trim, and the
 // measured positions the average is made from.
 // SPDX-License-Identifier: GPL-3.0-or-later

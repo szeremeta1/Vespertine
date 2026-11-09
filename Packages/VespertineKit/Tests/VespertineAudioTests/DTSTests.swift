@@ -1,5 +1,5 @@
 //
-// Vespertine — DTS CDs / DTS-in-WAV decode to 5.1 instead of playing as full-scale noise.
+// Vespertine: DTS CDs / DTS-in-WAV decode to 5.1 instead of playing as full-scale noise.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

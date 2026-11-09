@@ -1,5 +1,5 @@
 //
-// Vespertine — Phase 0 of multi-DAC speaker groups, PR 0.1: `vespertine-probe group-info`. A read-only report on a set of
+// Vespertine: Phase 0 of multi-DAC speaker groups, PR 0.1: `vespertine-probe group-info`. A read-only report on a set of
 // output devices: clock domains, rates, reported latencies and safety offsets, who holds them exclusively, and what that
 // means for putting them in one private aggregate. It changes nothing and plays nothing.
 // SPDX-License-Identifier: GPL-3.0-or-later

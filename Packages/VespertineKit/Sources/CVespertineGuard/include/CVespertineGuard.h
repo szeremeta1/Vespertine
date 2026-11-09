@@ -1,5 +1,5 @@
 //
-// Vespertine — calls into decoders with every exception caught (C++ and Objective-C), so a damaged
+// Vespertine: calls into decoders with every exception caught (C++ and Objective-C), so a damaged
 // file becomes an error instead of terminating the app. Some codec libraries (Monkey's Audio) throw
 // C++ exceptions that their Objective-C wrappers don't catch.
 // SPDX-License-Identifier: GPL-3.0-or-later

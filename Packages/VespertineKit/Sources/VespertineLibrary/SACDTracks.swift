@@ -1,5 +1,5 @@
 //
-// Vespertine — an SACD image as library tracks: every track of its stereo area and of its multichannel area,
+// Vespertine: an SACD image as library tracks: every track of its stereo area and of its multichannel area,
 // tagged from the disc's own text. The two areas' tracks share titles and numbers, so each song lists once
 // with a stereo and a surround version (TrackVersions).
 // SPDX-License-Identifier: GPL-3.0-or-later

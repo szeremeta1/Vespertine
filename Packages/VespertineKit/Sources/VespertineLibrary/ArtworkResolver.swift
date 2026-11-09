@@ -1,5 +1,5 @@
 //
-// Vespertine — finds the cover of the song that is playing, whatever the scan left behind.
+// Vespertine: finds the cover of the song that is playing, whatever the scan left behind.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

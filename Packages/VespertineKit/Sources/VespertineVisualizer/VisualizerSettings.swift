@@ -1,5 +1,5 @@
 //
-// Vespertine — the visualizer window's choices, and where the window goes.
+// Vespertine: the visualizer window's choices, and where the window goes.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
