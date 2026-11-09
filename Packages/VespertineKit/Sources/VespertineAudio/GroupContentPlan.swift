@@ -12,12 +12,17 @@ import Foundation
 public struct GroupContentPlan: Equatable, Sendable {
     public let router: PositionRouter
     public let group: SpeakerGroup
+    /// Room render, when the group has it on: the router then places what `RoomRenderer` makes of the song, and every channel is
+    /// rendered (none is the file's own).
+    public let render: RoomRenderPlan?
 
     /// nil when there is nothing to play or nowhere to play it (see `PositionRouter`).
     public init?(source: [AudioChannelLabel], group: SpeakerGroup) {
-        guard let router = PositionRouter(source: source, group: group) else { return nil }
+        let render = RoomRender.plan(source: source, group: group)
+        guard let router = PositionRouter(source: render?.routeLabels ?? source, group: render?.group ?? group) else { return nil }
         self.router = router
         self.group = group
+        self.render = render
     }
 
     /// The aggregate's channels that carry any music.
@@ -30,6 +35,7 @@ public struct GroupContentPlan: Equatable, Sendable {
 
     /// The channels of a member that carry exactly one channel of the file at exactly 1.0: its samples, nothing added.
     public func untouchedChannels(ofMember uid: String) -> [Int] {
+        guard render == nil else { return [] }
         let untouched = Set(router.untouchedOutputs)
         return channels(ofMember: uid).filter { untouched.contains($0.aggregate) }.map(\.local)
     }

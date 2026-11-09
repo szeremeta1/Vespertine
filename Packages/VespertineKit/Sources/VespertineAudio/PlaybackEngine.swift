@@ -1541,7 +1541,9 @@ public final class PlaybackEngine: @unchecked Sendable {
             let content = plan.channels == playing.totalChannels ? GroupRouting.content(source: probed.format, group: playing) : nil
             let stage = GroupSignalPath.stage(room: chain(room, session: session), used: content?.usedOutputs ?? Array(0..<max(plan.channels, 0)),
                                               equalizer: path.equalizer != nil, digitalVolumeDB: settings.digitalVolume(for: device), replayGainDB: path.replayGainDB)
-            let group = GroupSignalPath.make(group: playing, applied: session.applied, source: probed.format, plan: plan, stage: stage, content: content)
+            var group = GroupSignalPath.make(group: playing, applied: session.applied, source: probed.format, plan: plan, stage: stage, content: content)
+            // Room render weights the bass it moves by each speaker's level in the chain.
+            if group.render != nil { group.render?.levelsDB = chain(room, session: session)?.channels.map(\.levelDB) ?? [] }
             path.group = group
             path.deviceProfile = group.deviceProfile
             path.resampledMembers = group.resampledMemberNames
@@ -1604,6 +1606,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// it is chosen now, less any members that were lost, so an edit takes effect as the settings change.
     private func chain(_ room: RoomCorrectionPlayback?, session: OutputSession) -> RoomCorrectionPlayback? {
         guard let group = currentGroup(of: session) else { return room }
+        // Room render keeps the low-frequency correction to what holds across the room (`RoomRender.roomWide`).
+        let room = group.roomRender.flatMap { settings in room.map { RoomRender.roomWide($0, settings: settings) } } ?? room
         // Which members the aggregate drift-corrects decides what is certain about their delay (the resampler's) and whether a saved
         // skew still holds (`GroupDelay.lateMs`).
         var resampled: Set<String>?

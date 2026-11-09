@@ -88,6 +88,8 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
     public var onMemberLoss: LossPolicy
     /// The room profile (from the guide's geometry, or measured) that aligns this group.
     public var alignmentProfileID: UUID?
+    /// Room render (`RoomRender`): songs played to fill the room from every speaker. nil: off, songs play as routed.
+    public var roomRender: RoomRenderSettings?
 
     public struct Member: Codable, Hashable, Sendable {
         public var deviceUID: String
@@ -206,7 +208,8 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
 
     public init(id: UUID = UUID(), name: String, members: [Member], clockLeaderUID: String, speakers: [Speaker] = [],
                 listener: Listener = Listener(), room: RoomOutline? = nil, stereoPolicy: StereoPolicy = .frontOnly,
-                lfePolicy: LFEPolicy = .drop, onMemberLoss: LossPolicy = .pause, alignmentProfileID: UUID? = nil) {
+                lfePolicy: LFEPolicy = .drop, onMemberLoss: LossPolicy = .pause, alignmentProfileID: UUID? = nil,
+                roomRender: RoomRenderSettings? = nil) {
         self.id = id
         self.name = name
         self.members = members
@@ -218,6 +221,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
         self.lfePolicy = lfePolicy
         self.onMemberLoss = onMemberLoss
         self.alignmentProfileID = alignmentProfileID
+        self.roomRender = roomRender
     }
 
     public init(from decoder: Decoder) throws {
@@ -234,6 +238,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
         lfePolicy = try c.decodeIfPresent(LFEPolicy.self, forKey: .lfePolicy) ?? .drop
         onMemberLoss = try c.decodeIfPresent(LossPolicy.self, forKey: .onMemberLoss) ?? .pause
         alignmentProfileID = try c.decodeIfPresent(UUID.self, forKey: .alignmentProfileID)
+        roomRender = try c.decodeIfPresent(RoomRenderSettings.self, forKey: .roomRender)
     }
 
     // MARK: Identity
