@@ -638,13 +638,18 @@ final class PlayerController {
     }
 
     /// Copies to the network cache give the connection to a song streaming from a share while its buffer is
-    /// under a third full (or it's holding for more), and carry on once it's two thirds full again. On a link
+    /// under a third full (or it's holding for more), and carry on once it's two thirds full again; and to a song whose copy
+    /// from the share needs the link, whatever the buffer holds (`ShareIOGate`). On a link
     /// little faster than the music, a copy running alongside took half of it and the song stalled every few
     /// seconds; the copy still finishes when the link has room to spare.
     private func yieldCacheToPlayback(_ snap: EngineSnapshot) {
         let cache = shares.cache
         let yielding: Bool
-        if snap.state != .playing || !snap.readingFromShare { yielding = false }
+        // A song's copy from a share holds the scan gate while it needs the link: it is starting, it is behind the playhead, or
+        // a read waits on it. The output buffer can be full meanwhile (a start on a prefix), or there is none yet (a song copied
+        // whole before its first note): the copies wait too.
+        if ShareIOGate.shared.isPaused { yielding = true }
+        else if snap.state != .playing || !snap.readingFromShare { yielding = false }
         else if snap.isBuffering || snap.bufferFill < 1.0 / 3 { yielding = true }
         else if snap.bufferFill > 2.0 / 3 { yielding = false }
         else { yielding = cache.yieldsToPlayback }
