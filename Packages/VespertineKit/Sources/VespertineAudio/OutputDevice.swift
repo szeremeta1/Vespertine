@@ -58,6 +58,9 @@ public struct OutputDevice: Identifiable, Sendable, Hashable {
     public let capabilities: DeviceCapabilities
     public let hasHardwareVolume: Bool
     public let isDefault: Bool
+    /// A built-in output's current data source (`kAudioDevicePropertyDataSource`): 'ispk' for the Mac's speakers, 'hdpn'
+    /// for the headphone jack. nil for other outputs, or when it couldn't be read.
+    public var builtInDataSource: UInt32? = nil
 
     public var profile: DeviceProfile { DeviceProfile.detect(self) }
 
@@ -251,7 +254,8 @@ enum DeviceQuery {
             nominalSampleRate: (try? HAL.get(id, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0,
             capabilities: capabilities(id, supportsDoP: dopEnabledUIDs.contains(uid)),
             hasHardwareVolume: !volumeElements(id).isEmpty,
-            isDefault: id == defaultID)
+            isDefault: id == defaultID,
+            builtInDataSource: transport == .builtIn ? try? HAL.get(id, .output(kAudioDevicePropertyDataSource), initial: UInt32(0)) : nil)
     }
 
     /// UIDs of the connected outputs: cheap, no formats read.

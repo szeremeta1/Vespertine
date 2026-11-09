@@ -98,7 +98,7 @@ public struct DeviceProfile: Sendable, Hashable {
                                  note: String(localized: "AirPlay streams at 44.1 kHz; the receiver controls the final format."),
                                  canBeBitPerfect: false, symbol: "airplay.audio")
         case .builtIn:
-            let speakers = name.contains("speaker")
+            let speakers = isBuiltInSpeaker(uid: device.uid, name: name, dataSource: device.builtInDataSource)
             return DeviceProfile(kind: speakers ? .speakers : .builtIn, tag: String(localized: "BUILT-IN", comment: "Short uppercase tag shown next to the device."),
                                  note: speakers ? String(localized: "macOS tunes the Mac's own speakers with processing of its own, so music can't reach them bit-perfect.") : nil,
                                  canBeBitPerfect: !speakers, symbol: speakers ? "laptopcomputer" : "headphones")
@@ -117,6 +117,21 @@ public struct DeviceProfile: Sendable, Hashable {
             return DeviceProfile(kind: .other, tag: device.transport.label.uppercased(), note: nil, canBeBitPerfect: true,
                                  symbol: "speaker.wave.2")
         }
+    }
+}
+
+extension DeviceProfile {
+    /// The data sources of a built-in output: the Mac's speakers and the headphone jack.
+    static let internalSpeakerSource: UInt32 = 0x6973_706B   // 'ispk'
+    static let headphonesSource: UInt32 = 0x6864_706E        // 'hdpn'
+
+    /// Whether a built-in output is the Mac's own speakers. macOS names them in the system's language ("Haut-parleurs
+    /// MacBook Pro", "MacBook Pro-Lautsprecher"), so the name is the last resort: the data source says it on any Mac, and
+    /// on Apple silicon the speakers are their own device, "BuiltInSpeakerDevice".
+    static func isBuiltInSpeaker(uid: String, name: String, dataSource: UInt32?) -> Bool {
+        if dataSource == internalSpeakerSource { return true }
+        if dataSource == headphonesSource { return false }
+        return uid.localizedCaseInsensitiveContains("BuiltInSpeaker") || name.lowercased().contains("speaker")
     }
 }
 
