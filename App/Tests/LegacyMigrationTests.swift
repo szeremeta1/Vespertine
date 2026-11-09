@@ -55,10 +55,10 @@ struct LegacyMigrationTests {
         let dir = try scratch()
         defer { try? FileManager.default.removeItem(at: dir) }
         let defaults = try #require(UserDefaults(suiteName: dir.appendingPathComponent("d.plist").path))
-        defaults.setVolatileDomain(["VespertineDataDirectory": dir.path], forName: UserDefaults.argumentDomain)
-        LegacyMigration.runIfNeeded(defaults: defaults, bundleID: "org.szeremeta.Vespertine")
+        let arguments: [String: Any] = ["VespertineDataDirectory": dir.path]
+        LegacyMigration.runIfNeeded(defaults: defaults, bundleID: "org.szeremeta.Vespertine", launchArguments: arguments)
         #expect(defaults.object(forKey: LegacyMigration.doneKey) == nil)
-        LegacyMigration.runIfNeeded(defaults: defaults, bundleID: "com.example.other")
+        LegacyMigration.runIfNeeded(defaults: defaults, bundleID: "com.example.other", launchArguments: arguments)
         #expect(defaults.object(forKey: LegacyMigration.doneKey) == nil)
     }
 
@@ -67,10 +67,8 @@ struct LegacyMigrationTests {
         let dir = try scratch()
         defer { try? FileManager.default.removeItem(at: dir) }
         let defaults = try #require(UserDefaults(suiteName: dir.appendingPathComponent("d.plist").path))
-        #expect(!LegacyMigration.isTestRun(defaults))
         defaults.set(dir.path, forKey: "VespertineDataDirectory")
-        #expect(!LegacyMigration.isTestRun(defaults), "a saved value is not a launch argument")
-        defaults.setVolatileDomain(["VespertineDataDirectory": dir.path], forName: UserDefaults.argumentDomain)
-        #expect(LegacyMigration.isTestRun(defaults))
+        #expect(!LegacyMigration.isTestRun([:]), "a saved value is not a launch argument")
+        #expect(LegacyMigration.isTestRun(["VespertineDataDirectory": dir.path]))
     }
 }
