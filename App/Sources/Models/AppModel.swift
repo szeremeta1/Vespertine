@@ -299,7 +299,7 @@ final class AppModel {
         devices.dopUIDs = settings.effectiveDoPUIDs
         library.setSkipsNonMusic(settings.skipNonMusic)
         devices.onDevicesChanged = { [weak self] in
-            self?.speakerGroups?.followUSBPorts(among: self?.devices.devices ?? [])
+            self?.speakerGroups?.followUSBPorts(amongUIDs: self?.devices.devices.map(\.uid) ?? [])
             self?.followChosenOutput()
             self?.player.engine.devicesChanged()
             self?.syncEngine()
@@ -309,7 +309,7 @@ final class AppModel {
         library.bundlesCopiesByDefault = settings.bundleCopies
         if settings.speakerGroupsFeature {
             speakerGroups = SpeakerGroupsSwitch.apply(true, to: settings, current: nil, onChange: groupsChanged)
-            speakerGroups?.followUSBPorts(among: devices.devices)
+            speakerGroups?.followUSBPorts(amongUIDs: devices.devices.map(\.uid))
         }
         syncEngine()
         shares.start()
@@ -491,7 +491,7 @@ final class AppModel {
             settings.selectedDevice = nil
         }
         speakerGroups = SpeakerGroupsSwitch.apply(on, to: settings, current: speakerGroups, onChange: groupsChanged)
-        if on { speakerGroups?.followUSBPorts(among: devices.devices) }
+        if on { speakerGroups?.followUSBPorts(amongUIDs: devices.devices.map(\.uid)) }
         syncEngine()
     }
 

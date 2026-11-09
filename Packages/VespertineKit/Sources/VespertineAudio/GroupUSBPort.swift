@@ -64,10 +64,13 @@ extension SpeakerGroup {
 extension SpeakerGroupBook {
     /// Rewrites every group whose members were found on other USB ports. True when a group changed (to be saved).
     @discardableResult
-    public mutating func followUSBPorts(among devices: [OutputDevice]) -> Bool {
+    public mutating func followUSBPorts(among devices: [OutputDevice]) -> Bool { followUSBPorts(amongUIDs: devices.map(\.uid)) }
+
+    @discardableResult
+    public mutating func followUSBPorts(amongUIDs uids: [String]) -> Bool {
         var changed = false
         for group in groups {
-            if let moved = group.followingUSBPorts(among: devices) { upsert(moved); changed = true }
+            if let moved = group.followingUSBPorts(amongUIDs: uids) { upsert(moved); changed = true }
         }
         return changed
     }

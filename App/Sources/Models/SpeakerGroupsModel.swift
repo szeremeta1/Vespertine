@@ -60,9 +60,9 @@ final class SpeakerGroupsModel {
 
     /// A DAC plugged into another USB port has another UID: the groups that found their members that way are saved with the new UIDs,
     /// so they stay connected (and the engine hears of it like of any change).
-    func followUSBPorts(among devices: [OutputDevice]) {
+    func followUSBPorts(amongUIDs uids: [String]) {
         var next = book
-        guard next.followUSBPorts(among: devices) else { return }
+        guard next.followUSBPorts(amongUIDs: uids) else { return }
         book = next
         persist()
     }
