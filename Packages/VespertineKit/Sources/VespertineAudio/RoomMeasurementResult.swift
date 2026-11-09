@@ -18,8 +18,10 @@ public struct RoomMeasurementResult: Sendable {
     /// `recordings` are the accepted sweeps of `session` (matched to its captures by start time). Delays are lined up
     /// from the seat (position 0), and only when every speaker there was timed against the same reference speaker;
     /// levels from every position.
+    /// `groupClock` reads how a speaker group's aggregate (the output the sweeps played on) clocks its DACs, while it is still open.
     public static func make(recordings: [RoomRecording], session: RoomSession, calibration: MicCalibration?, name: String,
-                            micSerial: String, options: RoomFilterDesignOptions = .default, createdAt: Date = Date()) throws -> RoomMeasurementResult {
+                            micSerial: String, options: RoomFilterDesignOptions = .default, createdAt: Date = Date(),
+                            groupClock: (_ output: UInt32, _ rate: Double) -> GroupClockContext? = GroupClockContext.read) throws -> RoomMeasurementResult {
         let map = session.channelMap
         let positionOf: [Date: Int] = Dictionary(session.captures.map { ($0.recordedAt, $0.position) }, uniquingKeysWith: { a, _ in a })
         var responses: [Int: [RoomSpeaker: RoomMagnitudeResponse]] = [:]
@@ -48,6 +50,9 @@ public struct RoomMeasurementResult: Sendable {
         profile.positionCurves = RoomProfile.positionCurves(from: try responses.mapValues { try $0.mapValues { try RoomCurve($0) } })
         profile.designOptions = options
         profile.source = .measured
+        if session.deviceUID.hasPrefix(SpeakerGroup.outputUIDPrefix), let first = recordings.first {
+            profile.groupClock = groupClock(first.request.outputDevice, first.request.layout.sampleRate)
+        }
         if curves.count > 1 {
             profile.alignment = RoomSpeakerAlignment.align(arrivalMs: arrivals(responses[0] ?? [:], timedBy: timedAt[0] ?? [:]), levelDB: levels)
         }

@@ -45,6 +45,9 @@ public struct RoomCorrectionPlayback: Hashable, Sendable {
     public var channels: [RoomChannelPlayback]
     /// Where the impulse responses' files are.
     public var impulseDirectory: URL
+    /// A profile measured on a speaker group: how its DACs were clocked then. Its delays already hold the delay between them
+    /// (`GroupDelay.chain`). nil for any other profile.
+    public var measuredGroupClock: GroupClockContext?
 
     public static let maxChannels = Int(NRT_ROOM_MAX_CHANNELS)
     public static let maxBandsPerChannel = Int(NRT_ROOM_MAX_SECTIONS)
@@ -77,6 +80,7 @@ public struct RoomCorrectionPlayback: Hashable, Sendable {
         }
         self.init(profileID: profile.id, name: profile.name, preampDB: profile.filters.preampDB, channels: channels,
                   impulseDirectory: impulseDirectory)
+        measuredGroupClock = profile.origin == .measured ? profile.groupClock : nil
     }
 
     /// Changes nothing: no preamp and no channel with an effect.
