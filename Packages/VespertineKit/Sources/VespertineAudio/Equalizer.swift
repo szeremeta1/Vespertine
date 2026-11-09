@@ -217,7 +217,10 @@ extension EQPreset {
     public static func parse(_ text: String, name: String) throws -> EQPreset {
         var preset = EQPreset(name: name)
         var lineNumber = 0
-        for raw in text.components(separatedBy: .newlines) {
+        // Lines end in LF, CRLF (Windows, where Equalizer APO lives) or CR; a byte order mark in front isn't part of the
+        // first line.
+        let body = text.hasPrefix("\u{FEFF}") ? String(text.dropFirst()) : text
+        for raw in body.split(omittingEmptySubsequences: false, whereSeparator: \.isNewline) {
             lineNumber += 1
             let line = raw.trimmingCharacters(in: .whitespaces)
             guard !line.isEmpty, !line.hasPrefix("#"), !line.hasPrefix(";") else { continue }
@@ -237,6 +240,16 @@ extension EQPreset {
         guard preset.bands.count <= maxBands else { throw EQImportError.tooManyFilters(preset.bands.count) }
         preset.preampDB = min(max(preset.preampDB, preampRange.lowerBound), preampRange.upperBound)
         return preset
+    }
+
+    /// `parse` for the bytes of a file: UTF-8, UTF-16 when it starts with a byte order mark (Windows editors save that as
+    /// "Unicode"), else Latin-1 (every byte is a character, so a comment in an old code page doesn't turn the file away;
+    /// the filter lines are plain ASCII).
+    public static func parse(_ data: Data, name: String) throws -> EQPreset {
+        let utf16 = data.starts(with: [0xFF, 0xFE]) || data.starts(with: [0xFE, 0xFF])
+        let text = (utf16 ? String(data: data, encoding: .utf16) : String(data: data, encoding: .utf8))
+            ?? String(decoding: data.map { UInt16($0) }, as: UTF16.self)
+        return try parse(text, name: name)
     }
 
     /// The preset as Equalizer APO / AutoEQ text, which `parse` reads back.
@@ -283,9 +296,12 @@ extension EQPreset {
             case "fc":
                 frequency = number(next); i += 2
             case "gain":
-                gain = number(next) ?? 0; i += 2
+                // Present but not a number (a typo, "nan"): the line is wrong, not a band that does nothing.
+                guard let value = number(next) else { throw EQImportError.unreadable(line: line) }
+                gain = value; i += 2
             case "q":
-                q = number(next); i += 2
+                guard let value = number(next) else { throw EQImportError.unreadable(line: line) }
+                q = value; i += 2
             case "bw" where next.lowercased() == "oct":
                 // Bandwidth in octaves: Q = 1 / (2 sinh(ln 2 / 2 · BW)).
                 if let bw = i + 2 < tokens.count ? number(tokens[i + 2]) : nil, bw > 0 { q = 1 / (2 * sinh(Foundation.log(2.0) / 2 * bw)) }
@@ -295,7 +311,7 @@ extension EQPreset {
             }
         }
         guard let frequency, frequency > 0 else { throw EQImportError.unreadable(line: line) }
-        return EQBand(kind: kind, frequency: frequency, gainDB: min(max(gain, EQBand.gainRange.lowerBound), EQBand.gainRange.upperBound),
+        return EQBand(kind: kind, frequency: min(max(frequency, EQBand.frequencyRange.lowerBound), EQBand.frequencyRange.upperBound), gainDB: min(max(gain, EQBand.gainRange.lowerBound), EQBand.gainRange.upperBound),
                       q: min(max(q ?? 0.707, EQBand.qRange.lowerBound), EQBand.qRange.upperBound), enabled: enabled)
     }
 
