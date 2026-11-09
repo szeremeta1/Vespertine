@@ -118,6 +118,18 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     /// up gets `CancellationError` at once (the open itself finishes, or fails, in the background and is closed).
     /// For tests: the share's files, read through this instead of a mount.
     var readerFactory: (@Sendable (URL) -> (any PlaybackCacheReader)?)?
+    /// For tests: the bytes free on the cache's volume, instead of asking the file system.
+    var freeSpace: (@Sendable () -> Int64?)?
+
+    /// Bytes free for this app's own files on the volume holding `url`, counting what macOS would free for it (purgeable
+    /// space); the plain free size when the volume does not say. (`NetworkCache.freeBytes` in the library is the same.)
+    static func freeBytes(at url: URL) -> Int64? {
+        var fresh = url
+        fresh.removeAllCachedResourceValues()
+        if let important = try? fresh.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]).volumeAvailableCapacityForImportantUsage,
+           important > 0 { return important }
+        return (try? FileManager.default.attributesOfFileSystem(forPath: url.path)[.systemFreeSize] as? NSNumber)?.int64Value
+    }
 
     func entry(key: String, url: URL, reader: (any PlaybackCacheReader)? = nil, foreground: Bool = true,
                cancelled: () -> Bool = { false }) throws -> Entry {
@@ -135,9 +147,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                 return existing
             }
             guard source.size >= 0, source.size <= budget - reservedBytes else { throw Failure.budgetExceeded }
-            if let attributes = try? FileManager.default.attributesOfFileSystem(forPath: directory.path),
-               let free = attributes[.systemFreeSize] as? NSNumber,
-               source.size > max(0, free.int64Value - (64 << 20)) { throw CocoaError(.fileWriteOutOfSpace) }
+            // The other copies' files are sparse: what they have yet to write takes no space now, but will.
+            let unwritten = entries.values.compactMap(\.value).reduce(Int64(0)) { $0 + max(0, $1.size - $1.copiedBytes) }
+            if let free = freeSpace?() ?? Self.freeBytes(at: directory),
+               source.size + unwritten > max(0, free - (64 << 20)) { throw CocoaError(.fileWriteOutOfSpace) }
             let path = directory.appendingPathComponent(UUID().uuidString).appendingPathExtension(url.pathExtension)
             let size = source.size
             let storage = try Storage(url: path, reader: source, chunk: chunk, session: session, gate: gate, foreground: foreground,
