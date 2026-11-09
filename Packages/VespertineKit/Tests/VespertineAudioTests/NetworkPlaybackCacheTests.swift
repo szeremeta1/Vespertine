@@ -113,6 +113,30 @@ struct NetworkPlaybackCacheTests {
         #expect(!gate.isPaused, "scans may go again")
     }
 
+    @Test("A song paused half copied over a sleep of the Mac does not fail on waking: the silence counts from when a read waits")
+    func sleepDoesNotCountAsSilence() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let share = SlowShare(count: 65536); share.stall(true)
+        defer { share.stall(false) }
+        let now = Locked(TimeInterval(0))
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096, noProgressLimit: 120, clock: { now.withLock { $0 } })
+        let entry = try cache.entry(key: "paused", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
+        // Paused, nothing reading; the clock jumps by eight hours (a clock that runs through sleep would).
+        now.withLock { $0 += 8 * 3600 }
+        let result = Locked<Result<Data, Error>?>(nil)
+        let finished = DispatchSemaphore(value: 0)
+        Thread {
+            result.withLock { $0 = Result { try entry.read(at: 0, count: 4096) } }
+            finished.signal()
+        }.start()
+        // The share answers once the Mac is awake and the read has asked (a hang detector, not a latency bound).
+        for _ in 0..<500 where !entry.isWaiting { Thread.sleep(forTimeInterval: 0.002) }
+        #expect(finished.wait(timeout: .now() + 0.2) == .timedOut, "the read waits for the share instead of failing at once")
+        share.stall(false)
+        #expect(finished.wait(timeout: .now() + 30) == .success)
+        #expect(try result.withLock { $0 }?.get() == share.bytes[0..<4096])
+    }
+
     @Test("A share that answers every read with a temporary error fails the song after the limit instead of retrying for ever")
     func timeoutsGiveUp() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }

@@ -49,6 +49,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     /// reconnects (SMB does so within seconds) carries on well inside it; one that is gone for good no longer leaves the song
     /// buffering for ever with the scans of every share held back.
     static let defaultNoProgressLimit: TimeInterval = 120
+
+    /// Seconds the Mac has been awake: a sleep is not silence from the share (a wall clock would count it, and a song paused
+    /// over night would fail the moment the Mac woke).
+    static let awakeSeconds: @Sendable () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }
     private final class WeakEntry { weak var value: Entry?; init(_ value: Entry) { self.value = value } }
     private static let registry = Locked([String: WeakEntry]())
     private static let delivered = Locked(Date.distantPast)
@@ -84,6 +88,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     private let budget: Int64
     private let chunk: Int
     private let noProgressLimit: TimeInterval
+    private let clock: @Sendable () -> TimeInterval
     /// Library scans of network shares wait on this while a song is being read from one.
     let gate: ShareIOGate
     private let lock = NSLock()
@@ -96,7 +101,9 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     var reservedBytes: Int64 { reserved.withLock { $0 } }
 
     init(directory: URL, budget: Int64 = 8 << 30, chunk: Int = 1 << 20, gate: ShareIOGate = .shared,
-         noProgressLimit: TimeInterval = NetworkPlaybackCache.defaultNoProgressLimit) {
+         noProgressLimit: TimeInterval = NetworkPlaybackCache.defaultNoProgressLimit,
+         clock: @escaping @Sendable () -> TimeInterval = NetworkPlaybackCache.awakeSeconds) {
+        self.clock = clock
         self.gate = gate
         self.noProgressLimit = noProgressLimit
         session = try? Session(root: directory)
@@ -134,7 +141,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             let path = directory.appendingPathComponent(UUID().uuidString).appendingPathExtension(url.pathExtension)
             let size = source.size
             let storage = try Storage(url: path, reader: source, chunk: chunk, session: session, gate: gate, foreground: foreground,
-                                      reopen: reopen, noProgressLimit: noProgressLimit) { [weak self] in
+                                      reopen: reopen, noProgressLimit: noProgressLimit, clock: clock) { [weak self] in
                 guard let self else { return }
                 self.reserved.withLock { $0 -= size }
             }
@@ -347,8 +354,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var reader: any PlaybackCacheReader
         let reopen: Reopen?
         let noProgressLimit: TimeInterval
-        /// When bytes last arrived from the share (or the copy started). Under `condition`.
-        var lastProgress = Date()
+        /// On `clock`: when bytes last arrived from the share, the copy started, or a read began waiting with none waiting before.
+        /// Under `condition`.
+        var lastProgress: TimeInterval
+        let clock: @Sendable () -> TimeInterval
         let file: FileHandle
         let size: Int64
         let chunk: Int
@@ -376,7 +385,9 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         init(url: URL, reader: any PlaybackCacheReader, chunk: Int, session: Session?, gate: ShareIOGate, foreground: Bool,
              reopen: Reopen? = nil,
              noProgressLimit: TimeInterval = NetworkPlaybackCache.defaultNoProgressLimit,
+             clock: @escaping @Sendable () -> TimeInterval = NetworkPlaybackCache.awakeSeconds,
              release: @escaping @Sendable () -> Void) throws {
+            self.clock = clock; lastProgress = clock()
             self.url = url; self.reader = reader; self.size = reader.size; self.chunk = chunk; self.release = release
             self.reopen = reopen; self.noProgressLimit = noProgressLimit
             self.session = session; self.gate = gate; self.foreground = foreground
@@ -417,7 +428,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         /// Nothing has arrived for `noProgressLimit`: the song fails (every waiting read with it) and stops holding scans back.
         /// Called with the condition lock held; true when it gave up.
         private func giveUpIfSilent() -> Bool {
-            guard error == nil, Date().timeIntervalSince(lastProgress) >= noProgressLimit else { return false }
+            guard error == nil, clock() - lastProgress >= noProgressLimit else { return false }
             error = Failure.notAnswering
             condition.broadcast()
             return true
@@ -471,6 +482,8 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             let range = Int(offset / Int64(chunk))..<Int((offset + count - 1) / Int64(chunk) + 1)
             condition.lock()
             if range.allSatisfy({ ready.contains($0) }) { condition.unlock(); return }
+            // A read that starts waiting counts the silence from now: time with nothing asked of the share (paused) is not.
+            if waiters == 0 { lastProgress = max(lastProgress, clock()) }
             waiters += 1
             requests.append(range)
             condition.unlock()
@@ -515,7 +528,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                             let part = try readPart(at: offset + Int64(data.count), count: length - data.count)
                             guard !part.isEmpty, part.count <= length - data.count else { throw Failure.unexpectedEOF }
                             NetworkPlaybackCache.delivered.withLock { $0 = .now }
-                            condition.withLock { lastProgress = Date() }
+                            condition.withLock { lastProgress = clock() }
                             data.append(part)
                         }
                         try file.seek(toOffset: UInt64(offset))
