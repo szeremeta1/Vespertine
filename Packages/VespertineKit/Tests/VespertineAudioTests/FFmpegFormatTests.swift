@@ -127,20 +127,55 @@ struct FFmpegFormatTests {
         #expect(concealed > 0, "\(name): \(audio[0].count) of \(whole[0].count) frames, \(concealed) concealed")
     }
 
-    @Test("A stream whose channel count changes partway plays its first part, then reports an error instead of just ending")
-    func channelCountChange() throws {
-        let (probed, decoder) = try open("dts-channel-change.dts")
-        #expect(probed.format.channels == 2)
+    /// The frames of dts-channel-change.dts (1,024 bytes each): ten stereo, then ten 5.1.
+    private func channelChangeFrames() throws -> (stereo: [[UInt8]], surround: [[UInt8]]) {
+        let bytes = [UInt8](try Data(contentsOf: fixture("dts-channel-change.dts")))
+        let frames = stride(from: 0, to: bytes.count, by: 1024).map { Array(bytes[$0..<$0 + 1024]) }
+        #expect(frames.count == 20 && frames.allSatisfy { $0.starts(with: [0x7F, 0xFE, 0x80, 0x01]) })
+        return (Array(frames[..<10]), Array(frames[10...]))
+    }
+
+    /// Writes `frames` as a raw DTS file and opens it as playback does; then decodes until the end or an error.
+    private func play(_ frames: [[UInt8]]) throws -> (format: SourceFormat, frames: Int, error: Error?, concealed: Int) {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("dts-\(UUID())")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("stream.dts")
+        try Data(frames.flatMap { $0 }).write(to: url)
+        let probed = try SourceOpener.probe(url)
+        let plan = OutputPlan(mode: .pcm, deviceSampleRate: probed.format.sampleRate, decodedSampleRate: probed.format.sampleRate,
+                              physicalBitDepth: 32, channels: probed.format.channels, dsdConvertedToPCM: false, reason: "")
+        let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: PlayableItem(url: url))
         let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 1024)!
-        var frames = 0
-        #expect(throws: DTSError.self) {
+        var count = 0
+        var failure: Error?
+        do {
             while true {
                 try decoder.decode(into: buffer, length: 1024)
                 if buffer.frameLength == 0 { break }
-                frames += Int(buffer.frameLength)
+                count += Int(buffer.frameLength)
             }
-        }
-        #expect(frames > 3_000, "the stereo part plays first (\(frames) frames)")
+        } catch { failure = error }
+        return (probed.format, count, failure, (decoder as? ConcealingDecoder)?.concealedFrames ?? 0)
+    }
+
+    @Test("A stream whose channel count changes for good plays its first part, then reports an error instead of just ending")
+    func channelCountChange() throws {
+        let (stereo, surround) = try channelChangeFrames()
+        // Forty 5.1 frames: more than a run of damage, so the change has stuck.
+        let result = try play(stereo + surround + surround + surround + surround)
+        #expect(result.format.channels == 2)
+        #expect(result.error is DTSError)
+        #expect(result.frames > 3_000, "the stereo part plays first (\(result.frames) frames)")
+    }
+
+    @Test("One frame with another channel count in the middle is skipped and counted; the stream plays on to its end")
+    func channelCountBlip() throws {
+        let (stereo, surround) = try channelChangeFrames()
+        let result = try play(stereo + [surround[0]] + stereo)
+        #expect(result.error == nil)
+        #expect(result.concealed > 0)
+        #expect(result.frames >= 19 * 512, "\(result.frames) frames")
     }
 
     @Test("Matroska tags are read")

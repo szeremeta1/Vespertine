@@ -28,7 +28,7 @@ struct NFFDecoder {
     int64_t length, position;
     int64_t discard;          // frames to drop after a seek
     bool eof, flushed;
-    bool layoutChanged;       // the stream's channel count changed: what follows can't play as this stream
+    bool layoutChanged;       // the stream's channel count changed for good: what follows can't play as this stream
     int badFrames;            // damaged frames in a row (skipped, up to NFF_MAX_BAD_FRAMES)
     int64_t concealed;        // damaged frames skipped since opening (never reset: the signal path reports them)
     char profile[64];
@@ -212,8 +212,7 @@ const char *nff_tag(const NFFDecoder *d, const char *key) {
 
 static bool append(NFFDecoder *d, const AVFrame *f) {
     int ch = d->channels, n = f->nb_samples;
-    if (n > 0 && f->ch_layout.nb_channels != ch) { d->layoutChanged = true; return true; }
-    if (n <= 0) return true;
+    if (f->ch_layout.nb_channels != ch || n <= 0) return true;
     int drop = 0;
     if (d->discard > 0) { drop = d->discard < n ? (int)d->discard : n; d->discard -= drop; }
     int keep = n - drop;
@@ -263,15 +262,30 @@ static void send(NFFDecoder *d, const AVPacket *p) {
 
 int64_t nff_concealed(const NFFDecoder *d) { return d->concealed; }
 
+/// Whether a decoded frame has a channel count other than the stream's. One such frame (a damaged DTS-HD extension
+/// that falls back to the core, a broadcast that changes for a moment) is skipped and counted as damage; only a run of
+/// more than NFF_MAX_BAD_FRAMES means the stream has changed for good.
+static bool mismatched(const NFFDecoder *d, const AVFrame *f) { return f->nb_samples > 0 && f->ch_layout.nb_channels != d->channels; }
+
+/// Skips a frame with the other channel count; false (and the stream marked changed) once the change has stuck.
+static bool skip_mismatched(NFFDecoder *d) {
+    av_frame_unref(d->frame);
+    if (skip_bad_frame(d)) return true;
+    d->layoutChanged = true;
+    return false;
+}
+
 /// Decodes more into the FIFO. Returns false at the end (or on a fatal error).
 static bool pump(NFFDecoder *d) {
     for (;;) {
         int r = avcodec_receive_frame(d->ctx, d->frame);
         if (r == AVERROR_INVALIDDATA) { if (!skip_bad_frame(d)) return false; continue; }
         if (r == 0) {
+            // A new channel count can't be handed over in the same buffers: skipped, and once it sticks, the end
+            // (nff_read then reports it).
+            if (mismatched(d, d->frame)) { if (!skip_mismatched(d)) return false; continue; }
             d->badFrames = 0; bool ok = append(d, d->frame); av_frame_unref(d->frame);
-            // A new channel count can't be handed over in the same buffers: stop (nff_read then reports it).
-            if (!ok || d->layoutChanged) return false;
+            if (!ok) return false;
             if (d->fifoFrames > 0) return true;
             continue;
         }
@@ -344,6 +358,7 @@ bool nff_seek(NFFDecoder *d, int64_t target) {
         int r = avcodec_receive_frame(d->ctx, d->frame);
         if (r == AVERROR_INVALIDDATA) { if (!skip_bad_frame(d)) return false; continue; }
         if (r == 0) {
+            if (mismatched(d, d->frame)) { if (!skip_mismatched(d)) return false; continue; }
             d->badFrames = 0;
             int64_t pts = d->frame->best_effort_timestamp;
             start = pts == AV_NOPTS_VALUE ? 0 : av_rescale_q(pts, st->time_base, (AVRational){1, d->rate});
