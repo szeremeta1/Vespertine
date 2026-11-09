@@ -54,8 +54,10 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 Two or more USB DACs, played as one multichannel system: a Fosi ZD3 and a FiiO K11 as the front and back pairs of a quad, for example. Vespertine builds a private Core Audio aggregate of your DACs that exists only inside Vespertine (other apps can't see it or play into it) and removes it when playback stops. One DAC, the clock leader, sets the time; every other DAC is resampled by a few millionths to follow it, so the speakers stay together without the image drifting.
 
 <p align="center">
-  <img src="docs/screenshots/speaker-groups-setup.png" width="800" alt="PLACEHOLDER">
+  <img src="docs/screenshots/speaker-groups-setup.png" width="800" alt="Vespertine's Speaker Group editor for a quad named Quad (virtual devices): a top-down drawing of the room with four speakers (front left and right, back left and right) around the listening seat, and a table with each speaker's distance, angle, wait, level, level trim and delay trim">
 </p>
+
+<sub>The screenshots here were taken on a Mac with two virtual audio devices (Vespertine Loopback and BlackHole 2ch) standing in for two stereo DACs. They show the screens, not a measurement of real DACs.</sub>
 
 - **Channel map.** Every channel of every DAC is assigned to a speaker (front left, centre, back right…). An **Identify** button plays three quiet bursts of pink noise (-30 dBFS) on that one channel of that one DAC, so you can check the wiring, and each channel has an **Inverted** box. Presets lay out a Quad, an ITU 5.1 room or two pairs facing each other. Up to 16 output channels in total.
 - **Your room, drawn.** Drag the speakers and your seat on a top-down drawing; each speaker's distance, angle, delay and level are worked out from it, so every speaker reaches the seat together. "Use the Drawing" turns that into a room-correction profile (delays and levels, no microphone needed), or measure the group with a microphone and the wizard also times each follower DAC against the leader.
@@ -63,6 +65,18 @@ Two or more USB DACs, played as one multichannel system: a Fosi ZD3 and a FiiO K
 - **Surround placed by where your speakers stand.** A song's channels go to the speakers by position: a channel with a speaker of its own plays there untouched; one between two speakers is panned between them with equal power (halfway is -3 dB each, as in ITU-R BS.775); one outside every pair goes to the nearest speaker at -3 dB. Stereo, 5.1 and 7.1 files, and the 5.1/7.1 channel bed of a Dolby Digital Plus Atmos file, are all routed this way. The **LFE is dropped by default** where there is no subwoofer; you can instead send it to every speaker at a level, or to one speaker. Stereo on a quad plays the front pair only by default, or mirrors to the back at a level, or gives each pair its own stereo, or uses every speaker.
 - **A signal path that stays honest.** The group is labelled BIT-PERFECT only when every channel the song uses lands on a DAC that is not resampled (the leader, or DACs sharing a hardware clock) and nothing changes the samples: no mixing, trim, filter or digital volume. Otherwise the signal path says what changed. A drift-corrected follower is always slightly altered; on virtual devices it measured 103 to 131 dB signal to noise, far below the noise of a real DAC and amplifier, but it is not bit-perfect.
 - **If a DAC goes away,** the group either fades and pauses and names the DAC, or carries on with the DACs that are left (after a short mute) and folds the music onto them. It never carries on silently on a new clock in the middle of a song.
+
+**The signal path with a group playing.** A 5.1 test file folded into the quad by speaker position: the leader's pair is bit-perfect and says it is the clock leader; the other pair is marked resampled, and the group as a whole is not labelled BIT-PERFECT.
+
+<p align="center">
+  <img src="docs/screenshots/speaker-groups-signal-path.png" width="800" alt="Vespertine playing a 5.1 test signal through the Quad (virtual devices) group: the signal path lists the FLAC source, the decoder, the native 48 kHz rate, a 5.1 to Quad downmix, unity volume, the group at 32-bit float, Vespertine Loopback as bit-perfect for the front left and right and the clock leader, and BlackHole 2ch as resampled for the back left and right, followed by the channel meters">
+</p>
+
+**The channel map.** Every channel of every output against the speaker on it, with an Identify button and an Inverted box on each.
+
+<p align="center">
+  <img src="docs/screenshots/speaker-groups-channel-map.png" width="800" alt="The Speaker Group editor's channel map: Vespertine Loopback channels 1 and 2 are front left and front right, BlackHole 2ch channels 1 and 2 are back left and back right, each with an Inverted box and an Identify button; below are the DACs' own volume sliders and the stereo, subwoofer and lost-output choices">
+</p>
 
 **Limits, plainly:**
 
