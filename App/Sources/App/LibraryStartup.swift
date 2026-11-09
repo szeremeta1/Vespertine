@@ -1,6 +1,7 @@
 import AppKit
 import Observation
 import SwiftUI
+import VespertineLibrary
 
 @Observable @MainActor
 final class LibraryStartup {
@@ -22,8 +23,23 @@ final class LibraryStartup {
 
     func open(at directory: URL? = nil) {
         if let directory { selectedDirectory = directory }
-        do { model = try AppModel(dataDirectory: selectedDirectory); error = nil }
-        catch { self.error = error.localizedDescription }
+        do {
+            let opened = try AppModel(dataDirectory: selectedDirectory)
+            model = opened
+            error = nil
+            if let recovery = opened.library.database.recovery { Self.tellLibraryWasDamaged(recovery) }
+        } catch { self.error = error.localizedDescription }
+    }
+
+    /// The library file couldn't be read, so a new empty one was started and the old file kept beside it
+    /// (`LibraryDatabase.init(url:)`). Said once, so nobody wonders where their library went.
+    private static func tellLibraryWasDamaged(_ recovery: LibraryDatabase.Recovery) {
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Your library file was damaged")
+        alert.informativeText = String(localized: "Vespertine started a new, empty library. The damaged file was kept in the same folder as “\(recovery.backup.lastPathComponent)”. Your music files weren’t touched. Add your music folders again to rebuild the library.")
+        alert.addButton(withTitle: String(localized: "OK"))
+        alert.addButton(withTitle: String(localized: "Show in Finder"))
+        if alert.runModal() == .alertSecondButtonReturn { NSWorkspace.shared.activateFileViewerSelecting([recovery.backup]) }
     }
 
     func chooseLibrary() {

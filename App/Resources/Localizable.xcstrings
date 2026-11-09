@@ -135785,6 +135785,542 @@
         }
       }
     },
+    "Your library file was damaged": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የቤተ-መጻሕፍት ፋይልዎ ተበላሽቷል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ملف المكتبة تالف"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনার লাইব্রেরি ফাইলটি ক্ষতিগ্রস্ত হয়েছিল"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soubor knihovny byl poškozen"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Din biblioteksfil var beskadiget"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Datei deiner Mediathek war beschädigt"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το αρχείο της βιβλιοθήκης σας ήταν κατεστραμμένο"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El archivo de tu biblioteca estaba dañado"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فایل کتابخانهٔ شما آسیب دیده بود"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kirjastotiedostosi oli vioittunut"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nasira ang file ng iyong library"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier de votre bibliothèque était endommagé"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમારી લાઇબ્રેરી ફાઇલ ખરાબ થઈ ગઈ હતી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fayil ɗin laburarenku ya lalace"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קובץ הספרייה שלך ניזוק"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आपकी लाइब्रेरी फ़ाइल क्षतिग्रस्त थी"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A könyvtárfájl megsérült"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File perpustakaan Anda rusak"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il file della libreria era danneggiato"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライブラリファイルが破損していました"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮ್ಮ ಲೈಬ್ರರಿ ಫೈಲ್ ಹಾನಿಗೊಂಡಿತ್ತು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보관함 파일이 손상되었습니다"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങളുടെ ലൈബ്രറി ഫയൽ കേടായിരുന്നു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुमची लायब्ररी फाइल खराब झाली होती"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fail pustaka anda rosak"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotekfilen din var skadet"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het bestand van je bibliotheek was beschadigd"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਫ਼ਾਈਲ ਖ਼ਰਾਬ ਸੀ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plik biblioteki był uszkodzony"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O arquivo da sua biblioteca estava danificado"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O ficheiro da sua biblioteca estava danificado"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fișierul bibliotecii dvs. era deteriorat"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Din biblioteksfil var skadad"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Faili ya maktaba yako iliharibika"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "உங்கள் லைப்ரரி கோப்பு சேதமடைந்திருந்தது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీ లైబ్రరీ ఫైల్ పాడైపోయింది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไฟล์คลังของคุณเสียหาย"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arşiv dosyanız hasarlıydı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Файл медіатеки пошкоджено"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کی لائبریری فائل خراب ہو گئی تھی"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tệp thư viện của bạn đã bị hỏng"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資料庫檔案已損毀"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "资料库文件已损坏"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資料庫檔案已損毀"
+          }
+        }
+      }
+    },
+    "Vespertine started a new, empty library. The damaged file was kept in the same folder as “%@”. Your music files weren’t touched. Add your music folders again to rebuild the library.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine አዲስ ባዶ ቤተ-መጻሕፍት ጀምሯል። የተበላሸው ፋይል በተመሳሳይ አቃፊ ውስጥ “%@” ተብሎ ተቀምጧል። የሙዚቃ ፋይሎችዎ አልተነኩም። ቤተ-መጻሕፍቱን እንደገና ለመገንባት የሙዚቃ አቃፊዎችዎን እንደገና ያክሉ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بدأ Vespertine مكتبة جديدة فارغة. تم الاحتفاظ بالملف التالف في المجلد نفسه باسم “%@”. لم تتأثر ملفات الموسيقى لديك. أضف مجلدات الموسيقى مرة أخرى لإعادة بناء المكتبة."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine একটি নতুন, খালি লাইব্রেরি শুরু করেছে। ক্ষতিগ্রস্ত ফাইলটি একই ফোল্ডারে “%@” নামে রাখা হয়েছে। আপনার মিউজিক ফাইলগুলিতে হাত দেওয়া হয়নি। লাইব্রেরি আবার তৈরি করতে আপনার মিউজিক ফোল্ডারগুলি আবার যোগ করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine vytvořil novou, prázdnou knihovnu. Poškozený soubor zůstal ve stejné složce pod názvem „%@“. Vaše hudební soubory zůstaly nedotčené. Pro obnovení knihovny znovu přidejte své hudební složky."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine har startet et nyt, tomt bibliotek. Den beskadigede fil er gemt i samme mappe som “%@”. Dine musikfiler er ikke blevet rørt. Tilføj dine musikmapper igen for at genopbygge biblioteket."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine hat eine neue, leere Mediathek angelegt. Die beschädigte Datei wurde im selben Ordner als „%@“ aufbewahrt. Deine Musikdateien wurden nicht angetastet. Füge deine Musikordner erneut hinzu, um die Mediathek wieder aufzubauen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Vespertine ξεκίνησε μια νέα, κενή βιβλιοθήκη. Το κατεστραμμένο αρχείο διατηρήθηκε στον ίδιο φάκελο με το όνομα «%@». Τα αρχεία μουσικής σας δεν επηρεάστηκαν. Προσθέστε ξανά τους φακέλους μουσικής σας για να ξαναχτίσετε τη βιβλιοθήκη."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ha creado una biblioteca nueva y vacía. El archivo dañado se ha conservado en la misma carpeta como «%@». Tus archivos de música no se han tocado. Vuelve a añadir tus carpetas de música para reconstruir la biblioteca."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine یک کتابخانهٔ جدید و خالی ایجاد کرد. فایل آسیب‌دیده با نام «%@» در همان پوشه نگه داشته شد. فایل‌های موسیقی شما دست‌نخورده ماندند. برای بازسازی کتابخانه، پوشه‌های موسیقی خود را دوباره اضافه کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine aloitti uuden, tyhjän kirjaston. Vioittunut tiedosto säilytettiin samassa kansiossa nimellä ”%@”. Musiikkitiedostoihisi ei koskettu. Lisää musiikkikansiosi uudelleen rakentaaksesi kirjaston."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nagsimula ang Vespertine ng bago at walang laman na library. Itinago ang nasirang file sa parehong folder bilang “%@”. Hindi ginalaw ang iyong mga music file. Idagdag muli ang iyong mga music folder para muling buuin ang library."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine a créé une nouvelle bibliothèque vide. Le fichier endommagé a été conservé dans le même dossier sous le nom « %@ ». Vos fichiers de musique n’ont pas été touchés. Ajoutez à nouveau vos dossiers de musique pour reconstruire la bibliothèque."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine એ નવી, ખાલી લાઇબ્રેરી શરૂ કરી છે. ખરાબ થયેલી ફાઇલ એ જ ફોલ્ડરમાં “%@” તરીકે રાખવામાં આવી છે. તમારી મ્યુઝિક ફાઇલોને અડકવામાં આવ્યું નથી. લાઇબ્રેરી ફરીથી બનાવવા માટે તમારા મ્યુઝિક ફોલ્ડર ફરીથી ઉમેરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ya fara sabon laburare wanda babu komai a ciki. An ajiye fayil ɗin da ya lalace a cikin folda ɗaya da suna “%@”. Ba a taɓa fayilolin kiɗanku ba. Sake ƙara folda-foldan kiɗanku don sake gina laburaren."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine יצר ספרייה חדשה וריקה. הקובץ הפגום נשמר באותה תיקייה בשם ”%@“. קובצי המוזיקה שלך לא שונו. הוסף שוב את תיקיות המוזיקה שלך כדי לבנות מחדש את הספרייה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ने एक नई, खाली लाइब्रेरी शुरू की है। क्षतिग्रस्त फ़ाइल उसी फ़ोल्डर में “%@” नाम से रखी गई है। आपकी संगीत फ़ाइलों को छुआ नहीं गया। लाइब्रेरी दोबारा बनाने के लिए अपने संगीत फ़ोल्डर फिर से जोड़ें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Vespertine új, üres könyvtárat hozott létre. A sérült fájlt ugyanabban a mappában őriztük meg „%@” néven. A zenefájlokhoz nem nyúltunk. A könyvtár újjáépítéséhez adja hozzá újra a zenemappáit."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine memulai perpustakaan baru yang kosong. File yang rusak disimpan di folder yang sama dengan nama “%@”. File musik Anda tidak disentuh. Tambahkan lagi folder musik Anda untuk membangun ulang perpustakaan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ha creato una nuova libreria vuota. Il file danneggiato è stato conservato nella stessa cartella come “%@”. I tuoi file musicali non sono stati toccati. Aggiungi di nuovo le tue cartelle musicali per ricostruire la libreria."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineは新しい空のライブラリを作成しました。破損したファイルは、同じフォルダに「%@」として残してあります。ミュージックファイルには手を加えていません。ライブラリを再構築するには、ミュージックフォルダをもう一度追加してください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ಹೊಸ, ಖಾಲಿ ಲೈಬ್ರರಿಯನ್ನು ಪ್ರಾರಂಭಿಸಿದೆ. ಹಾನಿಗೊಂಡ ಫೈಲ್ ಅನ್ನು ಅದೇ ಫೋಲ್ಡರ್‌ನಲ್ಲಿ “%@” ಎಂದು ಉಳಿಸಲಾಗಿದೆ. ನಿಮ್ಮ ಸಂಗೀತ ಫೈಲ್‌ಗಳನ್ನು ಮುಟ್ಟಲಾಗಿಲ್ಲ. ಲೈಬ್ರರಿಯನ್ನು ಮರುನಿರ್ಮಿಸಲು ನಿಮ್ಮ ಸಂಗೀತ ಫೋಲ್ಡರ್‌ಗಳನ್ನು ಮತ್ತೆ ಸೇರಿಸಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine이 비어 있는 새 보관함을 만들었습니다. 손상된 파일은 같은 폴더에 “%@”(으)로 보관되어 있습니다. 음악 파일은 건드리지 않았습니다. 보관함을 다시 구성하려면 음악 폴더를 다시 추가하세요."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine പുതിയതും ശൂന്യവുമായ ഒരു ലൈബ്രറി ആരംഭിച്ചു. കേടായ ഫയൽ അതേ ഫോൾഡറിൽ “%@” എന്ന പേരിൽ സൂക്ഷിച്ചിട്ടുണ്ട്. നിങ്ങളുടെ സംഗീത ഫയലുകളിൽ തൊട്ടിട്ടില്ല. ലൈബ്രറി വീണ്ടും നിർമ്മിക്കാൻ നിങ്ങളുടെ സംഗീത ഫോൾഡറുകൾ വീണ്ടും ചേർക്കുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ने नवीन, रिकामी लायब्ररी सुरू केली आहे. खराब झालेली फाइल त्याच फोल्डरमध्ये “%@” या नावाने ठेवली आहे. तुमच्या संगीत फाइलींना हात लावलेला नाही. लायब्ररी पुन्हा तयार करण्यासाठी तुमचे संगीत फोल्डर पुन्हा जोडा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine telah memulakan pustaka baharu yang kosong. Fail yang rosak disimpan dalam folder yang sama sebagai “%@”. Fail muzik anda tidak disentuh. Tambah semula folder muzik anda untuk membina semula pustaka."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine har startet et nytt, tomt bibliotek. Den skadede filen er lagret i samme mappe som «%@». Musikkfilene dine er ikke rørt. Legg til musikkmappene dine på nytt for å bygge opp biblioteket igjen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine is gestart met een nieuwe, lege bibliotheek. Het beschadigde bestand is in dezelfde map bewaard als “%@”. Je muziekbestanden zijn niet aangeraakt. Voeg je muziekmappen opnieuw toe om de bibliotheek opnieuw op te bouwen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਨੇ ਨਵੀਂ, ਖਾਲੀ ਲਾਇਬ੍ਰੇਰੀ ਸ਼ੁਰੂ ਕੀਤੀ ਹੈ। ਖ਼ਰਾਬ ਫ਼ਾਈਲ ਉਸੇ ਫ਼ੋਲਡਰ ਵਿੱਚ “%@” ਨਾਂ ਨਾਲ ਰੱਖੀ ਗਈ ਹੈ। ਤੁਹਾਡੀਆਂ ਸੰਗੀਤ ਫ਼ਾਈਲਾਂ ਨੂੰ ਛੂਹਿਆ ਨਹੀਂ ਗਿਆ। ਲਾਇਬ੍ਰੇਰੀ ਮੁੜ ਬਣਾਉਣ ਲਈ ਆਪਣੇ ਸੰਗੀਤ ਫ਼ੋਲਡਰ ਦੁਬਾਰਾ ਜੋੜੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine utworzył nową, pustą bibliotekę. Uszkodzony plik został zachowany w tym samym folderze jako „%@”. Twoje pliki muzyczne nie zostały naruszone. Dodaj ponownie foldery z muzyką, aby odbudować bibliotekę."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine iniciou uma biblioteca nova e vazia. O arquivo danificado foi mantido na mesma pasta como “%@”. Seus arquivos de música não foram alterados. Adicione suas pastas de música novamente para reconstruir a biblioteca."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine iniciou uma biblioteca nova e vazia. O ficheiro danificado foi mantido na mesma pasta como “%@”. Os seus ficheiros de música não foram alterados. Adicione novamente as suas pastas de música para reconstruir a biblioteca."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine a creat o bibliotecă nouă, goală. Fișierul deteriorat a fost păstrat în același dosar sub numele „%@”. Fișierele dvs. muzicale nu au fost atinse. Adăugați din nou dosarele cu muzică pentru a reconstrui biblioteca."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine har startat ett nytt, tomt bibliotek. Den skadade filen sparades i samma mapp som ”%@”. Dina musikfiler har inte rörts. Lägg till dina musikmappar igen för att bygga upp biblioteket på nytt."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine imeanzisha maktaba mpya isiyo na kitu. Faili iliyoharibika imehifadhiwa kwenye folda ile ile kwa jina “%@”. Faili zako za muziki hazikuguswa. Ongeza tena folda zako za muziki ili kujenga upya maktaba."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine புதிய, காலியான லைப்ரரியைத் தொடங்கியது. சேதமடைந்த கோப்பு அதே கோப்புறையில் “%@” என்ற பெயரில் வைக்கப்பட்டுள்ளது. உங்கள் இசைக் கோப்புகள் தொடப்படவில்லை. லைப்ரரியை மீண்டும் உருவாக்க உங்கள் இசைக் கோப்புறைகளை மீண்டும் சேர்க்கவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine కొత్త, ఖాళీ లైబ్రరీని ప్రారంభించింది. పాడైన ఫైల్ అదే ఫోల్డర్‌లో “%@” పేరుతో ఉంచబడింది. మీ సంగీత ఫైల్‌లను ముట్టుకోలేదు. లైబ్రరీని తిరిగి నిర్మించడానికి మీ సంగీత ఫోల్డర్‌లను మళ్లీ జోడించండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine เริ่มคลังใหม่ที่ว่างเปล่า ไฟล์ที่เสียหายถูกเก็บไว้ในโฟลเดอร์เดียวกันในชื่อ “%@” ไฟล์เพลงของคุณไม่ได้ถูกแตะต้อง เพิ่มโฟลเดอร์เพลงของคุณอีกครั้งเพื่อสร้างคลังขึ้นใหม่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine yeni, boş bir arşiv başlattı. Hasarlı dosya aynı klasörde “%@” adıyla saklandı. Müzik dosyalarınıza dokunulmadı. Arşivi yeniden oluşturmak için müzik klasörlerinizi yeniden ekleyin."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine створив нову порожню медіатеку. Пошкоджений файл збережено в тій самій папці під назвою «%@». Ваші музичні файли не зачеплено. Додайте свої музичні папки ще раз, щоб відновити медіатеку."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine نے ایک نئی، خالی لائبریری شروع کی ہے۔ خراب فائل اسی فولڈر میں “%@” کے نام سے محفوظ رکھی گئی ہے۔ آپ کی موسیقی کی فائلوں کو ہاتھ نہیں لگایا گیا۔ لائبریری دوبارہ بنانے کے لیے اپنے موسیقی کے فولڈر دوبارہ شامل کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine đã tạo một thư viện mới, trống. Tệp bị hỏng được giữ lại trong cùng thư mục với tên “%@”. Các tệp nhạc của bạn không bị động đến. Hãy thêm lại các thư mục nhạc để xây dựng lại thư viện."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 已建立一個空的新資料庫。損毀的檔案已保留在同一個資料夾中，名稱為「%@」。你的音樂檔案沒有被更動。請重新加入你的音樂資料夾，以重建資料庫。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 已新建一个空的资料库。损坏的文件已保留在同一文件夹中，名为“%@”。你的音乐文件没有被改动。请重新添加你的音乐文件夹，以重建资料库。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 已建立一個空的新資料庫。損毀的檔案已保留在同一個檔案夾中，名稱為「%@」。你的音樂檔案沒有被更動。請重新加入你的音樂檔案夾，以重建資料庫。"
+          }
+        }
+      }
+    },
     "Couldn’t connect (%@).": {
       "comment": "The system's description of the error, e.g. “Connection refused”.",
       "extractionState": "manual",
