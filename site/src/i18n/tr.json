@@ -147,6 +147,28 @@
         "floatAlt": "Loopback testi penceresi: 44,1 ve 96 kHz’de 24 bit, doldurulmuş 16 bit ve bir boşluksuz çift; her biri bit düzeyinde aynı.",
         "floatCaption": "Loopback Testi · yazılım denetimi"
       },
+      "speaker-groups": {
+        "jack": "Hoparlör Grupları",
+        "kicker": "Hoparlör Grupları · beta",
+        "title": "Birden çok DAC. Tek bir hoparlör sistemi.",
+        "lede": "Bir akışı iki veya daha fazla USB DAC üzerinden tek bir quad ya da surround sistem olarak çalın; kanal haritası, hoparlör başına ayarlar ve odanızın çizimiyle.",
+        "body": [
+          "Vespertine, DAC’lerinizi diğer uygulamaların göremediği özel bir Core Audio toplaması içinde birleştirir. Saat lideri olan bir DAC zamanı belirler, diğerleri onu izler. Bir şarkının kanalları hoparlörlere bulundukları yere göre gider: kendi hoparlörü olan kanal orada değişmeden çalar, iki hoparlör arasındaki kanal aralarında eşit güçle paylaştırılır ve LFE varsayılan olarak atlanır. Dolby Digital Plus Atmos dosyaları 5.1 veya 7.1 kanal tabanını çalar."
+        ],
+        "list": [
+          "Her DAC’nin her çıkışı için bir kanal haritası, aynı anda tek bir kanalı belirleyen sessiz bir ses ve quad, ITU 5.1 ve karşılıklı iki çift için hazır ayarlar.",
+          "Hoparlörleri ve oturduğunuz yeri odanın çiziminde sürükleyin: mesafe, açı, gecikme ve seviye bundan çıkar. Ya da grubu bir mikrofonla ölçün.",
+          "Her hoparlör için seviye, gecikme ve kutup ayarları ile bir pay koruması.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> yalnızca kullanılan her kanal yeniden örneklenmeyen bir DAC’de (saat lideri) olduğunda görünür; aksi halde sinyal yolu neyin değiştiğini söyler."
+        ],
+        "note": "Beta: varsayılan olarak kapalı, uygulama ayarlarında tek bir anahtarın arkasında. Otomatik testler ve sanal aygıtlarla denendi; gerçek DAC’lerde yalnızca bir ölçüm aracı çalıştırıldı ve uygulamada henüz gerçek bir grup dinlenmedi. Yalnızca PCM; Bluetooth ve AirPlay çıkışları katılamaz.",
+        "links": [
+          "Hoparlör grupları ayrıntılı"
+        ],
+        "alt": "Vespertine’in bir quad için hoparlör grubu düzenleyicisi: dinleme koltuğunun çevresinde dört hoparlörlü, yukarıdan görünen oda çizimi ve her hoparlörün mesafesi, açısı, gecikmesi ve seviyesi.",
+        "floatAlt": "Kanal haritası: her çıkışın her kanalı bir hoparlöre atanmış, her kanalda bir “Identify” düğmesi ve bir “Inverted” kutusu var.",
+        "floatCaption": "Kanal haritası"
+      },
       "room-correction": {
         "jack": "Oda düzeltmesi",
         "kicker": "Oda düzeltmesi",

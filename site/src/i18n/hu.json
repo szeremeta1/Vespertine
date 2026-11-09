@@ -147,6 +147,28 @@
         "floatAlt": "A loopback-teszt panelje: 24 bit 44,1 és 96 kHz-en, kitöltött 16 bites jel és egy szünetmentesen lejátszott számpár; mindegyik bitre pontos.",
         "floatCaption": "Loopback-teszt · szoftveres ellenőrzés"
       },
+      "speaker-groups": {
+        "jack": "Hangszórócsoportok",
+        "kicker": "Hangszórócsoportok · béta",
+        "title": "Több DAC. Egy hangfalrendszer.",
+        "lede": "Játssz le egy adatfolyamot két vagy több USB-DAC-on egyetlen quad vagy térhatású rendszerként – csatornatérképpel, hangfalankénti korrekciókkal és a szobád rajzával.",
+        "body": [
+          "A Vespertine egy privát Core Audio aggregátumba fogja a DAC-jaidat, amelyet más appok nem látnak. Egy DAC, az órajelvezető, adja az időt, a többi követi. A dal csatornái oda kerülnek, ahol a hangfalak állnak: az a csatorna, amelynek saját hangfala van, ott szól változatlanul, a két hangfal közé eső csatorna egyenlő teljesítménnyel oszlik meg közöttük, az LFE-t pedig alapból elhagyja. A Dolby Digital Plus Atmos fájlok az 5.1-es vagy 7.1-es csatornaalapjukat játsszák le."
+        ],
+        "list": [
+          "Csatornatérkép minden DAC minden kimenetéhez, halk hanggal, amely egyszerre egy csatornát azonosít, valamint előbeállítások quadhoz, ITU 5.1-hez és két egymással szemben álló párhoz.",
+          "Húzd a hangfalakat és az ülőhelyedet a szoba rajzán: a távolság, a szög, a késleltetés és a szint ebből következik. Vagy mérd meg a csoportot mikrofonnal.",
+          "Szint-, késleltetés- és polaritáskorrekció minden hangfalhoz, túlvezérlés elleni tartalékkal.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> csak akkor jelenik meg, ha minden használt csatorna olyan DAC-on van, amelyet nem mintavételeznek újra (az órajelvezető); különben a jelút megmutatja, mi változott."
+        ],
+        "note": "Béta: alapból kikapcsolva, egyetlen kapcsoló mögött az app beállításaiban. Automatikus tesztekkel és virtuális eszközökkel tesztelve; valódi DAC-okon csak egy mérőeszköz futott, és az appban még nem hallgattak meg valódi csoportot. Csak PCM; a Bluetooth- és AirPlay-kimenetek nem csatlakozhatnak.",
+        "links": [
+          "Hangszórócsoportok részletesen"
+        ],
+        "alt": "A Vespertine hangszórócsoport-szerkesztője egy quadhoz: a szoba felülnézeti rajza négy hangfallal a hallgatási hely körül, valamint minden hangfal távolsága, szöge, késleltetése és szintje.",
+        "floatAlt": "A csatornatérkép: minden kimenet minden csatornája egy hangfalhoz rendelve, minden csatornánál „Identify” gombbal és „Inverted” jelölőnégyzettel.",
+        "floatCaption": "Csatornatérkép"
+      },
       "room-correction": {
         "jack": "Szobakorrekció",
         "kicker": "Szobakorrekció",

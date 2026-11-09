@@ -147,6 +147,28 @@
         "floatAlt": "Der Dialog des Loopback-Tests: 24 Bit bei 44,1 und 96 kHz, 16 Bit aufgefüllt und ein lückenloses Paar, jeweils bitgenau.",
         "floatCaption": "Loopback-Test · Softwareprüfung"
       },
+      "speaker-groups": {
+        "jack": "Lautsprechergruppen",
+        "kicker": "Lautsprechergruppen · Beta",
+        "title": "Mehrere DACs. Ein Lautsprechersystem.",
+        "lede": "Spiele einen Stream über zwei oder mehr USB-DACs als ein Quad- oder Surround-System ab – mit Kanalzuordnung, Pegelkorrekturen pro Lautsprecher und einer Zeichnung deines Raums.",
+        "body": [
+          "Vespertine fasst deine DACs in einem privaten Core-Audio-Aggregat zusammen, das andere Apps nicht sehen. Ein DAC, der Taktgeber, bestimmt die Zeit, die anderen folgen ihm. Die Kanäle eines Titels gehen dorthin, wo deine Lautsprecher stehen: Ein Kanal mit eigenem Lautsprecher läuft unverändert darüber, einer zwischen zwei Lautsprechern wird mit gleicher Leistung dazwischen verteilt, und der LFE-Kanal wird standardmäßig weggelassen. Dolby-Digital-Plus-Atmos-Dateien spielen ihr 5.1- oder 7.1-Kanalbett."
+        ],
+        "list": [
+          "Eine Kanalzuordnung für jeden Ausgang jedes DACs, mit einem leisen Ton, der jeweils einen Kanal kenntlich macht, sowie Vorlagen für ein Quad, ITU 5.1 und zwei einander gegenüberstehende Paare.",
+          "Ziehe Lautsprecher und Hörplatz auf einer Zeichnung des Raums: Abstand, Winkel, Verzögerung und Pegel ergeben sich daraus. Oder miss die Gruppe mit einem Mikrofon.",
+          "Pegel-, Verzögerungs- und Polaritätskorrektur für jeden Lautsprecher, mit Aussteuerungsreserve.",
+          "<span class=\"mono nowrap\">BIT-PERFEKT</span> erscheint nur, wenn jeder verwendete Kanal auf einem DAC liegt, der nicht neu abgetastet wird (der Taktgeber); sonst zeigt der Signalweg, was verändert wurde."
+        ],
+        "note": "Beta: standardmäßig aus, hinter einem Schalter in den Einstellungen der App. Getestet mit automatisierten Tests und virtuellen Geräten; auf echten DACs lief bisher nur ein Messwerkzeug, und in der App wurde noch keine echte Gruppe angehört. Nur PCM; Bluetooth- und AirPlay-Ausgänge können nicht beitreten.",
+        "links": [
+          "Lautsprechergruppen im Detail"
+        ],
+        "alt": "Vespertines Editor für Lautsprechergruppen bei einem Quad: eine Zeichnung des Raums von oben mit vier Lautsprechern um den Hörplatz sowie Abstand, Winkel, Verzögerung und Pegel jedes Lautsprechers.",
+        "floatAlt": "Die Kanalzuordnung: Jeder Kanal jedes Ausgangs ist einem Lautsprecher zugewiesen, mit einer Schaltfläche „Identify“ und einem Kästchen „Inverted“ je Kanal.",
+        "floatCaption": "Kanalzuordnung"
+      },
       "room-correction": {
         "jack": "Raumkorrektur",
         "kicker": "Raumkorrektur",

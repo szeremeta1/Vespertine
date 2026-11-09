@@ -147,6 +147,28 @@
         "floatAlt": "Het blad van de loopbacktest: 24 bit op 44,1 en 96 kHz, 16 bit opgevuld en een gapless paar, elk bitidentiek.",
         "floatCaption": "Loopbacktest · softwarecontrole"
       },
+      "speaker-groups": {
+        "jack": "Luidsprekergroepen",
+        "kicker": "Luidsprekergroepen · bèta",
+        "title": "Meerdere DAC’s. Eén luidsprekersysteem.",
+        "lede": "Speel één stream af over twee of meer USB-DAC’s als één quad- of surroundopstelling, met een kanaalindeling, instellingen per luidspreker en een tekening van je kamer.",
+        "body": [
+          "Vespertine voegt je DAC’s samen in een privé Core Audio-aggregaat dat andere apps niet zien. Eén DAC, de kloklieder, bepaalt de tijd en de anderen volgen. De kanalen van een nummer gaan naar je luidsprekers op basis van waar ze staan: een kanaal met een eigen luidspreker speelt daar ongewijzigd, een kanaal tussen twee luidsprekers wordt met gelijk vermogen tussen die twee verdeeld, en het LFE-kanaal wordt standaard weggelaten. Dolby Digital Plus Atmos-bestanden spelen hun 5.1- of 7.1-kanaalbed af."
+        ],
+        "list": [
+          "Een kanaalindeling voor elke uitgang van elke DAC, met een zachte toon om telkens één kanaal te herkennen, en voorinstellingen voor een quad, ITU 5.1 en twee paren tegenover elkaar.",
+          "Sleep de luidsprekers en je zitplek op een tekening van de kamer: afstand, hoek, vertraging en niveau volgen daaruit. Of meet de groep met een microfoon.",
+          "Niveau-, vertragings- en polariteitscorrecties voor elke luidspreker, met een bewaking van de headroom.",
+          "<span class=\"mono nowrap\">BITPERFECT</span> verschijnt alleen als elk gebruikt kanaal op een DAC ligt die niet opnieuw wordt gesampled (de kloklieder); anders laat het signaalpad zien wat er veranderde."
+        ],
+        "note": "Bèta: standaard uit, achter één schakelaar in de instellingen van de app. Getest met geautomatiseerde tests en virtuele apparaten; op echte DAC’s is alleen een meettool gebruikt, en in de app is nog niets beluisterd op een echte groep. Alleen PCM; Bluetooth- en AirPlay-uitgangen kunnen niet meedoen.",
+        "links": [
+          "Luidsprekergroepen in detail"
+        ],
+        "alt": "De luidsprekergroep-editor van Vespertine voor een quad: een tekening van de kamer van bovenaf met vier luidsprekers rond de luisterplek, en de afstand, hoek, vertraging en het niveau van elke luidspreker.",
+        "floatAlt": "De kanaalindeling: elk kanaal van elke uitgang is aan een luidspreker toegewezen, met een knop “Identify” en een vakje “Inverted” bij elk kanaal.",
+        "floatCaption": "Kanaalindeling"
+      },
       "room-correction": {
         "jack": "Ruimtecorrectie",
         "kicker": "Ruimtecorrectie",

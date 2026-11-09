@@ -147,6 +147,28 @@
         "floatAlt": "The loopback test sheet: 24-bit at 44.1 and 96 kHz, 16-bit padded and a gapless pair, each bit-exact.",
         "floatCaption": "Loopback test · software check"
       },
+      "speaker-groups": {
+        "jack": "Speaker Groups",
+        "kicker": "Speaker Groups · Beta",
+        "title": "Several DACs. One speaker system.",
+        "lede": "Play one stream across two or more USB DACs as a single quad or surround setup, with a channel map, per-speaker trims and a drawing of your room.",
+        "body": [
+          "Vespertine joins your DACs in a private Core Audio aggregate that other apps can’t see. One DAC, the clock leader, sets the time and the others follow it. A song’s channels go to your speakers by where they stand: a channel with a speaker of its own plays there untouched, one between two speakers is panned with equal power, and the LFE is dropped by default. Dolby Digital Plus Atmos files play their 5.1 or 7.1 channel bed."
+        ],
+        "list": [
+          "A channel map for every output of every DAC, with a quiet tone to identify one channel at a time, and presets for a quad, ITU 5.1 and two pairs facing.",
+          "Drag the speakers and your seat on a drawing of the room: distance, angle, delay and level follow from it. Or measure the group with a microphone.",
+          "Level, delay and polarity trims for each speaker, with a headroom guard.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> appears only when every channel in use is on a DAC that isn’t resampled (the clock leader); otherwise the signal path says what changed."
+        ],
+        "note": "Beta: off by default, behind one switch in the app’s settings. It is tested with automated tests and virtual devices; on real DACs only a probe tool has run, and nothing in the app has been listened to on a real group yet. PCM only; Bluetooth and AirPlay outputs can’t join.",
+        "links": [
+          "Speaker Groups in detail"
+        ],
+        "alt": "Vespertine’s speaker group editor for a quad: a top-down drawing of the room with four speakers around the listening seat, and each speaker’s distance, angle, delay and level.",
+        "floatAlt": "The channel map: every channel of each output assigned to a speaker, with an Identify button and an Inverted box on each channel.",
+        "floatCaption": "Channel map"
+      },
       "room-correction": {
         "jack": "Room correction",
         "kicker": "Room correction",

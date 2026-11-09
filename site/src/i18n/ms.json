@@ -147,6 +147,28 @@
         "floatAlt": "Helaian ujian gelung balik: 24-bit pada 44.1 dan 96 kHz, 16-bit dipad dan sepasang trek tanpa jurang, setiap satunya sama bit demi bit.",
         "floatCaption": "Ujian Gelung Balik · semakan perisian"
       },
+      "speaker-groups": {
+        "jack": "Kumpulan Pembesar Suara",
+        "kicker": "Kumpulan Pembesar Suara · beta",
+        "title": "Beberapa DAC. Satu sistem pembesar suara.",
+        "lede": "Mainkan satu aliran melalui dua atau lebih DAC USB sebagai satu sistem quad atau surround, dengan peta saluran, pelarasan bagi setiap pembesar suara dan lukisan bilik anda.",
+        "body": [
+          "Vespertine menggabungkan DAC anda dalam agregat Core Audio persendirian yang tidak dilihat oleh app lain. Satu DAC, pemimpin jam, menetapkan masa dan yang lain mengikutinya. Saluran sesebuah lagu pergi ke pembesar suara mengikut kedudukannya: saluran yang mempunyai pembesar suara sendiri dimainkan di situ tanpa diubah, saluran di antara dua pembesar suara dibahagikan antara keduanya dengan kuasa sama, dan LFE digugurkan secara lalai. Fail Dolby Digital Plus Atmos memainkan asas saluran 5.1 atau 7.1 mereka."
+        ],
+        "list": [
+          "Peta saluran untuk setiap output setiap DAC, dengan nada perlahan untuk mengenal pasti satu saluran pada satu masa, serta pratetap untuk quad, ITU 5.1 dan dua pasangan bertentangan.",
+          "Seret pembesar suara dan tempat duduk anda pada lukisan bilik: jarak, sudut, kelewatan dan aras terhasil daripadanya. Atau ukur kumpulan dengan mikrofon.",
+          "Pelarasan aras, kelewatan dan kekutuban bagi setiap pembesar suara, dengan pengawal ruang kepala.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> hanya muncul apabila setiap saluran yang digunakan berada pada DAC yang tidak disampel semula (pemimpin jam); jika tidak, laluan isyarat menyatakan apa yang berubah."
+        ],
+        "note": "Beta: dimatikan secara lalai, di sebalik satu suis dalam tetapan app. Diuji dengan ujian automatik dan peranti maya; pada DAC sebenar hanya satu alat pengukur dijalankan, dan belum ada kumpulan sebenar yang didengar dalam app. PCM sahaja; output Bluetooth dan AirPlay tidak boleh menyertai.",
+        "links": [
+          "Kumpulan pembesar suara secara terperinci"
+        ],
+        "alt": "Penyunting kumpulan pembesar suara Vespertine untuk quad: lukisan bilik dari atas dengan empat pembesar suara mengelilingi tempat mendengar, serta jarak, sudut, kelewatan dan aras setiap pembesar suara.",
+        "floatAlt": "Peta saluran: setiap saluran bagi setiap output ditetapkan kepada pembesar suara, dengan butang “Identify” dan kotak “Inverted” pada setiap saluran.",
+        "floatCaption": "Peta saluran"
+      },
       "room-correction": {
         "jack": "Pembetulan bilik",
         "kicker": "Pembetulan bilik",

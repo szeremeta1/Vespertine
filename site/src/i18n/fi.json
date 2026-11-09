@@ -147,6 +147,28 @@
         "floatAlt": "Loopback-testin taulukko: 24-bit 44,1 ja 96 kHz:llä, täytetty 16-bit sekä katkoton pari, jokainen bittitarkka.",
         "floatCaption": "Loopback-testi · ohjelmistotarkistus"
       },
+      "speaker-groups": {
+        "jack": "Kaiutinryhmät",
+        "kicker": "Kaiutinryhmät · beta",
+        "title": "Useita DAC-laitteita. Yksi kaiutinjärjestelmä.",
+        "lede": "Toista yksi virta kahdella tai useammalla USB-DAC:illa yhtenä quad- tai surround-järjestelmänä – kanavakartan, kaiutinkohtaisten säätöjen ja huoneesi piirroksen kanssa.",
+        "body": [
+          "Vespertine yhdistää DAC-laitteesi yksityiseksi Core Audio -aggregaatiksi, jota muut sovellukset eivät näe. Yksi DAC, kellon johtaja, määrää ajan ja muut seuraavat sitä. Kappaleen kanavat ohjataan kaiuttimiin sen mukaan, missä ne sijaitsevat: kanava, jolla on oma kaiutin, soi siinä muuttumattomana, kahden kaiuttimen väliin jäävä kanava jaetaan niiden kesken yhtä suurella teholla, ja LFE jätetään oletuksena pois. Dolby Digital Plus Atmos -tiedostot toistavat 5.1- tai 7.1-kanavapohjansa."
+        ],
+        "list": [
+          "Kanavakartta jokaiselle DAC:in lähdölle, hiljainen merkkiääni, joka tunnistaa yhden kanavan kerrallaan, sekä esiasetukset quadille, ITU 5.1:lle ja kahdelle vastakkaiselle parille.",
+          "Vedä kaiuttimet ja kuuntelupaikkasi huoneen piirrokseen: etäisyys, kulma, viive ja taso määräytyvät siitä. Tai mittaa ryhmä mikrofonilla.",
+          "Tason, viiveen ja napaisuuden säätö jokaiselle kaiuttimelle sekä suojaus ylivuotoa vastaan.",
+          "<span class=\"mono nowrap\">BITTITARKKA</span> näkyy vain, kun jokainen käytössä oleva kanava on DAC:illa, jota ei näytteistetä uudelleen (kellon johtaja); muuten signaalireitti kertoo, mikä muuttui."
+        ],
+        "note": "Beta: oletuksena pois päältä, yhden kytkimen takana sovelluksen asetuksissa. Testattu automaattisilla testeillä ja virtuaalilaitteilla; oikeilla DAC-laitteilla on ajettu vain mittatyökalua, eikä sovelluksessa ole vielä kuunneltu oikeaa ryhmää. Vain PCM; Bluetooth- ja AirPlay-lähdöt eivät voi liittyä.",
+        "links": [
+          "Kaiutinryhmät tarkemmin"
+        ],
+        "alt": "Vespertinen kaiutinryhmän muokkain quadille: huoneen piirros ylhäältä nähtynä, neljä kaiutinta kuuntelupaikan ympärillä sekä kunkin kaiuttimen etäisyys, kulma, viive ja taso.",
+        "floatAlt": "Kanavakartta: jokaisen lähdön jokainen kanava on osoitettu kaiuttimelle, ja jokaisella kanavalla on painike ”Identify” ja valintaruutu ”Inverted”.",
+        "floatCaption": "Kanavakartta"
+      },
       "room-correction": {
         "jack": "Huonekorjaus",
         "kicker": "Huonekorjaus",

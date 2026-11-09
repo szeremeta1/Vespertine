@@ -147,6 +147,28 @@
         "floatAlt": "La scheda del test di loopback: 24 bit a 44,1 e 96 kHz, 16 bit riempiti con zeri e una coppia gapless, ognuno identico bit per bit.",
         "floatCaption": "Test di loopback · verifica software"
       },
+      "speaker-groups": {
+        "jack": "Gruppi di altoparlanti",
+        "kicker": "Gruppi di altoparlanti · beta",
+        "title": "Più DAC. Un unico sistema di altoparlanti.",
+        "lede": "Riproduci un solo flusso su due o più DAC USB come un unico sistema quadrifonico o surround, con una mappa dei canali, regolazioni per altoparlante e un disegno della tua stanza.",
+        "body": [
+          "Vespertine riunisce i tuoi DAC in un aggregato Core Audio privato che le altre app non vedono. Un DAC, il master di clock, detta il tempo e gli altri lo seguono. I canali di un brano vanno agli altoparlanti in base a dove si trovano: un canale con un altoparlante tutto suo suona lì senza modifiche, uno tra due altoparlanti viene ripartito tra loro a potenza uguale, e l’LFE è escluso per impostazione predefinita. I file Dolby Digital Plus Atmos riproducono la loro base di canali 5.1 o 7.1."
+        ],
+        "list": [
+          "Una mappa dei canali per ogni uscita di ogni DAC, con un tono discreto per identificare un canale alla volta, e preset per un quad, un ITU 5.1 e due coppie una di fronte all’altra.",
+          "Trascina gli altoparlanti e la tua poltrona su un disegno della stanza: distanza, angolo, ritardo e livello ne derivano. Oppure misura il gruppo con un microfono.",
+          "Regolazioni di livello, ritardo e polarità per ogni altoparlante, con un margine di sicurezza contro la saturazione.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> compare solo quando ogni canale in uso si trova su un DAC che non viene ricampionato (il master di clock); altrimenti il percorso del segnale indica che cosa è cambiato."
+        ],
+        "note": "Beta: disattivata per impostazione predefinita, dietro un unico interruttore nelle impostazioni dell’app. Provata con test automatici e dispositivi virtuali; su DAC reali è stato eseguito solo uno strumento di sonda, e nell’app non è ancora stato ascoltato nulla su un gruppo reale. Solo PCM; le uscite Bluetooth e AirPlay non possono aggiungersi.",
+        "links": [
+          "I gruppi di altoparlanti nel dettaglio"
+        ],
+        "alt": "L’editor dei gruppi di altoparlanti di Vespertine per un quad: un disegno della stanza visto dall’alto con quattro altoparlanti attorno alla posizione d’ascolto, e distanza, angolo, ritardo e livello di ciascuno.",
+        "floatAlt": "La mappa dei canali: ogni canale di ogni uscita assegnato a un altoparlante, con un pulsante «Identify» e una casella «Inverted» su ogni canale.",
+        "floatCaption": "Mappa dei canali"
+      },
       "room-correction": {
         "jack": "Correzione ambiente",
         "kicker": "Correzione ambiente",

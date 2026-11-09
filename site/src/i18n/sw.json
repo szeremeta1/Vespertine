@@ -147,6 +147,28 @@
         "floatAlt": "Dirisha la jaribio la loopback: biti 24 kwa 44.1 na 96 kHz, biti 16 iliyojazwa na jozi isiyo na mapengo, kila moja sawa biti kwa biti.",
         "floatCaption": "Jaribio la Loopback · ukaguzi wa kiprogramu"
       },
+      "speaker-groups": {
+        "jack": "Vikundi vya Spika",
+        "kicker": "Vikundi vya Spika · beta",
+        "title": "DAC kadhaa. Mfumo mmoja wa spika.",
+        "lede": "Cheza mkondo mmoja kupitia DAC mbili au zaidi za USB kama mfumo mmoja wa quad au surround, ukiwa na ramani ya chaneli, marekebisho kwa kila spika na mchoro wa chumba chako.",
+        "body": [
+          "Vespertine huunganisha DAC zako katika mkusanyiko wa faragha wa Core Audio ambao programu nyingine haziuoni. DAC moja, kiongozi wa saa, huweka wakati na zingine zinaifuata. Chaneli za wimbo huenda kwa spika kulingana na mahali zilipo: chaneli yenye spika yake hucheza hapo bila mabadiliko, chaneli iliyo kati ya spika mbili hugawanywa kati yake kwa nguvu sawa, na LFE huachwa kwa chaguomsingi. Faili za Dolby Digital Plus Atmos hucheza msingi wake wa chaneli 5.1 au 7.1."
+        ],
+        "list": [
+          "Ramani ya chaneli kwa kila pato la kila DAC, yenye toni tulivu ya kutambua chaneli moja kwa wakati, na mipangilio awali ya quad, ITU 5.1 na jozi mbili zinazotazamana.",
+          "Buruta spika na kiti chako kwenye mchoro wa chumba: umbali, pembe, ucheleweshaji na kiwango hufuata kutoka kwake. Au pima kikundi kwa maikrofoni.",
+          "Marekebisho ya kiwango, ucheleweshaji na polarity kwa kila spika, na ulinzi wa nafasi ya ziada.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> huonekana tu pale kila chaneli inayotumika iko kwenye DAC isiyochukuliwa sampuli upya (kiongozi wa saa); vinginevyo njia ya mawimbi husema kilichobadilika."
+        ],
+        "note": "Beta: imezimwa kwa chaguomsingi, nyuma ya swichi moja katika mipangilio ya programu. Imejaribiwa kwa majaribio ya kiotomatiki na vifaa pepe; kwenye DAC halisi ni zana ya kupima tu iliyoendeshwa, na bado hakuna kikundi halisi kilichosikilizwa kwenye programu. PCM pekee; pato za Bluetooth na AirPlay haziwezi kujiunga.",
+        "links": [
+          "Vikundi vya spika kwa kina"
+        ],
+        "alt": "Kihariri cha kikundi cha spika cha Vespertine kwa quad: mchoro wa chumba unaotazamwa kutoka juu wenye spika nne kuzunguka kiti cha kusikilizia, na umbali, pembe, ucheleweshaji na kiwango cha kila spika.",
+        "floatAlt": "Ramani ya chaneli: kila chaneli ya kila pato imekabidhiwa spika, ikiwa na kitufe cha “Identify” na kisanduku cha “Inverted” kwenye kila chaneli.",
+        "floatCaption": "Ramani ya chaneli"
+      },
       "room-correction": {
         "jack": "Urekebishaji wa chumba",
         "kicker": "Urekebishaji wa chumba",

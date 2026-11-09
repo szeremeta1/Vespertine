@@ -147,6 +147,28 @@
         "floatAlt": "Panel testu loopbacku: 24 bitů při 44,1 a 96 kHz, doplněný 16bitový zvuk a dvojice bez mezer, vše bitově přesné.",
         "floatCaption": "Test loopbacku · softwarová kontrola"
       },
+      "speaker-groups": {
+        "jack": "Skupiny reproduktorů",
+        "kicker": "Skupiny reproduktorů · beta",
+        "title": "Více DAC. Jeden systém reproduktorů.",
+        "lede": "Přehrávejte jeden stream přes dva nebo více USB DAC jako jediný quad nebo prostorový systém – s mapou kanálů, úpravami pro každý reproduktor a nákresem vaší místnosti.",
+        "body": [
+          "Vespertine spojí vaše DAC do soukromého agregátu Core Audio, který ostatní aplikace nevidí. Jeden DAC, vedoucí hodin, udává čas a ostatní ho následují. Kanály skladby jdou do reproduktorů podle toho, kde stojí: kanál s vlastním reproduktorem hraje na něm beze změny, kanál mezi dvěma reproduktory se mezi ně rozdělí stejným výkonem a kanál LFE se ve výchozím nastavení vynechá. Soubory Dolby Digital Plus Atmos přehrávají svůj základ kanálů 5.1 nebo 7.1."
+        ],
+        "list": [
+          "Mapa kanálů pro každý výstup každého DAC, s tichým tónem, který označí vždy jeden kanál, a předvolby pro quad, ITU 5.1 a dva páry proti sobě.",
+          "Přetáhněte reproduktory a své místo na nákresu místnosti: vzdálenost, úhel, zpoždění i hlasitost z něj vyplynou. Nebo skupinu změřte mikrofonem.",
+          "Úpravy hlasitosti, zpoždění a polarity pro každý reproduktor, s ochranou rezervy proti přebuzení.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> se objeví jen tehdy, když každý používaný kanál leží na DAC, který se nepřevzorkovává (vedoucí hodin); jinak cesta signálu ukáže, co se změnilo."
+        ],
+        "note": "Beta: ve výchozím stavu vypnuto, za jedním přepínačem v nastavení aplikace. Otestováno automatickými testy a virtuálními zařízeními; na skutečných DAC běžel jen měřicí nástroj a v aplikaci se zatím neposlouchala skutečná skupina. Pouze PCM; výstupy Bluetooth a AirPlay se nemohou připojit.",
+        "links": [
+          "Skupiny reproduktorů podrobně"
+        ],
+        "alt": "Editor skupin reproduktorů ve Vespertine pro quad: nákres místnosti shora se čtyřmi reproduktory kolem místa poslechu a vzdálenost, úhel, zpoždění a hlasitost každého z nich.",
+        "floatAlt": "Mapa kanálů: každý kanál každého výstupu přiřazený k reproduktoru, s tlačítkem „Identify“ a políčkem „Inverted“ u každého kanálu.",
+        "floatCaption": "Mapa kanálů"
+      },
       "room-correction": {
         "jack": "Korekce místnosti",
         "kicker": "Korekce místnosti",

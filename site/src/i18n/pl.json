@@ -147,6 +147,28 @@
         "floatAlt": "Arkusz testu loopback: 24-bit przy 44,1 i 96 kHz, 16-bit z dopełnieniem oraz para bez przerw, każdy zgodny bit w bit.",
         "floatCaption": "Test loopback · test programowy"
       },
+      "speaker-groups": {
+        "jack": "Grupy głośników",
+        "kicker": "Grupy głośników · beta",
+        "title": "Kilka DAC-ów. Jeden system głośników.",
+        "lede": "Odtwarzaj jeden strumień na dwóch lub więcej DAC-ach USB jako jeden system quad lub surround – z mapą kanałów, korektami dla każdego głośnika i rysunkiem twojego pokoju.",
+        "body": [
+          "Vespertine łączy twoje DAC-i w prywatny agregat Core Audio, którego inne aplikacje nie widzą. Jeden DAC, nadrzędny zegar, wyznacza czas, a pozostałe za nim podążają. Kanały utworu trafiają do głośników zależnie od tego, gdzie stoją: kanał z własnym głośnikiem gra tam bez zmian, kanał między dwoma głośnikami jest rozdzielany między nie z równą mocą, a kanał LFE jest domyślnie pomijany. Pliki Dolby Digital Plus Atmos odtwarzają swoją bazę kanałów 5.1 lub 7.1."
+        ],
+        "list": [
+          "Mapa kanałów dla każdego wyjścia każdego DAC-a, z cichym dźwiękiem wskazującym po jednym kanale, oraz ustawienia wstępne dla quada, ITU 5.1 i dwóch par zwróconych ku sobie.",
+          "Przeciągnij głośniki i swoje miejsce na rysunku pokoju: odległość, kąt, opóźnienie i poziom wynikają z niego. Albo zmierz grupę mikrofonem.",
+          "Korekty poziomu, opóźnienia i polaryzacji dla każdego głośnika, z zapasem chroniącym przed przesterowaniem.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> pojawia się tylko wtedy, gdy każdy używany kanał jest na DAC-u, który nie jest przepróbkowywany (nadrzędny zegar); w przeciwnym razie ścieżka sygnału pokazuje, co zmieniono."
+        ],
+        "note": "Beta: domyślnie wyłączona, za jednym przełącznikiem w ustawieniach aplikacji. Sprawdzona testami automatycznymi i urządzeniami wirtualnymi; na prawdziwych DAC-ach uruchomiono tylko narzędzie pomiarowe, a w aplikacji nie odsłuchano jeszcze prawdziwej grupy. Tylko PCM; wyjścia Bluetooth i AirPlay nie mogą dołączyć.",
+        "links": [
+          "Grupy głośników szczegółowo"
+        ],
+        "alt": "Edytor grup głośników w Vespertine dla quada: rysunek pokoju z góry z czterema głośnikami wokół miejsca odsłuchu oraz odległość, kąt, opóźnienie i poziom każdego z nich.",
+        "floatAlt": "Mapa kanałów: każdy kanał każdego wyjścia przypisany do głośnika, z przyciskiem „Identify” i polem „Inverted” przy każdym kanale.",
+        "floatCaption": "Mapa kanałów"
+      },
       "room-correction": {
         "jack": "Korekcja pomieszczenia",
         "kicker": "Korekcja pomieszczenia",

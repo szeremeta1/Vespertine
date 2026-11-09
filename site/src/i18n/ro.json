@@ -147,6 +147,28 @@
         "floatAlt": "Fișa testului loopback: 24 de biți la 44,1 și 96 kHz, 16 biți completați și o pereche fără pauze, fiecare identic bit cu bit.",
         "floatCaption": "Test loopback · verificare software"
       },
+      "speaker-groups": {
+        "jack": "Grupuri de boxe",
+        "kicker": "Grupuri de boxe · beta",
+        "title": "Mai multe DAC-uri. Un singur sistem de boxe.",
+        "lede": "Redă un singur flux pe două sau mai multe DAC-uri USB ca un singur sistem quad sau surround, cu o hartă a canalelor, reglaje pentru fiecare boxă și un desen al camerei tale.",
+        "body": [
+          "Vespertine îți reunește DAC-urile într-un agregat Core Audio privat, pe care celelalte aplicații nu îl văd. Un DAC, liderul de ceas, dă timpul, iar celelalte îl urmează. Canalele unui cântec merg la boxe după locul în care stau: un canal cu boxă proprie sună acolo nemodificat, unul aflat între două boxe este împărțit între ele cu putere egală, iar LFE este omis implicit. Fișierele Dolby Digital Plus Atmos redau baza lor de canale 5.1 sau 7.1."
+        ],
+        "list": [
+          "O hartă a canalelor pentru fiecare ieșire a fiecărui DAC, cu un ton discret care identifică câte un canal, și presetări pentru quad, ITU 5.1 și două perechi față în față.",
+          "Trage boxele și locul tău pe un desen al camerei: distanța, unghiul, întârzierea și nivelul rezultă din el. Sau măsoară grupul cu un microfon.",
+          "Reglaje de nivel, întârziere și polaritate pentru fiecare boxă, cu o rezervă de protecție împotriva distorsiunii.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> apare doar când fiecare canal folosit se află pe un DAC care nu este reeșantionat (liderul de ceas); altfel, calea semnalului spune ce s-a schimbat."
+        ],
+        "note": "Beta: dezactivată implicit, în spatele unui singur comutator din setările aplicației. Testată cu teste automate și dispozitive virtuale; pe DAC-uri reale a rulat doar o unealtă de măsurare, iar în aplicație nu s-a ascultat încă un grup real. Doar PCM; ieșirile Bluetooth și AirPlay nu se pot alătura.",
+        "links": [
+          "Grupurile de boxe în detaliu"
+        ],
+        "alt": "Editorul de grupuri de boxe din Vespertine pentru un quad: un desen al camerei văzut de sus, cu patru boxe în jurul locului de ascultare, și distanța, unghiul, întârzierea și nivelul fiecăreia.",
+        "floatAlt": "Harta canalelor: fiecare canal al fiecărei ieșiri atribuit unei boxe, cu un buton „Identify” și o casetă „Inverted” la fiecare canal.",
+        "floatCaption": "Harta canalelor"
+      },
       "room-correction": {
         "jack": "Corecția camerei",
         "kicker": "Corecția camerei",
