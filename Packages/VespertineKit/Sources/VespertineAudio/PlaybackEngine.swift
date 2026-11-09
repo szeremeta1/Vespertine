@@ -366,7 +366,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             answered.signal()
         }
         while answered.wait(timeout: .now() + 0.025) == .timedOut {
-            if superseded { throw Superseded() }
+            if startSuperseded { throw Superseded() }
             if lookingAhead {
                 if lookAheadYields { throw LookAheadGivenUp() }
                 serviceTransportWhileWaiting()
@@ -831,6 +831,25 @@ public final class PlaybackEngine: @unchecked Sendable {
     private var superseded: Bool { commandPending { switch $0 { case .play, .stop: true; default: false } } }
     private struct Superseded: Error {}
 
+    /// A start (the song opening for the listener, not the look-ahead) is pointless now: another song or stop was asked for, or a
+    /// seek, or an output setting that reopens the song. Either one starts the song over from somewhere else, so what the start
+    /// still waits for (the song's bytes from a share that may have gone quiet) is not worth waiting for: the newest request wins
+    /// at once, not after the share answers. A pause or resume is no such request (the song opens paused, or plays), and neither
+    /// is a setting the output does not need reopening for. The song stays where it was asked for (`parked`), and the command that
+    /// ended the start finds it there.
+    private var startSuperseded: Bool {
+        if superseded { return true }
+        guard !lookingAhead else { return false }
+        let current = settings
+        return commandPending {
+            switch $0 {
+            case .seek: true
+            case .settingsChanged(let new, _): reopensOutput(from: current, to: new)
+            default: false
+            }
+        }
+    }
+
     // MARK: Transport while the engine thread waits on a share
 
     /// The engine thread is preparing the song after the one that plays (`advance`): that one's decoded audio is what the output
@@ -865,7 +884,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// the song that plays (`lookAheadYields`: LookAheadGivenUp, and the look-ahead is taken again afterwards). Once given up, the
     /// body has `abandonGrace` to notice; a share that holds it longer no longer holds the engine thread.
     private func waitOnShare<T>(_ body: @escaping @Sendable (@escaping @Sendable () -> Bool) throws -> T) throws -> T {
-        guard lookingAhead else { return try body { [self] in superseded } }
+        guard lookingAhead else { return try body { [self] in startSuperseded } }
         let abandoned = Locked(false)
         let finished = DispatchSemaphore(value: 0)
         let outcome = Locked<Result<T, Error>?>(nil)
@@ -952,6 +971,31 @@ public final class PlaybackEngine: @unchecked Sendable {
         publishSnapshot()
     }
 
+    /// Whether going from the settings `old` to `new` makes the output be set up again (a different device or mode, rate, spatial
+    /// choice, a gain the open output can't apply) and the song reopened at its position, rather than carrying on.
+    private func reopensOutput(from old: EngineSettings, to new: EngineSettings) -> Bool {
+        let deviceChanged = old.deviceUID != new.deviceUID || old.exclusive != new.exclusive
+            || old.dopDeviceUIDs != new.dopDeviceUIDs || old.ratePolicies != new.ratePolicies
+            || old.atmosBySystem != new.atmosBySystem || (atmos != nil && old.spatialModes != new.spatialModes)
+            || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
+            || old.matchSixteenBit != new.matchSixteenBit || old.spatializeStereoUIDs != new.spatializeStereoUIDs
+            // Live Set's fixed rate, set or changed: the output is set up again at it (or back to following songs).
+            || old.transitions.fixedRate != new.transitions.fixedRate
+            || (old.convertsDSDForRoom(sessionDevice) != new.convertsDSDForRoom(sessionDevice)
+                && (session?.plan.mode == .dop || session?.plan.dsdConvertedToPCM == true))
+            // Transitions first, turned on or off: DSD, integer and 16-bit output are planned again.
+            || (old.transitions.avoidsUnmixableModes != new.transitions.avoidsUnmixableModes
+                && (session?.plan.mode == .dop || session?.plan.dsdConvertedToPCM == true || session?.applied.integerMode == true
+                    || session?.plan.integerSamples == true || session?.plan.sixteenBit == .requested))
+        // Integer mode hands the samples over untouched, so it can't apply digital volume: switched on mid-song, the
+        // output reopens on the float path rather than playing on at full level under a DIGITAL GAIN label.
+        // A 16-bit word has no room for gain either: digital volume or an equalizer reopens it at the device's full depth.
+        let leavesInteger = (session?.applied.integerMode == true || session?.plan.sixteenBit == .requested)
+            && (new.digitalVolume(for: sessionDevice) != nil || new.equalizer(for: sessionDevice) != nil
+                || new.roomCorrection(for: sessionDevice) != nil)
+        return deviceChanged || leavesInteger
+    }
+
     private func handle(_ command: Command) {
         switch command {
         case .barrier(let done):
@@ -1017,33 +1061,15 @@ public final class PlaybackEngine: @unchecked Sendable {
             let old = settings
             settings = new
             applyGain()
-            let deviceChanged = old.deviceUID != new.deviceUID || old.exclusive != new.exclusive
-                || old.dopDeviceUIDs != new.dopDeviceUIDs || old.ratePolicies != new.ratePolicies
-                || old.atmosBySystem != new.atmosBySystem || (atmos != nil && old.spatialModes != new.spatialModes)
-                || old.bitstreamDeviceUIDs != new.bitstreamDeviceUIDs || old.integerMode != new.integerMode
-                || old.matchSixteenBit != new.matchSixteenBit || old.spatializeStereoUIDs != new.spatializeStereoUIDs
-                // Live Set's fixed rate, set or changed: the output is set up again at it (or back to following songs).
-                || old.transitions.fixedRate != new.transitions.fixedRate
-                || (old.convertsDSDForRoom(sessionDevice) != new.convertsDSDForRoom(sessionDevice)
-                    && (session?.plan.mode == .dop || session?.plan.dsdConvertedToPCM == true))
-                // Transitions first, turned on or off: DSD, integer and 16-bit output are planned again.
-                || (old.transitions.avoidsUnmixableModes != new.transitions.avoidsUnmixableModes
-                    && (session?.plan.mode == .dop || session?.plan.dsdConvertedToPCM == true || session?.applied.integerMode == true
-                        || session?.plan.integerSamples == true || session?.plan.sixteenBit == .requested))
-            // Integer mode hands the samples over untouched, so it can't apply digital volume: switched on mid-song, the
-            // output reopens on the float path rather than playing on at full level under a DIGITAL GAIN label.
-            // A 16-bit word has no room for gain either: digital volume or an equalizer reopens it at the device's full depth.
-            let leavesInteger = (session?.applied.integerMode == true || session?.plan.sixteenBit == .requested)
-                && (new.digitalVolume(for: sessionDevice) != nil || new.equalizer(for: sessionDevice) != nil
-                    || new.roomCorrection(for: sessionDevice) != nil)
-            if deviceChanged || leavesInteger, state != .stopped {
+            let reopens = reopensOutput(from: old, to: new)
+            if reopens, state != .stopped {
                 log.notice("Output settings changed (\(old.deviceUID ?? "system", privacy: .public) → \(new.deviceUID ?? "system", privacy: .public)); restarting at the current position")
                 restartFromCurrentPosition()
             } else if outputSwitched, state == .playing {
                 // Switched away and back before this ran (A → B → A): silenced on the way, nothing to restart.
                 unmute()
             }
-            if old.transitions.engineRelevant != new.transitions.engineRelevant, !(deviceChanged || leavesInteger), state != .stopped,
+            if old.transitions.engineRelevant != new.transitions.engineRelevant, !reopens, state != .stopped,
                let session {
                 // The next boundary is planned again; one already mixed into the ring is taken back if it still can be.
                 _ = replanBoundary(session)
@@ -1273,6 +1299,9 @@ public final class PlaybackEngine: @unchecked Sendable {
                 // seek that superseded it finds it there (a play or stop clears it).
                 log.info("Skipped past \(current.url.lastPathComponent, privacy: .public) while it opened")
                 teardownDecoding()
+                // A decoder kept open for a reopen is dropped: its read-ahead may be blocked on the share where the song went quiet, and
+                // the seek that ended this start would wait behind it (a play or stop clears it the same way).
+                carried = nil
                 parked = (current, offset)
                 return
             } catch let error where error is ChosenDeviceMissing || error is ChosenDeviceNotReady {
@@ -1344,7 +1373,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         mark("probe")
         // Opening the file is the slow part on a busy share: if you've skipped on meanwhile, stop here,
         // before the output is reconfigured for a song that won't play.
-        if superseded { throw Superseded() }
+        if startSuperseded { throw Superseded() }
         let isGroup = GroupOutput.isGroupOutput(device)
         let bitstream = !isGroup && settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
         if probed.format.codec == DolbyAtmos.codecName, settings.atmosBySystem, !bitstream, !isGroup {
@@ -1391,7 +1420,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         // A seek reads where the song may not have arrived from the share yet, and a decoder kept open may be waiting on it in
         // its read-ahead: on a share that has stopped answering both wait as long as it does. A skip, stop or another seek gives up.
         // A seek right behind an output change in the same batch counts too (`commandPending`). Called on this thread only.
-        let interrupted: () -> Bool = { [unowned self] in commandPending { switch $0 { case .play, .stop, .seek: true; default: false } } }
+        let interrupted: () -> Bool = { [unowned self] in startSuperseded }
         do {
             try NetworkPlaybackCache.cancellingReads(when: interrupted) {
                 if seconds > 0 || reused != nil, decoder.supportsSeeking, decoder.length > 0 {
@@ -1426,7 +1455,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         lastAudibleSegmentID = nil
         if plan.mode == .bitstream { startBitstreamMeter(item, url: probed.url, at: actualOffset) }
         try prefill()
-        if superseded { throw Superseded() }
+        if startSuperseded { throw Superseded() }
         mark("prefill")
     }
 
@@ -1901,7 +1930,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             // actual audio read so a CUE/SACD seek primes the region that will play, not a tag at EOF.
             if let ahead = decoding.decoder as? ReadAheadDecoder {
                 while !ahead.waitForAudio(timeout: 0.05), !ahead.hasEnded {
-                    if superseded { throw Superseded() }
+                    if startSuperseded { throw Superseded() }
                     if lookingAhead {
                         if lookAheadYields { throw LookAheadGivenUp() }
                         serviceTransportWhileWaiting()
