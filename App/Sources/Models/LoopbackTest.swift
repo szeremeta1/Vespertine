@@ -73,7 +73,7 @@ final class LoopbackTest {
         if player.outputDevice?.uid == output.uid { player.stop() } else if player.isPlaying { player.togglePlayPause() }
         let cases = LoopbackPlan.cases(rates: output.capabilities.sampleRates, mode: mode)
         guard !cases.isEmpty else {
-            error = "\(output.name) offers none of the test's sample rates (44.1 to 384 kHz)."
+            error = String(localized: "\(output.name) offers none of the test's sample rates (44.1 to 384 kHz).")
             phase = .finished
             return
         }
@@ -94,7 +94,7 @@ final class LoopbackTest {
         case .success(let report):
             self.report = report
             done = report.cases
-            do { saved = try store.save(report) } catch { self.error = "The results couldn't be saved: \(error.localizedDescription)" }
+            do { saved = try store.save(report) } catch { self.error = String(localized: "The results couldn't be saved: \(error.localizedDescription)") }
         case .failure(let error):
             self.error = error.localizedDescription
         }

@@ -24,12 +24,12 @@ public enum GroupAggregateError: Error, Equatable, LocalizedError {
 
     public var errorDescription: String? {
         switch self {
-        case .tooFewMembers: "A group needs at least two outputs."
-        case .duplicateMember(let uid): "The output \(uid) is in the group twice."
-        case .leaderNotAMember(let uid): "The clock leader \(uid) is not one of the group's outputs."
-        case .invalidMember(let uid): "The settings for \(uid) are not valid."
-        case .creation(let status): "macOS could not combine the outputs (\(status))."
-        case .notListed: "macOS did not list the combined output."
+        case .tooFewMembers: String(localized: "A group needs at least two outputs.")
+        case .duplicateMember(let uid): String(localized: "The output \(uid) is in the group twice.")
+        case .leaderNotAMember(let uid): String(localized: "The clock leader \(uid) is not one of the group's outputs.")
+        case .invalidMember(let uid): String(localized: "The settings for \(uid) are not valid.")
+        case .creation(let status): String(localized: "macOS could not combine the outputs (\(Int(status))).")
+        case .notListed: String(localized: "macOS did not list the combined output.")
         }
     }
 }
