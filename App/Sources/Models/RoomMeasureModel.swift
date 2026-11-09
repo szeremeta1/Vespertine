@@ -116,6 +116,8 @@ final class RoomMeasureModel {
         detail = ""
         runTask = Task { [weak self] in
             await self?.pausePlayback?()
+            // Cancelled while playback was let go: no DACs opened, no folder made; back to the start.
+            guard !Task.isCancelled else { self?.reset(); return }
             await self?.setUpAndRun(micName: micName)
         }
     }
