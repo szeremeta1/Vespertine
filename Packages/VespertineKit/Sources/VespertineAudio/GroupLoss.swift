@@ -70,6 +70,7 @@ extension GroupOutput {
     /// A group after followers were lost, when it carries on with the rest: the members that are connected as a group (two or
     /// more), or just the leader's own device. Only for a group set to carry on, and never without its leader.
     public static func resolveDegraded(_ group: SpeakerGroup, among devices: [OutputDevice]) -> Resolution {
+        let group = group.followingUSBPorts(among: devices) ?? group
         guard group.onMemberLoss == .continueOnRemaining else { return resolve(group, among: devices) }
         let connected = Set(devices.map(\.uid))
         guard case .followersLost = GroupLoss.assess(group, connected: connected) else { return resolve(group, among: devices) }

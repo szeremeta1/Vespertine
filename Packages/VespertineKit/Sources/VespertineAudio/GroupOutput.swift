@@ -25,6 +25,8 @@ public enum GroupOutput {
     /// aggregate is made when it plays), all the members' channels and the rates they all take.
     public static func resolve(_ group: SpeakerGroup, among devices: [OutputDevice]) -> Resolution {
         guard group.isValid else { return .invalid }
+        // A DAC on another USB port has another UID: the group is read as it would be saved for the ports it is on now.
+        let group = group.followingUSBPorts(among: devices) ?? group
         var members: [OutputDevice] = [], missing: [String] = []
         for member in group.members {
             if let device = devices.first(where: { $0.uid == member.deviceUID }), device.capabilities.outputChannels >= member.channelCount {
@@ -46,9 +48,10 @@ public enum GroupOutput {
                      capabilities: GroupCapabilities.combined(members.map(\.capabilities)), hasHardwareVolume: false, isDefault: false)
     }
 
-    /// The UIDs of the groups that count as connected outputs: those whose members all are.
+    /// The UIDs of the groups that count as connected outputs: those whose members all are (on whichever USB port).
     public static func connectedUIDs(of groups: [SpeakerGroup], connected: Set<String>) -> Set<String> {
-        Set(groups.filter { group in group.members.allSatisfy { connected.contains($0.deviceUID) } }.map(\.outputUID))
+        Set(groups.map { $0.followingUSBPorts(amongUIDs: Array(connected)) ?? $0 }
+            .filter { group in group.members.allSatisfy { connected.contains($0.deviceUID) } }.map(\.outputUID))
     }
 
     /// The same output: a single device by its ID, a group by its UID (its aggregate's ID changes whenever it is remade).

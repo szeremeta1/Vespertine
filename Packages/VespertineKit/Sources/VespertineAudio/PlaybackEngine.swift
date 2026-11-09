@@ -1156,6 +1156,8 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func resolveGroup(_ group: SpeakerGroup, among devices: [OutputDevice]) throws -> OutputDevice {
         // A group set to carry on plays with the members that are left (a lone leader as the single output it is); it moves back
         // to the whole group when the others return (`standingIn`, as for any chosen output that stands in).
+        // A member on another USB port than the one saved is the same DAC: the group plays as saved for the ports it is on now.
+        let group = group.followingUSBPorts(among: devices) ?? group
         switch GroupOutput.resolveDegraded(group, among: devices) {
         case .ready(let output, let members):
             standingIn = members.count < group.members.count ? group.outputUID : nil
