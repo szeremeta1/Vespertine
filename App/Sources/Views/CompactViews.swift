@@ -34,14 +34,19 @@ struct MiniPlayerView: View {
                         TransitionsButton(size: 11)
                         Spacer(minLength: 4)
                         if let path = player.signalPath {
-                            Text(path.isResampling
-                                 ? String(localized: "\(SampleRate.format(path.plan.decodedSampleRate)) → \(SampleRate.format(path.plan.deviceSampleRate)) kHz")
-                                 : path.deviceFormatShort)
-                                .font(Typeface.mono(10))
-                                .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
-                                .help(path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted on the way to the device"))
-                                .accessibilityLabel(path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted", comment: "The audio is converted (not bit-perfect) on the way to the device"))
-                                .accessibilityValue(path.deviceFormatShort)
+                            // A filled disc or a ring beside the format, so bit-perfect or converted isn't colour alone.
+                            HStack(spacing: 5) {
+                                VerdictMark(untouched: path.isBitPerfect)
+                                Text(path.isResampling
+                                     ? String(localized: "\(SampleRate.format(path.plan.decodedSampleRate)) → \(SampleRate.format(path.plan.deviceSampleRate)) kHz")
+                                     : path.deviceFormatShort)
+                                    .font(Typeface.mono(10))
+                                    .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
+                            }
+                            .help(path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted on the way to the device"))
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityLabel(path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted", comment: "The audio is converted (not bit-perfect) on the way to the device"))
+                            .accessibilityValue(path.deviceFormatShort)
                         }
                     }
                 }
@@ -109,8 +114,11 @@ struct MenuBarView: View {
                     Text(player.current.map { "\($0.track.displayArtist.libraryDisplayName) — \($0.track.displayAlbum.libraryDisplayName)" } ?? "Vespertine")
                         .font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     if let path = player.signalPath {
-                        (player.buffering ? Text("BUFFERING…") : Text(verbatim: ([path.statusLine] + path.conversionBadges + [path.deviceFormatShort]).joined(separator: " · "))).font(Typeface.mono(9.5)).lineLimit(2)
-                            .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
+                        HStack(alignment: .firstTextBaseline, spacing: 5) {
+                            VerdictMark(untouched: path.isBitPerfect)
+                            (player.buffering ? Text("BUFFERING…") : Text(verbatim: ([path.statusLine] + path.conversionBadges + [path.deviceFormatShort]).joined(separator: " · "))).font(Typeface.mono(9.5)).lineLimit(2)
+                                .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
+                        }
                     }
                 }
                 Spacer(minLength: 0)

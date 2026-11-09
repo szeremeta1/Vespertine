@@ -392,7 +392,7 @@ struct VolumeControl: View {
                 BrassSlider(value: Binding(get: { Double(v) }, set: { model.devices.setHardwareVolume(Float($0)) }),
                             tint: Palette.text2, showsThumb: false, accessibilityName: String(localized: "Hardware volume"))
                     .frame(width: 72)
-                Text("HW", comment: "Short label: hardware volume").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.text3).help("Hardware volume on the device; samples are untouched")
+                Text("HW", comment: "Short label: hardware volume").font(Typeface.mono(9.5)).fixedSize().foregroundStyle(Palette.text3).help("Hardware volume on the device; samples are untouched").accessibilityHidden(true)
             } else if let device, settings.usesAppVolume(device.uid) {
                 BrassSlider(value: Binding(get: { settings.appVolumeLevel(for: device.uid) },
                                            set: { settings.setAppVolumeLevel($0, for: device.uid); model.syncEngine() }),
@@ -407,6 +407,7 @@ struct VolumeControl: View {
                 }
                 .buttonStyle(.plain)
                 .help("Digital volume (64-bit, dithered). Not bit-perfect below 100%.")
+                .accessibilityLabel("Volume control in Vespertine")
                 .popover(isPresented: $showOptions, arrowEdge: .top) { options(device) }
             } else if let device {
                 // A fixed-volume output (HDMI, optical, a line-out DAC): the way to Vespertine's own volume.
@@ -419,6 +420,7 @@ struct VolumeControl: View {
                 }
                 .buttonStyle(.plain)
                 .help("This output has no volume control of its own. Click to set the volume in Vespertine instead (not bit-perfect below 100%).")
+                .accessibilityLabel("Volume control in Vespertine")
                 .popover(isPresented: $showOptions, arrowEdge: .top) { options(device) }
             }
         }
