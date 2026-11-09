@@ -53,6 +53,7 @@ public final class LibraryDatabase: Sendable {
         config.foreignKeysEnabled = true
         config.prepareDatabase { db in
             try db.execute(sql: "PRAGMA synchronous = NORMAL")
+            Self.addSortFunction(to: db)
         }
         let pool = try DatabasePool(path: url.path, configuration: config)
         do {
@@ -102,9 +103,51 @@ public final class LibraryDatabase: Sendable {
     }
 
     public static func inMemory() throws -> LibraryDatabase {
+        try LibraryDatabase(writer: DatabaseQueue(configuration: queueConfiguration()))
+    }
+
+    /// For a database that isn't opened through `init(url:)` (an in-memory one, a test's): foreign keys on and the sort function added.
+    static func queueConfiguration() -> Configuration {
         var config = Configuration()
         config.foreignKeysEnabled = true
-        return try LibraryDatabase(writer: DatabaseQueue(configuration: config))
+        config.prepareDatabase { db in Self.addSortFunction(to: db) }
+        return config
+    }
+
+    /// `vesperSort(key)`: the sort keys of the `track` table folded for ordering. The columns lowercase ASCII letters only
+    /// (SQLite's `lower()`), so "Édith Piaf", "Ólafur Arnalds" and "Çigdem" sorted after "Zappa", and "Beyoncé" after
+    /// "BEYONCE Live". This folds case and accents (and ø, æ, œ, ß, đ, ł, þ, ð, which aren't accents) so they sit with
+    /// the plain letter. Not stored anywhere (no index or column uses it), so files stay readable by earlier builds.
+    static func sortFold(_ key: String) -> String {
+        // Already lowercase, nothing to fold: the common case, and the one that must stay cheap on a big library.
+        if key.utf8.allSatisfy({ $0 < 0x80 }) { return key }
+        var folded = key.folding(options: [.diacriticInsensitive, .caseInsensitive, .widthInsensitive], locale: nil)
+        for (letter, plain) in [("ø", "o"), ("æ", "ae"), ("œ", "oe"), ("ß", "ss"), ("đ", "d"), ("ł", "l"), ("þ", "th"), ("ð", "d")] {
+            folded = folded.replacingOccurrences(of: letter, with: plain)
+        }
+        return folded
+    }
+
+    /// Registers `vesperSort` on a connection. Every connection that runs a query ordering by it needs it.
+    static func addSortFunction(to db: Database) {
+        // A song's artist and album repeat along a whole album or artist, so remembered folds (per connection, which
+        // runs one statement at a time) save most of the work on a big library.
+        let cache = SortFoldCache()
+        db.add(function: DatabaseFunction("vesperSort", argumentCount: 1, pure: true) { values in
+            String.fromDatabaseValue(values[0]).map(cache.fold)
+        })
+    }
+
+    private final class SortFoldCache: @unchecked Sendable {
+        private var folds: [String: String] = [:]
+
+        func fold(_ key: String) -> String {
+            if let known = folds[key] { return known }
+            let folded = LibraryDatabase.sortFold(key)
+            if folds.count >= 20_000 { folds.removeAll(keepingCapacity: true) }
+            folds[key] = folded
+            return folded
+        }
     }
 
     init(writer: any DatabaseWriter, migrate: Bool = true, recovery: Recovery? = nil) throws {
@@ -456,7 +499,7 @@ public extension LibraryDatabase {
                             CASE WHEN location = (SELECT min(image.location) FROM track AS image WHERE image.albumKey = track.albumKey
                                                   AND image.filePath = track.filePath AND image.isMissing = 0) THEN fileSize ELSE 0 END
                         WHEN cueStartFrame IS NULL OR cueStartFrame = 0 THEN fileSize ELSE 0 END) AS totalSize, min(filePath) AS anyPath,
-               min(albumArtistSortKey) AS artistKey, min(albumSortKey) AS titleKey,
+               vesperSort(min(albumArtistSortKey)) AS artistKey, vesperSort(min(albumSortKey)) AS titleKey,
                -- what filters look at: every value any track has (DSD counts as 1-bit; lossless PCM nobody analyzed yet as 'none')
                group_concat(DISTINCT replace(codec, ',', ' ') || ':' || isLossless || isDSD) AS kinds,
                group_concat(DISTINCT CAST(round(sampleRate) AS INTEGER)) AS rates,
@@ -603,7 +646,7 @@ public extension LibraryDatabase {
 
     func allTracks() throws -> [Track] {
         try writer.read { db in
-            try Track.fetchAll(db, sql: "SELECT * FROM track WHERE isMissing = 0 ORDER BY albumArtistSortKey, albumSortKey, discNumber, trackNumber")
+            try Track.fetchAll(db, sql: "SELECT * FROM track WHERE isMissing = 0 ORDER BY vesperSort(albumArtistSortKey), vesperSort(albumSortKey), discNumber, trackNumber")
         }
     }
 
@@ -655,7 +698,7 @@ public extension LibraryDatabase {
         return try writer.read { db in
             try Track.fetchAll(db, sql: """
                 SELECT * FROM track WHERE isMissing = 0 AND \(Array(repeating: oneWord, count: words.count).joined(separator: " AND "))
-                ORDER BY albumArtistSortKey, albumSortKey, discNumber, trackNumber LIMIT ?
+                ORDER BY vesperSort(albumArtistSortKey), vesperSort(albumSortKey), discNumber, trackNumber LIMIT ?
                 """, arguments: arguments)
         }
     }
@@ -680,7 +723,7 @@ public extension LibraryDatabase {
             try Row.fetchAll(db, sql: """
                 SELECT coalesce(albumArtist, artist, 'Unknown Artist') AS name, count(DISTINCT albumKey) AS albums,
                        count(*) AS tracks, max(artworkKey) AS art
-                FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY min(albumArtistSortKey)
+                FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY vesperSort(min(albumArtistSortKey))
                 """).map { ArtistSummary(name: $0["name"], albumCount: $0["albums"], trackCount: $0["tracks"], artworkKey: $0["art"]) }
         }
     }

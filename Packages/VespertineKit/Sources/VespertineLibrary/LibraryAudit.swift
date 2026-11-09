@@ -136,6 +136,7 @@ extension LibraryDatabase {
     public static func readOnly(url: URL) throws -> LibraryDatabase {
         var config = Configuration()
         config.readonly = true
+        config.prepareDatabase { db in Self.addSortFunction(to: db) }
         return try LibraryDatabase(writer: DatabaseQueue(path: url.path, configuration: config), migrate: false)
     }
 
