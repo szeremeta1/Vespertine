@@ -9,97 +9,17 @@ import VespertineAudio
 
 public final class LibraryDatabase: Sendable {
     public let writer: any DatabaseWriter
-    /// Set when the file at the opened URL couldn't be read as a database and was set aside: the app starts with a new,
-    /// empty library and tells the user where the old file went.
-    public let recovery: Recovery?
 
-    /// A library file that SQLite could not read (not a database, or damaged), kept beside the new one.
-    public struct Recovery: Sendable, Equatable {
-        /// The damaged file, renamed (its `-wal` and `-shm` files carry the same suffix).
-        public let backup: URL
-        /// What SQLite said.
-        public let reason: String
-    }
-
-    /// Opens (or creates) the library at `url`. A file that isn't a database or is damaged (SQLite's NOTADB and CORRUPT
-    /// errors) is renamed next to the library, never deleted, and a new library is created in its place (`recovery`
-    /// says so). Any other failure (no permission, a full disk, a locked file) is thrown with the file left as it is.
-    ///
-    /// `recoversDamagedFile: false` is for tools that must not change anything on their own (the command-line tool): the
-    /// error is thrown as it was, with the file where it was.
-    public convenience init(url: URL, recoversDamagedFile: Bool = true) throws {
+    /// Opens (or creates) the library at `url`.
+    public convenience init(url: URL) throws {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-        var recovery: Recovery?
-        var pool: DatabasePool
-        do {
-            pool = try Self.openMigrated(at: url)
-        } catch let error as DatabaseError where recoversDamagedFile && Self.isUnreadableFile(error) {
-            let backup = try Self.setAside(url)
-            recovery = Recovery(backup: backup, reason: error.description)
-            do {
-                pool = try Self.openMigrated(at: url)
-            } catch {
-                // A new library can't be made either (a full disk, say): put the file back, so the next try finds the
-                // same damage, recovers again and says so, instead of finding a missing file and starting silently empty.
-                try? Self.putBack(backup, at: url)
-                throw error
-            }
-        }
-        try self.init(writer: pool, migrate: false, recovery: recovery)
-    }
-
-    private static func openMigrated(at url: URL) throws -> DatabasePool {
         var config = Configuration()
         config.foreignKeysEnabled = true
         config.prepareDatabase { db in
             try db.execute(sql: "PRAGMA synchronous = NORMAL")
             Self.addSortFunction(to: db)
         }
-        let pool = try DatabasePool(path: url.path, configuration: config)
-        do {
-            try migrator.migrate(pool)
-        } catch {
-            try? pool.close()
-            throw error
-        }
-        return pool
-    }
-
-    /// Whether SQLite is saying the file's content is not a usable database (as opposed to the file being unreachable).
-    static func isUnreadableFile(_ error: DatabaseError) -> Bool {
-        if error.resultCode == .SQLITE_NOTADB { return true }
-        // "malformed database schema" is also CORRUPT, but it's what an older SQLite says about a schema a newer one wrote
-        // (a feature it doesn't know): the file is fine, so it's left alone and the error shown.
-        return error.resultCode == .SQLITE_CORRUPT && !(error.message ?? "").contains("malformed database schema")
-    }
-
-    /// Undoes `setAside`: the damaged file (and its log files) back under the library's name, replacing what an
-    /// aborted attempt to create a new library left there.
-    static func putBack(_ backup: URL, at url: URL) throws {
-        let fm = FileManager.default
-        for suffix in ["", "-wal", "-shm"] {
-            try? fm.removeItem(atPath: url.path + suffix)
-            if fm.fileExists(atPath: backup.path + suffix) { try fm.moveItem(atPath: backup.path + suffix, toPath: url.path + suffix) }
-        }
-    }
-
-    /// Renames the database file and its write-ahead log and shared-memory files to `<name>.damaged-<date>`.
-    static func setAside(_ url: URL, now: Date = .now) throws -> URL {
-        let fm = FileManager.default
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.dateFormat = "yyyyMMdd-HHmmss"
-        let stamp = formatter.string(from: now)
-        var backup = url.deletingLastPathComponent().appendingPathComponent("\(url.lastPathComponent).damaged-\(stamp)")
-        var n = 2
-        while ["", "-wal", "-shm"].contains(where: { fm.fileExists(atPath: backup.path + $0) }) {
-            backup = url.deletingLastPathComponent().appendingPathComponent("\(url.lastPathComponent).damaged-\(stamp)-\(n)")
-            n += 1
-        }
-        for suffix in ["", "-wal", "-shm"] where fm.fileExists(atPath: url.path + suffix) {
-            try fm.moveItem(atPath: url.path + suffix, toPath: backup.path + suffix)
-        }
-        return backup
+        try self.init(writer: DatabasePool(path: url.path, configuration: config))
     }
 
     public static func inMemory() throws -> LibraryDatabase {
@@ -150,9 +70,8 @@ public final class LibraryDatabase: Sendable {
         }
     }
 
-    init(writer: any DatabaseWriter, migrate: Bool = true, recovery: Recovery? = nil) throws {
+    init(writer: any DatabaseWriter, migrate: Bool = true) throws {
         self.writer = writer
-        self.recovery = recovery
         // Stored analyses from an older analyzer are judged anew by `rejudgeStoredAnalyses`, which the app runs off the
         // main thread after opening the library and before anything asks what needs analyzing.
         if migrate { try Self.migrator.migrate(writer) }
