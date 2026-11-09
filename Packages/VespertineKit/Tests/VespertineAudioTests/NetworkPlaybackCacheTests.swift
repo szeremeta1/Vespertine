@@ -66,6 +66,22 @@ private final class TimedOutShare: PlaybackCacheReader, @unchecked Sendable {
     func read(at offset: Int64, count: Int) throws -> Data { Thread.sleep(forTimeInterval: 0.01); throw POSIXError(.ETIMEDOUT) }
 }
 
+/// A file that is rewritten on the server part way through its copy: the share says so (its modification date moved).
+private final class RewrittenShare: PlaybackCacheReader, @unchecked Sendable {
+    let bytes: Data
+    let changeAt: Int64
+    private let lock = NSLock()
+    private var furthest: Int64 = 0
+    var size: Int64 { Int64(bytes.count) }
+    init(count: Int, changeAt: Int64) { bytes = Data((0..<count).map { UInt8(truncatingIfNeeded: $0 * 13) }); self.changeAt = changeAt }
+    func read(at offset: Int64, count: Int) throws -> Data {
+        lock.withLock { furthest = max(furthest, offset + Int64(count)) }
+        return bytes.subdata(in: Int(offset)..<min(Int(offset) + count, bytes.count))
+    }
+    /// The server rewrote the file once the copy got past `changeAt`.
+    var changedSinceOpen: Bool { lock.withLock { furthest > changeAt } }
+}
+
 struct NetworkPlaybackCacheTests {
     private func directory() throws -> URL {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -158,6 +174,17 @@ struct NetworkPlaybackCacheTests {
         #expect(current.copiedBytes == 0, "its sparse file takes no space yet, but will")
         #expect(throws: CocoaError.self) { _ = try cache.entry(key: "next", url: URL(fileURLWithPath: "/share/b.flac"), reader: second) }
         #expect(cache.reservedBytes == 2_000_000)
+    }
+
+    @Test("A file rewritten on the server while it is copied ends the copy in an error, never a complete mixed copy")
+    func rewrittenWhileCopying() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let share = RewrittenShare(count: 40 * 4096, changeAt: 10 * 4096)
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096)
+        let entry = try cache.entry(key: "rewritten", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
+        #expect(throws: (any Error).self) { try entry.prepare(full: true, lead: 0, cancelled: { false }) }
+        #expect(!entry.isComplete)
+        #expect(!entry.isWaiting)
     }
 
     @Test("A slow current track is completely local before output; a later outage makes no reads")
