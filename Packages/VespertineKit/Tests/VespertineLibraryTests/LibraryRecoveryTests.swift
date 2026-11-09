@@ -134,4 +134,55 @@ struct LibraryRecoveryTests {
         #expect(try Data(contentsOf: first) == Data("one".utf8))
         #expect(try Data(contentsOf: second) == Data("two".utf8))
     }
+
+    @Test("With recovery turned off (the command-line tool), a damaged file is an error and stays where it is")
+    func toolDoesNotRecover() throws {
+        let dir = try folder()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("Library.sqlite")
+        let garbage = Data((0..<20_000).map { UInt8(truncatingIfNeeded: $0 &* 17 &+ 3) })
+        try garbage.write(to: url)
+        #expect(throws: Error.self) { _ = try LibraryDatabase(url: url, recoversDamagedFile: false) }
+        #expect(try Data(contentsOf: url) == garbage)
+        #expect(try FileManager.default.contentsOfDirectory(atPath: dir.path).allSatisfy { !$0.contains("damaged") })
+    }
+
+    @Test("A schema this SQLite can't read (what a newer one may write) is an error, not damage: the file stays")
+    func malformedSchemaIsNotDamage() throws {
+        let dir = try folder()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("Library.sqlite")
+        try makeLibrary(at: url)
+        // The schema text sits in the file's first page: make one statement something this SQLite can't parse.
+        var bytes = try Data(contentsOf: url)
+        let statement = Data("CREATE TABLE \"source\"".utf8)
+        let at = try #require(bytes.range(of: statement), "the source table's statement is in the file")
+        bytes.replaceSubrange(at.lowerBound + 7..<at.lowerBound + 12, with: Data("TABLX".utf8))
+        try bytes.write(to: url)
+        let before = try Data(contentsOf: url)
+        do {
+            _ = try LibraryDatabase(url: url)
+            Issue.record("a schema SQLite can't parse must not open")
+        } catch let error as DatabaseError {
+            #expect(error.resultCode == .SQLITE_CORRUPT && (error.message ?? "").contains("malformed database schema"), "\(error.description)")
+            #expect(!LibraryDatabase.isUnreadableFile(error))
+        }
+        #expect(try FileManager.default.contentsOfDirectory(atPath: dir.path).allSatisfy { !$0.contains("damaged") })
+        #expect(try Data(contentsOf: url) == before)
+    }
+
+    @Test("Putting a set-aside file back restores it and its log files in place of whatever was made meanwhile")
+    func putBack() throws {
+        let dir = try folder()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent("Library.sqlite")
+        try Data("old".utf8).write(to: url)
+        try Data("old-wal".utf8).write(to: URL(fileURLWithPath: url.path + "-wal"))
+        let backup = try LibraryDatabase.setAside(url)
+        try Data("new".utf8).write(to: url)
+        try LibraryDatabase.putBack(backup, at: url)
+        #expect(try Data(contentsOf: url) == Data("old".utf8))
+        #expect(try Data(contentsOf: URL(fileURLWithPath: url.path + "-wal")) == Data("old-wal".utf8))
+        #expect(!FileManager.default.fileExists(atPath: backup.path))
+    }
 }

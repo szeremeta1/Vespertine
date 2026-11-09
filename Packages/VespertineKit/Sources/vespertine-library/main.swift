@@ -29,6 +29,17 @@ func value(after index: Int) -> String {
 /// The value of option `name`, or nil when it isn't given.
 func option(_ name: String) -> String? { args.firstIndex(of: name).map(value(after:)) }
 
+/// Opens (creating it when new) the library in `dataDir`. A library file that can't be read is left exactly as it is:
+/// the app sets such a file aside and starts a new library, but a tool run from a terminal shouldn't do that unasked.
+func openLibrary(_ dataDir: URL) throws -> LibraryDatabase {
+    let url = dataDir.appendingPathComponent("Library.sqlite")
+    do { return try LibraryDatabase(url: url, recoversDamagedFile: false) }
+    catch {
+        FileHandle.standardError.write("Can't open \(url.path): \(error.localizedDescription)\nNothing was changed. If the file is damaged, open the library in Vespertine, which keeps the damaged file under another name and starts a new library.\n".data(using: .utf8)!)
+        exit(1)
+    }
+}
+
 switch args.first {
 case "audit":
     // Read-only, without migrating: safe while Vespertine has the library open. Run it after importing music.
@@ -90,7 +101,7 @@ case "import":
     guard let library, let into else { print("import needs --library and --into"); exit(2) }
     let dataDir = URL(fileURLWithPath: (library as NSString).expandingTildeInPath)
     let root = URL(fileURLWithPath: (into as NSString).expandingTildeInPath)
-    let db = try LibraryDatabase(url: dataDir.appendingPathComponent("Library.sqlite"))
+    let db = try openLibrary(dataDir)
     let written = try Importer.copyAndOrganize(inputs, into: root)
     print("imported \(written.count) files into \(root.path)")
     let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dataDir.appendingPathComponent("Artwork")))
@@ -102,7 +113,7 @@ case "import-server-analysis":
     // Imports results from each network share's `.vespertine/analysis.jsonl` (written by vespertine-analyze).
     guard let library = option("--library") else { usageError("import-server-analysis needs --library") }
     let dataDir = URL(fileURLWithPath: (library as NSString).expandingTildeInPath)
-    let db = try LibraryDatabase(url: dataDir.appendingPathComponent("Library.sqlite"))
+    let db = try openLibrary(dataDir)
     // As the app does first: results an analyzer update can judge anew aren't looked for in the index.
     try db.rejudgeStoredAnalyses()
     let importer = ServerAnalysisImporter()
@@ -125,7 +136,7 @@ case "scan":
     let folders = args.dropFirst().enumerated().filter { $0.offset + 1 != li && $0.offset + 1 != li + 1 }.map(\.element)
     guard let folder = folders.first else { print("scan needs a folder"); exit(2) }
     try FileManager.default.createDirectory(at: dataDir, withIntermediateDirectories: true)
-    let db = try LibraryDatabase(url: dataDir.appendingPathComponent("Library.sqlite"))
+    let db = try openLibrary(dataDir)
     let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dataDir.appendingPathComponent("Artwork")))
     let root = URL(fileURLWithPath: (folder as NSString).expandingTildeInPath).standardizedFileURL
     let source = try db.addSource(LibrarySource(path: root.path, mode: .reference))
@@ -215,7 +226,7 @@ case "enrich":
     guard let library = option("--library") else { usageError("enrich needs --library") }
     let dataDir = URL(fileURLWithPath: (library as NSString).expandingTildeInPath)
     let mode = option("--apply")
-    let db = try LibraryDatabase(url: dataDir.appendingPathComponent("Library.sqlite"))
+    let db = try openLibrary(dataDir)
     let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dataDir.appendingPathComponent("Artwork")))
     let writer = TagWriter(database: db, scanner: scanner, backupDirectory: dataDir.appendingPathComponent("Tag Backups"))
     let enricher = MetadataEnricher(database: db)

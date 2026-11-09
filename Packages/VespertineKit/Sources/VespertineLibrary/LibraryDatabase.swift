@@ -24,16 +24,26 @@ public final class LibraryDatabase: Sendable {
     /// Opens (or creates) the library at `url`. A file that isn't a database or is damaged (SQLite's NOTADB and CORRUPT
     /// errors) is renamed next to the library, never deleted, and a new library is created in its place (`recovery`
     /// says so). Any other failure (no permission, a full disk, a locked file) is thrown with the file left as it is.
-    public convenience init(url: URL) throws {
+    ///
+    /// `recoversDamagedFile: false` is for tools that must not change anything on their own (the command-line tool): the
+    /// error is thrown as it was, with the file where it was.
+    public convenience init(url: URL, recoversDamagedFile: Bool = true) throws {
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
         var recovery: Recovery?
         var pool: DatabasePool
         do {
             pool = try Self.openMigrated(at: url)
-        } catch let error as DatabaseError where Self.isUnreadableFile(error) {
+        } catch let error as DatabaseError where recoversDamagedFile && Self.isUnreadableFile(error) {
             let backup = try Self.setAside(url)
             recovery = Recovery(backup: backup, reason: error.description)
-            pool = try Self.openMigrated(at: url)
+            do {
+                pool = try Self.openMigrated(at: url)
+            } catch {
+                // A new library can't be made either (a full disk, say): put the file back, so the next try finds the
+                // same damage, recovers again and says so, instead of finding a missing file and starting silently empty.
+                try? Self.putBack(backup, at: url)
+                throw error
+            }
         }
         try self.init(writer: pool, migrate: false, recovery: recovery)
     }
@@ -56,7 +66,20 @@ public final class LibraryDatabase: Sendable {
 
     /// Whether SQLite is saying the file's content is not a usable database (as opposed to the file being unreachable).
     static func isUnreadableFile(_ error: DatabaseError) -> Bool {
-        error.resultCode == .SQLITE_NOTADB || error.resultCode == .SQLITE_CORRUPT
+        if error.resultCode == .SQLITE_NOTADB { return true }
+        // "malformed database schema" is also CORRUPT, but it's what an older SQLite says about a schema a newer one wrote
+        // (a feature it doesn't know): the file is fine, so it's left alone and the error shown.
+        return error.resultCode == .SQLITE_CORRUPT && !(error.message ?? "").contains("malformed database schema")
+    }
+
+    /// Undoes `setAside`: the damaged file (and its log files) back under the library's name, replacing what an
+    /// aborted attempt to create a new library left there.
+    static func putBack(_ backup: URL, at url: URL) throws {
+        let fm = FileManager.default
+        for suffix in ["", "-wal", "-shm"] {
+            try? fm.removeItem(atPath: url.path + suffix)
+            if fm.fileExists(atPath: backup.path + suffix) { try fm.moveItem(atPath: backup.path + suffix, toPath: url.path + suffix) }
+        }
     }
 
     /// Renames the database file and its write-ahead log and shared-memory files to `<name>.damaged-<date>`.
