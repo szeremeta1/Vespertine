@@ -153,6 +153,19 @@ struct NetworkPlaybackCacheTests {
         #expect(try result.withLock { $0 }?.get() == share.bytes[0..<4096])
     }
 
+    @Test("How long a copy has been going is read off the cache's clock, as the share's silence is")
+    func copyAgeFollowsTheClock() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let share = SlowShare(count: 65536); share.stall(true)
+        defer { share.stall(false) }
+        let now = Locked(TimeInterval(5))
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096, noProgressLimit: 120, clock: { now.withLock { $0 } })
+        let entry = try cache.entry(key: "age", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
+        #expect(entry.copyElapsed == 0)
+        now.withLock { $0 += 42 }
+        #expect(entry.copyElapsed == 42, "the copy's age (and so the speed its start is planned on) is not the machine's wall clock")
+    }
+
     @Test("A share that answers every read with a temporary error fails the song after the limit instead of retrying for ever")
     func timeoutsGiveUp() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
