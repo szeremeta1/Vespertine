@@ -220,6 +220,17 @@ struct NetworkTests {
         #expect(cache.usage().offlineFiles == 2 && cache.usage().problem == nil)
     }
 
+    @Test("The free space the caches go by is read for the cache's own volume, purgeable space included")
+    func freeSpaceOfTheCacheVolume() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-free-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let free = try #require(NetworkCache.freeBytes(at: dir))
+        let plain = try #require((try FileManager.default.attributesOfFileSystem(forPath: dir.path)[.systemFreeSize] as? NSNumber)?.int64Value)
+        #expect(free > 0)
+        #expect(free >= plain / 2, "the same volume: \(free) against \(plain) bytes")
+    }
+
     @Test("A copy stops when the disk fills while it runs, and leaves no partial file")
     func cacheStopsWhenDiskFills() async throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-filling-\(UUID().uuidString)")

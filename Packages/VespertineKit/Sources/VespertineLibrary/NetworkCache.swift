@@ -60,6 +60,17 @@ public final class NetworkCache: @unchecked Sendable {
     /// Bytes free on the cache's volume (nil: unknown, copies go ahead). For tests: a disk that is full, or fills.
     public var freeSpace: @Sendable () -> Int64?
 
+    /// Bytes free for this app's own files on the volume holding `url`: what macOS would free for it too (purgeable space,
+    /// such as local snapshots and caches it can drop), which the plain free size leaves out. The plain free size when the
+    /// volume does not say.
+    public static func freeBytes(at url: URL) -> Int64? {
+        var fresh = url
+        fresh.removeAllCachedResourceValues()
+        if let important = try? fresh.resourceValues(forKeys: [.volumeAvailableCapacityForImportantUsageKey]).volumeAvailableCapacityForImportantUsage,
+           important > 0 { return important }
+        return (try? FileManager.default.attributesOfFileSystem(forPath: url.path)[.systemFreeSize] as? NSNumber)?.int64Value
+    }
+
     /// Whether `bytes` more fit on the disk, leaving `freeSpaceReserve` free.
     private func fits(_ bytes: Int64) -> Bool {
         guard let free = freeSpace() else { return true }
@@ -102,9 +113,7 @@ public final class NetworkCache: @unchecked Sendable {
     public init(directory: URL, limitBytes: Int64) {
         self.directory = directory
         self.limit = limitBytes
-        freeSpace = { [directory] in
-            (try? FileManager.default.attributesOfFileSystem(forPath: directory.path)[.systemFreeSize] as? NSNumber)?.int64Value
-        }
+        freeSpace = { [directory] in NetworkCache.freeBytes(at: directory) }
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         load()
     }
