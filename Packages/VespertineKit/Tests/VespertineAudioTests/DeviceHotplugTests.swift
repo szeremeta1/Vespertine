@@ -9,7 +9,11 @@ import Testing
 
 /// Core Audio as `DeviceMonitor` sees it, driven by hand. Notices are delivered on the queue the monitor gave.
 private final class FakeDeviceProvider: DeviceProvider, @unchecked Sendable {
-    private struct Observer { let device: AudioObjectID?; let queue: DispatchQueue; let action: @Sendable () -> Void }
+    private struct Observer {
+        let device: AudioObjectID?; let queue: DispatchQueue; let action: @Sendable () -> Void
+        /// The properties a volume observer listens to (nil: the device list or the streams).
+        var selectors: Set<AudioObjectPropertySelector>? = nil
+    }
     private let state = Locked((outputs: [AudioObjectID: Bool](), observers: [Int: Observer](), next: 0))
 
     init(_ devices: [AudioObjectID: Bool]) { state.withLock { $0.outputs = devices } }
@@ -26,10 +30,31 @@ private final class FakeDeviceProvider: DeviceProvider, @unchecked Sendable {
         observe(device, queue, action)
     }
 
-    private func observe(_ device: AudioObjectID?, _ queue: DispatchQueue, _ action: @escaping @Sendable () -> Void) -> @Sendable () -> Void {
+    /// Devices with a settable volume, and on which elements.
+    let volume = Locked([AudioObjectID: [UInt32]]())
+    func volumeElements(of device: AudioObjectID) -> [UInt32] { volume.withLock { $0[device] ?? [] } }
+
+    func observe(_ device: AudioObjectID, _ addresses: [AudioObjectPropertyAddress], on queue: DispatchQueue,
+                 _ action: @escaping @Sendable () -> Void) -> @Sendable () -> Void {
+        observe(device, queue, action, selectors: Set(addresses.map(\.mSelector)))
+    }
+
+    /// Volume and mute listeners currently installed on `device`.
+    func volumeObservers(of device: AudioObjectID) -> Int {
+        state.withLock { $0.observers.values.filter { $0.device == device && $0.selectors != nil }.count }
+    }
+
+    /// The device's `selector` changes (its volume from the keyboard, its mute from the DAC's own button).
+    func change(_ selector: AudioObjectPropertySelector, on device: AudioObjectID) {
+        let targets = state.withLock { $0.observers.values.filter { $0.device == device && $0.selectors?.contains(selector) == true } }
+        for o in targets { o.queue.async(execute: o.action) }
+    }
+
+    private func observe(_ device: AudioObjectID?, _ queue: DispatchQueue, _ action: @escaping @Sendable () -> Void,
+                         selectors: Set<AudioObjectPropertySelector>? = nil) -> @Sendable () -> Void {
         let key = state.withLock { s in
             s.next += 1
-            s.observers[s.next] = Observer(device: device, queue: queue, action: action)
+            s.observers[s.next] = Observer(device: device, queue: queue, action: action, selectors: selectors)
             return s.next
         }
         return { [weak self] in self?.state.withLock { _ = $0.observers.removeValue(forKey: key) } }
@@ -37,7 +62,7 @@ private final class FakeDeviceProvider: DeviceProvider, @unchecked Sendable {
 
     /// Stream listeners currently installed on `device`.
     func streamObservers(of device: AudioObjectID) -> Int {
-        state.withLock { $0.observers.values.filter { $0.device == device }.count }
+        state.withLock { $0.observers.values.filter { $0.device == device && $0.selectors == nil }.count }
     }
 
     /// A device joins the list, as `kAudioHardwarePropertyDevices` reports it.
@@ -58,7 +83,7 @@ private final class FakeDeviceProvider: DeviceProvider, @unchecked Sendable {
     }
 
     private func notify(_ device: AudioObjectID?) {
-        let targets = state.withLock { $0.observers.values.filter { $0.device == device } }
+        let targets = state.withLock { $0.observers.values.filter { $0.device == device && $0.selectors == nil } }
         for o in targets { o.queue.async(execute: o.action) }
     }
 }
@@ -184,5 +209,41 @@ struct DeviceHotplugTests {
         #expect(await waitUntil(.seconds(1)) { changes.withLock { $0 } > before }, "no device change after streams arrived")
         #expect(OutputDevices.list().contains { $0.uid == uid })
         withExtendedLifetime(m) {}
+    }
+}
+
+@Suite("Hardware volume and mute")
+struct HardwareVolumeWatchTests {
+    private func monitor(_ provider: FakeDeviceProvider, volumeChanges: Locked<Int>) -> DeviceMonitor {
+        DeviceMonitor(provider: provider, queue: DispatchQueue(label: "test.volume"), recheckWindow: 600) { change in
+            if case .volume = change { volumeChanges.withLock { $0 += 1 } }
+        }
+    }
+
+    @Test("Volume and mute changes on the playing output are both reported, on a main control or per channel",
+          arguments: [[kAudioObjectPropertyElementMain], [UInt32(1), 2]])
+    func volumeAndMute(elements: [UInt32]) async {
+        let provider = FakeDeviceProvider([zd3: true])
+        provider.volume.withLock { $0[zd3] = elements }
+        let changes = Locked(0)
+        let monitor = monitor(provider, volumeChanges: changes)
+        monitor.watchVolume(of: zd3)
+        provider.change(kAudioDevicePropertyVolumeScalar, on: zd3)
+        #expect(await waitUntil { changes.withLock { $0 } == 1 }, "volume")
+        provider.change(kAudioDevicePropertyMute, on: zd3)
+        #expect(await waitUntil { changes.withLock { $0 } == 2 }, "mute pressed on the DAC")
+    }
+
+    @Test("Watching another output, or none, removes the listeners from the last one")
+    func listenersGo() {
+        let provider = FakeDeviceProvider([zd3: true, airPodsMax: true])
+        provider.volume.withLock { $0 = [zd3: [kAudioObjectPropertyElementMain], airPodsMax: [kAudioObjectPropertyElementMain]] }
+        let monitor = monitor(provider, volumeChanges: Locked(0))
+        monitor.watchVolume(of: zd3)
+        #expect(provider.volumeObservers(of: zd3) == 1)
+        monitor.watchVolume(of: airPodsMax)
+        #expect(provider.volumeObservers(of: zd3) == 0 && provider.volumeObservers(of: airPodsMax) == 1)
+        monitor.watchVolume(of: nil)
+        #expect(provider.volumeObservers(of: airPodsMax) == 0)
     }
 }
