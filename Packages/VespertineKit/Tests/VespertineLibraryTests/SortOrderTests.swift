@@ -60,4 +60,10 @@ struct SortOrderTests {
         let playlist = try db.createPlaylist(name: "All", rules: SmartRules(match: .all, rules: [SmartRule(field: .codec, op: .equals, value: "FLAC")]))
         #expect(try db.tracks(in: playlist).compactMap(\.artist) == ["Abba", "Édith Piaf", "Zappa"])
     }
+
+    @Test("The substring search for Japanese, Chinese and Thai lists in the same order")
+    func substringSearchOrder() throws {
+        let db = try library(["Zappa 夜", "Édith 夜", "Abba 夜", "Ólafur 夜"])
+        #expect(try db.search("夜").compactMap(\.artist) == ["Abba 夜", "Édith 夜", "Ólafur 夜", "Zappa 夜"])
+    }
 }

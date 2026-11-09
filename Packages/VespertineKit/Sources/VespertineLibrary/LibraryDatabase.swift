@@ -617,7 +617,7 @@ public extension LibraryDatabase {
         return try writer.read { db in
             try Track.fetchAll(db, sql: """
                 SELECT * FROM track WHERE isMissing = 0 AND \(Array(repeating: oneWord, count: words.count).joined(separator: " AND "))
-                ORDER BY albumArtistSortKey, albumSortKey, discNumber, trackNumber LIMIT ?
+                ORDER BY vesperSort(albumArtistSortKey), vesperSort(albumSortKey), discNumber, trackNumber LIMIT ?
                 """, arguments: arguments)
         }
     }
