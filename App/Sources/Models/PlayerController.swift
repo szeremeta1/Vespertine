@@ -417,6 +417,14 @@ final class PlayerController {
         syncMirror()
     }
 
+    /// A share came back mounted at another path and the library repointed its songs: queued entries still name the old
+    /// path (and the old offline-copy key), so the rest of the queue would fail to open. Point them at the new files.
+    func sourceRelinked(_ sourceID: Int64) {
+        let ids = Set((queue + originalOrder).compactMap { $0.track.sourceId == sourceID ? $0.track.id : nil })
+        guard !ids.isEmpty else { return }
+        tracksMoved(Dictionary(uniqueKeysWithValues: ids.map { ($0, $0) }))
+    }
+
     func refreshReplayGain() {
         queue = queue.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id, transitions: $0.item.context?.override)) }
         originalOrder = originalOrder.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id, transitions: $0.item.context?.override)) }

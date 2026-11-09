@@ -54,6 +54,8 @@ final class NetworkShareManager {
     private var freshnessTask: Task<Void, Never>?
     /// Set by the app: whether music is playing (or starting) from a share. Rescans wait for it.
     var isStreamingPlayback: @MainActor () -> Bool = { false }
+    /// Called after a share's songs were repointed because it came back mounted at another path (the queue follows).
+    var onSourceRelinked: @MainActor (Int64) -> Void = { _ in }
     /// How old a share's last scan may get before it's rescanned (file-system events don't cross
     /// the network, so this is how additions and deletions on the server show up).
     static let rescanInterval: TimeInterval = 30 * 60
@@ -293,7 +295,9 @@ final class NetworkShareManager {
                 }
                 return password
             }
+            let moved = source.path != root.path
             try library.database.relinkSource(id, to: root.path)
+            if moved { onSourceRelinked(id) }
             try library.database.setSourceOnline(id, true)
             status[id] = .connected
             credentialFailedAt[id] = nil
