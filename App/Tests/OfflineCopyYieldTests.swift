@@ -18,8 +18,10 @@ struct OfflineCopyYieldTests {
         let library = try LibraryStore(dataDirectory: root.appendingPathComponent("library"))
         let shares = NetworkShareManager(library: library, settings: settings, dataDirectory: root)
         let player = PlayerController(library: library, settings: settings, shares: shares)
+        // A gate of its own: the shared one belongs to the app and to other suites.
+        let gate = ShareIOGate(healthyGrace: 0)
+        player.shareGate = gate
         let owner = "copy-\(UUID().uuidString)"
-        defer { ShareIOGate.shared.setPlaybackDemand(false, from: owner, grace: false) }
 
         // The song plays with a full output buffer, but its copy is still arriving and asks for the link (it is behind).
         var snapshot = player.engine.snapshot
@@ -27,7 +29,7 @@ struct OfflineCopyYieldTests {
         snapshot.readingFromShare = true
         snapshot.bufferFill = 0.9
         snapshot.isBuffering = false
-        ShareIOGate.shared.setPlaybackDemand(true, from: owner)
+        gate.setPlaybackDemand(true, from: owner)
         player.poll(snapshot)
         #expect(shares.cache.yieldsToPlayback, "the copy that holds the share goes first")
 
@@ -38,7 +40,7 @@ struct OfflineCopyYieldTests {
         #expect(shares.cache.yieldsToPlayback, "a song still being copied before it starts goes first too")
 
         // The copy is local: Keep Offline copies carry on.
-        ShareIOGate.shared.setPlaybackDemand(false, from: owner, grace: false)
+        gate.setPlaybackDemand(false, from: owner, grace: false)
         player.poll(snapshot)
         #expect(!shares.cache.yieldsToPlayback)
     }

@@ -629,11 +629,14 @@ final class PlayerController {
     /// engine). Scans resume a few seconds after the buffer is healthy, and go one request at a time while a song
     /// streams. A scan at full width queued the song's reads behind dozens of its own: starting a song took 40 s
     /// with stalls every few seconds after.
+    /// The gate library scans of shares wait at (`ShareIOGate.shared`; tests give the player one of its own).
+    @ObservationIgnored var shareGate = ShareIOGate.shared
+
     private func yieldShareToPlayback(_ snap: EngineSnapshot) {
         let active = state == .playing || requested != nil || requestedPosition != nil
         let pending = requested != nil && current.map { shares.isNetwork($0.track) } == true
         let streaming = active && (snap.readingFromShare || pending)
-        ShareIOGate.shared.playerState(pending: pending, streaming: streaming,
+        shareGate.playerState(pending: pending, streaming: streaming,
                                        buffering: snap.isBuffering && snap.readingFromShare, bufferFill: snap.readingFromShare ? snap.bufferFill : 1)
     }
 
@@ -648,7 +651,7 @@ final class PlayerController {
         // A song's copy from a share holds the scan gate while it needs the link: it is starting, it is behind the playhead, or
         // a read waits on it. The output buffer can be full meanwhile (a start on a prefix), or there is none yet (a song copied
         // whole before its first note): the copies wait too.
-        if ShareIOGate.shared.isPaused { yielding = true }
+        if shareGate.isPaused { yielding = true }
         else if snap.state != .playing || !snap.readingFromShare { yielding = false }
         else if snap.isBuffering || snap.bufferFill < 1.0 / 3 { yielding = true }
         else if snap.bufferFill > 2.0 / 3 { yielding = false }
