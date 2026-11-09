@@ -7,6 +7,15 @@ import Foundation
 import Testing
 @testable import VespertineLibrary
 
+/// A flag one thread raises and another reads.
+private final class Flag: @unchecked Sendable {
+    private let lock = NSLock()
+    private var raised = false
+    var isRaised: Bool { lock.withLock { raised } }
+    /// True for the call that raised it.
+    @discardableResult func raise() -> Bool { lock.withLock { defer { raised = true }; return !raised } }
+}
+
 @Suite("Network shares")
 struct NetworkTests {
     @Test("Share addresses parse the way people type them")
@@ -70,10 +79,20 @@ struct NetworkTests {
     @Test("Blocking share work never holds the caller past its deadline")
     func blockingDeadline() async {
         // A wedged mount: the work doesn't return for seconds. The caller gets the fallback at the deadline.
-        let stuck = await delivery(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 3); return "late" }
+        // The work stays stuck until the test lets it go (after the caller has its answer): the fallback can only be the deadline's,
+        // and the work not having ended when the answer came shows the caller never waited for it. No clock decides this, so a
+        // slow machine can't turn it into a failure. A broken deadline fails by returning "late" after the stuck work's own 30 s limit.
+        let gate = DispatchSemaphore(value: 0), workEnded = Flag()
+        let stuck = await delivery(timeout: 0.2, otherwise: "fallback") { _ = gate.wait(timeout: .now() + 30); workEnded.raise(); return "late" }
+        let endedBeforeAnswer = workEnded.isRaised
+        gate.signal()
         #expect(stuck.value == "fallback")
-        #expect(stuck.after < 1.5)
-        #expect(await NetworkVolume.blocking(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 3); return "late" } == "fallback")
+        #expect(!endedBeforeAnswer, "the caller was held until the stuck work ended")
+        #expect(stuck.after >= 0.2 * 0.9, "the deadline fired early: \(stuck.after) s")
+        let gate2 = DispatchSemaphore(value: 0)
+        let second = await NetworkVolume.blocking(timeout: 0.2, otherwise: "fallback") { _ = gate2.wait(timeout: .now() + 30); return "late" }
+        gate2.signal()
+        #expect(second == "fallback")
         // Work that finishes in time returns its own result. A long deadline: the work waits for a GCD thread, and
         // `deadlineWithAFullPool`, running alongside, holds them all for a moment (5 s ran out on a loaded CI machine).
         #expect(await NetworkVolume.blocking(timeout: 60, otherwise: 0) { 42 } == 42)
@@ -86,12 +105,23 @@ struct NetworkTests {
 
     @Test("A deadline fires on time even when stuck work has used up GCD's shared threads")
     func deadlineWithAFullPool() async {
-        // Wedged mounts hold GCD threads: fill the shared pool the way they would (it peaks around 64 to 90 threads),
-        // briefly, so other tests running alongside are held up for well under a second, then ask for a deadline.
-        for _ in 0..<120 { DispatchQueue.global().async { Thread.sleep(forTimeInterval: 0.8) } }
+        // Wedged mounts hold GCD threads: fill the shared pool the way they would (it peaks around 64 to 90 threads) and keep it
+        // full until the deadline has answered, then ask for one. The answer must come while the pool is still held, which no
+        // clock is needed to say: a deadline that waited for a pool thread would only answer after the hold was let go (here
+        // after 30 s, so it fails clearly instead of hanging). Other tests' GCD work waits for the pool meanwhile, for as
+        // long as the deadline takes (a fraction of a second).
+        let pool = DispatchSemaphore(value: 0), released = Flag()
+        for _ in 0..<120 { DispatchQueue.global().async { pool.wait() } }
+        let release = { @Sendable in
+            if released.raise() { for _ in 0..<120 { pool.signal() } }
+        }
+        let safety = Thread { Thread.sleep(forTimeInterval: 30); release() }   // a thread of its own: the pool is full
+        safety.start()
         let result = await delivery(timeout: 0.2, otherwise: "fallback") { Thread.sleep(forTimeInterval: 2); return "late" }
+        let poolStillHeld = !released.isRaised
+        release()
         #expect(result.value == "fallback")
-        #expect(result.after < 0.6)
+        #expect(poolStillHeld, "the deadline only answered once the pool was free")
     }
 
     @Test("Network reads are spread across folders")
