@@ -10672,6 +10672,275 @@
         }
       }
     },
+    "%@ was disconnected. %@ plays on without it.": {
+      "comment": "A speaker group lost one output (first %@, a DAC's name) and keeps playing on the others (second %@, the group's name). Used for exactly one lost output.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ተቋርጧል። %2$@ ያለ እሱ መጫወቱን ይቀጥላል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم فصل %1$@. تستمر %2$@ في التشغيل بدونه."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ বিচ্ছিন্ন হয়েছে। %2$@ এটি ছাড়াই চলতে থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zařízení %1$@ bylo odpojeno. Skupina %2$@ hraje dál bez něj."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ blev afbrudt. %2$@ spiller videre uden det."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Verbindung zu %1$@ wurde getrennt. %2$@ spielt ohne diesen Ausgang weiter."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το %1$@ αποσυνδέθηκε. Η ομάδα %2$@ συνεχίζει να παίζει χωρίς αυτό."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ se desconectó. %2$@ sigue sonando sin él."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ قطع شد. %2$@ بدون آن به پخش ادامه می‌دهد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ irrotettiin. %2$@ jatkaa soittoa ilman sitä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nadiskonekta ang %1$@. Patuloy na tutugtog ang %2$@ nang wala ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ a été déconnecté. %2$@ continue à jouer sans lui."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ડિસ્કનેક્ટ થયું. %2$@ તેના વિના વાગવાનું ચાલુ રાખે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An cire haɗin %1$@. %2$@ yana ci gaba da kunnawa ba tare da shi ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ נותק. %2$@ ממשיכה לנגן בלעדיו."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ डिस्कनेक्ट हो गया। %2$@ उसके बिना बजता रहता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) %1$@ megszakadt. A(z) %2$@ nélküle szól tovább."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ terputus. %2$@ tetap diputar tanpanya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ è stato scollegato. %2$@ continua a suonare senza."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@の接続が解除されました。%2$@は、それなしで再生を続けます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ಸಂಪರ್ಕ ಕಡಿತಗೊಂಡಿದೆ. %2$@ ಅದರ ಇಲ್ಲದೆ ಪ್ಲೇ ಆಗುವುದನ್ನು ಮುಂದುವರಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 연결이 해제되었습니다. %2$@은(는) 그것 없이 계속 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ വിച്ഛേദിക്കപ്പെട്ടു. %2$@ അതില്ലാതെ പ്ലേ ചെയ്യുന്നത് തുടരുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ डिस्कनेक्ट झाले. %2$@ त्याशिवाय वाजत राहतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ telah diputuskan. %2$@ terus dimainkan tanpanya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ble frakoblet. %2$@ spiller videre uten den."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ is losgekoppeld. %2$@ speelt zonder deze door."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ਡਿਸਕਨੈਕਟ ਹੋ ਗਿਆ। %2$@ ਉਸ ਦੇ ਬਿਨਾਂ ਚੱਲਦਾ ਰਹਿੰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urządzenie %1$@ zostało odłączone. Grupa %2$@ gra dalej bez niego."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ foi desconectado. %2$@ continua tocando sem ele."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ foi desligado. %2$@ continua a tocar sem ele."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ a fost deconectat. %2$@ continuă să redea fără el."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ kopplades bort. %2$@ spelar vidare utan den."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ imekatika. %2$@ inaendelea kucheza bila hiyo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ துண்டிக்கப்பட்டது. %2$@ அது இல்லாமல் தொடர்ந்து இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ డిస్‌కనెక్ట్ అయింది. %2$@ అది లేకుండా ప్లే అవుతూనే ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ถูกตัดการเชื่อมต่อ %2$@ เล่นต่อโดยไม่มีอุปกรณ์นี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ bağlantısı kesildi. %2$@ onsuz çalmaya devam ediyor."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ відключено. %2$@ продовжує відтворення без нього."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ منقطع ہو گیا۔ %2$@ اس کے بغیر چلتا رہتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ đã bị ngắt kết nối. %2$@ tiếp tục phát mà không có nó."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 已中斷連接。%2$@ 會在沒有它的情況下繼續播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 已断开连接。%2$@ 会在没有它的情况下继续播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 已中斷連接。%2$@ 會在沒有它的情況下繼續播放。"
+          }
+        }
+      }
+    },
     "%@ was disconnected. Playback paused.": {
       "comment": "%@ is the name of an audio output device.",
       "localizations": {
@@ -10937,6 +11206,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 已中斷連線。播放已暫停。"
+          }
+        }
+      }
+    },
+    "%@ were disconnected. %@ plays on without them.": {
+      "comment": "A speaker group lost several outputs (first %@, their names joined as a list) and keeps playing on the others (second %@, the group's name). Used for two or more lost outputs.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ተቋርጠዋል። %2$@ ያለ እነሱ መጫወቱን ይቀጥላል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تم فصل %1$@. تستمر %2$@ في التشغيل بدونها."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ বিচ্ছিন্ন হয়েছে। %2$@ এগুলো ছাড়াই চলতে থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zařízení %1$@ byla odpojena. Skupina %2$@ hraje dál bez nich."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ blev afbrudt. %2$@ spiller videre uden dem."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Verbindung zu %1$@ wurde getrennt. %2$@ spielt ohne diese Ausgänge weiter."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τα %1$@ αποσυνδέθηκαν. Η ομάδα %2$@ συνεχίζει να παίζει χωρίς αυτά."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ se desconectaron. %2$@ sigue sonando sin ellos."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ قطع شدند. %2$@ بدون آن‌ها به پخش ادامه می‌دهد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ irrotettiin. %2$@ jatkaa soittoa ilman niitä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nadiskonekta ang %1$@. Patuloy na tutugtog ang %2$@ nang wala ang mga ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ont été déconnectés. %2$@ continue à jouer sans eux."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ડિસ્કનેક્ટ થયા. %2$@ તેમના વિના વાગવાનું ચાલુ રાખે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An cire haɗin %1$@. %2$@ yana ci gaba da kunnawa ba tare da su ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ נותקו. %2$@ ממשיכה לנגן בלעדיהם."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ डिस्कनेक्ट हो गए। %2$@ उनके बिना बजता रहता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) %1$@ megszakadt. A(z) %2$@ nélkülük szól tovább."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ terputus. %2$@ tetap diputar tanpa semuanya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ sono stati scollegati. %2$@ continua a suonare senza."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@の接続が解除されました。%2$@は、それらなしで再生を続けます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ಸಂಪರ್ಕ ಕಡಿತಗೊಂಡಿವೆ. %2$@ ಅವುಗಳ ಇಲ್ಲದೆ ಪ್ಲೇ ಆಗುವುದನ್ನು ಮುಂದುವರಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 연결이 해제되었습니다. %2$@은(는) 그것들 없이 계속 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ വിച്ഛേദിക്കപ്പെട്ടു. %2$@ അവയില്ലാതെ പ്ലേ ചെയ്യുന്നത് തുടരുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ डिस्कनेक्ट झाले. %2$@ त्यांच्याशिवाय वाजत राहतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ telah diputuskan. %2$@ terus dimainkan tanpa mereka."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ble frakoblet. %2$@ spiller videre uten dem."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ zijn losgekoppeld. %2$@ speelt zonder deze door."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ਡਿਸਕਨੈਕਟ ਹੋ ਗਏ। %2$@ ਉਹਨਾਂ ਦੇ ਬਿਨਾਂ ਚੱਲਦਾ ਰਹਿੰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Urządzenia %1$@ zostały odłączone. Grupa %2$@ gra dalej bez nich."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ foram desconectados. %2$@ continua tocando sem eles."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ foram desligados. %2$@ continua a tocar sem eles."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ au fost deconectate. %2$@ continuă să redea fără ele."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ kopplades bort. %2$@ spelar vidare utan dem."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ zimekatika. %2$@ inaendelea kucheza bila hizo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ துண்டிக்கப்பட்டன. %2$@ அவை இல்லாமல் தொடர்ந்து இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ డిస్‌కనెక్ట్ అయ్యాయి. %2$@ అవి లేకుండా ప్లే అవుతూనే ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ถูกตัดการเชื่อมต่อ %2$@ เล่นต่อโดยไม่มีอุปกรณ์เหล่านี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ bağlantıları kesildi. %2$@ onlarsız çalmaya devam ediyor."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ відключено. %2$@ продовжує відтворення без них."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ منقطع ہو گئے۔ %2$@ ان کے بغیر چلتا رہتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ đã bị ngắt kết nối. %2$@ tiếp tục phát mà không có chúng."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 已中斷連接。%2$@ 會在沒有它們的情況下繼續播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 已断开连接。%2$@ 会在没有它们的情况下继续播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 已中斷連接。%2$@ 會在沒有它們的情況下繼續播放。"
           }
         }
       }

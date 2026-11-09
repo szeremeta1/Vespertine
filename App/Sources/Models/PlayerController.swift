@@ -620,8 +620,12 @@ final class PlayerController {
                 : String(localized: "\(name) didn’t come back. Press play to continue on another output.", comment: "%@ is the name of an audio output device.")
         case .deviceNotResponding(let name):
             lastError = String(localized: "\(name) is connected but won’t start. Quit and reopen Vespertine, then press play.", comment: "%@ is the name of an audio output device.")
-        case .speakerGroupCarriesOn:
-            break   // The sentence for it comes with the speaker groups' strings.
+        case .speakerGroupCarriesOn(let group, let without):
+            guard !without.isEmpty else { break }
+            let names = ListFormatter.localizedString(byJoining: without)
+            lastError = without.count == 1
+                ? String(localized: "\(names) was disconnected. \(group) plays on without it.", comment: "A speaker group lost one output (%1$@, a DAC's name) and keeps playing on the others. %2$@ is the group's name.")
+                : String(localized: "\(names) were disconnected. \(group) plays on without them.", comment: "A speaker group lost several outputs (%1$@, their names joined as a list) and keeps playing on the others. %2$@ is the group's name.")
         }
     }
 
