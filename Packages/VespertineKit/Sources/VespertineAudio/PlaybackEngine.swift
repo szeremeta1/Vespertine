@@ -2462,16 +2462,23 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     // MARK: Position
 
-    private func audibleSegment() -> Segment? {
+    /// `read`: the output's read position to judge by (one reading shared by callers that need the segment and its position).
+    private func audibleSegment(read: UInt64? = nil) -> Segment? {
         guard let session else { return segments.first }
-        let read = session.totalRead
+        let read = read ?? session.totalRead
         return segments.last(where: { $0.audibleFrom <= read }) ?? segments.first
     }
 
     private func currentPosition() -> TimeInterval {
+        let read = session?.totalRead ?? 0
+        return position(in: audibleSegment(read: read), read: read)
+    }
+
+    /// The playhead in `segment` at the output's read position `read`: the song and its position from the same reading, so a
+    /// gapless join between two readings can't pair one song with the other's position.
+    private func position(in segment: Segment?, read: UInt64) -> TimeInterval {
         if let atmos { return atmos.position }
-        guard let session, let segment = audibleSegment() else { return parked?.position ?? 0 }
-        let read = session.totalRead
+        guard let session, let segment else { return parked?.position ?? 0 }
         let played = read > segment.startRingFrame ? Double(read - segment.startRingFrame) / session.applied.sampleRate : 0
         return min(segment.startOffsetSeconds + played, segment.durationSeconds)
     }
@@ -2506,8 +2513,10 @@ public final class PlaybackEngine: @unchecked Sendable {
     }
 
     private func publishSnapshot() {
-        let segment = audibleSegment()
-        let position = currentPosition()
+        // One reading of the output's position for the song shown and its playhead.
+        let read = session?.totalRead ?? 0
+        let segment = audibleSegment(read: read)
+        let position = position(in: segment, read: read)
         var path = segment?.path
         if path?.plan.mode == .pcm {
             if let db = settings.digitalVolume(for: sessionDevice) { path?.volume = .digital(dB: db) }
