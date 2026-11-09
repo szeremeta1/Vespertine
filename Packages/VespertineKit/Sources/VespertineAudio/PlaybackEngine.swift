@@ -2423,6 +2423,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                 // Paused while the output was being set up: it stays set up, and the pause (queued) finds it stopped.
                 if queuedTransportIntent() != .pause { try session.start() }
                 log.notice("Next song plays on \(pending.device.name, privacy: .public) at \(SampleRate.format(session.applied.sampleRate), privacy: .public) kHz after \(Int(Date().timeIntervalSince(startedAt) * 1000), privacy: .public) ms")
+            } catch is Superseded {
+                // A skip or stop came while the song waited on its share: the command that follows handles it. Nothing failed.
+                log.info("Stopped opening \(pending.item.url.lastPathComponent, privacy: .public) for another command")
+                teardownDecoding()
             } catch {
                 log.error("Next song couldn't start on \(pending.device.name, privacy: .public): \(error.localizedDescription, privacy: .public)")
                 emit(.failed(pending.item, error.localizedDescription))
