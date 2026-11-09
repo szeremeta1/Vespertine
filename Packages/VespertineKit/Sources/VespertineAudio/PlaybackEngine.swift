@@ -2689,7 +2689,9 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.bedMeters = bed
             s.snapshot.signalPath = path
             s.snapshot.underruns = underruns
-            s.snapshot.isBuffering = buffering
+            // Buffering is said only while playing: `buffering` is updated only then, and a pause that caught the output holding
+            // for data leaves it as it was.
+            s.snapshot.isBuffering = (st == .playing && buffering)
                 || (st == .playing && decoding.flatMap { staged[cacheKey($0.item)] }?.isWaiting == true)
                 || (st == .playing && lookingAhead && ringLow)
             s.snapshot.waitingForDevice = waiting
