@@ -1034,6 +1034,71 @@ static void test_concurrent_fade(void) {
     nrt_ring_destroy(ring);
 }
 
+// A resume while a pause's fade out ends: the engine posts a fade in and unmutes while the I/O thread is inside the slice
+// where the fade out reaches silence. That slice must not leave the output muted afterwards (the engine believes it plays).
+static NRTRenderContext *race_ctx;
+static NRTRing *race_ring;
+static atomic_bool race_done;
+static atomic_uint_fast64_t race_renders;
+
+static void *race_renderer(void *unused) {
+    (void)unused;
+    float in[2 * 256] = {0}, out[2 * 256];
+    for (int i = 0; i < 2 * 256; i++) in[i] = 0.25f;
+    while (!atomic_load(&race_done)) {
+        nrt_ring_write(race_ring, in, 256);
+        nrt_context_render_interleaved(race_ctx, out, 256, 2);
+        atomic_fetch_add(&race_renders, 1);
+    }
+    return NULL;
+}
+
+static void test_fade_out_resume_race(void) {
+    race_ring = nrt_ring_create(4096, 2);
+    assert(race_ring);
+    race_ctx = nrt_context_create(race_ring, 512);
+    assert(race_ctx);
+    nrt_context_set_gain(race_ctx, 1.0, 0);
+    atomic_store(&race_done, false);
+    atomic_store(&race_renders, 0);
+    pthread_t thread;
+    int started = pthread_create(&thread, NULL, race_renderer, NULL);
+    assert(!started); (void)started;
+    unsigned stuck = 0;
+    for (unsigned i = 0; i < 20000; i++) {
+        nrt_context_fade(race_ctx, false, 16 + i % 64, false, true);    // pause: fade out, then mute
+        for (volatile unsigned spin = 0; spin < (i * 37) % 3000; spin++) {}
+        nrt_context_fade(race_ctx, true, 32, true, false);              // resume: fade in from silence
+        nrt_context_set_muted(race_ctx, false);
+        const uint_fast64_t at = atomic_load(&race_renders);
+        while (atomic_load(&race_renders) < at + 3) sched_yield();
+        if (nrt_context_is_muted(race_ctx)) {
+            stuck++;
+            nrt_context_set_muted(race_ctx, false);
+        }
+    }
+    // The same with a resume that only unmutes (no fade in): a pause's fade out not yet taken when the unmute comes must not
+    // be taken afterwards and hold the output silent.
+    for (unsigned i = 0; i < 20000; i++) {
+        nrt_context_fade(race_ctx, false, 16 + i % 64, false, true);
+        for (volatile unsigned spin = 0; spin < (i * 53) % 3000; spin++) {}
+        nrt_context_set_muted(race_ctx, false);
+        const uint_fast64_t at = atomic_load(&race_renders);
+        while (atomic_load(&race_renders) < at + 3) sched_yield();
+        if (nrt_context_is_muted(race_ctx)) {
+            stuck++;
+            nrt_context_set_muted(race_ctx, false);
+            nrt_context_fade(race_ctx, true, 0, false, false);
+        }
+    }
+    atomic_store(&race_done, true);
+    pthread_join(thread, NULL);
+    if (stuck) fprintf(stderr, "fade out/resume race: muted after a resume %u times\n", stuck);
+    assert(stuck == 0);
+    nrt_context_destroy(race_ctx);
+    nrt_ring_destroy(race_ring);
+}
+
 // The watchdog that ends a hung run: 30 s on an idle machine, scaled with the load per core (the larger of the 1- and
 // 5-minute averages, as the load can climb during a run) and capped at 10 minutes. ThreadSanitizer on a busy machine
 // needs far more than 30 s for the same work (a load of 100 on 8 cores took about 50-100 s), and a fixed 30 s alarm
@@ -1107,6 +1172,7 @@ int main(void) {
     test_concurrent_fir();
     test_room_then_fir();
     test_concurrent_fade();
+    test_fade_out_resume_race();
     test_concurrent_peek();
     return 0;
 }

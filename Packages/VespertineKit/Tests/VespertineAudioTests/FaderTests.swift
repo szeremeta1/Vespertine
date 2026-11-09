@@ -67,6 +67,20 @@ struct FaderTests {
         #expect(render(ctx, 256).map(\.bitPattern) == input[2048..<2560].map(\.bitPattern))
     }
 
+    @Test("A second fade out that arrives once the first has gone silent stays silent (a second pause in the fade's last slice)")
+    func secondFadeOutStaysSilent() {
+        let ring = nrt_ring_create(8192, 2)!, ctx = nrt_context_create(ring, 512)!
+        defer { nrt_context_destroy(ctx); nrt_ring_destroy(ring) }
+        nrt_context_set_gain(ctx, 1, 0)
+        #expect(nrt_ring_write(ring, [Float](repeating: 0.5, count: 2 * 6000), 6000) == 6000)
+        nrt_context_fade(ctx, false, 400, false, true)
+        _ = render(ctx, 512)                             // the fade ends in this slice and holds the output silent
+        #expect(nrt_context_is_muted(ctx))
+        nrt_context_fade(ctx, false, 400, false, true)    // posted before the caller could see the hold
+        #expect(render(ctx, 1024).allSatisfy { $0 == 0 }, "the second fade out started from full level")
+        #expect(nrt_context_is_muted(ctx))
+    }
+
     @Test("A fade in from silence rises along its ramp; held muted, it waits")
     func fadeIn() {
         let ring = nrt_ring_create(8192, 2)!, ctx = nrt_context_create(ring, 512)!
