@@ -151,7 +151,8 @@ public struct SignalPath: Sendable, Hashable {
             return plan.spatial == .headTracked ? String(localized: "SPATIAL · HEAD TRACKED", comment: "Status badge (short, uppercase).") : String(localized: "SPATIAL AUDIO", comment: "Status badge (short, uppercase).")
         }
         if let onto = foldedOnto { return foldNotice(onto: onto) }
-        if plan.channels < source.channels { return downmixNotice(from: ChannelLayouts.name(channels: source.channels), channels: plan.channels) }
+        // A bitstream's two channels are IEC 61937 frames that carry all of the source's: nothing is mixed down.
+        if plan.mode == .pcm, plan.channels < source.channels { return downmixNotice(from: ChannelLayouts.name(channels: source.channels), channels: plan.channels) }
         if !deviceProfile.canBeBitPerfect && !isResampling && !plan.dsdConvertedToPCM {
             switch deviceProfile.kind {
             case .airPlay: return String(localized: "AIRPLAY", comment: "Status badge (short, uppercase).")
