@@ -1,5 +1,5 @@
 //
-// Vespertine — a seek or an output change while the song's share has stopped answering must not take the engine with it:
+// Vespertine: a seek or an output change while the song's share has stopped answering must not take the engine with it:
 // a stop (or a skip) pressed after it still gets through while the share stays quiet.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
