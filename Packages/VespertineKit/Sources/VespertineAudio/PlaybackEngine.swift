@@ -1339,6 +1339,9 @@ public final class PlaybackEngine: @unchecked Sendable {
             if interrupted() { throw Superseded() }
             throw error
         }
+        // Setting a DoP marker on a decoder that reads ahead can be given up on too, and that setter can't throw: a hold given
+        // up on leaves the marker unset, so this song must not carry on (the command that gave it up starts what is next).
+        if interrupted() { throw Superseded() }
         let streaming = isStreaming(item)
         let decoding = try Decoding(item: item, probed: probed, decoder: Self.readingAhead(decoder, streaming: streaming),
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),

@@ -230,7 +230,9 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         return try body()
     }
 
-    /// Whether the reads of this thread have been given up on (see `cancellingReads`).
+    /// Whether the reads of this thread have been given up on (see `cancellingReads`). The check runs while a waiting read holds
+    /// the copy's condition lock, and the engine's check takes the engine's lock: the engine thread, the only one that installs a
+    /// check, never takes a copy's condition while holding its own lock, so the order is always condition, then engine.
     static var readsCancelled: Bool {
         (Thread.current.threadDictionary[readCancellationKey] as? ReadCancellation)?.check() ?? false
     }

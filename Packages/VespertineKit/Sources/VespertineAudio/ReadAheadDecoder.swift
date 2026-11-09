@@ -140,6 +140,9 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     /// ahead dropped, then lets it carry on from wherever `body` left the decoder.
     /// A decode call can wait on a share that has stopped answering for as long as it stays quiet: this thread's
     /// `NetworkPlaybackCache.cancellingReads` gives up on that wait (`CancellationError`, nothing dropped).
+    /// Lock order: the check runs with `shared.condition` held and takes the engine's own lock (its command queue). Only the
+    /// engine thread installs such a check, and it never takes `shared.condition` while holding the engine's lock, so the
+    /// order is always this condition, then the engine's lock.
     private func withDecoderHeld<T>(_ body: () throws -> T) throws -> T {
         let s = shared
         s.condition.lock()
@@ -248,6 +251,7 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         set {
             guard let newValue, let dop = inner as? RawDoPDecoder else { return }
             // Frames decoded ahead carry the old sequence: they're decoded again with the new one.
+            // Given up on (see `withDecoderHeld`), the marker stays as it was: the engine then abandons the song (`begin`).
             try? withDecoderHeld {
                 if inner.position != position { try? inner.seek(to: position) }
                 dop.nextMarker = newValue
