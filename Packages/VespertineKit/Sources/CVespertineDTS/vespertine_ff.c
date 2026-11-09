@@ -28,6 +28,7 @@ struct NFFDecoder {
     int64_t length, position;
     int64_t discard;          // frames to drop after a seek
     bool eof, flushed;
+    bool layoutChanged;       // the stream's channel count changed: what follows can't play as this stream
     int badFrames;            // damaged frames in a row (skipped, up to NFF_MAX_BAD_FRAMES)
     int64_t concealed;        // damaged frames skipped since opening (never reset: the signal path reports them)
     char profile[64];
@@ -211,7 +212,8 @@ const char *nff_tag(const NFFDecoder *d, const char *key) {
 
 static bool append(NFFDecoder *d, const AVFrame *f) {
     int ch = d->channels, n = f->nb_samples;
-    if (f->ch_layout.nb_channels != ch || n <= 0) return true;
+    if (n > 0 && f->ch_layout.nb_channels != ch) { d->layoutChanged = true; return true; }
+    if (n <= 0) return true;
     int drop = 0;
     if (d->discard > 0) { drop = d->discard < n ? (int)d->discard : n; d->discard -= drop; }
     int keep = n - drop;
@@ -266,7 +268,13 @@ static bool pump(NFFDecoder *d) {
     for (;;) {
         int r = avcodec_receive_frame(d->ctx, d->frame);
         if (r == AVERROR_INVALIDDATA) { if (!skip_bad_frame(d)) return false; continue; }
-        if (r == 0) { d->badFrames = 0; bool ok = append(d, d->frame); av_frame_unref(d->frame); if (!ok) return false; if (d->fifoFrames > 0) return true; continue; }
+        if (r == 0) {
+            d->badFrames = 0; bool ok = append(d, d->frame); av_frame_unref(d->frame);
+            // A new channel count can't be handed over in the same buffers: stop (nff_read then reports it).
+            if (!ok || d->layoutChanged) return false;
+            if (d->fifoFrames > 0) return true;
+            continue;
+        }
         if (r == AVERROR_EOF) return false;
         if (r != AVERROR(EAGAIN)) return false;
         if (d->eof) {
@@ -281,8 +289,9 @@ static bool pump(NFFDecoder *d) {
 }
 
 int nff_read(NFFDecoder *d, float *const *planes, int frames) {
-    while (d->fifoFrames < frames) if (!pump(d)) break;
+    while (d->fifoFrames < frames && !d->layoutChanged) if (!pump(d)) break;
     int n = frames < d->fifoFrames ? frames : d->fifoFrames;
+    if (n == 0 && d->layoutChanged) return -1;
     int ch = d->channels;
     for (int s = 0; s < n; s++) for (int c = 0; c < ch; c++) planes[c][s] = d->fifo[(size_t)s * ch + c];
     memmove(d->fifo, d->fifo + (size_t)n * ch, (size_t)(d->fifoFrames - n) * ch * sizeof(float));
@@ -328,7 +337,7 @@ bool nff_seek(NFFDecoder *d, int64_t target) {
     if (av_seek_frame(d->fmt, d->stream, ts, AVSEEK_FLAG_BACKWARD) < 0 && av_seek_frame(d->fmt, d->stream, 0, AVSEEK_FLAG_BACKWARD | AVSEEK_FLAG_BYTE) < 0)
         return false;
     avcodec_flush_buffers(d->ctx);
-    d->fifoFrames = 0; d->eof = false; d->flushed = false; d->badFrames = 0;
+    d->fifoFrames = 0; d->eof = false; d->flushed = false; d->badFrames = 0; d->layoutChanged = false;
     // Find where decoding restarts: the first frame's timestamp.
     int64_t start = -1;
     for (;;) {

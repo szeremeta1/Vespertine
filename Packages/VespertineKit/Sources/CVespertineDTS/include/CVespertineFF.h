@@ -56,7 +56,8 @@ int nff_bits(const NFFDecoder *_Nonnull d);
 /// A container tag ("title", "artist", "album", "date", "track", …), or NULL.
 const char *_Nullable nff_tag(const NFFDecoder *_Nonnull d, const char *_Nonnull key);
 
-/// Decodes up to `frames` frames into `planes` (one float buffer per channel). Returns frames written, 0 at the end, -1 on error.
+/// Decodes up to `frames` frames into `planes` (one float buffer per channel). Returns frames written, 0 at the end, -1 on error
+/// (including a stream whose channel count changes: the frames before the change are handed over first).
 int nff_read(NFFDecoder *_Nonnull d, float *_Nonnull const *_Nonnull planes, int frames);
 /// Positions at `frame` exactly (decoding from the nearest earlier point and dropping the surplus).
 bool nff_seek(NFFDecoder *_Nonnull d, int64_t frame);

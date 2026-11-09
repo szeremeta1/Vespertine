@@ -127,6 +127,22 @@ struct FFmpegFormatTests {
         #expect(concealed > 0, "\(name): \(audio[0].count) of \(whole[0].count) frames, \(concealed) concealed")
     }
 
+    @Test("A stream whose channel count changes partway plays its first part, then reports an error instead of just ending")
+    func channelCountChange() throws {
+        let (probed, decoder) = try open("dts-channel-change.dts")
+        #expect(probed.format.channels == 2)
+        let buffer = AVAudioPCMBuffer(pcmFormat: decoder.processingFormat, frameCapacity: 1024)!
+        var frames = 0
+        #expect(throws: DTSError.self) {
+            while true {
+                try decoder.decode(into: buffer, length: 1024)
+                if buffer.frameLength == 0 { break }
+                frames += Int(buffer.frameLength)
+            }
+        }
+        #expect(frames > 3_000, "the stereo part plays first (\(frames) frames)")
+    }
+
     @Test("Matroska tags are read")
     func tags() {
         let tags = SourceInspector.containerTags(fixture("dts-tones.mka"))
