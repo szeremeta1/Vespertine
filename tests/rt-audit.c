@@ -1077,6 +1077,20 @@ static void test_fade_out_resume_race(void) {
             nrt_context_set_muted(race_ctx, false);
         }
     }
+    // The same with a resume that only unmutes (no fade in): a pause's fade out not yet taken when the unmute comes must not
+    // be taken afterwards and hold the output silent.
+    for (unsigned i = 0; i < 20000; i++) {
+        nrt_context_fade(race_ctx, false, 16 + i % 64, false, true);
+        for (volatile unsigned spin = 0; spin < (i * 53) % 3000; spin++) {}
+        nrt_context_set_muted(race_ctx, false);
+        const uint_fast64_t at = atomic_load(&race_renders);
+        while (atomic_load(&race_renders) < at + 3) sched_yield();
+        if (nrt_context_is_muted(race_ctx)) {
+            stuck++;
+            nrt_context_set_muted(race_ctx, false);
+            nrt_context_fade(race_ctx, true, 0, false, false);
+        }
+    }
     atomic_store(&race_done, true);
     pthread_join(thread, NULL);
     if (stuck) fprintf(stderr, "fade out/resume race: muted after a resume %u times\n", stuck);

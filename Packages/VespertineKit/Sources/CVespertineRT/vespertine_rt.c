@@ -911,12 +911,13 @@ void nrt_context_reset_history(NRTRenderContext *ctx) {
 
 // Whether a fade out that mutes has ended and still holds the output silent: its command is still the newest, and nothing has
 // unmuted since it was taken. A newer command (a fade in on resume) or an unmute ends it, whenever the I/O thread wrote it.
-static bool fade_held(const NRTRenderContext *ctx) {
+static bool fade_held_by(const NRTRenderContext *ctx, uint64_t serial) {
     const uint64_t hold = atomic_load_explicit(&ctx->fadeHold, memory_order_acquire);
     if (!(hold & NRT_FADE_HOLD_ON)) return false;
-    const uint64_t serial = atomic_load(&ctx->fadeCommand) >> 35;
-    return (hold & NRT_FADE_SERIAL_MASK) == serial && (uint32_t)(hold >> 32) == atomic_load(&ctx->unmutes);
+    return (hold & NRT_FADE_SERIAL_MASK) == (serial & NRT_FADE_SERIAL_MASK) && (uint32_t)(hold >> 32) == atomic_load(&ctx->unmutes);
 }
+
+static bool fade_held(const NRTRenderContext *ctx) { return fade_held_by(ctx, atomic_load(&ctx->fadeCommand) >> 35); }
 
 // I/O thread: the fade just taken has ended in silence and mutes.
 static void hold_fade(NRTRenderContext *ctx) {
@@ -926,7 +927,17 @@ static void hold_fade(NRTRenderContext *ctx) {
 
 void nrt_context_set_passthrough(NRTRenderContext *ctx, bool p) { atomic_store(&ctx->passthrough, p); }
 void nrt_context_set_muted(NRTRenderContext *ctx, bool m) {
-    if (!m) atomic_fetch_add(&ctx->unmutes, 1);
+    if (!m) {
+        atomic_fetch_add(&ctx->unmutes, 1);
+        // A fade out still pending or under way is overruled: replaced by a new command (full level at once), so the I/O
+        // thread can't take it after this and hold the output silent. A fade in is left to run.
+        uint64_t current = atomic_load(&ctx->fadeCommand), next;
+        do {
+            if ((current >> 32) & 1) break;   // the newest command fades in
+            const uint64_t serial = ((current >> 35) + 1) & NRT_FADE_SERIAL_MASK;
+            next = serial << 35 | 1ull << 32;
+        } while (!atomic_compare_exchange_weak(&ctx->fadeCommand, &current, next));
+    }
     atomic_store(&ctx->muted, m);
 }
 bool nrt_context_is_muted(const NRTRenderContext *ctx) { return atomic_load(&ctx->muted) || fade_held(ctx); }
@@ -951,6 +962,9 @@ static void take_fade(NRTRenderContext *ctx, bool bypass) {
     if (serial == atomic_load_explicit(&ctx->fadeTaken, memory_order_relaxed)) return;
     const bool thenMute = (command >> 34) & 1, fromSilence = (command >> 33) & 1, up = (command >> 32) & 1;
     const uint32_t frames = (uint32_t)command;
+    // The output is still held silent by the fade before (a second pause that came in its last slice): ramp from silence,
+    // not from the full level the fader was reset to.
+    if (fade_held_by(ctx, atomic_load_explicit(&ctx->fadeTaken, memory_order_relaxed))) ctx->fadeLevel = 0.0;
     ctx->fadeEpoch = atomic_load(&ctx->unmutes);
     if (fromSilence) ctx->fadeLevel = 0.0;
     ctx->fadeUp = up;
