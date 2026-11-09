@@ -105,6 +105,28 @@ struct FFmpegFormatTests {
         }
     }
 
+    @Test("Damaged frames in a lossless stream are counted, so the signal path can't call it bit-perfect", arguments: ["truehd-tones.thd", "truehd-tones.mka"])
+    func damagedFramesCounted(name: String) throws {
+        let (_, clean) = try open(name)
+        let whole = try decode(clean)
+        #expect((clean as? ConcealingDecoder)?.concealedFrames == 0)
+        // 40 bytes in the middle of the stream scrambled, as a bad sector or a broken copy leaves them.
+        var bytes = [UInt8](try Data(contentsOf: fixture(name)))
+        for i in bytes.count / 2..<bytes.count / 2 + 40 { bytes[i] ^= 0x5A }
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("damaged-\(UUID())")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let url = dir.appendingPathComponent(name)
+        try Data(bytes).write(to: url)
+        let probed = try SourceOpener.probe(url)
+        let plan = OutputPlan(mode: .pcm, deviceSampleRate: 48_000, decodedSampleRate: 48_000, physicalBitDepth: 32,
+                              channels: probed.format.channels, dsdConvertedToPCM: false, reason: "")
+        let damaged = try SourceOpener.decoder(for: probed, plan: plan, item: PlayableItem(url: url))
+        let audio = try decode(damaged)
+        let concealed = (damaged as? ConcealingDecoder)?.concealedFrames ?? 0
+        #expect(concealed > 0, "\(name): \(audio[0].count) of \(whole[0].count) frames, \(concealed) concealed")
+    }
+
     @Test("Matroska tags are read")
     func tags() {
         let tags = SourceInspector.containerTags(fixture("dts-tones.mka"))
