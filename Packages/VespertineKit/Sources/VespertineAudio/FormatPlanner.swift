@@ -140,11 +140,7 @@ public enum FormatPlanner {
         // DSD: native DoP when the user has confirmed the DAC understands it and the carrier rate exists.
         if source.encoding == .dsd {
             let carrier = dopCarrierRate(source.sampleRate)
-            // DoP words are 24-bit integers: they reach the DAC intact only in an integer format of at least 24 bits at the
-            // carrier rate, for every channel. A device that lists no formats is left to the output's read-back check.
-            let dopDepth = device.physicalFormats.isEmpty ? device.bestIntegerBitDepth(at: carrier)
-                : device.physicalFormats.filter { $0.isInteger && $0.bitDepth >= 24 && $0.supports(rate: carrier) && $0.channels >= channels }
-                    .map(\.bitDepth).max() ?? 0
+            let dopDepth = dopCarrierDepth(device, carrier: carrier, channels: channels)
             if !dsdToPCMForRoom, !dsdToPCMForTransitions, channels == source.channels, device.supportsDoP, device.supports(rate: carrier), dopDepth >= 24 {
                 return OutputPlan(mode: .dop, deviceSampleRate: carrier, decodedSampleRate: carrier,
                                   physicalBitDepth: dopDepth, channels: channels,
@@ -184,6 +180,25 @@ public enum FormatPlanner {
         return OutputPlan(mode: .pcm, deviceSampleRate: rate, decodedSampleRate: source.sampleRate,
                           physicalBitDepth: device.bestIntegerBitDepth(at: rate), channels: channels,
                           dsdConvertedToPCM: false, reason: reason)
+    }
+
+    /// The bit depth DoP's words would reach the DAC in at `carrier` for `channels` channels; 0 where they wouldn't arrive
+    /// intact. DoP words are 24-bit integers: they need an integer format of at least 24 bits at the carrier rate for every
+    /// channel, in one stream, or across the streams the channels are spread over in order (an 8-channel DAC as four
+    /// stereo streams), each of those taking one. A device that lists no formats is left to the output's read-back check.
+    static func dopCarrierDepth(_ device: DeviceCapabilities, carrier: Double, channels: Int) -> Int {
+        if device.physicalFormats.isEmpty { return device.bestIntegerBitDepth(at: carrier) }
+        func carries(_ f: PhysicalFormat) -> Bool { f.isInteger && f.bitDepth >= 24 && f.supports(rate: carrier) }
+        if let depth = device.physicalFormats.filter({ carries($0) && $0.channels >= channels }).map(\.bitDepth).max() { return depth }
+        guard let streams = device.streamFormats, streams.count > 1 else { return 0 }
+        var covered = 0, depth = Int.max
+        for stream in streams where covered < channels {
+            let usable = stream.filter(carries)
+            guard let widest = usable.map(\.channels).max() else { return 0 }
+            covered += widest
+            depth = min(depth, usable.filter { $0.channels == widest }.map(\.bitDepth).max() ?? 0)
+        }
+        return covered >= channels ? depth : 0
     }
 
     /// Picks the device rate for a PCM stream at `rate`.

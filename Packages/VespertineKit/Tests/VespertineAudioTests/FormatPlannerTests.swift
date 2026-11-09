@@ -153,6 +153,25 @@ struct FormatPlannerTests {
         }
     }
 
+    @Test("Multichannel DoP on a DAC whose channels come as several stereo streams, when every stream that carries them takes 24-bit integers")
+    func dopAcrossStreams() {
+        let stereo24 = format(24, channels: 2), stereoFloat = format(32, integer: false, channels: 2)
+        func dac(_ streams: [[PhysicalFormat]]) -> DeviceCapabilities {
+            DeviceCapabilities(sampleRates: k11.sampleRates, physicalFormats: Array(Set(streams.flatMap { $0 })),
+                               outputChannels: streams.count * 2, supportsDoP: true, streamFormats: streams)
+        }
+        let src = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 6)
+        let four = FormatPlanner.plan(source: src, device: dac([[stereo24], [stereo24], [stereo24], [stereo24]]))
+        #expect(four.mode == .dop && four.channels == 6 && four.physicalBitDepth == 24)
+        // The channels go to the streams in order: one of the first three without an integer carrier means PCM.
+        let floatSecond = FormatPlanner.plan(source: src, device: dac([[stereo24], [stereoFloat], [stereo24], [stereo24]]))
+        #expect(floatSecond.mode == .pcm && floatSecond.dsdConvertedToPCM)
+        // The fourth stream isn't used by 5.1, so it doesn't matter what it takes.
+        #expect(FormatPlanner.plan(source: src, device: dac([[stereo24], [stereo24], [stereo24], [stereoFloat]])).mode == .dop)
+        // Too few streams for every channel: PCM.
+        #expect(FormatPlanner.plan(source: src, device: dac([[stereo24], [stereo24]])).mode == .pcm)
+    }
+
     @Test("A DAC that lists no formats at all keeps DoP: the output checks the format it gets before playing")
     func dopWithoutListedFormats() {
         let src = SourceFormat(encoding: .dsd, codec: "DSF", sampleRate: 2_822_400, bitDepth: 1, channels: 2)
