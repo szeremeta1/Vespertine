@@ -366,7 +366,10 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         while answered.wait(timeout: .now() + 0.025) == .timedOut {
             if superseded { throw Superseded() }
-            if lookingAhead { serviceTransportWhileWaiting() }
+            if lookingAhead {
+                if lookAheadYields { throw LookAheadGivenUp() }
+                serviceTransportWhileWaiting()
+            }
         }
         return answer.withLock { $0 } ?? false
     }
@@ -852,6 +855,9 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// A wait on a share, which can last as long as the share does. While the output plays (`lookingAhead`) it runs on another
     /// queue and the engine thread keeps serving the transport and the position meanwhile; otherwise it is simply run, polled
     /// for a skip or stop (`superseded`) as it always was. `body` is handed the question "has this been given up?".
+    /// While looking ahead, a skip or stop gives the wait up (CancellationError, as before), and so does anything else asked of
+    /// the song that plays (`lookAheadYields`: LookAheadGivenUp, and the look-ahead is taken again afterwards). Once given up, the
+    /// body has `abandonGrace` to notice; a share that holds it longer no longer holds the engine thread.
     private func waitOnShare<T>(_ body: @escaping @Sendable (@escaping @Sendable () -> Bool) throws -> T) throws -> T {
         guard lookingAhead else { return try body { [self] in superseded } }
         let abandoned = Locked(false)
@@ -862,12 +868,43 @@ public final class PlaybackEngine: @unchecked Sendable {
             outcome.withLock { $0 = result }
             finished.signal()
         }
+        var givenUp: Error?
+        var givenUpAt = Date.distantFuture
         while finished.wait(timeout: .now() + 0.04) == .timedOut {
-            if superseded { abandoned.withLock { $0 = true } }
-            serviceTransportWhileWaiting()
+            if givenUp == nil {
+                if superseded { givenUp = CancellationError() } else if lookAheadYields { givenUp = LookAheadGivenUp() }
+                if givenUp != nil {
+                    abandoned.withLock { $0 = true }
+                    givenUpAt = Date()
+                    continue
+                }
+                serviceTransportWhileWaiting()
+            } else if Date().timeIntervalSince(givenUpAt) > Self.abandonGrace {
+                break
+            }
         }
+        if let givenUp { throw givenUp }
         return try outcome.withLock { $0 }!.get()
     }
+
+    /// How long a share wait that was given up may take to notice before the engine thread goes on without it.
+    static let abandonGrace: TimeInterval = 0.5
+
+    /// The look-ahead was given up for a command about the song that plays (see `lookAheadYields`); `advance` runs again after it.
+    private struct LookAheadGivenUp: Error {}
+
+    /// While looking ahead: something other than pause or resume is waiting (a seek, a change of output or settings, a queue
+    /// edit, a change of devices). It is about the song that plays or about what follows it, so it is not left until the next
+    /// song's share answers. Play and stop are `superseded`.
+    private var lookAheadYields: Bool {
+        guard lookingAhead else { return false }
+        let yields: (Command) -> Bool = { switch $0 { case .pause, .resume, .barrier: false; default: true } }
+        return batchRest.contains(where: yields) || shared.withLock { $0.commands.contains(where: yields) }
+    }
+
+    /// The finished song whose look-ahead was given up (`LookAheadGivenUp`): `fill` looks ahead for it again, with the queue
+    /// as it is by then.
+    private var retryAdvance: (item: PlayableItem, produced: UInt64)?
 
     /// Engine thread, while it waits on a share with the output playing: acts on a pause or resume now (the last one asked for
     /// wins, as in `coalesce`) and publishes the snapshot, so the playhead, the button and the sound agree during the wait.
@@ -1547,6 +1584,7 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     private func teardownDecoding() {
         decoding = nil
+        retryAdvance = nil
         crossfade = nil
         outgoing = nil
         boundary = nil
@@ -1823,7 +1861,10 @@ public final class PlaybackEngine: @unchecked Sendable {
             if let ahead = decoding.decoder as? ReadAheadDecoder {
                 while !ahead.waitForAudio(timeout: 0.05), !ahead.hasEnded {
                     if superseded { throw Superseded() }
-                    if lookingAhead { serviceTransportWhileWaiting() }
+                    if lookingAhead {
+                        if lookAheadYields { throw LookAheadGivenUp() }
+                        serviceTransportWhileWaiting()
+                    }
                 }
             }
             // Target two minutes of raw DSD, at least 128 MiB, capped at 1 GiB. No audio conversion:
@@ -1854,6 +1895,11 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func fill() -> Bool {
         guard let session else { return false }
         if gapOwed > 0 { return writeGap(session) }
+        if let retry = retryAdvance {
+            retryAdvance = nil
+            advance(after: retry.item, produced: retry.produced)
+            return true
+        }
         guard let decoding else {
             return false
         }
@@ -2190,6 +2236,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             staged = staged.filter { $0.key == cacheKey(next) }
             carried = nil
             decoding = nil
+            retryAdvance = nil
             crossfade = nil
             outgoing = nil
             boundary = nil
@@ -2368,6 +2415,13 @@ public final class PlaybackEngine: @unchecked Sendable {
                 return
             } catch is Superseded {
                 teardownDecoding()
+                return
+            } catch is LookAheadGivenUp {
+                // The song that plays is left as it is (a seek or restart handles it; a queue edit chooses again): the
+                // next one is looked for again by `fill` once the command has been handled.
+                if produced == 0 { emptyTransitions -= 1 }
+                boundary = planned
+                retryAdvance = (finished, produced)
                 return
             } catch {
                 emit(.failed(next, error.localizedDescription))
