@@ -282,17 +282,19 @@ final class NetworkShareManager {
         defer { connecting.remove(id) }
         if !status(of: source).isConnected { status[id] = .connecting }
         do {
-            let root = try await mountedRoot(share, readOnly: !source.isWritable) {
-                guard let user = share.user else { return nil }
-                // Off the main thread: the read can wait on macOS's keychain prompt.
-                let found = await Task.detached { NetworkCredentials.lookup(share) }.value
-                // Without a password NetFS fails locally with an authentication error; say what's really wrong.
-                guard let password = found.password else {
-                    shareLog.error("share \(id, privacy: .public): no saved password (keychain: \(found.status, privacy: .public))")
-                    throw NetworkShareError.passwordMissing(account: "\(user)@\(share.host)")
-                }
-                return password
+            // A mount the server accepted and never answers, or a keychain prompt nobody answers, would leave the share
+            // "Connecting…" for ever (and health checks skip a share that is connecting). Past the deadline it is offline with
+            // the reason, and Reconnect or the next health check tries again; a mount that finishes later is adopted then.
+            let readOnly = !source.isWritable
+            let attempt: @MainActor @Sendable () async -> Result<URL, any Error>? = { [weak self] in
+                guard let self else { return nil }
+                do { return .success(try await self.mount(share, readOnly: readOnly, sourceID: id)) } catch { return .failure(error) }
             }
+            guard let outcome = await NetworkVolume.waiting(atMost: connectDeadline, otherwise: nil, attempt) else {
+                shareLog.error("share \(id, privacy: .public): no answer from the mount within \(Int(self.connectDeadline), privacy: .public) s")
+                throw NetworkShareError.unreachable(host: share.host)
+            }
+            let root = try outcome.get()
             try library.database.relinkSource(id, to: root.path)
             try library.database.setSourceOnline(id, true)
             status[id] = .connected
@@ -320,6 +322,27 @@ final class NetworkShareManager {
             }
             try? library.database.setSourceOnline(id, false)
             return false
+        }
+    }
+
+    /// How long connecting waits for the mount (and the keychain before it).
+    var connectDeadline: TimeInterval = 60
+    /// For tests: mounts a share instead of NetFS and the keychain (`share`, read-only), returning the folder to index.
+    var mounter: (@Sendable (NetworkShare, Bool) async throws -> URL)?
+
+    /// The share's folder, mounted with its saved password (or by `mounter`).
+    private func mount(_ share: NetworkShare, readOnly: Bool, sourceID id: Int64) async throws -> URL {
+        if let mounter { return try await mounter(share, readOnly) }
+        return try await mountedRoot(share, readOnly: readOnly) {
+            guard let user = share.user else { return nil }
+            // Off the main thread: the read can wait on macOS's keychain prompt.
+            let found = await Task.detached { NetworkCredentials.lookup(share) }.value
+            // Without a password NetFS fails locally with an authentication error; say what's really wrong.
+            guard let password = found.password else {
+                shareLog.error("share \(id, privacy: .public): no saved password (keychain: \(found.status, privacy: .public))")
+                throw NetworkShareError.passwordMissing(account: "\(user)@\(share.host)")
+            }
+            return password
         }
     }
 
