@@ -111,10 +111,15 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
         /// How fast this output falls behind the others while it plays, in parts per million (positive: later and later), as the wizard
         /// measured it with drift correction on (the FiiO K11 behind the Fosi ZD3 measured +13.5). 0 until measured. See `GroupRateTrim`.
         public var rateTrimPPM: Double
+        /// For how long after the output starts this output keeps falling behind at `rateTrimPPM`, in seconds; nil: the default horizon
+        /// (`GroupDelay.rateTrimHorizonSeconds`). The FiiO K11 behind the Fosi ZD3 crept at +11.6 ppm for the first 297.5 s and then stopped
+        /// (its Core Audio clock estimate corrects itself), so a trim that ran on for 600 s would have pulled it 3.5 ms early.
+        public var rateTrimSeconds: Double?
         /// Core Audio's drift correction quality for this member, 0 (cheapest) to 127 (best).
         public var driftQuality: Int
 
         public static let rateTrimRangePPM: ClosedRange<Double> = -200...200
+        public static let rateTrimSecondsRange: ClosedRange<Double> = 1...3600
 
         /// How the skew was measured: whether the member was drift-corrected, at what quality, at what rate.
         public struct SkewContext: Codable, Hashable, Sendable {
@@ -138,7 +143,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
 
         public init(deviceUID: String, name: String, modelUID: String? = nil, channelCount: Int,
                     extraLatencyFrames: Double = 0, skewMs: Double = 0, skewContext: SkewContext? = nil, rateTrimPPM: Double = 0,
-                    driftQuality: Int = Member.defaultDriftQuality) {
+                    rateTrimSeconds: Double? = nil, driftQuality: Int = Member.defaultDriftQuality) {
             self.deviceUID = deviceUID
             self.name = name
             self.modelUID = modelUID
@@ -147,6 +152,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
             self.skewMs = skewMs
             self.skewContext = skewContext
             self.rateTrimPPM = rateTrimPPM
+            self.rateTrimSeconds = rateTrimSeconds
             self.driftQuality = driftQuality
         }
 
@@ -160,6 +166,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
             skewMs = try c.decodeIfPresent(Double.self, forKey: .skewMs) ?? 0
             skewContext = try c.decodeIfPresent(SkewContext.self, forKey: .skewContext)
             rateTrimPPM = try c.decodeIfPresent(Double.self, forKey: .rateTrimPPM) ?? 0
+            rateTrimSeconds = try c.decodeIfPresent(Double.self, forKey: .rateTrimSeconds)
             driftQuality = try c.decodeIfPresent(Int.self, forKey: .driftQuality) ?? Member.defaultDriftQuality
         }
     }
@@ -298,6 +305,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
         case driftQualityInvalid(String)
         case skewInvalid(String)
         case rateTrimInvalid(String)
+        case rateTrimSecondsInvalid(String)
         case speakerOnUnknownDevice(UUID)
         case channelOutOfRange(UUID)
         case channelShared(device: String, channel: Int)
@@ -319,6 +327,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
             case .driftQualityInvalid(let uid): String(localized: "The drift correction quality of \(uid) must be between 0 and 127.")
             case .skewInvalid(let uid): String(localized: "The measured delay of \(uid) must be between 0 and \(Int(SpeakerGroup.delayTrimRangeMs.upperBound)) ms.")
             case .rateTrimInvalid(let uid): String(localized: "The measured drift of \(uid) must be between \(Int(SpeakerGroup.Member.rateTrimRangePPM.lowerBound)) and \(Int(SpeakerGroup.Member.rateTrimRangePPM.upperBound)) parts per million.")
+            case .rateTrimSecondsInvalid(let uid): String(localized: "How long \(uid) drifts must be between \(Int(SpeakerGroup.Member.rateTrimSecondsRange.lowerBound)) and \(Int(SpeakerGroup.Member.rateTrimSecondsRange.upperBound)) seconds.")
             case .speakerOnUnknownDevice: String(localized: "A speaker is on an output that is not in the group.")
             case .channelOutOfRange: String(localized: "A speaker is on an output channel its device does not have.")
             case .channelShared(let device, let channel): String(localized: "Two speakers are on channel \(channel + 1) of \(device).")
@@ -344,6 +353,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
             if !(0...127).contains(member.driftQuality) { found.append(.driftQualityInvalid(member.deviceUID)) }
             if !Self.delayTrimRangeMs.contains(member.skewMs) { found.append(.skewInvalid(member.deviceUID)) }
             if !Member.rateTrimRangePPM.contains(member.rateTrimPPM) { found.append(.rateTrimInvalid(member.deviceUID)) }
+            if let seconds = member.rateTrimSeconds, !Member.rateTrimSecondsRange.contains(seconds) { found.append(.rateTrimSecondsInvalid(member.deviceUID)) }
         }
         if !members.contains(where: { $0.deviceUID == clockLeaderUID }) { found.append(.leaderNotAMember(clockLeaderUID)) }
         if totalChannels > Self.maxChannels { found.append(.tooManyChannels(totalChannels)) }

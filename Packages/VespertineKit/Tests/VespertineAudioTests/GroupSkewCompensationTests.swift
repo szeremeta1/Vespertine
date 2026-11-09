@@ -189,6 +189,51 @@ struct GroupSkewCompensationTests {
         #expect(rt[2].advancePPM == 13.5 && abs(rt[2].advanceLimitFrames - 388.8) < 1e-6 && rt[2].delayFrames >= 389 + 8)
     }
 
+    @Test("A member's own span: a FiiO creeping +11.6 ppm for 297.5 s is held back and brought forward for that long only")
+    func rateTrimOwnSpan() {
+        var g = group(followerSkew: 1.0, context: ctx, rateTrim: 11.6)
+        g.members[1].rateTrimSeconds = 297.5
+        #expect(g.isValid)
+        #expect(GroupDelay.advanceSeconds(g, resampled: resampledFiio) == [0, 297.5])
+        #expect(GroupDelay.perChannelAdvanceSeconds(g, resampled: resampledFiio) == [0, 0, 297.5, 297.5])
+        let headroom = 11.6e-6 * 297.5 * 1000 + 8.0 / 48
+        #expect(abs(GroupDelay.rateHeadroomMs(g, resampled: resampledFiio) - headroom) < 1e-9)
+        let chain = GroupDelay.chain(nil, group: g, resampled: resampledFiio)
+        #expect(chain?.channels.map(\.advanceSeconds) == [600, 600, 297.5, 297.5])
+        // 11.6 ppm × 297.5 s × 48 kHz = 165.648 frames given back, then the delay stays: no over-correction after the creep stops.
+        let rt = chain!.renderChannels(sampleRate: 48_000, channelCount: 4)
+        #expect(rt[2].advancePPM == 11.6 && abs(rt[2].advanceLimitFrames - 165.648) < 1e-6 && rt[2].delayFrames >= 166 + 8)
+        #expect(rt[0].advanceLimitFrames == 0)
+    }
+
+    @Test("Without a span the trim runs for the default horizon, as before; a span out of range is an issue and not used")
+    func rateTrimSpanDefaultAndValidation() {
+        var g = group(followerSkew: 12.5, context: ctx, rateTrim: 13.5)
+        #expect(GroupDelay.advanceSeconds(g, resampled: resampledFiio) == [0, GroupDelay.rateTrimHorizonSeconds])
+        for bad in [0.0, 3601, .nan] {
+            g.members[1].rateTrimSeconds = bad
+            #expect(g.issues == [.rateTrimSecondsInvalid(fiio)])
+            #expect(GroupDelay.trimSeconds(g.members[1]) == GroupDelay.rateTrimHorizonSeconds)
+        }
+        // A leader brought forward because the follower gets ahead runs for the follower's span.
+        g.members[1].rateTrimPPM = -4; g.members[1].rateTrimSeconds = 120
+        #expect(GroupDelay.advanceSeconds(g, resampled: resampledFiio) == [120, 0])
+    }
+
+    @Test("The span is saved, and a group saved before it existed reads as none")
+    func rateTrimSpanCoding() throws {
+        var g = group(followerSkew: 1.0, context: ctx, rateTrim: 11.6)
+        g.members[1].rateTrimSeconds = 297.5
+        let saved = try SpeakerGroupCoding.decode(SpeakerGroupCoding.encode(g))
+        #expect(saved.members[1].rateTrimSeconds == 297.5 && saved.members[0].rateTrimSeconds == nil)
+        var json = try #require(JSONSerialization.jsonObject(with: SpeakerGroupCoding.encode(g)) as? [String: Any])
+        var members = try #require(json["members"] as? [[String: Any]])
+        for i in members.indices { members[i].removeValue(forKey: "rateTrimSeconds") }
+        json["members"] = members
+        let old = try SpeakerGroupCoding.decode(JSONSerialization.data(withJSONObject: json))
+        #expect(old.members.allSatisfy { $0.rateTrimSeconds == nil })
+    }
+
     @Test("No trim, no headroom: a group without a measured rate holds nothing back for it")
     func noRateTrim() {
         let g = group(followerSkew: 12.5, context: ctx)

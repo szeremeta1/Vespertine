@@ -18,13 +18,17 @@ public struct RoomChannelPlayback: Hashable, Sendable {
     public var impulse: RoomImpulse?
     /// The signal is turned over (every sample's sign flipped): a speaker wired the other way round. Only a speaker group sets it.
     public var inverted: Bool
-    /// The delay is brought down by this many parts per million of the time the output has run, down to what `GroupDelay.rateTrimHorizonSeconds`
+    /// The delay is brought down by this many parts per million of the time the output has run, down to what `advanceSeconds` of it
     /// gives back (a speaker group's rate trim: the channel is read a little faster than it is written, so a member that falls behind the
     /// others at this rate catches up). 0: the delay is fixed, in whole frames.
     public var advancePPM: Double
+    /// For how long from the start of the output `advancePPM` runs, in seconds; after that the delay stays where it got to.
+    public var advanceSeconds: Double
 
-    public init(delayMs: Double = 0, levelDB: Double = 0, bands: [EQBand] = [], impulse: RoomImpulse? = nil, inverted: Bool = false, advancePPM: Double = 0) {
+    public init(delayMs: Double = 0, levelDB: Double = 0, bands: [EQBand] = [], impulse: RoomImpulse? = nil, inverted: Bool = false, advancePPM: Double = 0,
+                advanceSeconds: Double = GroupDelay.rateTrimHorizonSeconds) {
         self.advancePPM = advancePPM
+        self.advanceSeconds = advanceSeconds
         self.delayMs = delayMs
         self.levelDB = levelDB
         self.bands = bands
@@ -122,10 +126,11 @@ public struct RoomCorrectionPlayback: Hashable, Sendable {
             var out = NRTRoomChannel()
             let frames: Double = (alignment.delayMs * sampleRate / 1000).rounded()
             out.delayFrames = UInt32(min(max(frames, 0), Double(NRT_ROOM_MAX_DELAY - 1)))
-            // A trimmed channel gives back its advance over the horizon, never more than it holds (and keeps the filter's reach: 8 frames).
+            // A trimmed channel gives back its advance over its span, never more than it holds (and keeps the filter's reach: 8 frames).
             let advance = correction.advancePPM.isFinite && correction.advancePPM > 0 ? correction.advancePPM : 0
             out.advancePPM = advance
-            out.advanceLimitFrames = min(advance * 1e-6 * GroupDelay.rateTrimHorizonSeconds * sampleRate, max(Double(out.delayFrames) - 8, 0))
+            let span = correction.advanceSeconds.isFinite && correction.advanceSeconds > 0 ? correction.advanceSeconds : GroupDelay.rateTrimHorizonSeconds
+            out.advanceLimitFrames = min(advance * 1e-6 * span * sampleRate, max(Double(out.delayFrames) - 8, 0))
             out.gain = (correction.inverted ? -1 : 1) * preamp * pow(10, alignment.levelDB / 20)
             let sections = Array(correction.bands.compactMap { $0.section(sampleRate: sampleRate) }.prefix(Self.maxBandsPerChannel))
             withUnsafeMutableBytes(of: &out.sections) { raw in
