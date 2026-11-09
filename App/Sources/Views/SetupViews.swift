@@ -279,6 +279,7 @@ private struct SetupPrimaryButton: View {
     let label: ButtonStyleConfiguration.Label
     let pressed: Bool
     @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var hovering = false
 
     var body: some View {
@@ -290,10 +291,10 @@ private struct SetupPrimaryButton: View {
             .background(Palette.brassGradient, in: Capsule())
             .overlay(Capsule().strokeBorder(.white.opacity(0.3), lineWidth: 0.5).blendMode(.overlay))
             .shadow(color: Palette.brass.opacity(hovering ? 0.55 : 0.25), radius: hovering ? 16 : 8, y: 2)
-            .scaleEffect(pressed ? 0.97 : hovering ? 1.03 : 1)
+            .scaleEffect(reduceMotion ? 1 : pressed ? 0.97 : hovering ? 1.03 : 1)
             .opacity(isEnabled ? 1 : 0.4)
-            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: hovering)
-            .animation(.spring(response: 0.2, dampingFraction: 0.7), value: pressed)
+            .animation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.7), value: hovering)
+            .animation(reduceMotion ? nil : .spring(response: 0.2, dampingFraction: 0.7), value: pressed)
             .onHover { hovering = $0 }
     }
 }
@@ -348,6 +349,7 @@ private struct SetupCard<Content: View>: View {
     var padding: CGFloat = 16
     @ViewBuilder var content: Content
     @State private var hovering = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         content
@@ -363,9 +365,9 @@ private struct SetupCard<Content: View>: View {
                                   lineWidth: selected ? 1.5 : 1)
             }
             .shadow(color: selected ? Palette.brass.opacity(0.28) : .black.opacity(0.35), radius: selected ? 18 : 10, y: 4)
-            .scaleEffect(hovering ? 1.012 : 1)
-            .animation(.spring(response: 0.35, dampingFraction: 0.75), value: hovering)
-            .animation(.spring(response: 0.4, dampingFraction: 0.8), value: selected)
+            .scaleEffect(hovering && !reduceMotion ? 1.012 : 1)
+            .animation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.75), value: hovering)
+            .animation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.8), value: selected)
             .onHover { hovering = $0 }
     }
 }
@@ -374,6 +376,7 @@ private struct SetupCard<Content: View>: View {
 private struct SetupSymbol: View {
     let name: String
     var selected = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Image(systemName: name)
@@ -382,7 +385,7 @@ private struct SetupSymbol: View {
             .frame(width: 40, height: 40)
             .background(Circle().fill(Palette.brass.opacity(selected ? 0.18 : 0.08)))
             .overlay(Circle().strokeBorder(Palette.brass.opacity(selected ? 0.5 : 0.2), lineWidth: 1))
-            .symbolEffect(.bounce, value: selected)
+            .symbolEffect(.bounce, value: reduceMotion ? false : selected)
     }
 }
 
@@ -495,6 +498,7 @@ private struct SetupWelcome: View {
 
 private struct SetupMusic: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var shown = false
 
     var body: some View {
@@ -600,14 +604,14 @@ private struct SetupMusic: View {
         } else if stats.tracks > 0 {
             HStack(spacing: 8) {
                 Image(systemName: "checkmark.circle.fill").foregroundStyle(Palette.brassHi)
-                    .symbolEffect(.bounce, value: stats.tracks)
+                    .symbolEffect(.bounce, value: reduceMotion ? 0 : stats.tracks)   // never fires with Reduce Motion
                 Text("\(stats.albums) albums · \(stats.tracks) tracks")
                     .contentTransition(.numericText(value: Double(stats.tracks)))
                     .font(Typeface.ui(13, weight: .medium)).foregroundStyle(Palette.text)
                 Text("You can add more at any time.").font(Typeface.ui(12)).foregroundStyle(Palette.text3)
             }
-            .animation(.spring, value: stats.tracks)
-            .transition(.scale(scale: 0.9).combined(with: .opacity))
+            .animation(reduceMotion ? nil : .spring, value: stats.tracks)
+            .transition(reduceMotion ? .opacity : .scale(scale: 0.9).combined(with: .opacity))
         } else {
             Text("You can skip this and add music later from the File menu.")
                 .font(Typeface.ui(12)).foregroundStyle(Palette.text3)
@@ -639,12 +643,12 @@ private struct SetupOutput: View {
                     ForEach(Array(devices.enumerated()), id: \.element.uid) { index, device in
                         row(device.uid, name: device.name, detail: "\(device.profile.tag) · \(device.rangeSummary)",
                             symbol: device.profile.symbol, recommended: device.uid == recommended, index: index + 1)
-                            .transition(.asymmetric(insertion: .scale(scale: 0.94).combined(with: .opacity), removal: .opacity))
+                            .transition(reduceMotion ? .opacity : .asymmetric(insertion: .scale(scale: 0.94).combined(with: .opacity), removal: .opacity))
                     }
                 }
                 .padding(.vertical, 6)
                 .padding(.horizontal, 4)
-                .animation(.spring(response: 0.5, dampingFraction: 0.8), value: devices.map(\.uid))
+                .animation(reduceMotion ? nil : .spring(response: 0.5, dampingFraction: 0.8), value: devices.map(\.uid))
             }
             .scrollIndicators(.never)
             .frame(maxWidth: 620, maxHeight: 300)
@@ -686,7 +690,7 @@ private struct SetupOutput: View {
 
     private func row(_ uid: String?, name: String, detail: String, symbol: String, recommended: Bool = false, index: Int) -> some View {
         let selected = model.settings.selectedDeviceUID == uid
-        return Button { withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) { model.selectDevice(uid) } } label: {
+        return Button { withAnimation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.75)) { model.selectDevice(uid) } } label: {
             SetupCard(selected: selected, padding: 12) {
                 HStack(spacing: 14) {
                     SetupSymbol(name: symbol, selected: selected)
