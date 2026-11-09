@@ -175,7 +175,10 @@ public final class GroupAggregateDevice: @unchecked Sendable {
     }
 
     /// The aggregate's sub-devices as Core Audio holds them.
-    public func subDeviceStates() -> [SubDeviceState] {
+    public func subDeviceStates() -> [SubDeviceState] { Self.subDeviceStates(of: id) }
+
+    /// The sub-devices of the aggregate `id` as Core Audio holds them (none for a device that isn't an aggregate).
+    public static func subDeviceStates(of id: AudioObjectID) -> [SubDeviceState] {
         let owned = (try? HAL.getArray(id, .global(kAudioObjectPropertyOwnedObjects), of: AudioObjectID.self)) ?? []
         return owned.compactMap { object in
             guard (try? HAL.get(object, .global(kAudioObjectPropertyClass), initial: AudioClassID(0))) == kAudioSubDeviceClassID else { return nil }
