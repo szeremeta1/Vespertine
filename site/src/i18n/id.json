@@ -147,6 +147,28 @@
         "floatAlt": "Lembar tes loopback: 24-bit pada 44,1 dan 96 kHz, 16-bit yang diisi, dan sepasang trek gapless, masing-masing identik bit demi bit.",
         "floatCaption": "Tes Loopback · pemeriksaan perangkat lunak"
       },
+      "speaker-groups": {
+        "jack": "Grup Speaker",
+        "kicker": "Grup Speaker · beta",
+        "title": "Beberapa DAC. Satu sistem speaker.",
+        "lede": "Putar satu aliran lewat dua DAC USB atau lebih sebagai satu sistem quad atau surround, dengan peta kanal, penyesuaian per speaker, dan gambar ruangan Anda.",
+        "body": [
+          "Vespertine menggabungkan DAC Anda dalam agregat Core Audio pribadi yang tidak terlihat oleh app lain. Satu DAC, pemimpin clock, menentukan waktu dan yang lain mengikutinya. Kanal sebuah lagu diarahkan ke speaker menurut posisinya: kanal dengan speaker sendiri diputar di sana tanpa diubah, kanal di antara dua speaker dibagi di antara keduanya dengan daya yang sama, dan LFE dibuang secara default. File Dolby Digital Plus Atmos memutar dasar kanal 5.1 atau 7.1-nya."
+        ],
+        "list": [
+          "Peta kanal untuk setiap output setiap DAC, dengan nada pelan untuk mengenali satu kanal setiap kali, serta preset untuk quad, ITU 5.1, dan dua pasang berhadapan.",
+          "Seret speaker dan tempat duduk Anda pada gambar ruangan: jarak, sudut, penundaan, dan level mengikuti dari gambar itu. Atau ukur grup dengan mikrofon.",
+          "Penyesuaian level, penundaan, dan polaritas untuk setiap speaker, dengan pengaman headroom.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> hanya muncul jika setiap kanal yang dipakai berada di DAC yang tidak di-resample (pemimpin clock); jika tidak, jalur sinyal menyebutkan apa yang berubah."
+        ],
+        "note": "Beta: nonaktif secara default, di balik satu sakelar di pengaturan app. Diuji dengan pengujian otomatis dan perangkat virtual; di DAC sungguhan baru satu alat pengukur yang dijalankan, dan belum ada grup sungguhan yang didengarkan di app. Hanya PCM; output Bluetooth dan AirPlay tidak bisa bergabung.",
+        "links": [
+          "Grup speaker secara rinci"
+        ],
+        "alt": "Editor grup speaker Vespertine untuk quad: gambar ruangan dari atas dengan empat speaker mengelilingi posisi dengar, serta jarak, sudut, penundaan, dan level tiap speaker.",
+        "floatAlt": "Peta kanal: setiap kanal pada setiap output ditetapkan ke sebuah speaker, dengan tombol “Identify” dan kotak “Inverted” di tiap kanal.",
+        "floatCaption": "Peta kanal"
+      },
       "room-correction": {
         "jack": "Koreksi ruangan",
         "kicker": "Koreksi ruangan",

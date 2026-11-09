@@ -147,6 +147,28 @@
         "floatAlt": "La fiche du test de bouclage : 24 bits à 44,1 et 96 kHz, 16 bits complété et une paire enchaînée sans blanc, chacun exact au bit près.",
         "floatCaption": "Test de bouclage · vérification logicielle"
       },
+      "speaker-groups": {
+        "jack": "Groupes d’enceintes",
+        "kicker": "Groupes d’enceintes · bêta",
+        "title": "Plusieurs DAC. Un seul système d’enceintes.",
+        "lede": "Jouez un même flux sur deux DAC USB ou plus, comme un seul système quadriphonique ou surround, avec une table des canaux, des réglages par enceinte et un plan de votre pièce.",
+        "body": [
+          "Vespertine réunit vos DAC dans un agrégat Core Audio privé que les autres apps ne voient pas. Un DAC, le maître d’horloge, donne l’heure et les autres le suivent. Les canaux d’un morceau vont aux enceintes selon leur position : un canal qui a sa propre enceinte y est joué tel quel, un canal situé entre deux enceintes est réparti entre elles à puissance égale, et le LFE est supprimé par défaut. Les fichiers Dolby Digital Plus Atmos jouent leur lit de canaux 5.1 ou 7.1."
+        ],
+        "list": [
+          "Une table des canaux pour chaque sortie de chaque DAC, avec un signal discret pour repérer un canal à la fois, et des préréglages pour un quad, un ITU 5.1 et deux paires face à face.",
+          "Déplacez les enceintes et votre siège sur un plan de la pièce : distance, angle, retard et niveau en découlent. Ou mesurez le groupe avec un microphone.",
+          "Niveau, retard et polarité réglables pour chaque enceinte, avec une marge de sécurité contre l’écrêtage.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> n’apparaît que si chaque canal utilisé est sur un DAC qui n’est pas rééchantillonné (le maître d’horloge) ; sinon, le chemin du signal indique ce qui a changé."
+        ],
+        "note": "Bêta : désactivé par défaut, derrière un seul interrupteur dans les réglages de l’app. Testé par des tests automatisés et des appareils virtuels ; sur de vrais DAC, seul un outil de sonde a tourné, et rien dans l’app n’a encore été écouté sur un vrai groupe. PCM uniquement ; les sorties Bluetooth et AirPlay ne peuvent pas en faire partie.",
+        "links": [
+          "Les groupes d’enceintes en détail"
+        ],
+        "alt": "L’éditeur de groupe d’enceintes de Vespertine pour un quad : un plan de la pièce vu de dessus avec quatre enceintes autour du siège d’écoute, et la distance, l’angle, le retard et le niveau de chacune.",
+        "floatAlt": "La table des canaux : chaque canal de chaque sortie est attribué à une enceinte, avec un bouton « Identify » et une case « Inverted » sur chaque canal.",
+        "floatCaption": "Table des canaux"
+      },
       "room-correction": {
         "jack": "Correction de salle",
         "kicker": "Correction de salle",

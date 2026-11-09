@@ -147,6 +147,28 @@
         "floatAlt": "Loopbacktest-arket: 24-bit ved 44,1 og 96 kHz, utfylt 16-bit og et gapløst par, alle bitnøyaktige.",
         "floatCaption": "Loopbacktest · programvaresjekk"
       },
+      "speaker-groups": {
+        "jack": "Høyttalergrupper",
+        "kicker": "Høyttalergrupper · beta",
+        "title": "Flere DAC-er. Ett høyttalersystem.",
+        "lede": "Spill én strøm over to eller flere USB-DAC-er som ett quad- eller surroundsystem, med kanalkart, justeringer per høyttaler og en tegning av rommet ditt.",
+        "body": [
+          "Vespertine slår DAC-ene dine sammen i et privat Core Audio-aggregat som andre apper ikke ser. Én DAC, klokkelederen, bestemmer tiden, og de andre følger den. Kanalene i en sang går til høyttalerne etter hvor de står: en kanal med egen høyttaler spilles der uendret, en kanal mellom to høyttalere fordeles mellom dem med lik effekt, og LFE-kanalen utelates som standard. Dolby Digital Plus Atmos-filer spiller sin 5.1- eller 7.1-kanalbed."
+        ],
+        "list": [
+          "Et kanalkart for hver utgang på hver DAC, med en dempet tone som peker ut én kanal om gangen, og forhåndsinnstillinger for quad, ITU 5.1 og to par vendt mot hverandre.",
+          "Dra høyttalerne og plassen din rundt på en tegning av rommet: avstand, vinkel, forsinkelse og nivå følger av den. Eller mål gruppen med en mikrofon.",
+          "Justering av nivå, forsinkelse og polaritet for hver høyttaler, med en sikring mot overstyring.",
+          "<span class=\"mono nowrap\">BITPERFEKT</span> vises bare når hver kanal i bruk ligger på en DAC som ikke resamples (klokkelederen); ellers viser signalveien hva som ble endret."
+        ],
+        "note": "Beta: av som standard, bak én bryter i appens innstillinger. Testet med automatiske tester og virtuelle enheter; på ekte DAC-er har bare et måleverktøy kjørt, og ingenting i appen er ennå avlyttet på en ekte gruppe. Bare PCM; Bluetooth- og AirPlay-utganger kan ikke være med.",
+        "links": [
+          "Høyttalergrupper i detalj"
+        ],
+        "alt": "Vespertines redigering av høyttalergrupper for en quad: en tegning av rommet sett ovenfra med fire høyttalere rundt lytteplassen, og hver høyttalers avstand, vinkel, forsinkelse og nivå.",
+        "floatAlt": "Kanalkartet: hver kanal på hver utgang er tildelt en høyttaler, med en knapp «Identify» og en boks «Inverted» ved hver kanal.",
+        "floatCaption": "Kanalkart"
+      },
       "room-correction": {
         "jack": "Romkorrigering",
         "kicker": "Romkorrigering",

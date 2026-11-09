@@ -147,6 +147,28 @@
         "floatAlt": "Bảng kết quả kiểm tra loopback: 24 bit ở 44,1 và 96 kHz, 16 bit chèn 0 và một cặp bài liền mạch, mỗi mục đều khớp từng bit.",
         "floatCaption": "Kiểm tra loopback · kiểm tra bằng phần mềm"
       },
+      "speaker-groups": {
+        "jack": "Nhóm loa",
+        "kicker": "Nhóm loa · beta",
+        "title": "Nhiều DAC. Một hệ thống loa.",
+        "lede": "Phát một luồng qua hai hoặc nhiều DAC USB như một hệ thống quad hay surround duy nhất, với sơ đồ kênh, chỉnh riêng từng loa và bản vẽ căn phòng của bạn.",
+        "body": [
+          "Vespertine gộp các DAC của bạn vào một tập hợp Core Audio riêng mà các ứng dụng khác không thấy. Một DAC, DAC dẫn nhịp, đặt thời gian và các DAC khác theo nó. Các kênh của bài hát được đưa đến loa theo vị trí loa: kênh có loa riêng phát ở đó không đổi, kênh nằm giữa hai loa được chia cho hai loa với công suất bằng nhau, và LFE mặc định bị bỏ. Tệp Dolby Digital Plus Atmos phát lớp nền kênh 5.1 hoặc 7.1 của chúng."
+        ],
+        "list": [
+          "Sơ đồ kênh cho mọi đầu ra của mọi DAC, kèm âm báo nhẹ để nhận diện từng kênh một, và các mẫu có sẵn cho quad, ITU 5.1 và hai cặp đối diện nhau.",
+          "Kéo các loa và chỗ ngồi của bạn trên bản vẽ căn phòng: khoảng cách, góc, độ trễ và mức âm đều suy ra từ đó. Hoặc đo nhóm bằng micro.",
+          "Chỉnh mức âm, độ trễ và cực tính cho từng loa, kèm bảo vệ biên độ dự phòng.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> chỉ xuất hiện khi mọi kênh đang dùng nằm trên DAC không bị lấy mẫu lại (DAC dẫn nhịp); nếu không, đường dẫn tín hiệu cho biết điều gì đã thay đổi."
+        ],
+        "note": "Beta: mặc định tắt, sau một công tắc trong cài đặt của ứng dụng. Đã thử bằng kiểm thử tự động và thiết bị ảo; trên DAC thật mới chạy một công cụ đo, và ứng dụng chưa được nghe thử trên một nhóm thật. Chỉ PCM; đầu ra Bluetooth và AirPlay không thể tham gia.",
+        "links": [
+          "Nhóm loa chi tiết"
+        ],
+        "alt": "Trình chỉnh sửa nhóm loa của Vespertine cho một quad: bản vẽ căn phòng nhìn từ trên xuống với bốn loa quanh chỗ nghe, cùng khoảng cách, góc, độ trễ và mức âm của từng loa.",
+        "floatAlt": "Sơ đồ kênh: mỗi kênh của mỗi đầu ra được gán cho một loa, có nút “Identify” và ô “Inverted” ở mỗi kênh.",
+        "floatCaption": "Sơ đồ kênh"
+      },
       "room-correction": {
         "jack": "Hiệu chỉnh phòng",
         "kicker": "Hiệu chỉnh phòng",

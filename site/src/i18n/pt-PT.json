@@ -147,6 +147,28 @@
         "floatAlt": "A janela do teste de loopback: 24 bits a 44,1 e 96 kHz, 16 bits com preenchimento e um par sem pausas, todos idênticos bit a bit.",
         "floatCaption": "Teste de loopback · verificação por software"
       },
+      "speaker-groups": {
+        "jack": "Grupos de altifalantes",
+        "kicker": "Grupos de altifalantes · beta",
+        "title": "Vários DAC. Um só sistema de altifalantes.",
+        "lede": "Reproduza um mesmo fluxo em dois ou mais DAC USB como um único sistema quadrifónico ou surround, com mapa de canais, ajustes por altifalante e um desenho da sua sala.",
+        "body": [
+          "O Vespertine junta os seus DAC num agregado privado do Core Audio que as outras apps não veem. Um DAC, o líder do relógio, marca o tempo e os outros seguem-no. Os canais de uma música vão para os altifalantes consoante a posição deles: um canal com altifalante próprio toca aí sem alterações, um entre dois altifalantes é distribuído entre eles com potência igual, e o LFE é descartado por predefinição. Os ficheiros Dolby Digital Plus Atmos reproduzem a base de canais 5.1 ou 7.1."
+        ],
+        "list": [
+          "Um mapa de canais para cada saída de cada DAC, com um tom baixo para identificar um canal de cada vez, e predefinições para quadrifónico, ITU 5.1 e dois pares frente a frente.",
+          "Arraste os altifalantes e o seu lugar num desenho da sala: a distância, o ângulo, o atraso e o nível resultam dele. Ou meça o grupo com um microfone.",
+          "Ajustes de nível, atraso e polaridade para cada altifalante, com uma margem de segurança contra distorção.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> só aparece quando todos os canais em uso estão num DAC que não é reamostrado (o líder do relógio); caso contrário, o caminho do sinal diz o que mudou."
+        ],
+        "note": "Beta: desativada por predefinição, atrás de um único interruptor nos ajustes da app. Testada com testes automáticos e dispositivos virtuais; em DAC reais só correu uma ferramenta de sonda, e nada na app foi ainda ouvido num grupo real. Apenas PCM; as saídas Bluetooth e AirPlay não podem juntar-se.",
+        "links": [
+          "Grupos de altifalantes em detalhe"
+        ],
+        "alt": "O editor de grupos de altifalantes do Vespertine para um quadrifónico: um desenho da sala visto de cima com quatro altifalantes à volta do lugar de audição, e a distância, o ângulo, o atraso e o nível de cada um.",
+        "floatAlt": "O mapa de canais: cada canal de cada saída atribuído a um altifalante, com um botão “Identify” e uma caixa “Inverted” em cada canal.",
+        "floatCaption": "Mapa de canais"
+      },
       "room-correction": {
         "jack": "Correção de sala",
         "kicker": "Correção de sala",

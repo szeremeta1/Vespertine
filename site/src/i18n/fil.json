@@ -147,6 +147,28 @@
         "floatAlt": "Ang sheet ng loopback test: 24-bit sa 44.1 at 96 kHz, 16-bit na padded at isang gapless na pares, bawat isa bit-exact.",
         "floatCaption": "Loopback test · software check"
       },
+      "speaker-groups": {
+        "jack": "Mga Speaker Group",
+        "kicker": "Mga Speaker Group · beta",
+        "title": "Maraming DAC. Isang speaker system.",
+        "lede": "Magpatugtog ng isang stream sa dalawa o higit pang USB DAC bilang iisang quad o surround na setup, na may channel map, mga pagsasaayos sa bawat speaker at drawing ng iyong kuwarto.",
+        "body": [
+          "Pinagsasama ng Vespertine ang iyong mga DAC sa isang pribadong Core Audio aggregate na hindi nakikita ng ibang app. Isang DAC, ang clock leader, ang nagtatakda ng oras at sumusunod ang iba. Ang mga channel ng kanta ay napupunta sa mga speaker ayon sa kinatatayuan ng mga ito: ang channel na may sariling speaker ay tumutugtog doon nang walang binabago, ang nasa pagitan ng dalawang speaker ay hinahati sa kanila nang pantay ang lakas, at ang LFE ay inaalis bilang default. Ang mga file na Dolby Digital Plus Atmos ay tumutugtog ng kanilang 5.1 o 7.1 na channel bed."
+        ],
+        "list": [
+          "Isang channel map para sa bawat output ng bawat DAC, na may mahinang tunog para tukuyin ang isang channel sa bawat pagkakataon, at mga preset para sa quad, ITU 5.1 at dalawang pares na magkaharap.",
+          "I-drag ang mga speaker at ang upuan mo sa drawing ng kuwarto: sumusunod dito ang layo, anggulo, delay at antas. O sukatin ang grupo gamit ang mikropono.",
+          "Mga pagsasaayos ng antas, delay at polarity para sa bawat speaker, na may proteksyon sa headroom.",
+          "Lalabas lang ang <span class=\"mono nowrap\">BIT-PERFECT</span> kapag ang bawat channel na ginagamit ay nasa DAC na hindi nire-resample (ang clock leader); kung hindi, sasabihin ng signal path kung ano ang nagbago."
+        ],
+        "note": "Beta: naka-off bilang default, sa likod ng isang switch sa mga setting ng app. Nasubok sa mga awtomatikong pagsubok at virtual na device; sa mga totoong DAC, isang tool sa pagsukat lang ang napatakbo, at wala pang napakinggan sa app sa totoong grupo. PCM lang; hindi maaaring sumali ang mga output ng Bluetooth at AirPlay.",
+        "links": [
+          "Mga speaker group nang detalyado"
+        ],
+        "alt": "Ang editor ng speaker group ng Vespertine para sa isang quad: drawing ng kuwarto mula sa itaas na may apat na speaker sa paligid ng upuan sa pakikinig, at ang layo, anggulo, delay at antas ng bawat speaker.",
+        "floatAlt": "Ang channel map: bawat channel ng bawat output ay itinakda sa isang speaker, na may button na “Identify” at checkbox na “Inverted” sa bawat channel.",
+        "floatCaption": "Mapa ng mga channel"
+      },
       "room-correction": {
         "jack": "Room correction",
         "kicker": "Room correction",

@@ -147,6 +147,28 @@
         "floatAlt": "Takardar Gwajin Loopback: bit 24 a 44.1 da 96 kHz, bit 16 da aka cike da sifili da waƙoƙi biyu marasa tazara, kowanne daidai bit da bit.",
         "floatCaption": "Gwajin Loopback · gwajin manhaja"
       },
+      "speaker-groups": {
+        "jack": "Ƙungiyoyin Lasifika",
+        "kicker": "Ƙungiyoyin Lasifika · beta",
+        "title": "DAC da yawa. Tsarin lasifika ɗaya.",
+        "lede": "Kunna rafi ɗaya ta hanyar DAC guda biyu ko fiye na USB a matsayin tsarin quad ko surround ɗaya, tare da taswirar tasha, gyare-gyare ga kowace lasifika da zanen ɗakinka.",
+        "body": [
+          "Vespertine yana haɗa DAC ɗinka a cikin tarin Core Audio na sirri wanda sauran manhajoji ba sa gani. DAC ɗaya, shugaban agogo, yana tsara lokaci kuma sauran suna bin sa. Ana tura tashoshin waƙa zuwa lasifikoki bisa inda suke tsaye: tashar da take da lasifikarta tana kunnawa a wurin ba tare da canji ba, tashar da take tsakanin lasifika biyu ana raba ta tsakaninsu da ƙarfi daidai, kuma ana bari LFE ta tsohuwa. Fayilolin Dolby Digital Plus Atmos suna kunna tushen tashoshinsu na 5.1 ko 7.1."
+        ],
+        "list": [
+          "Taswirar tasha ga kowane fitarwa na kowane DAC, tare da ƙaramar sauti da ke gane tasha ɗaya a lokaci guda, da saitunan farko na quad, ITU 5.1 da nau'i biyu masu fuskantar juna.",
+          "Ja lasifikoki da kujerarka a zanen ɗakin: nisa, kusurwa, jinkiri da matakin suna fitowa daga gare shi. Ko kuma auna ƙungiyar da makirufo.",
+          "Gyaran mataki, jinkiri da polarity ga kowace lasifika, tare da kariyar sarari.",
+          "<span class=\"mono nowrap\">BIT-PERFECT</span> yana bayyana ne kawai idan kowace tashar da ake amfani da ita tana kan DAC da ba a sake ɗaukar samfurinsa ba (shugaban agogo); in ba haka ba hanyar sigina tana faɗin abin da ya canza."
+        ],
+        "note": "Beta: a kashe ta tsohuwa, bayan maɓalli ɗaya a saitunan manhaja. An gwada da gwaje-gwajen atomatik da na'urorin kirkirarru; a kan DAC na gaske kayan aikin aunawa kawai aka gudanar, kuma har yanzu ba a saurari ƙungiya ta gaske a cikin manhajar ba. PCM kawai; fitarwa na Bluetooth da AirPlay ba za su iya shiga ba.",
+        "links": [
+          "Ƙungiyoyin lasifika dalla-dalla"
+        ],
+        "alt": "Editan ƙungiyar lasifika na Vespertine don quad: zanen ɗaki daga sama tare da lasifika huɗu kewaye da kujerar saurare, da nisa, kusurwa, jinkiri da matakin kowace lasifika.",
+        "floatAlt": "Taswirar tasha: kowace tashar kowane fitarwa an danƙa ta ga lasifika, tare da maɓallin “Identify” da akwatin “Inverted” a kowace tasha.",
+        "floatCaption": "Taswirar tasha"
+      },
       "room-correction": {
         "jack": "Gyaran sautin ɗaki",
         "kicker": "Gyaran sautin ɗaki",
