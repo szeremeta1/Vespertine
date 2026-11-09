@@ -275,7 +275,7 @@ public final class VisualizerAnalyzer {
             let r = UnsafeBufferPointer(rebasing: right[(right.count - newFrames)...])
             let power = Double(max(vDSP.meanSquare(l), vDSP.meanSquare(r)))
             // Loudness follows the music over a few seconds, ignoring silence between songs.
-            if power > 1e-5 { loudness += (power - loudness) * Double(Self.coefficient(dt, 3)) }
+            if power.isFinite, power > 1e-5 { loudness += (power - loudness) * Double(Self.coefficient(dt, 3)) }
         }
         let reference = meterReference
         if !configuration.meters {

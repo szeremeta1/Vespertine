@@ -112,7 +112,7 @@ public struct VisualizerMeters: Sendable, Equatable {
             let samples = c == 0 ? left : right
             var position = vu[c], speed = vuVelocity[c], level = ppmLevel[c]
             for i in 0..<(count + max(0, silentFrames)) {
-                let x = i < count ? Double(abs(samples[i])) : 0
+                let x = i < count ? Self.rectified(samples[i]) : 0
                 // Semi-implicit Euler: the needle's acceleration, then its speed, then where it is.
                 speed += stiffness * (x * drive - position) - damping * speed
                 position += speed * dt
@@ -133,7 +133,7 @@ public struct VisualizerMeters: Sendable, Equatable {
                 let samples = c == 0 ? left : right
                 var position = vuWide[c], speed = vuWideVelocity[c]
                 for i in 0..<frames {
-                    let x = i < count ? Double(abs(samples[i])) : 0
+                    let x = i < count ? Self.rectified(samples[i]) : 0
                     speed += stiffness * (x * wideDrive - position) - damping * speed
                     position += speed * dt
                     if position < low { position = low; speed = max(0, speed) }
@@ -148,7 +148,7 @@ public struct VisualizerMeters: Sendable, Equatable {
                 let samples = c == 0 ? left : right
                 var level = typeILevel[c]
                 for i in 0..<frames {
-                    let x = i < count ? Double(abs(samples[i])) : 0
+                    let x = i < count ? Self.rectified(samples[i]) : 0
                     level = x > level ? level + (x - level) * typeIAttackStep : level * typeIFall
                 }
                 typeILevel[c] = level
@@ -157,7 +157,7 @@ public struct VisualizerMeters: Sendable, Equatable {
         if extras.contains(.midSide) {
             var m = midSideLevel.x, s = midSideLevel.y
             for i in 0..<frames {
-                let a = i < count ? Double(left[i]) : 0, b = i < count ? Double(right[i]) : 0
+                let a = i < count ? Self.finite(left[i]) : 0, b = i < count ? Self.finite(right[i]) : 0
                 let xm = abs(a + b) * 0.5, xs = abs(a - b) * 0.5
                 m = xm > m ? m + (xm - m) * attack : m * fall
                 s = xs > s ? s + (xs - s) * attack : s * fall
@@ -184,6 +184,11 @@ public struct VisualizerMeters: Sendable, Equatable {
         let peak = pow(10, referenceDBFS / 20) * 2.0.squareRoot() * ppmCalibration
         return SIMD2(Self.decibels(midSideLevel.x / peak), Self.decibels(midSideLevel.y / peak))
     }
+
+    /// A sample's magnitude; a NaN or infinite one (a corrupt float file) counts as silence, because one of them in the
+    /// needle's spring would leave it NaN for good.
+    @inline(__always) static func rectified(_ sample: Float) -> Double { sample.isFinite ? Double(abs(sample)) : 0 }
+    @inline(__always) static func finite(_ sample: Float) -> Double { sample.isFinite ? Double(sample) : 0 }
 
     static func decibels(_ x: Double) -> Double { x > 1e-5 ? max(-40, 20 * log10(x)) : -40 }
 
