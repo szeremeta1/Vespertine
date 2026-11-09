@@ -213,7 +213,7 @@ struct RoomCorrectionWindow: View {
         }
         .onAppear {
             let player = model.player
-            measure.pausePlayback = { [weak m = measure] in if m?.groupTarget != nil { player.stop(); player.engine.stopAndWait() } else { player.pause() } }
+            measure.pausePlayback = { [weak m = measure] in if m?.groupTarget != nil { player.stop(); let engine = player.engine; await withCheckedContinuation { done in DispatchQueue.global().async { engine.stopAndWait(); done.resume() } } } else { player.pause() } }
             if measure.launch != nil || LaunchArguments().string(forKey: "VespertineOpenSheet") == "room-measure" { showWizard = true }
         }
     }
