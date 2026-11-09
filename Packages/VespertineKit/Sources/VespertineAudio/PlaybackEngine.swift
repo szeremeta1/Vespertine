@@ -1902,8 +1902,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                     }
                 }
             }
-            // A song that started on a prefix (PCM or DSD) waits for as much as the copy's speed says the rest of the song needs,
-            // and at least a few seconds of it. (DSD used to wait for two minutes of the song, at least 128 MiB, whatever the link:
+            // A song that started on a prefix (PCM or DSD) waits for as much as the copy's speed says the rest of the song needs;
+            // DSD for at least a few seconds of it. (DSD used to wait for two minutes of the song, at least 128 MiB, whatever the link:
             // about 40 s of "Preparing output…" for a 5.1 DSD64 song on a share 100 ms away.) Reads beyond the lead remain guarded.
             // An SACD image holds the whole disc, so its size says nothing of one track's rate: two minutes of the track's raw DSD,
             // at least 128 MiB, capped at 1 GiB, as before.
@@ -1912,7 +1912,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             let lead = decoding.item.sacdArea != nil
                 ? min(entry.size - position, min(Int64(1 << 30), max(Int64(128 << 20), Int64(format.sampleRate / 8 * Double(format.channels) * 120))))
                 : NetworkStart.startLead(fileSize: entry.size, position: position, duration: decoding.durationSeconds,
-                                         copied: entry.copiedBytes, elapsed: entry.copyElapsed)
+                                         copied: entry.copiedBytes, elapsed: entry.copyElapsed,
+                                         minimumSeconds: format.encoding == .pcm ? 0 : NetworkStart.safetySeconds)
             // The percentage shown while the lead fills.
             if !lookingAhead {
                 let target = max(1, min(entry.size, position + lead))

@@ -55,15 +55,17 @@ enum NetworkStart {
         return min(remaining, max(smallestLead, Int64(max(0, needed))))
     }
 
-    /// What a song that started on a prefix waits for before its output starts, whatever it is (PCM or DSD: bytes stand for time
-    /// in both): `lead`, and never less than `safetySeconds` of the song. It replaces a fixed reserve for DSD (two minutes of the
+    /// What a song that started on a prefix waits for before its output starts (PCM or DSD: bytes stand for time in both): `lead`,
+    /// and never less than `minimumSeconds` of the song. For DSD (`safetySeconds`) it replaces a fixed reserve (two minutes of the
     /// song, at least 128 MiB: about 250 MB for a 5.1 DSD64 song, close to 40 s on a share that copies 6.7 MB/s) that made the
-    /// wait depend on the format instead of on what the link can bring in.
-    static func startLead(fileSize: Int64, position: Int64, duration: TimeInterval, copied: Int64, elapsed: TimeInterval) -> Int64 {
+    /// wait depend on the format instead of on what the link can bring in. PCM passes 0: its output holds and rebuffers on its
+    /// own, and a seek on a share gone quiet still lands on what is local.
+    static func startLead(fileSize: Int64, position: Int64, duration: TimeInterval, copied: Int64, elapsed: TimeInterval,
+                          minimumSeconds: TimeInterval = safetySeconds) -> Int64 {
         let remaining = max(0, fileSize - position)
         let measured = lead(fileSize: fileSize, position: position, duration: duration, copied: copied, elapsed: elapsed)
-        guard duration > 0, fileSize > 0 else { return measured }
-        let floor = Int64(Double(fileSize) / duration * safetySeconds)
+        guard duration > 0, fileSize > 0, minimumSeconds > 0 else { return measured }
+        let floor = Int64(Double(fileSize) / duration * minimumSeconds)
         return min(remaining, max(measured, floor))
     }
 }

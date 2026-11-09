@@ -157,6 +157,9 @@ struct NetworkStartTests {
         // Never more than what is left, and the whole rest when nothing has been measured yet.
         #expect(lead(link: 6_700_000, position: size - (1 << 20)) <= 1 << 20)
         #expect(NetworkStart.startLead(fileSize: size, position: 0, duration: duration, copied: 0, elapsed: 0) == size)
+        // PCM keeps the plain lead: no floor of seconds.
+        #expect(NetworkStart.startLead(fileSize: size, position: 0, duration: duration, copied: Int64(6_700_000 * 4), elapsed: 4,
+                                       minimumSeconds: 0) == NetworkStart.smallestLead)
     }
 
     @Test("The lead from the middle of a song (a seek, another output) plans on the part still to play, not the whole song")
