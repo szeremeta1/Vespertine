@@ -37,6 +37,9 @@ final class Decoding {
     /// (when the output's layout isn't plain 5.1) places that on the speaker setup. `upmixed` holds what goes out next.
     let upmixer: StereoUpmixer?
     private let upmixed: AVAudioPCMBuffer?
+    /// Room render on a speaker group (`RoomRender`): the converter keeps the song's own channels and this makes the group's of
+    /// them, in place of `groupRouter`. Its frames queue in `upmixQueue` (as wide as the group) and go out through `routed`.
+    let renderer: RoomRenderer?
     private var upmixQueue: [Float] = []
     private var upmixFinished = false
     var inputExhausted = false
@@ -53,10 +56,13 @@ final class Decoding {
         let own = decoder.processingFormat.channelLayout
         var router: BedRouter?
         // PCM only: a group's router is never given DoP or bitstream words (the group's plan is always PCM).
-        let groupRouter = path.plan.mode == .pcm && !path.applied.integerMode
-            ? path.group?.router.flatMap { $0.outputChannels == path.plan.channels ? $0 : nil } : nil
         let channels = Int(decoder.processingFormat.channelCount)
-        let upmixer = path.plan.upmix && !path.applied.integerMode
+        let renderer = path.plan.mode == .pcm && !path.applied.integerMode
+            ? path.group?.render.flatMap { $0.source.count == channels ? RoomRenderer(plan: $0, sampleRate: path.plan.deviceSampleRate) : nil }
+                .flatMap { $0.outputChannels == path.plan.channels ? $0 : nil } : nil
+        let groupRouter = path.plan.mode == .pcm && !path.applied.integerMode && renderer == nil
+            ? path.group?.router.flatMap { $0.outputChannels == path.plan.channels ? $0 : nil } : nil
+        let upmixer = path.plan.upmix && !path.applied.integerMode && renderer == nil
             ? StereoUpmixer(inputChannels: channels, sampleRate: path.plan.deviceSampleRate) : nil
         if let upmixer {
             // 5.1 onto the output's layout: as it is for Spatial Audio's bed and the outputs in standard order, by speaker
@@ -68,7 +74,7 @@ final class Decoding {
         } else if path.plan.spatialBed != nil, let bed = layout?.channelLabels,
            let speakers = ChannelLayouts.speakerLabels(own) ?? ChannelLayouts.wavOrderLabels(channels: channels) {
             router = BedRouter(source: speakers, bed: bed)
-        } else if groupRouter == nil, !path.applied.integerMode, let fold = OutputSession.speakerFold(from: decoder.processingFormat, to: layout, plan: path.plan) {
+        } else if groupRouter == nil, renderer == nil, !path.applied.integerMode, let fold = OutputSession.speakerFold(from: decoder.processingFormat, to: layout, plan: path.plan) {
             router = fold
             // Channels with no speaker of their own are mixed into their neighbours: the signal path names the setup.
             path.foldedOnto = layout.map { ChannelLayouts.name(labels: $0.channelLabels, channels: Int($0.channelCount)) }
@@ -77,8 +83,9 @@ final class Decoding {
         self.router = router
         self.groupRouter = groupRouter
         self.upmixer = upmixer
+        self.renderer = renderer
         // Integer mode: straight to 32-bit integers (the device takes them as they are).
-        let float = upmixer != nil ? AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: channels, interleaved: true)
+        let float = upmixer != nil || renderer != nil ? AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: channels, interleaved: true, layout: renderer == nil ? nil : own)
             : groupRouter.flatMap { AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: $0.sourceChannels, interleaved: true, layout: own) }
             ?? router.flatMap { AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: $0.sourceChannels, interleaved: true, layout: own) }
             ?? AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: path.plan.channels, interleaved: true, layout: layout)
@@ -98,7 +105,7 @@ final class Decoding {
         }
         input = inBuffer
         output = outBuffer
-        routed = (groupRouter?.outputChannels ?? router?.bedChannels).flatMap { width in
+        routed = (renderer?.outputChannels ?? groupRouter?.outputChannels ?? router?.bedChannels).flatMap { width in
             AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: width, interleaved: true, layout: layout)
                 .flatMap { AVAudioPCMBuffer(pcmFormat: $0, frameCapacity: chunk) }
         }
@@ -151,6 +158,7 @@ final class Decoding {
     /// exactly as the ring gets them. `framesProduced` counts them.
     func convertChunk() -> Chunk {
         if let upmixer { return convertUpmixedChunk(upmixer) }
+        if let renderer { return convertRenderedChunk(renderer) }
         let (status, conversionError, waiting) = runConverter()
 
         let frames = output.frameLength
@@ -214,6 +222,43 @@ final class Decoding {
         }
         let ended = upmixFinished && upmixQueue.isEmpty
         return Chunk(frames: AVAudioFrameCount(frames), data: frames > 0 ? raw : nil, ended: ended, waiting: waiting && frames == 0,
+                     error: ended ? (conversionError ?? error) : nil)
+    }
+
+    /// Room render: converts until a chunk's worth of the group's frames is ready (or the song ends), then hands that out. As with
+    /// the upmix, the renderer's latency is its own: every source frame comes out, aligned, nothing more.
+    private func convertRenderedChunk(_ renderer: RoomRenderer) -> Chunk {
+        let n = renderer.outputChannels
+        guard let routed, let buffer = routed.floatChannelData?[0] else {
+            return Chunk(frames: 0, data: nil, ended: true, waiting: false, error: error)
+        }
+        let capacity = Int(routed.frameCapacity)
+        var waiting = false, conversionError: NSError?
+        while upmixQueue.count / n < capacity, !upmixFinished {
+            let (status, failure, starved) = runConverter()
+            let frames = Int(output.frameLength)
+            if frames > 0, let source = output.floatChannelData?[0] { renderer.process(source, frames: frames, into: &upmixQueue) }
+            if status == .error || status == .endOfStream || (inputExhausted && frames == 0) {
+                renderer.finish(into: &upmixQueue)
+                upmixFinished = true
+                conversionError = failure
+            }
+            if starved { waiting = true; break }
+            if frames == 0 { break }
+        }
+        let frames = min(capacity, upmixQueue.count / n)
+        upmixQueue.withUnsafeBufferPointer { buffer.update(from: $0.baseAddress!, count: frames * n) }
+        upmixQueue.removeFirst(frames * n)
+        routed.frameLength = AVAudioFrameCount(frames)
+        if frames > 0 {
+            framesProduced += UInt64(frames)
+            if gain != 1 {
+                var g = gain
+                vDSP_vsmul(buffer, 1, &g, buffer, 1, vDSP_Length(frames) * vDSP_Length(n))
+            }
+        }
+        let ended = upmixFinished && upmixQueue.isEmpty
+        return Chunk(frames: AVAudioFrameCount(frames), data: frames > 0 ? buffer : nil, ended: ended, waiting: waiting && frames == 0,
                      error: ended ? (conversionError ?? error) : nil)
     }
 

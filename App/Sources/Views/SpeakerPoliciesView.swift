@@ -1,6 +1,6 @@
 //
-// Vespertine: Settings › Speaker Groups › Edit: what a stereo song does on more than two speakers, what becomes of the subwoofer
-// channel, and what happens when an output goes away. The options and their words are `GroupPolicies` in VespertineKit.
+// Vespertine: Settings › Speaker Groups › Edit: what a stereo song does on more than two speakers, room render, what becomes of
+// the subwoofer channel, and what happens when an output goes away. The options and their words are `GroupPolicies` in VespertineKit.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -13,6 +13,7 @@ struct SpeakerPoliciesView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             stereo
+            roomRender
             lfe
             loss
         }
@@ -32,6 +33,15 @@ struct SpeakerPoliciesView: View {
                 }
             }
             Text(verbatim: GroupPolicies.stereoNote).font(.caption).foregroundStyle(.secondary)
+        }
+    }
+
+    private var roomRender: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Toggle(isOn: Binding(get: { GroupPolicies.roomRenderOn(group) }, set: { group = GroupPolicies.setRoomRender($0, in: group) })) {
+                Text(verbatim: GroupPolicies.roomRenderTitle).font(.headline)
+            }
+            Text(verbatim: GroupPolicies.roomRenderDetail).font(.caption).foregroundStyle(.secondary)
         }
     }
 

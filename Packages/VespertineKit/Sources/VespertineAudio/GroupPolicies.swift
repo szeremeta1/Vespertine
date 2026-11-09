@@ -146,6 +146,20 @@ public enum GroupPolicies {
 
     public static let lfeNote = String(localized: "Played: a song's LFE channel goes by this choice, or to the group's subwoofer when it has one.")
 
+    // MARK: Room render
+
+    public static func roomRenderOn(_ group: SpeakerGroup) -> Bool { group.roomRender != nil }
+
+    /// On: the default settings, or the ones the group had. Off: nil, so songs play as routed.
+    public static func setRoomRender(_ on: Bool, in group: SpeakerGroup) -> SpeakerGroup {
+        var result = group
+        if on { result.roomRender = group.roomRender ?? RoomRenderSettings() } else { result.roomRender = nil }
+        return result
+    }
+
+    public static let roomRenderTitle = String(localized: "Fill the room")
+    public static let roomRenderDetail = String(localized: "For listening anywhere in the room, not only at the seat: stereo songs add their ambience on the back pair, and the bass moves to the front pair. Songs are no longer bit-perfect.")
+
     // MARK: A lost output
 
     public enum LossChoice: String, CaseIterable, Sendable, Identifiable {
