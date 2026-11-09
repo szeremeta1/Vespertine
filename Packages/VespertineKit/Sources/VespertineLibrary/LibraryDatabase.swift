@@ -533,14 +533,49 @@ public extension LibraryDatabase {
         }
     }
 
-    /// Full-text search across title/artist/album/composer/genre. Prefix matching on every word.
+    /// Full-text search across title/artist/album/composer/genre. Prefix matching on every word. A query with Han,
+    /// kana or Thai in it (written without spaces, so the index holds whole runs as one word) matches any part of
+    /// a field instead (`searchSubstrings`).
     func search(_ text: String, limit: Int = 500) throws -> [Track] {
+        if Self.hasUnspacedScript(text) { return try searchSubstrings(text, limit: limit) }
         guard let pattern = FTS5Pattern(matchingAllPrefixesIn: text) else { return [] }
         return try writer.read { db in
             try Track.fetchAll(db, sql: """
                 SELECT track.* FROM track JOIN trackFts ON trackFts.rowid = track.id
                 WHERE trackFts MATCH ? AND track.isMissing = 0 ORDER BY rank LIMIT ?
                 """, arguments: [pattern, limit])
+        }
+    }
+
+    /// Whether `text` has a character from a script whose words aren't separated by spaces: the index's tokenizer keeps
+    /// such a run whole, so "夜" would never find "東京の夜".
+    static func hasUnspacedScript(_ text: String) -> Bool {
+        text.unicodeScalars.contains { scalar in
+            switch scalar.value {
+            case 0x3040...0x30FF, 0x31F0...0x31FF, 0x3400...0x4DBF, 0x4E00...0x9FFF, 0xF900...0xFAFF, 0xFF66...0xFF9F, 0x20000...0x2FA1F,
+                 0x0E00...0x0E7F: true
+            default: false
+            }
+        }
+    }
+
+    /// Every word of `text` found anywhere in a song's title, artist, album, album artist, composer or genre.
+    private func searchSubstrings(_ text: String, limit: Int) throws -> [Track] {
+        let words = text.split(whereSeparator: \.isWhitespace).map(String.init)
+        guard !words.isEmpty else { return [] }
+        func escaped(_ s: String) -> String {
+            s.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "%", with: "\\%").replacingOccurrences(of: "_", with: "\\_")
+        }
+        let columns = ["title", "artist", "album", "albumArtist", "composer", "genre"]
+        let oneWord = "(" + columns.map { "IFNULL(\($0), '') LIKE ? ESCAPE '\\'" }.joined(separator: " OR ") + ")"
+        var arguments = StatementArguments()
+        for word in words { for _ in columns { arguments += ["%\(escaped(word))%"] } }
+        arguments += [limit]
+        return try writer.read { db in
+            try Track.fetchAll(db, sql: """
+                SELECT * FROM track WHERE isMissing = 0 AND \(Array(repeating: oneWord, count: words.count).joined(separator: " AND "))
+                ORDER BY albumArtistSortKey, albumSortKey, discNumber, trackNumber LIMIT ?
+                """, arguments: arguments)
         }
     }
 
