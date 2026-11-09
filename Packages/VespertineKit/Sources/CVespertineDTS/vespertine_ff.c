@@ -29,6 +29,7 @@ struct NFFDecoder {
     int64_t discard;          // frames to drop after a seek
     bool eof, flushed;
     int badFrames;            // damaged frames in a row (skipped, up to NFF_MAX_BAD_FRAMES)
+    int64_t concealed;        // damaged frames skipped since opening (never reset: the signal path reports them)
     char profile[64];
     // Raw DSD reading
     uint8_t *dsd;             // per-channel planes, dsdCapacity bytes each
@@ -253,7 +254,15 @@ static bool append(NFFDecoder *d, const AVFrame *f) {
 #define NFF_MAX_BAD_FRAMES 32
 
 /// Skips a damaged frame; false once too many came in a row.
-static bool skip_bad_frame(NFFDecoder *d) { return ++d->badFrames <= NFF_MAX_BAD_FRAMES; }
+static bool skip_bad_frame(NFFDecoder *d) { d->concealed++; return ++d->badFrames <= NFF_MAX_BAD_FRAMES; }
+
+/// Hands a packet of the stream to the decoder. A packet the decoder refuses as damaged is skipped and counted.
+static void send(NFFDecoder *d, const AVPacket *p) {
+    int r = avcodec_send_packet(d->ctx, p);
+    if (r < 0 && r != AVERROR(EAGAIN) && r != AVERROR_EOF) d->concealed++;
+}
+
+int64_t nff_concealed(const NFFDecoder *d) { return d->concealed; }
 
 /// Decodes more into the FIFO. Returns false at the end (or on a fatal error).
 static bool pump(NFFDecoder *d) {
@@ -269,7 +278,7 @@ static bool pump(NFFDecoder *d) {
         }
         r = av_read_frame(d->fmt, d->packet);
         if (r < 0) { d->eof = true; continue; }
-        if (d->packet->stream_index == d->stream) avcodec_send_packet(d->ctx, d->packet);
+        if (d->packet->stream_index == d->stream) send(d, d->packet);
         av_packet_unref(d->packet);
     }
 }
@@ -341,7 +350,7 @@ bool nff_seek(NFFDecoder *d, int64_t target) {
         if (r != AVERROR(EAGAIN)) return false;
         r = av_read_frame(d->fmt, d->packet);
         if (r < 0) { d->eof = true; return false; }
-        if (d->packet->stream_index == d->stream) avcodec_send_packet(d->ctx, d->packet);
+        if (d->packet->stream_index == d->stream) send(d, d->packet);
         av_packet_unref(d->packet);
     }
     while (d->discard > 0) { if (!pump(d)) break; }

@@ -62,6 +62,8 @@ int nff_read(NFFDecoder *_Nonnull d, float *_Nonnull const *_Nonnull planes, int
 bool nff_seek(NFFDecoder *_Nonnull d, int64_t frame);
 /// Current frame position.
 int64_t nff_position(const NFFDecoder *_Nonnull d);
+/// Damaged frames the decoder skipped since the file was opened (seeks don't reset it).
+int64_t nff_concealed(const NFFDecoder *_Nonnull d);
 
 // MARK: Raw DSD (for DoP): the 1-bit stream itself, per channel, most significant bit first in time.
 
