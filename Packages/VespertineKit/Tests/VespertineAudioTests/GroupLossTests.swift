@@ -106,4 +106,13 @@ struct GroupLossTests {
         #expect(GroupOutput.resolveDegraded(group(loss: .continueOnRemaining), among: fiioOnly) == .missing(["Fosi ZD3"]))
         #expect(GroupOutput.resolveDegraded(group(loss: .pause), among: [device(fosi, "Fosi ZD3", id: 10)]) == .missing(["FiiO K11"]))
     }
+
+    @Test("What the listener is told names the DAC that went away, not the group: one, several, or the leader")
+    func lostDACIsNamed() {
+        let g = group(three: true)
+        #expect(GroupLoss.lostName(GroupLoss.assess(g, connected: [fosi, dac3]), group: g.name) == "FiiO K11")
+        #expect(GroupLoss.lostName(GroupLoss.assess(g, connected: [fosi]), group: g.name) == "FiiO K11, Third DAC")
+        #expect(GroupLoss.lostName(GroupLoss.assess(g, connected: [fiio, dac3]), group: g.name) == "Fosi ZD3")
+        #expect(GroupLoss.lostName(GroupLoss.assess(g, connected: [fosi, fiio, dac3]), group: g.name) == g.name)
+    }
 }

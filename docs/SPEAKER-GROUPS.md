@@ -51,7 +51,7 @@ A group has no volume of its own. The volume keys do not control it, and the gro
 
 ## When a DAC goes away
 
-With "pause", the group fades and pauses and names the DAC; with "carry on", it re-plans on the DACs left and folds the music onto them after a short mute. A lost leader pauses. When the DAC returns, the group is rebuilt at the next play. It never carries on silently on a new clock in the middle of a song.
+With "pause", the group pauses and names the DAC that went away; with "carry on", it re-plans on the DACs left and folds the music onto them after a short mute. A lost leader pauses. When the DAC returns, the group is rebuilt at the next play. It never carries on silently on a new clock in the middle of a song.
 
 ## What is not verified
 
