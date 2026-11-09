@@ -129,6 +129,18 @@ struct RoomRenderTests {
         #expect(try JSONDecoder().decode(RoomRenderSettings.self, from: Data("{\"fillDB\": -3}".utf8)) == RoomRenderSettings(fillDB: -3))
     }
 
+    @Test("The switch: on takes the defaults (or keeps what the group had), off clears it")
+    func toggle() {
+        let plain = GroupFixtures.quad()
+        #expect(!GroupPolicies.roomRenderOn(plain))
+        let on = GroupPolicies.setRoomRender(true, in: plain)
+        #expect(on.roomRender == RoomRenderSettings())
+        var tuned = plain
+        tuned.roomRender = RoomRenderSettings(fillDB: -15)
+        #expect(GroupPolicies.setRoomRender(true, in: tuned).roomRender?.fillDB == -15)
+        #expect(GroupPolicies.setRoomRender(false, in: on) == plain)
+    }
+
     @Test("Settings are held to their ranges; a number that isn't one takes the default")
     func clamped() {
         let wild = RoomRenderSettings(ambienceDB: 9, fillDB: -.infinity, surroundDelayMs: 2, crossoverHz: .nan, lowCorrectionDepth: 3, lowCorrectionBelowHz: -1)

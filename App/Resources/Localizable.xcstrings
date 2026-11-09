@@ -194697,6 +194697,274 @@
         }
       }
     },
+    "Fill the room": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ክፍሉን ሙላ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "املأ الغرفة"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ঘর ভরিয়ে দিন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyplnit místnost"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fyld rummet"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den Raum füllen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Γέμισμα του δωματίου"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Llenar la sala"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پر کردن اتاق"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Täytä huone"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Punuin ang kuwarto"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remplir la pièce"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ઓરડો ભરી દો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cika ɗakin"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מילוי החדר"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कमरा भर दें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A szoba betöltése"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isi ruangan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riempi la stanza"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "部屋全体に広げる"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಕೋಣೆಯನ್ನು ತುಂಬಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "방 전체 채우기"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മുറി നിറയ്ക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "खोली भरून टाका"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penuhi bilik"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fyll rommet"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De kamer vullen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਮਰਾ ਭਰ ਦਿਓ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wypełnij pokój"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preencher o ambiente"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Encher a sala"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umple camera"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fyll rummet"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jaza chumba"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அறையை நிரப்பு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "గదిని నింపండి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เติมเสียงให้เต็มห้อง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odayı doldur"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Заповнити кімнату"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کمرہ بھر دیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lấp đầy căn phòng"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "充滿整個房間"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "充满整个房间"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "充滿整個房間"
+          }
+        }
+      }
+    },
     "Fills %@": {
       "comment": "Summary of an enrichment proposal: a list such as “titles, artists, album”.",
       "extractionState": "manual",
@@ -202049,6 +202317,274 @@
           "stringUnit": {
             "state": "translated",
             "value": "適用於透過 HDMI 或光纖連接的 AV 擴大機或聲霸：由它自行解碼杜比數位、杜比數位增強版（包含全景聲，僅限 HDMI）和 DTS。請只在已連接這類裝置時才開啟；其他裝置會將位元流播放成很大聲的雜訊。"
+          }
+        }
+      }
+    },
+    "For listening anywhere in the room, not only at the seat: stereo songs add their ambience on the back pair, and the bass moves to the front pair. Songs are no longer bit-perfect.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በመቀመጫው ብቻ ሳይሆን በክፍሉ ውስጥ በየትኛውም ቦታ ለማዳመጥ፦ የስቴሪዮ ዘፈኖች ድባባቸውን በኋለኛው ጥንድ ላይ ይጨምራሉ፣ ባሱም ወደ ፊተኛው ጥንድ ይሄዳል። ዘፈኖች ከእንግዲህ ቢት-ፍጹም አይደሉም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "للاستماع من أي مكان في الغرفة، لا من المقعد وحده: تضيف الأغاني الستيريو أجواءها على الزوج الخلفي، وينتقل الجهير إلى الزوج الأمامي. لم تعد الأغاني مطابقة بت ببت."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "শুধু আসনে নয়, ঘরের যেকোনো জায়গা থেকে শোনার জন্য: স্টেরিও গান তার পরিবেশ-শব্দ পেছনের জোড়ায় যোগ করে, আর বেস সামনের জোড়ায় চলে যায়। গান আর বিট-পারফেক্ট থাকে না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro poslech kdekoli v místnosti, nejen na místě poslechu: stereo skladby přidají svůj prostor na zadní pár a basy se přesunou na přední pár. Skladby už nejsou bitově přesné."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Til at lytte hvor som helst i rummet, ikke kun fra lyttepladsen: stereonumre får deres rumklang på det bageste par, og bassen flytter til det forreste par. Numrene er ikke længere bit-perfekte."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zum Hören überall im Raum, nicht nur am Hörplatz: Stereotitel geben ihren Raumklang auf das hintere Paar, und der Bass wandert zum vorderen Paar. Titel sind dann nicht mehr bitgenau."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Για ακρόαση οπουδήποτε στο δωμάτιο, όχι μόνο στη θέση ακρόασης: τα στερεοφωνικά τραγούδια προσθέτουν την ατμόσφαιρά τους στο πίσω ζεύγος και τα μπάσα μεταφέρονται στο μπροστινό ζεύγος. Τα τραγούδια δεν είναι πλέον bit-perfect."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para escuchar desde cualquier punto de la sala, no solo desde el asiento: las canciones estéreo añaden su ambiente en el par trasero y los graves pasan al par delantero. Las canciones dejan de ser bit-perfect."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "برای شنیدن از هر جای اتاق، نه فقط از جای نشستن: آهنگ‌های استریو فضای صوتی خود را روی جفت عقبی اضافه می‌کنند و صدای بم به جفت جلویی می‌رود. آهنگ‌ها دیگر بیت‌به‌بیت دقیق نیستند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuunteluun missä tahansa huoneessa, ei vain kuuntelupaikalla: stereokappaleiden tilaääni lisätään takapariin, ja basso siirtyy etupariin. Kappaleet eivät ole enää bittitarkkoja."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para makinig kahit saan sa kuwarto, hindi lang sa upuan: idinadagdag ng mga stereo na kanta ang kanilang ambience sa likurang pares, at lumilipat ang bass sa harapang pares. Hindi na bit-perfect ang mga kanta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pour écouter n'importe où dans la pièce, pas seulement à la place d'écoute : les morceaux stéréo ajoutent leur ambiance sur la paire arrière, et les graves passent sur la paire avant. Les morceaux ne sont plus bit-perfect."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ફક્ત બેઠક પરથી નહીં, ઓરડામાં ક્યાંય પણ સાંભળવા માટે: સ્ટીરિયો ગીતો પોતાનું વાતાવરણ પાછળની જોડી પર ઉમેરે છે, અને બાસ આગળની જોડી પર જાય છે. ગીતો હવે બિટ-પરફેક્ટ રહેતાં નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Don sauraro a ko'ina cikin ɗakin, ba a wurin zama kaɗai ba: waƙoƙin sitiriyo suna ƙara yanayinsu a kan biyu na baya, kuma bas yana komawa biyu na gaba. Waƙoƙi ba su zama bit-perfect ba kuma."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "להאזנה מכל מקום בחדר, לא רק ממקום הישיבה: שירי סטריאו מוסיפים את האווירה שלהם בזוג האחורי, והבס עובר לזוג הקדמי. השירים כבר אינם מדויקים ברמת הביט."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सिर्फ़ बैठने की जगह पर नहीं, कमरे में कहीं से भी सुनने के लिए: स्टीरियो गाने अपना माहौल पीछे वाली जोड़ी पर जोड़ते हैं, और बेस आगे वाली जोड़ी पर चला जाता है। गाने अब बिट-परफ़ेक्ट नहीं रहते।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hogy a szobában bárhol jól szóljon, ne csak a hallgatási helyen: a sztereó dalok térhangzása a hátsó párra is kerül, a basszus pedig az első párra költözik. A dalok így már nem bitpontosak."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk mendengarkan di mana saja di ruangan, bukan hanya di tempat duduk: lagu stereo menambahkan suasananya di pasangan belakang, dan bas pindah ke pasangan depan. Lagu tidak lagi bit-perfect."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per ascoltare da qualsiasi punto della stanza, non solo dal posto d'ascolto: i brani stereo aggiungono il loro ambiente sulla coppia posteriore e i bassi passano alla coppia anteriore. I brani non sono più bit-perfect."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リスニング位置だけでなく、部屋のどこで聴いてもよいように：ステレオの曲は残響成分をリアのペアに加え、低音はフロントのペアに移ります。曲はビットパーフェクトではなくなります。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಆಸನದಲ್ಲಿ ಮಾತ್ರವಲ್ಲ, ಕೋಣೆಯ ಎಲ್ಲಿಂದಲಾದರೂ ಕೇಳಲು: ಸ್ಟೀರಿಯೋ ಹಾಡುಗಳು ತಮ್ಮ ವಾತಾವರಣವನ್ನು ಹಿಂದಿನ ಜೋಡಿಗೆ ಸೇರಿಸುತ್ತವೆ, ಮತ್ತು ಬಾಸ್ ಮುಂದಿನ ಜೋಡಿಗೆ ಹೋಗುತ್ತದೆ. ಹಾಡುಗಳು ಇನ್ನು ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಆಗಿರುವುದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "청취 위치뿐 아니라 방 어디에서나 들을 수 있도록: 스테레오 곡은 공간감을 뒤쪽 쌍에 더하고, 저음은 앞쪽 쌍으로 옮겨집니다. 곡은 더 이상 비트 퍼펙트가 아닙니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഇരിപ്പിടത്തിൽ മാത്രമല്ല, മുറിയിൽ എവിടെനിന്നും കേൾക്കാൻ: സ്റ്റീരിയോ പാട്ടുകൾ അവയുടെ അന്തരീക്ഷം പിന്നിലെ ജോഡിയിൽ ചേർക്കുന്നു, ബാസ് മുന്നിലെ ജോഡിയിലേക്ക് മാറുന്നു. പാട്ടുകൾ ഇനി ബിറ്റ്-പെർഫെക്റ്റ് ആയിരിക്കില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फक्त बसण्याच्या जागी नव्हे, खोलीत कुठूनही ऐकण्यासाठी: स्टिरिओ गाणी त्यांचे वातावरण मागच्या जोडीवर जोडतात आणि बास पुढच्या जोडीवर जातो. गाणी आता बिट-परफेक्ट राहत नाहीत."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk mendengar di mana-mana dalam bilik, bukan hanya di tempat duduk: lagu stereo menambah suasananya pada pasangan belakang, dan bes berpindah ke pasangan hadapan. Lagu tidak lagi bit-perfect."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For å lytte hvor som helst i rommet, ikke bare fra lytteplassen: stereolåter får romklangen sin på det bakre paret, og bassen flytter til det fremre paret. Låtene er ikke lenger bitperfekte."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Om overal in de kamer te luisteren, niet alleen op de luisterplek: stereonummers krijgen hun ruimtelijkheid op het achterste paar en de bas gaat naar het voorste paar. Nummers zijn dan niet meer bit-perfect."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਿਰਫ਼ ਬੈਠਣ ਵਾਲੀ ਥਾਂ ਤੋਂ ਨਹੀਂ, ਕਮਰੇ ਵਿੱਚ ਕਿਤੋਂ ਵੀ ਸੁਣਨ ਲਈ: ਸਟੀਰੀਓ ਗੀਤ ਆਪਣਾ ਮਾਹੌਲ ਪਿਛਲੀ ਜੋੜੀ 'ਤੇ ਜੋੜਦੇ ਹਨ, ਅਤੇ ਬੇਸ ਅਗਲੀ ਜੋੜੀ 'ਤੇ ਚਲਾ ਜਾਂਦਾ ਹੈ। ਗੀਤ ਹੁਣ ਬਿਟ-ਪਰਫੈਕਟ ਨਹੀਂ ਰਹਿੰਦੇ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Do słuchania w dowolnym miejscu pokoju, nie tylko w miejscu odsłuchu: utwory stereo dodają swój pogłos na tylnej parze, a bas przechodzi na przednią parę. Utwory nie są już bit-perfect."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para ouvir de qualquer lugar do ambiente, não só da posição de escuta: as músicas estéreo ganham sua ambiência no par traseiro, e os graves passam para o par dianteiro. As músicas deixam de ser bit-perfect."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para ouvir em qualquer ponto da sala, não só no lugar de audição: as músicas estéreo juntam a sua ambiência no par traseiro, e os graves passam para o par dianteiro. As músicas deixam de ser bit-perfect."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pentru ascultare oriunde în cameră, nu doar din locul de ascultare: melodiile stereo își adaugă ambianța pe perechea din spate, iar basul trece pe perechea din față. Melodiile nu mai sunt bit-perfect."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "För att lyssna var som helst i rummet, inte bara från lyssningsplatsen: stereolåtar får sin rumsklang på det bakre paret och basen flyttas till det främre paret. Låtarna är inte längre bitperfekta."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kwa kusikiliza popote chumbani, si kitini pekee: nyimbo za stereo huongeza mandhari yao kwenye jozi ya nyuma, na besi huhamia jozi ya mbele. Nyimbo hazitakuwa tena bit-perfect."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இருக்கையில் மட்டுமல்ல, அறையில் எங்கிருந்தும் கேட்க: ஸ்டீரியோ பாடல்கள் தங்கள் சூழலொலியைப் பின் ஜோடியில் சேர்க்கின்றன, பேஸ் முன் ஜோடிக்கு மாறுகிறது. பாடல்கள் இனி பிட்-பர்ஃபெக்ட் ஆக இருக்காது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కూర్చునే చోటే కాకుండా గదిలో ఎక్కడి నుంచైనా వినడానికి: స్టీరియో పాటలు తమ వాతావరణాన్ని వెనుక జతకు జోడిస్తాయి, బేస్ ముందు జతకు వెళ్తుంది. పాటలు ఇకపై బిట్-పర్ఫెక్ట్ కావు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สำหรับฟังได้ทุกที่ในห้อง ไม่ใช่แค่ที่ตำแหน่งนั่งฟัง: เพลงสเตอริโอจะเพิ่มเสียงบรรยากาศที่ลำโพงคู่หลัง และเสียงเบสจะย้ายไปที่ลำโพงคู่หน้า เพลงจะไม่เป็นบิตเพอร์เฟกต์อีกต่อไป"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yalnızca dinleme yerinden değil, odanın her yerinden dinlemek için: stereo şarkılar ortam seslerini arka çifte ekler, baslar ön çifte geçer. Şarkılar artık bit-perfect olmaz."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для прослуховування будь-де в кімнаті, а не лише на місці слухача: стереопісні додають свій простір на задню пару, а баси переходять на передню пару. Пісні більше не бітоточні."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صرف نشست پر نہیں، کمرے میں کہیں سے بھی سننے کے لیے: اسٹیریو گانے اپنا ماحول پچھلے جوڑے پر شامل کرتے ہیں، اور باس اگلے جوڑے پر چلا جاتا ہے۔ گانے اب بٹ پرفیکٹ نہیں رہتے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Để nghe ở bất kỳ đâu trong phòng, không chỉ ở chỗ ngồi: các bài stereo thêm âm thanh không gian lên cặp loa sau, và âm trầm chuyển sang cặp loa trước. Bài hát không còn bit-perfect nữa."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "讓房間內任何位置都能好好聆聽，而不只是聆聽位：立體聲歌曲會把氛圍聲加到後方一對喇叭上，低音則移到前方一對喇叭。歌曲將不再是位元完美。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "让房间里任何位置都能好好聆听，而不只是聆听位：立体声歌曲会把氛围声加到后方一对音箱上，低音则移到前方一对音箱。歌曲将不再是比特完美。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "讓房間裡任何位置都能好好聆聽，而不只是聆聽位：立體聲歌曲會把氛圍聲加到後方一對喇叭上，低音則移到前方一對喇叭。歌曲將不再是位元完美。"
           }
         }
       }
