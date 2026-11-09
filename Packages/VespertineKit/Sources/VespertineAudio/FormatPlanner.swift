@@ -127,12 +127,14 @@ public enum FormatPlanner {
     static func basePlan(source: SourceFormat, device rawDevice: DeviceCapabilities, policy: RatePolicy, dsdToPCMForRoom: Bool = false,
                          dsdToPCMForTransitions: Bool = false) -> OutputPlan {
         let channels = max(1, min(source.channels, max(rawDevice.outputChannels, 1)))
-        // Ignore rates whose only formats carry fewer channels than we need
-        // (e.g. AirPods' 24 kHz mono hands-free mode).
+        // Ignore rates whose only formats carry fewer channels than we need (e.g. AirPods' 24 kHz mono hands-free
+        // mode). A mono song counts as stereo on a device that has stereo: a call mode's mono rate would switch
+        // Bluetooth headphones to their call codec for it.
         var device = rawDevice
         if !rawDevice.physicalFormats.isEmpty {
+            let needed = max(channels, min(2, rawDevice.physicalFormats.map(\.channels).max() ?? channels))
             let usable = rawDevice.sampleRates.filter { rate in
-                rawDevice.physicalFormats.contains { $0.supports(rate: rate) && $0.channels >= channels }
+                rawDevice.physicalFormats.contains { $0.supports(rate: rate) && $0.channels >= needed }
             }
             if !usable.isEmpty { device.sampleRates = usable }
         }
