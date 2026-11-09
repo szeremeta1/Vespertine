@@ -40,6 +40,13 @@ cp "$dmg" "$feed/"
 gh release download --repo "$repo" --pattern appcast.xml --dir "$feed" 2>/dev/null || print "No existing appcast; starting a new one."
 [[ ! -f "$feed/appcast.xml" ]] || /usr/bin/sed -i '' 's|<title>Nocturne</title>|<title>Vespertine</title>|' "$feed/appcast.xml"
 
+# Sparkle compares build numbers: refuse before anything outward (the tag, the push, the release) a build that is not
+# above the release-candidate builds on the remote (chore/build-<n> branches) and the builds in the carried-over feed.
+build=$(/usr/libexec/PlistBuddy -c "Print CFBundleVersion" "$app/Contents/Info.plist")
+remote_builds=$(git ls-remote origin 'refs/heads/chore/build-*') \
+  || { print -u2 "Can't list the chore/build-* branches on origin, so the build number can't be checked."; exit 1; }
+print -r -- "$remote_builds" | /usr/bin/python3 scripts/check-build-number.py "$build" "$feed/appcast.xml" || exit 1
+
 # Sparkle shows HTML release notes placed beside the archive.
 /usr/bin/python3 - "$notes" "$feed/Vespertine-$version.html" <<'PY'
 import html, re, sys
