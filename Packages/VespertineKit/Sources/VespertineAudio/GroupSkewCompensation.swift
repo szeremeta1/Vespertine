@@ -60,7 +60,10 @@ public enum GroupSkewCompensation {
         out.members[followerIndex].skewMs = min(max(rounded(electronic), 0), limit.upperBound)
         out.members[followerIndex].skewContext = context
         out.members[leaderIndex].skewMs = min(max(rounded(-electronic), 0), limit.upperBound)
-        out.members[leaderIndex].skewContext = context
+        // The leader is never resampled: its share is kept with the leader's own settings (not the follower's), or `GroupDelay.lateMs`
+        // would find it measured under other settings and drop it.
+        out.members[leaderIndex].skewContext = SpeakerGroup.Member.SkewContext(driftCorrected: false, driftQuality: group.members[leaderIndex].driftQuality,
+                                                                              sampleRate: rate)
         if let rateTrimPPM, rateTrimPPM.isFinite { out.members[followerIndex].rateTrimPPM = min(max(rateTrimPPM, SpeakerGroup.Member.rateTrimRangePPM.lowerBound), SpeakerGroup.Member.rateTrimRangePPM.upperBound) }
         return Result(group: out, measuredMs: measured, acousticMs: acoustic, electronicMs: electronic)
     }
