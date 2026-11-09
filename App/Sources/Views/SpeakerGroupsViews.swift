@@ -1,9 +1,7 @@
 //
 // Vespertine: Settings › Playback › Speaker Groups (beta): its switch (off by default) and, while it is on, the list of saved
-// groups, to copy, remove and make. The list's own words are plain English with `verbatim` text for now.
+// groups, to copy, remove and make. Group, output and device names are shown as they are.
 // SPDX-License-Identifier: GPL-3.0-or-later
-//
-// Plain English with `verbatim` text: these strings join the catalog together with the screens that stay.
 //
 
 import SwiftUI
@@ -42,16 +40,16 @@ private struct SpeakerGroupsList: View {
     var body: some View {
         Group {
             if groups.groups.isEmpty {
-                Text(verbatim: "No speaker groups yet.").foregroundStyle(.secondary)
+                Text("No speaker groups yet.").foregroundStyle(.secondary)
             }
             ForEach(groups.groups) { group in
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
                         Text(verbatim: group.name).font(.body.weight(.medium))
                         Spacer()
-                        Button { editing = group } label: { Text(verbatim: "Edit…") }
-                        Button(role: .none) { groups.duplicate(group.id) } label: { Text(verbatim: "Duplicate") }
-                        Button(role: .destructive) { groups.remove(group.id) } label: { Text(verbatim: "Remove") }
+                        Button { editing = group } label: { Text("Edit…") }
+                        Button(role: .none) { groups.duplicate(group.id) } label: { Text("Duplicate") }
+                        Button(role: .destructive) { groups.remove(group.id) } label: { Text("Remove") }
                     }
                     Text(verbatim: SpeakerGroupsModel.summary(group)).font(.caption).foregroundStyle(.secondary)
                     if let problem = SpeakerGroupsModel.problem(group) {
@@ -60,14 +58,14 @@ private struct SpeakerGroupsList: View {
                 }
             }
             if groups.unreadableCount > 0 {
-                Text(verbatim: "\(groups.unreadableCount) saved group(s) from another version are kept as they are.")
+                Text("\(groups.unreadableCount) saved groups from another version are kept as they are.", comment: "Speaker Groups settings: groups a newer version saved, which this version keeps untouched. Plural by the count.")
                     .font(.caption).foregroundStyle(.secondary)
             }
-            Button { making = true } label: { Text(verbatim: "New Group…") }
+            Button { making = true } label: { Text("New Group…") }
             if let error = groups.lastError {
-                Text(verbatim: "Couldn't save: \(error)").font(.caption).foregroundStyle(.red)
+                Text("Couldn't save: \(error)", comment: "Speaker Groups settings: the reason saving the group list failed.").font(.caption).foregroundStyle(.red)
             }
-            Text(verbatim: "Beta: tested with virtual devices and one probe session on real DACs, but not yet listened to in the app on a real group. Only the clock leader's channels can be bit-perfect.")
+            Text("Beta: tested with virtual devices and one probe session on real DACs, but not yet listened to in the app on a real group. Only the clock leader's channels can be bit-perfect.")
                 .font(.caption).foregroundStyle(.secondary)
         }
     }
@@ -83,15 +81,15 @@ private struct NewSpeakerGroupSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(verbatim: "New Speaker Group").font(.title3.weight(.semibold))
-            TextField(text: $draft.name, prompt: Text(verbatim: "Name")) { Text(verbatim: "Name") }
-            Text(verbatim: "Outputs to combine").font(.headline)
+            Text("New Speaker Group").font(.title3.weight(.semibold))
+            TextField(text: $draft.name, prompt: Text("Name")) { Text("Name") }
+            Text("Outputs to combine").font(.headline)
             List(candidates) { candidate in
                 HStack(alignment: .firstTextBaseline) {
                     Toggle(isOn: Binding(get: { draft.isChosen(candidate.uid) }, set: { _ in draft.toggle(candidate) })) {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(verbatim: candidate.name)
-                            Text(verbatim: "\(candidate.channels) \(candidate.channels == 1 ? "channel" : "channels") · \(candidate.transport.label)")
+                            Text("\(candidate.channels) channels · \(candidate.transport.label)", comment: "New Speaker Group: an output's channel count (plural by the count), a dot, then how it connects (USB, built-in).")
                                 .font(.caption).foregroundStyle(.secondary)
                             switch candidate.eligibility {
                             case .ok: EmptyView()
@@ -104,9 +102,9 @@ private struct NewSpeakerGroupSheet: View {
                     if draft.isChosen(candidate.uid) {
                         Spacer()
                         Button { draft.move(candidate.uid, by: -1) } label: { Image(systemName: "chevron.up") }
-                            .accessibilityLabel(Text(verbatim: "Move \(candidate.name) earlier"))
+                            .accessibilityLabel(Text("Move \(candidate.name) earlier", comment: "Accessibility label: moves this output earlier in the group's order."))
                         Button { draft.move(candidate.uid, by: 1) } label: { Image(systemName: "chevron.down") }
-                            .accessibilityLabel(Text(verbatim: "Move \(candidate.name) later"))
+                            .accessibilityLabel(Text("Move \(candidate.name) later", comment: "Accessibility label: moves this output later in the group's order."))
                     }
                 }
             }
@@ -114,7 +112,7 @@ private struct NewSpeakerGroupSheet: View {
             if draft.chosen.count >= 2 {
                 Picker(selection: Binding(get: { draft.leaderUID ?? "" }, set: { draft.setLeader($0) })) {
                     ForEach(draft.chosen) { Text(verbatim: $0.name).tag($0.uid) }
-                } label: { Text(verbatim: "Clock leader") }
+                } label: { Text("Clock leader") }
                 Text(verbatim: SpeakerGroupDraft.leaderExplanation).font(.caption).foregroundStyle(.secondary)
             }
             ForEach(draft.problems.filter { draft.chosen.count > 0 || $0 != "Choose at least two outputs." }, id: \.self) {
@@ -122,8 +120,8 @@ private struct NewSpeakerGroupSheet: View {
             }
             HStack {
                 Spacer()
-                Button(role: .cancel) { dismiss() } label: { Text(verbatim: "Cancel") }
-                Button { groups.create(draft); dismiss() } label: { Text(verbatim: "Create") }
+                Button(role: .cancel) { dismiss() } label: { Text("Cancel") }
+                Button { groups.create(draft); dismiss() } label: { Text("Create") }
                     .keyboardShortcut(.defaultAction).disabled(!draft.canCreate)
             }
         }

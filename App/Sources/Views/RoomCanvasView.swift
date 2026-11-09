@@ -3,8 +3,7 @@
 // seat, arrow keys nudge the speaker that has the focus (Shift: 50 cm), and a screen reader hears each speaker's distance and angle.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
-// Plain English with `verbatim` text: these strings join the catalog together with the screens that stay. The rules (snapping, the
-// grid, the walls, the sentences) are `RoomCanvas` in VespertineKit, with tests.
+// The rules (snapping, the grid, the walls, the sentences) are `RoomCanvas` in VespertineKit, with tests.
 //
 
 import SwiftUI
@@ -20,15 +19,15 @@ struct RoomCanvasView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                Text(verbatim: "Room").font(.headline)
+                Text("Room").font(.headline)
                 Spacer()
                 Picker(selection: $unitName) {
-                    Text(verbatim: "Metres").tag(DistanceUnit.metres.rawValue)
-                    Text(verbatim: "Feet").tag(DistanceUnit.feet.rawValue)
-                } label: { Text(verbatim: "Units") }
+                    Text("Metres").tag(DistanceUnit.metres.rawValue)
+                    Text("Feet").tag(DistanceUnit.feet.rawValue)
+                } label: { Text("Units") }
                 .pickerStyle(.segmented).labelsHidden().frame(width: 140)
             }
-            Text(verbatim: "Drag the speakers and the seat to where they are. The arrow turns the seat; Option while dragging turns the 10 cm grid off.")
+            Text("Drag the speakers and the seat to where they are. The arrow turns the seat; Option while dragging turns the 10 cm grid off.")
                 .font(.caption).foregroundStyle(.secondary)
             GeometryReader { geo in
                 let layout = RoomCanvasLayout(group: group, viewWidth: geo.size.width, viewHeight: geo.size.height)
@@ -44,7 +43,7 @@ struct RoomCanvasView: View {
             .frame(height: 300)
             .background(RoundedRectangle(cornerRadius: 8).fill(Color.secondary.opacity(0.08)))
             if group.speakers.isEmpty {
-                Text(verbatim: "No speakers are placed yet. Choose a speaker for each channel first.").font(.caption).foregroundStyle(.secondary)
+                Text("No speakers are placed yet. Choose a speaker for each channel first.").font(.caption).foregroundStyle(.secondary)
             }
         }
     }
@@ -70,7 +69,7 @@ struct RoomCanvasView: View {
                                with: .color(.secondary.opacity(0.15)), lineWidth: 0.5)
                 line += 1
             }
-            context.draw(Text(verbatim: "front").font(.caption2).foregroundStyle(.secondary), at: CGPoint(x: rect.midX, y: rect.minY + 8))
+            context.draw(Text("front").font(.caption2).foregroundStyle(.secondary), at: CGPoint(x: rect.midX, y: rect.minY + 8))
         }
         .accessibilityHidden(true)
     }
@@ -105,10 +104,10 @@ struct RoomCanvasView: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: RoomCanvas.describe(speaker: speaker, in: group, unit: unit)))
         .accessibilityAddTraits(.isButton)
-        .accessibilityAction(named: Text(verbatim: "Move left")) { group = RoomCanvas.nudge(speaker: speaker.id, dx: -1, dy: 0, large: false, in: group) }
-        .accessibilityAction(named: Text(verbatim: "Move right")) { group = RoomCanvas.nudge(speaker: speaker.id, dx: 1, dy: 0, large: false, in: group) }
-        .accessibilityAction(named: Text(verbatim: "Move forward")) { group = RoomCanvas.nudge(speaker: speaker.id, dx: 0, dy: 1, large: false, in: group) }
-        .accessibilityAction(named: Text(verbatim: "Move back")) { group = RoomCanvas.nudge(speaker: speaker.id, dx: 0, dy: -1, large: false, in: group) }
+        .accessibilityAction(named: Text("Move left")) { group = RoomCanvas.nudge(speaker: speaker.id, dx: -1, dy: 0, large: false, in: group) }
+        .accessibilityAction(named: Text("Move right")) { group = RoomCanvas.nudge(speaker: speaker.id, dx: 1, dy: 0, large: false, in: group) }
+        .accessibilityAction(named: Text("Move forward")) { group = RoomCanvas.nudge(speaker: speaker.id, dx: 0, dy: 1, large: false, in: group) }
+        .accessibilityAction(named: Text("Move back")) { group = RoomCanvas.nudge(speaker: speaker.id, dx: 0, dy: -1, large: false, in: group) }
     }
 
     private func seat(_ layout: RoomCanvasLayout) -> some View {
@@ -123,9 +122,9 @@ struct RoomCanvasView: View {
                 .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .named("room")).onChanged { value in
                     group = RoomCanvas.turnListener(toward: layout.roomPoint(viewX: value.location.x, viewY: value.location.y), in: group)
                 })
-                .accessibilityLabel(Text(verbatim: "Turn the seat"))
-                .accessibilityAction(named: Text(verbatim: "Turn right")) { group.listener.facingDegrees = Self.turned(group.listener.facingDegrees, by: 15) }
-                .accessibilityAction(named: Text(verbatim: "Turn left")) { group.listener.facingDegrees = Self.turned(group.listener.facingDegrees, by: -15) }
+                .accessibilityLabel(Text("Turn the seat"))
+                .accessibilityAction(named: Text("Turn right")) { group.listener.facingDegrees = Self.turned(group.listener.facingDegrees, by: 15) }
+                .accessibilityAction(named: Text("Turn left")) { group.listener.facingDegrees = Self.turned(group.listener.facingDegrees, by: -15) }
             Circle().stroke(Color.orange, lineWidth: 3).background(Circle().fill(Color.orange.opacity(0.25))).frame(width: 22, height: 22)
                 .position(x: p.x, y: p.y)
                 .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .named("room")).onChanged { value in
