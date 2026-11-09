@@ -750,7 +750,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                 defer { s.commands.removeAll() }
                 return s.commands
             }
-            for command in Self.coalesce(commands) { handle(command) }
+            // The rest of the batch stays visible while each command is handled (see `queuedTransportIntent`): a pause
+            // taken together with an earlier play, resume or seek decides how that one starts.
+            batchRest = Self.coalesce(commands)
+            while !batchRest.isEmpty { handle(batchRest.removeFirst()) }
 
             var didWork = false
             if state == .playing, let atmos {
@@ -809,9 +812,13 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
     }
 
+    /// Commands taken from the queue with the one being handled, not handled yet (engine thread).
+    private var batchRest: [Command] = []
+
     /// Another song (or stop) was asked for while this one was opening: finishing it would only delay that.
     private var superseded: Bool {
-        shared.withLock { $0.commands.contains { switch $0 { case .play, .stop: true; default: false } } }
+        let startsOver: (Command) -> Bool = { switch $0 { case .play, .stop: true; default: false } }
+        return batchRest.contains(where: startsOver) || shared.withLock { $0.commands.contains(where: startsOver) }
     }
     private struct Superseded: Error {}
 
@@ -827,19 +834,19 @@ public final class PlaybackEngine: @unchecked Sendable {
 
     /// What the user last asked of the transport and the engine has not acted on yet; nil when nothing (or a play or stop, which
     /// start over and make an earlier pause or resume moot, is waiting).
+    /// The rest of the batch being handled counts as well as what was posted since: a pause pressed right after a play, resume
+    /// or seek reaches the engine together with it, and the caller's thread has already silenced the output for it.
     private func queuedTransportIntent() -> TransportIntent? {
-        shared.withLock { s in
-            var intent: TransportIntent?
-            for command in s.commands {
-                switch command {
-                case .play, .stop: intent = nil
-                case .pause: intent = .pause
-                case .resume: intent = .resume
-                default: break
-                }
+        var intent: TransportIntent?
+        for command in batchRest + shared.withLock({ $0.commands }) {
+            switch command {
+            case .play, .stop: intent = nil
+            case .pause: intent = .pause
+            case .resume: intent = .resume
+            default: break
             }
-            return intent
         }
+        return intent
     }
 
     /// A wait on a share, which can last as long as the share does. While the output plays (`lookingAhead`) it runs on another
@@ -872,9 +879,10 @@ public final class PlaybackEngine: @unchecked Sendable {
         // Only what the wait leaves coherent: a song playing or paused on its output, no other command waiting to reshape it.
         guard atmos == nil, let session, state != .stopped, !superseded else { return }
         let canResume = state == .playing || (state == .paused && !session.formatChanged())
+        let isTransport: (Command) -> Bool = { switch $0 { case .pause, .resume: true; default: false } }
         let intent: TransportIntent? = shared.withLock { s in
             var last: TransportIntent?
-            for command in s.commands {
+            for command in batchRest + s.commands {
                 switch command {
                 case .pause: last = .pause
                 case .resume: last = .resume
@@ -882,9 +890,10 @@ public final class PlaybackEngine: @unchecked Sendable {
                 }
             }
             guard let last, last == .pause || canResume else { return nil }
-            s.commands.removeAll { switch $0 { case .pause, .resume: true; default: false } }
+            s.commands.removeAll(where: isTransport)
             return last
         }
+        if intent != nil { batchRest.removeAll(where: isTransport) }
         switch intent {
         case .pause?:
             handle(.pause)
@@ -931,6 +940,8 @@ public final class PlaybackEngine: @unchecked Sendable {
             state = .paused
             pausedAt = Date()
         case .resume:
+            // A pause after it in the same batch is the last word: starting the output only to stop it again would be heard.
+            if queuedTransportIntent() == .pause { return }
             if state == .paused, let atmos {
                 atmos.play(); state = .playing; pausedAt = nil
             } else if state == .paused, let session, session.formatChanged() {
