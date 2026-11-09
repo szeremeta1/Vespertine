@@ -167,4 +167,41 @@ final class PlayPauseRig: @unchecked Sendable {
     }
 
     func sleep(ms: Int) async { try? await Task.sleep(for: .milliseconds(ms)) }
+
+    // MARK: A script on a thread of its own
+    //
+    // The song's buffered lead (15 s here) drains while it plays, so a scenario that says "paused while the share was quiet, with
+    // sound still buffered" holds only if the test reacts within that lead. A test awaiting `Task.sleep` resumes on one of Swift's
+    // few cooperative threads, and on a small runner running the whole package at once those can all be held by other tests for
+    // 20 s and more: the song then plays out its lead before the test gets to press anything. A script that must react in time
+    // runs on a plain thread (never the pool), records what it saw, and the test asserts on it afterwards.
+
+    /// Runs `script` on a thread of its own and returns what it returns, without holding a cooperative thread meanwhile.
+    func onOwnThread<T: Sendable>(_ script: @escaping @Sendable (PlayPauseRig) -> T) async -> T {
+        await withCheckedContinuation { continuation in
+            let thread = Thread { continuation.resume(returning: script(self)) }
+            thread.name = "Play/pause script"
+            thread.start()
+        }
+    }
+
+    /// `observe` for a script thread.
+    func observeBlocking(_ seconds: Double) -> Observation {
+        let p0 = engine.snapshot.position, a0 = audibleFrames, began = Date()
+        Thread.sleep(forTimeInterval: seconds)
+        let s = engine.snapshot
+        let window = Date().timeIntervalSince(began)
+        return Observation(state: s.state, buffering: s.isBuffering, fraction: s.bufferingFraction, positionMoved: s.position - p0,
+                           audibleSeconds: Double(audibleFrames - a0) / Self.rate, window: window)
+    }
+
+    /// `wait` for a script thread (false on timeout).
+    func waitBlocking(timeout: Double = 10, _ condition: (EngineSnapshot) -> Bool) -> Bool {
+        let end = Date().addingTimeInterval(timeout)
+        while Date() < end {
+            if condition(engine.snapshot) { return true }
+            Thread.sleep(forTimeInterval: 0.005)
+        }
+        return false
+    }
 }

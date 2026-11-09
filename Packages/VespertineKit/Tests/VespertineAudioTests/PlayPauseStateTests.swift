@@ -25,6 +25,17 @@ struct PlayPauseStateTests {
         #expect(o.state == .playing && o.audible && o.moving, "\(note): \(o)", sourceLocation: sourceLocation)
     }
 
+    /// What one run of the script below saw, to be judged afterwards.
+    private struct QuietShareRun: Sendable {
+        var ranShort = false
+        var short = ""
+        var pausedAt = 0.0, positionAfterPause = 0.0
+        var whilePaused: Observation?
+        var resumedQuiet: Observation?
+        var backPlaying: Observation?
+        var pausedAgain: Observation?
+    }
+
     @Test("Pause while the share has gone quiet and the song is buffering: it pauses, stays silent, and plays on when asked")
     func pauseDuringBuffering() async throws {
         let rig = try PlayPauseRig()
@@ -35,24 +46,41 @@ struct PlayPauseStateTests {
         // buffer from the start of the song up to where the share goes quiet and then waits on the share, while nothing is played away.
         // (Left running, a machine slower than the song's pace drained the buffer first, and "buffering" then meant the output had
         // starved, not that the share was quiet: a pause then had nothing left to play on from.)
+        // The presses then come from a thread of its own: once the output runs again the buffer plays out in real time, and a test task
+        // resumed late (every cooperative thread held by other tests for a while) would find it empty. The same task also timed out
+        // its own wait for the scene while starved, so the waits are on that thread too.
         rig.holdOutput(true)
-        rig.engine.play(rig.item())
-        let ranShort = await rig.wait(timeout: 40) { $0.state == .playing && $0.isBuffering && rig.share.readsWaiting > 0 && $0.bufferFill > 0.25 }
-        let seen = rig.engine.snapshot
-        #expect(ranShort, "the share never went quiet under the song: \(seen.state), buffering \(seen.isBuffering), \(rig.share.readsWaiting) reads waiting, buffer \(seen.bufferFill), \(rig.elapsed) s in")
-        rig.holdOutput(false)
-        let before = rig.engine.snapshot.position
-        rig.engine.pause()
-        await expectPaused(rig, "paused while buffering")
-        #expect(abs(rig.engine.snapshot.position - before) < 1.5, "the playhead stayed where the pause caught it")
-        rig.engine.resume()
-        await rig.sleep(ms: 300)
-        let o = await rig.observe(0.6)
-        #expect(o.state == .playing && o.audible, "resumed while the share is still quiet: \(o)")
-        rig.share.goQuiet(from: nil)
-        await expectPlaying(rig, "the share is back")
-        rig.engine.pause()
-        await expectPaused(rig, "paused again")
+        let run = await rig.onOwnThread { rig -> QuietShareRun in
+            var run = QuietShareRun()
+            rig.engine.play(rig.item())
+            run.ranShort = rig.waitBlocking(timeout: 120) { $0.state == .playing && $0.isBuffering && rig.share.readsWaiting > 0 && $0.bufferFill > 0.25 }
+            let seen = rig.engine.snapshot
+            run.short = "\(seen.state), buffering \(seen.isBuffering), \(rig.share.readsWaiting) reads waiting, buffer \(seen.bufferFill), \(rig.elapsed) s in"
+            rig.holdOutput(false)
+            run.pausedAt = rig.engine.snapshot.position
+            rig.engine.pause()
+            Thread.sleep(forTimeInterval: 0.4)                // the pause fades out, then the output stops
+            run.whilePaused = rig.observeBlocking(0.6)
+            run.positionAfterPause = rig.engine.snapshot.position
+            rig.engine.resume()
+            Thread.sleep(forTimeInterval: 0.3)
+            run.resumedQuiet = rig.observeBlocking(0.6)
+            rig.share.goQuiet(from: nil)
+            _ = rig.waitBlocking(timeout: 60) { $0.state == .playing && !$0.isBuffering }
+            run.backPlaying = rig.observeBlocking(0.8)
+            rig.engine.pause()
+            Thread.sleep(forTimeInterval: 0.4)
+            run.pausedAgain = rig.observeBlocking(0.6)
+            return run
+        }
+        #expect(run.ranShort, "the share never went quiet under the song: \(run.short)")
+        func paused(_ o: Observation?) -> Bool { o.map { $0.state == .paused && !$0.audible && !$0.moving && !$0.buffering } == true }
+        func playing(_ o: Observation?) -> Bool { o.map { $0.state == .playing && $0.audible } == true }
+        #expect(paused(run.whilePaused), "paused while buffering: \(String(describing: run.whilePaused))")
+        #expect(abs(run.positionAfterPause - run.pausedAt) < 1.5, "the playhead stayed where the pause caught it")
+        #expect(playing(run.resumedQuiet), "resumed while the share is still quiet: \(String(describing: run.resumedQuiet))")
+        #expect(playing(run.backPlaying) && run.backPlaying?.moving == true, "the share is back: \(String(describing: run.backPlaying))")
+        #expect(paused(run.pausedAgain), "paused again: \(String(describing: run.pausedAgain))")
     }
 
     @Test("Play, pause, play within 100 ms of each other, on a playing song, ends playing; pause, play, pause ends paused")
