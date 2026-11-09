@@ -35,6 +35,37 @@ private final class ReconnectingShare: PlaybackCacheReader, @unchecked Sendable 
     }
 }
 
+/// A share that is remounted part way through a copy: a handle opened before the remount fails every read from `dropAt` on
+/// with EIO, for ever (its vnode is dead), and only a handle opened afterwards reads.
+private final class RemountedShare: @unchecked Sendable {
+    let bytes: Data
+    let dropAt: Int64
+    private let mount = Locked(0)
+    init(count: Int, dropAt: Int64) { bytes = Data((0..<count).map { UInt8(truncatingIfNeeded: $0 * 7 + 3) }); self.dropAt = dropAt }
+    var remounted: Bool { mount.withLock { $0 > 0 } }
+    func open() -> any PlaybackCacheReader { Handle(self, generation: mount.withLock { $0 }) }
+
+    final class Handle: PlaybackCacheReader, @unchecked Sendable {
+        let share: RemountedShare
+        let generation: Int
+        var size: Int64 { Int64(share.bytes.count) }
+        init(_ share: RemountedShare, generation: Int) { self.share = share; self.generation = generation }
+        func read(at offset: Int64, count: Int) throws -> Data {
+            if generation == 0, offset + Int64(count) > share.dropAt {
+                share.mount.withLock { $0 = max($0, 1) }   // the link dropped and the share was mounted again
+                throw POSIXError(.EIO)
+            }
+            return share.bytes.subdata(in: Int(offset)..<min(Int(offset) + count, share.bytes.count))
+        }
+    }
+}
+
+/// A share that answers every read with a timeout, for ever.
+private final class TimedOutShare: PlaybackCacheReader, @unchecked Sendable {
+    let size: Int64 = 65536
+    func read(at offset: Int64, count: Int) throws -> Data { Thread.sleep(forTimeInterval: 0.01); throw POSIXError(.ETIMEDOUT) }
+}
+
 struct NetworkPlaybackCacheTests {
     private func directory() throws -> URL {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -49,6 +80,69 @@ struct NetworkPlaybackCacheTests {
         let entry = try cache.entry(key: "retry", url: URL(fileURLWithPath: "/share/a.flac"), reader: ReconnectingShare())
         try entry.prepare(full: true, lead: 0, cancelled: { false })
         #expect(try entry.read(at: 0, count: 4096) == Data(repeating: 42, count: 4096))
+        #expect(!entry.isWaiting)
+    }
+
+    @Test("A copy whose share handle died in a remount opens the file again and finishes, byte for byte")
+    func reopensAfterRemount() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let share = RemountedShare(count: 64 * 4096 + 100, dropAt: 20 * 4096)
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096)
+        cache.readerFactory = { _ in share.open() }
+        let entry = try cache.entry(key: "remount", url: URL(fileURLWithPath: "/share/song.flac"))
+        // Patience, not a latency bound: on the base commit the copy retried the dead handle for ever.
+        let patience = Date().addingTimeInterval(60)
+        try entry.prepare(full: true, lead: 0, cancelled: { Date() > patience })
+        #expect(share.remounted)
+        #expect(entry.isComplete)
+        #expect(try entry.read(at: 0, count: share.bytes.count) == share.bytes)
+    }
+
+    @Test("A share that sends nothing for the limit fails the read with the share's message, frees the scans and stops waiting")
+    func silentShareGivesUp() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let gate = ShareIOGate(healthyGrace: 0)
+        let share = SlowShare(count: 65536); share.stall(true)
+        defer { share.stall(false) }
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096, gate: gate, noProgressLimit: 0.3)
+        let entry = try cache.entry(key: "silent", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
+        #expect(gate.isPaused, "the song's copy holds the scans back")
+        let failure = #expect(throws: NetworkPlaybackCache.Failure.self) { try entry.read(at: 0, count: 4096) }
+        #expect(failure?.localizedDescription == NetworkPlaybackCache.Failure.notAnswering.localizedDescription)
+        #expect(!entry.isWaiting)
+        #expect(!gate.isPaused, "scans may go again")
+    }
+
+    @Test("A song paused half copied over a sleep of the Mac does not fail on waking: the silence counts from when a read waits")
+    func sleepDoesNotCountAsSilence() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let share = SlowShare(count: 65536); share.stall(true)
+        defer { share.stall(false) }
+        let now = Locked(TimeInterval(0))
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096, noProgressLimit: 120, clock: { now.withLock { $0 } })
+        let entry = try cache.entry(key: "paused", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
+        // Paused, nothing reading; the clock jumps by eight hours (a clock that runs through sleep would).
+        now.withLock { $0 += 8 * 3600 }
+        let result = Locked<Result<Data, Error>?>(nil)
+        let finished = DispatchSemaphore(value: 0)
+        Thread {
+            result.withLock { $0 = Result { try entry.read(at: 0, count: 4096) } }
+            finished.signal()
+        }.start()
+        // The share answers once the Mac is awake and the read has asked (a hang detector, not a latency bound).
+        for _ in 0..<500 where !entry.isWaiting { Thread.sleep(forTimeInterval: 0.002) }
+        #expect(finished.wait(timeout: .now() + 0.2) == .timedOut, "the read waits for the share instead of failing at once")
+        share.stall(false)
+        #expect(finished.wait(timeout: .now() + 30) == .success)
+        #expect(try result.withLock { $0 }?.get() == share.bytes[0..<4096])
+    }
+
+    @Test("A share that answers every read with a temporary error fails the song after the limit instead of retrying for ever")
+    func timeoutsGiveUp() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096, noProgressLimit: 0.3)
+        let entry = try cache.entry(key: "timeouts", url: URL(fileURLWithPath: "/share/song.flac"), reader: TimedOutShare())
+        #expect(throws: NetworkPlaybackCache.Failure.self) { try entry.prepare(full: true, lead: 0, cancelled: { false }) }
         #expect(!entry.isWaiting)
     }
 
