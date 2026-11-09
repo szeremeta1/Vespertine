@@ -1319,14 +1319,29 @@ public final class PlaybackEngine: @unchecked Sendable {
         mark(reused == nil ? "decoder" : "decoder (kept open)")
         var actualOffset = 0.0
         var startFrame: AVAudioFramePosition = 0
-        if seconds > 0 || reused != nil, decoder.supportsSeeking, decoder.length > 0 {
-            let bounded = min(seconds * decoder.processingFormat.sampleRate, Double(max(0, decoder.length - 1)))
-            let frame = AVAudioFramePosition(bounded)
-            try decoder.seek(to: frame)
-            actualOffset = Double(frame) / decoder.processingFormat.sampleRate
-            startFrame = frame
+        // A seek reads where the song may not have arrived from the share yet, and a decoder kept open may be waiting on it in
+        // its read-ahead: on a share that has stopped answering both wait as long as it does. A skip, stop or another seek gives up.
+        let interrupted: () -> Bool = { [shared] in
+            shared.withLock { $0.commands.contains { switch $0 { case .play, .stop, .seek: true; default: false } } }
         }
-        Self.alignDoPMarkers(decoder, at: session.totalWritten)
+        do {
+            try NetworkPlaybackCache.cancellingReads(when: interrupted) {
+                if seconds > 0 || reused != nil, decoder.supportsSeeking, decoder.length > 0 {
+                    let bounded = min(seconds * decoder.processingFormat.sampleRate, Double(max(0, decoder.length - 1)))
+                    let frame = AVAudioFramePosition(bounded)
+                    try decoder.seek(to: frame)
+                    actualOffset = Double(frame) / decoder.processingFormat.sampleRate
+                    startFrame = frame
+                }
+                Self.alignDoPMarkers(decoder, at: session.totalWritten)
+            }
+        } catch {
+            if interrupted() { throw Superseded() }
+            throw error
+        }
+        // Setting a DoP marker on a decoder that reads ahead can be given up on too, and that setter can't throw: a hold given
+        // up on leaves the marker unset, so this song must not carry on (the command that gave it up starts what is next).
+        if interrupted() { throw Superseded() }
         let streaming = isStreaming(item)
         let decoding = try Decoding(item: item, probed: probed, decoder: Self.readingAhead(decoder, streaming: streaming),
                                     path: makePath(probed: probed, plan: plan, device: device, session: session, item: item),
