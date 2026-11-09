@@ -37,8 +37,8 @@ struct MainWindow: View {
                             .transition(reduceMotion ? .opacity : .move(edge: .trailing))
                     }
                 }
-                .animation(.easeInOut(duration: 0.22), value: model.showInspector)
-                .animation(.easeInOut(duration: 0.22), value: model.showQueue)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: model.showInspector)
+                .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: model.showQueue)
             }
             TransportBar()
         }
