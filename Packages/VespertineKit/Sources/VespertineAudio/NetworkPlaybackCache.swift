@@ -28,10 +28,11 @@ private final class ShareFileReader: PlaybackCacheReader, @unchecked Sendable {
         modified = fstat(file.fileDescriptor, &info) == 0 ? info.st_mtimespec : timespec()
     }
     /// Asks the share (one round trip). A handle that can't answer says no: its reads report the trouble.
+    /// Whole seconds only: SMB can report a cached date and a fresh one at different precision for the same, unchanged file.
     var changedSinceOpen: Bool {
         var info = stat()
         guard fstat(file.fileDescriptor, &info) == 0 else { return false }
-        return info.st_size != size || info.st_mtimespec.tv_sec != modified.tv_sec || info.st_mtimespec.tv_nsec != modified.tv_nsec
+        return info.st_size != size || info.st_mtimespec.tv_sec != modified.tv_sec
     }
     deinit { try? file.close() }
     func read(at offset: Int64, count: Int) throws -> Data {
