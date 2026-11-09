@@ -93,7 +93,9 @@ struct NowPlayingPanel: View {
                         if let bed = player.bedMeters, bed.names.count > 2 {
                             ChannelMetersView(bed: bed, bitstream: false, levels: model.player.channelLevels).padding(.top, 14)
                         }
-                    } else {
+                    } else if !player.buffering || player.waitingForDevice != nil {
+                        // While a song's bytes are still on their way from a share, the line below says so (with how far it got):
+                        // "Preparing output…" then read as an output that had stopped answering.
                         Text(player.waitingForDevice.map { String(localized: "Waiting for \($0)…", comment: "%@ is the name of an audio output device.") } ?? String(localized: "Preparing output…")).font(Typeface.mono(11)).foregroundStyle(Palette.text3).padding(.top, 16)
                     }
                     SpectrumView().frame(height: 44).padding(.top, 16).id("spectrum")

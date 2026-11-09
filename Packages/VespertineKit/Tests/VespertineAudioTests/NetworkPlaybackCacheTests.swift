@@ -82,6 +82,27 @@ private final class RewrittenShare: PlaybackCacheReader, @unchecked Sendable {
     var changedSinceOpen: Bool { lock.withLock { furthest > changeAt } }
 }
 
+/// A share 100 ms away (scaled down): every read waits a round trip before its bytes come back, however few they are. It
+/// remembers how many reads were outstanding at once.
+private final class FarShare: PlaybackCacheReader, @unchecked Sendable {
+    let bytes: Data
+    let roundTrip: TimeInterval
+    private let lock = NSLock()
+    private var outstanding = 0
+    private var most = 0
+    var size: Int64 { Int64(bytes.count) }
+    init(count: Int, roundTrip: TimeInterval) {
+        bytes = Data((0..<count).map { UInt8(truncatingIfNeeded: $0 &* 29 &+ 5) }); self.roundTrip = roundTrip
+    }
+    func read(at offset: Int64, count: Int) throws -> Data {
+        lock.withLock { outstanding += 1; most = max(most, outstanding) }
+        defer { lock.withLock { outstanding -= 1 } }
+        Thread.sleep(forTimeInterval: roundTrip)
+        return bytes.subdata(in: Int(offset)..<min(Int(offset) + count, bytes.count))
+    }
+    var mostAtOnce: Int { lock.withLock { most } }
+}
+
 struct NetworkPlaybackCacheTests {
     private func directory() throws -> URL {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -234,6 +255,21 @@ struct NetworkPlaybackCacheTests {
         let steps = seen.withLock { $0 }
         #expect(!steps.isEmpty && steps == steps.sorted() && steps.last == entry.size, "\(steps.suffix(3))")
         entry.setProgress(nil)
+    }
+
+    @Test("A share with a long round trip: the copy keeps several reads in flight, so it is not one chunk per round trip, and stays byte exact")
+    func readsInFlight() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        // 32 chunks, each read a "round trip" of 20 ms. One read at a time is 1 chunk per round trip: what a 100 ms SMB link over a
+        // VPN gave (1 MiB per round trip, ~6.7 MB/s), too slow to copy a 5.1 DSD song ahead of a start in reasonable time.
+        let share = FarShare(count: 32 * 65536, roundTrip: 0.02)
+        let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 65536)
+        let entry = try cache.entry(key: "far", url: URL(fileURLWithPath: "/share/far.dsf"), reader: share)
+        try entry.prepare(full: true, lead: 0, cancelled: { false })
+        #expect(entry.isComplete)
+        #expect(share.mostAtOnce >= 2, "reads in flight at once: \(share.mostAtOnce)")
+        #expect(share.mostAtOnce <= NetworkPlaybackCache.readsInFlight)
+        #expect(try Data(contentsOf: entry.url) == share.bytes)
     }
 
     @Test("Large DSD uses a local lead; a stalled producer cannot interrupt reads within that reserve")

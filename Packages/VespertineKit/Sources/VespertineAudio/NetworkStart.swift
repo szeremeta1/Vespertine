@@ -13,8 +13,10 @@ import Foundation
 /// carries on ahead of the playhead; the output's buffer and its rebuffering cover a link that turns out too slow.
 enum NetworkStart {
     /// Containers whose header and first audio are at the front of the file, so a prefix is all the decoder asks for at first.
+    /// DSF and DSDIFF too: their native readers go through the cache's guarded reads (`PlaybackFile`), and a 5.1 DSD song of a
+    /// few hundred megabytes copied whole first kept a share with a long round trip on "Preparing output…" for a minute or more.
     /// Others (MP4/ALAC keep their index at the end, MP3 and APE may scan the whole file) still copy whole.
-    static let earlyExtensions: Set<String> = ["flac", "wav", "aif", "aiff"]
+    static let earlyExtensions: Set<String> = ["flac", "wav", "aif", "aiff", "dsf", "dff", "dsdiff"]
 
     /// Smaller files copy whole: the wait is short and nothing is gained by streaming them.
     static let smallestEarlyFile: Int64 = 12 << 20
@@ -27,6 +29,9 @@ enum NetworkStart {
 
     /// The copy's measured speed is trusted to this fraction: a link that does 10 MB/s is planned on as doing 7.7.
     static let trust = 1 / 1.3
+    /// The fewest seconds of the song on disk ahead of the playhead when the output starts: one slow round trip, or a few, on a
+    /// share far away is covered by what is already local instead of becoming a gap.
+    static let safetySeconds: TimeInterval = 8
 
     /// Whether `size` bytes of a `fileExtension` file are played from a prefix rather than copied whole first.
     /// A CUE track (a region of a bigger file) always copies whole: its share of the file is not its length.
@@ -48,5 +53,19 @@ enum NetworkStart {
         let playing = duration * Double(remaining) / Double(fileSize)
         let needed = Double(remaining) - rate * playing
         return min(remaining, max(smallestLead, Int64(max(0, needed))))
+    }
+
+    /// What a song that started on a prefix waits for before its output starts (PCM or DSD: bytes stand for time in both): `lead`,
+    /// and never less than `minimumSeconds` of the song. For DSD (`safetySeconds`) it replaces a fixed reserve (two minutes of the
+    /// song, at least 128 MiB: about 250 MB for a 5.1 DSD64 song, close to 40 s on a share that copies 6.7 MB/s) that made the
+    /// wait depend on the format instead of on what the link can bring in. PCM passes 0: its output holds and rebuffers on its
+    /// own, and a seek on a share gone quiet still lands on what is local.
+    static func startLead(fileSize: Int64, position: Int64, duration: TimeInterval, copied: Int64, elapsed: TimeInterval,
+                          minimumSeconds: TimeInterval = safetySeconds) -> Int64 {
+        let remaining = max(0, fileSize - position)
+        let measured = lead(fileSize: fileSize, position: position, duration: duration, copied: copied, elapsed: elapsed)
+        guard duration > 0, fileSize > 0, minimumSeconds > 0 else { return measured }
+        let floor = Int64(Double(fileSize) / duration * minimumSeconds)
+        return min(remaining, max(measured, floor))
     }
 }
