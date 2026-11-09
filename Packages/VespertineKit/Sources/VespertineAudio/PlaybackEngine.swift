@@ -1895,7 +1895,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func fill() -> Bool {
         guard let session else { return false }
         if gapOwed > 0 { return writeGap(session) }
-        if let retry = retryAdvance {
+        if let retry = retryAdvance, decoding == nil {
             retryAdvance = nil
             advance(after: retry.item, produced: retry.produced)
             return true
@@ -2316,6 +2316,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         pending = nil
         pendingSystem = nil
         pendingFadeIn = nil
+        retryAdvance = nil
         draining = false
         drainedAt = nil
         nrt_context_set_draining(session.context, false)
@@ -2347,6 +2348,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         let planned = boundary?.after == finished.id ? boundary : nil
         boundary = nil
         crossfade = nil
+        // A gap decided below is owed only once the next song is lined up: given up (`LookAheadGivenUp`), it is decided again.
+        let gapBefore = gapOwed
         guard let session, let device = sessionDevice else { return }
         if produced == 0 {
             emptyTransitions += 1
@@ -2420,6 +2423,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 // The song that plays is left as it is (a seek or restart handles it; a queue edit chooses again): the
                 // next one is looked for again by `fill` once the command has been handled.
                 if produced == 0 { emptyTransitions -= 1 }
+                gapOwed = gapBefore
                 boundary = planned
                 retryAdvance = (finished, produced)
                 return

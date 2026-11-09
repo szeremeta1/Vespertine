@@ -76,4 +76,46 @@ struct LookAheadYieldTests {
         let o = await rig.observe(0.5)
         #expect(o.state == .playing && o.audible && o.moving, "after the change: \(o)")
     }
+
+    @Test("A gap between songs stays one gap when the next song's wait is given up for a volume change")
+    func gapOwedOnce() async throws {
+        let rig = try PlayPauseRig()          // 24 s songs: the next one is large enough to start on a prefix
+        var settings = EngineSettings()
+        settings.deviceUID = rig.device.uid
+        settings.exclusive = true
+        settings.transitions.enabled = true
+        settings.transitions.gapSeconds = 2
+        rig.engine.update(settings: settings)
+        let first = rig.item(), next = rig.nextItem()
+        let provided = Locked<PlayableItem?>(nil)
+        rig.engine.nextItemProvider = { $0.id == first.id ? provided.withLock { $0 } : nil }
+        rig.nextShare.stall(true)
+        rig.engine.play(first)
+        _ = await rig.wait(timeout: 30) { $0.state == .playing && !$0.isBuffering }
+        _ = await rig.wait(timeout: 30) { $0.position >= 3 }     // decoded to its end by now
+        // Added to the queue after the first song was decoded: no boundary was planned for it, so the gap is decided when the
+        // next song has been looked at.
+        provided.withLock { $0 = next }
+        rig.engine.queueChanged()
+        // Its share answers only after 10 s, and then only the prefix: the copy looks slow, so the song's start waits for
+        // more, after the gap has been decided. Volume changes give that wait up.
+        await rig.sleep(ms: 10_000)
+        rig.nextShare.goQuiet(from: NetworkStart.prefix + (256 << 10))
+        rig.nextShare.stall(false)
+        await rig.sleep(ms: 1000)
+        for volume in [-6.0, -7, -6] {
+            settings.digitalVolumeDB = volume
+            rig.engine.update(settings: settings)
+            await rig.sleep(ms: 500)
+        }
+        rig.nextShare.goQuiet(from: nil)
+        let started = await rig.wait(timeout: 40) { $0.item?.id == next.id && $0.state == .playing && $0.position > 0.2 }
+        try #require(started, "the next song never played")
+        // Where the next song starts in the output: the read position less what of it has played.
+        let snapshot = rig.engine.snapshot
+        let read = Double(try #require(rig.engine.currentSessionForTesting).totalRead)
+        let start = read - snapshot.position * PlayPauseRig.rate
+        let gap = (start - 24 * PlayPauseRig.rate) / PlayPauseRig.rate
+        #expect(abs(gap - 2) < 0.25, "the silence between the songs is \(gap) s, not 2 s")
+    }
 }
