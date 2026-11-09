@@ -1,11 +1,11 @@
 # Room correction
 
 Vespertine can measure your speakers at your listening seat with a calibrated USB measurement microphone (miniDSP
-UMIK-1), line them up in time and level, and fit parametric filters that cut the room's bass peaks, separately for each
-speaker (stereo or 5.1). It can also play filters made elsewhere: REW's Equalizer APO export (each speaker's delay,
-level and parametric filters) or impulse responses (convolution filters). It is off unless you turn it on, it is bound
-to the output it was measured on (or imported for), and while it is on the signal path says **ROOM CORRECTION** and
-playback is not bit-perfect.
+UMIK-1), line them up in time and level, and fit parametric filters that cut the room's bass peaks, separately for
+each speaker (stereo or 5.1; 5.1 is tested with simulated rooms and imported profiles, not yet in a real 5.1 room). It
+can also play filters made elsewhere: REW's Equalizer APO export (each speaker's delay, level and parametric filters)
+or impulse responses (convolution filters). It is off unless you turn it on, it is bound to the output it was measured
+on (or imported for), and while it is on the signal path says **ROOM CORRECTION** and playback is not bit-perfect.
 
 ## Using it
 
