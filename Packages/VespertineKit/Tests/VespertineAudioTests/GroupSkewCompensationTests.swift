@@ -141,6 +141,18 @@ struct GroupSkewCompensationTests {
         #expect(abs(result.group.members[0].skewMs - 0.367) < 1e-3)
     }
 
+    @Test("A follower measured earlier than the leader is held back by that much when it plays, as the leader never is resampled")
+    func applyNegativePlays() throws {
+        let result = try #require(GroupSkewCompensation.apply(measuredFrames: 10, rate: 48_000, to: group(), followerUID: fiio,
+                                                              leaderSpeaker: leaderSpeaker, followerSpeaker: followerSpeaker, corrected: true))
+        let delays = GroupDelay.perChannelMs(result.group, resampled: resampledFiio, rate: 48_000)
+        #expect(delays[0] == 0 && delays[1] == 0, "the leader waits for nobody")
+        #expect(abs(delays[2] - 0.367) < 1e-3 && abs(delays[3] - 0.367) < 1e-3, "the follower waits for the leader: \(delays)")
+        // At another rate the measurement doesn't hold: only the certain part (the resampler's delay on the follower) is left.
+        let other = GroupDelay.perChannelMs(result.group, resampled: resampledFiio, rate: 96_000)
+        #expect(abs(other[0] - 53.5 / 96) < 1e-9 && other[2] == 0, "\(other)")
+    }
+
     @Test("Only a follower can be measured, and the measurement must be a number")
     func applyRefusals() {
         #expect(GroupSkewCompensation.apply(measuredFrames: 600, rate: 48_000, to: group(), followerUID: fosi, leaderSpeaker: leaderSpeaker, followerSpeaker: followerSpeaker, corrected: true) == nil)
