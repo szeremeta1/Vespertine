@@ -39,6 +39,9 @@ cp "$dmg" "$feed/"
 # with a signed feed (SURequireSignedFeed) any later edit breaks the signature and every installed copy's updates.
 gh release download --repo "$repo" --pattern appcast.xml --dir "$feed" 2>/dev/null || print "No existing appcast; starting a new one."
 [[ ! -f "$feed/appcast.xml" ]] || /usr/bin/sed -i '' 's|<title>Nocturne</title>|<title>Vespertine</title>|' "$feed/appcast.xml"
+# Entries for 0.8.0 and older are dropped from the carried-over feed here, for the same reason: generate_appcast signs
+# whatever is in the feed it is given. Newer entries, including every informational one, are left as they are.
+[[ ! -f "$feed/appcast.xml" ]] || /usr/bin/python3 scripts/prune-appcast.py "$feed/appcast.xml" 0.8.0
 
 # Sparkle shows HTML release notes placed beside the archive.
 /usr/bin/python3 - "$notes" "$feed/Vespertine-$version.html" <<'PY'
