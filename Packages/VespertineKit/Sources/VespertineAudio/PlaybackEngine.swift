@@ -1009,7 +1009,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 return
             }
             guard let device = sessionDevice else { return }
-            var alive = DeviceQuery.allDeviceIDs().contains(device.id)
+            var alive = outputListing.flatMap { list in session?.groupResources == nil ? list().contains { $0.id == device.id } : nil } ?? DeviceQuery.allDeviceIDs().contains(device.id)
             // A speaker group's aggregate outlives a member that went away; the members are what decide.
             if alive, let playing = session?.groupResources?.group, let chosen = settings.group(forOutputUID: playing.outputUID) {
                 let connected = connectedUIDs ?? DeviceQuery.outputUIDs()
