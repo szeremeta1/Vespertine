@@ -159,26 +159,41 @@ struct PlayPauseStateTests {
     @Test("Random presses of play and pause against a slow share and a slow output settle on the last one")
     func lastPressWins() async throws {
         for seed in 0..<4 {
+            // Everything random is drawn here, in the order it always was; the script below only carries it out.
             var rng = SeededRandom(state: UInt64(seed) &* 7919 &+ 1)
-            let rig = try PlayPauseRig(bytesPerSecond: Double.random(in: 1.5...6, using: &rng) * 1_048_576)
+            let rate = Double.random(in: 1.5...6, using: &rng) * 1_048_576
+            let openDelay = Double.random(in: 0...1, using: &rng)
+            let startAfter = Int.random(in: 200...2000, using: &rng)
+            var presses: [(play: Bool, gap: Int)] = []
+            for _ in 0..<Int.random(in: 3...8, using: &rng) {
+                let play = Bool.random(using: &rng)
+                presses.append((play, Bool.random(using: &rng) ? Int.random(in: 0...150, using: &rng) : Int.random(in: 300...1200, using: &rng)))
+            }
+            let rig = try PlayPauseRig(bytesPerSecond: rate)
             var settings = EngineSettings(); settings.deviceUID = "sim-out"; settings.exclusive = true
             settings.releaseExclusiveAfterPause = 0.3      // a pause of a moment lets the output go: resuming reopens it
             rig.engine.update(settings: settings)
-            rig.openDelay.withLock { $0 = Double.random(in: 0...1, using: &rng) }
-            rig.engine.play(rig.item())
-            await rig.sleep(ms: Int.random(in: 200...2000, using: &rng))
-            var last = true, presses: [String] = []
-            for _ in 0..<Int.random(in: 3...8, using: &rng) {
-                last = Bool.random(using: &rng)
-                if last { rig.engine.resume() } else { rig.engine.pause() }
-                let gap = Bool.random(using: &rng) ? Int.random(in: 0...150, using: &rng) : Int.random(in: 300...1200, using: &rng)
-                presses.append("\(last ? "play" : "pause") +\(gap)ms")
-                await rig.sleep(ms: gap)
+            rig.openDelay.withLock { $0 = openDelay }
+            let sequence = presses
+            // The song is 24 s long and the presses take up to 10 s: from a test task resumed late (every cooperative thread held
+            // by other tests) the presses would come after the song had ended. They come from a thread of its own instead.
+            let (last, settledOn, o) = await rig.onOwnThread { rig -> (Bool, Bool, Observation) in
+                rig.engine.play(rig.item())
+                Thread.sleep(forTimeInterval: Double(startAfter) / 1000)
+                var last = true
+                for press in sequence {
+                    last = press.play
+                    if last { rig.engine.resume() } else { rig.engine.pause() }
+                    Thread.sleep(forTimeInterval: Double(press.gap) / 1000)
+                }
+                // The end state has to settle (a share to catch up, an output to reopen, a fade to finish) and then hold.
+                let settled = last
+                    ? rig.settledBlocking(timeout: 60, hold: 0.5) { $0.state == .playing && !$0.isBuffering }
+                    : rig.settledBlocking(timeout: 60, hold: 1.2) { $0.state == .paused }
+                return (last, settled, rig.observeBlocking(1.0))
             }
-            _ = await rig.wait(timeout: 8) { $0.state != .stopped && !$0.isBuffering }
-            await rig.sleep(ms: 1200)
-            let o = await rig.observe(1.0)
-            let note = "seed \(seed): \(presses.joined(separator: ", ")) → \(o)"
+            let note = "seed \(seed): \(sequence.map { "\($0.play ? "play" : "pause") +\($0.gap)ms" }.joined(separator: ", ")) → \(o)"
+            #expect(settledOn, "the end state never settled: \(note)")
             if last { #expect(o.state == .playing && o.audible && o.moving, "\(note)") }
             else { #expect(o.state == .paused && !o.audible && !o.moving, "\(note)") }
         }

@@ -204,4 +204,19 @@ final class PlayPauseRig: @unchecked Sendable {
         }
         return false
     }
+
+    /// Waits until `condition` has held of the snapshot for `hold` seconds without a break (false on timeout): an end state that has
+    /// settled, not one that was true for a moment on the way (a pause that a queued resume is about to undo). For a script thread.
+    func settledBlocking(timeout: Double, hold: Double, _ condition: (EngineSnapshot) -> Bool) -> Bool {
+        let end = Date().addingTimeInterval(timeout)
+        var since: Date?
+        while Date() < end {
+            if condition(engine.snapshot) {
+                since = since ?? Date()
+                if Date().timeIntervalSince(since!) >= hold { return true }
+            } else { since = nil }
+            Thread.sleep(forTimeInterval: 0.005)
+        }
+        return false
+    }
 }
