@@ -592,20 +592,19 @@ final class PlayerController {
             let track = queue.first { $0.id == item?.id }?.track ?? current?.track
             if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
                 lastError = String(localized: "“\(track.title)” is on a network share that isn’t connected. Vespertine reconnects automatically when the server is reachable.")
-            } else if let track, shares.isNetwork(track) {
-                // On a share, even asking whether the file exists can block for seconds: ask off the main thread.
+            } else if let track {
+                // Gone only when the file answers "no such file" and its source's folder still lists: a share that timed out or
+                // dropped its mount, or a folder the app may not read, is not a deleted song. Even asking can block for as long
+                // as a share does, so never on the main thread. Moved or deleted: look again now; moved songs rejoin the queue.
                 lastError = message
                 let path = track.filePath
+                let root = library.sources.first { $0.id == track.sourceId }?.path
                 Task { [weak self] in
-                    let exists = await Task.detached(priority: .utility) { FileManager.default.fileExists(atPath: path) }.value
-                    guard let self, !exists else { return }
+                    let gone = await NetworkVolume.blocking(timeout: 30, otherwise: false) { LibraryStore.fileIsGone(path, sourceRoot: root) }
+                    guard let self, gone else { return }
                     self.library.rescanForMissingFile(track)
-                    self.lastError = self.goneFileMessage(for: track)
+                    if self.lastError == message { self.lastError = self.goneFileMessage(for: track) }
                 }
-            } else if let track, !FileManager.default.fileExists(atPath: track.filePath) {
-                // Moved or deleted since the last scan: look again now; moved songs rejoin the queue.
-                library.rescanForMissingFile(track)
-                lastError = goneFileMessage(for: track)
             } else {
                 lastError = message
             }
@@ -629,22 +628,30 @@ final class PlayerController {
     /// engine). Scans resume a few seconds after the buffer is healthy, and go one request at a time while a song
     /// streams. A scan at full width queued the song's reads behind dozens of its own: starting a song took 40 s
     /// with stalls every few seconds after.
+    /// The gate library scans of shares wait at (`ShareIOGate.shared`; tests give the player one of its own).
+    @ObservationIgnored var shareGate = ShareIOGate.shared
+
     private func yieldShareToPlayback(_ snap: EngineSnapshot) {
         let active = state == .playing || requested != nil || requestedPosition != nil
         let pending = requested != nil && current.map { shares.isNetwork($0.track) } == true
         let streaming = active && (snap.readingFromShare || pending)
-        ShareIOGate.shared.playerState(pending: pending, streaming: streaming,
+        shareGate.playerState(pending: pending, streaming: streaming,
                                        buffering: snap.isBuffering && snap.readingFromShare, bufferFill: snap.readingFromShare ? snap.bufferFill : 1)
     }
 
     /// Copies to the network cache give the connection to a song streaming from a share while its buffer is
-    /// under a third full (or it's holding for more), and carry on once it's two thirds full again. On a link
+    /// under a third full (or it's holding for more), and carry on once it's two thirds full again; and to a song whose copy
+    /// from the share needs the link, whatever the buffer holds (`ShareIOGate`). On a link
     /// little faster than the music, a copy running alongside took half of it and the song stalled every few
     /// seconds; the copy still finishes when the link has room to spare.
     private func yieldCacheToPlayback(_ snap: EngineSnapshot) {
         let cache = shares.cache
         let yielding: Bool
-        if snap.state != .playing || !snap.readingFromShare { yielding = false }
+        // A song's copy from a share holds the scan gate while it needs the link: it is starting, it is behind the playhead, or
+        // a read waits on it. The output buffer can be full meanwhile (a start on a prefix), or there is none yet (a song copied
+        // whole before its first note): the copies wait too.
+        if shareGate.isPaused { yielding = true }
+        else if snap.state != .playing || !snap.readingFromShare { yielding = false }
         else if snap.isBuffering || snap.bufferFill < 1.0 / 3 { yielding = true }
         else if snap.bufferFill > 2.0 / 3 { yielding = false }
         else { yielding = cache.yieldsToPlayback }

@@ -91,11 +91,32 @@ final class PlayPauseRig: @unchecked Sendable {
         }
     }
 
-    init(seconds: Int = 24, bytesPerSecond: Double = 50 * 1_048_576, nextBytesPerSecond: Double = 50 * 1_048_576) throws {
+    /// The song's file type on the share: "wav", or "flac" (made from the same noise).
+    let fileExtension: String
+
+    /// The WAV at `wav` encoded as a 24-bit FLAC beside it.
+    static func writeFLAC(from wav: URL) throws -> URL {
+        let source = try AVAudioFile(forReading: wav)
+        let url = wav.deletingPathExtension().appendingPathExtension("flac")
+        let settings: [String: Any] = [AVFormatIDKey: kAudioFormatFLAC, AVSampleRateKey: source.fileFormat.sampleRate,
+                                       AVNumberOfChannelsKey: 2, AVEncoderBitDepthHintKey: 24]
+        let out = try AVAudioFile(forWriting: url, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
+        let buffer = AVAudioPCMBuffer(pcmFormat: source.processingFormat, frameCapacity: 96_000)!
+        while source.framePosition < source.length {
+            try source.read(into: buffer)
+            try out.write(from: buffer)
+        }
+        return url
+    }
+
+    init(seconds: Int = 24, bytesPerSecond: Double = 50 * 1_048_576, nextBytesPerSecond: Double = 50 * 1_048_576,
+         fileExtension: String = "wav") throws {
+        self.fileExtension = fileExtension
         directory = FileManager.default.temporaryDirectory.appendingPathComponent("playpause-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
-        let url = directory.appendingPathComponent("song.wav")
+        var url = directory.appendingPathComponent("song.wav")
         try Self.writeWAV(url, seconds: seconds)
+        if fileExtension == "flac" { url = try Self.writeFLAC(from: url) }
         share = ControlledShare(data: try Data(contentsOf: url), bytesPerSecond: bytesPerSecond)
         cache = NetworkPlaybackCache(directory: directory.appendingPathComponent("cache"), budget: 256 << 20, chunk: 1 << 16)
         let share = share
@@ -132,7 +153,7 @@ final class PlayPauseRig: @unchecked Sendable {
     }
 
     func nextItem() -> PlayableItem { PlayableItem(url: URL(fileURLWithPath: "/share/next.wav"), cacheKey: "next") }
-    func item() -> PlayableItem { PlayableItem(url: URL(fileURLWithPath: "/share/song.wav"), cacheKey: "song") }
+    func item() -> PlayableItem { PlayableItem(url: URL(fileURLWithPath: "/share/song.\(fileExtension)"), cacheKey: "song") }
 
     /// Stops the output's clock (nothing plays or is consumed) or starts it again: a test sets its scene while the song stands at its start,
     /// so how fast the machine runs cannot change how much of the song is left to play when the scene is ready.

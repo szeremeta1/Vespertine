@@ -192,6 +192,10 @@ struct NetworkSettings: View {
                 LabeledContent("Using") {
                     Text(usageText(usage)).foregroundStyle(.secondary).monospacedDigit()
                 }
+                if let problem = usage.problem {
+                    // Copies stopped because the disk is full (the system's own words for it).
+                    Text(problem).font(.caption).foregroundStyle(Palette.copper).fixedSize(horizontal: false, vertical: true)
+                }
                 HStack {
                     Button("Clear Cache") { model.shares.cache.clear(includingOffline: false) }
                         .disabled(usage.cachedFiles == 0)

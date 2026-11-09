@@ -36,14 +36,17 @@ enum NetworkStart {
 
     /// The bytes that must be on disk beyond `position` before the output starts, so the rest of the file arrives before the
     /// playhead reaches it: `smallestLead` when the copy is faster than the song plays, more the slower it is, all of it when it has all but stopped.
-    /// - `duration`: the song's length in seconds. `copied`/`elapsed`: what the copy has done so far, and how long it took.
+    /// - `duration`: the song's length in seconds (all of it, wherever `position` is). `copied`/`elapsed`: what the copy has done so
+    ///   far, and how long it took.
     static func lead(fileSize: Int64, position: Int64, duration: TimeInterval, copied: Int64, elapsed: TimeInterval) -> Int64 {
         let remaining = max(0, fileSize - position)
-        guard duration > 0, elapsed > 0, copied > 0 else { return remaining }
+        guard duration > 0, elapsed > 0, copied > 0, fileSize > 0 else { return remaining }
         let rate = Double(copied) / elapsed * trust
-        // Local before the start: the file less what the copy can fetch while the song plays.
-        let needed = Double(fileSize) - rate * duration
-        let lead = Int64(max(0, needed)) - position
-        return min(remaining, max(smallestLead, lead))
+        // From `position` (a seek, another output) only the rest of the song plays: its share of the file, in seconds (bytes stand
+        // for time closely enough in FLAC and WAV). Local before the start: what is left of the file less what the copy can fetch
+        // while that part plays.
+        let playing = duration * Double(remaining) / Double(fileSize)
+        let needed = Double(remaining) - rate * playing
+        return min(remaining, max(smallestLead, Int64(max(0, needed))))
     }
 }

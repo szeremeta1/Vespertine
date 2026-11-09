@@ -380,6 +380,22 @@ public enum NetworkVolume {
         }
     }
 
+    /// Async share work that can take for ever (a mount that the server accepted and never answered, a keychain prompt nobody
+    /// answers): waits at most `timeout`, then returns `fallback`. The work carries on (or stays stuck) and its result is dropped.
+    public static func waiting<T: Sendable>(atMost timeout: TimeInterval, otherwise fallback: T,
+                                            _ work: @escaping @Sendable () async -> T) async -> T {
+        await withCheckedContinuation { (continuation: CheckedContinuation<T, Never>) in
+            let once = ResumeOnce()
+            Task {
+                let value = await work()
+                if once.claim() { continuation.resume(returning: value) }
+            }
+            deadlines.asyncAfter(deadline: .now() + timeout) {
+                if once.claim() { continuation.resume(returning: fallback) }
+            }
+        }
+    }
+
     /// Whether a mounted share still answers: lists its root on a background thread, within `timeout`.
     /// A mount can stay listed after the server rebooted or the connection died; it then errors or stalls.
     public static func isResponsive(_ root: URL, timeout: TimeInterval = 8) async -> Bool {
