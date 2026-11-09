@@ -214,7 +214,13 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         return try job.wait(cancelled: cancelled)
     }
 
+    /// Prefetches waiting for their file on the share to open (for tests).
+    var waitingPrefetches: Int { prefetchWaits.withLock { $0 } }
+    private let prefetchWaits = Locked(0)
+
     /// Current always gets the link first. Prefetch only after its required reserve is on disk.
+    /// Opening the file can take as long as the share does: the wait ends when another next song is chosen (the open itself
+    /// finishes, or fails, in the background).
     func prefetch(key: String?, url: URL?) {
         let generation = lock.withLock { () -> Int in
             if nextKey == key { return -1 }
@@ -226,7 +232,11 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         guard generation >= 0, let key, let url else { return }
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self, self.lock.withLock({ self.prefetchGeneration == generation }) else { return }
-            guard let entry = try? self.entry(key: key, url: url, foreground: false) else { return }
+            self.prefetchWaits.withLock { $0 += 1 }
+            let opened = try? self.entry(key: key, url: url, foreground: false,
+                                         cancelled: { self.lock.withLock { self.prefetchGeneration != generation } })
+            self.prefetchWaits.withLock { $0 -= 1 }
+            guard let entry = opened else { return }
             self.lock.withLock {
                 if self.prefetchGeneration == generation { self.next = entry }
             }
@@ -254,7 +264,9 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                 self.prefetchGeneration += 1
                 return self.prefetchGeneration
             }
-            guard let entry = try? self.entry(key: key, url: url) else { return }
+            // A press on another song ends this wait (and the hold on the scans with it), even while the open hangs.
+            guard let entry = try? self.entry(key: key, url: url, cancelled: { self.lock.withLock { self.warmGeneration != pressed } })
+            else { return }
             kept = true
             self.lock.withLock {
                 if self.prefetchGeneration == generation { self.next = entry }
