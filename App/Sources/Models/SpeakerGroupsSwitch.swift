@@ -33,6 +33,7 @@ enum SpeakerGroupsSwitch {
         if let current { return current }
         let groups = SpeakerGroupsModel(directory: settings.dataDirectory)
         groups.onChange = onChange
+        groups.onNewGroup = { [weak settings] group, original in settings?.startVolume(ofNew: group, copiedFrom: original) }
         return groups
     }
 

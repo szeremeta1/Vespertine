@@ -97,6 +97,8 @@ final class AppSettings {
     var appVolumeChoices: [String: Bool] { didSet { defaults.set(appVolumeChoices, forKey: "appVolumeChoices") } }
     /// Vespertine's volume level per output (0…1). Outputs that aren't listed use `digitalVolume`.
     var appVolumeLevels: [String: Double] { didSet { defaults.set(appVolumeLevels, forKey: "appVolumeLevels") } }
+    /// While an output is muted from the Controls menu: the level Mute brings back (output UID → 0…1).
+    var appVolumeRestore: [String: Double] { didSet { defaults.set(appVolumeRestore, forKey: "appVolumeRestore") } }
     var defaultImportMode: ImportMode { didSet { defaults.set(defaultImportMode.rawValue, forKey: "importMode") } }
     var managedFolderPath: String { didSet { defaults.set(managedFolderPath, forKey: "managedFolder") } }
     /// Scan for new music by itself: watch local folders, look again at launch, and recheck network shares now and then.
@@ -229,6 +231,7 @@ final class AppSettings {
         digitalVolume = defaults.double(forKey: "digitalVolume")
         appVolumeChoices = defaults.dictionary(forKey: "appVolumeChoices") as? [String: Bool] ?? [:]
         appVolumeLevels = defaults.dictionary(forKey: "appVolumeLevels") as? [String: Double] ?? [:]
+        appVolumeRestore = defaults.dictionary(forKey: "appVolumeRestore") as? [String: Double] ?? [:]
         defaultImportMode = ImportMode(rawValue: defaults.string(forKey: "importMode") ?? "") ?? .copyAndOrganize
         let music = FileManager.default.urls(for: .musicDirectory, in: .userDomainMask)[0]
         managedFolderPath = defaults.string(forKey: "managedFolder") ?? music.appendingPathComponent("Vespertine").path
@@ -354,6 +357,7 @@ final class AppSettings {
         if roomNativeDSDDeviceUIDs.contains(old) { roomNativeDSDDeviceUIDs.insert(new) }
         if appVolumeChoices[new] == nil, let choice = appVolumeChoices[old] { appVolumeChoices[new] = choice }
         if appVolumeLevels[new] == nil, let level = appVolumeLevels[old] { appVolumeLevels[new] = level }
+        if appVolumeRestore[new] == nil, let level = appVolumeRestore[old] { appVolumeRestore[new] = level }
     }
 
     func rateChoice(for uid: String) -> RateChoice { RateChoice(code: rateChoices[uid] ?? "match") }
@@ -375,7 +379,29 @@ final class AppSettings {
     func usesAppVolume(_ uid: String) -> Bool { appVolumeChoices[uid] ?? allowDigitalVolume }
     func setUsesAppVolume(_ on: Bool, for uid: String) { appVolumeChoices[uid] = on }
     func appVolumeLevel(for uid: String) -> Double { appVolumeLevels[uid] ?? digitalVolume }
-    func setAppVolumeLevel(_ level: Double, for uid: String) { appVolumeLevels[uid] = min(max(level, 0), 1) }
+    func setAppVolumeLevel(_ level: Double, for uid: String) {
+        appVolumeLevels[uid] = min(max(level, 0), 1)
+        // A level set by hand ends a mute: what Mute remembered is out of date.
+        if level > 0, appVolumeRestore[uid] != nil { appVolumeRestore[uid] = nil }
+    }
+
+    /// Volume Up, Volume Down or Mute on Vespertine's own volume for `uid`.
+    func applyVolume(_ action: VolumeControls.Action, for uid: String) {
+        let next = VolumeControls.apply(action, to: VolumeControls.State(level: appVolumeLevel(for: uid), restoreLevel: appVolumeRestore[uid]))
+        setAppVolumeLevel(next.level, for: uid)
+        appVolumeRestore[uid] = next.restoreLevel
+    }
+
+    /// Whether Mute is on for `uid`: silent, with a level to come back to.
+    func isMuted(_ uid: String) -> Bool { appVolumeLevel(for: uid) == 0 && appVolumeRestore[uid] != nil }
+
+    /// A speaker group that has just been made starts on Vespertine's own volume, the usual way to set one level for every DAC in it.
+    /// A copy of a group starts as that group is. A choice already stored for the new group's UID stays.
+    func startVolume(ofNew group: SpeakerGroup, copiedFrom original: SpeakerGroup? = nil) {
+        let uid = group.outputUID
+        if appVolumeChoices[uid] == nil { appVolumeChoices[uid] = original.flatMap { appVolumeChoices[$0.outputUID] } ?? true }
+        if appVolumeLevels[uid] == nil, let level = original.flatMap({ appVolumeLevels[$0.outputUID] }) { appVolumeLevels[uid] = level }
+    }
 
     /// Each output with a volume choice or level of its own: its digital volume in dB, or nil where it stays fixed.
     var deviceDigitalVolumes: [String: Double?] {
