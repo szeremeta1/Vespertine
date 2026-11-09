@@ -118,6 +118,19 @@ struct GroupBitPerfectTests {
         #expect(!GroupSignalPath.make(group: group(), applied: applied(known: false), source: source(channels: 2), plan: plan(channels: 2), stage: .none).isBitPerfect)
     }
 
+    @Test("A song converted to the group's common rate says RESAMPLED, and the leader's row says from what rate")
+    func songResampledToTheCommonRate() {
+        let src = source(channels: 2, rate: 44_100)
+        let plan = FormatPlanner.plan(source: src, device: DeviceCapabilities(sampleRates: [96_000], physicalFormats: [], outputChannels: 4, supportsDoP: false))
+        let path = GroupSignalPath.make(group: group(), applied: applied(), source: src, plan: plan, stage: .none)
+        #expect(!path.isBitPerfect)
+        #expect(path.statusLine == "RESAMPLED", "\(path.badges)")
+        #expect(path.rows[0].contains("not bit-perfect: the song is resampled from 44.1 kHz"), "\(path.rows[0])")
+        // At the song's own rate nothing is said about resampling.
+        let same = GroupSignalPath.make(group: group(), applied: applied(), source: source(channels: 2), plan: self.plan(channels: 2), stage: .none)
+        #expect(!same.badges.contains("RESAMPLED") && same.rows[0].hasSuffix("bit-perfect") && !same.rows[0].contains("resampled from"))
+    }
+
     @Test("A group whose speakers aren't assigned still counts the channels in order: the first ones are used")
     func unassigned() {
         var bare = group()

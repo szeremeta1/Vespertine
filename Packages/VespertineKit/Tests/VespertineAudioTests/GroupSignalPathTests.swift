@@ -94,7 +94,7 @@ struct GroupSignalPathTests {
 
         var rate = quad(followerResampled: false)
         rate.members[0].sampleRate = 192_000
-        #expect(!rate.isBitPerfect && rate.statusLine == "CONVERTED")
+        #expect(!rate.isBitPerfect && rate.statusLine == "RESAMPLED", "a DAC at another rate than the song's is a resampled song")
 
         var shared = quad(followerResampled: false)
         shared.members[0].exclusive = false
