@@ -2245,7 +2245,9 @@ public final class PlaybackEngine: @unchecked Sendable {
             let channels = session.plan.channels
             var tail = [Float](repeating: 0, count: length * channels)
             let copied = tail.withUnsafeMutableBufferPointer { nrt_ring_peek(session.ring, cut, $0.baseAddress!, UInt32(length)) }
-            guard copied == UInt32(length), nrt_ring_rewind(session.ring, cut, margin) else { return skipFades(session) }
+            // The output reads on while the tail is copied (milliseconds for a long crossfade at a high rate): the ring is taken
+            // back to `cut` as long as half the margin is still left before what is heard. The blend is written right after.
+            guard copied == UInt32(length), nrt_ring_rewind(session.ring, cut, margin / 2) else { return skipFades(session) }
             // The ring now ends at `cut`: what was lined up after it goes.
             for (key, entry) in staged where key != cacheKey(next) { entry.cancel() }
             staged = staged.filter { $0.key == cacheKey(next) }
