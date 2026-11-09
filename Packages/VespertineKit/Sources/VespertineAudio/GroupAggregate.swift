@@ -230,3 +230,26 @@ public final class GroupAggregateDevice: @unchecked Sendable {
         return (try? HAL.get(device, .global(kAudioDevicePropertyClockDomain), initial: UInt32(0))) ?? 0
     }
 }
+
+// MARK: A member gone from a running aggregate
+
+extension GroupAggregateDevice {
+    /// The UIDs of the members Core Audio has active in the aggregate `id` now; empty for a device that is not an aggregate.
+    public static func activeMemberUIDs(of id: AudioObjectID) -> [String] {
+        let active = (try? HAL.getArray(id, .global(kAudioAggregateDevicePropertyActiveSubDeviceList), of: AudioObjectID.self)) ?? []
+        return active.compactMap { HAL.getString($0, .global(kAudioDevicePropertyDeviceUID)) }
+    }
+
+    /// An aggregate outlives a member that goes away, so its own "alive" says nothing about the member: every member active when it
+    /// started (`atStart`) must still be active in it (`now`) and still connected.
+    public static func membersPresent(atStart: [String], now: [String], connected: (String) -> Bool) -> Bool {
+        let active = Set(now)
+        return atStart.allSatisfy { active.contains($0) && connected($0) }
+    }
+
+    /// The device with this UID is listed and says it is alive.
+    public static func isConnected(uid: String) -> Bool {
+        guard let device = deviceID(uid: uid) else { return false }
+        return ((try? HAL.get(device, .global(kAudioDevicePropertyDeviceIsAlive), initial: UInt32(0))) ?? 0) != 0
+    }
+}
