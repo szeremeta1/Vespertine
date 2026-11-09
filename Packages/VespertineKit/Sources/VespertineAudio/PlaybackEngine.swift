@@ -1498,12 +1498,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// The group `session` plays, as it is chosen now, less any members that were lost; nil for a single device.
     private func currentGroup(of session: OutputSession) -> SpeakerGroup? {
         guard let playing = session.groupResources?.group else { return nil }
-        let chosen = settings.group(forOutputUID: playing.outputUID) ?? playing
-        let present = Set(playing.members.map(\.deviceUID))
-        var group = chosen
-        group.members = chosen.members.filter { present.contains($0.deviceUID) }
-        group.speakers = chosen.speakers.filter { present.contains($0.deviceUID) }
-        return group
+        return playing.asPlayed(chosen: settings.group(forOutputUID: playing.outputUID) ?? playing)
     }
 
     /// The plan for `probed` on a speaker group: PCM only (`GroupFormatRules`), the ring as wide as the group, the song put onto
