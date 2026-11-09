@@ -45,7 +45,10 @@ public enum GroupRouting {
         let name = ChannelLayouts.name(labels: sourceLabels(of: source), channels: source.channels)
         let router = content.router
         let speakers = group.speakers.count
-        if router.isUnmixed && router.dropped.isEmpty {
+        if let render = content.render {
+            routed.reason = "\(name) rendered for the room on the \(speakers) speakers of \(group.name). " + plan.reason
+            _ = render
+        } else if router.isUnmixed && router.dropped.isEmpty {
             routed.reason = "\(name) to the speakers of \(group.name), each channel on its own. " + plan.reason
         } else {
             routed.reason = "\(name) spread over the \(speakers) speakers of \(group.name) by where the speakers stand. " + plan.reason

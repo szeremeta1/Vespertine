@@ -76,6 +76,8 @@ public struct GroupSignalPath: Sendable, Hashable {
     public var members: [Member]
     /// How the song's channels were put onto the group's outputs (nil: they went to the first outputs, in order).
     public var router: PositionRouter?
+    /// Room render, when the group played the song with it (`RoomRender`).
+    public var render: RoomRenderPlan?
 
     public init(groupName: String, source: SourceFormat, folds: Bool, dsdConvertedToPCM: Bool, stage: Stage, members: [Member],
                 router: PositionRouter? = nil) {
@@ -123,7 +125,7 @@ public struct GroupSignalPath: Sendable, Hashable {
         } else {
             let used = usedMembers
             if dsdConvertedToPCM { list.append(SignalPath.convertedFromDSD) }
-            if folds { list.append("Downmixed") }
+            if render != nil { list.append("ROOM RENDER") } else if folds { list.append("Downmixed") }
             if songResampled || used.contains(where: \.resampled) { list.append("RESAMPLED") }
             if used.contains(where: { !$0.exclusive && $0.otherAppsPlaying }) { list.append("MIXED WITH OTHER APPS") }
             switch stage {
@@ -148,8 +150,12 @@ public struct GroupSignalPath: Sendable, Hashable {
     /// DACs that are resampled to follow the leader and carry some of this song's channels.
     public var resampledMemberNames: [String] { usedMembers.filter(\.resampled).map(\.name) }
 
-    /// One line per DAC for the signal-path view.
+    /// One line per DAC for the signal-path view, then one for room render when the song was played with it.
     public var rows: [String] {
+        memberRows + (render.map { [RoomRender.summary($0)] } ?? [])
+    }
+
+    private var memberRows: [String] {
         members.map { m in
             let format = "\(m.physicalBitDepth)/\(SampleRate.format(m.sampleRate))"
             let follows = "follows \(leaderName), resampled to stay in step"
@@ -215,9 +221,11 @@ extension GroupSignalPath {
                           sampleRate: m.sampleRate, physicalBitDepth: m.physicalBitDepth, physicalIsInteger: m.physicalIsInteger,
                           physicalFormatKnown: m.physicalFormatKnown, exclusive: m.exclusive, otherAppsPlaying: otherAppsPlaying)
         }
-        let folds = content.map { !$0.router.isUnmixed || !$0.router.dropped.isEmpty } ?? (plan.channels < source.channels)
-        return GroupSignalPath(groupName: group.name, source: source, folds: folds, dsdConvertedToPCM: plan.dsdConvertedToPCM,
-                               stage: stage, members: members, router: content?.router)
+        let folds = content.map { $0.render != nil || !$0.router.isUnmixed || !$0.router.dropped.isEmpty } ?? (plan.channels < source.channels)
+        var path = GroupSignalPath(groupName: group.name, source: source, folds: folds, dsdConvertedToPCM: plan.dsdConvertedToPCM,
+                                   stage: stage, members: members, router: content?.router)
+        path.render = content?.render
+        return path
     }
 
     /// The speakers of a channel count, in the order a file's channels go (WAVE order).
