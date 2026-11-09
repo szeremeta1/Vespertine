@@ -94,7 +94,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/VERIFICATION.md:36` — "Vespertine detects the cable through the IORegistry (`DeviceProfile.swift`) and treats 48 kHz files as bit-perfect on that device."
 - **Text:** `docs/FEATURES.md:53` — "AirPods Max on USB-C are recognized as a lossless 24-bit / 48 kHz device. Unprocessed 48 kHz tracks meet the app's bit-perfect conditions; other rates are converted to 48 kHz."
-- **Text:** `site/src/i18n/en.json:237` — "48 kHz music plays bit-perfect"
+- **Text:** `site/src/i18n/en.json:259` — "48 kHz music plays bit-perfect"
 - **Property:** with the cable connected, the device profile allows bit-perfect and 48 kHz unprocessed PCM gets the badge.
 - **Governed by:** vespertine-rule, resting on Apple's description of the USB-C path. The docs already say a loopback cannot confirm it.
 - **Route:** inventory. Detection needs the hardware, and no standard or loopback can check what happens inside the headphones.
@@ -478,7 +478,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-DEC-01 <a id="dec-lossless"></a>Lossless decoders are exact
 
 - **Text:** `docs/ARCHITECTURE.md:58` — "A test checks TrueHD decodes identically to the 24-bit source it was encoded from."
-- **Text:** `site/src/i18n/en.json:303` — "Lossless, can be bit-perfect"
+- **Text:** `site/src/i18n/en.json:325` — "Lossless, can be bit-perfect"
 - **Property:** decoding returns the encoder's input exactly.
 - **Governed by:** oracle (the decoders are FFmpeg's and SFBAudioEngine's).
 - **Route:** inventory.
@@ -551,7 +551,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-HIRES-01 <a id="hires-padding"></a>Zero padding is detected exactly
 
 - **Text:** `docs/FEATURES.md:59` — "Analysis detects zero-padded bit depth exactly."
-- **Text:** `site/src/i18n/en.json:216` — "Only zero padding is exact"
+- **Text:** `site/src/i18n/en.json:238` — "Only zero padding is exact"
 - **Text:** `docs/ANALYSIS.md:13` — "Every sample's lowest bits are zero. Exact."
 - **Property:** the reported effective bit depth is 24 minus the number of low bits that are zero in every sample.
 - **Governed by:** vespertine-rule (a definition, not a standard).
