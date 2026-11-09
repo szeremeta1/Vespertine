@@ -244,22 +244,28 @@ struct NetworkPlaybackCacheTests {
         share.stall(true)
         let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096)
         let entry = try cache.entry(key: "wait", url: URL(fileURLWithPath: "/share/song.dsf"), reader: share)
-        let started = DispatchSemaphore(value: 0)
+        // A fresh entry reports itself as waiting while it is "starting", whoever is reading: that is cleared by the first
+        // `prepare` or `read`. With no lead asked for, `prepare` only clears it, so from here `isWaiting` means a read is queued.
+        try entry.prepare(full: false, lead: 0, cancelled: { false })
+        #expect(!entry.isWaiting, "nothing is waiting before the read")
         let finished = DispatchSemaphore(value: 0)
         let result = Locked<Data?>(nil)
         // A dedicated thread, not the global queue: under a loaded runner the shared pool can take seconds to start a
         // block (measured 1.5 s with 24 busy processes), which made the waits below time out although the cache was fine.
         let reader = Thread {
-            started.signal()
-            result.withLock { $0 = try? entry.read(at: 98304, count: 4096) }
+            let data = try? entry.read(at: 98304, count: 4096)   // (not inside the lock: it blocks until the share answers)
+            result.withLock { $0 = data }
             finished.signal()
         }
         reader.start()
-        #expect(started.wait(timeout: .now() + 30) == .success)
-        #expect(finished.wait(timeout: .now() + 0.03) == .timedOut)
-        #expect(entry.isWaiting)
+        // The read is queued once the entry says so: wait for that (the thread signalling that it started would only say it
+        // is about to call `read`, not that `read` is waiting). A hang detector, not a latency bound.
+        let deadline = Date().addingTimeInterval(30)
+        while !entry.isWaiting, Date() < deadline { Thread.sleep(forTimeInterval: 0.002) }
+        #expect(entry.isWaiting, "the stalled range was never waited for")
+        // Still stalled, so the read has not handed over anything (not zeros, not an early end of file).
+        #expect(result.withLock { $0 } == nil)
         share.stall(false)
-        // A hang detector, not a latency bound: the copy takes milliseconds when the machine is idle.
         #expect(finished.wait(timeout: .now() + 30) == .success)
         #expect(result.withLock { $0 } == share.bytes[98304..<102400])
         #expect(!entry.isWaiting)
