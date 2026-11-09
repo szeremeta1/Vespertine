@@ -682,6 +682,13 @@ final class LibraryStore {
 
     // MARK: Playlists from and for other players
 
+    /// A playlist file's text: M3U8 is UTF-8; an old .m3u is in the Windows or Latin-1 code page, where reading it as
+    /// UTF-8 would turn every accented letter in a file name into a replacement character and match nothing.
+    nonisolated static func playlistText(_ data: Data) -> String {
+        String(data: data, encoding: .utf8) ?? String(data: data, encoding: .windowsCP1252)
+            ?? String(data: data, encoding: .isoLatin1) ?? String(decoding: data, as: UTF8.self)
+    }
+
     /// Makes a playlist of each M3U / M3U8 file, from the songs of it already in the library.
     func importPlaylistFiles(_ urls: [URL]) async -> PlaylistImportResult {
         let database = database
@@ -690,8 +697,7 @@ final class LibraryStore {
                 var total = PlaylistImportResult()
                 for url in urls {
                     let data = try Data(contentsOf: url)
-                    // M3U8 is UTF-8; an old .m3u may be Latin-1.
-                    let text = String(data: data, encoding: .utf8) ?? String(decoding: data, as: UTF8.self)
+                    let text = Self.playlistText(data)
                     let entries = M3U.entries(text, base: url.deletingLastPathComponent())
                     if let one = try database.importPlaylist(named: url.deletingPathExtension().lastPathComponent, entries: entries)?.1 {
                         total.playlists += one.playlists
