@@ -134,6 +134,8 @@ public final class CoreAudioRoomDevice: RoomCaptureDevice, @unchecked Sendable {
     private var cursor = 0
     private var seenDiscontinuities = 0
     private var devices: [AudioObjectID] = []
+    /// A speaker group's aggregate as the output: the members it had active at the start (empty for any other output).
+    private var members: [String] = []
 
     public init() {}
 
@@ -168,6 +170,7 @@ public final class CoreAudioRoomDevice: RoomCaptureDevice, @unchecked Sendable {
         cursor = 0
         seenDiscontinuities = 0
         devices = [request.inputDevice, request.outputDevice]
+        members = GroupAggregateDevice.activeMemberUIDs(of: request.outputDevice)
         try recorder.start()
         try player.start()
     }
@@ -175,7 +178,12 @@ public final class CoreAudioRoomDevice: RoomCaptureDevice, @unchecked Sendable {
     public func readAvailable(maxFrames: Int) -> RoomCaptureChunk {
         lock.lock(); defer { lock.unlock() }
         guard let recorder else { return RoomCaptureChunk(frames: [], lostFrames: 0, alive: false) }
-        let alive = devices.allSatisfy { ((try? HAL.get($0, .global(kAudioDevicePropertyDeviceIsAlive), initial: UInt32(0))) ?? 0) != 0 }
+        var alive = devices.allSatisfy { ((try? HAL.get($0, .global(kAudioDevicePropertyDeviceIsAlive), initial: UInt32(0))) ?? 0) != 0 }
+        // A group's aggregate stays alive when one of its DACs goes away: the members are checked themselves.
+        if alive, !members.isEmpty, let output = devices.last {
+            alive = GroupAggregateDevice.membersPresent(atStart: members, now: GroupAggregateDevice.activeMemberUIDs(of: output),
+                                                        connected: GroupAggregateDevice.isConnected(uid:))
+        }
         recorder.drain()
         let all = recorder.samples[channel]
         let take = min(maxFrames, all.count - cursor)
