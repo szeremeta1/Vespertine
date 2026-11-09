@@ -366,8 +366,9 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var lastRead: Int64 { storage.condition.withLock { storage.cursor } }
         /// Bytes on disk so far.
         var copiedBytes: Int64 { storage.condition.withLock { min(storage.size, Int64(storage.ready.count) * Int64(storage.chunk)) } }
-        /// How long this file has been copying: the copy's speed is `copiedBytes` over this.
-        var copyElapsed: TimeInterval { Date().timeIntervalSince(storage.startedAt) }
+        /// How long this file has been copying, on the cache's clock (the Mac's awake time, as for the share's silence): the copy's
+        /// speed is `copiedBytes` over this.
+        var copyElapsed: TimeInterval { storage.clock() - storage.startedAt }
         /// `report` is told how many bytes are on disk each time one more chunk arrives, from the copy thread (nil: stop telling).
         func setProgress(_ report: (@Sendable (Int64) -> Void)?) { storage.condition.withLock { storage.progress = report } }
         func cancel() { storage.cancel() }
@@ -448,14 +449,15 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var cancelled = false
         var error: Error?
         var progress: (@Sendable (Int64) -> Void)?
-        let startedAt = Date()
+        /// On `clock`: when the copy started.
+        let startedAt: TimeInterval
 
         init(url: URL, reader: any PlaybackCacheReader, chunk: Int, session: Session?, gate: ShareIOGate, foreground: Bool,
              reopen: Reopen? = nil,
              noProgressLimit: TimeInterval = NetworkPlaybackCache.defaultNoProgressLimit,
              clock: @escaping @Sendable () -> TimeInterval = NetworkPlaybackCache.awakeSeconds,
              release: @escaping @Sendable () -> Void) throws {
-            self.clock = clock; lastProgress = clock()
+            self.clock = clock; lastProgress = clock(); startedAt = lastProgress
             self.url = url; self.reader = reader; self.size = reader.size; self.chunk = chunk; self.release = release
             self.reopen = reopen; self.noProgressLimit = noProgressLimit
             self.session = session; self.gate = gate; self.foreground = foreground

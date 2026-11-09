@@ -15,11 +15,19 @@ struct QueuedSeekTests {
         var playing = false, waiting = false
         var landed = false, landedAt = "", quietAtLanding = false
         var stopped = false, end = ""
+        /// What the engine said at the first step that did not come out, so a failure says where the song went.
+        var trouble = ""
+    }
+
+    /// The engine's state, position and last error, for a failure message.
+    private static func describe(_ rig: PlayPauseRig) -> String {
+        let s = rig.engine.snapshot
+        return "state \(s.state), position \(s.position) s, buffering \(s.isBuffering), last error \(s.lastError ?? "none")"
     }
 
     @Test("An output change and a seek taken together while the share is quiet: the seek lands, and stop still works")
     func seekBehindOutputChange() async throws {
-        let rig = try PlayPauseRig()
+        let rig = try PlayPauseRig(cacheClock: PlayPauseRig.slowCacheClock())
         rig.share.goQuiet(from: 6 << 20)        // about 10 s in: the read-ahead reaches it soon
         defer { rig.share.goQuiet(from: nil) }
         let run = try await rig.runScript { rig -> Run in
@@ -31,11 +39,11 @@ struct QueuedSeekTests {
             rig.engine.update(settings: settings)
             rig.engine.play(rig.item())
             run.playing = rig.scriptWait(timeout: 120) { $0.state == .playing && $0.position > 3 }   // well away from where it seeks to
-            guard run.playing else { return run }
+            guard run.playing else { run.trouble = Self.describe(rig); return run }
             // The read-ahead has decoded up to where the share went quiet and waits there for bytes.
             let entry = try rig.cache.entry(key: "song", url: rig.item().url, foreground: false)
             run.waiting = rig.scriptWait(timeout: 120) { _ in entry.isWaiting && rig.share.readsWaiting > 0 }
-            guard run.waiting else { return run }
+            guard run.waiting else { run.trouble = Self.describe(rig); return run }
             // While the engine waits out the pause's fade, another output and a seek back to 1 s: one batch.
             rig.engine.pause()
             rig.scriptSleep(ms: 50)
@@ -45,14 +53,15 @@ struct QueuedSeekTests {
             run.landed = rig.scriptWait(timeout: 120) { $0.state == .paused && abs($0.position - 1) < 0.5 && $0.item != nil }
             run.landedAt = "\(rig.engine.snapshot.state) at \(rig.engine.snapshot.position) s"
             run.quietAtLanding = rig.share.readsWaiting > 0
+            if !run.landed { run.trouble = Self.describe(rig) }
             rig.engine.stop()
             run.stopped = rig.scriptWait(timeout: 120) { $0.state == .stopped }
             run.end = "\(rig.engine.snapshot.state)"
             return run
         }
-        try #require(run.playing, "the song never played from its prefix")
-        try #require(run.waiting, "the read-ahead never reached the quiet part of the song")
-        #expect(run.landed, "the seek never landed: \(run.landedAt)")
+        try #require(run.playing, "the song never played from its prefix: \(run.trouble)")
+        try #require(run.waiting, "the read-ahead never reached the quiet part of the song: \(run.trouble)")
+        #expect(run.landed, "the seek never landed: \(run.landedAt); \(run.trouble)")
         #expect(run.quietAtLanding, "the share was not quiet any more when the seek landed")
         #expect(run.stopped, "stop got through while the share was quiet: \(run.end)")
     }
