@@ -58,7 +58,11 @@ enum EmbeddedCue {
                     var start = offset
                     for i in 0..<indices {
                         let at = p + 36 + i * 12
-                        if b[at + 8] == 1 { start = offset + u64(at) }
+                        guard b[at + 8] == 1 else { continue }
+                        // Both are 64-bit numbers from the file: a damaged block can add up past the largest one.
+                        let (sum, overflow) = offset.addingReportingOverflow(u64(at))
+                        guard !overflow else { return nil }
+                        start = sum
                     }
                     if number != 170, number >= 1, number <= 99, isAudio {
                         let frames = (Double(start) / rate * 75).rounded()

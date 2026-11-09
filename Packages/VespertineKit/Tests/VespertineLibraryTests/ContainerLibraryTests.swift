@@ -73,6 +73,32 @@ struct ContainerLibraryTests {
         #expect(EmbeddedCue.sheet(for: Self.fixture("stereo24.flac"), tags: ["CUESHEET": backwards]) == nil)
     }
 
+    /// A FLAC file's metadata only (no audio frames): STREAMINFO at 48 kHz, then a CUESHEET block with these tracks,
+    /// each (offset in samples, its index 01 offset from there). The lead-out (track 170) ends the list.
+    static func cueBlockFLAC(_ tracks: [(offset: UInt64, index: UInt64)]) -> Data {
+        func be(_ v: UInt64, _ n: Int) -> [UInt8] { (0..<n).map { UInt8(truncatingIfNeeded: v >> (8 * UInt64(n - 1 - $0))) } }
+        var info = [UInt8](repeating: 0, count: 34)
+        info[10] = 0x0B; info[11] = 0xB8; info[12] = 0x02             // 48 000 Hz, 2 channels
+        var cue = [UInt8](repeating: 0, count: 395) + [UInt8(tracks.count + 1)]
+        for (i, t) in tracks.enumerated() {
+            cue += be(t.offset, 8) + [UInt8(i + 1)] + [UInt8](repeating: 0, count: 26) + [1]   // audio, one index
+            cue += be(t.index, 8) + [1, 0, 0, 0]
+        }
+        cue += be(48_000, 8) + [170] + [UInt8](repeating: 0, count: 26) + [0]
+        return Data(Array("fLaC".utf8) + [0x00] + be(34, 3) + info + [0x85] + be(UInt64(cue.count), 3) + cue)
+    }
+
+    @Test("A FLAC CUESHEET block whose offsets add up past 64 bits is ignored, not a crash")
+    func cueBlockOverflow() throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let good = dir.appendingPathComponent("Good.flac"), bad = dir.appendingPathComponent("Bad.flac")
+        try Self.cueBlockFLAC([(0, 0), (23_000, 680)]).write(to: good)
+        try Self.cueBlockFLAC([(0, 0), (0xFFFF_FFFF_FFFF_FFF0, 0x100)]).write(to: bad)
+        #expect(EmbeddedCue.flacBlock(good)?.files.first?.tracks.map(\.startSample) == [0, 23_680])
+        #expect(EmbeddedCue.flacBlock(bad) == nil)
+    }
+
     @Test("A Matroska file with two audio streams lists a track for each, with its own format and layout")
     func streams() async throws {
         let (dir, db, scanner, source) = try await library([("two-streams.mka", "Two.mka"), ("flac-stereo.mka", "One.mka"), ("opus-51.webm", "Opus.webm")])
