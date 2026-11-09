@@ -244,12 +244,11 @@ public final class PlaybackEngine: @unchecked Sendable {
         } catch is CancellationError { throw Superseded() }
         // Keep current, and let the prefetched next lease survive until it is taken by entry().
         staged = [key: entry]
-        let dsd = ["dsf", "dff", "dsdiff"].contains(resolved.pathExtension.lowercased())
-            || (item.sacdArea != nil && item.dvd == nil)
-        let progressiveDSD = dsd && entry.size > 512 << 20
-        // A FLAC or WAV on a share starts on a prefix too (see `NetworkStart`); the rest keeps copying ahead of the playhead.
-        let early = !progressiveDSD && NetworkStart.startsEarly(fileExtension: resolved.pathExtension, size: entry.size,
-                                                                isRegion: item.regionStartFrame != nil || item.regionFrameLength != nil)
+        // A FLAC, WAV, DSF or DSDIFF on a share starts on a prefix (see `NetworkStart`); the rest keeps copying ahead of the playhead.
+        let early = NetworkStart.startsEarly(fileExtension: resolved.pathExtension, size: entry.size,
+                                             isRegion: item.regionStartFrame != nil || item.regionFrameLength != nil)
+        // An SACD image's area is not at the front of the file: a large one still starts on a lead from where it plays.
+        let progressiveDSD = !early && item.sacdArea != nil && item.dvd == nil && entry.size > 512 << 20
         let progressive = progressiveDSD || early
         let copyStarted = Date(), total = entry.size
         // The wait shown is for what is waited for: the prefix of an early start, otherwise the whole file.
@@ -1903,17 +1902,19 @@ public final class PlaybackEngine: @unchecked Sendable {
                     }
                 }
             }
-            // Target two minutes of raw DSD, at least 128 MiB, capped at 1 GiB. No audio conversion:
-            // these are the original compressed/container bytes. Reads beyond the lead remain guarded.
-            // A PCM file that started on a prefix waits for as much as the copy's speed says the rest of the song needs.
-            let format = decoding.probed.format
+            // A song that started on a prefix (PCM or DSD) waits for as much as the copy's speed says the rest of the song needs,
+            // and at least a few seconds of it. (DSD used to wait for two minutes of the song, at least 128 MiB, whatever the link:
+            // about 40 s of "Preparing output…" for a 5.1 DSD64 song on a share 100 ms away.) Reads beyond the lead remain guarded.
+            // An SACD image holds the whole disc, so its size says nothing of one track's rate: two minutes of the track's raw DSD,
+            // at least 128 MiB, capped at 1 GiB, as before.
             let position = min(entry.lastRead, entry.size)
-            let lead = format.encoding == .pcm
-                ? NetworkStart.lead(fileSize: entry.size, position: position, duration: decoding.durationSeconds,
-                                    copied: entry.copiedBytes, elapsed: entry.copyElapsed)
-                : min(Int64(1 << 30), max(Int64(128 << 20), Int64(format.sampleRate / 8 * Double(format.channels) * 120)))
-            // The percentage shown while the lead fills (a PCM song's; DSD shows none, as before).
-            if format.encoding == .pcm, !lookingAhead {
+            let format = decoding.probed.format
+            let lead = decoding.item.sacdArea != nil
+                ? min(entry.size - position, min(Int64(1 << 30), max(Int64(128 << 20), Int64(format.sampleRate / 8 * Double(format.channels) * 120))))
+                : NetworkStart.startLead(fileSize: entry.size, position: position, duration: decoding.durationSeconds,
+                                         copied: entry.copiedBytes, elapsed: entry.copyElapsed)
+            // The percentage shown while the lead fills.
+            if !lookingAhead {
                 let target = max(1, min(entry.size, position + lead))
                 entry.setProgress { [shared] copied in shared.withLock { $0.snapshot.bufferingFraction = min(1, Double(copied) / Double(target)) } }
             }

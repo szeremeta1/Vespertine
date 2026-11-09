@@ -87,15 +87,20 @@ struct NetworkStartTests {
         return out
     }
 
-    @Test("Which songs start on a prefix: FLAC and WAV above a size, never a CUE track, never the rest")
+    @Test("Which songs start on a prefix: FLAC, WAV and DSD files above a size, never a CUE track, never the rest")
     func policy() {
         let big: Int64 = 200 << 20
         #expect(NetworkStart.startsEarly(fileExtension: "flac", size: big, isRegion: false))
         #expect(NetworkStart.startsEarly(fileExtension: "WAV", size: big, isRegion: false))
         #expect(NetworkStart.startsEarly(fileExtension: "aiff", size: big, isRegion: false))
+        // DSF and DSDIFF keep their header and first audio at the front too. A 5.1 DSD64 song of under 512 MB used to be
+        // copied whole before its first note: minutes on a share with a long round trip, all of it on "Preparing output…".
+        #expect(NetworkStart.startsEarly(fileExtension: "dsf", size: big, isRegion: false))
+        #expect(NetworkStart.startsEarly(fileExtension: "DFF", size: big, isRegion: false))
+        #expect(NetworkStart.startsEarly(fileExtension: "dsdiff", size: big, isRegion: false))
         #expect(!NetworkStart.startsEarly(fileExtension: "flac", size: big, isRegion: true))
         #expect(!NetworkStart.startsEarly(fileExtension: "flac", size: 3 << 20, isRegion: false))
-        for ext in ["m4a", "mp3", "ape", "wv", "dsf", "ogg", "iso"] {
+        for ext in ["m4a", "mp3", "ape", "wv", "ogg", "iso"] {
             #expect(!NetworkStart.startsEarly(fileExtension: ext, size: big, isRegion: false), "\(ext)")
         }
     }
@@ -128,6 +133,30 @@ struct NetworkStartTests {
         #expect(lead(link: 0.00001, position: 1 << 20) <= size - (1 << 20))
         #expect(NetworkStart.lead(fileSize: size, position: 0, duration: duration, copied: 0, elapsed: 0) == size)   // nothing measured yet
         #expect(NetworkStart.lead(fileSize: size, position: 0, duration: 0, copied: 1 << 20, elapsed: 1) == size)   // no length
+    }
+
+    @Test("The start lead: a few seconds of the song on a fast link, not a fixed 128 MiB or the whole file; the shortfall on a slow one")
+    func startLead() {
+        // A 5.1 DSD64 song of 3:48: about 483 MB at 2.12 MB/s, from a share 100 ms away that copies 6.7 MB/s.
+        let duration = 228.0
+        let size = Int64(2_822_400.0 / 8 * 6 * duration)
+        let perSecond = Double(size) / duration
+        func lead(link bytesPerSecond: Double, position: Int64 = 0) -> Int64 {
+            NetworkStart.startLead(fileSize: size, position: position, duration: duration,
+                                   copied: Int64(bytesPerSecond * 4), elapsed: 4)
+        }
+        let fast = lead(link: 6_700_000)
+        // At least `safetySeconds` of the song, so one slow round trip is not a gap…
+        #expect(Double(fast) >= perSecond * NetworkStart.safetySeconds - 1)
+        // …and nowhere near the 128 MiB (a minute of waiting at this speed) or the whole file the start used to wait for.
+        #expect(fast < 32 << 20, "lead \(fast >> 20) MiB")
+        // A link slower than the song still brings in what it cannot fetch while the song plays.
+        let slow = lead(link: 1_500_000)
+        let expected = Double(size) - 1_500_000 / 1.3 * duration
+        #expect(abs(Double(slow) - expected) < 1_048_576, "lead \(slow >> 20) MiB, expected about \(Int(expected) >> 20)")
+        // Never more than what is left, and the whole rest when nothing has been measured yet.
+        #expect(lead(link: 6_700_000, position: size - (1 << 20)) <= 1 << 20)
+        #expect(NetworkStart.startLead(fileSize: size, position: 0, duration: duration, copied: 0, elapsed: 0) == size)
     }
 
     @Test("The lead from the middle of a song (a seek, another output) plans on the part still to play, not the whole song")
@@ -171,6 +200,8 @@ struct NetworkStartTests {
         #expect(try Data(contentsOf: entry.url) == share.bytes, "the staged file is the share's file")
     }
 
+    /// The share here is all bandwidth and no round trip, timed with sleeps: one read at a time, so what is compared is a prefix against
+    /// the whole file (several reads in flight are for a share far away, see `NetworkPlaybackCacheTests.readsInFlight`).
     @Test("Time to first audio: a prefix on a throttled share starts without the rest of the file, where copying the file first waits for all of it")
     func timeToFirstAudio() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
@@ -186,7 +217,7 @@ struct NetworkStartTests {
         }
         let localSeconds = try firstAudio { url }
         let fullSeconds = try firstAudio {
-            let cache = NetworkPlaybackCache(directory: dir.appendingPathComponent("full"), budget: 64 << 20)
+            let cache = NetworkPlaybackCache(directory: dir.appendingPathComponent("full"), budget: 64 << 20, readsInFlight: 1)
             let entry = try cache.entry(key: "full", url: url, reader: ThrottledShare(data: data, bytesPerSecond: rate))
             try entry.prepare(full: true, lead: 0, cancelled: { false })
             leak.withLock { $0.append(entry) }
@@ -200,7 +231,7 @@ struct NetworkStartTests {
         defer { quietShare.goQuiet(from: nil) }
         let deadline = Date().addingTimeInterval(60)
         let earlySeconds = try firstAudio {
-            let cache = NetworkPlaybackCache(directory: dir.appendingPathComponent("early"), budget: 64 << 20)
+            let cache = NetworkPlaybackCache(directory: dir.appendingPathComponent("early"), budget: 64 << 20, readsInFlight: 1)
             let entry = try cache.entry(key: "early", url: url, reader: quietShare)
             try entry.prepare(full: false, lead: NetworkStart.prefix, cancelled: { Date() > deadline })
             #expect(!entry.isComplete, "first audio came from the prefix, with the rest of the file not there yet")
