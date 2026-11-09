@@ -218,6 +218,28 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     }
     private static let warmQueue = DispatchQueue(label: "org.szeremeta.vespertine.network-warm", qos: .userInitiated, attributes: .concurrent)
 
+    /// Reads this thread makes inside `body` (through `Entry.read`: a decoder's guarded input source, `PlaybackFile`) give up
+    /// with `CancellationError` once `cancelled` says so, instead of waiting for as long as the share stays quiet. The engine thread
+    /// uses it where it reads a song that may still be arriving (a seek), so a skip, stop or another seek still gets through.
+    /// Reads on other threads (the read-ahead's) are unaffected.
+    static func cancellingReads<T>(when cancelled: @escaping () -> Bool, _ body: () throws -> T) rethrows -> T {
+        let thread = Thread.current.threadDictionary
+        let previous = thread[readCancellationKey]
+        thread[readCancellationKey] = ReadCancellation(cancelled)
+        defer { thread[readCancellationKey] = previous }
+        return try body()
+    }
+
+    /// Whether the reads of this thread have been given up on (see `cancellingReads`).
+    static var readsCancelled: Bool {
+        (Thread.current.threadDictionary[readCancellationKey] as? ReadCancellation)?.check() ?? false
+    }
+    private static let readCancellationKey = "org.szeremeta.vespertine.read-cancellation"
+    private final class ReadCancellation {
+        let check: () -> Bool
+        init(_ check: @escaping () -> Bool) { self.check = check }
+    }
+
     func discardPrefetch(except key: String? = nil) {
         let discarded: Entry? = lock.withLock {
             guard nextKey != key else { return nil }
@@ -295,7 +317,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             defer { storage.condition.withLock { storage.starting = false }; storage.publishDemand() }
             guard offset >= 0, count >= 0 else { throw CocoaError(.fileReadUnknown) }
             let count = Int(min(Int64(count), max(0, size - offset)))
-            try storage.ensure(offset: offset, count: Int64(count), cancelled: { false })
+            try storage.ensure(offset: offset, count: Int64(count), cancelled: { NetworkPlaybackCache.readsCancelled })
             storage.condition.withLock {
                 storage.cursor = offset + Int64(count)
                 storage.resumeAt = min(storage.blocks, Int(storage.cursor / Int64(storage.chunk)))
