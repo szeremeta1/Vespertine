@@ -1454,8 +1454,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             try replaceGroupSession(old: old, device: device, group: group, plan: plan)
             return
         }
-        // DSD over DoP only survives untouched with sole access, so it always takes the device.
-        let exclusive = (settings.exclusive && !device.alwaysShared) || plan.isPassthrough
+        let exclusive = Self.takesDevice(device, plan: plan, exclusiveSetting: settings.exclusive)
         // A new format on the device already held (a skip to another rate): keep holding it and leave its format
         // to the new session. Letting go and taking it back reconfigures the device several times in a row, and
         // macOS can lose track of its own pause/resume pairs then: the device stays paused for this process and
@@ -1471,6 +1470,13 @@ public final class PlaybackEngine: @unchecked Sendable {
         nrt_context_set_viz(new.context, visualizerTap)
         sessionLock.unlock()
         applyGain()
+    }
+
+    /// Whether a session for `plan` takes `device` for itself (hog mode). DSD over DoP and bitstreams only survive untouched with
+    /// sole access, so they always take it; the Mac's built-in output never (macOS keeps it for the system: a DoP or bitstream plan
+    /// there fails to open rather than take it away).
+    static func takesDevice(_ device: OutputDevice, plan: OutputPlan, exclusiveSetting: Bool) -> Bool {
+        !device.alwaysShared && (exclusiveSetting || plan.isPassthrough)
     }
 
     /// A speaker group's session: its members configured at the plan's rate (held, when exclusive), combined into a private
