@@ -1,5 +1,5 @@
 //
-// Vespertine — room measurement sweep: the faded exponential sweep, its matched inverse and impulse recovery,
+// Vespertine: room measurement sweep: the faded exponential sweep, its matched inverse and impulse recovery,
 // checked against filters whose response is known exactly.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

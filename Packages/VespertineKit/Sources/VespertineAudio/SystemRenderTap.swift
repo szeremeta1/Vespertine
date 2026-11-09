@@ -1,5 +1,5 @@
 //
-// Vespertine — what the visualizer reads while macOS renders Dolby Atmos.
+// Vespertine: what the visualizer reads while macOS renders Dolby Atmos.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

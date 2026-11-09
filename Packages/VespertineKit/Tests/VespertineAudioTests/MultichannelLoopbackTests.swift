@@ -1,5 +1,5 @@
 //
-// Vespertine — multichannel through the real engine and Core Audio to a 16-channel virtual device (BlackHole 16ch), recorded
+// Vespertine: multichannel through the real engine and Core Audio to a 16-channel virtual device (BlackHole 16ch), recorded
 // back from its input: every channel on its own output, bit for bit, at the file's rate; and Spatial Audio rendered on the
 // I/O thread to the first pair only.
 // SPDX-License-Identifier: GPL-3.0-or-later

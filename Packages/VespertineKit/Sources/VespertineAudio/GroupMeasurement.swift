@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the measurement wizard on a group. A group is measured as the layout and channel map its drawing makes
+// Vespertine: speaker groups: the measurement wizard on a group. A group is measured as the layout and channel map its drawing makes
 // (stereo, a quad, a 5.1 or its own set of places, on the outputs of the group), saved against the group's output UID, so the profile
 // fits the group while it is wired that way (`RoomProfile.applies(to:)`). The timing references come from a speaker on the clock
 // leader, the one DAC that is never resampled, and the group plays for `settleSeconds` before the first sweep.

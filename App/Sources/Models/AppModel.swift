@@ -1,5 +1,5 @@
 //
-// Vespertine — app-wide state: navigation, selection, devices, and wiring between stores.
+// Vespertine: app-wide state: navigation, selection, devices, and wiring between stores.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

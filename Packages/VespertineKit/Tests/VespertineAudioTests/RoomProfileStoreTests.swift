@@ -1,5 +1,5 @@
 //
-// Vespertine — where the room correction library lives: one file in the app's data folder, written whole and kept
+// Vespertine: where the room correction library lives: one file in the app's data folder, written whole and kept
 // with its previous version, so a crash or a full disk can't leave the listener with half a library.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

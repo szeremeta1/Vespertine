@@ -1,5 +1,5 @@
 //
-// Vespertine — SACD images: the table of contents and text, both areas, DST, DoP and PCM matching DSDIFF bit for
+// Vespertine: SACD images: the table of contents and text, both areas, DST, DoP and PCM matching DSDIFF bit for
 // bit, gapless track boundaries, seeking. Every image here is synthesized (VespertineTestSupport).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

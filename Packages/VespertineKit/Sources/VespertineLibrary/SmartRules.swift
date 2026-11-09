@@ -1,5 +1,5 @@
 //
-// Vespertine — smart playlist rules, compiled to SQL.
+// Vespertine: smart playlist rules, compiled to SQL.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction filters as impulse responses: one speaker's measured filter (from REW, rePhase,
+// Vespertine: room correction filters as impulse responses: one speaker's measured filter (from REW, rePhase,
 // Dirac-style tools …), kept as a file of its own and convolved on the I/O thread (`nrt_context_set_fir`).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

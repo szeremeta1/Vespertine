@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the delay of each speaker in the room correction chain. macOS 27 takes a sub-device's extra output
+// Vespertine: speaker groups: the delay of each speaker in the room correction chain. macOS 27 takes a sub-device's extra output
 // latency without error and reads 0 back, so a measured skew between the DACs is held back in Vespertine instead: the members that
 // are ahead wait for the one that is latest, and a speaker's own delay trim adds to its channel. Pure; no device.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -17,7 +17,7 @@ struct GroupDelayTests {
         func speaker(_ role: SpeakerRole, _ uid: String, _ channel: Int, _ x: Double, _ y: Double, _ trim: Double) -> SpeakerGroup.Speaker {
             SpeakerGroup.Speaker(role: role, deviceUID: uid, channel: channel, position: Point2D(x: x, y: y), delayTrimMs: trim)
         }
-        return SpeakerGroup(name: "Dorm quad",
+        return SpeakerGroup(name: "Downstairs quad",
                             members: [SpeakerGroup.Member(deviceUID: fosi, name: "Fosi ZD3", channelCount: 2, skewMs: leaderSkew),
                                       SpeakerGroup.Member(deviceUID: fiio, name: "FiiO K11", channelCount: 2, skewMs: followerSkew)],
                             clockLeaderUID: fosi,
@@ -90,7 +90,7 @@ struct GroupDelayTests {
     @Test("With no room correction the delays are a chain of their own, timing only; with none to hold back, no chain")
     func chainOfItsOwn() {
         #expect(GroupDelay.composing(nil, delaysMs: [0, 0, 0, 0], name: "x") == nil)
-        let chain = GroupDelay.composing(nil, delaysMs: [5, 5, 0, 0], name: "Dorm quad")
+        let chain = GroupDelay.composing(nil, delaysMs: [5, 5, 0, 0], name: "Downstairs quad")
         #expect(chain?.channels.map(\.delayMs) == [5, 5, 0, 0])
         #expect(chain?.changesOnlyTiming(channels: 0..<4) == true)
         #expect(chain?.preampDB == 0)
@@ -101,7 +101,7 @@ struct GroupDelayTests {
         let band = EQBand(kind: .peak, frequency: 100, gainDB: -3, q: 1)
         let room = RoomCorrectionPlayback(profileID: UUID(), name: "Room", preampDB: -2,
                                           channels: [RoomChannelPlayback(delayMs: 3, levelDB: -1, bands: [band]), RoomChannelPlayback(delayMs: 0)])
-        let chain = GroupDelay.composing(room, delaysMs: [5, 5, 0, 0], name: "Dorm quad")
+        let chain = GroupDelay.composing(room, delaysMs: [5, 5, 0, 0], name: "Downstairs quad")
         #expect(chain?.name == "Room" && chain?.preampDB == -2 && chain?.profileID == room.profileID)
         #expect(chain?.channels.map(\.delayMs) == [8, 5, 0, 0], "extended to the group's channels")
         #expect(chain?.channels[0].levelDB == -1 && chain?.channels[0].bands == [band])
@@ -110,7 +110,7 @@ struct GroupDelayTests {
 
     @Test("A measured skew like 12.95 ms is whole frames in the chain: 622 at 48 kHz, 1243 at 96 kHz")
     func wholeFrames() throws {
-        let chain = try #require(GroupDelay.composing(nil, delaysMs: [12.95, 12.95, 0, 0], name: "Dorm quad"))
+        let chain = try #require(GroupDelay.composing(nil, delaysMs: [12.95, 12.95, 0, 0], name: "Downstairs quad"))
         #expect(chain.renderChannels(sampleRate: 48_000, channelCount: 4).map(\.delayFrames) == [622, 622, 0, 0])
         #expect(chain.renderChannels(sampleRate: 96_000, channelCount: 4).map(\.delayFrames) == [1243, 1243, 0, 0])
         // The chain's delay is held at the end of the queue: what the engine plays out.

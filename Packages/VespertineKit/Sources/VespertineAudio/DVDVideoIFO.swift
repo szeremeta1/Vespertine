@@ -1,5 +1,5 @@
 //
-// Vespertine — DVD-Video navigation: the video manager (VIDEO_TS.IFO: which title set each title is in) and each
+// Vespertine: DVD-Video navigation: the video manager (VIDEO_TS.IFO: which title set each title is in) and each
 // title set's information file (VTS_nn_0.IFO: audio attributes, program chains, their programs and cells, the cell
 // address table and the VOBU address map). Field offsets follow the DVD-Video layout as documented by the
 // open-source libdvdread project (ifo_types.h); this reader is Vespertine's own. Menus (VMGM, VTSM) are never read

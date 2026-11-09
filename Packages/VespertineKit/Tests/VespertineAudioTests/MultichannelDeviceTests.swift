@@ -1,5 +1,5 @@
 //
-// Vespertine — multichannel music on a multichannel output, channel for channel: what the engine's own pieces hand the
+// Vespertine: multichannel music on a multichannel output, channel for channel: what the engine's own pieces hand the
 // device (FormatPlanner → decoder → Decoding → ring → the I/O proc's render), for 3 to 16 channels on an output with
 // more channels than the file (a 16-channel interface, an HDMI receiver), in one interleaved buffer and spread over
 // several streams. Every sample carries its channel's number, so each output's source, order and bit-exactness is read

@@ -1,5 +1,5 @@
 //
-// Vespertine — where the speaker groups live: one JSON file in the app's data folder, written whole and kept with its
+// Vespertine: where the speaker groups live: one JSON file in the app's data folder, written whole and kept with its
 // previous version beside it. A file that can't be read is set aside, never overwritten, and the last good version is used
 // instead. Groups from a newer Vespertine are kept as they were and written back with the rest. (The same rules as the
 // room correction library.)
@@ -44,7 +44,7 @@ public struct SpeakerGroupBook: Equatable, Sendable {
         return copy
     }
 
-    /// The name, or the name with the first number from 2 that no group has taken ("Dorm", "Dorm 2", "Dorm 3").
+    /// The name, or the name with the first number from 2 that no group has taken ("Downstairs", "Downstairs 2", "Downstairs 3").
     public func availableName(_ wanted: String) -> String {
         let base = wanted.trimmingCharacters(in: .whitespacesAndNewlines)
         let name = base.isEmpty ? "Speaker group" : base

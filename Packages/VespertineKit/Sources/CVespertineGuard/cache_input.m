@@ -1,5 +1,5 @@
 //
-// Vespertine — see CVespertineCacheInput.h.
+// Vespertine: see CVespertineCacheInput.h.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 #import "CVespertineCacheInput.h"

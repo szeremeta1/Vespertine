@@ -1,5 +1,5 @@
 //
-// Vespertine — known-device knowledge (AirPods Max over USB-C, Bluetooth caveats, …).
+// Vespertine: known-device knowledge (AirPods Max over USB-C, Bluetooth caveats, …).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

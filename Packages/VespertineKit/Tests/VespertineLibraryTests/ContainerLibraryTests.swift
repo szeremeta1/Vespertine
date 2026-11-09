@@ -1,5 +1,5 @@
 //
-// Vespertine — CUE sheets inside FLAC files, and Matroska files with several audio streams, in the library.
+// Vespertine: CUE sheets inside FLAC files, and Matroska files with several audio streams, in the library.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

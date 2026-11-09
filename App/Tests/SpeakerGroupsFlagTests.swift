@@ -44,15 +44,15 @@ struct SpeakerGroupsFlagTests {
         let model = SpeakerGroupsModel(directory: root)
         #expect(model.groups.isEmpty)
         #expect(!FileManager.default.fileExists(atPath: root.appendingPathComponent("Speaker Groups.json").path))
-        let dorm = group("Dorm")
-        model.upsert(dorm)
-        #expect(model.groups.map(\.name) == ["Dorm"])
-        model.duplicate(dorm.id)
+        let downstairs = group("Downstairs")
+        model.upsert(downstairs)
+        #expect(model.groups.map(\.name) == ["Downstairs"])
+        model.duplicate(downstairs.id)
         #expect(model.groups.map(\.name).count == 2)
         #expect(Set(model.groups.map(\.id)).count == 2)
         let again = SpeakerGroupsModel(directory: root)
         #expect(again.groups.map(\.id) == model.groups.map(\.id))
-        again.remove(dorm.id)
+        again.remove(downstairs.id)
         #expect(SpeakerGroupsModel(directory: root).groups.count == 1)
         #expect(model.lastError == nil && again.lastError == nil)
     }
@@ -62,7 +62,7 @@ struct SpeakerGroupsFlagTests {
         let (root, defaults, suite) = try scratch()
         defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
         let store = SpeakerGroupStore(directory: root)
-        try store.save([group("Dorm")], unreadable: [["schemaVersion": 99, "name": "From the future"]])
+        try store.save([group("Downstairs")], unreadable: [["schemaVersion": 99, "name": "From the future"]])
         let model = SpeakerGroupsModel(directory: root)
         #expect(model.groups.count == 1 && model.unreadableCount == 1)
         model.upsert(group("Second"))
@@ -71,10 +71,10 @@ struct SpeakerGroupsFlagTests {
 
     @Test("A row says what the group is made of and whether it is ready")
     func summary() {
-        let ready = group("Dorm")
+        let ready = group("Downstairs")
         #expect(SpeakerGroupsModel.summary(ready) == "Fosi ZD3 + FiiO K11 · 4 channels")
         #expect(SpeakerGroupsModel.problem(ready) == nil)
-        var bad = group("Dorm")
+        var bad = group("Downstairs")
         bad.members.removeLast()
         #expect(SpeakerGroupsModel.problem(bad) == "A group needs at least two outputs.")
     }
@@ -84,7 +84,7 @@ struct SpeakerGroupsFlagTests {
         let (root, defaults, suite) = try scratch()
         defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
         let model = SpeakerGroupsModel(directory: root)
-        var draft = SpeakerGroupDraft(name: "Dorm quad")
+        var draft = SpeakerGroupDraft(name: "Downstairs quad")
         #expect(model.create(draft) == nil && model.groups.isEmpty)
         func candidate(_ uid: String, _ name: String) -> GroupCandidate {
             GroupCandidate(uid: uid, name: name, channels: 2, transport: .usb, eligibility: .ok)
@@ -93,7 +93,7 @@ struct SpeakerGroupsFlagTests {
         draft.toggle(candidate("dac-b", "FiiO K11"))
         let made = try #require(model.create(draft))
         #expect(model.groups.map(\.id) == [made.id] && made.isValid)
-        #expect(SpeakerGroupsModel(directory: root).groups.map(\.name) == ["Dorm quad"])
+        #expect(SpeakerGroupsModel(directory: root).groups.map(\.name) == ["Downstairs quad"])
     }
 
     @Test("The engine hears of saved groups only while the switch is on, and a group can be the chosen output")
@@ -102,14 +102,14 @@ struct SpeakerGroupsFlagTests {
         defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
         defaults.set(true, forKey: "setupCompleted")
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
-        let dorm = group("Dorm")
-        #expect(settings.engineSettings(groups: [dorm]).speakerGroups.isEmpty, "off: none reach the engine, whatever is saved")
+        let downstairs = group("Downstairs")
+        #expect(settings.engineSettings(groups: [downstairs]).speakerGroups.isEmpty, "off: none reach the engine, whatever is saved")
         #expect(settings.engineSettings().speakerGroups.isEmpty)
         settings.speakerGroupsFeature = true
-        settings.selectedDeviceUID = dorm.outputUID
-        let engine = settings.engineSettings(groups: [dorm])
-        #expect(engine.speakerGroups == [dorm] && engine.deviceUID == dorm.outputUID)
-        #expect(engine.group(forOutputUID: engine.deviceUID)?.name == "Dorm")
+        settings.selectedDeviceUID = downstairs.outputUID
+        let engine = settings.engineSettings(groups: [downstairs])
+        #expect(engine.speakerGroups == [downstairs] && engine.deviceUID == downstairs.outputUID)
+        #expect(engine.group(forOutputUID: engine.deviceUID)?.name == "Downstairs")
     }
 
     @Test("A change to the list tells the engine's owner after it is written")
@@ -119,7 +119,7 @@ struct SpeakerGroupsFlagTests {
         let model = SpeakerGroupsModel(directory: root)
         var calls = 0
         model.onChange = { calls += 1 }
-        model.upsert(group("Dorm"))
+        model.upsert(group("Downstairs"))
         model.remove(model.groups[0].id)
         #expect(calls == 2)
     }

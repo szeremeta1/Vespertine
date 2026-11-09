@@ -1,5 +1,5 @@
 //
-// Vespertine — the loopback analyzer finds every fault injected into a perfect capture, and calls a perfect one exact.
+// Vespertine: the loopback analyzer finds every fault injected into a perfect capture, and calls a perfect one exact.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

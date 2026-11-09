@@ -1,5 +1,5 @@
 //
-// Vespertine — the saved speaker groups, for the settings list. Read only when the list is shown (the feature is off for
+// Vespertine: the saved speaker groups, for the settings list. Read only when the list is shown (the feature is off for
 // everyone until its switch is turned on), and every change is written at once.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

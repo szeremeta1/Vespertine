@@ -1,5 +1,5 @@
 //
-// Vespertine — a truthful description of what happens between file and DAC.
+// Vespertine: a truthful description of what happens between file and DAC.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

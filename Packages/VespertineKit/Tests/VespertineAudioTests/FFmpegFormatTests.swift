@@ -1,5 +1,5 @@
 //
-// Vespertine — DTS and Dolby TrueHD files (raw and in Matroska) decode through FFmpeg.
+// Vespertine: DTS and Dolby TrueHD files (raw and in Matroska) decode through FFmpeg.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — rich metadata editing (single and batch), MusicBrainz lookup, smart playlist rules.
+// Vespertine: rich metadata editing (single and batch), MusicBrainz lookup, smart playlist rules.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

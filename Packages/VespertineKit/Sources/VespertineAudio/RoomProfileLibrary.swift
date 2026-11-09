@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction profiles as a library: named for a speaker pair, a room or a desk, renamed, duplicated,
+// Vespertine: room correction profiles as a library: named for a speaker pair, a room or a desk, renamed, duplicated,
 // deleted, exported and imported, one chosen per output (and in force whenever that output is). Also what a profile can
 // do on its own: play at a fraction of its strength, take hand-edited bands and trims, re-average its positions and
 // redesign from its measurement. Pure and offline; the app stores the result and hands it to playback.

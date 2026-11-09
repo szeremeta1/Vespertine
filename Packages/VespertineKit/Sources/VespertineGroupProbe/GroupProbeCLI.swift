@@ -1,5 +1,5 @@
 //
-// Vespertine — Phase 0 speaker-group probe: the command-line front of group-info, group-play and group-skew.
+// Vespertine: Phase 0 speaker-group probe: the command-line front of group-info, group-play and group-skew.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

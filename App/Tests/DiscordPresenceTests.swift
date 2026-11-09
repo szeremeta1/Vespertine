@@ -75,7 +75,7 @@ private nonisolated final class FakeDiscord: @unchecked Sendable {
                 case DiscordIPC.Opcode.handshake.rawValue:
                     switch answer {
                     case .ready:
-                        reply(fd, .frame, ["cmd": "DISPATCH", "evt": "READY", "data": ["v": 1, "user": ["username": "alex", "global_name": "Alex"]]])
+                        reply(fd, .frame, ["cmd": "DISPATCH", "evt": "READY", "data": ["v": 1, "user": ["username": "listener", "global_name": "Listener"]]])
                     case .invalidClientID:
                         reply(fd, .close, ["code": 4000, "message": "Invalid Client ID"])
                     }
@@ -251,7 +251,7 @@ struct DiscordPresenceTests {
         #expect(args["pid"] as? Int == Int(getpid()))
         let activity = try #require(args["activity"] as? [String: Any])
         #expect(activity["details"] as? String == "So What" && activity["type"] as? Int == 2)
-        #expect(await eventually { states.withLock { $0.last } == .connected(user: "Alex") })
+        #expect(await eventually { states.withLock { $0.last } == .connected(user: "Listener") })
 
         // The same status again isn't sent again.
         client.setActivity(DiscordStatus.activity(for: song(), artworkURL: nil).encoded())

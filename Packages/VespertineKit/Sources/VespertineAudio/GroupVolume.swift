@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: volume. A group plays through a private aggregate, which has no volume of its own and which only this
+// Vespertine: speaker groups: volume. A group plays through a private aggregate, which has no volume of its own and which only this
 // app can see, so two things that follow "the output" must skip it: the relay that carries the volume keys to a device held with
 // exclusive access (it would read and write a device that has no volume, and move the Mac's volume and alert volume for nothing), and
 // making the output the Mac's sound output (macOS would be handed a device other apps cannot see). Each DAC's own hardware volume

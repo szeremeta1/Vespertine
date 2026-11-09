@@ -1,5 +1,5 @@
 //
-// Vespertine — Settings › Speaker Groups › Edit: what a stereo song does on more than two speakers, what becomes of the subwoofer
+// Vespertine: Settings › Speaker Groups › Edit: what a stereo song does on more than two speakers, what becomes of the subwoofer
 // channel, and what happens when an output goes away. The options and their words are `GroupPolicies` in VespertineKit.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

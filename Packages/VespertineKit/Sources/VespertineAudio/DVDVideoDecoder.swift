@@ -1,5 +1,5 @@
 //
-// Vespertine — DVD-Video LPCM playback: one LPCM run (a VOB's audio) as a PCM decoder. Library tracks are sample
+// Vespertine: DVD-Video LPCM playback: one LPCM run (a VOB's audio) as a PCM decoder. Library tracks are sample
 // ranges of a run, played through the same region path as CUE tracks, so tracks that share a run join gaplessly.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

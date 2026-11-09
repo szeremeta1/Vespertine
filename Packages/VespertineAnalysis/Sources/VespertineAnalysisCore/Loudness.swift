@@ -1,5 +1,5 @@
 //
-// Vespertine — loudness as ITU-R BS.1770-4 measures it: K-weighting, 400 ms blocks every 100 ms, gating.
+// Vespertine: loudness as ITU-R BS.1770-4 measures it: K-weighting, 400 ms blocks every 100 ms, gating.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Plain Swift (no Accelerate) so the same numbers come out in the app and on a Linux server. Used by the transition

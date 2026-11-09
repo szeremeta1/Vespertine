@@ -377,7 +377,7 @@ struct VisualizerVinylLayoutTests {
 
 @Suite("Visualizer modes: the sleeve where MD Vinyl puts it")
 struct VisualizerSleeveReferenceTests {
-    // Measured from Alex's MD Vinyl screenshots (2796×1290): the record's radius is 509 px in both. In front, the
+    // Measured from MD Vinyl reference screenshots (2796×1290): the record's radius is 509 px in both. In front, the
     // sleeve is 1046 px square, its right edge through the record's centre, level with it; behind, the same size,
     // its centre 822 px left of the record's, level, turned 4.0° anticlockwise.
     static let r = Double(VisualizerLayout.recordRadius)

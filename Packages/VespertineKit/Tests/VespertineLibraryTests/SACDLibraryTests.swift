@@ -1,5 +1,5 @@
 //
-// Vespertine — SACD images in the library: each song once, with a stereo and a 5.1 version, tagged from the disc.
+// Vespertine: SACD images in the library: each song once, with a stereo and a 5.1 version, tagged from the disc.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

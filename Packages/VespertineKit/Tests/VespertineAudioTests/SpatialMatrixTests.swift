@@ -1,5 +1,5 @@
 //
-// Vespertine — Spatial Audio end to end, for every channel layout in every format: files are made with FFmpeg
+// Vespertine: Spatial Audio end to end, for every channel layout in every format: files are made with FFmpeg
 // (one tone per channel), then go through the app's own probe, decoder, converter and Apple's spatial mixer.
 // Each channel must reach the bed slot of its own speaker position, and be heard on the correct side.
 // Needs FFmpeg; runs when VESPERTINE_SPATIAL_MATRIX is set (it takes a minute or two).

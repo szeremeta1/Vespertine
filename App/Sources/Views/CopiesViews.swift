@@ -1,5 +1,5 @@
 //
-// Vespertine — an album's copies on its page (which are in the library, which one plays, or all of them bundled), and
+// Vespertine: an album's copies on its page (which are in the library, which one plays, or all of them bundled), and
 // a song's copies from its row (play one, favorite one, prefer one).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

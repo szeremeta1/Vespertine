@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups through the real engine: a quad file chosen on a group of two virtual devices, recorded back from
+// Vespertine: speaker groups through the real engine: a quad file chosen on a group of two virtual devices, recorded back from
 // each member's input. The leader's channels arrive bit for bit; the follower's, resampled to stay in step, arrive as the tones
 // they were; the signal path names the members; and stopping leaves no aggregate and nothing held.
 // SPDX-License-Identifier: GPL-3.0-or-later

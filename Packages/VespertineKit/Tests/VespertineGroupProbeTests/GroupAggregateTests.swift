@@ -1,5 +1,5 @@
 //
-// Vespertine — Phase 0 of multi-DAC speaker groups, PR 0.2: the private aggregate behind `vespertine-probe group-play`.
+// Vespertine: Phase 0 of multi-DAC speaker groups, PR 0.2: the private aggregate behind `vespertine-probe group-play`.
 // The description is checked as plain data; the opt-in test below creates a real private aggregate of virtual devices.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

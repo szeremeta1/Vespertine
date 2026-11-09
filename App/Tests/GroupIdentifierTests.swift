@@ -10,7 +10,7 @@ struct GroupIdentifierTests {
     private func group() -> SpeakerGroup {
         let a = SpeakerGroup.Member(deviceUID: "no-such-dac-a-\(UUID())", name: "Fosi ZD3", channelCount: 2)
         let b = SpeakerGroup.Member(deviceUID: "no-such-dac-b-\(UUID())", name: "FiiO K11", channelCount: 2)
-        return SpeakerGroup(name: "Dorm", members: [a, b], clockLeaderUID: a.deviceUID)
+        return SpeakerGroup(name: "Downstairs", members: [a, b], clockLeaderUID: a.deviceUID)
     }
 
     @Test("While the group's output is in use nothing plays and the reason is given")

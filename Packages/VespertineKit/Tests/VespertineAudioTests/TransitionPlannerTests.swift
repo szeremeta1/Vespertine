@@ -1,5 +1,5 @@
 //
-// Vespertine — song transitions, the pure parts: the gain curves, the album rule, the planner's decision for every
+// Vespertine: song transitions, the pure parts: the gain curves, the album rule, the planner's decision for every
 // kind of boundary, where an overlap goes, and the ramps of a dip.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

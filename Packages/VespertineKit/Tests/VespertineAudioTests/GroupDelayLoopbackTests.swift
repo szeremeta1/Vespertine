@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups through the real engine with a delay (room correction's timing alone) on the leader's pair: the
+// Vespertine: speaker groups through the real engine with a delay (room correction's timing alone) on the leader's pair: the
 // samples arrive late and still bit for bit, and the signal path says BIT-PERFECT; with a level trim added they are not, and it says
 // ROOM CORRECTION.
 // SPDX-License-Identifier: GPL-3.0-or-later

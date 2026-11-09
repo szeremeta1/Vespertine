@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: per-member compensation from a measured skew. The numbers are the hardware session of 2026-11-07 (Fosi ZD3
+// Vespertine: speaker groups: per-member compensation from a measured skew. The numbers are the hardware session of 2026-11-07 (Fosi ZD3
 // leader, FiiO K11 follower, drift correction at quality 127, 48 kHz): the resampler adds 53.5 frames, and the follower falls behind the
 // leader at +13.47 ppm. Pure; no device.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -18,7 +18,7 @@ struct GroupSkewCompensationTests {
     /// Fosi front pair, FiiO side pair. The seat is at the origin: front left at 1.803 m, side left at 2.000 m.
     private func group(followerSkew: Double = 0, context: SpeakerGroup.Member.SkewContext? = nil, rateTrim: Double = 0, quality: Int = 127,
                        sideLeft: Point2D = Point2D(x: -2, y: 0)) -> SpeakerGroup {
-        SpeakerGroup(name: "Dorm quad",
+        SpeakerGroup(name: "Downstairs quad",
                      members: [SpeakerGroup.Member(deviceUID: fosi, name: "Fosi ZD3", channelCount: 2),
                                SpeakerGroup.Member(deviceUID: fiio, name: "FiiO K11", channelCount: 2, skewMs: followerSkew, skewContext: context, rateTrimPPM: rateTrim, driftQuality: quality)],
                      clockLeaderUID: fosi,

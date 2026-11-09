@@ -1,5 +1,5 @@
 //
-// Vespertine — room measurement timing: the acoustic reference, and the clock mismatch between output and input.
+// Vespertine: room measurement timing: the acoustic reference, and the clock mismatch between output and input.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // The measurement plays a short chirp (the reference) before the sweep and again after it. Where the two arrive in
@@ -92,7 +92,7 @@ public struct TimingReference: Sendable {
     /// called ambiguous. Another peak within 2 ms is the same arrival (the chirp's own ringing), not a second one.
     /// A peak is preferred over a stronger later one if it reaches `earliestArrivalShare` of the strongest, and peaks
     /// up to `reflectionSeconds` after the one taken are its reflections (30 ms is a 10 m longer path) and don't count
-    /// against it. Measured in a dorm room, where a reflection about as strong as the direct sound followed it by 3 ms.
+    /// against it. Measured in a small room, where a reflection about as strong as the direct sound followed it by 3 ms.
     public static let minimumScore = 0.3
     public static let ambiguityRatio = 0.8
     public static let earliestArrivalShare = 0.6

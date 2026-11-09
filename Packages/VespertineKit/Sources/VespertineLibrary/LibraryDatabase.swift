@@ -1,5 +1,5 @@
 //
-// Vespertine — the library database (SQLite via GRDB).
+// Vespertine: the library database (SQLite via GRDB).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

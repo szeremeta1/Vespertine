@@ -1,5 +1,5 @@
 //
-// Vespertine — DSD inside WavPack (.wv). libwavpack opens such a file as the DSD bitstream itself, so the bytes go
+// Vespertine: DSD inside WavPack (.wv). libwavpack opens such a file as the DSD bitstream itself, so the bytes go
 // to DoP, or through the shared DSD-to-PCM converter, exactly as stored. SFBAudioEngine's WavPack decoder doesn't.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

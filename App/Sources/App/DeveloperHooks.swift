@@ -1,5 +1,5 @@
 //
-// Vespertine — launch-argument hooks for reproducible visual QA and screenshots.
+// Vespertine: launch-argument hooks for reproducible visual QA and screenshots.
 // None of these run unless the argument is passed, e.g.:
 //   Vespertine.app/Contents/MacOS/Vespertine -VespertineDataDirectory /tmp/lib -VespertineAddSource ~/Demo \
 //       -VespertineOpenAlbum "Horizon Line" -VespertinePlayAlbum "Horizon Line" -VespertinePlayTrack 2 -VespertinePauseAfter 4

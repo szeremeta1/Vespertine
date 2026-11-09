@@ -46,7 +46,7 @@ import tempfile
 AUDIO_EXT = {'.flac', '.wav', '.caf', '.aif', '.aiff', '.aifc', '.m4a', '.mp4', '.mka', '.mkv', '.ac3', '.ec3', '.eac3',
              '.thd', '.mlp', '.dts', '.dtshd', '.dsf', '.dff', '.wv', '.opus', '.ogg', '.mp3', '.tta', '.ape', '.iso',
              '.aac', '.mpc', '.wma', '.rf64', '.w64'}
-TOOLS = '10 Tools (for Claude)'
+TOOLS = '10 Tools'  # the pack's tools folder; matched as a name prefix, so any suffix on it still works
 PRIVATE = ('08 Real music', '09 Real discs')
 EV = 'evidence'
 
@@ -665,7 +665,10 @@ def verify_cmd(py, tool, seg, path, coreaudio=False, lossy=False):
 
 def tools_dir(library):
     pack = pack_root(library)
-    return os.path.join(pack, TOOLS) if pack else None
+    if not pack:
+        return None
+    names = sorted(n for n in os.listdir(pack) if n.startswith(TOOLS) and os.path.isdir(os.path.join(pack, n)))
+    return os.path.join(pack, names[0] if names else TOOLS)
 
 
 def step_chid(a):

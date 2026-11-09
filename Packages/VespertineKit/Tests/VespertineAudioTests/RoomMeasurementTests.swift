@@ -1,5 +1,5 @@
 //
-// Vespertine — room measurement state machine: level check, route identification, sweeps, quality rejection,
+// Vespertine: room measurement state machine: level check, route identification, sweeps, quality rejection,
 // retry and resume, against a scripted room (no microphone, no sound).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

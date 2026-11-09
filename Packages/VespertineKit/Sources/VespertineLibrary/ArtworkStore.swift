@@ -1,5 +1,5 @@
 //
-// Vespertine — content-addressed artwork cache with pre-rendered thumbnails.
+// Vespertine: content-addressed artwork cache with pre-rendered thumbnails.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

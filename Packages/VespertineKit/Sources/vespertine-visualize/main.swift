@@ -1,5 +1,5 @@
 //
-// Vespertine — renders the visualizer offline from decoded audio, with the same analysis and renderer as the window.
+// Vespertine: renders the visualizer offline from decoded audio, with the same analysis and renderer as the window.
 //
 //   ffmpeg -i song.flac -f f32le -ac 2 -ar 48000 song.f32
 //   vespertine-visualize song.f32 --rate 48000 --style vinyl --art cover.jpg --title T --artist A \

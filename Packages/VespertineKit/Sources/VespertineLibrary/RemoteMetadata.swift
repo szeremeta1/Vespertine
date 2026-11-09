@@ -1,11 +1,11 @@
 //
-// Vespertine — fast tag reading over high-latency network shares.
+// Vespertine: fast tag reading over high-latency network shares.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Tag readers make many small reads, each a full round trip on a network share
 // (≈20 per file, ~2 s at 100 ms). Instead, fetch the regions that hold metadata in a few
-// large reads — walking the container structure (FLAC blocks, ID3v2, MP4 atoms, RIFF/AIFF
-// chunks, DSF) — into a sparse local file of the same size, and read tags from that.
+// large reads (walking the container structure: FLAC blocks, ID3v2, MP4 atoms, RIFF/AIFF
+// chunks, DSF) into a sparse local file of the same size, and read tags from that.
 //
 
 import Foundation

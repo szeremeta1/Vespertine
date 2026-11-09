@@ -1,4 +1,4 @@
-// Vespertine — DST-compressed DSDIFF, using the same lossless DST decoder as SACD images.
+// Vespertine: DST-compressed DSDIFF, using the same lossless DST decoder as SACD images.
 // Container: Philips DSDIFF 1.5 §§3.2, 3.4–3.5. Source files are never rewritten.
 // SPDX-License-Identifier: GPL-3.0-or-later
 import Foundation

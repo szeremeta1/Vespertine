@@ -1,5 +1,5 @@
 //
-// Vespertine — SACD images (.iso): the disc's table of contents, its stereo and multichannel areas, their
+// Vespertine: SACD images (.iso): the disc's table of contents, its stereo and multichannel areas, their
 // tracks and text. The layout is the Scarlet Book's (Super Audio CD, Sony/Philips), as documented by the
 // open-source SACD tools (sacd-ripper's libsacd); this reader is Vespertine's own.
 // SPDX-License-Identifier: GPL-3.0-or-later

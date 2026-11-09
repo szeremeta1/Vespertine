@@ -1,5 +1,5 @@
 //
-// Vespertine — decides the device format for a given source.
+// Vespertine: decides the device format for a given source.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Pure logic, no Core Audio calls, so every decision is unit-testable.

@@ -29,13 +29,13 @@ Packages/VespertineKit/Package.resolved.bak
 *.provisionprofile
 *.xcarchive
 vespertine-sparkle-key.txt
-.claude/
 
-# Maintainer and agent notes (machine-specific or private; kept local on purpose)
-CLAUDE.md
-CLAUDE.local.md
-AGENTS.md
-PROMOTION.md
+# Local notes and tool folders at the top level stay out of git: any new Markdown file or hidden file or folder there
+# (machine-specific or private on purpose). Tracked ones (README.md, .github/, ...) are unaffected; add a new one with
+# `git add -f`.
+/*.md
+/.*
+!/.github/
 nocturne-sparkle-key.txt
 *sparkle-private-key*
 

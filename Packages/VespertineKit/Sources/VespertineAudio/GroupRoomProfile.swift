@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups and room correction: the layout a group is measured and aligned as, the channel map onto its
+// Vespertine: speaker groups and room correction: the layout a group is measured and aligned as, the channel map onto its
 // outputs, and a room profile bound to the group (made for its UID, valid only while it is wired the way it was made for).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

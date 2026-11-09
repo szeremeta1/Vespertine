@@ -1,5 +1,5 @@
 //
-// Vespertine — where the scope's screen and the meters sit in the window, shared by the shaders (in pixels) and the
+// Vespertine: where the scope's screen and the meters sit in the window, shared by the shaders (in pixels) and the
 // labels drawn over them (in points). Points, y down, as the overlay draws.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -78,7 +78,7 @@ enum VisualizerLayout {
     // MARK: Vinyl
 
     // The turntable in the record's own units (y up, the record's centre at 0): the record, the platter, the ring of
-    // light round it, the label, and the sleeve. Where the sleeve rests follows MD Vinyl's (Alex's references): in front,
+    // light round it, the label, and the sleeve. Where the sleeve rests follows MD Vinyl's (the design references): in front,
     // upright, a touch larger than the record (as an LP's is) and level with it, its right edge through the record's
     // centre, so the record shows half out of it; behind, the same sleeve further left, turned 4° anticlockwise, the
     // record lying over its right edge.

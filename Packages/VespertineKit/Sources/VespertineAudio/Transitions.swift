@@ -1,5 +1,5 @@
 //
-// Vespertine — song transitions: what the listener chose (crossfade, Smart Mix, Live Set).
+// Vespertine: song transitions: what the listener chose (crossfade, Smart Mix, Live Set).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // The settings, the gain curves, and the planner that decides what happens at each boundary between two songs

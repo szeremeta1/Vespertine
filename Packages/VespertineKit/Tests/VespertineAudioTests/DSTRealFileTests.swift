@@ -1,5 +1,5 @@
 //
-// Vespertine — DST in DSDIFF, from a real encoder's file: native decoding agrees with FFmpeg's own DST decoder, and the
+// Vespertine: DST in DSDIFF, from a real encoder's file: native decoding agrees with FFmpeg's own DST decoder, and the
 // DSD it yields goes out as DoP bit for bit.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

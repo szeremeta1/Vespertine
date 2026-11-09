@@ -1,5 +1,5 @@
 //
-// Vespertine — writes metadata into files (TagLib via SFBAudioEngine) with history and backups.
+// Vespertine: writes metadata into files (TagLib via SFBAudioEngine) with history and backups.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

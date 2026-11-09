@@ -1,5 +1,5 @@
 //
-// Vespertine — room measurement capture: permission, bounded recording, unplug handling and the saved file,
+// Vespertine: room measurement capture: permission, bounded recording, unplug handling and the saved file,
 // all against a fake device (no microphone, no sound).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

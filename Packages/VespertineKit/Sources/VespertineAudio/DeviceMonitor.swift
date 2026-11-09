@@ -1,5 +1,5 @@
 //
-// Vespertine — observes device arrival/removal, default-output changes and hardware volume.
+// Vespertine: observes device arrival/removal, default-output changes and hardware volume.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

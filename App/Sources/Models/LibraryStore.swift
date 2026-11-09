@@ -1,5 +1,5 @@
 //
-// Vespertine — observable view of the library database.
+// Vespertine: observable view of the library database.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -116,7 +116,7 @@ final class LibraryStore {
         }
     }
 
-    /// A location as people should see it: files on a network share read "High-Res Music › Artist/Album"
+    /// A location as people should see it: files on a network share read "Music Share › Artist/Album"
     /// (never the mount folder, which carries the server's address); local files use ~ paths.
     func displayPath(_ path: String) -> String {
         if let share = sources.first(where: { $0.remoteURL != nil && (path == $0.path || path.hasPrefix($0.path + "/")) }) {
@@ -137,7 +137,7 @@ final class LibraryStore {
         return tracks.map { songByLocation[$0.location] ?? [$0] }
     }
 
-    /// Where an album lives, broadly: its source and the folder under it ("High-Res Music › Pink Floyd").
+    /// Where an album lives, broadly: its source and the folder under it ("Music Share › Pink Floyd").
     /// A grouping folder like "_Spatial Extras" brings the next one along ("… › _Spatial Extras › Eagles").
     func albumLocation(_ path: String) -> String {
         guard let source = sources.filter({ path == $0.path || path.hasPrefix($0.path + "/") }).max(by: { $0.path.count < $1.path.count }) else {

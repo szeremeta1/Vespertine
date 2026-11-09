@@ -1,5 +1,5 @@
 //
-// Vespertine — playlists in and out: M3U / M3U8 both ways, and the library Apple Music exports.
+// Vespertine: playlists in and out: M3U / M3U8 both ways, and the library Apple Music exports.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Nothing here adds files to the library. An imported entry is matched to a song already in it: by its file, or,

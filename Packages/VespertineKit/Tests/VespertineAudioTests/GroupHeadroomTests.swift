@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the headroom guard. A positive level trim (up to +12 dB) on a speaker could push a loud song past full
+// Vespertine: speaker groups: the headroom guard. A positive level trim (up to +12 dB) on a speaker could push a loud song past full
 // scale; the shared preamp of the group's chain is lowered so that no channel's peak (its level plus the top of its bands) can
 // rise above 0 dB. The other channels come down with it, so the balance the trims ask for holds.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -21,7 +21,7 @@ struct GroupHeadroomTests {
 
     @Test("A positive trim lowers the shared preamp by that much, so the loudest channel peaks at 0 dB")
     func plusSix() throws {
-        let chain = try #require(GroupDelay.composing(nil, delaysMs: [0, 0, 0, 0], levelsDB: [6, 0, 0, 0], name: "Dorm quad"))
+        let chain = try #require(GroupDelay.composing(nil, delaysMs: [0, 0, 0, 0], levelsDB: [6, 0, 0, 0], name: "Downstairs quad"))
         #expect(chain.preampDB == -6)
         #expect(chain.channels.map(\.levelDB) == [6, 0, 0, 0], "the trims themselves are as asked: the balance holds")
         #expect(loudestDB(chain) <= 0.0001)

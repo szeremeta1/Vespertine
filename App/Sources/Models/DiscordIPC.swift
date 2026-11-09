@@ -1,5 +1,5 @@
 //
-// Vespertine — Discord's local RPC: framed JSON over the Unix socket the Discord app opens for other apps on the Mac.
+// Vespertine: Discord's local RPC: framed JSON over the Unix socket the Discord app opens for other apps on the Mac.
 // No Discord SDK and no network: the Discord app itself carries the status to Discord.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

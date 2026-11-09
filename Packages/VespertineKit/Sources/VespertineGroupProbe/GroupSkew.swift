@@ -1,5 +1,5 @@
 //
-// Vespertine — Phase 0 of multi-DAC speaker groups, PR 0.3: `vespertine-probe group-skew`. The leader plays the room
+// Vespertine: Phase 0 of multi-DAC speaker groups, PR 0.3: `vespertine-probe group-skew`. The leader plays the room
 // measurement's timing reference twice (which also gives the microphone-against-DAC clock ratio); the follower plays the
 // same chirp once, between them. One microphone hears both, so the follower's arrival against the leader's does not depend
 // on when the capture started. Repeated over N restarts of the output, the spread of that number is what H3 and H4 ask for.

@@ -1,5 +1,5 @@
 //
-// Vespertine — a value behind an unfair lock.
+// Vespertine: a value behind an unfair lock.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // The same `withLock` shape as Synchronization's `Mutex`, which needs macOS 15. This one runs on macOS 14,

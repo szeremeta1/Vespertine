@@ -1,4 +1,4 @@
-// Vespertine — opt-in real-disc DVD-Video LPCM audit: every track through the app's own source opener and region
+// Vespertine: opt-in real-disc DVD-Video LPCM audit: every track through the app's own source opener and region
 // decoder, complete-PCM hashes against independent references, and seeks at the beginning, middle and end.
 // No audio or private paths are checked in. Set VESPERTINE_DVD_FIXTURES to a folder holding the discs (a .iso, or a
 // folder with VIDEO_TS) and, optionally, VESPERTINE_DVD_REFERENCE to a JSON file of expected results

@@ -1,5 +1,5 @@
 //
-// Vespertine — output devices as seen by the Core Audio HAL.
+// Vespertine: output devices as seen by the Core Audio HAL.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

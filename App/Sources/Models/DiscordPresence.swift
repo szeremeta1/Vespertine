@@ -1,5 +1,5 @@
 //
-// Vespertine — what's playing, as a Discord status: song, artist, album, format, cover and progress.
+// Vespertine: what's playing, as a Discord status: song, artist, album, format, cover and progress.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

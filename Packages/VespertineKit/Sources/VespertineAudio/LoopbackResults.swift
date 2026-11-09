@@ -1,5 +1,5 @@
 //
-// Vespertine — the loopback self-test's report as Markdown, and its results saved per device, format, settings, macOS
+// Vespertine: the loopback self-test's report as Markdown, and its results saved per device, format, settings, macOS
 // version and app version, so the signal path can say a format's software path was checked on this Mac and version.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

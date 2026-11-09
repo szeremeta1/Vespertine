@@ -1,5 +1,5 @@
 //
-// Vespertine — transitions and the engine's state machine: what happens when something arrives inside an overlap.
+// Vespertine: transitions and the engine's state machine: what happens when something arrives inside an overlap.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // - A starved read-ahead decoder as the incoming song (no hardware): the mix waits for it, sample for sample the same

@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the measurement's output on a real group of two virtual devices. The aggregate keeps running on
+// Vespertine: speaker groups: the measurement's output on a real group of two virtual devices. The aggregate keeps running on
 // silence between captures (so a capture's player starting and stopping does not stop it), a capture's tone arrives on the one
 // channel it was sent to, and releasing leaves no aggregate and no hold.
 // SPDX-License-Identifier: GPL-3.0-or-later

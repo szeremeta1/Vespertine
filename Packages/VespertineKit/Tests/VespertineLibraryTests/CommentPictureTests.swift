@@ -1,5 +1,5 @@
 //
-// Vespertine — cover art stored as a METADATA_BLOCK_PICTURE comment is found.
+// Vespertine: cover art stored as a METADATA_BLOCK_PICTURE comment is found.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

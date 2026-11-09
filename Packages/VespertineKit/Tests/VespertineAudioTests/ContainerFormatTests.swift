@@ -1,5 +1,5 @@
 //
-// Vespertine — TAK, Matroska/WebM audio (and its stream picker), and the gapless, xHE-AAC, APAC and Opus
+// Vespertine: TAK, Matroska/WebM audio (and its stream picker), and the gapless, xHE-AAC, APAC and Opus
 // multichannel checks that decide whether those files play as they were made.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

@@ -1,5 +1,5 @@
 //
-// Vespertine — the loopback self-test's files, plan, guard and forced settings (no device needed), and one real run
+// Vespertine: the loopback self-test's files, plan, guard and forced settings (no device needed), and one real run
 // through "Vespertine Loopback" when hardware tests are on.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

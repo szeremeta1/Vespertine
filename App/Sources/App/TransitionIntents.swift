@@ -1,5 +1,5 @@
 //
-// Vespertine — Shortcuts actions for song transitions: turn them on or off, choose a style (for a party, from Vesper
+// Vespertine: Shortcuts actions for song transitions: turn them on or off, choose a style (for a party, from Vesper
 // or a Focus).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

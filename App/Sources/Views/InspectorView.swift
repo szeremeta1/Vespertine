@@ -1,5 +1,5 @@
 //
-// Vespertine — inspector: Now Playing + signal path, metadata editor, file analysis.
+// Vespertine: inspector: Now Playing + signal path, metadata editor, file analysis.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

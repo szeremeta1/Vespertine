@@ -1,5 +1,5 @@
 //
-// Vespertine — Dolby Digital and Dolby Digital Plus decode to their channels, each in its place.
+// Vespertine: Dolby Digital and Dolby Digital Plus decode to their channels, each in its place.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

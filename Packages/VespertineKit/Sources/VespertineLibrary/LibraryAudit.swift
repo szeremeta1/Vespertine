@@ -1,5 +1,5 @@
 //
-// Vespertine — finds what makes albums look wrong: one album split in pieces, several editions merged into
+// Vespertine: finds what makes albums look wrong: one album split in pieces, several editions merged into
 // one, the same file listed twice, missing track or disc numbers, titles that are file names.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

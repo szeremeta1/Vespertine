@@ -17,7 +17,7 @@ private let speakers = output("BuiltInSpeakerDevice", "MacBook Pro Speakers", .b
 private let k11 = output("AppleUSBAudioEngine:FiiO:FiiO K11:1100000:1", "FiiO K11", .usb,
                          rates: [44_100, 48_000, 96_000, 192_000, 384_000], depths: [16, 24, 32], model: "K11")
 private let zoom = output("ZoomAudioDevice", "ZoomAudioDevice", .virtual, rates: [48_000], isDefault: true)
-private let airPods = output("AA-BB-CC:output", "Alex's AirPods Max", .bluetooth, rates: [48_000])
+private let airPods = output("AA-BB-CC:output", "Sam's AirPods Max", .bluetooth, rates: [48_000])
 
 @Suite("Output choice")
 struct OutputChoiceTests {

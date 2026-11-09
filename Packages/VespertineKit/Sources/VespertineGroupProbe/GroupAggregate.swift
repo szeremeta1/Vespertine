@@ -1,5 +1,5 @@
 //
-// Vespertine — Phase 0 of multi-DAC speaker groups, PR 0.2: a private aggregate device built in code (dev only), and the
+// Vespertine: Phase 0 of multi-DAC speaker groups, PR 0.2: a private aggregate device built in code (dev only), and the
 // rate choice for its members. A private aggregate belongs to this process and disappears when it exits.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

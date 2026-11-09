@@ -1,5 +1,5 @@
 //
-// Vespertine — the visualizer's Metal shaders. Compiled from source when the first window opens, so the package
+// Vespertine: the visualizer's Metal shaders. Compiled from source when the first window opens, so the package
 // builds the same with SwiftPM and Xcode.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

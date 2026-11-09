@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: what an output session on a group reports. The format of a group is read back from each
+// Vespertine: speaker groups: what an output session on a group reports. The format of a group is read back from each
 // member, never from the aggregate (whose streams show the aggregate's rate even while a member resamples to its own), and
 // the group's numbers are the weakest member's. Pure; no device.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -15,7 +15,7 @@ struct GroupSessionTests {
     private let fosi = "fosi-uid", fiio = "fiio-uid"
 
     private func group() -> SpeakerGroup {
-        SpeakerGroup(name: "Dorm quad",
+        SpeakerGroup(name: "Downstairs quad",
                      members: [SpeakerGroup.Member(deviceUID: fosi, name: "Fosi ZD3", channelCount: 2),
                                SpeakerGroup.Member(deviceUID: fiio, name: "FiiO K11", channelCount: 2)],
                      clockLeaderUID: fosi)

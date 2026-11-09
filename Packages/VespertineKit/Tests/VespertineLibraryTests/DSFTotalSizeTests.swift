@@ -1,5 +1,5 @@
 //
-// Vespertine — a DSF whose header total-size field is larger than the file still joins the library.
+// Vespertine: a DSF whose header total-size field is larger than the file still joins the library.
 // Retagging tools can rewrite the ID3 tag without fixing that field; the tag reader (TagLib) then calls the
 // file "not a valid DSD Stream file" and the scanner skips it, although the audio and the tag are fine.
 // SPDX-License-Identifier: GPL-3.0-or-later

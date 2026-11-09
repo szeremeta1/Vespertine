@@ -1,5 +1,5 @@
 //
-// Vespertine — Up Next and History: the queue panel beside the library, as in Apple Music.
+// Vespertine: Up Next and History: the queue panel beside the library, as in Apple Music.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

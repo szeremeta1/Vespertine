@@ -1,5 +1,5 @@
 //
-// Vespertine — an album's copies (folders, formats, layouts) and its songs across them, on libraries shaped like
+// Vespertine: an album's copies (folders, formats, layouts) and its songs across them, on libraries shaped like
 // real ones: a download beside a vinyl transfer and an Atmos mix, a WAV import beside the FLAC on a share, a one-disc
 // CD beside a two-disc SACD whose numbers differ, a super deluxe box beside its Blu-ray mixes.
 // SPDX-License-Identifier: GPL-3.0-or-later

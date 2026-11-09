@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the private aggregate device a group plays through. What its description says (the clock
+// Vespertine: speaker groups: the private aggregate device a group plays through. What its description says (the clock
 // leader as the main sub-device, drift correction on every follower that doesn't share the leader's clock), without
 // touching an audio device.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -17,7 +17,7 @@ struct GroupAggregateTests {
     }
 
     private func plan(_ members: [GroupAggregate.Member], leader: String? = nil, drift: GroupAggregate.DriftMode = .byClockDomain) throws -> GroupAggregate.Plan {
-        try GroupAggregate.plan(name: "Dorm quad", uid: "org.szeremeta.vespertine.group.test", members: members, leaderUID: leader ?? members[0].uid, drift: drift)
+        try GroupAggregate.plan(name: "Downstairs quad", uid: "org.szeremeta.vespertine.group.test", members: members, leaderUID: leader ?? members[0].uid, drift: drift)
     }
 
     private func subDevices(_ description: [String: Any]) -> [[String: Any]] {
@@ -52,7 +52,7 @@ struct GroupAggregateTests {
     @Test("The description: private, not stacked (stacked is a multi-output device, the same audio to every member), named, with a UID")
     func description() throws {
         let d = GroupAggregate.description(try plan([member("fosi"), member("fiio")]))
-        #expect(d[kAudioAggregateDeviceNameKey] as? String == "Dorm quad")
+        #expect(d[kAudioAggregateDeviceNameKey] as? String == "Downstairs quad")
         #expect(d[kAudioAggregateDeviceUIDKey] as? String == "org.szeremeta.vespertine.group.test")
         #expect(d[kAudioAggregateDeviceIsPrivateKey] as? Int == 1)
         #expect(d[kAudioAggregateDeviceIsStackedKey] as? Int == 0)
@@ -103,7 +103,7 @@ struct GroupAggregateTests {
         group.members[1].driftQuality = 0x20
         group.members[1].extraLatencyFrames = 48
         let plan = try GroupAggregate.plan(for: group, clockDomain: { $0 == GroupFixtures.fosi ? 5 : 0 })
-        #expect(plan.name == "Dorm quad" && plan.leaderUID == GroupFixtures.fosi)
+        #expect(plan.name == "Downstairs quad" && plan.leaderUID == GroupFixtures.fosi)
         #expect(plan.members.map(\.uid) == [GroupFixtures.fosi, GroupFixtures.fiio])
         #expect(plan.members.map(\.clockDomain) == [5, 0])
         #expect(plan.members[1].driftQuality == 0x20 && plan.members[1].extraLatencyFrames == 48)

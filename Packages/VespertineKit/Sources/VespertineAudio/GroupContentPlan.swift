@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: what each output of a group carries for a given song, and what a lost output does to the
+// Vespertine: speaker groups: what each output of a group carries for a given song, and what a lost output does to the
 // group. The consequences of the listener's choices (stereo on more than two speakers, the LFE, a DAC that goes away) for
 // the music each member plays, which is what the signal path has to tell the truth about.
 // SPDX-License-Identifier: GPL-3.0-or-later

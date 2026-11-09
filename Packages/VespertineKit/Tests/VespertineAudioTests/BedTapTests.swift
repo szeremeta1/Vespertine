@@ -1,5 +1,5 @@
 //
-// Vespertine — the spectrum and visualizer taps on a multichannel bed (Spatial Audio, upmixed stereo, 5.1 outputs): they
+// Vespertine: the spectrum and visualizer taps on a multichannel bed (Spatial Audio, upmixed stereo, 5.1 outputs): they
 // must carry every speaker, not the first two channels of the bed.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

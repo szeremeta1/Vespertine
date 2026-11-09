@@ -1,5 +1,5 @@
 //
-// Vespertine — what a speaker group's signal path honestly is: which DACs' channels reach the speakers untouched, which are
+// Vespertine: what a speaker group's signal path honestly is: which DACs' channels reach the speakers untouched, which are
 // resampled to stay in step with the leader's clock, and the badges and rows that say so. Nothing here touches playback.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

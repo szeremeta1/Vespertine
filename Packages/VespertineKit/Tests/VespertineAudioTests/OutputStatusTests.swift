@@ -7,8 +7,8 @@ struct OutputStatusTests {
     @Test("Opening a new output drops the wait, the stand-in and the old output's path")
     func openingDropsWhatWasPublishedForTheOldOutput() {
         var snapshot = EngineSnapshot()
-        snapshot.waitingForDevice = "Alex’s AirPods Max"
-        snapshot.standingInFor = "Alex’s AirPods Max"
+        snapshot.waitingForDevice = "Sam’s AirPods Max"
+        snapshot.standingInFor = "Sam’s AirPods Max"
         snapshot.isBuffering = true
         snapshot.bufferFill = 0.5
         snapshot.beginOpeningOutput(keepingSession: false)

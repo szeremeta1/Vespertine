@@ -1,5 +1,5 @@
 //
-// Vespertine — library scans make way for a song playing from a network share.
+// Vespertine: library scans make way for a song playing from a network share.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

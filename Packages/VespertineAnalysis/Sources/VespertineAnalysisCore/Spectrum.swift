@@ -1,5 +1,5 @@
 //
-// Vespertine — magnitude spectra for the live display and for file analysis.
+// Vespertine: magnitude spectra for the live display and for file analysis.
 // Uses Accelerate's FFT on Apple platforms and a portable radix-2 FFT elsewhere (Linux servers);
 // both produce the same normalised dBFS values (tested against each other).
 // SPDX-License-Identifier: GPL-3.0-or-later

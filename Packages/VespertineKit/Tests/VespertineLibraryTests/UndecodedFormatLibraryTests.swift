@@ -1,5 +1,5 @@
 //
-// Vespertine — formats Vespertine can't decode are listed under their name, with a badge that says so.
+// Vespertine: formats Vespertine can't decode are listed under their name, with a badge that says so.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

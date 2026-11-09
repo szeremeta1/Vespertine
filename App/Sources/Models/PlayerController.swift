@@ -1,5 +1,5 @@
 //
-// Vespertine — play queue, transport and system integration (Now Playing, media keys, scrobbling, Discord).
+// Vespertine: play queue, transport and system integration (Now Playing, media keys, scrobbling, Discord).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the choices for what a stereo song does on more than two speakers, what becomes of the subwoofer
+// Vespertine: speaker groups: the choices for what a stereo song does on more than two speakers, what becomes of the subwoofer
 // channel, and what happens when an output goes away. The options and the words for them, and how a choice is put in the group.
 // Pure; no view.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -12,7 +12,7 @@ import Testing
 @Suite("Group policies")
 struct GroupPoliciesTests {
     private func group() -> SpeakerGroup {
-        SpeakerGroup(name: "Dorm quad",
+        SpeakerGroup(name: "Downstairs quad",
                      members: [SpeakerGroup.Member(deviceUID: "a", name: "A", channelCount: 2), SpeakerGroup.Member(deviceUID: "b", name: "B", channelCount: 2)],
                      clockLeaderUID: "a",
                      speakers: [SpeakerGroup.Speaker(role: .frontLeft, deviceUID: "a", channel: 0, position: Point2D(x: -1, y: 2)),

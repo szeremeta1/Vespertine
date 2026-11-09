@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: a member that goes away while the group plays. The decision is plain data (below, tested
+// Vespertine: speaker groups: a member that goes away while the group plays. The decision is plain data (below, tested
 // without a device); the engine acts on it (PlaybackEngine.devicesChanged).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

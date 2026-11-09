@@ -1,5 +1,5 @@
 //
-// Vespertine — Dolby files join the library with their real format.
+// Vespertine: Dolby files join the library with their real format.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

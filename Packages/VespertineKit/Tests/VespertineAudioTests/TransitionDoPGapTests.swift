@@ -1,5 +1,5 @@
 //
-// Vespertine — a gap between two native DSD songs (DoP): DSD silence between them, the markers alternating through the
+// Vespertine: a gap between two native DSD songs (DoP): DSD silence between them, the markers alternating through the
 // gap and into the next song, each song's words untouched; the album and SACD rules still come first.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

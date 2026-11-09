@@ -1,5 +1,5 @@
 //
-// Vespertine — CUE sheet parsing (single-file albums split into virtual tracks).
+// Vespertine: CUE sheet parsing (single-file albums split into virtual tracks).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

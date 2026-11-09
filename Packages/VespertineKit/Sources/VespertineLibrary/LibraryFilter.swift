@@ -1,5 +1,5 @@
 //
-// Vespertine — filters for every list in the library. Choices within one facet widen the match ("FLAC or ALAC",
+// Vespertine: filters for every list in the library. Choices within one facet widen the match ("FLAC or ALAC",
 // "Jazz or Blues"); facets narrow it ("FLAC, 24-bit, from the 1970s"). An album matches a facet when any of its
 // songs does, so a 5.1 album with a stereo bonus disc is both stereo and multichannel.
 // SPDX-License-Identifier: GPL-3.0-or-later

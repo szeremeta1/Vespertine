@@ -140,7 +140,7 @@ struct NetworkPlaybackCacheTests {
         #expect(throws: CancellationError.self) { try entry.prepare(full: true, lead: 0, cancelled: { true }) }
     }
 
-    /// The 11-05 23:54 hang on Alex's laptop: the engine thread opened the share file itself, so while the share did
+    /// The 11-05 hang seen on a test Mac: the engine thread opened the share file itself, so while the share did
     /// not answer, skip and stop sat in its queue. A FIFO with no writer blocks `open(2)` exactly like a stuck SMB open.
     @Test("Opening a file the share does not answer for can be given up on, and gives the engine thread back")
     func cancellableOpen() throws {

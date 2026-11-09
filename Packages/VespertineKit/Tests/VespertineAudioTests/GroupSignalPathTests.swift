@@ -16,7 +16,7 @@ private func member(_ name: String, leader: Bool = false, resampled: Bool = fals
 }
 
 private func quad(followerResampled: Bool = true, stage: GroupSignalPath.Stage = .none, source: SourceFormat = flac96) -> GroupSignalPath {
-    GroupSignalPath(groupName: "Dorm quad", source: source, folds: false, dsdConvertedToPCM: false, stage: stage, members: [
+    GroupSignalPath(groupName: "Downstairs quad", source: source, folds: false, dsdConvertedToPCM: false, stage: stage, members: [
         member("Fosi ZD3", leader: true, [.frontLeft, .frontRight]),
         member("FiiO K11", resampled: followerResampled, [.sideLeft, .sideRight]),
     ])

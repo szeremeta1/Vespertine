@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: configuring the members of a group before they play together. What the group can do as one
+// Vespertine: speaker groups: configuring the members of a group before they play together. What the group can do as one
 // device (the rates every member takes), which rate it runs at, and who may be held exclusively. Without touching a device.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

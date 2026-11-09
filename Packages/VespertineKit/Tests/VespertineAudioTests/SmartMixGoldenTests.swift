@@ -1,5 +1,5 @@
 //
-// Vespertine — golden PCM for Smart Mix and gaps: songs made to order (a fade-out, a cold end, silence, a segue), played
+// Vespertine: golden PCM for Smart Mix and gaps: songs made to order (a fade-out, a cold end, silence, a segue), played
 // through the engine's own pieces (the planner, the just-in-time measurements, Crossfade with Smart Mix's shape and the
 // limiter) into the real ring and I/O stage, and checked sample by sample against a reference computed here from the
 // source samples and the decision (dither off). The decisions themselves are checked against how the songs were made.

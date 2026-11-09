@@ -1,5 +1,5 @@
 //
-// Vespertine — the channels the built-in meters show for a bed Vespertine decodes beside the output.
+// Vespertine: the channels the built-in meters show for a bed Vespertine decodes beside the output.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Dolby Atmos rendered by macOS and Dolby/DTS sent to a receiver untouched reach the output as compressed frames, so

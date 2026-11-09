@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the measurement wizard's skew step. For each follower DAC, one speaker on it and one on the clock leader
+// Vespertine: speaker groups: the measurement wizard's skew step. For each follower DAC, one speaker on it and one on the clock leader
 // play the timing chirp (`GroupSkew`), heard by the microphone already set up for the sweeps. A long capture gives how fast the follower
 // falls behind the leader while its drift correction is on (the rate trim); a few short ones give where it starts. What is kept is the
 // electronic part (`GroupSkewCompensation`), with the settings it was measured under.

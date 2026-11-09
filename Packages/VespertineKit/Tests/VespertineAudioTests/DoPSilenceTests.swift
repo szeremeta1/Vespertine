@@ -1,5 +1,5 @@
 //
-// Vespertine — DSD over PCM keeps the DAC locked in DSD: what isn't music is DoP idle frames (DSD silence behind
+// Vespertine: DSD over PCM keeps the DAC locked in DSD: what isn't music is DoP idle frames (DSD silence behind
 // markers that never repeat), not zeros, and the output keeps running through pauses, seeks and skips.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

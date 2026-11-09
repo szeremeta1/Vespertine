@@ -1,5 +1,5 @@
 //
-// Vespertine — favorite songs: the heart button, its table cell, and the Favorites page.
+// Vespertine: favorite songs: the heart button, its table cell, and the Favorites page.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — the measurement audit: a simulated two-speaker room under noise, measured end to end through the
+// Vespertine: the measurement audit: a simulated two-speaker room under noise, measured end to end through the
 // capture session, the measurement state machine, the response analysis, the filter fit and the alignment. The
 // speakers sit at different distances and levels and the left one has a bass mode; all of it has to come back.
 // SPDX-License-Identifier: GPL-3.0-or-later

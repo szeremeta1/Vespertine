@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: an output session on a real group of two virtual devices. The aggregate is not held, the
+// Vespertine: speaker groups: an output session on a real group of two virtual devices. The aggregate is not held, the
 // members are; the format is the members' own; the session runs; and letting go leaves no aggregate and no hold behind.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

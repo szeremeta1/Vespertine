@@ -1,5 +1,5 @@
 //
-// Vespertine — songs whose files are gone: counted for the Remove Missing Songs… sheet, removed on request (the library
+// Vespertine: songs whose files are gone: counted for the Remove Missing Songs… sheet, removed on request (the library
 // rows only, never files), and marked missing when one is found gone during playback.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

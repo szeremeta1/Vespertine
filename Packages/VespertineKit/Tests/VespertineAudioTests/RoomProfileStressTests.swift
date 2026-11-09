@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction the way a listener goes through it, end to end and over and over: measure (through the
+// Vespertine: room correction the way a listener goes through it, end to end and over and over: measure (through the
 // measurement controller, against a simulated room with a resonance per speaker), keep it as a profile, play it
 // (through the I/O-thread code), switch outputs, export and import, quit and start again. At every step what plays
 // has to be what was measured and saved.
@@ -187,7 +187,7 @@ struct RoomProfileStressTests {
         // Kept as a profile, named and labelled, and switched on for the output.
         var book = RoomProfileBook()
         let desk = book.add(measured)
-        try book.update(desk.id) { $0.tags = RoomProfileTags(speakers: "Fosi ZD3 + LS3", room: "Dorm", position: "Desk") }
+        try book.update(desk.id) { $0.tags = RoomProfileTags(speakers: "Fosi ZD3 + LS3", room: "Downstairs", position: "Desk") }
         book.setEnabled(true, for: "zd3")
         #expect(book.active(for: "zd3")?.id == desk.id)
 
@@ -284,7 +284,7 @@ struct RoomProfileStressTests {
         var book = RoomProfileBook()
         var desk = book.add(try await DeskMeasurement.shared.result().profile)
         try book.update(desk.id) {
-            $0.tags = RoomProfileTags(speakers: "LS3", room: "Dorm", position: "Desk")
+            $0.tags = RoomProfileTags(speakers: "LS3", room: "Downstairs", position: "Desk")
             $0.strength = 0.8
             $0.setAlignment(RoomSpeakerAlignment(delayMs: 0.7, levelDB: -1.2), for: .right)
             try $0.setBands([EQBand(kind: .peak, frequency: 118, gainDB: -7.5, q: 4.2), EQBand(kind: .lowShelf, frequency: 60, gainDB: 1.5, q: 0.7)], for: .left)

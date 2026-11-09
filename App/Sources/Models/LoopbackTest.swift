@@ -1,5 +1,5 @@
 //
-// Vespertine — runs the loopback self-test from the app: pauses playback, plays the test signal through a virtual
+// Vespertine: runs the loopback self-test from the app: pauses playback, plays the test signal through a virtual
 // loopback device with a separate engine, and keeps the results. A software-path check; it never changes the
 // BIT-PERFECT badge.
 // SPDX-License-Identifier: GPL-3.0-or-later

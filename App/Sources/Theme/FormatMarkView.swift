@@ -1,5 +1,5 @@
 //
-// Vespertine — format badges ("DOLBY | ATMOS", "DSD | 256").
+// Vespertine: format badges ("DOLBY | ATMOS", "DSD | 256").
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

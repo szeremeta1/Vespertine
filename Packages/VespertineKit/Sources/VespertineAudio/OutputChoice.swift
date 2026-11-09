@@ -1,5 +1,5 @@
 //
-// Vespertine — which output plays when the one you chose isn't connected.
+// Vespertine: which output plays when the one you chose isn't connected.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

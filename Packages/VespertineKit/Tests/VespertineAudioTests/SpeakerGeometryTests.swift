@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: from where the speakers and the seat stand to each speaker's distance, angle, delay and level.
+// Vespertine: speaker groups: from where the speakers and the seat stand to each speaker's distance, angle, delay and level.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -9,8 +9,8 @@ import Testing
 
 @Suite("Speaker geometry")
 struct SpeakerGeometryTests {
-    /// The dorm, as the plan's example: Alex's pair 1.5 m from the seat, the roommate's pair 2.5 m.
-    private func dorm() -> SpeakerGroup {
+    /// The plan's example room: one pair 1.5 m from the seat, the other pair 2.5 m.
+    private func downstairs() -> SpeakerGroup {
         var group = GroupFixtures.quad()
         group.speakers[0].position = Point2D(x: -1.2, y: 0.9)       // 1.5 m: a 3-4-5 triangle
         group.speakers[1].position = Point2D(x: 1.2, y: 0.9)
@@ -46,9 +46,9 @@ struct SpeakerGeometryTests {
         #expect(abs(SpeakerGeometry.azimuth(from: Listener(facingDegrees: 360), to: Point2D(x: 0, y: 1))) < 1e-9)
     }
 
-    @Test("The plan's dorm example: pairs at 1.5 m and 2.5 m, so the near pair waits 2.92 ms (140 frames at 48 kHz) and is 4.4 dB down")
-    func dormExample() {
-        let alignment = SpeakerGeometry.alignment(for: dorm(), sampleRate: 48_000)
+    @Test("The plan's two-pair example: pairs at 1.5 m and 2.5 m, so the near pair waits 2.92 ms (140 frames at 48 kHz) and is 4.4 dB down")
+    func downstairsExample() {
+        let alignment = SpeakerGeometry.alignment(for: downstairs(), sampleRate: 48_000)
         let near = entry(alignment, .frontLeft), far = entry(alignment, .backLeft)
         #expect(abs(near.distance - 1.5) < 1e-12 && abs(far.distance - 2.5) < 1e-12)
         #expect(abs(near.delayMs - 1000 / 343) < 1e-9)
@@ -104,7 +104,7 @@ struct SpeakerGeometryTests {
 
     @Test("A speaker's own trims are added on top: its delay trim to the delay, its level trim to the level (kept apart from the geometry's)")
     func trims() {
-        var group = dorm()
+        var group = downstairs()
         group.speakers[0].delayTrimMs = 0.5
         group.speakers[0].trimDB = -1.5
         group.speakers[3].trimDB = 2
@@ -117,7 +117,7 @@ struct SpeakerGeometryTests {
 
     @Test("A speaker that can't be placed (at the seat, or not a number) is left out and doesn't set the reference")
     func unplaceable() {
-        var group = dorm()
+        var group = downstairs()
         group.speakers[0].position = group.listener.position
         group.speakers[1].position = Point2D(x: .nan, y: 1)
         let alignment = SpeakerGeometry.alignment(for: group, sampleRate: 48_000)
@@ -128,10 +128,10 @@ struct SpeakerGeometryTests {
 
     @Test("Delay in frames follows the sample rate, and is held to what the room correction chain can delay")
     func frames() {
-        let low = SpeakerGeometry.alignment(for: dorm(), sampleRate: 48_000)
-        let high = SpeakerGeometry.alignment(for: dorm(), sampleRate: 192_000)
+        let low = SpeakerGeometry.alignment(for: downstairs(), sampleRate: 48_000)
+        let high = SpeakerGeometry.alignment(for: downstairs(), sampleRate: 192_000)
         #expect(abs(entry(high, .frontLeft).delayFrames - 4 * entry(low, .frontLeft).delayFrames) < 1e-9)
-        var far = dorm()
+        var far = downstairs()
         far.speakers[2].position = Point2D(x: 0, y: -90)            // 90 m away: 262 ms
         let limited = SpeakerGeometry.alignment(for: far, sampleRate: 192_000)
         let near = entry(limited, .frontLeft)
@@ -141,8 +141,8 @@ struct SpeakerGeometryTests {
 
     @Test("A warmer room carries sound faster: the speed of sound can be given, 343 m/s by default")
     func speedOfSound() {
-        let slow = SpeakerGeometry.alignment(for: dorm(), sampleRate: 48_000)
-        let fast = SpeakerGeometry.alignment(for: dorm(), sampleRate: 48_000, speedOfSound: 346)
+        let slow = SpeakerGeometry.alignment(for: downstairs(), sampleRate: 48_000)
+        let fast = SpeakerGeometry.alignment(for: downstairs(), sampleRate: 48_000, speedOfSound: 346)
         #expect(entry(fast, .frontLeft).delayMs < entry(slow, .frontLeft).delayMs)
         #expect(abs(entry(fast, .frontLeft).delayMs - 1000 / 346) < 1e-9)
         #expect(abs(SpeakerGeometry.speedOfSound(celsius: 20) - 343.2) < 0.1)

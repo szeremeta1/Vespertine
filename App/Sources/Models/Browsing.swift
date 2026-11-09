@@ -1,5 +1,5 @@
 //
-// Vespertine — what each page lists and plays through its filter: albums, artists, genres, sources, songs,
+// Vespertine: what each page lists and plays through its filter: albums, artists, genres, sources, songs,
 // playlists and search.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

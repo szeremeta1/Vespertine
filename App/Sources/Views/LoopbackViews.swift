@@ -1,5 +1,5 @@
 //
-// Vespertine — the loopback self-test sheet: setup, running, results per format and per channel.
+// Vespertine: the loopback self-test sheet: setup, running, results per format and per channel.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — the visualizer's axes and the song's title, drawn with AppKit into the overlay texture.
+// Vespertine: the visualizer's axes and the song's title, drawn with AppKit into the overlay texture.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

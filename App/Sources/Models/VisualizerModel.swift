@@ -1,5 +1,5 @@
 //
-// Vespertine — the visualizer window's link to the engine: the tap and the analysis run only while it's showing.
+// Vespertine: the visualizer window's link to the engine: the tap and the analysis run only while it's showing.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

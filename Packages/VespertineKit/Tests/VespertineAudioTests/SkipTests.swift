@@ -1,5 +1,5 @@
 //
-// Vespertine — skipping quickly while the engine is busy (a file opening on a slow share): only the
+// Vespertine: skipping quickly while the engine is busy (a file opening on a slow share): only the
 // last song asked for is opened, and the commands that still matter keep their order.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

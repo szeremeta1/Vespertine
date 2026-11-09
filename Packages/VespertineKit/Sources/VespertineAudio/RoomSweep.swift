@@ -1,5 +1,5 @@
 //
-// Vespertine — room measurement sweep (Farina): a faded exponential sweep, its matched inverse, and impulse recovery.
+// Vespertine: room measurement sweep (Farina): a faded exponential sweep, its matched inverse, and impulse recovery.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Offline and hardware-independent. Convolving a recording of the sweep with the inverse gives the system's impulse

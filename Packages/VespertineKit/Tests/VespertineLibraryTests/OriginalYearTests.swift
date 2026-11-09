@@ -1,5 +1,5 @@
 //
-// Vespertine — albums are dated by their original release, not the reissue in hand.
+// Vespertine: albums are dated by their original release, not the reissue in hand.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

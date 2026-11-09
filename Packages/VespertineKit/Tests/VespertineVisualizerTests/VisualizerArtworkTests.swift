@@ -1,5 +1,5 @@
 //
-// Vespertine — the visualizer's cover: any picture reaches the GPU, and the screen follows the song.
+// Vespertine: the visualizer's cover: any picture reaches the GPU, and the screen follows the song.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

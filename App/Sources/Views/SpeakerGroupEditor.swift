@@ -1,5 +1,5 @@
 //
-// Vespertine — Settings › Speaker Groups › Edit: one saved group. Hidden with the rest of the feature. Every change is saved at once.
+// Vespertine: Settings › Speaker Groups › Edit: one saved group. Hidden with the rest of the feature. Every change is saved at once.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Plain English with `verbatim` text: these strings join the catalog together with the screens that stay.

@@ -1,5 +1,5 @@
 //
-// Vespertine — golden PCM: today's output for a fixed set of files and devices, recorded as SHA-256 hashes
+// Vespertine: golden PCM: today's output for a fixed set of files and devices, recorded as SHA-256 hashes
 // (Fixtures/golden-pcm.json). Any change to what reaches the device for these cases fails here, which is how
 // "with transitions off, playback is exactly as before" is shown (docs: verification/CLAIMS.md).
 // SPDX-License-Identifier: GPL-3.0-or-later

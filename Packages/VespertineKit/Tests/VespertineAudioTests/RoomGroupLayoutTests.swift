@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction on a speaker group: the layouts a group can be measured and aligned as (stereo, quad, 5.1, or any
+// Vespertine: room correction on a speaker group: the layouts a group can be measured and aligned as (stereo, quad, 5.1, or any
 // set of speakers), the room speakers for the places in a group, the channel map onto the group's outputs, and a profile bound to
 // the group so it plays only while the group is wired the way it was made for.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -72,7 +72,7 @@ struct RoomGroupLayoutTests {
 
     // MARK: The group's layout
 
-    @Test("A stereo group is stereo; the dorm quad (front pair and back pair on two DACs) is a quad with the back pair as the surrounds")
+    @Test("A stereo group is stereo; the downstairs quad (front pair and back pair on two DACs) is a quad with the back pair as the surrounds")
     func stereoAndQuad() throws {
         let stereo = try #require(RoomLayout.layout(for: group([.frontLeft, .frontRight])))
         #expect(stereo.layout == .stereo)

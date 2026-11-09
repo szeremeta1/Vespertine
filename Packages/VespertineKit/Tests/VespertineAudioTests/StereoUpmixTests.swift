@@ -1,5 +1,5 @@
 //
-// Vespertine — the stereo-to-5.1 upmixer on its own: where each kind of sound goes, that nothing is phase-inverted or
+// Vespertine: the stereo-to-5.1 upmixer on its own: where each kind of sound goes, that nothing is phase-inverted or
 // invented, that folding the result back (ITU-R BS.775) gives the original, and that it's sample-aligned and length-exact.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

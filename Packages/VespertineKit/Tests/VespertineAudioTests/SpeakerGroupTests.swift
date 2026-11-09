@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups, the saved description: roles and their places, validation, coding, the channel map.
+// Vespertine: speaker groups, the saved description: roles and their places, validation, coding, the channel map.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -12,8 +12,8 @@ enum GroupFixtures {
     static let fosi = "AppleUSBAudioEngine:Fosi:ZD3:1"
     static let fiio = "AppleUSBAudioEngine:FiiO:K11:2"
 
-    /// The dorm quad: the Fosi's two outputs in front, the FiiO's two behind.
-    static func quad(id: UUID = UUID(), name: String = "Dorm quad") -> SpeakerGroup {
+    /// The downstairs quad: the Fosi's two outputs in front, the FiiO's two behind.
+    static func quad(id: UUID = UUID(), name: String = "Downstairs quad") -> SpeakerGroup {
         SpeakerGroup(
             id: id, name: name,
             members: [.init(deviceUID: fosi, name: "Fosi Audio ZD3", channelCount: 2),
@@ -110,7 +110,7 @@ struct SpeakerGroupTests {
 
     // MARK: Validation
 
-    @Test("The dorm quad is valid")
+    @Test("The downstairs quad is valid")
     func valid() {
         #expect(GroupFixtures.quad().issues.isEmpty)
     }

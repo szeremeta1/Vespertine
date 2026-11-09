@@ -1,5 +1,5 @@
 //
-// Vespertine — motion the renderer works out on the CPU for the newer modes: the Smooth spectrum's springs and the
+// Vespertine: motion the renderer works out on the CPU for the newer modes: the Smooth spectrum's springs and the
 // Vinyl cover moving between the label and its sleeve.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

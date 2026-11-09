@@ -1,5 +1,5 @@
 //
-// Vespertine — TagLib's property map, for what SFBAudioEngine's metadata writer can't carry: it writes one value
+// Vespertine: TagLib's property map, for what SFBAudioEngine's metadata writer can't carry: it writes one value
 // per field, so a save would keep only the first of several artists, genres or MusicBrainz IDs.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

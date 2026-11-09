@@ -1,5 +1,5 @@
 //
-// Vespertine — from a finished measurement to a room correction profile: each speaker's calibrated response at each
+// Vespertine: from a finished measurement to a room correction profile: each speaker's calibrated response at each
 // position, the positions averaged per speaker, the fitted filters, and the speakers' delays and levels lined up at the
 // seat. Offline; nothing here touches playback.
 // SPDX-License-Identifier: GPL-3.0-or-later

@@ -1,5 +1,5 @@
 //
-// Vespertine — integer mode: decoding straight to 32-bit integers keeps every source bit.
+// Vespertine: integer mode: decoding straight to 32-bit integers keeps every source bit.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

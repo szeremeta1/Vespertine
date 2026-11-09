@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the room drawing. Between metres in the room and points on the screen, dragging a speaker or the seat
+// Vespertine: speaker groups: the room drawing. Between metres in the room and points on the screen, dragging a speaker or the seat
 // (kept inside the room, on a 10 cm grid unless told otherwise, never on top of each other), turning the seat, nudging from the
 // keyboard, snapping to the usual angles, feet or metres, and the sentence a screen reader says for a speaker. Plain data; the view
 // is a thin layer.

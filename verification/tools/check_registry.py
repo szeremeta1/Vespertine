@@ -41,7 +41,7 @@ IMPLEMENTATIONS = re.compile(
 SCANNED = [ROOT / "harness", ROOT / "oracles", REPO / "Packages" / "VespertineKit" / "Tests"]
 REQ_TAG = re.compile(r"REQ:\s*([A-Z]+(?:-[A-Z])?-\d{3}(?:\s*,\s*[A-Z]+(?:-[A-Z])?-\d{3})*)")
 REQ_STRING = re.compile(r"\"((?:DOP|DOPS|FLT|INT|BPV|RATE|DST|IEC)(?:-[A-Z])?-\d{3})\"")
-CLAIM_TEXT = re.compile(r"^- \*\*Text:\*\* `([^`:]+):(\d+)` — \"(.*)\"$")
+CLAIM_TEXT = re.compile(r"^- \*\*Text:\*\* `([^`:]+):(\d+)`: \"(.*)\"$")
 ANCHOR = re.compile(r'<a id="([a-z0-9-]+)"></a>')
 
 
@@ -171,7 +171,7 @@ def check_claims(errors: list) -> set:
     for n, line in enumerate(text.splitlines(), 1):
         m = CLAIM_TEXT.match(line)
         if line.startswith("- **Text:**") and not m:
-            errors.append(f"CLAIMS.md:{n}: Text line isn't `path:line` — \"quote\"")
+            errors.append(f"CLAIMS.md:{n}: Text line isn't `path:line`: \"quote\"")
             continue
         if not m:
             continue

@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the follower's arrival against the leader's, heard by one microphone. The leader plays the room
+// Vespertine: speaker groups: the follower's arrival against the leader's, heard by one microphone. The leader plays the room
 // measurement's timing reference twice (which also gives the microphone-against-DAC clock ratio); the follower plays the same chirp once,
 // between them, so the follower's arrival does not depend on when the capture started. Used by `vespertine-probe group-skew` (the spread
 // over N restarts) and by the group measurement wizard (the skew to hold the other members back by, `GroupSkewMeasurement`).

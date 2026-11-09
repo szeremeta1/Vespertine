@@ -39,7 +39,7 @@ fi
 export PATH=/opt/homebrew/bin:/usr/local/bin:$PATH
 LIB="${STUDIO_LIBRARY:-$HOME/Music/Vespertine-SH Studio Library}"
 if [[ -f "$LIB/SHA256SUMS.txt" ]]; then PACK="$LIB"; else PACK="$LIB/Vespertine Surround Test Pack (2026-10-15)"; fi
-TOOLS="$PACK/10 Tools (for Claude)"
+TOOLS=("$PACK"/"10 Tools"*(N/)); TOOLS="${TOOLS[1]:-$PACK/10 Tools}"
 PY="${STUDIO_PYTHON:-python3}"
 APP="${STUDIO_APP:-/Applications/Vespertine.app}"
 DATA="${STUDIO_DATA:-$HOME/Library/Application Support/Vespertine-SH}"

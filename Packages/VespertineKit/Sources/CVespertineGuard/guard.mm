@@ -1,5 +1,5 @@
 //
-// Vespertine — decoder calls with every exception caught.
+// Vespertine: decoder calls with every exception caught.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 #import "CVespertineGuard.h"

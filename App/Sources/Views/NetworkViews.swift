@@ -1,5 +1,5 @@
 //
-// Vespertine — connecting to network shares, and the Network settings tab.
+// Vespertine: connecting to network shares, and the Network settings tab.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

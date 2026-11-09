@@ -1,5 +1,5 @@
 //
-// Vespertine — exports multichannel tracks for Spatial Audio listening elsewhere, fully tagged.
+// Vespertine: exports multichannel tracks for Spatial Audio listening elsewhere, fully tagged.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

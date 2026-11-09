@@ -1,5 +1,5 @@
 //
-// vespertine-demo — builds a library of original synthesized music in many formats,
+// vespertine-demo: builds a library of original synthesized music in many formats,
 // with generative cover art, for development, testing and screenshots.
 // Every artist, album and track here is fictional.
 //

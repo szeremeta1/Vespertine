@@ -1,5 +1,5 @@
 //
-// Vespertine — a song on a share starts on a prefix, not after the whole file: the policy, the guarded decoder, and the time to first audio.
+// Vespertine: a song on a share starts on a prefix, not after the whole file: the policy, the guarded decoder, and the time to first audio.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

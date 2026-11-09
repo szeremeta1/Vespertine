@@ -1,5 +1,5 @@
 //
-// Vespertine — artwork loading with an in-memory cache.
+// Vespertine: artwork loading with an in-memory cache.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

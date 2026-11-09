@@ -1,5 +1,5 @@
 //
-// Vespertine — original release date and label read from MP3s' ID3 frames.
+// Vespertine: original release date and label read from MP3s' ID3 frames.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

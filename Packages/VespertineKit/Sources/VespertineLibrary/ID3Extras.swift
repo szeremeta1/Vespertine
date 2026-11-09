@@ -1,5 +1,5 @@
 //
-// Vespertine — ID3v2 frames the tag reader doesn't pass on (it only maps the common fields for MP3):
+// Vespertine: ID3v2 frames the tag reader doesn't pass on (it only maps the common fields for MP3):
 // release and original dates (TDRC / TYER, TDOR / TORY), label (TPUB) and TXXX user fields
 // (e.g. "originalyear"). Also DSF, whose reader drops the dates.
 // SPDX-License-Identifier: GPL-3.0-or-later

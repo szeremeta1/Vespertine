@@ -1,5 +1,5 @@
 //
-// Vespertine — Live Set: its settings, the beat-matched blend's placement (LiveSetPlanner, pure) and the bass swap's
+// Vespertine: Live Set: its settings, the beat-matched blend's placement (LiveSetPlanner, pure) and the bass swap's
 // filter.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

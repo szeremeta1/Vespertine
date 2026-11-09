@@ -1,5 +1,5 @@
 //
-// Vespertine — automatic updates via Sparkle (EdDSA-signed appcast on GitHub Releases).
+// Vespertine: automatic updates via Sparkle (EdDSA-signed appcast on GitHub Releases).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

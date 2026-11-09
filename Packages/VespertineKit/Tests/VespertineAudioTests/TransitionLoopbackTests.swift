@@ -1,5 +1,5 @@
 //
-// Vespertine — a crossfade through the real engine (PlaybackEngine's own planning, decks, segments and fader) to the
+// Vespertine: a crossfade through the real engine (PlaybackEngine's own planning, decks, segments and fader) to the
 // "Vespertine Loopback" virtual device, recorded back and compared with the offline mixer sample for sample.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

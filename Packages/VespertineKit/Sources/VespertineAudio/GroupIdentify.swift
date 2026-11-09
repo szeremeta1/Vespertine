@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the Identify button. Plays the quiet tone (`IdentifyTone`) on one channel of one of the group's DACs, so
+// Vespertine: speaker groups: the Identify button. Plays the quiet tone (`IdentifyTone`) on one channel of one of the group's DACs, so
 // that a person can hear which speaker that is. It plays on the DAC itself, one-shot, on the channel the DAC has, and not through
 // the group (an aggregate exists only while music plays) and not while the group's output is in use.
 // SPDX-License-Identifier: GPL-3.0-or-later

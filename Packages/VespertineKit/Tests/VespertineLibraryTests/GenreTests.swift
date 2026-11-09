@@ -1,5 +1,5 @@
 //
-// Vespertine — genre tags as people mean them.
+// Vespertine: genre tags as people mean them.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

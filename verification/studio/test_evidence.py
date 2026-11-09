@@ -274,7 +274,7 @@ class FormatClass(unittest.TestCase):
 class Report(unittest.TestCase):
     def test_split(self):
         with tempfile.TemporaryDirectory() as d:
-            env = {"machine": "dormhub", "macos": "27.0", "commit": "abc", "date": "2026-10-23"}
+            env = {"machine": "test-mac", "macos": "27.0", "commit": "abc", "date": "2026-10-23"}
             files = [{"rel": "01 Layouts/a.flac", "sha256": "aa", "expected_sha256": "aa", "sha_ok": True,
                       "ffprobe": {"channels": 2, "rate": 48000}, "vsh": {"opened": True, "channels": 2}, "open_class": "OPENS",
                       "manifest": {"channels": 2, "rate": 48000}}]

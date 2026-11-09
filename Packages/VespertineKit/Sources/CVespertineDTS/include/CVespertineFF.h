@@ -1,5 +1,5 @@
 //
-// Vespertine — FFmpeg-decoded files: DTS / DTS-HD Master Audio and Dolby TrueHD in .dts, .dtshd,
+// Vespertine: FFmpeg-decoded files: DTS / DTS-HD Master Audio and Dolby TrueHD in .dts, .dtshd,
 // .thd/.mlp and Matroska. Decoded to float, one plane per channel.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

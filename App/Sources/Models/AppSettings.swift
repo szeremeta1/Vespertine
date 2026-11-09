@@ -1,5 +1,5 @@
 //
-// Vespertine — user preferences (UserDefaults-backed).
+// Vespertine: user preferences (UserDefaults-backed).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

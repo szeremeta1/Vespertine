@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: each member DAC is put in its best physical format when the group opens, as a single device is.
+// Vespertine: speaker groups: each member DAC is put in its best physical format when the group opens, as a single device is.
 // Found on real DACs (2026-11-07): the FiiO K11 comes up in 16-bit integer after it is plugged in, and the group kept it there
 // (the aggregate is multi-stream, so the single-device format step never touched the members), so the resampled follower was
 // cut to 16 bits, and a 16-bit leader could never be BIT-PERFECT for a 24-bit song although the DAC takes 24 and 32 bits.

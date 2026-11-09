@@ -1,5 +1,5 @@
 //
-// Vespertine — localized text for the analysis results.
+// Vespertine: localized text for the analysis results.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

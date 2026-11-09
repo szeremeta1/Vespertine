@@ -1,5 +1,5 @@
 //
-// Vespertine — imports analysis results computed on the server behind a network share
+// Vespertine: imports analysis results computed on the server behind a network share
 // (`vespertine-analyze` writes `<share>/.vespertine/analysis.jsonl`), so the Mac never has to read
 // every file over the network to learn which ones are genuine.
 // SPDX-License-Identifier: GPL-3.0-or-later

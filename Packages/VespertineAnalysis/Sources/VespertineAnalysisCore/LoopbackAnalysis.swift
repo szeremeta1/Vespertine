@@ -1,5 +1,5 @@
 //
-// Vespertine — compares a loopback capture with the signal that was played, sample for sample, and says what went
+// Vespertine: compares a loopback capture with the signal that was played, sample for sample, and says what went
 // wrong when they differ.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

@@ -1,5 +1,5 @@
 //
-// Vespertine — a measured speaker's magnitude response, with the microphone's calibration applied, and its CSV and
+// Vespertine: a measured speaker's magnitude response, with the microphone's calibration applied, and its CSV and
 // PNG renderings. Offline analysis of an accepted recording; nothing here touches playback.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

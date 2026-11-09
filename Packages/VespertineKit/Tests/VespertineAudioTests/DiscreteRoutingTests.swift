@@ -1,5 +1,5 @@
 //
-// Vespertine — a multichannel file on a device with as many outputs and no speaker setup: every channel on an output of
+// Vespertine: a multichannel file on a device with as many outputs and no speaker setup: every channel on an output of
 // its own, at the file's level, in the standard order (L R C LFE Ls Rs …), each output named for the speaker it carries.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

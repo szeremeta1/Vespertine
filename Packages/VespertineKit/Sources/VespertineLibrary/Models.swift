@@ -1,5 +1,5 @@
 //
-// Vespertine — library records.
+// Vespertine: library records.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -137,7 +137,7 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
 
     public mutating func didInsert(_ inserted: InsertionSuccess) { id = inserted.rowID }
 
-    /// Never touches the disk (without `isDirectory`, Foundation lstat()s the path — a network round
+    /// Never touches the disk (without `isDirectory`, Foundation lstat()s the path: a network round
     /// trip for tracks on a share, and a hang if the share has gone away).
     public var fileURL: URL { URL(fileURLWithPath: filePath, isDirectory: false) }
     public var displayArtist: String { artist ?? albumArtist ?? "Unknown Artist" }

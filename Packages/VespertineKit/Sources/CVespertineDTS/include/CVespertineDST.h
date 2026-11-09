@@ -1,5 +1,5 @@
 //
-// Vespertine — DST (Direct Stream Transfer), the lossless compression of SACD audio, decoded to raw DSD.
+// Vespertine: DST (Direct Stream Transfer), the lossless compression of SACD audio, decoded to raw DSD.
 // SPDX-License-Identifier: LGPL-2.1-or-later (derived from FFmpeg's DST decoder; see vespertine_dst.c)
 //
 #pragma once

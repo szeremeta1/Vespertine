@@ -1,5 +1,5 @@
 //
-// Vespertine — the transitions switch: its icon, its button and the note shown the first time it's turned on.
+// Vespertine: the transitions switch: its icon, its button and the note shown the first time it's turned on.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — carries volume keys and Control Center to a device held with exclusive access.
+// Vespertine: carries volume keys and Control Center to a device held with exclusive access.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

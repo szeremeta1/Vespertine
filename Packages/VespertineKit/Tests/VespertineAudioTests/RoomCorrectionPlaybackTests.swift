@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction in playback: separate filters per output channel on the I/O thread, off unless chosen,
+// Vespertine: room correction in playback: separate filters per output channel on the I/O thread, off unless chosen,
 // never on DoP, bitstream or integer samples, and named in the signal path.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

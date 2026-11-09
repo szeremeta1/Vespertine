@@ -1,5 +1,5 @@
 //
-// Vespertine — a rig for the engine's play/pause state machine: the real engine thread, a simulated output that counts what is
+// Vespertine: a rig for the engine's play/pause state machine: the real engine thread, a simulated output that counts what is
 // audible, and a share whose speed and silence the test controls.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

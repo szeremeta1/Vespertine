@@ -1,5 +1,5 @@
 //
-// Vespertine — synthetic SACD images for tests: a Master TOC, area TOCs (track lists, text, ISRCs), and audio
+// Vespertine: synthetic SACD images for tests: a Master TOC, area TOCs (track lists, text, ISRCs), and audio
 // sectors of plain DSD or DST, the DST made by a small encoder below. All of it is generated; no disc audio.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

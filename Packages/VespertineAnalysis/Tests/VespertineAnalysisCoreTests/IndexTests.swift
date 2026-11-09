@@ -1,5 +1,5 @@
 //
-// Vespertine — `vespertine-analyze index` reads and compacts a large `.vespertine/analysis.jsonl` a chunk at a time,
+// Vespertine: `vespertine-analyze index` reads and compacts a large `.vespertine/analysis.jsonl` a chunk at a time,
 // keeping the latest line for each file, copied as it is. Runs the built tool on files whose records are current,
 // so nothing is decoded (no ffmpeg needed).
 // SPDX-License-Identifier: GPL-3.0-or-later

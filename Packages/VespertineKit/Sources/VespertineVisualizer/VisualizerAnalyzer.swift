@@ -1,5 +1,5 @@
 //
-// Vespertine — the visualizer's analysis: spectrum, levels and beats from the newest samples, once per frame.
+// Vespertine: the visualizer's analysis: spectrum, levels and beats from the newest samples, once per frame.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

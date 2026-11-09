@@ -1,5 +1,5 @@
 //
-// Vespertine — one-time move from the app's old name, Nocturne. Settings and the library folder are
+// Vespertine: one-time move from the app's old name, Nocturne. Settings and the library folder are
 // copied (APFS clones, so no extra disk space); the originals stay where they were as a backup.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

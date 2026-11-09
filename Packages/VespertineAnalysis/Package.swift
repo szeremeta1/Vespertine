@@ -1,6 +1,6 @@
 // swift-tools-version: 6.2
 //
-// Vespertine — file analysis core (true bit depth, lossy-origin, upsampling and synthetic-HF forensics).
+// Vespertine: file analysis core (true bit depth, lossy-origin, upsampling and synthetic-HF forensics).
 // Plain Swift + Foundation so the same code runs in the app and on a Linux file server
 // (`vespertine-analyze`), next to the music, where reading files is fast.
 // SPDX-License-Identifier: GPL-3.0-or-later

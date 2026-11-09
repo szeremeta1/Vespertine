@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the Identify button. The tone for a channel is played on that channel of the DAC that has it (not
+// Vespertine: speaker groups: the Identify button. The tone for a channel is played on that channel of the DAC that has it (not
 // through the group, which exists only while music plays), quietly, and not while the group's own output is in use.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

@@ -1,5 +1,5 @@
 //
-// Vespertine — decodes a file read live from a network share ahead of playback, on a thread of its own.
+// Vespertine: decodes a file read live from a network share ahead of playback, on a thread of its own.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

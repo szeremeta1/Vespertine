@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction records: sessions, captures and profiles survive a save and reload unchanged, older
+// Vespertine: room correction records: sessions, captures and profiles survive a save and reload unchanged, older
 // files are upgraded on load, newer ones are refused, and a recorded capture can't be rewritten.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

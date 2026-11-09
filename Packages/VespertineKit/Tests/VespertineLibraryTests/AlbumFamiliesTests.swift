@@ -1,5 +1,5 @@
 //
-// Vespertine — album editions are one card while the tagged releases remain separate.
+// Vespertine: album editions are one card while the tagged releases remain separate.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

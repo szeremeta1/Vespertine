@@ -1,5 +1,5 @@
 //
-// Vespertine — playing from network shares: moving a streaming track to its local copy mid-track,
+// Vespertine: playing from network shares: moving a streaming track to its local copy mid-track,
 // and a buffer deep enough to ride out a slow server.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

@@ -1,5 +1,5 @@
 //
-// Vespertine — the Album Art colour theme: a palette of the cover's own colours, how it becomes the visualizer's
+// Vespertine: the Album Art colour theme: a palette of the cover's own colours, how it becomes the visualizer's
 // colours, and the short fade between one song's palette and the next.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

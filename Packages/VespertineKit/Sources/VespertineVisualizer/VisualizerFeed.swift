@@ -1,5 +1,5 @@
 //
-// Vespertine — runs the visualizer's analysis on its own thread, at the display's rate, while a window shows it.
+// Vespertine: runs the visualizer's analysis on its own thread, at the display's rate, while a window shows it.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

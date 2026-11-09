@@ -1,5 +1,5 @@
 //
-// Vespertine — Phase 0 of multi-DAC speaker groups, PR 0.3: `vespertine-probe group-skew`. A timing chirp from each DAC,
+// Vespertine: Phase 0 of multi-DAC speaker groups, PR 0.3: `vespertine-probe group-skew`. A timing chirp from each DAC,
 // heard by one microphone, N times; how far apart the two arrive and how much that moves from start to start.
 // Everything here runs on the simulated room (a scripted delay per output channel); the opt-in test at the end uses Core Audio.
 // SPDX-License-Identifier: GPL-3.0-or-later

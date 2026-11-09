@@ -1,5 +1,5 @@
 //
-// Vespertine — the meters' printed faces (scale, numbers, the red zone), drawn with AppKit into masks the shader
+// Vespertine: the meters' printed faces (scale, numbers, the red zone), drawn with AppKit into masks the shader
 // lights and colours.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

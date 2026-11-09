@@ -1,5 +1,5 @@
 //
-// Vespertine — the meter designs modelled on real instruments: where each meter sits in its case, panel and cabinet,
+// Vespertine: the meter designs modelled on real instruments: where each meter sits in its case, panel and cabinet,
 // where its scale puts the needle, and its printing (scales, numbers, legends), drawn with AppKit into a mask that
 // the shader lights and colours. The original pair is drawn by VisualizerMeterFace and is untouched by this.
 // SPDX-License-Identifier: GPL-3.0-or-later

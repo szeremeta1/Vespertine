@@ -1,5 +1,5 @@
 //
-// Vespertine — the parametric equalizer: presets, the band editor and the response curve.
+// Vespertine: the parametric equalizer: presets, the band editor and the response curve.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

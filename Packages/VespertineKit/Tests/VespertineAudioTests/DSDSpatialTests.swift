@@ -1,5 +1,5 @@
 //
-// Vespertine — 5.1 DSD on headphones: converted to PCM for AirPods, every channel kept for Spatial Audio, and the
+// Vespertine: 5.1 DSD on headphones: converted to PCM for AirPods, every channel kept for Spatial Audio, and the
 // conversion (and any downmix) reported for the UI.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

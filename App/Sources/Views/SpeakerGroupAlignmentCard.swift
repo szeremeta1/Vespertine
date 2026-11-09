@@ -1,5 +1,5 @@
 //
-// Vespertine — Room Correction, for a speaker group's output: the profile made from the drawing and the warning when a measurement and
+// Vespertine: Room Correction, for a speaker group's output: the profile made from the drawing and the warning when a measurement and
 // the drawing disagree. Hidden with the rest of the feature (only a group's output shows it).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

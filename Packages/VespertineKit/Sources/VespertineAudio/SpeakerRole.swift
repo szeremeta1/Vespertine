@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the places a loudspeaker can stand in a room, named after the speakers of a surround
+// Vespertine: speaker groups: the places a loudspeaker can stand in a room, named after the speakers of a surround
 // layout, and how they line up with Core Audio's channel labels.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

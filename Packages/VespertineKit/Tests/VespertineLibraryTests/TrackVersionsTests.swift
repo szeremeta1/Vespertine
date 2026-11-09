@@ -1,5 +1,5 @@
 //
-// Vespertine — stereo and multichannel versions of the same song.
+// Vespertine: stereo and multichannel versions of the same song.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

@@ -1,5 +1,5 @@
 //
-// Vespertine — decoding a track read live from a share on a thread of its own: the engine never waits on a stalled
+// Vespertine: decoding a track read live from a share on a thread of its own: the engine never waits on a stalled
 // read, and what it gets is exactly what the file holds.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

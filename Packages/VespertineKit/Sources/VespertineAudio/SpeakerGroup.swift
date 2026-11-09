@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: two or more outputs (a Fosi and a FiiO, say) played as one multichannel system. This is the
+// Vespertine: speaker groups: two or more outputs (a Fosi and a FiiO, say) played as one multichannel system. This is the
 // saved description of a group: which outputs, which one leads the clock, which speaker is on which output channel, and
 // where everything stands in the room. Nothing here touches playback.
 // SPDX-License-Identifier: GPL-3.0-or-later

@@ -1,5 +1,5 @@
 //
-// Vespertine — Settings › Speaker Groups › Edit: a preset to lay the speakers out with, and for each speaker where it stands and what
+// Vespertine: Settings › Speaker Groups › Edit: a preset to lay the speakers out with, and for each speaker where it stands and what
 // that asks of it (distance, angle, delay, level) with its own level and delay trims. The numbers are `GroupReadout` in VespertineKit.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

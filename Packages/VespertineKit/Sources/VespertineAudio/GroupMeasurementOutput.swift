@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: the output a measurement plays to. The group's members are configured at the measurement's rate and
+// Vespertine: speaker groups: the output a measurement plays to. The group's members are configured at the measurement's rate and
 // held, and combined into a private aggregate (as for playback). A hold keeps the aggregate running, on silence, from the moment
 // the measurement begins through every capture, so the followers' drift correction is settled and stays settled: each capture's own
 // player then starts and stops on a device that never stopped.

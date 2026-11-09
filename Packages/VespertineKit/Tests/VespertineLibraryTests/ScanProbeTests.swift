@@ -2,7 +2,7 @@ import Foundation
 import Testing
 @testable import VespertineLibrary
 
-/// Diagnostic: VESPERTINE_SCAN_FILE — reads one file as the scanner does (directly and through the network shadow).
+/// Diagnostic: VESPERTINE_SCAN_FILE reads one file as the scanner does (directly and through the network shadow).
 @Test(.enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_SCAN_FILE"] != nil))
 func scanProbe() throws {
     let url = URL(fileURLWithPath: ProcessInfo.processInfo.environment["VESPERTINE_SCAN_FILE"]!)

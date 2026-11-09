@@ -1,5 +1,5 @@
 //
-// Vespertine — finds music on this Mac and tells music apart from recordings, prompts and clips.
+// Vespertine: finds music on this Mac and tells music apart from recordings, prompts and clips.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

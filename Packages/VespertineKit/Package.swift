@@ -89,7 +89,7 @@ let package = Package(
         // Phase 0 of multi-DAC "speaker groups": the probe's group-info / group-play / group-skew commands. Not a product, so
         // nothing links it into the app; only vespertine-probe and its tests use it.
         .target(name: "VespertineGroupProbe", dependencies: ["VespertineAudio"]),
-        // Library operations from the command line (find music, import, enrich) — same code the app uses.
+        // Library operations from the command line (find music, import, enrich), with the same code the app uses.
         .executableTarget(name: "vespertine-library", dependencies: ["VespertineLibrary"]),
         // Synthetic test media both test targets build (SACD images, DST frames, DSDIFF files).
         .target(name: "VespertineTestSupport", path: "Tests/VespertineTestSupport"),

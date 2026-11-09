@@ -1,5 +1,5 @@
 //
-// Vespertine — the playback engine.
+// Vespertine: the playback engine.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // decoder → AVAudioConverter (format, and SRC only when needed) → lock-free ring → HAL IOProc

@@ -1,5 +1,5 @@
 //
-// Vespertine — the transitions settings: defaults, ranges, and loading whatever an older or newer version stored.
+// Vespertine: the transitions settings: defaults, ranges, and loading whatever an older or newer version stored.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 

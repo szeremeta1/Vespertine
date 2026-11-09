@@ -1,5 +1,5 @@
 //
-// Vespertine — synthetic DVD-Video discs for tests: LPCM payloads at every width (with the 20/24-bit grouped
+// Vespertine: synthetic DVD-Video discs for tests: LPCM payloads at every width (with the 20/24-bit grouped
 // layout written independently of the decoder), program streams of NAV packs, LPCM packets (PTS, first-access-unit
 // pointers, frames split across packets), video and padding packets, VMG/VTS IFOs, and ISO 9660 / UDF images.
 // Everything is generated; no disc audio.

@@ -1,5 +1,5 @@
 //
-// Vespertine — a bit-perfect audio player for macOS.
+// Vespertine: a bit-perfect audio player for macOS.
 // Copyright © 2026 Vespertine contributors.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

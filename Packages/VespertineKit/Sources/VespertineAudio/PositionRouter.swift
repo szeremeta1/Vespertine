@@ -1,5 +1,5 @@
 //
-// Vespertine — speaker groups: which speaker plays which channel of a song, from where the speakers really stand.
+// Vespertine: speaker groups: which speaker plays which channel of a song, from where the speakers really stand.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // The rule generalizes what BedRouter does for a speaker setup and keeps the ITU-R BS.775 folds as special cases:

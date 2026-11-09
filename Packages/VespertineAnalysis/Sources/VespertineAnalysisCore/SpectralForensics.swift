@@ -1,5 +1,5 @@
 //
-// Vespertine — spectral forensics: tells genuine high-resolution audio from lossy, upsampled and
+// Vespertine: spectral forensics: tells genuine high-resolution audio from lossy, upsampled and
 // "enhanced" copies (high frequencies synthesized by SBR-style bandwidth extension or AI upscalers).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //

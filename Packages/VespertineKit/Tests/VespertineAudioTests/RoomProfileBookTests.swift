@@ -1,5 +1,5 @@
 //
-// Vespertine — room correction profiles as a library the listener manages: named for a speaker, room or desk,
+// Vespertine: room correction profiles as a library the listener manages: named for a speaker, room or desk,
 // renamed, duplicated, deleted, exported and imported, one chosen per output that switches in with the output, and
 // older stored profiles carried over unchanged.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -263,7 +263,7 @@ struct RoomProfileSchemaTests {
     @Test("A profile with tags, strength and edited flags round-trips")
     func roundTrip() throws {
         var p = try ProfileFixtures.profile()
-        p.tags = RoomProfileTags(speakers: "Genelec 8030", room: "Dorm", position: "Desk")
+        p.tags = RoomProfileTags(speakers: "Genelec 8030", room: "Downstairs", position: "Desk")
         p.strength = 0.6
         p.filtersEdited = true
         p.excludedPositions = [2]

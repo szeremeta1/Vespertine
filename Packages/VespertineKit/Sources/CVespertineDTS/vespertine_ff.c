@@ -1,5 +1,5 @@
 //
-// Vespertine — FFmpeg-decoded files: DTS / DTS-HD MA and Dolby TrueHD in their containers.
+// Vespertine: FFmpeg-decoded files: DTS / DTS-HD MA and Dolby TrueHD in their containers.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 #include "CVespertineFF.h"
