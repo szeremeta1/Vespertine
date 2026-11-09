@@ -67,7 +67,7 @@ private struct SpeakerGroupsList: View {
             if let error = groups.lastError {
                 Text(verbatim: "Couldn't save: \(error)").font(.caption).foregroundStyle(.red)
             }
-            Text(verbatim: "Experimental. Combining outputs into one speaker system isn't available yet; this list only shows what is saved.")
+            Text(verbatim: "Beta: tested with virtual devices and one probe session on real DACs, but not yet listened to in the app on a real group. Only the clock leader's channels can be bit-perfect.")
                 .font(.caption).foregroundStyle(.secondary)
         }
     }
