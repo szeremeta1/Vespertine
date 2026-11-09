@@ -27,8 +27,15 @@ public enum GroupDelay {
         return context.holds(driftCorrected: resampled, driftQuality: member.driftQuality, sampleRate: rate) ? member.skewMs : certain
     }
 
-    /// How long a play is kept aligned by the rate trim (below), from the start of the output.
+    /// How long a play is kept aligned by the rate trim (below), from the start of the output, for a member that doesn't say
+    /// (`Member.rateTrimSeconds`).
     public static let rateTrimHorizonSeconds = 600.0
+
+    /// How long this member's trim runs from the start of the output: its own measured span, or the default horizon.
+    public static func trimSeconds(_ member: SpeakerGroup.Member) -> Double {
+        guard let seconds = member.rateTrimSeconds, seconds.isFinite, SpeakerGroup.Member.rateTrimSecondsRange.contains(seconds) else { return rateTrimHorizonSeconds }
+        return seconds
+    }
 
     /// How fast this member falls behind the others while it plays, in ppm: its measured rate (`Member.rateTrimPPM`), if that was
     /// measured under the settings it runs with now (the same rule as `lateMs`; a member that is not drift-corrected is not trimmed).
@@ -50,8 +57,23 @@ public enum GroupDelay {
     /// The hold every channel gets at the start so that a member can be brought forward later: the largest advance over
     /// `rateTrimHorizonSeconds`, and the 8 frames the interpolator looks ahead of its read position (`ROOM_ADV_REACH`). 0 with no trim.
     public static func rateHeadroomMs(_ group: SpeakerGroup, resampled: Set<String>? = nil, rate: Double = 48_000) -> Double {
-        guard let largest = advancePPM(group, resampled: resampled, rate: rate).max(), largest > 0, rate > 0 else { return 0 }
-        return largest * 1e-6 * rateTrimHorizonSeconds * 1000 + 8 / rate * 1000
+        let advance = advancePPM(group, resampled: resampled, rate: rate), seconds = advanceSeconds(group, resampled: resampled, rate: rate)
+        guard let largest = zip(advance, seconds).map({ $0 * 1e-6 * $1 }).max(), largest > 0, rate > 0 else { return 0 }
+        return largest * 1000 + 8 / rate * 1000
+    }
+
+    /// Per member, in the group's order: for how long it is brought forward (`advancePPM`), in seconds; 0 for a member that isn't. A member
+    /// that creeps itself runs for its own span; one brought forward because another gets ahead runs for that one's span; with both, the
+    /// longer (the advance itself is the sum of the two rates throughout, which is exact when the spans are equal).
+    public static func advanceSeconds(_ group: SpeakerGroup, resampled: Set<String>? = nil, rate: Double = 48_000) -> [Double] {
+        let creep = group.members.map { member in creepPPM(member, resampled: resampled.map { $0.contains(member.deviceUID) }, rate: rate) }
+        guard let slowest = creep.indices.min(by: { creep[$0] < creep[$1] }) else { return [] }
+        return group.members.indices.map { i in
+            guard creep[i] - creep[slowest] > 0 else { return 0 }
+            let own = creep[i] > 0 ? trimSeconds(group.members[i]) : 0
+            let other = creep[slowest] < 0 ? trimSeconds(group.members[slowest]) : 0
+            return max(own, other)
+        }
     }
 
     /// Each aggregate channel's delay in ms, in channel order: its member's wait for the latest member, plus the delay trim of the
@@ -77,6 +99,12 @@ public enum GroupDelay {
     public static func perChannelAdvancePPM(_ group: SpeakerGroup, resampled: Set<String>? = nil, rate: Double = 48_000) -> [Double] {
         let advance = advancePPM(group, resampled: resampled, rate: rate)
         return group.members.indices.flatMap { index in [Double](repeating: advance[index], count: max(group.members[index].channelCount, 0)) }
+    }
+
+    /// Each aggregate channel's advance span in seconds, in channel order: its member's (`advanceSeconds`).
+    public static func perChannelAdvanceSeconds(_ group: SpeakerGroup, resampled: Set<String>? = nil, rate: Double = 48_000) -> [Double] {
+        let seconds = advanceSeconds(group, resampled: resampled, rate: rate)
+        return group.members.indices.flatMap { index in [Double](repeating: seconds[index], count: max(group.members[index].channelCount, 0)) }
     }
 
     /// Each aggregate channel's level trim in dB, in channel order: that of the speaker on it, held to what the chain takes; a
@@ -111,7 +139,7 @@ public enum GroupDelay {
     /// and preamp stay), or a chain of those alone when there is no room correction. nil when there is nothing to hold back or turn
     /// and no room correction. The channels of the chain are those of the group, so a room correction measured for fewer keeps them
     /// as they are.
-    public static func composing(_ room: RoomCorrectionPlayback?, delaysMs: [Double], levelsDB: [Double] = [], inverted: [Bool] = [], advancePPM: [Double] = [], name: String) -> RoomCorrectionPlayback? {
+    public static func composing(_ room: RoomCorrectionPlayback?, delaysMs: [Double], levelsDB: [Double] = [], inverted: [Bool] = [], advancePPM: [Double] = [], advanceSeconds: [Double] = [], name: String) -> RoomCorrectionPlayback? {
         guard delaysMs.contains(where: { $0 > 0 }) || levelsDB.contains(where: { $0 != 0 }) || inverted.contains(true) || advancePPM.contains(where: { $0 > 0 }) else { return room }
         let count = min(max(delaysMs.count, levelsDB.count, inverted.count, advancePPM.count, room?.channels.count ?? 0), RoomCorrectionPlayback.maxChannels)
         var channels = (0..<count).map { c in c < (room?.channels.count ?? 0) ? room!.channels[c] : RoomChannelPlayback() }
@@ -119,6 +147,7 @@ public enum GroupDelay {
         for c in 0..<min(levelsDB.count, count) { channels[c].levelDB += levelsDB[c] }
         for c in 0..<min(inverted.count, count) where inverted[c] { channels[c].inverted.toggle() }
         for c in 0..<min(advancePPM.count, count) where advancePPM[c] > 0 { channels[c].advancePPM = advancePPM[c] }
+        for c in 0..<min(advanceSeconds.count, count) where advanceSeconds[c] > 0 && advancePPM.indices.contains(c) && advancePPM[c] > 0 { channels[c].advanceSeconds = advanceSeconds[c] }
         return RoomCorrectionPlayback(profileID: room?.profileID ?? UUID(uuidString: "00000000-0000-4000-8000-000000670000")!,
                                       name: room?.name ?? name, preampDB: room?.preampDB ?? 0, channels: channels,
                                       impulseDirectory: room?.impulseDirectory ?? RoomImpulse.defaultDirectory).withHeadroom()
@@ -131,6 +160,7 @@ public enum GroupDelay {
     public static func chain(_ room: RoomCorrectionPlayback?, group: SpeakerGroup, resampled: Set<String>? = nil, rate: Double = 48_000) -> RoomCorrectionPlayback? {
         let measuredHere = room?.measuredGroupClock?.holds(for: group, resampled: resampled, rate: rate) == true
         return composing(room, delaysMs: perChannelMs(group, resampled: resampled, rate: rate, memberWaits: !measuredHere), levelsDB: perChannelLevelDB(group), inverted: perChannelInverted(group),
-                  advancePPM: perChannelAdvancePPM(group, resampled: resampled, rate: rate), name: group.name)
+                         advancePPM: perChannelAdvancePPM(group, resampled: resampled, rate: rate),
+                         advanceSeconds: perChannelAdvanceSeconds(group, resampled: resampled, rate: rate), name: group.name)
     }
 }
