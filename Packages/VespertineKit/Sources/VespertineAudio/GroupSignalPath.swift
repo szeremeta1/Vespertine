@@ -102,6 +102,12 @@ public struct GroupSignalPath: Sendable, Hashable {
         return m.physicalIsInteger ? m.physicalBitDepth >= bits : m.physicalBitDepth >= 32
     }
 
+    /// The song was converted to another rate for the group (its own rate isn't one every member takes): a used DAC runs at a
+    /// rate that isn't the song's.
+    public var songResampled: Bool {
+        source.encoding == .pcm && !dsdConvertedToPCM && usedMembers.contains { $0.sampleRate > 0 && abs($0.sampleRate - source.sampleRate) >= 0.5 }
+    }
+
     public var isBitPerfect: Bool {
         guard source.encoding == .pcm, !dsdConvertedToPCM, !folds, !stage.modifiesSamples else { return false }
         let used = usedMembers
@@ -118,7 +124,7 @@ public struct GroupSignalPath: Sendable, Hashable {
             let used = usedMembers
             if dsdConvertedToPCM { list.append(SignalPath.convertedFromDSD) }
             if folds { list.append("Downmixed") }
-            if used.contains(where: \.resampled) { list.append("RESAMPLED") }
+            if songResampled || used.contains(where: \.resampled) { list.append("RESAMPLED") }
             if used.contains(where: { !$0.exclusive && $0.otherAppsPlaying }) { list.append("MIXED WITH OTHER APPS") }
             switch stage {
             case .roomCorrection: list.append("ROOM CORRECTION")
@@ -155,7 +161,11 @@ public struct GroupSignalPath: Sendable, Hashable {
             else if m.resampled { parts.append(follows) }
             else { parts.append("shares \(leaderName)'s clock") }
             parts.append(format)
-            if !m.resampled { parts.append(isUntouched(m) ? "bit-perfect" : "not bit-perfect") }
+            if !m.resampled {
+                let converted = songResampled && abs(m.sampleRate - source.sampleRate) >= 0.5
+                parts.append(isUntouched(m) ? "bit-perfect"
+                             : converted ? "not bit-perfect: the song is resampled from \(SampleRate.format(source.sampleRate)) kHz" : "not bit-perfect")
+            }
             return parts.joined(separator: " · ")
         }
     }

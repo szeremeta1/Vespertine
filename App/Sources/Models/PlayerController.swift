@@ -619,6 +619,8 @@ final class PlayerController {
                 : String(localized: "\(name) didn’t come back. Press play to continue on another output.", comment: "%@ is the name of an audio output device.")
         case .deviceNotResponding(let name):
             lastError = String(localized: "\(name) is connected but won’t start. Quit and reopen Vespertine, then press play.", comment: "%@ is the name of an audio output device.")
+        case .speakerGroupCarriesOn:
+            break   // The sentence for it comes with the speaker groups' strings.
         }
     }
 

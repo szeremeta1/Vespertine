@@ -56,14 +56,15 @@ public enum GroupDelay {
 
     /// Each aggregate channel's delay in ms, in channel order: its member's wait for the latest member, plus the delay trim of the
     /// speaker on it, plus the rate trim's headroom (every channel alike); at most what the chain holds. `resampled`: the UIDs of the
-    /// members the aggregate drift-corrects (nil: unknown); `rate`: the group's sample rate.
-    public static func perChannelMs(_ group: SpeakerGroup, resampled: Set<String>? = nil, rate: Double = 48_000) -> [Double] {
+    /// members the aggregate drift-corrects (nil: unknown); `rate`: the group's sample rate. `memberWaits` false leaves the members'
+    /// waits out (a profile measured on the group holds them already), keeping the trims and the headroom.
+    public static func perChannelMs(_ group: SpeakerGroup, resampled: Set<String>? = nil, rate: Double = 48_000, memberWaits: Bool = true) -> [Double] {
         let late = group.members.map { member in lateMs(member, resampled: resampled.map { $0.contains(member.deviceUID) }, rate: rate) }
         let latest = late.max() ?? 0
         let headroom = rateHeadroomMs(group, resampled: resampled, rate: rate)
         var delays: [Double] = []
         for (index, member) in group.members.enumerated() {
-            let wait = max(latest - late[index], 0)
+            let wait = memberWaits ? max(latest - late[index], 0) : 0
             for channel in 0..<max(member.channelCount, 0) {
                 let trim = group.speakers.first { $0.deviceUID == member.deviceUID && $0.channel == channel }?.delayTrimMs ?? 0
                 delays.append(min(max(wait + trim + headroom, 0), RoomSpeakerAlignment.delayRange.upperBound))
@@ -125,8 +126,11 @@ public enum GroupDelay {
 
     /// What the engine runs for `group`: `room` with the group's delays and level trims added (`composing`), whose preamp leaves
     /// room for the largest boost (`RoomCorrectionPlayback.withHeadroom`). `room` itself when the group adds nothing.
+    /// A profile measured on this group while it ran as it runs now already holds the delay between its DACs (the sweeps were timed
+    /// against the leader), so the members' waits are left out then; anything else gets them as before.
     public static func chain(_ room: RoomCorrectionPlayback?, group: SpeakerGroup, resampled: Set<String>? = nil, rate: Double = 48_000) -> RoomCorrectionPlayback? {
-        composing(room, delaysMs: perChannelMs(group, resampled: resampled, rate: rate), levelsDB: perChannelLevelDB(group), inverted: perChannelInverted(group),
+        let measuredHere = room?.measuredGroupClock?.holds(for: group, resampled: resampled, rate: rate) == true
+        return composing(room, delaysMs: perChannelMs(group, resampled: resampled, rate: rate, memberWaits: !measuredHere), levelsDB: perChannelLevelDB(group), inverted: perChannelInverted(group),
                   advancePPM: perChannelAdvancePPM(group, resampled: resampled, rate: rate), name: group.name)
     }
 }

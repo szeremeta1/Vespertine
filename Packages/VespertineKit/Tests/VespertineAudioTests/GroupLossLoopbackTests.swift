@@ -93,7 +93,7 @@ struct GroupLossLoopbackTests {
 
         run.followerShown.set(false)
         run.engine.devicesChanged()
-        #expect(wait(5) { run.engine.snapshot.state == .paused && run.engine.snapshot.waitingForDevice == run.group.name },
+        #expect(wait(5) { run.engine.snapshot.state == .paused && run.engine.snapshot.waitingForDevice == run.members[1].name },
                 "state \(run.engine.snapshot.state), waiting \(run.engine.snapshot.waitingForDevice ?? "-")")
         let pausedAt = run.engine.snapshot.position
         #expect(Set(DeviceQuery.allDeviceIDs()) == before, "the aggregate is gone")

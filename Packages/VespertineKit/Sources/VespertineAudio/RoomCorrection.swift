@@ -359,6 +359,9 @@ public struct RoomProfile: Codable, Hashable, Sendable, Identifiable {
     public var excludedPositions: [Int]?
     /// True once a band was edited by hand, so a redesign is known to replace the listener's own work (schema 4).
     public var filtersEdited: Bool?
+    /// A profile measured on a speaker group: how the group's DACs were clocked then (its delays hold the delay between them).
+    /// nil for any other profile, and in profiles saved before this existed.
+    public var groupClock: GroupClockContext?
 
     public init(id: UUID, name: String, createdAt: Date, sessionID: UUID, deviceUID: String, layout: RoomLayout, channelMap: RoomChannelMap,
                 micSerial: String, calibrationSHA256: String?, target: RoomTarget, filters: RoomFilterSet) {

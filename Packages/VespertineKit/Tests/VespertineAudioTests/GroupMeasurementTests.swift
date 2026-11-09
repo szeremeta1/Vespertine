@@ -89,5 +89,13 @@ struct GroupMeasurementTests {
         // The nearest speaker waits for the farthest: output 2 (12 ms) is the latest, so the left (8.1 ms) waits about 3.9 ms.
         let waits = result.profile.alignment(for: .left).delayMs
         #expect(abs(waits - 3.9) < 0.3, "\(waits)")
+        // How the group's aggregate clocked its DACs is kept with the profile, read from the output the sweeps played on.
+        let clock = GroupClockContext(sampleRate: 48_000, members: [.init(uid: GroupFixtures.fosi, driftCorrected: false, driftQuality: 0),
+                                                                    .init(uid: GroupFixtures.fiio, driftCorrected: true, driftQuality: 127)])
+        var asked: (UInt32, Double)?
+        let kept = try RoomMeasurementResult.make(recordings: controller.acceptedRecordings, session: controller.session, calibration: nil,
+                                                  name: "Downstairs quad", micSerial: "7001", groupClock: { output, rate in asked = (output, rate); return clock })
+        #expect(kept.profile.groupClock == clock)
+        #expect(asked?.0 == 72 && asked?.1 == 48_000)
     }
 }
