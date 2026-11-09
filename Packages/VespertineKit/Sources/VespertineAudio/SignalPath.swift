@@ -101,7 +101,7 @@ public struct SignalPath: Sendable, Hashable {
     /// True only when every sample reaches the DAC unaltered.
     public var isBitPerfect: Bool {
         if let group { return groupIsBitPerfect(group) }
-        guard transition?.audible != true, !faderRamping, deviceProfile.canBeBitPerfect, applied.physicalFormatKnown, applied.exclusive || !otherAppsPlaying, !modifiesSamples,
+        guard transition?.audible != true, !faderRamping, foldedOnto == nil, deviceProfile.canBeBitPerfect, applied.physicalFormatKnown, applied.exclusive || !otherAppsPlaying, !modifiesSamples,
               plan.spatial == .off, concealedFrames == 0, plan.channels == source.channels, applied.virtualChannels >= source.channels
         else { return false }
         switch plan.mode {
@@ -150,6 +150,7 @@ public struct SignalPath: Sendable, Hashable {
         if plan.spatial != .off {
             return plan.spatial == .headTracked ? String(localized: "SPATIAL · HEAD TRACKED", comment: "Status badge (short, uppercase).") : String(localized: "SPATIAL AUDIO", comment: "Status badge (short, uppercase).")
         }
+        if let onto = foldedOnto { return foldNotice(onto: onto) }
         if plan.channels < source.channels { return downmixNotice(from: ChannelLayouts.name(channels: source.channels), channels: plan.channels) }
         if !deviceProfile.canBeBitPerfect && !isResampling && !plan.dsdConvertedToPCM {
             switch deviceProfile.kind {
@@ -182,6 +183,11 @@ public struct SignalPath: Sendable, Hashable {
                       : "\(from) → \(ChannelLayouts.name(channels: channels).uppercased())"
     }
 
+    /// The notice for a fold onto a speaker setup, as for a downmix: "5.1.2 → 7.1".
+    private func foldNotice(onto: String) -> String {
+        "\(ChannelLayouts.name(labels: source.channelLabels, channels: source.channels)) → \(onto.uppercased())"
+    }
+
     /// A source's channels mixed into fewer ("5.1" → "Stereo").
     public struct Downmix: Sendable, Hashable {
         public var from: String
@@ -198,9 +204,10 @@ public struct SignalPath: Sendable, Hashable {
 
     /// nil: neither happened.
     public var conversion: Conversion? {
-        let downmix = plan.mode == .pcm && plan.spatial == .off && plan.channels < source.channels
-            ? Downmix(from: ChannelLayouts.name(labels: source.channelLabels, channels: source.channels), to: ChannelLayouts.name(channels: plan.channels))
-            : nil
+        let from = ChannelLayouts.name(labels: source.channelLabels, channels: source.channels)
+        let downmix = foldedOnto.map { Downmix(from: from, to: $0) }
+            ?? (plan.mode == .pcm && plan.spatial == .off && plan.channels < source.channels
+                ? Downmix(from: from, to: ChannelLayouts.name(channels: plan.channels)) : nil)
         guard plan.dsdConvertedToPCM || downmix != nil else { return nil }
         return Conversion(dsdToPCM: plan.dsdConvertedToPCM, downmix: downmix)
     }
@@ -211,7 +218,9 @@ public struct SignalPath: Sendable, Hashable {
         var badges: [String] = []
         if conversion.dsdToPCM, statusLine != Self.convertedFromDSD { badges.append(Self.convertedFromDSD) }
         // The status line says a downmix itself, unless damaged frames take its place.
-        if let mix = conversion.downmix, concealedFrames > 0 { badges.append(downmixNotice(from: mix.from, channels: plan.channels)) }
+        if let mix = conversion.downmix, concealedFrames > 0 {
+            badges.append(foldedOnto.map(foldNotice(onto:)) ?? downmixNotice(from: mix.from, channels: plan.channels))
+        }
         return badges
     }
 
@@ -234,4 +243,8 @@ public struct SignalPath: Sendable, Hashable {
     public var deviceFormatShort: String {
         "\(applied.physicalBitDepth)/\(SampleRate.format(applied.sampleRate))"
     }
+
+    /// The speaker setup (its name, "7.1", "Quad") the file is folded onto: it has as many or fewer speakers than the file has
+    /// channels, and some channels have no speaker of their own, so they are mixed into the nearest ones. nil: not folded.
+    public var foldedOnto: String? = nil
 }
