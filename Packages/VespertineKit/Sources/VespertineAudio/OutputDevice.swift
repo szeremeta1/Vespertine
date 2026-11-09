@@ -169,10 +169,12 @@ enum DeviceQuery {
 
     static func capabilities(_ device: AudioObjectID, supportsDoP: Bool) -> DeviceCapabilities {
         var formats: [PhysicalFormat] = []
+        var perStream: [[PhysicalFormat]] = []
         for stream in outputStreams(device) {
+            var own: [PhysicalFormat] = []
             for ranged in physicalFormats(stream) where ranged.mFormat.mFormatID == kAudioFormatLinearPCM {
                 let f = ranged.mFormat
-                formats.append(PhysicalFormat(
+                own.append(PhysicalFormat(
                     minRate: ranged.mSampleRateRange.mMinimum,
                     maxRate: ranged.mSampleRateRange.mMaximum,
                     bitDepth: Int(f.mBitsPerChannel),
@@ -180,6 +182,8 @@ enum DeviceQuery {
                     isMixable: f.mFormatFlags & kAudioFormatFlagIsNonMixable == 0,
                     channels: Int(f.mChannelsPerFrame)))
             }
+            formats += own
+            perStream.append(own)
         }
         // Capacity, not the current setting: an HDMI receiver left in 2-channel mode still offers 8.
         let streams = outputStreams(device).map { stream in
@@ -190,7 +194,8 @@ enum DeviceQuery {
         let channels = channelCapacity(streams: streams, configured: outputChannelCount(device))
         return DeviceCapabilities(sampleRates: nominalRates(device), physicalFormats: Array(Set(formats)),
                                   outputChannels: channels, supportsDoP: supportsDoP,
-                                  speakerLayoutChannels: speakerLayout(device).flatMap { $0.hasSpeakerPositions ? Int($0.channelCount) : nil })
+                                  speakerLayoutChannels: speakerLayout(device).flatMap { $0.hasSpeakerPositions ? Int($0.channelCount) : nil },
+                                  streamFormats: perStream.count > 1 ? perStream : nil)
     }
 
     /// Channels the device can carry: per stream, the widest format it offers (or its current one,

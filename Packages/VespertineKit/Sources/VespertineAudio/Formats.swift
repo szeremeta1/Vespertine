@@ -80,14 +80,18 @@ public struct DeviceCapabilities: Sendable, Hashable, Codable {
     /// Channels in the device's configured speaker layout (Audio MIDI Setup → Configure Speakers),
     /// when those channels carry real speaker positions. nil when unconfigured or just numbered.
     public var speakerLayoutChannels: Int?
+    /// Each output stream's own formats, in stream order, when the device has more than one stream (an 8-channel DAC as
+    /// four stereo streams). `physicalFormats` merges them. nil for a single stream, or when not known.
+    public var streamFormats: [[PhysicalFormat]]?
 
     public init(sampleRates: [Double], physicalFormats: [PhysicalFormat], outputChannels: Int, supportsDoP: Bool,
-                speakerLayoutChannels: Int? = nil) {
+                speakerLayoutChannels: Int? = nil, streamFormats: [[PhysicalFormat]]? = nil) {
         self.sampleRates = sampleRates.sorted()
         self.physicalFormats = physicalFormats
         self.outputChannels = outputChannels
         self.supportsDoP = supportsDoP
         self.speakerLayoutChannels = speakerLayoutChannels
+        self.streamFormats = streamFormats
     }
 
     public func supports(rate: Double) -> Bool {
