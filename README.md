@@ -9,7 +9,7 @@
   <strong>The free, open-source Mac player for surround and hi-res music collections.</strong>
 </p>
 
-Vespertine plays your stereo and surround music from one library: SACD images, DVD-Video discs, DTS CDs, Dolby TrueHD, DTS-HD Master Audio, Atmos and plain FLAC. It plays surround as head-tracked Spatial Audio on AirPods, measures your room with a USB microphone and corrects each speaker, shows every step between the file and your DAC, and tells you whether your "hi-res" files really are.
+Vespertine plays your stereo and surround music from one library: SACD images, DVD-Video discs, DTS CDs, Dolby TrueHD, DTS-HD Master Audio, Atmos and plain FLAC. It plays surround as head-tracked Spatial Audio on AirPods, or across several USB DACs at once as one speaker system (Speaker Groups, in beta), measures your room with a USB microphone and corrects each speaker, shows every step between the file and your DAC, and tells you whether your "hi-res" files really are.
 
 <p align="center">
   <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><strong>Download the DMG</strong></a> or <code>brew install --cask szeremeta1/tap/vespertine</code> · macOS 14.4+ · Apple silicon and Intel<br>
@@ -33,6 +33,7 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 
 ## Highlights
 
+- **Speaker Groups (Beta): several DACs, one speaker system.** Play one stream across two or more DACs as a single quad or surround setup, with a channel map, a drawing of your room, and per-speaker level, delay and polarity. 5.1 and Dolby Atmos beds are placed on the speakers you actually have, and the signal path says exactly what that did to the samples. Off by default, and a beta: [read what is and isn't verified](#speaker-groups-beta).
 - **Room correction, measured in your room.** Measure with a UMIK-1 or another calibrated USB microphone at one to five spots around your seat, and Vespertine fits filters to each speaker and lines up their delay and level. Stereo and 5.1. It also imports REW and Equalizer APO filters and impulse responses. Off by default and bit-perfect while off. [More below](#room-correction).
 - **Stereo and surround in one library.** SACD 5.1, multichannel FLAC, DTS CDs, TrueHD and DTS-HD MA sit next to your stereo albums. When an album has both versions, each song is listed once and Vespertine plays the one that suits your output.
 - **Disc images, played directly.** SACD `.iso` images (stereo and multichannel, DST or plain) and DVD-Video LPCM (`.iso` or a `VIDEO_TS` folder) play straight from the image, with nothing mounted or extracted. It matched sacd_extract bit for bit on two real discs.
@@ -45,6 +46,34 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 <p align="center">
   <img src="docs/screenshots/languages-wall.png" width="800" alt="Vespertine written in each of its 45 interface languages, from ヴェスパタイン and Веспертайн to فسبرتاين and वेस्परटाइन, at mixed sizes and typefaces">
 </p>
+
+## Speaker Groups (Beta)
+
+> **This is a beta.** It is off by default, behind one switch in Settings › Playback › Speaker Groups (beta), and with the switch off nothing about playback changes. The routing, the editor and the room-correction pieces are covered by automated tests and by opt-in tests against virtual devices. On real DACs only one session has run (a Fosi Audio ZD3 leading a FiiO K11, with a UMIK-1), using a probe tool rather than the app. **Nothing in the app has been listened to on a real group yet**, so reports are very welcome.
+
+Two or more USB DACs, played as one multichannel system: a Fosi ZD3 and a FiiO K11 as the front and back pairs of a quad, for example. Vespertine builds a private Core Audio aggregate of your DACs that exists only inside Vespertine (other apps can't see it or play into it) and removes it when playback stops. One DAC, the clock leader, sets the time; every other DAC is resampled by a few millionths to follow it, so the speakers stay together without the image drifting.
+
+<p align="center">
+  <img src="docs/screenshots/speaker-groups-setup.png" width="800" alt="PLACEHOLDER">
+</p>
+
+- **Channel map.** Every channel of every DAC is assigned to a speaker (front left, centre, back right…). An **Identify** button plays three quiet bursts of pink noise (-30 dBFS) on that one channel of that one DAC, so you can check the wiring, and each channel has an **Inverted** box. Presets lay out a Quad, an ITU 5.1 room or two pairs facing each other. Up to 16 output channels in total.
+- **Your room, drawn.** Drag the speakers and your seat on a top-down drawing; each speaker's distance, angle, delay and level are worked out from it, so every speaker reaches the seat together. "Use the Drawing" turns that into a room-correction profile (delays and levels, no microphone needed), or measure the group with a microphone and the wizard also times each follower DAC against the leader.
+- **Per-speaker trims.** Level (-40 to +12 dB), extra delay (0 to 40 ms) and a polarity flip for each speaker. A headroom guard lowers the shared preamp by the largest boost any channel can reach, so a trim doesn't clip a loud song.
+- **Surround placed by where your speakers stand.** A song's channels go to the speakers by position: a channel with a speaker of its own plays there untouched; one between two speakers is panned between them with equal power (halfway is -3 dB each, as in ITU-R BS.775); one outside every pair goes to the nearest speaker at -3 dB. Stereo, 5.1 and 7.1 files, and the 5.1/7.1 channel bed of a Dolby Digital Plus Atmos file, are all routed this way. The **LFE is dropped by default** where there is no subwoofer; you can instead send it to every speaker at a level, or to one speaker. Stereo on a quad plays the front pair only by default, or mirrors to the back at a level, or gives each pair its own stereo, or uses every speaker.
+- **A signal path that stays honest.** The group is labelled BIT-PERFECT only when every channel the song uses lands on a DAC that is not resampled (the leader, or DACs sharing a hardware clock) and nothing changes the samples: no mixing, trim, filter or digital volume. Otherwise the signal path says what changed. A drift-corrected follower is always slightly altered; on virtual devices it measured 103 to 131 dB signal to noise, far below the noise of a real DAC and amplifier, but it is not bit-perfect.
+- **If a DAC goes away,** the group either fades and pauses and names the DAC, or carries on with the DACs that are left (after a short mute) and folds the music onto them. It never carries on silently on a new clock in the middle of a song.
+
+**Limits, plainly:**
+
+- Beta, with one probe session on real DACs and none of the app. Not yet checked on hardware: a bit-exact leader, follower quality, a quad channel for channel, the Identify tone, a real unplug, one hour of playback. [The script for the next hardware session](verification/hardware/SPEAKER-GROUPS.md) is in the repo.
+- Only the clock leader's channels can be bit-perfect. Start offsets between DACs were repeatable to about 21 µs in typical runs, but 3 of 49 drift-corrected runs came in about 3.5 ms late, unexplained, and a follower crept steadily behind the leader (+13.5 ppm, 0.81 ms a minute, in one pair). The wizard can measure that rate and trim for it, but the trim has not been confirmed on hardware over its full 10 minutes.
+- PCM only: DSD is converted to PCM, Dolby and DTS bitstreams are decoded rather than passed through, and integer mode, "Match 16-bit sources" and head-tracked Spatial Audio don't apply to a group. On a group, Atmos plays its channel bed, not macOS's object rendering.
+- It is for speakers around one listening seat, not whole-home audio: Bluetooth and AirPlay outputs can't join (they add 100 ms or more of changing delay), and a macOS built-in output can join but is never bit-perfect.
+- The group has no volume of its own, and the volume keys don't control it: set each DAC's volume once, by hand.
+- The screens for creating and editing groups are in English for now; the switch is in all 45 languages. The stereo-to-quad rows come from the routing rules, not a standard, and still need listening approval.
+
+[Speaker Groups in detail](docs/SPEAKER-GROUPS.md)
 
 ## Room correction
 
