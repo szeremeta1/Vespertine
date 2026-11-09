@@ -283,13 +283,13 @@ final class PlayerController {
         let upcoming = Array(queue[(c + 1)...])
         let byID = Dictionary(upcoming.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         var seen = Set<UUID>()
-        let moving = ids.filter { byID[$0] != nil && $0 != target && seen.insert($0).inserted }
+        let moving = ids.filter { byID[$0] != nil && $0 != target && seen.insert($0).inserted }.compactMap { byID[$0] }
         guard !moving.isEmpty else { return }
         var rest = upcoming.filter { !seen.contains($0.id) }
         let at = target.flatMap { t in rest.firstIndex { $0.id == t } } ?? rest.count
         let block = rest.prefix { $0.queuedByUser }.count
-        let joins = playingNext ?? (at < block || (at == block && block > 0 && moving.allSatisfy { byID[$0]!.queuedByUser }))
-        rest.insert(contentsOf: moving.map { var e = byID[$0]!; e.queuedByUser = joins; return e }, at: at)
+        let joins = playingNext ?? (at < block || (at == block && block > 0 && moving.allSatisfy(\.queuedByUser)))
+        rest.insert(contentsOf: moving.map { var e = $0; e.queuedByUser = joins; return e }, at: at)
         // Songs left behind Playing Next's last one aren't part of it any more (they'd play after the rest started).
         if let firstOther = rest.firstIndex(where: { !$0.queuedByUser }) {
             for i in rest.indices where i > firstOther { rest[i].queuedByUser = false }
