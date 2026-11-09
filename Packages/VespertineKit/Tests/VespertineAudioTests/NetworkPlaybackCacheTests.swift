@@ -165,6 +165,39 @@ struct NetworkPlaybackCacheTests {
         else { Issue.record("the open was not cancelled") }
     }
 
+    @Test("Play pressed on a song whose share does not answer its open, then on another song: the scans are let go at once")
+    func pressThenSkipWhileOpenHangs() async throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let fifo = dir.appendingPathComponent("song.flac")
+        #expect(mkfifo(fifo.path, 0o600) == 0)
+        defer { let fd = open(fifo.path, O_WRONLY | O_NONBLOCK); if fd >= 0 { close(fd) } }   // lets the stuck open return
+        let gate = ShareIOGate(healthyGrace: 0)
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096, gate: gate)
+        cache.warm(key: "stuck", url: fifo, press: true) { true }
+        #expect(gate.isPaused, "pressing play on a song on a share holds the scans back")
+        // Skipped to a song that turns out to be local: nothing of the stuck one should hold the share any longer.
+        cache.warm(key: "local", url: dir.appendingPathComponent("local.flac"), press: true) { false }
+        // Patience, not a latency bound: on the base commit the first press held the scans until the open returned.
+        for _ in 0..<300 where gate.isPaused { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(!gate.isPaused, "the scans go while the first open is still stuck")
+    }
+
+    @Test("A prefetch of the next song whose open hangs gives up when another next song is chosen")
+    func prefetchGivesUpOnNewerNext() async throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let fifo = dir.appendingPathComponent("next.flac")
+        #expect(mkfifo(fifo.path, 0o600) == 0)
+        defer { let fd = open(fifo.path, O_WRONLY | O_NONBLOCK); if fd >= 0 { close(fd) } }
+        let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096)
+        let waiting = cache.waitingPrefetches
+        cache.prefetch(key: "stuck", url: fifo)
+        for _ in 0..<300 where cache.waitingPrefetches == waiting { try await Task.sleep(for: .milliseconds(10)) }
+        #expect(cache.waitingPrefetches == waiting + 1, "the prefetch waits for the share")
+        cache.prefetch(key: nil, url: nil)   // the queue changed: no next song on a share
+        for _ in 0..<300 where cache.waitingPrefetches > waiting { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(cache.waitingPrefetches == waiting, "it stopped waiting while the open is still stuck")
+    }
+
     @Test("Two callers opening the same file on a stuck share share one open, and each can give up alone")
     func sharedOpen() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
