@@ -170,7 +170,10 @@ struct NetworkPriorityTests {
         gate.maxInFlight = ShareIOGate.whileStreaming
         let scan = ScanLoad(link: link, gate: gate)
         defer { Task { await scan.stop() } }
-        while link.count(.scan) < 5 { try await Task.sleep(for: .milliseconds(5)) }   // the scan is under way
+        // The scan is under way. Waited for as a condition with patience for a starved machine, and failing here with what is
+        // missing, not hanging until the job's watchdog (these requests need pool threads, which other tests can hold for a while).
+        let underWay = await waitFor(patience: 90) { link.count(.scan) >= 5 }
+        try #require(underWay, "the scan never got going: \(link.count(.scan)) of its requests went over the link")
 
         // Where on the wire play is pressed, and what goes over it until the song is local. Counted in requests,
         // not seconds: a starved test machine stretches every round trip, never the order they go in.
@@ -207,6 +210,16 @@ struct NetworkPriorityTests {
         #expect(wire.filter { $0 == .playback }.count == Self.chunks, "the song's copy didn't go over the link in full: \(wire)")
         #expect(wire.firstIndex(of: .scan).map { $0 > 0 && $0 < wire.count - 1 } == true, "the held scan request didn't land mid-copy: \(wire)")
         expectScansMadeWay(counts, wire)
+    }
+
+    /// Polls `condition` until it holds (true) or `patience` seconds pass (false).
+    private func waitFor(patience: TimeInterval, _ condition: () -> Bool) async -> Bool {
+        let deadline = Date().addingTimeInterval(patience)
+        while !condition() {
+            if Date() >= deadline { return false }
+            try? await Task.sleep(for: .milliseconds(5))
+        }
+        return true
     }
 
     private func settle(_ seconds: TimeInterval = 15, until condition: () -> Bool) async {
