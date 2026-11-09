@@ -256,6 +256,28 @@ struct DVDVideoTests {
         #expect(read.excluded.map(\.cell.vobID) == [3])   // 2 s: under the preview limit
     }
 
+    @Test("A program map entry of 0 (a damaged or copy-protected IFO) reads the disc instead of crashing")
+    func programEntryZero() throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        var files = Self.sampleDisc().files
+        let good = dir.appendingPathComponent("Good/VIDEO_TS")
+        try DVDFixture.writeFolder(files, at: good)
+        let expected = try DVDVideoDisc.read(good.appendingPathComponent("VIDEO_TS.IFO")).tracks.map(\.startFrame)
+        // The first program of the first program chain says it starts at cell 0 (cells are numbered from 1).
+        var ifo = files["VTS_01_0.IFO"]!
+        let pgcit = dvdBE32(ifo, 0xCC) * DVDVideoVolume.sectorSize
+        let pg = pgcit + dvdBE32(ifo, pgcit + 8 + 4)
+        let mapAt = pg + dvdBE16(ifo, pg + 0xE6)
+        #expect(ifo[mapAt] == 1)
+        ifo[mapAt] = 0
+        files["VTS_01_0.IFO"] = ifo
+        let broken = dir.appendingPathComponent("Broken/VIDEO_TS")
+        try DVDFixture.writeFolder(files, at: broken)
+        let disc = try DVDVideoDisc.read(broken.appendingPathComponent("VIDEO_TS.IFO"))
+        #expect(disc.tracks.map(\.startFrame) == expected)
+    }
+
     // MARK: Damage
 
     @Test("Truncated, malformed or inconsistent streams fail with an error, never silent garbage")

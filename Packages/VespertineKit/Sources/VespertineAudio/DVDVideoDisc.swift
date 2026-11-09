@@ -274,7 +274,7 @@ struct TitleSetMapping {
                 usedChains.insert(chain.number)
                 guard ch.program - 1 < chain.programCells.count else { continue }
                 let indexes = chain.programCells[ch.program - 1].compactMap { c -> Int? in
-                    guard c < chain.cells.count, !chain.cells[c].isOtherAngle else { return nil }
+                    guard chain.cells.indices.contains(c), !chain.cells[c].isOtherAngle else { return nil }
                     let cell = chain.cells[c]
                     return cellIndex(vob: cell.vobID, cell: cell.cellID, sectors: cell.firstSector...max(cell.firstSector, cell.lastSector))
                 }

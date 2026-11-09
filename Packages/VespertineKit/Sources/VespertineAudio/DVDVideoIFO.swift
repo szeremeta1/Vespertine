@@ -84,11 +84,13 @@ public struct DVDTitleSetInfo: Sendable, Hashable {
         /// Each program's first cell (1-based), in order.
         public var programEntries: [Int]
         public var cells: [Cell]
-        /// The cells (indexes into `cells`) of each program.
+        /// The cells (indexes into `cells`) of each program. A damaged map can name cell 0 (cells count from 1): the
+        /// program then starts at the first cell, never before it.
         public var programCells: [[Int]] {
             programEntries.enumerated().map { i, entry in
                 let next = i + 1 < programEntries.count ? programEntries[i + 1] : cells.count + 1
-                return Array((entry - 1)..<max(entry - 1, next - 1))
+                let first = max(0, entry - 1)
+                return Array(first..<max(first, next - 1))
             }
         }
     }
