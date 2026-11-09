@@ -78,13 +78,13 @@ final class GroupSilenceHold: @unchecked Sendable {
         let status = AudioDeviceCreateIOProcIDWithBlock(&id, device, queue) { _, _, _, outputData, _ in
             for buffer in UnsafeMutableAudioBufferListPointer(outputData) { memset(buffer.mData, 0, Int(buffer.mDataByteSize)) }
         }
-        guard status == noErr, let id else { throw RoomHardwareError("The group's output couldn't be kept running (\(status)).") }
+        guard status == noErr, let id else { throw RoomHardwareError(String(localized: "The group's output couldn't be kept running (\(Int(status))).")) }
         procID = id
         let started = AudioDeviceStart(device, id)
         guard started == noErr else {
             AudioDeviceDestroyIOProcID(device, id)
             procID = nil
-            throw RoomHardwareError("The group's output couldn't be started (\(started)).")
+            throw RoomHardwareError(String(localized: "The group's output couldn't be started (\(Int(started)))."))
         }
     }
 

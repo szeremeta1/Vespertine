@@ -115,7 +115,7 @@ private struct NewSpeakerGroupSheet: View {
                 } label: { Text("Clock leader") }
                 Text(verbatim: SpeakerGroupDraft.leaderExplanation).font(.caption).foregroundStyle(.secondary)
             }
-            ForEach(draft.problems.filter { draft.chosen.count > 0 || $0 != "Choose at least two outputs." }, id: \.self) {
+            ForEach(draft.problemsWhileChoosing, id: \.self) {
                 Text(verbatim: $0).font(.caption).foregroundStyle(.orange)
             }
             HStack {

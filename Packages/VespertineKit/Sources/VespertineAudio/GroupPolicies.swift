@@ -21,19 +21,19 @@ public enum GroupPolicies {
 
         public var title: String {
             switch self {
-            case .frontOnly: "Front pair only"
-            case .mirror: "Mirror on the back pair"
-            case .eachPairStereo: "Each pair its own stereo"
-            case .allSpeakers: "Every speaker"
+            case .frontOnly: String(localized: "Front pair only")
+            case .mirror: String(localized: "Mirror on the back pair")
+            case .eachPairStereo: String(localized: "Each pair its own stereo")
+            case .allSpeakers: String(localized: "Every speaker")
             }
         }
 
         public var detail: String {
             switch self {
-            case .frontOnly: "Left and right play on the front pair; the other speakers stay quiet. The clock leader's channels can stay bit-perfect."
-            case .mirror: "Left and right play on the front pair, and again on the back pair at a lower level."
-            case .eachPairStereo: "Each pair of speakers plays the song's left and right."
-            case .allSpeakers: "Every speaker plays something of the song."
+            case .frontOnly: String(localized: "Left and right play on the front pair; the other speakers stay quiet. The clock leader's channels can stay bit-perfect.")
+            case .mirror: String(localized: "Left and right play on the front pair, and again on the back pair at a lower level.")
+            case .eachPairStereo: String(localized: "Each pair of speakers plays the song's left and right.")
+            case .allSpeakers: String(localized: "Every speaker plays something of the song.")
             }
         }
     }
@@ -75,7 +75,7 @@ public enum GroupPolicies {
     }
 
     /// What the stereo choices do today.
-    public static let stereoNote = "Played: a stereo song goes to the speakers by where the speakers stand, then this choice decides what the others do. Only the front pair plays it unless you choose otherwise."
+    public static let stereoNote = String(localized: "Played: a stereo song goes to the speakers by where the speakers stand, then this choice decides what the others do. Only the front pair plays it unless you choose otherwise.")
 
     // MARK: Subwoofer channel
 
@@ -85,17 +85,17 @@ public enum GroupPolicies {
 
         public var title: String {
             switch self {
-            case .drop: "Leave it out"
-            case .toAll: "Add it to every speaker"
-            case .toSpeaker: "Add it to one speaker"
+            case .drop: String(localized: "Leave it out")
+            case .toAll: String(localized: "Add it to every speaker")
+            case .toSpeaker: String(localized: "Add it to one speaker")
             }
         }
 
         public var detail: String {
             switch self {
-            case .drop: "As in the usual downmix: a group with no subwoofer plays without the LFE channel."
-            case .toAll: "The LFE channel is added to every speaker, at a lower level."
-            case .toSpeaker: "The LFE channel is added to the speaker you choose."
+            case .drop: String(localized: "As in the usual downmix: a group with no subwoofer plays without the LFE channel.")
+            case .toAll: String(localized: "The LFE channel is added to every speaker, at a lower level.")
+            case .toSpeaker: String(localized: "The LFE channel is added to the speaker you choose.")
             }
         }
     }
@@ -144,7 +144,7 @@ public enum GroupPolicies {
         return result
     }
 
-    public static let lfeNote = "Played: a song's LFE channel goes by this choice, or to the group's subwoofer when it has one."
+    public static let lfeNote = String(localized: "Played: a song's LFE channel goes by this choice, or to the group's subwoofer when it has one.")
 
     // MARK: A lost output
 
@@ -154,15 +154,15 @@ public enum GroupPolicies {
 
         public var title: String {
             switch self {
-            case .pause: "Pause"
-            case .continueOnRemaining: "Carry on with the rest"
+            case .pause: String(localized: "Pause")
+            case .continueOnRemaining: String(localized: "Carry on with the rest")
             }
         }
 
         public var detail: String {
             switch self {
-            case .pause: "The music pauses and plays on from the same place when the output comes back."
-            case .continueOnRemaining: "The music goes on on the outputs that are left, folded onto them. If the clock leader is the one that goes, it pauses instead: the group never carries on silently on another clock."
+            case .pause: String(localized: "The music pauses and plays on from the same place when the output comes back.")
+            case .continueOnRemaining: String(localized: "The music goes on on the outputs that are left, folded onto them. If the clock leader is the one that goes, it pauses instead: the group never carries on silently on another clock.")
             }
         }
     }
@@ -176,7 +176,7 @@ public enum GroupPolicies {
     }
 
     /// What a group's per-speaker settings do in playback today.
-    public static let playedToday = "Played today: each channel of a song goes to the speakers by where the speakers stand, and the delays, level trims and polarity shown here (the waits, the delay trims, the level trims and the speakers marked inverted)."
+    public static let playedToday = String(localized: "Played today: each channel of a song goes to the speakers by where the speakers stand, and the delays, level trims and polarity shown here (the waits, the delay trims, the level trims and the speakers marked inverted).")
 
-    public static let lossNote = "Played by the engine: a lost output pauses the group or moves it to the rest, and it moves back when the output returns."
+    public static let lossNote = String(localized: "Played by the engine: a lost output pauses the group or moves it to the rest, and it moves back when the output returns.")
 }

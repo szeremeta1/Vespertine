@@ -63,7 +63,8 @@ public enum GroupSkewMeasurement {
         public var errorDescription: String? {
             switch self {
             case .tooFewGoodRuns(let good, let total, let problem):
-                "Only \(good) of \(total) timing captures could be read" + (problem.map { " (\($0))" } ?? "") + ". The delay between the DACs was not measured."
+                problem.map { String(localized: "Readable timing captures: \(good) of \(total) (\($0)). The delay between the DACs was not measured.", comment: "Speaker group measurement: how many of the timing captures of a follower DAC could be read, and the first problem found.") }
+                    ?? String(localized: "Readable timing captures: \(good) of \(total). The delay between the DACs was not measured.", comment: "Speaker group measurement: how many of the timing captures of a follower DAC could be read.")
             }
         }
     }
@@ -84,7 +85,7 @@ public enum GroupSkewMeasurement {
                 current = outcome.group
                 outcomes.append(outcome)
             } catch {
-                failures.append("\(name): \((error as? LocalizedError)?.errorDescription ?? "\(error)")")
+                failures.append(String(localized: "\(name): \((error as? LocalizedError)?.errorDescription ?? "\(error)")", comment: "Speaker group measurement: a follower DAC's name, then why it could not be timed."))
             }
         }
         return (outcomes, failures)
@@ -94,30 +95,30 @@ public enum GroupSkewMeasurement {
                         capture: Capture, progress: @Sendable (String) -> Void) async throws -> Outcome {
         var notes: [String] = []
         let boost = GroupSkew.followerGain(level: level)
-        if boost.limited { notes.append("The \(name) chirp could not be made louder than the leader's by the full \(Int(GroupSkew.followerBoostDB)) dB; if it is not found, raise its volume.") }
+        if boost.limited { notes.append(String(localized: "The \(name) chirp could not be made louder than the leader's by the full \(Int(GroupSkew.followerBoostDB)) dB; if it is not found, raise its volume.")) }
 
         // The long capture first: the follower's slip in ppm, and where it was when that capture's first follower chirp played.
         var rateTrim: Double?
         if isCorrected {
-            progress("Timing \(name) against the leader over \(Int(rateSpanSeconds)) seconds…")
+            progress(String(localized: "Timing \(name) against the leader over \(Int(rateSpanSeconds)) s…"))
             do {
                 let layout = try GroupSkew.layout(rate: rate, leadIn: 1.5, level: level, span: rateSpanSeconds)
                 let m = try GroupSkew.measure(samples: try await capture(layout, pair.leaderChannel, pair.followerChannel, true), layout: layout, span: true)
                 if let ppm = m.memberDriftPPM, abs(ppm) <= SpeakerGroup.Member.rateTrimRangePPM.upperBound {
                     rateTrim = ppm
                 } else {
-                    notes.append("The \(name) rate against the leader was out of the range a trim holds; it was not set.")
+                    notes.append(String(localized: "The \(name) rate against the leader was out of the range a trim holds; it was not set."))
                 }
             } catch {
-                notes.append("The \(name) rate against the leader was not measured (\((error as? LocalizedError)?.errorDescription ?? "\(error)")); it is not trimmed.")
+                notes.append(String(localized: "The \(name) rate against the leader was not measured (\((error as? LocalizedError)?.errorDescription ?? "\(error)")); it is not trimmed."))
             }
         } else {
-            notes.append("\(name) is not drift-corrected (it shares the leader's clock), so it has no rate to trim.")
+            notes.append(String(localized: "\(name) is not drift-corrected (it shares the leader's clock), so it has no rate to trim."))
         }
 
         var good: [Double] = [], firstProblem: String?, warned = false
         for run in 0..<shortRuns {
-            progress("Timing \(name) against the leader (\(run + 1) of \(shortRuns))…")
+            progress(String(localized: "Timing \(name) against the leader (\(run + 1) of \(shortRuns))…"))
             do {
                 let layout = try GroupSkew.layout(rate: rate, leadIn: 1.5, level: level)
                 let elapsed = secondsSinceOutputStarted()
@@ -127,7 +128,7 @@ public enum GroupSkewMeasurement {
                 good.append(m.skewFrames - creep)
                 if m.followerLaterCopyFrames != nil, !warned {
                     warned = true
-                    notes.append("The \(name) chirp arrives twice about \(Int(m.followerLaterCopyFrames ?? 0)) frames apart (a reflection, or a second driver); the earlier one is timed.")
+                    notes.append(String(localized: "The \(name) chirp arrives twice about \(Int(m.followerLaterCopyFrames ?? 0)) frames apart (a reflection, or a second driver); the earlier one is timed."))
                 }
             } catch {
                 firstProblem = firstProblem ?? ((error as? LocalizedError)?.errorDescription ?? "\(error)")
@@ -136,16 +137,16 @@ public enum GroupSkewMeasurement {
         // A pick 100 frames or more from the others is a later copy of the chirp, not a skew.
         let median = good.sorted().isEmpty ? 0 : good.sorted()[good.count / 2]
         let kept = good.filter { abs($0 - median) < GroupSkew.outlierFrames }
-        if kept.count < good.count { notes.append("\(good.count - kept.count) of the \(name) captures landed on a later copy of the chirp and were left out.") }
+        if kept.count < good.count { notes.append(String(localized: "Captures of \(name) that landed on a later copy of the chirp were left out: \(good.count - kept.count).")) }
         guard kept.count >= minimumGoodRuns else { throw Failure.tooFewGoodRuns(good: kept.count, of: shortRuns, firstProblem: firstProblem) }
         let stats = GroupSkew.stats(kept)!
         let skew = kept.sorted()[kept.count / 2]
-        if rateTrim == nil, isCorrected { notes.append("Without the rate, the skew is as it was when measured, \(Int(secondsSinceOutputStarted())) seconds after the output started.") }
+        if rateTrim == nil, isCorrected { notes.append(String(localized: "Without the rate, the skew is as it was when measured, \(Int(secondsSinceOutputStarted())) s after the output started.")) }
         guard let result = GroupSkewCompensation.apply(measuredFrames: skew, rate: rate, to: group, followerUID: pair.followerUID, leaderSpeaker: pair.leaderSpeaker.id,
                                                        followerSpeaker: pair.followerSpeaker.id, corrected: isCorrected, rateTrimPPM: rateTrim) else {
-            throw Failure.tooFewGoodRuns(good: 0, of: shortRuns, firstProblem: "the speakers could not be matched")
+            throw Failure.tooFewGoodRuns(good: 0, of: shortRuns, firstProblem: String(localized: "the speakers could not be matched"))
         }
-        if result.acousticMs == nil { notes.append("The drawing has no distance for one of the two speakers, so the whole \(String(format: "%.2f", result.measuredMs)) ms is kept, path difference included. Place both speakers in the drawing and measure again.") }
+        if result.acousticMs == nil { notes.append(String(localized: "The drawing has no distance for one of the two speakers, so the whole \(result.measuredMs.formatted(.number.precision(.fractionLength(2)))) ms is kept, path difference included. Place both speakers in the drawing and measure again.")) }
         return Outcome(group: result.group, followerName: name, skewFrames: skew, spreadFrames: stats.peakToPeak, goodRuns: kept.count, rateTrimPPM: rateTrim, result: result, notes: notes)
     }
 }

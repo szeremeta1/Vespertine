@@ -45,17 +45,17 @@ public enum GroupCandidates {
         let eligibility: GroupCandidate.Eligibility
         switch device.transport {
         case _ where channels < 1:
-            eligibility = .refused("It has no output channels.")
+            eligibility = .refused(String(localized: "It has no output channels."))
         case .bluetooth, .bluetoothLE, .airPlay:
-            eligibility = .refused("It adds 100 ms or more of delay that changes, so it can't be kept in step with the others.")
+            eligibility = .refused(String(localized: "It adds 100 ms or more of delay that changes, so it can't be kept in step with the others."))
         case .aggregate:
-            eligibility = .refused("It is already a combined output.")
+            eligibility = .refused(String(localized: "It is already a combined output."))
         case .virtual:
-            eligibility = .refused("It is a software device, not a speaker output.")
+            eligibility = .refused(String(localized: "It is a software device, not a speaker output."))
         case .builtIn:
-            eligibility = .warning("macOS processes this output, so it is never bit-perfect.")
+            eligibility = .warning(String(localized: "macOS processes this output, so it is never bit-perfect."))
         case .unknown:
-            eligibility = .warning("This kind of connection hasn't been tested with groups.")
+            eligibility = .warning(String(localized: "This kind of connection hasn't been tested with groups."))
         case .usb, .hdmi, .displayPort, .thunderbolt, .pci, .fireWire:
             eligibility = .ok
         }
@@ -82,7 +82,7 @@ public struct SpeakerGroupDraft: Equatable, Sendable {
     public init(name: String = "") { self.name = name }
 
     /// One plain sentence for the clock leader picker.
-    public static let leaderExplanation = "Your other DACs follow this one's clock. Its channels can be bit-perfect; the others are resampled by a few millionths to stay in step."
+    public static let leaderExplanation = String(localized: "Your other DACs follow this one's clock. Its channels can be bit-perfect; the others are resampled by a few millionths to stay in step.")
 
     public func isChosen(_ uid: String) -> Bool { chosen.contains { $0.uid == uid } }
 
@@ -114,20 +114,23 @@ public struct SpeakerGroupDraft: Equatable, Sendable {
     /// What stops the group from being made, in sentences; empty when it can be.
     public var problems: [String] {
         var found: [String] = []
-        if chosen.count < 2 { found.append("Choose at least two outputs.") }
+        if chosen.count < 2 { found.append(String(localized: "Choose at least two outputs.")) }
         if totalChannels > SpeakerGroup.maxChannels {
-            found.append("The outputs add up to \(totalChannels) channels; a group can have \(SpeakerGroup.maxChannels).")
+            found.append(String(localized: "The outputs add up to \(totalChannels) channels; a group can have \(SpeakerGroup.maxChannels)."))
         }
         return found
     }
 
     public var canCreate: Bool { problems.isEmpty }
 
+    /// The problems worth showing now: nothing is said about too few outputs before the first one is chosen.
+    public var problemsWhileChoosing: [String] { chosen.isEmpty ? [] : problems }
+
     /// The group: members in the chosen order with all their channels, the clock leader, no speakers placed yet.
     public func makeGroup(id: UUID = UUID()) -> SpeakerGroup? {
         guard canCreate, let leaderUID else { return nil }
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        return SpeakerGroup(id: id, name: trimmed.isEmpty ? "Speaker group" : trimmed,
+        return SpeakerGroup(id: id, name: trimmed.isEmpty ? String(localized: "Speaker group", comment: "The name a new speaker group gets when none was typed.") : trimmed,
                             members: chosen.map { SpeakerGroup.Member(deviceUID: $0.uid, name: $0.name, channelCount: $0.channels) },
                             clockLeaderUID: leaderUID)
     }

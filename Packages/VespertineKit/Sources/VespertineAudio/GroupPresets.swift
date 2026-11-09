@@ -13,17 +13,17 @@ public enum GroupPresets {
 
         public var title: String {
             switch self {
-            case .quad: "Quad"
-            case .itu51: "ITU 5.1"
-            case .twoPairsFacing: "Two pairs facing"
+            case .quad: String(localized: "Quad")
+            case .itu51: String(localized: "ITU 5.1")
+            case .twoPairsFacing: String(localized: "Two pairs facing")
             }
         }
 
         public var detail: String {
             switch self {
-            case .quad: "Four speakers around the seat, 2 m away, at 45° and 135°."
-            case .itu51: "The standard 5.1 room: 30° front pair, centre ahead, surrounds at 110°, the subwoofer in front."
-            case .twoPairsFacing: "A pair 1.5 m ahead, and another pair 2.5 m behind facing it, as in a shared room."
+            case .quad: String(localized: "Four speakers around the seat, 2 m away, at 45° and 135°.")
+            case .itu51: String(localized: "The standard 5.1 room: 30° front pair, centre ahead, surrounds at 110°, the subwoofer in front.")
+            case .twoPairsFacing: String(localized: "A pair 1.5 m ahead, and another pair 2.5 m behind facing it, as in a shared room.")
             }
         }
 
@@ -89,7 +89,7 @@ public enum GroupReadout {
     public static func rows(_ group: SpeakerGroup, sampleRate: Double, unit: DistanceUnit) -> [Row] {
         SpeakerGeometry.alignment(for: group, sampleRate: sampleRate).map { a in
             Row(speakerID: a.speakerID, role: a.role, distance: unit.format(a.distance), angle: angle(a.azimuth),
-                delay: a.delayMs < 0.05 ? "0 ms" : "\(decimal(a.delayMs, places: 1)) ms · \(a.roundedDelayFrames) frames",
+                delay: a.delayMs < 0.05 ? "0 ms" : String(localized: "\(decimal(a.delayMs, places: 1)) ms · \(a.roundedDelayFrames) frames", comment: "Readout of a speaker's wait: milliseconds, a dot, then whole frames (plural by the frames)."),
                 level: abs(a.gainDB) < 0.05 ? "0 dB" : "\(decimal(a.gainDB, places: 1)) dB", delayLimited: a.delayLimited)
         }
     }
@@ -102,8 +102,9 @@ public enum GroupReadout {
 
     private static func angle(_ azimuth: Double) -> String {
         let a = abs(azimuth).rounded()
-        if a < 1 { return "ahead" }
-        if a >= 180 { return "behind" }
-        return "\(Int(a))° \(azimuth < 0 ? "left" : "right")"
+        if a < 1 { return String(localized: "ahead", comment: "A speaker's angle: straight ahead of where the seat faces.") }
+        if a >= 180 { return String(localized: "behind", comment: "A speaker's angle: directly behind the seat.") }
+        return azimuth < 0 ? String(localized: "\(Int(a))° left", comment: "A direction in degrees to the left of straight ahead (also read aloud by the screen reader).")
+                           : String(localized: "\(Int(a))° right", comment: "A direction in degrees to the right of straight ahead (also read aloud by the screen reader).")
     }
 }

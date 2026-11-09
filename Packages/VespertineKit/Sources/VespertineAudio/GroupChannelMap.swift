@@ -19,7 +19,7 @@ public enum GroupChannelMap {
         public var id: Int { aggregateChannel }
 
         /// "Fosi ZD3 · channel 1"
-        public var label: String { "\(deviceName) · channel \(channelOnDevice + 1)" }
+        public var label: String { String(localized: "\(deviceName) · channel \(channelOnDevice + 1)", comment: "Channel map row: an output device's name, a dot, then which of its channels (counted from 1).") }
     }
 
     public static func rows(_ group: SpeakerGroup) -> [Row] {
