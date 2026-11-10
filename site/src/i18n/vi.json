@@ -161,7 +161,7 @@
           "Chỉnh mức âm, độ trễ và cực tính cho từng loa, kèm bảo vệ biên độ dự phòng.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> chỉ xuất hiện khi mọi kênh đang dùng nằm trên DAC không bị lấy mẫu lại (DAC dẫn nhịp); nếu không, đường dẫn tín hiệu cho biết điều gì đã thay đổi."
         ],
-        "note": "Beta: mặc định tắt, sau một công tắc trong cài đặt của ứng dụng. Đã thử bằng kiểm thử tự động và thiết bị ảo; trên DAC thật mới chạy một công cụ đo, và ứng dụng chưa được nghe thử trên một nhóm thật. Chỉ PCM; đầu ra Bluetooth và AirPlay không thể tham gia.",
+        "note": "Beta: mặc định tắt, sau một công tắc trong cài đặt của ứng dụng. Đã thử bằng kiểm thử tự động và thiết bị ảo, và thử thủ công trên một cặp DAC thật (Fosi Audio ZD3 và FiiO K11) ở nhiều cấu hình và thiết lập. Chỉ PCM; đầu ra Bluetooth và AirPlay không thể tham gia.",
         "links": [
           "Nhóm loa chi tiết"
         ],

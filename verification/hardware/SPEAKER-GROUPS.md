@@ -1,6 +1,6 @@
 # Speaker groups: hardware QA
 
-For the next session with the Fosi ZD3 (leader), the FiiO K11 (follower, through the Cable Matters USB-over-Cat extender) and the UMIK-1. It checks what the automated tests cannot: what real DACs do. Nothing in the app has been listened to on a real group yet, so expect to find things; write them down as they are.
+For the next session with the Fosi ZD3 (leader), the FiiO K11 (follower, through the Cable Matters USB-over-Cat extender) and the UMIK-1. It checks what the automated tests cannot: what real DACs do. The app has been tested by hand on this pair of DACs in several configurations and settings, but none of this script's measurements has been run from the app yet, so expect to find things; write them down as they are.
 
 **Turn the amplifiers down first.** The tones are quiet (-20 to -30 dBFS) but a wrong setting can still play loudly.
 

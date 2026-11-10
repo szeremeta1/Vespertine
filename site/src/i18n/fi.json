@@ -161,7 +161,7 @@
           "Tason, viiveen ja napaisuuden säätö jokaiselle kaiuttimelle sekä suojaus ylivuotoa vastaan.",
           "<span class=\"mono nowrap\">BITTITARKKA</span> näkyy vain, kun jokainen käytössä oleva kanava on DAC:illa, jota ei näytteistetä uudelleen (kellon johtaja); muuten signaalireitti kertoo, mikä muuttui."
         ],
-        "note": "Beta: oletuksena pois päältä, yhden kytkimen takana sovelluksen asetuksissa. Testattu automaattisilla testeillä ja virtuaalilaitteilla; oikeilla DAC-laitteilla on ajettu vain mittatyökalua, eikä sovelluksessa ole vielä kuunneltu oikeaa ryhmää. Vain PCM; Bluetooth- ja AirPlay-lähdöt eivät voi liittyä.",
+        "note": "Beta: oletuksena pois päältä, yhden kytkimen takana sovelluksen asetuksissa. Testattu automaattisilla testeillä ja virtuaalilaitteilla sekä käsin oikealla DAC-parilla (Fosi Audio ZD3 ja FiiO K11) useissa kokoonpanoissa ja asetuksissa. Vain PCM; Bluetooth- ja AirPlay-lähdöt eivät voi liittyä.",
         "links": [
           "Kaiutinryhmät tarkemmin"
         ],

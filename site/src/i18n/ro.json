@@ -161,7 +161,7 @@
           "Reglaje de nivel, întârziere și polaritate pentru fiecare boxă, cu o rezervă de protecție împotriva distorsiunii.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> apare doar când fiecare canal folosit se află pe un DAC care nu este reeșantionat (liderul de ceas); altfel, calea semnalului spune ce s-a schimbat."
         ],
-        "note": "Beta: dezactivată implicit, în spatele unui singur comutator din setările aplicației. Testată cu teste automate și dispozitive virtuale; pe DAC-uri reale a rulat doar o unealtă de măsurare, iar în aplicație nu s-a ascultat încă un grup real. Doar PCM; ieșirile Bluetooth și AirPlay nu se pot alătura.",
+        "note": "Beta: dezactivată implicit, în spatele unui singur comutator din setările aplicației. Testată cu teste automate și dispozitive virtuale, și manual pe o pereche reală de DAC-uri (Fosi Audio ZD3 și FiiO K11) în mai multe configurații și setări. Doar PCM; ieșirile Bluetooth și AirPlay nu se pot alătura.",
         "links": [
           "Grupurile de boxe în detaliu"
         ],

@@ -161,7 +161,7 @@
           "Pelarasan aras, kelewatan dan kekutuban bagi setiap pembesar suara, dengan pengawal ruang kepala.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> hanya muncul apabila setiap saluran yang digunakan berada pada DAC yang tidak disampel semula (pemimpin jam); jika tidak, laluan isyarat menyatakan apa yang berubah."
         ],
-        "note": "Beta: dimatikan secara lalai, di sebalik satu suis dalam tetapan app. Diuji dengan ujian automatik dan peranti maya; pada DAC sebenar hanya satu alat pengukur dijalankan, dan belum ada kumpulan sebenar yang didengar dalam app. PCM sahaja; output Bluetooth dan AirPlay tidak boleh menyertai.",
+        "note": "Beta: dimatikan secara lalai, di sebalik satu suis dalam tetapan app. Diuji dengan ujian automatik dan peranti maya, serta secara manual pada sepasang DAC sebenar (Fosi Audio ZD3 dan FiiO K11) dalam beberapa konfigurasi dan tetapan. PCM sahaja; output Bluetooth dan AirPlay tidak boleh menyertai.",
         "links": [
           "Kumpulan pembesar suara secara terperinci"
         ],

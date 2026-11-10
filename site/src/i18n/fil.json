@@ -161,7 +161,7 @@
           "Mga pagsasaayos ng antas, delay at polarity para sa bawat speaker, na may proteksyon sa headroom.",
           "Lalabas lang ang <span class=\"mono nowrap\">BIT-PERFECT</span> kapag ang bawat channel na ginagamit ay nasa DAC na hindi nire-resample (ang clock leader); kung hindi, sasabihin ng signal path kung ano ang nagbago."
         ],
-        "note": "Beta: naka-off bilang default, sa likod ng isang switch sa mga setting ng app. Nasubok sa mga awtomatikong pagsubok at virtual na device; sa mga totoong DAC, isang tool sa pagsukat lang ang napatakbo, at wala pang napakinggan sa app sa totoong grupo. PCM lang; hindi maaaring sumali ang mga output ng Bluetooth at AirPlay.",
+        "note": "Beta: naka-off bilang default, sa likod ng isang switch sa mga setting ng app. Nasubok sa mga awtomatikong pagsubok at virtual na device, at nang mano-mano sa isang totoong pares ng DAC (Fosi Audio ZD3 at FiiO K11) sa iba't ibang configuration at setting. PCM lang; hindi maaaring sumali ang mga output ng Bluetooth at AirPlay.",
         "links": [
           "Mga speaker group nang detalyado"
         ],

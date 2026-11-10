@@ -161,7 +161,7 @@
           "Korekty poziomu, opóźnienia i polaryzacji dla każdego głośnika, z zapasem chroniącym przed przesterowaniem.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> pojawia się tylko wtedy, gdy każdy używany kanał jest na DAC-u, który nie jest przepróbkowywany (nadrzędny zegar); w przeciwnym razie ścieżka sygnału pokazuje, co zmieniono."
         ],
-        "note": "Beta: domyślnie wyłączona, za jednym przełącznikiem w ustawieniach aplikacji. Sprawdzona testami automatycznymi i urządzeniami wirtualnymi; na prawdziwych DAC-ach uruchomiono tylko narzędzie pomiarowe, a w aplikacji nie odsłuchano jeszcze prawdziwej grupy. Tylko PCM; wyjścia Bluetooth i AirPlay nie mogą dołączyć.",
+        "note": "Beta: domyślnie wyłączona, za jednym przełącznikiem w ustawieniach aplikacji. Sprawdzona testami automatycznymi i urządzeniami wirtualnymi oraz ręcznie na prawdziwej parze DAC-ów (Fosi Audio ZD3 i FiiO K11) w kilku konfiguracjach i ustawieniach. Tylko PCM; wyjścia Bluetooth i AirPlay nie mogą dołączyć.",
         "links": [
           "Grupy głośników szczegółowo"
         ],

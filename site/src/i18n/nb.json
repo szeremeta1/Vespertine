@@ -161,7 +161,7 @@
           "Justering av nivå, forsinkelse og polaritet for hver høyttaler, med en sikring mot overstyring.",
           "<span class=\"mono nowrap\">BITPERFEKT</span> vises bare når hver kanal i bruk ligger på en DAC som ikke resamples (klokkelederen); ellers viser signalveien hva som ble endret."
         ],
-        "note": "Beta: av som standard, bak én bryter i appens innstillinger. Testet med automatiske tester og virtuelle enheter; på ekte DAC-er har bare et måleverktøy kjørt, og ingenting i appen er ennå avlyttet på en ekte gruppe. Bare PCM; Bluetooth- og AirPlay-utganger kan ikke være med.",
+        "note": "Beta: av som standard, bak én bryter i appens innstillinger. Testet med automatiske tester og virtuelle enheter, og for hånd på et ekte par DAC-er (Fosi Audio ZD3 og FiiO K11) i flere konfigurasjoner og innstillinger. Bare PCM; Bluetooth- og AirPlay-utganger kan ikke være med.",
         "links": [
           "Høyttalergrupper i detalj"
         ],

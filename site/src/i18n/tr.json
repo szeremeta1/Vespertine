@@ -161,7 +161,7 @@
           "Her hoparlör için seviye, gecikme ve kutup ayarları ile bir pay koruması.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> yalnızca kullanılan her kanal yeniden örneklenmeyen bir DAC’de (saat lideri) olduğunda görünür; aksi halde sinyal yolu neyin değiştiğini söyler."
         ],
-        "note": "Beta: varsayılan olarak kapalı, uygulama ayarlarında tek bir anahtarın arkasında. Otomatik testler ve sanal aygıtlarla denendi; gerçek DAC’lerde yalnızca bir ölçüm aracı çalıştırıldı ve uygulamada henüz gerçek bir grup dinlenmedi. Yalnızca PCM; Bluetooth ve AirPlay çıkışları katılamaz.",
+        "note": "Beta: varsayılan olarak kapalı, uygulama ayarlarında tek bir anahtarın arkasında. Otomatik testler ve sanal aygıtlarla, ayrıca gerçek bir DAC çiftinde (Fosi Audio ZD3 ve FiiO K11) birkaç yapılandırma ve ayarla elle denendi. Yalnızca PCM; Bluetooth ve AirPlay çıkışları katılamaz.",
         "links": [
           "Hoparlör grupları ayrıntılı"
         ],

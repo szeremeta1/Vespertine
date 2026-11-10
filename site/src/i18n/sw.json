@@ -161,7 +161,7 @@
           "Marekebisho ya kiwango, ucheleweshaji na polarity kwa kila spika, na ulinzi wa nafasi ya ziada.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> huonekana tu pale kila chaneli inayotumika iko kwenye DAC isiyochukuliwa sampuli upya (kiongozi wa saa); vinginevyo njia ya mawimbi husema kilichobadilika."
         ],
-        "note": "Beta: imezimwa kwa chaguomsingi, nyuma ya swichi moja katika mipangilio ya programu. Imejaribiwa kwa majaribio ya kiotomatiki na vifaa pepe; kwenye DAC halisi ni zana ya kupima tu iliyoendeshwa, na bado hakuna kikundi halisi kilichosikilizwa kwenye programu. PCM pekee; pato za Bluetooth na AirPlay haziwezi kujiunga.",
+        "note": "Beta: imezimwa kwa chaguomsingi, nyuma ya swichi moja katika mipangilio ya programu. Imejaribiwa kwa majaribio ya kiotomatiki na vifaa pepe, na kwa mkono kwenye jozi halisi ya DAC (Fosi Audio ZD3 na FiiO K11) katika mipangilio kadhaa tofauti. PCM pekee; pato za Bluetooth na AirPlay haziwezi kujiunga.",
         "links": [
           "Vikundi vya spika kwa kina"
         ],

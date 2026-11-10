@@ -161,7 +161,7 @@
           "Penyesuaian level, penundaan, dan polaritas untuk setiap speaker, dengan pengaman headroom.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> hanya muncul jika setiap kanal yang dipakai berada di DAC yang tidak di-resample (pemimpin clock); jika tidak, jalur sinyal menyebutkan apa yang berubah."
         ],
-        "note": "Beta: nonaktif secara default, di balik satu sakelar di pengaturan app. Diuji dengan pengujian otomatis dan perangkat virtual; di DAC sungguhan baru satu alat pengukur yang dijalankan, dan belum ada grup sungguhan yang didengarkan di app. Hanya PCM; output Bluetooth dan AirPlay tidak bisa bergabung.",
+        "note": "Beta: nonaktif secara default, di balik satu sakelar di pengaturan app. Diuji dengan pengujian otomatis dan perangkat virtual, serta secara manual pada sepasang DAC sungguhan (Fosi Audio ZD3 dan FiiO K11) dalam beberapa konfigurasi dan pengaturan. Hanya PCM; output Bluetooth dan AirPlay tidak bisa bergabung.",
         "links": [
           "Grup speaker secara rinci"
         ],

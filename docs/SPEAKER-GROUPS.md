@@ -2,7 +2,7 @@
 
 Two or more USB DACs played as one multichannel system: for example a Fosi ZD3 and a FiiO K11 as the front and back pairs of a quad. This is a beta. It is off by default, and with it off nothing about playback changes.
 
-**Status.** The group engine, the routing, the editor and the room-correction pieces are covered by automated tests, and by opt-in tests against virtual devices (Vespertine Loopback and BlackHole). On real DACs only one session has run (a Fosi ZD3 leader, a FiiO K11 follower, a UMIK-1), with a probe tool, not the app: it showed a group can be built, held and played, and measured how the DACs start (see [What is not verified](#what-is-not-verified)). Nothing in the app has been listened to on a real group yet.
+**Status.** The group engine, the routing, the editor and the room-correction pieces are covered by automated tests, and by opt-in tests against virtual devices (Vespertine Loopback and BlackHole). It has also been tested by hand on a real pair of DACs (a Fosi Audio ZD3 leader and a FiiO K11 follower) in several configurations and settings. One earlier session on that pair (with a UMIK-1), using a probe tool rather than the app, showed a group can be built, held and played, and measured how the DACs start (see [What is not verified](#what-is-not-verified)).
 
 ## Turning it on
 
@@ -55,7 +55,7 @@ With "pause", the group pauses and names the DAC that went away; with "carry on"
 
 ## What is not verified
 
-- Nothing from the app on real DACs: bit-exact leader, follower quality, quad channel for channel, the Identify tone, the sliders, a real unplug, one hour of playback. [verification/hardware/SPEAKER-GROUPS.md](../verification/hardware/SPEAKER-GROUPS.md) is the script for the next session.
+- Hand testing on the Fosi Audio ZD3 and FiiO K11 is not a measurement. Not yet measured from the app on real DACs: bit-exact leader, follower quality, quad channel for channel, the Identify tone, the sliders, a real unplug, one hour of playback. [verification/hardware/SPEAKER-GROUPS.md](../verification/hardware/SPEAKER-GROUPS.md) is the script for the next session.
 - From the 11-06 session: start offsets are repeatable to about the measurement's noise (σ 21 µs) in typical runs, but 3 of 49 drift-corrected runs came in about 3.5 ms (166 frames) late, unexplained; the follower crept about 0.2 ms between 1.6 s and 15.6 s and had not flattened (the 2026-11-07 mic session: a steady +13.5 ppm for 2 minutes, not a settling); the Fosi against FiiO drift over 300 s was not measured.
 - The Room Portrait in the wizard still draws its stereo/5.1 sketch for a quad.
 - The words of Speaker Groups (the settings, the editor, the room drawing, the engine's labels, notes and refusals, and the group part of the measurement wizard) are in the 44-language catalog. They are machine translations that native speakers have not reviewed yet. Still English: the signal-path lines for a group (`GroupSignalPath`, `GroupOutputRows`) and the engine's reason texts in `GroupRouting` and `GroupFormatRules`.
