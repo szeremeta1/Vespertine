@@ -65,7 +65,7 @@ private struct SpeakerGroupsList: View {
             if let error = groups.lastError {
                 Text("Couldn't save: \(error)", comment: "Speaker Groups settings: the reason saving the group list failed.").font(.caption).foregroundStyle(.red)
             }
-            Text("Beta: tested with virtual devices and one probe session on real DACs, but not yet listened to in the app on a real group. Only the clock leader's channels can be bit-perfect.")
+            Text("Beta: tested with virtual devices and by hand on a real pair of DACs (Fosi Audio ZD3 and FiiO K11). Only the clock leader's channels can be bit-perfect.")
                 .font(.caption).foregroundStyle(.secondary)
         }
     }

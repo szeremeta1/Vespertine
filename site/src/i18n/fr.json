@@ -161,7 +161,7 @@
           "Niveau, retard et polarité réglables pour chaque enceinte, avec une marge de sécurité contre l’écrêtage.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> n’apparaît que si chaque canal utilisé est sur un DAC qui n’est pas rééchantillonné (le maître d’horloge) ; sinon, le chemin du signal indique ce qui a changé."
         ],
-        "note": "Bêta : désactivé par défaut, derrière un seul interrupteur dans les réglages de l’app. Testé par des tests automatisés et des appareils virtuels ; sur de vrais DAC, seul un outil de sonde a tourné, et rien dans l’app n’a encore été écouté sur un vrai groupe. PCM uniquement ; les sorties Bluetooth et AirPlay ne peuvent pas en faire partie.",
+        "note": "Bêta : désactivé par défaut, derrière un seul interrupteur dans les réglages de l’app. Testé par des tests automatisés et des appareils virtuels, et à la main sur une vraie paire de DAC (Fosi Audio ZD3 et FiiO K11) dans plusieurs configurations et réglages. PCM uniquement ; les sorties Bluetooth et AirPlay ne peuvent pas en faire partie.",
         "links": [
           "Les groupes d’enceintes en détail"
         ],

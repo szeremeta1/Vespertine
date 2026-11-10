@@ -111732,271 +111732,271 @@
         }
       }
     },
-    "Beta: tested with virtual devices and one probe session on real DACs, but not yet listened to in the app on a real group. Only the clock leader's channels can be bit-perfect.": {
+    "Beta: tested with virtual devices and by hand on a real pair of DACs (Fosi Audio ZD3 and FiiO K11). Only the clock leader's channels can be bit-perfect.": {
       "comment": "Speaker Groups settings: a short note under the list. “Beta” stays as it is in your language; DAC is the digital-to-analog converter (a USB audio device).",
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "ቤታ፦ በምናባዊ መሣሪያዎች እና በእውነተኛ DAC ላይ በአንድ የሙከራ ክፍለ ጊዜ ተፈትኗል፤ ነገር ግን በመተግበሪያው ውስጥ በእውነተኛ ቡድን ላይ ገና አልተደመጠም። ቢት-ፍጹም ሊሆኑ የሚችሉት የሰዓት መሪው ቻናሎች ብቻ ናቸው።"
+            "value": "ቤታ፦ በምናባዊ መሣሪያዎች እና በእጅ በእውነተኛ DAC ጥንድ (Fosi Audio ZD3 እና FiiO K11) ተፈትኗል። ቢት-ፍጹም ሊሆኑ የሚችሉት የሰዓት መሪው ቻናሎች ብቻ ናቸው።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "تجريبي: جرى اختباره بأجهزة افتراضية وبجلسة فحص واحدة على أجهزة DAC حقيقية، لكنه لم يُستمع إليه بعد في التطبيق على مجموعة حقيقية. لا يمكن أن تكون مطابقة للبتات إلا قنوات قائد الساعة."
+            "value": "تجريبي: جرى اختباره بأجهزة افتراضية ويدويًا على زوج حقيقي من أجهزة DAC (Fosi Audio ZD3 وFiiO K11). لا يمكن أن تكون مطابقة للبتات إلا قنوات قائد الساعة."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "বিটা: ভার্চুয়াল ডিভাইসে এবং আসল DAC-এ একটি প্রোব সেশনে পরীক্ষা করা হয়েছে, কিন্তু অ্যাপে আসল গ্রুপে এখনও শোনা হয়নি। শুধু ক্লক লিডারের চ্যানেলগুলো বিট-পারফেক্ট হতে পারে।"
+            "value": "বিটা: ভার্চুয়াল ডিভাইসে এবং হাতে-কলমে আসল একজোড়া DAC-তে (Fosi Audio ZD3 ও FiiO K11) পরীক্ষা করা হয়েছে। শুধু ক্লক লিডারের চ্যানেলগুলো বিট-পারফেক্ট হতে পারে।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: testováno s virtuálními zařízeními a jednou zkušební relací na skutečných DAC, ale v aplikaci zatím nebylo poslechnuto na skutečné skupině. Bit-perfect mohou být jen kanály vedoucího hodin."
+            "value": "Beta: testováno s virtuálními zařízeními a ručně na skutečné dvojici DAC (Fosi Audio ZD3 a FiiO K11). Bit-perfect mohou být jen kanály vedoucího hodin."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: afprøvet med virtuelle enheder og én prøvesession på rigtige DAC’er, men endnu ikke lyttet til i appen på en rigtig gruppe. Kun urlederens kanaler kan være bitperfekte."
+            "value": "Beta: afprøvet med virtuelle enheder og i hånden på et rigtigt par DAC’er (Fosi Audio ZD3 og FiiO K11). Kun urlederens kanaler kan være bitperfekte."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: mit virtuellen Geräten und einer Testsitzung an echten DACs geprüft, aber in der App noch nicht an einer echten Gruppe angehört. Nur die Kanäle des Taktgebers können bit-perfekt sein."
+            "value": "Beta: mit virtuellen Geräten und von Hand an einem echten DAC-Paar (Fosi Audio ZD3 und FiiO K11) geprüft. Nur die Kanäle des Taktgebers können bit-perfekt sein."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: δοκιμάστηκε με εικονικές συσκευές και μία δοκιμαστική συνεδρία σε πραγματικούς DAC, αλλά δεν έχει ακουστεί ακόμη στην εφαρμογή σε πραγματική ομάδα. Μόνο τα κανάλια του κύριου ρολογιού μπορούν να είναι bit-perfect."
+            "value": "Beta: δοκιμάστηκε με εικονικές συσκευές και χειροκίνητα σε ένα πραγματικό ζεύγος DAC (Fosi Audio ZD3 και FiiO K11). Μόνο τα κανάλια του κύριου ρολογιού μπορούν να είναι bit-perfect."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: probado con dispositivos virtuales y una sesión de prueba en DAC reales, pero aún no escuchado en la app con un grupo real. Solo los canales del líder de reloj pueden ser bit-perfect."
+            "value": "Beta: probado con dispositivos virtuales y a mano en un par real de DAC (Fosi Audio ZD3 y FiiO K11). Solo los canales del líder de reloj pueden ser bit-perfect."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "بتا: با دستگاه‌های مجازی و یک جلسهٔ آزمایشی روی DACهای واقعی آزمایش شده، اما هنوز در برنامه روی گروهی واقعی گوش داده نشده است. فقط کانال‌های رهبر ساعت می‌توانند بیت‌به‌بیت باشند."
+            "value": "بتا: با دستگاه‌های مجازی و به‌صورت دستی روی یک جفت DAC واقعی (Fosi Audio ZD3 و FiiO K11) آزمایش شده است. فقط کانال‌های رهبر ساعت می‌توانند بیت‌به‌بیت باشند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: kokeiltu virtuaalilaitteilla ja yhdellä koeistunnolla oikeilla DAC-laitteilla, mutta ei vielä kuunneltu sovelluksessa oikealla ryhmällä. Vain kellon johtajan kanavat voivat olla bittitarkkoja."
+            "value": "Beta: kokeiltu virtuaalilaitteilla ja käsin oikealla DAC-parilla (Fosi Audio ZD3 ja FiiO K11). Vain kellon johtajan kanavat voivat olla bittitarkkoja."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: nasubukan sa mga virtual device at isang probe session sa totoong DAC, pero hindi pa napakinggan sa app sa totoong group. Ang mga channel lang ng clock leader ang maaaring bit-perfect."
+            "value": "Beta: nasubukan sa mga virtual device at nang mano-mano sa isang totoong pares ng DAC (Fosi Audio ZD3 at FiiO K11). Ang mga channel lang ng clock leader ang maaaring bit-perfect."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bêta : testé avec des appareils virtuels et une session de sonde sur de vrais DAC, mais pas encore écouté dans l’app sur un vrai groupe. Seuls les canaux du maître d’horloge peuvent être bit-perfect."
+            "value": "Bêta : testé avec des appareils virtuels et à la main sur une vraie paire de DAC (Fosi Audio ZD3 et FiiO K11). Seuls les canaux du maître d’horloge peuvent être bit-perfect."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "બીટા: વર્ચ્યુઅલ ડિવાઇસ અને વાસ્તવિક DAC પર એક પ્રોબ સેશન સાથે ચકાસાયેલ છે, પણ ઍપમાં વાસ્તવિક ગ્રુપ પર હજી સાંભળવામાં આવ્યું નથી. ફક્ત ક્લૉક લીડરની ચૅનલો બિટ-પરફેક્ટ હોઈ શકે છે."
+            "value": "બીટા: વર્ચ્યુઅલ ડિવાઇસ સાથે અને સાચા DAC ની જોડી (Fosi Audio ZD3 અને FiiO K11) પર હાથે ચકાસાયેલ છે. ફક્ત ક્લૉક લીડરની ચૅનલો બિટ-પરફેક્ટ હોઈ શકે છે."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: an gwada shi da na'urori na kama-da-wane da zaman bincike ɗaya akan DAC na gaske, amma ba a saurare shi a cikin manhajar akan ƙungiya ta gaske ba tukuna. Tashoshin jagoran agogo kawai ne za su iya zama BIT-PERFECT."
+            "value": "Beta: an gwada shi da na'urori na kama-da-wane kuma da hannu a kan DAC na gaske guda biyu (Fosi Audio ZD3 da FiiO K11). Tashoshin jagoran agogo kawai ne za su iya zama BIT-PERFECT."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "בטא: נבדק עם התקנים וירטואליים ועם סבב בדיקה אחד על DAC אמיתיים, אך עדיין לא הושמע באפליקציה על קבוצה אמיתית. רק ערוצי מוביל השעון יכולים להיות מדויקים לסיבית."
+            "value": "בטא: נבדק עם התקנים וירטואליים וביד על זוג DAC אמיתי (Fosi Audio ZD3 ו-FiiO K11). רק ערוצי מוביל השעון יכולים להיות מדויקים לסיבית."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "बीटा: वर्चुअल डिवाइस और असली DAC पर एक प्रोब सत्र से परखा गया है, लेकिन ऐप में असली ग्रुप पर अभी सुना नहीं गया है। केवल क्लॉक लीडर के चैनल ही बिट-परफ़ेक्ट हो सकते हैं।"
+            "value": "बीटा: वर्चुअल डिवाइस से और असली DAC की एक जोड़ी (Fosi Audio ZD3 और FiiO K11) पर हाथ से परखा गया है। केवल क्लॉक लीडर के चैनल ही बिट-परफ़ेक्ट हो सकते हैं।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Béta: virtuális eszközökkel és egy próbaüléssel tesztelve valódi DAC-eken, de az alkalmazásban még nem hallgatták meg valódi csoporton. Csak az óravezérlő csatornái lehetnek bit-perfect-ek."
+            "value": "Béta: virtuális eszközökkel és kézzel egy valódi DAC-páron (Fosi Audio ZD3 és FiiO K11) tesztelve. Csak az óravezérlő csatornái lehetnek bit-perfect-ek."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: diuji dengan perangkat virtual dan satu sesi probe pada DAC sungguhan, tetapi belum didengarkan di app pada grup sungguhan. Hanya saluran pemimpin clock yang bisa bit-perfect."
+            "value": "Beta: diuji dengan perangkat virtual dan secara manual pada sepasang DAC sungguhan (Fosi Audio ZD3 dan FiiO K11). Hanya saluran pemimpin clock yang bisa bit-perfect."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: provato con dispositivi virtuali e una sessione di sonda su DAC reali, ma non ancora ascoltato nell’app con un gruppo reale. Solo i canali del leader di clock possono essere bit-perfect."
+            "value": "Beta: provato con dispositivi virtuali e a mano su una coppia reale di DAC (Fosi Audio ZD3 e FiiO K11). Solo i canali del leader di clock possono essere bit-perfect."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ベータ: 仮想デバイスと、実機のDACでのプローブセッション1回で検証済みですが、アプリで実際のグループを聴いての確認はまだ行っていません。ビットパーフェクトになれるのは、クロックリーダーのチャンネルだけです。"
+            "value": "ベータ: 仮想デバイスと、実機のDACペア（Fosi Audio ZD3とFiiO K11）での手動テストで検証済みです。ビットパーフェクトになれるのは、クロックリーダーのチャンネルだけです。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಬೀಟಾ: ವರ್ಚುವಲ್ ಸಾಧನಗಳು ಮತ್ತು ನಿಜವಾದ DAC ಗಳಲ್ಲಿ ಒಂದು ಪ್ರೋಬ್ ಸೆಷನ್‌ನೊಂದಿಗೆ ಪರೀಕ್ಷಿಸಲಾಗಿದೆ, ಆದರೆ ಆ್ಯಪ್‌ನಲ್ಲಿ ನಿಜವಾದ ಗುಂಪಿನಲ್ಲಿ ಇನ್ನೂ ಆಲಿಸಿಲ್ಲ. ಕ್ಲಾಕ್ ಲೀಡರ್‌ನ ಚಾನೆಲ್‌ಗಳು ಮಾತ್ರ ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಆಗಿರಬಹುದು."
+            "value": "ಬೀಟಾ: ವರ್ಚುವಲ್ ಸಾಧನಗಳೊಂದಿಗೆ ಮತ್ತು ನಿಜವಾದ ಒಂದು ಜೋಡಿ DAC ಗಳಲ್ಲಿ (Fosi Audio ZD3 ಮತ್ತು FiiO K11) ಕೈಯಾರೆ ಪರೀಕ್ಷಿಸಲಾಗಿದೆ. ಕ್ಲಾಕ್ ಲೀಡರ್‌ನ ಚಾನೆಲ್‌ಗಳು ಮಾತ್ರ ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಆಗಿರಬಹುದು."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "베타: 가상 기기와 실제 DAC에서의 프로브 세션 1회로 테스트했지만, 앱에서 실제 그룹으로 들어보지는 않았습니다. 클록 리더의 채널만 비트 퍼펙트일 수 있습니다."
+            "value": "베타: 가상 기기와 실제 DAC 한 쌍(Fosi Audio ZD3와 FiiO K11)으로 직접 테스트했습니다. 클록 리더의 채널만 비트 퍼펙트일 수 있습니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "ബീറ്റ: വെർച്വൽ ഉപകരണങ്ങളിലും യഥാർഥ DAC-കളിലെ ഒരു പ്രോബ് സെഷനിലും പരീക്ഷിച്ചു, എന്നാൽ ആപ്പിൽ യഥാർഥ ഗ്രൂപ്പിൽ ഇതുവരെ കേട്ടിട്ടില്ല. ക്ലോക്ക് ലീഡറുടെ ചാനലുകൾ മാത്രമേ ബിറ്റ്-പെർഫെക്റ്റ് ആകൂ."
+            "value": "ബീറ്റ: വെർച്വൽ ഉപകരണങ്ങളിലും യഥാർഥ ഒരു ജോടി DAC-കളിലും (Fosi Audio ZD3, FiiO K11) കൈകൊണ്ടും പരീക്ഷിച്ചു. ക്ലോക്ക് ലീഡറുടെ ചാനലുകൾ മാത്രമേ ബിറ്റ്-പെർഫെക്റ്റ് ആകൂ."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "बीटा: व्हर्च्युअल डिव्हाइसेस आणि खऱ्या DAC वरील एका प्रोब सत्रासह तपासले आहे, पण अॅपमध्ये खऱ्या ग्रुपवर अजून ऐकलेले नाही. फक्त क्लॉक लीडरचे चॅनेल बिट-परफेक्ट असू शकतात."
+            "value": "बीटा: व्हर्च्युअल डिव्हाइसेस आणि खऱ्या DAC च्या जोडीवर (Fosi Audio ZD3 आणि FiiO K11) हाताने तपासले आहे. फक्त क्लॉक लीडरचे चॅनेल बिट-परफेक्ट असू शकतात."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: diuji dengan peranti maya dan satu sesi probe pada DAC sebenar, tetapi belum didengar dalam app pada kumpulan sebenar. Hanya saluran pemimpin jam yang boleh bit-perfect."
+            "value": "Beta: diuji dengan peranti maya dan secara manual pada sepasang DAC sebenar (Fosi Audio ZD3 dan FiiO K11). Hanya saluran pemimpin jam yang boleh bit-perfect."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: testet med virtuelle enheter og én prøveøkt på ekte DAC-er, men ennå ikke lyttet til i appen på en ekte gruppe. Bare klokkelederens kanaler kan være bitperfekte."
+            "value": "Beta: testet med virtuelle enheter og for hånd på et ekte par DAC-er (Fosi Audio ZD3 og FiiO K11). Bare klokkelederens kanaler kan være bitperfekte."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bèta: getest met virtuele apparaten en één testsessie op echte DAC’s, maar nog niet beluisterd in de app op een echte groep. Alleen de kanalen van de klokleider kunnen bitperfect zijn."
+            "value": "Bèta: getest met virtuele apparaten en met de hand op een echt paar DAC’s (Fosi Audio ZD3 en FiiO K11). Alleen de kanalen van de klokleider kunnen bitperfect zijn."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਬੀਟਾ: ਵਰਚੁਅਲ ਡਿਵਾਈਸਾਂ ਅਤੇ ਅਸਲੀ DAC ਉੱਤੇ ਇੱਕ ਪ੍ਰੋਬ ਸੈਸ਼ਨ ਨਾਲ ਪਰਖਿਆ ਗਿਆ ਹੈ, ਪਰ ਐਪ ਵਿੱਚ ਅਸਲੀ ਗਰੁੱਪ ਉੱਤੇ ਹਾਲੇ ਸੁਣਿਆ ਨਹੀਂ ਗਿਆ। ਸਿਰਫ਼ ਕਲਾਕ ਲੀਡਰ ਦੇ ਚੈਨਲ ਹੀ ਬਿੱਟ-ਪਰਫ਼ੈਕਟ ਹੋ ਸਕਦੇ ਹਨ।"
+            "value": "ਬੀਟਾ: ਵਰਚੁਅਲ ਡਿਵਾਈਸਾਂ ਨਾਲ ਅਤੇ ਅਸਲੀ DAC ਦੀ ਇੱਕ ਜੋੜੀ (Fosi Audio ZD3 ਅਤੇ FiiO K11) ਉੱਤੇ ਹੱਥੀਂ ਪਰਖਿਆ ਗਿਆ ਹੈ। ਸਿਰਫ਼ ਕਲਾਕ ਲੀਡਰ ਦੇ ਚੈਨਲ ਹੀ ਬਿੱਟ-ਪਰਫ਼ੈਕਟ ਹੋ ਸਕਦੇ ਹਨ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: przetestowano z urządzeniami wirtualnymi i jedną sesją sondy na prawdziwych DAC-ach, ale jeszcze nie odsłuchano w aplikacji na prawdziwej grupie. Tylko kanały lidera zegara mogą być bit-perfect."
+            "value": "Beta: przetestowano z urządzeniami wirtualnymi oraz ręcznie na prawdziwej parze DAC-ów (Fosi Audio ZD3 i FiiO K11). Tylko kanały lidera zegara mogą być bit-perfect."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: testado com dispositivos virtuais e uma sessão de sonda em DACs reais, mas ainda não ouvido no app com um grupo real. Só os canais do líder do clock podem ser bit-perfect."
+            "value": "Beta: testado com dispositivos virtuais e à mão em um par real de DACs (Fosi Audio ZD3 e FiiO K11). Só os canais do líder do clock podem ser bit-perfect."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: testado com dispositivos virtuais e uma sessão de sonda em DACs reais, mas ainda não ouvido na app com um grupo real. Só os canais do líder do relógio podem ser bit-perfect."
+            "value": "Beta: testado com dispositivos virtuais e à mão num par real de DAC (Fosi Audio ZD3 e FiiO K11). Só os canais do líder do relógio podem ser bit-perfect."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: testat cu dispozitive virtuale și o sesiune de sondare pe DAC-uri reale, dar încă neascultat în aplicație pe un grup real. Doar canalele liderului de ceas pot fi bit-perfect."
+            "value": "Beta: testat cu dispozitive virtuale și manual pe o pereche reală de DAC-uri (Fosi Audio ZD3 și FiiO K11). Doar canalele liderului de ceas pot fi bit-perfect."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: testad med virtuella enheter och en provsession på riktiga DAC:ar, men ännu inte avlyssnad i appen på en riktig grupp. Bara klockledarens kanaler kan vara bitperfekta."
+            "value": "Beta: testad med virtuella enheter och för hand på ett riktigt par DAC:ar (Fosi Audio ZD3 och FiiO K11). Bara klockledarens kanaler kan vara bitperfekta."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: imejaribiwa kwa vifaa pepe na kipindi kimoja cha uchunguzi kwenye DAC halisi, lakini bado haijasikilizwa kwenye programu kwa kikundi halisi. Ni chaneli za kiongozi wa saa pekee zinazoweza kuwa BIT-PERFECT."
+            "value": "Beta: imejaribiwa kwa vifaa pepe na kwa mkono kwenye jozi halisi ya DAC (Fosi Audio ZD3 na FiiO K11). Ni chaneli za kiongozi wa saa pekee zinazoweza kuwa BIT-PERFECT."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "பீட்டா: மெய்நிகர் சாதனங்களிலும் உண்மையான DAC-களில் ஒரு சோதனை அமர்விலும் பரிசோதிக்கப்பட்டது, ஆனால் செயலியில் உண்மையான குழுவில் இன்னும் கேட்கப்படவில்லை. கடிகாரத் தலைவரின் சேனல்கள் மட்டுமே பிட்-பெர்ஃபெக்ட்டாக இருக்க முடியும்."
+            "value": "பீட்டா: மெய்நிகர் சாதனங்களுடனும், உண்மையான ஒரு ஜோடி DAC-களில் (Fosi Audio ZD3 மற்றும் FiiO K11) கையாலும் சோதிக்கப்பட்டது. கடிகாரத் தலைவரின் சேனல்கள் மட்டுமே பிட்-பெர்ஃபெக்ட்டாக இருக்க முடியும்."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "బీటా: వర్చువల్ పరికరాలతో మరియు నిజమైన DAC లపై ఒక ప్రోబ్ సెషన్‌తో పరీక్షించబడింది, కానీ యాప్‌లో నిజమైన గ్రూప్‌పై ఇంకా వినలేదు. క్లాక్ లీడర్ ఛానెల్‌లు మాత్రమే బిట్-పర్ఫెక్ట్ కావచ్చు."
+            "value": "బీటా: వర్చువల్ పరికరాలతో మరియు నిజమైన ఒక జత DACలపై (Fosi Audio ZD3, FiiO K11) చేత్తో పరీక్షించబడింది. క్లాక్ లీడర్ ఛానెల్‌లు మాత్రమే బిట్-పర్ఫెక్ట్ కావచ్చు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "เบตา: ทดสอบกับอุปกรณ์เสมือนและเซสชันตรวจสอบหนึ่งครั้งบน DAC จริง แต่ยังไม่เคยฟังในแอปกับกลุ่มจริง มีเพียงช่องสัญญาณของตัวนำนาฬิกาเท่านั้นที่เป็นบิตเพอร์เฟกต์ได้"
+            "value": "เบตา: ทดสอบกับอุปกรณ์เสมือนและด้วยตนเองบน DAC จริงหนึ่งคู่ (Fosi Audio ZD3 และ FiiO K11) มีเพียงช่องสัญญาณของตัวนำนาฬิกาเท่านั้นที่เป็นบิตเพอร์เฟกต์ได้"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: sanal aygıtlarla ve gerçek DAC’lerde tek bir prob oturumuyla denendi, ancak uygulamada gerçek bir grup üzerinde henüz dinlenmedi. Yalnızca saat liderinin kanalları bit-perfect olabilir."
+            "value": "Beta: sanal aygıtlarla ve gerçek bir DAC çiftinde (Fosi Audio ZD3 ve FiiO K11) elle denendi. Yalnızca saat liderinin kanalları bit-perfect olabilir."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Бета: перевірено на віртуальних пристроях і в одному пробному сеансі на справжніх ЦАП, але ще не прослухано в застосунку на справжній групі. Бітово точними можуть бути лише канали ведучого годинника."
+            "value": "Бета: перевірено на віртуальних пристроях і вручну на справжній парі ЦАП (Fosi Audio ZD3 і FiiO K11). Бітово точними можуть бути лише канали ведучого годинника."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "بیٹا: ورچوئل آلات اور اصل DAC پر ایک پروب سیشن کے ساتھ آزمایا گیا ہے، لیکن ایپ میں اصل گروپ پر ابھی سنا نہیں گیا۔ صرف کلاک لیڈر کے چینل ہی بٹ پرفیکٹ ہو سکتے ہیں۔"
+            "value": "بیٹا: ورچوئل آلات اور اصل DAC کی ایک جوڑی (Fosi Audio ZD3 اور FiiO K11) پر ہاتھ سے آزمایا گیا ہے۔ صرف کلاک لیڈر کے چینل ہی بٹ پرفیکٹ ہو سکتے ہیں۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Beta: đã thử với thiết bị ảo và một phiên thăm dò trên DAC thật, nhưng chưa nghe thử trong ứng dụng trên một nhóm thật. Chỉ các kênh của bộ dẫn nhịp mới có thể bit-perfect."
+            "value": "Beta: đã thử với thiết bị ảo và thử thủ công trên một cặp DAC thật (Fosi Audio ZD3 và FiiO K11). Chỉ các kênh của bộ dẫn nhịp mới có thể bit-perfect."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "測試版：已用虛擬裝置及一次在真實 DAC 上的探測工作階段測試，但尚未在 App 中以真實的群組聆聽過。只有時脈主導的聲道可以做到位元完美。"
+            "value": "測試版：已用虛擬裝置及在一對真實 DAC（Fosi Audio ZD3 和 FiiO K11）上手動測試。只有時脈主導的聲道可以做到位元完美。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "测试版：已用虚拟设备和一次在真实 DAC 上的探测会话测试，但尚未在 App 中用真实的组听过。只有时钟主导的声道可以做到比特完美。"
+            "value": "测试版：已用虚拟设备测试，并在一对真实的 DAC（Fosi Audio ZD3 和 FiiO K11）上手动测试。只有时钟主导的声道可以做到比特完美。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "測試版：已用虛擬裝置及一次在真實 DAC 上的探測工作階段測試，但尚未在 App 中以真實的群組聆聽過。只有時脈主導的聲道可以做到位元完美。"
+            "value": "測試版：已用虛擬裝置及在一對真實的 DAC（Fosi Audio ZD3 與 FiiO K11）上手動測試。只有時脈主導的聲道可以做到位元完美。"
           }
         }
       }

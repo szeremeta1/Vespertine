@@ -161,7 +161,7 @@
           "Úpravy hlasitosti, zpoždění a polarity pro každý reproduktor, s ochranou rezervy proti přebuzení.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> se objeví jen tehdy, když každý používaný kanál leží na DAC, který se nepřevzorkovává (vedoucí hodin); jinak cesta signálu ukáže, co se změnilo."
         ],
-        "note": "Beta: ve výchozím stavu vypnuto, za jedním přepínačem v nastavení aplikace. Otestováno automatickými testy a virtuálními zařízeními; na skutečných DAC běžel jen měřicí nástroj a v aplikaci se zatím neposlouchala skutečná skupina. Pouze PCM; výstupy Bluetooth a AirPlay se nemohou připojit.",
+        "note": "Beta: ve výchozím stavu vypnuto, za jedním přepínačem v nastavení aplikace. Otestováno automatickými testy a virtuálními zařízeními a ručně na skutečné dvojici DAC (Fosi Audio ZD3 a FiiO K11) v několika konfiguracích a nastaveních. Pouze PCM; výstupy Bluetooth a AirPlay se nemohou připojit.",
         "links": [
           "Skupiny reproduktorů podrobně"
         ],

@@ -161,7 +161,7 @@
           "Regolazioni di livello, ritardo e polarità per ogni altoparlante, con un margine di sicurezza contro la saturazione.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> compare solo quando ogni canale in uso si trova su un DAC che non viene ricampionato (il master di clock); altrimenti il percorso del segnale indica che cosa è cambiato."
         ],
-        "note": "Beta: disattivata per impostazione predefinita, dietro un unico interruttore nelle impostazioni dell’app. Provata con test automatici e dispositivi virtuali; su DAC reali è stato eseguito solo uno strumento di sonda, e nell’app non è ancora stato ascoltato nulla su un gruppo reale. Solo PCM; le uscite Bluetooth e AirPlay non possono aggiungersi.",
+        "note": "Beta: disattivata per impostazione predefinita, dietro un unico interruttore nelle impostazioni dell’app. Provata con test automatici e dispositivi virtuali, e a mano su una coppia reale di DAC (Fosi Audio ZD3 e FiiO K11) in diverse configurazioni e impostazioni. Solo PCM; le uscite Bluetooth e AirPlay non possono aggiungersi.",
         "links": [
           "I gruppi di altoparlanti nel dettaglio"
         ],

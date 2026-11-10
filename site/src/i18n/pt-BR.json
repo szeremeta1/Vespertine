@@ -161,7 +161,7 @@
           "Ajustes de nível, atraso e polaridade para cada alto-falante, com uma margem de segurança contra distorção.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> só aparece quando todos os canais em uso estão num DAC que não é reamostrado (o líder do clock); caso contrário, o caminho do sinal diz o que mudou."
         ],
-        "note": "Beta: desativado por padrão, atrás de uma única chave nos ajustes do app. Testado com testes automatizados e dispositivos virtuais; em DACs reais só rodou uma ferramenta de sonda, e nada no app foi ouvido ainda em um grupo real. Somente PCM; saídas Bluetooth e AirPlay não podem entrar.",
+        "note": "Beta: desativado por padrão, atrás de uma única chave nos ajustes do app. Testado com testes automatizados e dispositivos virtuais, e à mão em um par real de DACs (Fosi Audio ZD3 e FiiO K11) em várias configurações e ajustes. Somente PCM; saídas Bluetooth e AirPlay não podem entrar.",
         "links": [
           "Grupos de alto-falantes em detalhe"
         ],

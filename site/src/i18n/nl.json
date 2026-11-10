@@ -161,7 +161,7 @@
           "Niveau-, vertragings- en polariteitscorrecties voor elke luidspreker, met een bewaking van de headroom.",
           "<span class=\"mono nowrap\">BITPERFECT</span> verschijnt alleen als elk gebruikt kanaal op een DAC ligt die niet opnieuw wordt gesampled (de kloklieder); anders laat het signaalpad zien wat er veranderde."
         ],
-        "note": "Bèta: standaard uit, achter één schakelaar in de instellingen van de app. Getest met geautomatiseerde tests en virtuele apparaten; op echte DAC’s is alleen een meettool gebruikt, en in de app is nog niets beluisterd op een echte groep. Alleen PCM; Bluetooth- en AirPlay-uitgangen kunnen niet meedoen.",
+        "note": "Bèta: standaard uit, achter één schakelaar in de instellingen van de app. Getest met geautomatiseerde tests en virtuele apparaten, en met de hand op een echt paar DAC’s (Fosi Audio ZD3 en FiiO K11) in meerdere configuraties en instellingen. Alleen PCM; Bluetooth- en AirPlay-uitgangen kunnen niet meedoen.",
         "links": [
           "Luidsprekergroepen in detail"
         ],

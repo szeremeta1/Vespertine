@@ -49,7 +49,7 @@ Vespertine plays your stereo and surround music from one library: SACD images, D
 
 ## Speaker Groups (Beta)
 
-> **This is a beta.** It is off by default, behind one switch in Settings › Playback › Speaker Groups (beta), and with the switch off nothing about playback changes. The routing, the editor and the room-correction pieces are covered by automated tests and by opt-in tests against virtual devices. On real DACs only one session has run (a Fosi Audio ZD3 leading a FiiO K11, with a UMIK-1), using a probe tool rather than the app. **Nothing in the app has been listened to on a real group yet**, so reports are very welcome.
+> **This is a beta.** It is off by default, behind one switch in Settings › Playback › Speaker Groups (beta), and with the switch off nothing about playback changes. The routing, the editor and the room-correction pieces are covered by automated tests and by opt-in tests against virtual devices. It has also been tested by hand on a real pair of DACs (a Fosi Audio ZD3 and a FiiO K11) in several configurations and settings. One earlier session on that pair, with a UMIK-1 and a probe tool rather than the app, measured how the DACs start. Reports from other DACs are very welcome.
 
 Two or more USB DACs, played as one multichannel system: a Fosi ZD3 and a FiiO K11 as the front and back pairs of a quad, for example. Vespertine builds a private Core Audio aggregate of your DACs that exists only inside Vespertine (other apps can't see it or play into it) and removes it when playback stops. One DAC, the clock leader, sets the time; every other DAC is resampled by a few millionths to follow it, so the speakers stay together without the image drifting.
 
@@ -80,7 +80,7 @@ Two or more USB DACs, played as one multichannel system: a Fosi ZD3 and a FiiO K
 
 **Limits, plainly:**
 
-- Beta, with one probe session on real DACs and none of the app. Not yet checked on hardware: a bit-exact leader, follower quality, a quad channel for channel, the Identify tone, a real unplug, one hour of playback. [The script for the next hardware session](verification/hardware/SPEAKER-GROUPS.md) is in the repo.
+- Beta. Tested by hand on one real pair of DACs (Fosi Audio ZD3 and FiiO K11). Hand testing is not a measurement: not yet measured from the app on hardware are a bit-exact leader, follower quality, a quad channel for channel, the Identify tone, a real unplug and one hour of playback. [The script for the next hardware session](verification/hardware/SPEAKER-GROUPS.md) is in the repo.
 - Only the clock leader's channels can be bit-perfect. Start offsets between DACs were repeatable to about 21 µs in typical runs, but 3 of 49 drift-corrected runs came in about 3.5 ms late, unexplained, and a follower crept steadily behind the leader (+13.5 ppm, 0.81 ms a minute, in one pair). The wizard can measure that rate and trim for it, but the trim has not been confirmed on hardware over its full 10 minutes.
 - PCM only: DSD is converted to PCM, Dolby and DTS bitstreams are decoded rather than passed through, and integer mode, "Match 16-bit sources" and head-tracked Spatial Audio don't apply to a group. On a group, Atmos plays its channel bed, not macOS's object rendering.
 - It is for speakers around one listening seat, not whole-home audio: Bluetooth and AirPlay outputs can't join (they add 100 ms or more of changing delay), and a macOS built-in output can join but is never bit-perfect.

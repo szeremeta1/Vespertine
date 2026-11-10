@@ -161,7 +161,7 @@
           "Level, delay and polarity trims for each speaker, with a headroom guard.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> appears only when every channel in use is on a DAC that isn’t resampled (the clock leader); otherwise the signal path says what changed."
         ],
-        "note": "Beta: off by default, behind one switch in the app’s settings. It is tested with automated tests and virtual devices; on real DACs only a probe tool has run, and nothing in the app has been listened to on a real group yet. PCM only; Bluetooth and AirPlay outputs can’t join.",
+        "note": "Beta: off by default, behind one switch in the app’s settings. It is tested with automated tests and virtual devices, and by hand on a real pair of DACs (Fosi Audio ZD3 and FiiO K11) in several configurations and settings. PCM only; Bluetooth and AirPlay outputs can’t join.",
         "links": [
           "Speaker Groups in detail"
         ],

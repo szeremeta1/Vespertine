@@ -161,7 +161,7 @@
           "Pegel-, Verzögerungs- und Polaritätskorrektur für jeden Lautsprecher, mit Aussteuerungsreserve.",
           "<span class=\"mono nowrap\">BIT-PERFEKT</span> erscheint nur, wenn jeder verwendete Kanal auf einem DAC liegt, der nicht neu abgetastet wird (der Taktgeber); sonst zeigt der Signalweg, was verändert wurde."
         ],
-        "note": "Beta: standardmäßig aus, hinter einem Schalter in den Einstellungen der App. Getestet mit automatisierten Tests und virtuellen Geräten; auf echten DACs lief bisher nur ein Messwerkzeug, und in der App wurde noch keine echte Gruppe angehört. Nur PCM; Bluetooth- und AirPlay-Ausgänge können nicht beitreten.",
+        "note": "Beta: standardmäßig aus, hinter einem Schalter in den Einstellungen der App. Getestet mit automatisierten Tests und virtuellen Geräten sowie von Hand an einem echten DAC-Paar (Fosi Audio ZD3 und FiiO K11) in mehreren Konfigurationen und Einstellungen. Nur PCM; Bluetooth- und AirPlay-Ausgänge können nicht beitreten.",
         "links": [
           "Lautsprechergruppen im Detail"
         ],

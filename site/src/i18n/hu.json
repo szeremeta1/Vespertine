@@ -161,7 +161,7 @@
           "Szint-, késleltetés- és polaritáskorrekció minden hangfalhoz, túlvezérlés elleni tartalékkal.",
           "<span class=\"mono nowrap\">BIT-PERFECT</span> csak akkor jelenik meg, ha minden használt csatorna olyan DAC-on van, amelyet nem mintavételeznek újra (az órajelvezető); különben a jelút megmutatja, mi változott."
         ],
-        "note": "Béta: alapból kikapcsolva, egyetlen kapcsoló mögött az app beállításaiban. Automatikus tesztekkel és virtuális eszközökkel tesztelve; valódi DAC-okon csak egy mérőeszköz futott, és az appban még nem hallgattak meg valódi csoportot. Csak PCM; a Bluetooth- és AirPlay-kimenetek nem csatlakozhatnak.",
+        "note": "Béta: alapból kikapcsolva, egyetlen kapcsoló mögött az app beállításaiban. Automatikus tesztekkel és virtuális eszközökkel, valamint kézzel egy valódi DAC-páron (Fosi Audio ZD3 és FiiO K11) tesztelve, több konfigurációban és beállítással. Csak PCM; a Bluetooth- és AirPlay-kimenetek nem csatlakozhatnak.",
         "links": [
           "Hangszórócsoportok részletesen"
         ],
