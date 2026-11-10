@@ -191,7 +191,10 @@ struct ReadAheadTests {
         #expect(decoder.firstAudioRead == 4096)
         try decoder.seek(to: 48_000)
         #expect(decoder.waitForAudio(timeout: 60))
-        #expect(decoder.firstAudioRead == 48_000 + 4096)
+        // The sum is spelled as an Int64 on purpose: with the Swift 6.4 toolchain's Testing library (2084), `#expect(someInt64? ==
+        // 48_000 + 4096)` fails although both sides print 52096. The same comparison outside `#expect`, or against a plain literal
+        // or an Int64(...), is true: it is the macro's handling of the literal sum, not the decoder.
+        #expect(decoder.firstAudioRead == Int64(48_000 + 4096))
     }
 
     @Test("A track read ahead moves to its local copy at the frame the engine reached, not the one read up to")

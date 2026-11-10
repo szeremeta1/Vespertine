@@ -78,7 +78,7 @@ Phase 0 of multi-DAC "speaker groups" (research only; nothing here is in the app
 - `group-play <leader> <follower>[,…] <file>…` builds a private aggregate of the devices, sets and reads back each member's own rate, plays through the real engine and compares what the engine claims with what each member reports. It needs `VESPERTINE_GROUP_PROBE=1`, takes only virtual devices unless `--real-hardware` is given, and puts everything back on exit.
 - `group-skew <leader> <follower> --mic <UMIK>` plays a timing chirp from each device, records it with one microphone N times and reports the follower's arrival against the leader's and its spread from start to start. `--control` plays every chirp from the leader, to show the method's own zero. The follower's chirp is played 11 dB louder (cut to the channel's headroom), is accepted by how far it stands over its window's floor rather than the normalised score, and a run 100 frames or more from the median of its lead-in is listed as EXCLUDED and left out of the figures and the verdict.
 
-The opt-in loopback tests (`VESPERTINE_GROUP_LOOPBACK=1 swift test --filter GroupPlayLoopback`) need "Vespertine Loopback" and "BlackHole 2ch" (or the device named by `VESPERTINE_GROUP_FOLLOWER`), both unused by other apps.
+The opt-in loopback tests (`VESPERTINE_GROUP_LOOPBACK=1 swift test --filter GroupPlayLoopback`; `--filter GroupAdvanceLoopback` plays a queue on a group and checks that it moves on by itself, `VESPERTINE_GROUP_EXCLUSIVE=1` holding the devices) need "Vespertine Loopback" and "BlackHole 2ch" (or the device named by `VESPERTINE_GROUP_FOLLOWER`), both unused by other apps.
 
 `vespertine-library` runs the same library code from the command line:
 - `find` lists folders with music;
