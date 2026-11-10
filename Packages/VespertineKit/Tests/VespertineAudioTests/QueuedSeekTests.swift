@@ -12,7 +12,8 @@ import Testing
 @Suite("A seek behind an output change, on a quiet share", .serialized)
 struct QueuedSeekTests {
     private struct Run: Sendable {
-        var playing = false, waiting = false
+        var playing = false, waiting = false, reopening = false
+        var atEdge = false, leadWait = false
         var landed = false, landedAt = "", quietAtLanding = false
         var stopped = false, end = ""
         /// What the engine said at the first step that did not come out, so a failure says where the song went.
@@ -63,6 +64,62 @@ struct QueuedSeekTests {
         try #require(run.waiting, "the read-ahead never reached the quiet part of the song: \(run.trouble)")
         #expect(run.landed, "the seek never landed: \(run.landedAt); \(run.trouble)")
         #expect(run.quietAtLanding, "the share was not quiet any more when the seek landed")
+        #expect(run.stopped, "stop got through while the share was quiet: \(run.end)")
+    }
+
+    /// What the engine is asked while it waits for the lead of a song on a quiet share.
+    enum Newest: String, CaseIterable, Sendable { case seek, outputChange }
+
+    @Test("A song waiting for its lead on a quiet share gives way to the newest request: a seek lands, an output change reopens the song", arguments: Newest.allCases)
+    func newestRequestEndsLeadWait(_ newest: Newest) async throws {
+        let rig = try PlayPauseRig(cacheClock: PlayPauseRig.slowCacheClock())
+        rig.share.goQuiet(from: 6 << 20)        // about 10 s in: the read-ahead reaches it soon
+        defer { rig.share.goQuiet(from: nil) }
+        let run = try await rig.runScript { rig -> Run in
+            var run = Run()
+            var settings = EngineSettings()
+            settings.deviceUID = rig.device.uid
+            settings.exclusive = true
+            rig.engine.update(settings: settings)
+            rig.engine.play(rig.item())
+            run.playing = rig.scriptWait(timeout: 120) { $0.state == .playing && $0.position > 3 }
+            guard run.playing else { run.trouble = Self.describe(rig); return run }
+            let entry = try rig.cache.entry(key: "song", url: rig.item().url, foreground: false)
+            run.waiting = rig.scriptWait(timeout: 120) { _ in entry.isWaiting && rig.share.readsWaiting > 0 }
+            guard run.waiting else { run.trouble = Self.describe(rig); return run }
+            // The playhead has played what was buffered and stands where the share went quiet (a little past 10 s, buffering).
+            run.atEdge = rig.scriptWait(timeout: 120) { $0.position > 10 && $0.isBuffering }
+            guard run.atEdge else { run.trouble = Self.describe(rig); return run }
+            // A seek back to a place that is on disk, but whose lead (the next megabytes, which the song waits for before its
+            // output starts) reaches into what the share has not sent: the engine thread waits there, in the song's lead, not in a read.
+            rig.engine.seek(to: 8)
+            run.leadWait = rig.scriptWait(timeout: 120) { _ in entry.isFillingLead }
+            guard run.leadWait else { run.trouble = Self.describe(rig); return run }
+            // The newest request, as a command of its own: it has to end that wait, not be handled after the share answers (it never does).
+            let opened = rig.opens.withLock { $0 }
+            switch newest {
+            case .seek:
+                // 1 s and its lead are on disk: the song plays from there. Until then the engine says 8 s (where it was asked for
+                // before), and the song would take six seconds of playing from 1 s to get that far again.
+                rig.engine.seek(to: 1)
+                run.landed = rig.scriptWait(timeout: 120) { $0.state == .playing && $0.item != nil && $0.position < 7 }
+            case .outputChange:
+                settings.exclusive = false
+                rig.engine.update(settings: settings)
+                run.landed = rig.scriptWait(timeout: 120) { _ in rig.opens.withLock { $0 } > opened }
+            }
+            run.landedAt = "\(rig.engine.snapshot.state) at \(rig.engine.snapshot.position) s, \(rig.opens.withLock { $0 } - opened) outputs opened"
+            if !run.landed { run.trouble = Self.describe(rig) }
+            rig.engine.stop()
+            run.stopped = rig.scriptWait(timeout: 120) { $0.state == .stopped }
+            run.end = "\(rig.engine.snapshot.state)"
+            return run
+        }
+        try #require(run.playing, "the song never played from its prefix: \(run.trouble)")
+        try #require(run.waiting, "the read-ahead never reached the quiet part of the song: \(run.trouble)")
+        try #require(run.atEdge, "the playhead never reached the quiet part: \(run.trouble)")
+        try #require(run.leadWait, "the song never waited for its lead: \(run.trouble)")
+        #expect(run.landed, "the \(newest.rawValue) never took effect: \(run.landedAt); \(run.trouble)")
         #expect(run.stopped, "stop got through while the share was quiet: \(run.end)")
     }
 }

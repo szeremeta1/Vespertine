@@ -64,10 +64,15 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         var busy = false
         var cancelled = false
         var concealed = 0
+        /// What `firstRead` said right after the first audio was decoded from where the decoder stands (nil: not yet).
+        var firstAudioRead: Int64?
     }
 
     /// `seconds` of audio are decoded ahead (less at high rates and channel counts, within `budgetBytes`).
-    init(_ inner: PCMDecoding, seconds: Double = 8, budgetBytes: Int = 48 << 20, chunk: AVAudioFrameCount = 4096) {
+    /// `firstRead`, asked on the decoding thread right after the first audio is decoded (and again after each seek): how far the
+    /// file has been read then (see `firstAudioRead`).
+    init(_ inner: PCMDecoding, seconds: Double = 8, budgetBytes: Int = 48 << 20, chunk: AVAudioFrameCount = 4096,
+         firstRead: (@Sendable () -> Int64)? = nil) {
         self.inner = inner
         format = inner.processingFormat
         position = inner.position
@@ -84,7 +89,7 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         let bytesPerFrame = max(1, Int(asbd.mBytesPerFrame) * buffers)
         let target = max(Int(chunk) * 2, min(Int(format.sampleRate * seconds), budgetBytes / bytesPerFrame))
         super.init()
-        let thread = Thread { [shared] in Self.run(shared, chunk: chunk, target: target) }
+        let thread = Thread { [shared] in Self.run(shared, chunk: chunk, target: target, firstRead: firstRead) }
         thread.name = "Vespertine Read-Ahead"
         // Above the cache's copies and library scans (utility), below the engine.
         thread.qualityOfService = .userInitiated
@@ -94,7 +99,7 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     deinit { stop() }
 
     /// The decoding thread: keeps `target` frames decoded ahead. A read stuck on the share holds up only it.
-    private static func run(_ s: Shared, chunk: AVAudioFrameCount, target: Int) {
+    private static func run(_ s: Shared, chunk: AVAudioFrameCount, target: Int, firstRead: (@Sendable () -> Int64)?) {
         let inner = s.inner
         while true {
             s.condition.lock()
@@ -111,10 +116,16 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
                 failure = NoBuffer()
             }
             let concealed = (inner as? ConcealingDecoder)?.concealedFrames
+            // Asked before this decode is handed over (a seek in between can't happen: it waits while `busy`), and outside the
+            // condition: `firstRead` may take a lock of its own.
+            let decodedFirst = failure == nil && (buffer?.frameLength ?? 0) > 0
+                && s.condition.withLock { s.firstAudioRead == nil }
+            let reached = decodedFirst ? firstRead?() : nil
 
             s.condition.lock()
             s.busy = false
             if let buffer, failure == nil, buffer.frameLength > 0 {
+                if s.firstAudioRead == nil { s.firstAudioRead = reached }
                 s.ready.append(buffer)
                 s.buffered += Int(buffer.frameLength)
                 delivered.withLock { $0 = Date() }
@@ -162,6 +173,7 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
         s.buffered = 0
         s.ended = false
         s.error = nil
+        s.firstAudioRead = nil
         s.condition.unlock()
         defer {
             s.condition.lock()
@@ -233,6 +245,12 @@ final class ReadAheadDecoder: NSObject, PCMDecoding, ConcealingDecoder {
     // MARK: For the engine
 
     var hasEnded: Bool { shared.condition.withLock { shared.ended } }
+
+    /// How far the file had been read when the first audio from where the decoder stands was decoded (`firstRead`): where what
+    /// plays starts, in the file. The decoding thread reads on (up to `seconds` ahead), so how far the file has been read by the
+    /// time the engine asks depends on how quickly that thread ran; this does not. Nil before that audio, after a seek until
+    /// the audio after it, or without `firstRead`.
+    var firstAudioRead: Int64? { shared.condition.withLock { shared.firstAudioRead } }
 
     /// Waits up to `timeout` for decoded audio (or the end of the file). True when there is some.
     @discardableResult

@@ -381,6 +381,8 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var copyElapsed: TimeInterval { storage.clock() - storage.startedAt }
         /// `report` is told how many bytes are on disk each time one more chunk arrives, from the copy thread (nil: stop telling).
         func setProgress(_ report: (@Sendable (Int64) -> Void)?) { storage.condition.withLock { storage.progress = report } }
+        /// Whether a start is filling the lead of this file (it has asked to be told how many bytes are on disk).
+        var isFillingLead: Bool { storage.condition.withLock { storage.progress != nil } }
         func cancel() { storage.cancel() }
         /// The prefetched next song became the one being played.
         func promote() { storage.promote() }
