@@ -70,6 +70,13 @@ struct FLACEndOfStreamTests {
 
     struct Outcome { var frames = 0; var finished = false; var failed = false; var cpu = -1.0; var reads = 0 }
 
+    /// CPU time the calling thread has used so far, in seconds.
+    private static func ownCPU() -> Double {
+        var t = timespec()
+        clock_gettime(CLOCK_THREAD_CPUTIME_ID, &t)
+        return Double(t.tv_sec) + Double(t.tv_nsec) / 1e9
+    }
+
     /// Decodes to the end on a thread of its own and gives it `patience` seconds: a decoder that spins never finishes, so the
     /// thread is left to it (it is stopped with the test process) and its CPU time is what it used in that time.
     private func decodeToEnd(_ src: Counted, patience: TimeInterval = 3) throws -> Outcome {
@@ -89,14 +96,16 @@ struct FLACEndOfStreamTests {
                     frames += Int(buffer.frameLength)
                 }
             } catch { box.withLock { $0.failed = true } }
-            box.withLock { $0.frames = frames; $0.finished = true }
+            let own = Self.ownCPU()
+            box.withLock { $0.frames = frames; $0.finished = true; $0.cpu = own }
             done.signal()
         }
         thread.start()
         _ = done.wait(timeout: .now() + patience)
         var outcome = box.withLock { $0 }
         let p = port.withLock { $0 }
-        outcome.cpu = p == 0 ? -1 : cpuSeconds(ofMachThread: p)
+        // A thread that finished reported its own CPU time; one still going (a spin) is read from outside.
+        if !outcome.finished { outcome.cpu = p == 0 ? -1 : cpuSeconds(ofMachThread: p) }
         outcome.reads = src.reads.withLock { $0 }
         return outcome
     }
