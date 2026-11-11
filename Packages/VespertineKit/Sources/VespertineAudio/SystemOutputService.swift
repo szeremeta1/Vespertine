@@ -1,0 +1,291 @@
+//
+// Vespertine: Mac Sound Output (beta): what Vespertine's helper runs. It publishes the groups the user turned on as outputs of
+// Vespertine's audio driver, keeps them published (the driver drops an output nobody refreshes), and plays a group whenever an app
+// plays to its output. It reads only the snapshot the app writes, so it runs the same with the app quit.
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Vespertine itself playing a group takes the DACs from the helper: the app asks with a distributed notification
+// (`SystemOutputHandOff`), the helper lets go of that group until the app hands it back (or quits). Sound other apps send the
+// group's output meanwhile is dropped, as the user chose.
+//
+
+import CoreAudio
+import Foundation
+import os
+
+private let log = Logger(subsystem: "org.szeremeta.vespertine", category: "SystemOutput")
+
+/// The app and the helper agree on these.
+public enum SystemOutputHandOff {
+    /// Posted by the app (userInfo: `groupKey` the group's UUID string, `pidKey` the app's pid) when it starts playing a group, and
+    /// `returned` when it stops.
+    public static let taken = Notification.Name("org.szeremeta.vespertine.systemOutput.taken")
+    public static let returned = Notification.Name("org.szeremeta.vespertine.systemOutput.returned")
+    /// Posted by the app after writing a new snapshot.
+    public static let snapshotChanged = Notification.Name("org.szeremeta.vespertine.systemOutput.snapshotChanged")
+    /// Posted by the helper after writing a new status.
+    public static let statusChanged = Notification.Name("org.szeremeta.vespertine.systemOutput.statusChanged")
+    public static let groupKey = "group"
+    public static let pidKey = "pid"
+}
+
+/// What the helper is doing with each published group, for the app's settings and the menu bar item.
+public struct SystemOutputStatus: Codable, Hashable, Sendable {
+    public enum State: String, Codable, Sendable {
+        /// Published; nothing plays to it.
+        case ready
+        /// An app plays to it and the group plays.
+        case playing
+        /// Vespertine plays the group itself.
+        case handedOff
+        /// Something failed (see `message`); tried again a little later.
+        case failed
+    }
+
+    public struct Group: Codable, Hashable, Sendable {
+        public var groupID: UUID
+        public var name: String
+        public var state: State
+        public var message: String?
+        public var sampleRate: Double?
+        public var latencyMs: Double?
+        /// The output is the Mac's chosen output.
+        public var isDefault: Bool
+    }
+
+    public var driverLoaded: Bool
+    public var groups: [Group]
+    public var updated: Date
+
+    public static func url(in directory: URL) -> URL { directory.appendingPathComponent("Mac Sound Output status.json") }
+
+    public static func read(from url: URL) -> SystemOutputStatus? {
+        guard let data = try? Data(contentsOf: url) else { return nil }
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try? decoder.decode(SystemOutputStatus.self, from: data)
+    }
+}
+
+public final class SystemOutputService: @unchecked Sendable {
+    /// After this long with no app playing, the group is let go (the DACs are free again for others).
+    public static let idleSeconds: TimeInterval = 30
+    /// After a failed start, wait this long before trying again.
+    public static let retrySeconds: TimeInterval = 10
+
+    private let directory: URL
+    private let queue = DispatchQueue(label: "org.szeremeta.vespertine.systemOutput", qos: .userInitiated)
+    private var timer: DispatchSourceTimer?
+    private var snapshot = SystemOutputSnapshot(entries: [])
+    private var snapshotDate: Date?
+    private var sessions: [UUID: SystemOutputSession] = [:]
+    private var idleSince: [UUID: Date] = [:]
+    private var failures: [UUID: (date: Date, message: String)] = [:]
+    /// Groups Vespertine plays itself, and the pid of the app that took them.
+    private var handedOff: [UUID: pid_t] = [:]
+    private var latency: [String: Int] = [:]
+    private var lastStatus: SystemOutputStatus?
+    private var observers: [NSObjectProtocol] = []
+    private var listened: [(AudioObjectID, AudioObjectPropertyAddress)] = []
+    private lazy var listener: AudioObjectPropertyListenerBlock = { [weak self] _, _ in self?.poke() }
+    /// Called on the service's queue whenever the status changes (the menu bar item).
+    public var onStatus: (@Sendable (SystemOutputStatus) -> Void)?
+
+    /// `directory`: the app's data directory, where the snapshot is.
+    public init(directory: URL) {
+        self.directory = directory
+    }
+
+    public func start() {
+        let center = DistributedNotificationCenter.default()
+        observers.append(center.addObserver(forName: SystemOutputHandOff.snapshotChanged, object: nil, queue: nil) { [weak self] _ in self?.poke() })
+        observers.append(center.addObserver(forName: SystemOutputHandOff.taken, object: nil, queue: nil) { [weak self] note in
+            guard let (group, pid) = Self.handOff(note) else { return }
+            self?.queue.async { self?.take(group, by: pid) }
+        })
+        observers.append(center.addObserver(forName: SystemOutputHandOff.returned, object: nil, queue: nil) { [weak self] note in
+            guard let (group, _) = Self.handOff(note) else { return }
+            self?.queue.async { self?.handedOff[group] = nil; self?.tick() }
+        })
+        let timer = DispatchSource.makeTimerSource(queue: queue)
+        timer.schedule(deadline: .now(), repeating: SystemOutput.refreshSeconds)
+        timer.setEventHandler { [weak self] in self?.tick() }
+        self.timer = timer
+        timer.resume()
+    }
+
+    /// Takes every output away and lets go of every group (the user turned the feature off, or the helper quits).
+    public func stop() {
+        queue.sync {
+            timer?.cancel()
+            timer = nil
+            for session in sessions.values { session.stop() }
+            sessions = [:]
+            unlisten()
+            try? SystemOutputDriver.publish([])
+        }
+        for observer in observers { DistributedNotificationCenter.default().removeObserver(observer) }
+        observers = []
+    }
+
+    /// Look again now (a snapshot change, an app starting to play, a rate change).
+    public func poke() { queue.async { [weak self] in self?.tick() } }
+
+    private static func handOff(_ note: Notification) -> (UUID, pid_t)? {
+        guard let text = note.userInfo?[SystemOutputHandOff.groupKey] as? String, let group = UUID(uuidString: text) else { return nil }
+        let pid = (note.userInfo?[SystemOutputHandOff.pidKey] as? NSNumber)?.int32Value ?? 0
+        return (group, pid)
+    }
+
+    private func take(_ group: UUID, by pid: pid_t) {
+        handedOff[group] = pid
+        if let session = sessions.removeValue(forKey: group) {
+            session.stop()
+            log.info("Mac Sound Output: Vespertine took the group over")
+        }
+        tick()
+    }
+
+    // MARK: The loop
+
+    private func tick() {
+        reloadSnapshot()
+        let entries = snapshot.entries.filter(\.choice.published)
+        let ids = Set(entries.map(\.group.id))
+
+        // Groups no longer published: stop.
+        for (id, session) in sessions where !ids.contains(id) {
+            session.stop()
+            sessions[id] = nil
+        }
+        // An app that took a group and has gone gives it back.
+        for (id, pid) in handedOff where pid > 0 && kill(pid, 0) != 0 && errno == ESRCH { handedOff[id] = nil }
+
+        // Publish (refreshes too).
+        let driverLoaded = SystemOutputDriver.isLoaded
+        if driverLoaded {
+            do { try SystemOutputDriver.publish(SystemOutput.driverConfiguration(entries, latency: latency)) } catch {
+                log.error("Mac Sound Output: publishing failed: \(error.localizedDescription, privacy: .public)")
+            }
+        }
+        listen(entries)
+
+        var groups: [SystemOutputStatus.Group] = []
+        let now = Date()
+        for entry in entries.prefix(SystemOutput.maxOutputs) {
+            let id = entry.group.id
+            var status = SystemOutputStatus.Group(groupID: id, name: entry.group.name, state: .ready, isDefault: false)
+            guard driverLoaded, let output = SystemOutputDriver.device(uid: entry.deviceUID) else {
+                groups.append(status)
+                continue
+            }
+            status.isDefault = SystemOutputDriver.isDefaultOutput(output)
+            if handedOff[id] != nil {
+                status.state = .handedOff
+                groups.append(status)
+                continue
+            }
+            // A session for an older version of the entry, or one that lost a DAC: start again.
+            if let session = sessions[id], session.entry != entry || !session.membersPresent
+                || abs(SystemOutputDriver.nominalRate(output) - session.rate) >= 0.5 {
+                session.stop()
+                sessions[id] = nil
+            }
+            let wanted = SystemOutputDriver.isRunningSomewhere(output)
+            if wanted { idleSince[id] = nil } else if sessions[id] != nil, idleSince[id] == nil { idleSince[id] = now }
+            if let since = idleSince[id], now.timeIntervalSince(since) >= Self.idleSeconds, let session = sessions[id] {
+                session.stop()
+                sessions[id] = nil
+                idleSince[id] = nil
+            }
+            if wanted, sessions[id] == nil, failures[id].map({ now.timeIntervalSince($0.date) >= Self.retrySeconds }) ?? true {
+                start(entry, output: output)
+            }
+            if let session = sessions[id] {
+                status.state = .playing
+                status.sampleRate = session.rate
+                status.latencyMs = Double(session.latencyFrames) / session.rate * 1000
+            } else if let failure = failures[id] {
+                status.state = .failed
+                status.message = failure.message
+            }
+            groups.append(status)
+        }
+        writeStatus(SystemOutputStatus(driverLoaded: driverLoaded, groups: groups, updated: now))
+    }
+
+    private func start(_ entry: SystemOutputEntry, output: AudioObjectID) {
+        let id = entry.group.id
+        guard let capture = SystemOutputDriver.device(uid: entry.captureUID) else { return }
+        // The output's own rate, or (if the DACs won't take it) the film rate, then the CD rate; the output follows.
+        let own = SystemOutputDriver.nominalRate(output)
+        var lastError: Error?
+        for rate in [own, 48_000, 44_100] where rate > 0 {
+            if abs(rate - own) >= 0.5 { SystemOutputDriver.setNominalRate(rate, on: output) }
+            do {
+                let session = try SystemOutputSession(entry: entry, captureDevice: capture, rate: rate)
+                sessions[id] = session
+                failures[id] = nil
+                if latency[entry.deviceUID] != session.latencyFrames {
+                    latency[entry.deviceUID] = session.latencyFrames
+                    try? SystemOutputDriver.publish(SystemOutput.driverConfiguration(snapshot.entries.filter(\.choice.published), latency: latency))
+                }
+                return
+            } catch let error as GroupMemberError {
+                lastError = error
+                if case .rateRefused = error { continue }
+                break
+            } catch {
+                lastError = error
+                break
+            }
+        }
+        let message = lastError?.localizedDescription ?? ""
+        failures[id] = (Date(), message)
+        log.error("Mac Sound Output: could not play the group: \(message, privacy: .public)")
+    }
+
+    private func reloadSnapshot() {
+        let url = SystemOutputSnapshot.url(in: directory)
+        let date = (try? FileManager.default.attributesOfItem(atPath: url.path)[.modificationDate]) as? Date
+        guard date != snapshotDate || date == nil else { return }
+        snapshotDate = date
+        snapshot = SystemOutputSnapshot.read(from: url) ?? SystemOutputSnapshot(entries: [])
+    }
+
+    private func writeStatus(_ status: SystemOutputStatus) {
+        var comparable = status
+        comparable.updated = lastStatus?.updated ?? status.updated
+        guard comparable != lastStatus else { return }
+        lastStatus = status
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        encoder.dateEncodingStrategy = .iso8601
+        if let data = try? encoder.encode(status) { try? data.write(to: SystemOutputStatus.url(in: directory), options: .atomic) }
+        DistributedNotificationCenter.default().postNotificationName(SystemOutputHandOff.statusChanged, object: nil, userInfo: nil, deliverImmediately: true)
+        onStatus?(status)
+    }
+
+    // MARK: Listening for apps starting to play
+
+    private func listen(_ entries: [SystemOutputEntry]) {
+        let wanted = entries.compactMap { SystemOutputDriver.device(uid: $0.deviceUID) }
+        let now = Set(listened.map(\.0))
+        guard Set(wanted) != now else { return }
+        unlisten()
+        for device in wanted {
+            for selector in [kAudioDevicePropertyDeviceIsRunningSomewhere, kAudioDevicePropertyNominalSampleRate] {
+                var address = AudioObjectPropertyAddress.global(selector)
+                if AudioObjectAddPropertyListenerBlock(device, &address, queue, listener) == noErr { listened.append((device, address)) }
+            }
+        }
+    }
+
+    private func unlisten() {
+        for (device, address) in listened {
+            var address = address
+            AudioObjectRemovePropertyListenerBlock(device, &address, queue, listener)
+        }
+        listened = []
+    }
+}
