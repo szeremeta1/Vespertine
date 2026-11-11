@@ -66,6 +66,21 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         let enumerated = LibraryScanner.enumerate(try #require(folders.first))
         #expect(LibraryScanner.cueSheets(enumerated.cue).count == 1)
     }
+    /// A copied sheet is written back in the encoding it was read in (#236): every byte but the FILE line stays as it
+    /// was, where it used to be re-encoded as UTF-8 and a misread sheet's mojibake became permanent.
+    @Test func importKeepsCueSheetEncoding() throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let src = dir.appendingPathComponent("src"), dst = dir.appendingPathComponent("dst")
+        try FileManager.default.createDirectory(at: src, withIntermediateDirectories: true)
+        try audio(src.appendingPathComponent("set.wav"))
+        let original = try #require(("TITLE \"光辉岁月\"\nFILE \"set.wav\" WAVE\n  TRACK 01 AUDIO\n    TITLE \"旧日的足迹\"\n    INDEX 01 00:00:00\n")
+            .data(using: .gb18030))
+        try original.write(to: src.appendingPathComponent("set.cue"))
+        let folder = try #require(try Importer.copyAndOrganize([src], into: dst).first).deletingLastPathComponent()
+        let copied = try Data(contentsOf: folder.appendingPathComponent("set.cue"))
+        #expect(copied == original)
+        #expect(CueSheet.load(folder.appendingPathComponent("set.cue"))?.title == "光辉岁月")
+    }
     /// Importing the same folder twice copies nothing the second time (it used to leave a "… 2" of every file),
     /// even after the first copy's tags were filled in; a different file that wants the same name still gets one.
     @Test func importingTwiceCopiesNothingNew() throws {
@@ -419,6 +434,14 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         #expect(try sheet("Группа крови", .windowsCP1251) == "Группа крови")
         #expect(try sheet("Mötley Crüe, Café Tacvba", .windowsCP1252) == "Mötley Crüe, Café Tacvba")
         #expect(try sheet("Ångström Größe", .windowsCP1252) == "Ångström Größe")
+        // Chinese rips (#236): a GBK/GB 18030 sheet used to be read as Windows-1251 and came out as "№в»ФЛкФВ".
+        #expect(try sheet("光辉岁月", .gb18030) == "光辉岁月")
+        #expect(try sheet("旧日的足迹", .gb18030) == "旧日的足迹")
+        #expect(try sheet("但愿人长久（国）", .gb18030) == "但愿人长久（国）")
+        // ...without taking the sheets that look most like it: capital Cyrillic, capital Western accents.
+        #expect(try sheet("КИНО", .windowsCP1251) == "КИНО")
+        #expect(try sheet("Émile Ólafur", .windowsCP1252) == "Émile Ólafur")
+        #expect(try sheet("ÉÈ", .windowsCP1252) == "ÉÈ")
         #expect(CueSheet.text(of: Data([0xEF, 0xBB, 0xBF]) + Data("TITLE \"Édith\"".utf8)) == "TITLE \"Édith\"")
     }
     @Test func numericCueOverflowIsRejected() {

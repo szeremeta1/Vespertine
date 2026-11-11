@@ -119,7 +119,8 @@ public enum Importer {
                 }
                 guard mapped.count == sheet.files.count, let folder = mapped.first?.deletingLastPathComponent() else { continue }
                 let data = try Data(contentsOf: sheetURL)
-                guard var text = CueSheet.text(of: data) else { continue }
+                guard let decoded = CueSheet.decode(data) else { continue }
+                var text = decoded.text
                 for (source, dest) in zip(sheet.files, mapped) {
                     let from = folder.standardizedFileURL.pathComponents
                     let to = dest.standardizedFileURL.pathComponents
@@ -137,7 +138,10 @@ public enum Importer {
                 // Imported before: the same sheet is already there.
                 let existing = folder.appendingPathComponent(sheetURL.lastPathComponent)
                 if (try? Data(contentsOf: existing)).flatMap(CueSheet.text(of:)) == text { continue }
-                try text.write(to: uniqueURL(existing), atomically: true, encoding: .utf8)
+                // Written back in the encoding it was read in, so a sheet in a legacy encoding keeps every byte but the
+                // FILE lines, even if that encoding was guessed wrong. UTF-8 only when the new paths need it.
+                let out = text.data(using: decoded.encoding) ?? Data(text.utf8)
+                try out.write(to: uniqueURL(existing), options: .atomic)
             }
         }
         return written
