@@ -407,7 +407,20 @@ public final class PlaybackEngine: @unchecked Sendable {
         } else if now.timeIntervalSince(lastStallAt) > Self.rebufferRelax {
             rebufferSeconds = Self.rebufferRange.lowerBound
         }
-        let active = decoding.map { $0.streaming && !$0.finished } ?? false
+        // Between songs, with the next one's look-ahead given up for a command and taken again: still a wait for the next song.
+        var active = decoding.map { $0.streaming && !$0.finished } ?? (retryAdvance != nil)
+        // The hold taken for that wait (`holdOutputForNextSong`) ends when the next song has filled the buffer again, not on its
+        // first frame when it is local: let go at once, the output would start on a buffer still all but empty (a moment of
+        // silence, counted as an underrun).
+        if nextSongHold, let decoding {
+            if !active, !decoding.finished, !draining, rebuffer?.context == session.context, nrt_context_is_starved(session.context) {
+                active = true
+            } else {
+                nextSongHold = false
+            }
+        } else if nextSongHold, retryAdvance == nil {
+            nextSongHold = false
+        }
         let want = active && !draining ? UInt32(session.applied.sampleRate * rebufferSeconds) : 0
         if rebuffer?.context != session.context || rebuffer?.frames != want {
             nrt_context_set_rebuffer(session.context, want)
@@ -418,6 +431,30 @@ public final class PlaybackEngine: @unchecked Sendable {
             log.notice("Network read stalled; holding until \(Int(self.rebufferSeconds), privacy: .public) s are buffered")
         }
         buffering = starved
+    }
+
+    /// The song that played has been decoded to its end and the next one is being looked for (`advance`): if the output runs out
+    /// of the old song before the new one is there (its first bytes still on their way from a share slower than the music), it
+    /// holds as it does for a stalled read, and carries on from the same frame when the next song arrives. That wait is a wait for
+    /// the network, not a buffer underrun: without the hold every empty output buffer counted as one (about a hundred a second,
+    /// thousands in one wait). `updateRebuffering` decides again once the look-ahead is over: the usual hold for a song read from
+    /// a share, none for a song that is local (once it has filled the buffer, if the output was holding).
+    private func holdOutputForNextSong(_ session: OutputSession) {
+        nextSongHold = true
+        let want = UInt32(session.applied.sampleRate * rebufferSeconds)
+        guard rebuffer?.context != session.context || rebuffer?.frames != want else { return }
+        nrt_context_set_rebuffer(session.context, want)
+        rebuffer = (session.context, want)
+    }
+
+    /// The output's hold was taken for the wait for the next song, and that song has not filled the buffer yet.
+    private var nextSongHold = false
+
+    /// The look-ahead ended with no song lined up on this output (a skip or a stop took over): no hold is left behind.
+    private func releaseOutputHold(_ session: OutputSession) {
+        nextSongHold = false
+        nrt_context_set_rebuffer(session.context, 0)
+        rebuffer = (session.context, 0)
     }
 
     /// Seconds buffered before playback resumes after a stall, and when a stall counts as following another.
@@ -1672,6 +1709,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         draining = false
         drainedAt = nil
         buffering = false
+        nextSongHold = false
     }
 
     /// `idle`: the engine is done with the device for now (see `OutputSession.invalidate`).
@@ -2434,6 +2472,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         // A gap decided below is owed only once the next song is lined up: given up (`LookAheadGivenUp`), it is decided again.
         let gapBefore = gapOwed
         guard let session, let device = sessionDevice else { return }
+        holdOutputForNextSong(session)
         if produced == 0 {
             emptyTransitions += 1
             if emptyTransitions >= 8 {
@@ -2501,6 +2540,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 return
             } catch is Superseded {
                 teardownDecoding()
+                releaseOutputHold(session)
                 return
             } catch is LookAheadGivenUp {
                 // The song that plays is left as it is (a seek or restart handles it; a queue edit chooses again): the
