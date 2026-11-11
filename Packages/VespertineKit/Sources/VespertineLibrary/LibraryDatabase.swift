@@ -1015,9 +1015,23 @@ public extension LibraryDatabase {
         public var isCurrent: Bool
     }
 
+    /// How an analysis is stored. A file that decodes as digital silence has a peak of minus infinity, which plain JSON
+    /// has no number for (the encoder refuses it): it's written the way the server's index writes it, as "-inf".
+    static func analysisEncoder() -> JSONEncoder {
+        let encoder = JSONEncoder()
+        encoder.nonConformingFloatEncodingStrategy = .convertToString(positiveInfinity: "inf", negativeInfinity: "-inf", nan: "nan")
+        return encoder
+    }
+
+    static func analysisDecoder() -> JSONDecoder {
+        let decoder = JSONDecoder()
+        decoder.nonConformingFloatDecodingStrategy = .convertFromString(positiveInfinity: "inf", negativeInfinity: "-inf", nan: "nan")
+        return decoder
+    }
+
     /// Saves a full analysis for every track that plays from `filePath` (CUE tracks share a file).
     public func saveAnalysis(_ analysis: FileAnalysis, filePath: String) throws {
-        let data = try JSONEncoder().encode(analysis)
+        let data = try Self.analysisEncoder().encode(analysis)
         try writer.write { db in
             for track in try Track.filter(Column("filePath") == filePath).fetchAll(db) {
                 guard let id = track.id else { continue }
@@ -1034,7 +1048,7 @@ public extension LibraryDatabase {
     /// Saves many results in one transaction (e.g. imported from a server's analysis index).
     public func saveAnalyses(_ items: [(FileAnalysis, String)]) throws {
         guard !items.isEmpty else { return }
-        let encoder = JSONEncoder()
+        let encoder = Self.analysisEncoder()
         let encoded = try items.map { (try encoder.encode($0.0), $0.0, $0.1) }
         let now = Date()
         try writer.write { db in
@@ -1124,7 +1138,7 @@ public extension LibraryDatabase {
         guard let id = track.id else { return nil }
         return try writer.read { db in
             guard let row = try Row.fetchOne(db, sql: "SELECT * FROM analysis WHERE trackId = ?", arguments: [id]),
-                  let analysis = try? JSONDecoder().decode(FileAnalysis.self, from: row["data"] as Data) else { return nil }
+                  let analysis = try? Self.analysisDecoder().decode(FileAnalysis.self, from: row["data"] as Data) else { return nil }
             let size: Int64 = row["fileSize"], modified: Date = row["modifiedAt"], version: Int = row["version"]
             let current = version >= FileAnalysis.currentVersion && size == track.fileSize
                 && abs(modified.timeIntervalSince(track.modifiedAt)) < 0.001
@@ -1142,7 +1156,7 @@ public extension LibraryDatabase {
         let key = "rejudgedForAnalyzerVersion", version = FileAnalysis.currentVersion
         let done = try writer.read { db in try Int.fetchOne(db, sql: "SELECT CAST(value AS INTEGER) FROM meta WHERE key = ?", arguments: [key]) }
         guard (done ?? 0) < version else { return 0 }
-        let decoder = JSONDecoder(), encoder = JSONEncoder()
+        let decoder = Self.analysisDecoder(), encoder = Self.analysisEncoder()
         var updated = 0, cursor: Int64 = .min
         while true {
             let (count, last) = try writer.write { db -> (Int, Int64?) in
