@@ -103,6 +103,26 @@ private final class FarShare: PlaybackCacheReader, @unchecked Sendable {
     var mostAtOnce: Int { lock.withLock { most } }
 }
 
+/// A share that notes what it is asked for: every read's size, in order, and how many bytes were asked for in all. Each read
+/// takes `roundTrip`.
+private final class NotingShare: PlaybackCacheReader, @unchecked Sendable {
+    let bytes: Data
+    let roundTrip: TimeInterval
+    private let lock = NSLock()
+    private var sizes: [Int] = []
+    var size: Int64 { Int64(bytes.count) }
+    init(count: Int, roundTrip: TimeInterval = 0) {
+        bytes = Data((0..<count).map { UInt8(truncatingIfNeeded: $0 &* 131 &+ ($0 >> 9)) }); self.roundTrip = roundTrip
+    }
+    func read(at offset: Int64, count: Int) throws -> Data {
+        lock.withLock { sizes.append(count) }
+        if roundTrip > 0 { Thread.sleep(forTimeInterval: roundTrip) }
+        return bytes.subdata(in: Int(offset)..<min(Int(offset) + count, bytes.count))
+    }
+    var readSizes: [Int] { lock.withLock { sizes } }
+    var bytesAsked: Int { lock.withLock { sizes.reduce(0, +) } }
+}
+
 struct NetworkPlaybackCacheTests {
     private func directory() throws -> URL {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -270,6 +290,45 @@ struct NetworkPlaybackCacheTests {
         #expect(share.mostAtOnce >= 2, "reads in flight at once: \(share.mostAtOnce)")
         #expect(share.mostAtOnce <= NetworkPlaybackCache.readsInFlight)
         #expect(try Data(contentsOf: entry.url) == share.bytes)
+    }
+
+    @Test("A copy begins with small reads and goes on with whole blocks, byte for byte")
+    func smallReadsAtTheStart() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        // Blocks as large as the app's, a file that is no whole number of them, and a clock on which the start's two seconds are
+        // over in two microseconds (this copy from memory takes about a millisecond), so only how much is local decides. On that
+        // clock the share's silence is not timed.
+        let share = NotingShare(count: 9 * 1_048_576 + 70_001)
+        let begun = ProcessInfo.processInfo.systemUptime
+        let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 1 << 20, noProgressLimit: .greatestFiniteMagnitude,
+                                         clock: { (ProcessInfo.processInfo.systemUptime - begun) * 1_000_000 + 100 })
+        let entry = try cache.entry(key: "song", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
+        try entry.prepare(full: true, lead: 0, cancelled: { false })
+        #expect(entry.isComplete)
+        #expect(try Data(contentsOf: entry.url) == share.bytes, "the copy is the file, byte for byte")
+        let sizes = share.readSizes
+        let lanes = NetworkPlaybackCache.readsInFlight
+        #expect(sizes.prefix(lanes).allSatisfy { $0 <= NetworkPlaybackCache.startReadBytes }, "the first reads are small: \(sizes.prefix(lanes))")
+        #expect(sizes.contains(1 << 20), "whole blocks once the start is local: largest read \(sizes.max() ?? 0)")
+    }
+
+    @Test("A copy given up on as it begins leaves little on the link: no megabyte reads on their way")
+    func cancelledStartLeavesLittleInFlight() throws {
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        // Every read takes 50 ms (a share far away). The copy is given up on 120 ms in, as a skip does to the song skipped past.
+        let share = NotingShare(count: 16 << 20, roundTrip: 0.05)
+        let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 1 << 20)
+        let entry = try cache.entry(key: "skipped", url: URL(fileURLWithPath: "/share/skipped.flac"), reader: share)
+        Thread.sleep(forTimeInterval: 0.12)
+        let before = share.bytesAsked
+        entry.cancel()
+        Thread.sleep(forTimeInterval: 0.3)
+        let lanes = NetworkPlaybackCache.readsInFlight
+        #expect(share.readSizes.allSatisfy { $0 <= NetworkPlaybackCache.startReadBytes }, "only small reads were sent: largest \(share.readSizes.max() ?? 0)")
+        #expect(before <= 3 * lanes * NetworkPlaybackCache.startReadBytes, "asked for before it was given up on: \(before) bytes")
+        // A lane that had just looked may still send the one small read it was about to.
+        #expect(share.bytesAsked - before <= lanes * NetworkPlaybackCache.startReadBytes,
+                "asked for after it was given up on: \(share.bytesAsked - before) bytes")
     }
 
     @Test("Large DSD uses a local lead; a stalled producer cannot interrupt reads within that reserve")
