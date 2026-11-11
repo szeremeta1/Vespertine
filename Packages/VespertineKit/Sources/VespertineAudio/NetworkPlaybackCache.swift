@@ -76,6 +76,16 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     /// VPN 100 ms away that was about 6.7 MB/s, so a 5.1 DSD song took a minute to copy ahead of its start and its next song's
     /// copy could not keep up. Several in flight fill the link instead; on a near share they cost nothing.
     static let readsInFlight = 4
+    /// A copy begins with reads this small, and reads whole blocks once `startBytes` of the file are local and `startSeconds`
+    /// have passed. A read that has been sent can't be taken back: the copy of a song skipped past (a press on the next one
+    /// cancels it) used to leave four reads of a megabyte each on their way, and on a link of about 1 MB/s to a share 100 ms
+    /// away the song landed on after six quick skips waited behind 24 MB of them (26 s of "Buffering from the network…", where
+    /// a start by itself takes a few seconds). Small reads cost a start nothing a listener notices (four lanes of them still
+    /// bring 5 MB/s over a 100 ms round trip, and a near share answers in a millisecond), and a song skipped past leaves at
+    /// most half a megabyte behind.
+    static let startReadBytes = 128 << 10
+    static let startBytes: Int64 = 4 << 20
+    static let startSeconds: TimeInterval = 2
 
     /// Seconds the Mac has been awake: a sleep is not silence from the share (a wall clock would count it, and a song paused
     /// over night would fail the moment the Mac woke).
@@ -637,8 +647,14 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                     let length = Int(min(Int64(chunk), size - offset))
                     var data = Data()
                     while data.count < length {
-                        if condition.withLock({ cancelled }) { condition.withLock { _ = inFlight.remove(block) }; return }
-                        let part = try readPart(at: offset + Int64(data.count), count: length - data.count)
+                        // A copy that has only just begun asks for little at a time (see `startReadBytes`).
+                        let (stop, beginning) = condition.withLock {
+                            (cancelled, Int64(ready.count) * Int64(chunk) < NetworkPlaybackCache.startBytes
+                                || clock() - startedAt < NetworkPlaybackCache.startSeconds)
+                        }
+                        if stop { condition.withLock { _ = inFlight.remove(block) }; return }
+                        let ask = beginning ? min(length - data.count, NetworkPlaybackCache.startReadBytes) : length - data.count
+                        let part = try readPart(at: offset + Int64(data.count), count: ask)
                         guard !part.isEmpty, part.count <= length - data.count else { throw Failure.unexpectedEOF }
                         NetworkPlaybackCache.delivered.withLock { $0 = .now }
                         condition.withLock { lastProgress = clock() }

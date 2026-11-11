@@ -18,6 +18,9 @@ final class ControlledShare: PlaybackCacheReader, @unchecked Sendable {
     private var delivered = 0.0
     private var started: Date?
     private var blocked = 0
+    private var asked: Int64 = 0
+    /// Bytes the share has been asked for so far, by every reader of it (a read that was given up on still crosses the link).
+    var bytesAsked: Int64 { gate.lock(); defer { gate.unlock() }; return asked }
     var size: Int64 { Int64(bytes.count) }
     init(data: Data, bytesPerSecond: Double) { bytes = data; self.bytesPerSecond = bytesPerSecond }
     func read(at offset: Int64, count: Int) throws -> Data {
@@ -26,6 +29,7 @@ final class ControlledShare: PlaybackCacheReader, @unchecked Sendable {
         let start = started ?? Date()
         started = start
         delivered += Double(min(count, bytes.count - Int(offset)))
+        asked += Int64(min(count, bytes.count - Int(offset)))
         let due = start.addingTimeInterval(delivered / bytesPerSecond)
         gate.unlock()
         let wait = due.timeIntervalSinceNow
@@ -120,7 +124,7 @@ final class PlayPauseRig: @unchecked Sendable {
     }
 
     init(seconds: Int = 24, bytesPerSecond: Double = 50 * 1_048_576, nextBytesPerSecond: Double = 50 * 1_048_576,
-         fileExtension: String = "wav", cacheClock: (@Sendable () -> TimeInterval)? = nil) throws {
+         fileExtension: String = "wav", cacheClock: (@Sendable () -> TimeInterval)? = nil, cacheChunk: Int = 1 << 16) throws {
         self.fileExtension = fileExtension
         directory = FileManager.default.temporaryDirectory.appendingPathComponent("playpause-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -129,8 +133,8 @@ final class PlayPauseRig: @unchecked Sendable {
         if fileExtension == "flac" { url = try Self.writeFLAC(from: url) }
         share = ControlledShare(data: try Data(contentsOf: url), bytesPerSecond: bytesPerSecond)
         let cacheDirectory = directory.appendingPathComponent("cache")
-        cache = cacheClock.map { NetworkPlaybackCache(directory: cacheDirectory, budget: 256 << 20, chunk: 1 << 16, clock: $0) }
-            ?? NetworkPlaybackCache(directory: cacheDirectory, budget: 256 << 20, chunk: 1 << 16)
+        cache = cacheClock.map { NetworkPlaybackCache(directory: cacheDirectory, budget: 256 << 20, chunk: cacheChunk, clock: $0) }
+            ?? NetworkPlaybackCache(directory: cacheDirectory, budget: 256 << 20, chunk: cacheChunk)
         let share = share
         nextShare = ControlledShare(data: share.bytes, bytesPerSecond: nextBytesPerSecond)
         let nextShare = nextShare
@@ -166,6 +170,10 @@ final class PlayPauseRig: @unchecked Sendable {
 
     func nextItem() -> PlayableItem { PlayableItem(url: URL(fileURLWithPath: "/share/next.wav"), cacheKey: "next") }
     func item() -> PlayableItem { PlayableItem(url: URL(fileURLWithPath: "/share/song.\(fileExtension)"), cacheKey: "song") }
+    /// Another song of the same share (the same bytes, a file and a cache key of its own): they share the link's speed.
+    func item(numbered number: Int) -> PlayableItem {
+        PlayableItem(url: URL(fileURLWithPath: "/share/song-\(number).\(fileExtension)"), cacheKey: "song-\(number)")
+    }
 
     /// Stops the output's clock (nothing plays or is consumed) or starts it again: a test sets its scene while the song stands at its start,
     /// so how fast the machine runs cannot change how much of the song is left to play when the scene is ready.
