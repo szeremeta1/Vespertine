@@ -1034,7 +1034,12 @@ public final class PlaybackEngine: @unchecked Sendable {
         let leavesInteger = (session?.applied.integerMode == true || session?.plan.sixteenBit == .requested)
             && (new.digitalVolume(for: sessionDevice) != nil || new.equalizer(for: sessionDevice) != nil
                 || new.roomCorrection(for: sessionDevice) != nil)
-        return deviceChanged || leavesInteger
+        // Room render belongs to the decoder and queued audio. Rebuild it for the output actually playing (or the
+        // parked choice), including on/off; editing another group must not interrupt this song.
+        let activeUID = sessionDevice?.uid ?? old.deviceUID
+        let roomRenderChanged = old.group(forOutputUID: activeUID)?.roomRender?.clamped
+            != new.group(forOutputUID: activeUID)?.roomRender?.clamped
+        return deviceChanged || leavesInteger || roomRenderChanged
     }
 
     private func handle(_ command: Command) {
