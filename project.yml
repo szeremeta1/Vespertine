@@ -43,6 +43,14 @@ targets:
       - package: VespertineKit
         product: VespertineVisualizer
       - package: Sparkle
+      # Mac Sound Output (beta): the audio driver travels inside the app (Contents/Library/Audio) and is copied to
+      # /Library/Audio/Plug-Ins/HAL only when the user turns the feature on.
+      - target: VespertineSound
+        embed: true
+        codeSign: true
+        copy:
+          destination: wrapper
+          subpath: Contents/Library/Audio
     info:
       path: App/Info.plist
       properties:
@@ -101,6 +109,30 @@ targets:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.Vespertine.dev
           VESPERTINE_DISPLAY_NAME: Vespertine Dev
+
+  # Mac Sound Output (beta): the Core Audio driver (an AudioServerPlugIn) that shows published speaker groups as outputs.
+  # Plain C, no Swift: it runs inside coreaudiod. See Driver/VespertineSound/VespertineSound.c.
+  VespertineSound:
+    type: bundle
+    platform: macOS
+    sources:
+      - path: Driver/VespertineSound
+        excludes: [Info.plist]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.vespertine.sound
+        PRODUCT_NAME: VespertineSound
+        WRAPPER_EXTENSION: driver
+        INFOPLIST_FILE: Driver/VespertineSound/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        GCC_C_LANGUAGE_STANDARD: c11
+        GCC_TREAT_WARNINGS_AS_ERRORS: YES
+        CLANG_ENABLE_OBJC_ARC: NO
+        SKIP_INSTALL: YES
+        OTHER_LDFLAGS: ["-framework", "CoreAudio", "-framework", "CoreFoundation"]
 
   VespertineAppTests:
     type: bundle.unit-test

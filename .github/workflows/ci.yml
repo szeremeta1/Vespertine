@@ -132,6 +132,18 @@ jobs:
         run: |
           clang --analyze -Xclang -analyzer-werror -std=c11 -I Packages/VespertineKit/Sources/CVespertineRT/include \
             Packages/VespertineKit/Sources/CVespertineRT/vespertine_rt.c -o /dev/null
+      # Mac Sound Output (beta): the audio driver's ring and layout helpers under the sanitizers, and the driver itself
+      # compiled with every warning as an error and through the static analyzer (it runs inside coreaudiod).
+      - name: Sound driver checks
+        if: ${{ !cancelled() }}
+        run: |
+          for sanitizer in address,undefined thread; do
+            clang -std=c11 -g -O1 -fsanitize="$sanitizer" -fno-sanitize-recover=all -I Driver/VespertineSound \
+              tests/sound-driver-audit.c -o "sound-driver-audit-${sanitizer//,/}"
+            "./sound-driver-audit-${sanitizer//,/}"
+          done
+          clang -std=c11 -Wall -Wextra -Werror -c Driver/VespertineSound/VespertineSound.c -o /dev/null
+          clang --analyze -Xclang -analyzer-werror -std=c11 Driver/VespertineSound/VespertineSound.c -o /dev/null
       - name: Release scripts parse
         if: ${{ !cancelled() }}
         run: for s in scripts/*.sh; do zsh -n "$s"; done
