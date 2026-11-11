@@ -3,15 +3,27 @@
 const ESC: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
 export const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ESC[c]);
 
-/** HTML (as written in src/data/content.ts) to plain text, for meta descriptions, JSON-LD and llms.txt. */
+/** Removes tags until none is left: one pass over `<b<i>>` would leave `<b>` behind. */
+const stripTags = (html: string) => {
+  let text = html;
+  for (let before = ''; before !== text; ) {
+    before = text;
+    text = text.replace(/<[^>]+>/g, '');
+  }
+  return text;
+};
+
+/**
+ * HTML (as written in src/data/content.ts) to plain text, for meta descriptions, JSON-LD and llms.txt.
+ * `&amp;` is decoded last, so text that shows an entity (`&amp;lt;`) comes out as that entity (`&lt;`), not as what it names.
+ */
 export const plain = (html: string) =>
-  html
-    .replace(/<[^>]+>/g, '')
+  stripTags(html)
     .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ')
     .trim();
 
