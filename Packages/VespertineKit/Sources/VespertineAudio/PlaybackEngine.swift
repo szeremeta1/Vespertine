@@ -1341,13 +1341,26 @@ public final class PlaybackEngine: @unchecked Sendable {
                 emit(.failed(current, error.localizedDescription))
                 shared.withLock { $0.snapshot.lastError = error.localizedDescription }
                 teardownDecoding()
-                candidate = nextItemProvider?(current)
+                candidate = songToTry(after: current, failedWith: error)
                 offset = 0
             }
         }
         // Nothing left that would play: done with the device.
         teardown(releaseHog: true, idle: true)
         state = .stopped
+    }
+
+    /// The song to try after `failed` could not be played. None when the share did not answer for it (`Failure.notAnswering`, after
+    /// the whole of the cache's silence limit) and the next song would have to be read from a share too: each of the songs after
+    /// it would be waited for as long in turn, eight of them, with nothing to hear. Playback stops there with the reason shown;
+    /// a next song that has a copy on this Mac (or is not on a share) plays.
+    private func songToTry(after failed: PlayableItem, failedWith error: Error) -> PlayableItem? {
+        guard let next = nextItemProvider?(failed) else { return nil }
+        guard case NetworkPlaybackCache.Failure.notAnswering = error else { return next }
+        // Told from the item alone, without asking any volume: a song of a share (it has a cache key) with no complete copy here.
+        let needsShare = next.cacheKey != nil && staged[cacheKey(next)]?.isComplete != true && (urlResolver?(next) ?? next.url) == next.url
+        if needsShare { log.notice("The share did not answer for \(failed.url.lastPathComponent, privacy: .public): not waiting for the songs after it") }
+        return needsShare ? nil : next
     }
 
     /// Opens `item`, (re)configures the device if needed, positions and prefills.
@@ -2512,7 +2525,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 return
             } catch {
                 emit(.failed(next, error.localizedDescription))
-                candidate = nextItemProvider?(next)
+                candidate = songToTry(after: next, failedWith: error)
             }
         }
         draining = true
@@ -2582,7 +2595,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             } catch {
                 log.error("Next song couldn't start on \(pending.device.name, privacy: .public): \(error.localizedDescription, privacy: .public)")
                 emit(.failed(pending.item, error.localizedDescription))
-                if let next = nextItemProvider?(pending.item) { start(next, at: 0, autoplay: true) }
+                if let next = songToTry(after: pending.item, failedWith: error) { start(next, at: 0, autoplay: true) }
                 else { finishQueue() }
             }
         } else {

@@ -73,7 +73,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         }
     }
 
-    /// How long a song waits for its share to send anything at all before it fails with `Failure.notAnswering`. A share that
+    /// How long a song waits for its share to send anything at all (or to open its file) before it fails with `Failure.notAnswering`. A share that
     /// reconnects (SMB does so within seconds) carries on well inside it; one that is gone for good no longer leaves the song
     /// buffering for ever with the scans of every share held back.
     static let defaultNoProgressLimit: TimeInterval = 120
@@ -242,11 +242,13 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         private let done = NSCondition()
         private var result: Result<ShareFileReader, Error>?
         func finish(_ value: Result<ShareFileReader, Error>) { done.withLock { result = value; done.broadcast() } }
-        func wait(cancelled: () -> Bool) throws -> ShareFileReader {
+        /// `silent`: the share has taken longer over this open than a song waits for it (`noProgressLimit`).
+        func wait(cancelled: () -> Bool, silent: () -> Bool) throws -> ShareFileReader {
             try done.withLock {
                 while true {
                     if let result { return try result.get() }
                     if cancelled() { throw CancellationError() }
+                    if silent() { throw Failure.notAnswering }
                     _ = done.wait(until: Date().addingTimeInterval(0.025))
                 }
             }
@@ -268,7 +270,11 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                 job.finish(result)
             }
         }
-        return try job.wait(cancelled: cancelled)
+        // An open the share never answers is the same silence as a read it never answers: the song is given up after
+        // `noProgressLimit` with that reason, instead of buffering for as long as the share stays quiet. Each caller counts from
+        // when it began to wait; the open itself finishes, or fails, in the background (and is closed there).
+        let began = clock()
+        return try job.wait(cancelled: cancelled, silent: { [clock, noProgressLimit] in clock() - began >= noProgressLimit })
     }
 
     /// Prefetches waiting for their file on the share to open (for tests).
