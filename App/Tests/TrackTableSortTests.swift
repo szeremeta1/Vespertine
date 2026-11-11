@@ -170,4 +170,52 @@ struct TrackTableSortTests {
             #expect(worstSort * 1000 < budget)
         }
     }
+
+    @Test("The songs selected stay selected through a sort, wherever they are shown now")
+    func selectionFollowsTheSongs() async throws {
+        let count = 3000
+        let tracks = try SortFixture.library(count)
+        let rig = try await makeRig(tracks)
+        defer { rig.window.close() }
+        let table = rig.table
+        let model = try #require(LibraryStartup.current?.model)
+        let before = model.selectedTrackIDs
+        defer { model.selectedTrackIDs = before }
+        table.selectRowIndexes(IndexSet([2, 40]), byExtendingSelection: false)
+        let chosen = Set([tracks[2].id, tracks[40].id].compactMap { $0 })
+        await until { model.selectedTrackIDs == chosen }
+        #expect(model.selectedTrackIDs == chosen)
+
+        /// Whether the row is drawn selected, once scrolled to (SwiftUI tells AppKit about the rows in sight).
+        func selected(_ row: Int) async -> Bool {
+            table.scrollRowToVisible(row)
+            await until { table.rowView(atRow: row, makeIfNecessary: false) != nil }
+            await settle(0.3)
+            return table.rowView(atRow: row, makeIfNecessary: false)?.isSelected ?? false
+        }
+
+        // By number, descending: the list backwards.
+        let number = try #require(table.tableColumns.first?.sortDescriptorPrototype)
+        let top = topRow(table)
+        table.sortDescriptors = [try #require(number.reversedSortDescriptor as? NSSortDescriptor)]
+        await until { topRow(table) != top }
+        await settle(0.3)
+        #expect(model.selectedTrackIDs == chosen, "the same songs, as the rest of the app sees it")
+        #expect(await selected(count - 3), "the song that was third is third from the end, selected")
+        #expect(await selected(count - 41))
+        #expect(await !selected(count - 4))
+        #expect(await !selected(2), "the third row shows another song now, not selected")
+        #expect(await !selected(40))
+
+        table.scrollRowToVisible(0)
+        await until { topRow(table) != nil }
+        let backward = topRow(table)
+        table.sortDescriptors = [number]
+        await until { topRow(table) != backward }
+        await settle(0.3)
+        #expect(model.selectedTrackIDs == chosen)
+        #expect(await selected(2))
+        #expect(await selected(40))
+        #expect(await !selected(count - 3))
+    }
 }
