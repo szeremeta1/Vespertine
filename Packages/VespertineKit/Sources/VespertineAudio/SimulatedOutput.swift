@@ -48,6 +48,27 @@ final class SimulatedOutput: @unchecked Sendable {
     var rendered: Int { counts.withLock { $0.rendered } }
     var audible: Int { counts.withLock { $0.audible } }
 
+    /// Advances a held clock explicitly. A test can inspect each quarter-second of playback even if its thread is
+    /// descheduled for longer than the transition it is checking. Uses the same render context as the clock thread.
+    func advance(seconds: Double) {
+        precondition(held && seconds.isFinite && seconds >= 0)
+        var remaining = Int((seconds * rate).rounded())
+        var buffer = [Float](repeating: 0, count: frames * channels)
+        render.withLock {
+            precondition(flags.withLock { $0.running && !$0.cancelled })
+            while remaining > 0 {
+                let count = min(remaining, frames)
+                buffer.withUnsafeMutableBufferPointer {
+                    nrt_context_render_interleaved(context, $0.baseAddress!, UInt32(count), UInt32(channels))
+                }
+                var sound = 0
+                for frame in 0..<count where (0..<channels).contains(where: { buffer[frame * channels + $0] != 0 }) { sound += 1 }
+                counts.withLock { $0.rendered += count; $0.audible += sound }
+                remaining -= count
+            }
+        }
+    }
+
     private func run() {
         var buffer = [Float](repeating: 0, count: frames * channels)
         // Paced by an absolute schedule, as a device's clock is: a sleep that overshoots is made up by the next buffer.

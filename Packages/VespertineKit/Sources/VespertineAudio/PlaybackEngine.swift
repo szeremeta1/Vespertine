@@ -647,6 +647,12 @@ public final class PlaybackEngine: @unchecked Sendable {
         post(.barrier(done))
         _ = done.wait(timeout: .now() + timeout)
     }
+    /// Tests with a held output clock: wait for a skip to be handled before advancing the simulated device.
+    func waitForCommandsForTesting(timeout: TimeInterval) -> Bool {
+        let done = DispatchSemaphore(value: 0)
+        post(.barrier(done))
+        return done.wait(timeout: .now() + timeout) == .success
+    }
     public func seek(to seconds: TimeInterval) {
         guard seconds.isFinite else { return }
         fadeOutNow(pausing: false)
@@ -1034,7 +1040,12 @@ public final class PlaybackEngine: @unchecked Sendable {
         let leavesInteger = (session?.applied.integerMode == true || session?.plan.sixteenBit == .requested)
             && (new.digitalVolume(for: sessionDevice) != nil || new.equalizer(for: sessionDevice) != nil
                 || new.roomCorrection(for: sessionDevice) != nil)
-        return deviceChanged || leavesInteger
+        // Room render belongs to the decoder and queued audio. Rebuild it for the output actually playing (or the
+        // parked choice), including on/off; editing another group must not interrupt this song.
+        let activeUID = sessionDevice?.uid ?? old.deviceUID
+        let roomRenderChanged = old.group(forOutputUID: activeUID)?.roomRender?.clamped
+            != new.group(forOutputUID: activeUID)?.roomRender?.clamped
+        return deviceChanged || leavesInteger || roomRenderChanged
     }
 
     private func handle(_ command: Command) {
@@ -1619,9 +1630,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                               roomCorrection: room?.name,
                               bypassedRoomCorrection: room == nil ? settings.roomCorrection(for: device)?.name : nil)
         path.roomFiltersSkipped = room?.filtersTooLong(sampleRate: session.applied.sampleRate, channelCount: plan.channels) ?? false
-        if let resources = session.groupResources {
+        if let playing = routingGroup(for: device) ?? session.groupResources?.group {
             // A speaker group: the DACs that carry this song, each as read back from it, and what is done to the samples.
-            let playing = routingGroup(for: device) ?? resources.group
             let content = plan.channels == playing.totalChannels ? GroupRouting.content(source: probed.format, group: playing) : nil
             let stage = GroupSignalPath.stage(room: chain(room, session: session), used: content?.usedOutputs ?? Array(0..<max(plan.channels, 0)),
                                               equalizer: path.equalizer != nil, digitalVolumeDB: settings.digitalVolume(for: device), replayGainDB: path.replayGainDB)

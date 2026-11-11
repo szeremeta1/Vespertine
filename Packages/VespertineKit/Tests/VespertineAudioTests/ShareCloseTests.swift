@@ -80,8 +80,9 @@ struct ShareCloseTests {
         // The next song, copied whole ahead of time (nothing reads it any more: only the cache holds its open file).
         let next = URL(fileURLWithPath: "/share/next.flac")
         cache.prefetch(key: "next", url: next)
-        let copied = await eventually { (try? cache.entry(key: "next", url: next, reader: nil, foreground: false))?.isComplete == true }
-        #expect(copied, "the next song was copied")
+        // Setup is not the responsiveness assertion below: a busy runner may take longer to schedule the copy.
+        let copied = await eventually(120) { (try? cache.entry(key: "next", url: next, reader: nil, foreground: false))?.isComplete == true }
+        try #require(copied, "the next song was copied")
         try await Task.sleep(for: .milliseconds(300))   // its copy threads have ended
 
         // The share goes quiet. Play is pressed on some other song: the copied next one is let go, and its file closed.
