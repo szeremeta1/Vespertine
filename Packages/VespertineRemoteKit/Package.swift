@@ -12,9 +12,12 @@ let package = Package(
     platforms: [.macOS(.v14), .iOS(.v17)],
     products: [
         .library(name: "VespertineRemoteProtocol", targets: ["VespertineRemoteProtocol"]),
+        // A command-line remote for testing a Mac's remote server (pair, send commands, watch what it pushes).
+        .executable(name: "vespertine-remote", targets: ["vespertine-remote"]),
     ],
     targets: [
         .target(name: "VespertineRemoteProtocol"),
+        .executableTarget(name: "vespertine-remote", dependencies: ["VespertineRemoteProtocol"]),
         .testTarget(name: "VespertineRemoteProtocolTests", dependencies: ["VespertineRemoteProtocol"]),
     ]
 )

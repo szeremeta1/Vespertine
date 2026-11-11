@@ -176,7 +176,7 @@ struct RemotePairingSheet: View {
                     .accessibilityLabel(Text("Pairing code \(pairing.code)"))
                 TimelineView(.periodic(from: .now, by: 1)) { context in
                     let left = max(0, Int(pairing.expires.timeIntervalSince(context.date)))
-                    Text("Good for \(left / 60):\(String(format: "%02d", left % 60))", comment: "Pairing sheet: minutes and seconds the code stays valid.")
+                    Text("Good for \(Self.clock(left))", comment: "Pairing sheet: %@ is the minutes and seconds the code stays valid, e.g. 1:45.")
                         .font(.caption).foregroundStyle(.secondary).monospacedDigit()
                 }
                 Button("Cancel", action: done).keyboardShortcut(.cancelAction)
@@ -191,6 +191,9 @@ struct RemotePairingSheet: View {
         .padding(24)
         .frame(width: 360)
     }
+
+    /// "1:45"
+    static func clock(_ seconds: Int) -> String { "\(seconds / 60):" + (seconds % 60 < 10 ? "0" : "") + "\(seconds % 60)" }
 
     /// "123 456"
     static func spaced(_ code: String) -> String {
