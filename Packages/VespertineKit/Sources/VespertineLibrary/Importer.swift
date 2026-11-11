@@ -138,13 +138,23 @@ public enum Importer {
                 // Imported before: the same sheet is already there.
                 let existing = folder.appendingPathComponent(sheetURL.lastPathComponent)
                 if (try? Data(contentsOf: existing)).flatMap(CueSheet.text(of:)) == text { continue }
-                // Written back in the encoding it was read in, so a sheet in a legacy encoding keeps every byte but the
-                // FILE lines, even if that encoding was guessed wrong. UTF-8 only when the new paths need it.
-                let out = text.data(using: decoded.encoding) ?? Data(text.utf8)
-                try out.write(to: uniqueURL(existing), options: .atomic)
+                try cueSheetBytes(original: data, decoded: decoded, rewritten: text).write(to: uniqueURL(existing), options: .atomic)
             }
         }
         return written
+    }
+
+    /// What goes in the managed copy of a CUE sheet. The original's bytes untouched when no FILE line changed, and
+    /// otherwise the rewritten text in the encoding the sheet was read in (and with its BOM, if it had one), so a sheet
+    /// in a legacy encoding keeps every byte but the FILE lines even when that encoding was guessed wrong. UTF-8 only
+    /// when the new paths can't be written in that encoding, or the encoding can't reproduce the original's bytes.
+    static func cueSheetBytes(original: Data, decoded: (text: String, encoding: String.Encoding), rewritten: String) -> Data {
+        if rewritten == decoded.text { return original }
+        let bom = original.starts(with: [0xEF, 0xBB, 0xBF]) ? Data([0xEF, 0xBB, 0xBF]) : Data()
+        let body = original.dropFirst(bom.count)
+        guard decoded.encoding == .utf8 || decoded.text.data(using: decoded.encoding) == body,
+              let out = rewritten.data(using: decoded.encoding) else { return bom + Data(rewritten.utf8) }
+        return bom + out
     }
 
     static func fillMissingTags(at url: URL, from inferred: InferredTags, existing md: AudioMetadata?) {
