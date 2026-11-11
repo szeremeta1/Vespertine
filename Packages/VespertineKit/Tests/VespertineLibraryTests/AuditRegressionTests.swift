@@ -145,9 +145,9 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         #expect(Importer.identity(of: twinFile) == Importer.identity(of: src.appendingPathComponent("set.wav")))
         #expect(try Importer.copyAndOrganize([twin], into: dst).map(\.lastPathComponent) == ["set 3.wav"])
     }
-    /// A name is limited in bytes, not letters: a Hindi, Tamil or Thai letter with its vowel signs is six bytes or
-    /// more, a Japanese one three, so a long title in those made a folder or file name the volume refuses, and
-    /// Import & Organize stopped there with part of the selection copied.
+    /// Names and paths are limited in bytes, not letters: a Hindi, Tamil or Thai letter with its vowel signs is six
+    /// bytes or more, a Japanese one three, so a long title, album and artist in those made a path longer than the
+    /// 1024 bytes macOS takes, and Import & Organize stopped there with part of the selection copied.
     @Test func importTakesLongTitlesInScriptsWithWideLetters() throws {
         let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
         let src = dir.appendingPathComponent("src"), dst = dir.appendingPathComponent("dst")

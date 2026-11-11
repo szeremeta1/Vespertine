@@ -275,13 +275,14 @@ public enum Importer {
         return t.isEmpty ? nil : t
     }
 
-    /// The longest file or folder name a volume takes, in UTF-8 bytes (APFS; HFS+ and exFAT count 255 UTF-16 units,
-    /// which is never fewer).
+    /// The most UTF-8 bytes a file or folder name gets. The file systems a NAS uses (ext4, Btrfs, ZFS) take 255 bytes
+    /// for one name; APFS, HFS+ and exFAT take 255 UTF-16 units, which is never fewer. It also keeps the whole path
+    /// (artist, album and file under the library folder) inside the 1024 bytes macOS takes for a path.
     static let maxNameBytes = 255
 
     /// A name that can be a file or folder: at most 120 characters and `maxBytes` UTF-8 bytes. The characters alone
     /// don't bound it: a letter is three bytes in Japanese or Chinese, and six or more in Hindi, Tamil or Thai, where
-    /// it carries its vowel signs, so a title of 50 letters can be longer than any name the volume takes.
+    /// it carries its vowel signs, so three names of 120 letters can be longer than any path macOS takes.
     static func sanitize(_ s: String, maxBytes: Int = maxNameBytes) -> String {
         let bad = CharacterSet(charactersIn: "/:\\?%*|\"<>").union(.controlCharacters)
         let cleaned = s.components(separatedBy: bad).joined(separator: "_").trimmingCharacters(in: .whitespaces)
