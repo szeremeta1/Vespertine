@@ -66,6 +66,49 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         let enumerated = LibraryScanner.enumerate(try #require(folders.first))
         #expect(LibraryScanner.cueSheets(enumerated.cue).count == 1)
     }
+    /// A copied sheet is written back in the encoding it was read in (#236): every byte but the FILE line stays as it
+    /// was, where it used to be re-encoded as UTF-8 and a misread sheet's mojibake became permanent.
+    @Test func importKeepsCueSheetEncoding() throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let src = dir.appendingPathComponent("src"), dst = dir.appendingPathComponent("dst")
+        try FileManager.default.createDirectory(at: src, withIntermediateDirectories: true)
+        try audio(src.appendingPathComponent("set.wav"))
+        let original = try #require(("TITLE \"光辉岁月\"\nFILE \"set.wav\" WAVE\n  TRACK 01 AUDIO\n    TITLE \"旧日的足迹\"\n    INDEX 01 00:00:00\n")
+            .data(using: .gb18030))
+        try original.write(to: src.appendingPathComponent("set.cue"))
+        let folder = try #require(try Importer.copyAndOrganize([src], into: dst).first).deletingLastPathComponent()
+        let copied = try Data(contentsOf: folder.appendingPathComponent("set.cue"))
+        #expect(copied == original)
+        #expect(CueSheet.load(folder.appendingPathComponent("set.cue"))?.title == "光辉岁月")
+    }
+    /// When the FILE line does have to change (a sheet written for the "set.flac" the rip was compressed to, beside
+    /// the "set.wav" that was imported), only that line changes: the rest is the original's bytes, in the original's
+    /// encoding and with its BOM, for GBK, Shift-JIS, Windows-1251, Windows-1252 and UTF-8 alike (#236).
+    @Test func importRewritesOnlyTheFileLineOfACueSheetInItsEncoding() throws {
+        let samples: [(String, [UInt8])] = [
+            ("GBK", [0xB9, 0xE2, 0xBB, 0xD4, 0xCB, 0xEA, 0xD4, 0xC2]),
+            ("Shift-JIS", [0x96, 0xE9, 0x82, 0xC9, 0x8B, 0xEC, 0x82, 0xAF, 0x82, 0xE9]),
+            ("Windows-1251", [0xC3, 0xF0, 0xF3, 0xEF, 0xEF, 0xE0, 0x20, 0xEA, 0xF0, 0xEE, 0xE2, 0xE8]),
+            ("Windows-1252", [0x4D, 0xF6, 0x74, 0x6C, 0x65, 0x79, 0x20, 0x43, 0x72, 0xFC, 0x65]),
+            ("UTF-8 BOM", [0xEF, 0xBB, 0xBF] + Array("光辉岁月".utf8)),
+        ]
+        for (name, title) in samples {
+            let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+            let src = dir.appendingPathComponent("src"), dst = dir.appendingPathComponent("dst")
+            try FileManager.default.createDirectory(at: src, withIntermediateDirectories: true)
+            try audio(src.appendingPathComponent("set.wav"))
+            func sheet(_ file: String) -> Data {
+                // The BOM, when there is one, leads the file; the title goes in its TITLE line.
+                let bom = title.starts(with: [0xEF, 0xBB, 0xBF])
+                return Data((bom ? [0xEF, 0xBB, 0xBF] : []) + Array("TITLE \"".utf8) + (bom ? Array(title.dropFirst(3)) : title)
+                    + Array("\"\r\nFILE \"\(file)\" WAVE\r\n  TRACK 01 AUDIO\r\n    INDEX 01 00:00:00\r\n".utf8))
+            }
+            try sheet("set.flac").write(to: src.appendingPathComponent("set.cue"))
+            let folder = try #require(try Importer.copyAndOrganize([src], into: dst).first, "\(name)").deletingLastPathComponent()
+            let copied = try Data(contentsOf: folder.appendingPathComponent("set.cue"))
+            #expect(copied == sheet("set.wav"), "\(name): only the FILE line may differ")
+        }
+    }
     /// Importing the same folder twice copies nothing the second time (it used to leave a "… 2" of every file),
     /// even after the first copy's tags were filled in; a different file that wants the same name still gets one.
     @Test func importingTwiceCopiesNothingNew() throws {
@@ -419,7 +462,66 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         #expect(try sheet("Группа крови", .windowsCP1251) == "Группа крови")
         #expect(try sheet("Mötley Crüe, Café Tacvba", .windowsCP1252) == "Mötley Crüe, Café Tacvba")
         #expect(try sheet("Ångström Größe", .windowsCP1252) == "Ångström Größe")
+        // Chinese rips (#236): a GBK/GB 18030 sheet used to be read as Windows-1251 and came out as "№в»ФЛкФВ".
+        #expect(try sheet("光辉岁月", .gb18030) == "光辉岁月")
+        #expect(try sheet("旧日的足迹", .gb18030) == "旧日的足迹")
+        #expect(try sheet("但愿人长久（国）", .gb18030) == "但愿人长久（国）")
+        // ...without taking the sheets that look most like it: capital Cyrillic, capital Western accents.
+        #expect(try sheet("КИНО", .windowsCP1251) == "КИНО")
+        #expect(try sheet("Émile Ólafur", .windowsCP1252) == "Émile Ólafur")
         #expect(CueSheet.text(of: Data([0xEF, 0xBB, 0xBF]) + Data("TITLE \"Édith\"".utf8)) == "TITLE \"Édith\"")
+    }
+    /// Sheets built from literal bytes (what the ripper wrote, not what Foundation's encoder makes of a String): each
+    /// is read in the encoding it was written in, and the look-alikes of Chinese stay what they are (#236).
+    @Test func cueSheetsFromRealBytesAreReadByScore() {
+        func raw(_ parts: [UInt8]...) -> Data { Data(parts.flatMap { $0 }) }
+        func ascii(_ s: String) -> [UInt8] { Array(s.utf8) }
+        func sheet(title: [UInt8], performer: [UInt8], track: [UInt8]) -> Data {
+            raw(ascii("PERFORMER \""), performer, ascii("\"\r\nTITLE \""), title, ascii("\"\r\nFILE \"a.wav\" WAVE\r\n  TRACK 01 AUDIO\r\n    TITLE \""),
+                track, ascii("\"\r\n    INDEX 01 00:00:00\r\n"))
+        }
+        func read(_ data: Data) -> (String, String.Encoding)? { CueSheet.decode(data).map { ($0.text, $0.encoding) } }
+        // GBK, the bytes EAC writes on a Chinese Windows: 张学友 / 光辉岁月 / 旧日的足迹.
+        let gbk = sheet(title: [0xB9, 0xE2, 0xBB, 0xD4, 0xCB, 0xEA, 0xD4, 0xC2], performer: [0xD5, 0xC5, 0xD1, 0xA7, 0xD3, 0xD1],
+                        track: [0xBE, 0xC9, 0xC8, 0xD5, 0xB5, 0xC4, 0xD7, 0xE3, 0xBC, 0xA3])
+        #expect(read(gbk)?.1 == .gb18030)
+        #expect(CueSheet.parse(read(gbk)?.0 ?? "").title == "光辉岁月")
+        #expect(CueSheet.parse(read(gbk)?.0 ?? "").files.first?.tracks.first?.title == "旧日的足迹")
+        // Short Chinese titles and full-width punctuation: 海阔天空 / 但愿人长久（国）.
+        let gbkShort = sheet(title: [0xBA, 0xA3, 0xC0, 0xAB, 0xCC, 0xEC, 0xBF, 0xD5], performer: [0xCE, 0xD2, 0xB1, 0xB1],
+                             track: [0xB5, 0xAB, 0xD4, 0xB8, 0xC8, 0xCB, 0xB3, 0xA4, 0xBE, 0xC3, 0xA3, 0xA8, 0xB9, 0xFA, 0xA3, 0xA9])
+        #expect(read(gbkShort)?.1 == .gb18030)
+        #expect(CueSheet.parse(read(gbkShort)?.0 ?? "").files.first?.tracks.first?.title == "但愿人长久（国）")
+        // A UTF-8 BOM and valid UTF-8 come first, whatever the bytes could also be.
+        let utf8 = Data([0xEF, 0xBB, 0xBF]) + Data("TITLE \"光辉岁月\"\n".utf8)
+        #expect(read(utf8)?.1 == .utf8)
+        #expect(read(utf8)?.0 == "TITLE \"光辉岁月\"\n")
+        // Shift-JIS: 宇多田ヒカル / 交響曲第9番 ニ短調 / 夜に駆ける.
+        let sjis = sheet(title: [0x8C, 0xF0, 0x8B, 0xBF, 0x8B, 0xC8, 0x91, 0xE6, 0x39, 0x94, 0xD4, 0x20, 0x83, 0x6A, 0x92, 0x5A, 0x92, 0xB2],
+                         performer: [0x89, 0x46, 0x91, 0xBD, 0x93, 0x63, 0x83, 0x71, 0x83, 0x4A, 0x83, 0x8B],
+                         track: [0x96, 0xE9, 0x82, 0xC9, 0x8B, 0xEC, 0x82, 0xAF, 0x82, 0xE9])
+        #expect(read(sjis)?.1 == .shiftJIS)
+        #expect(CueSheet.parse(read(sjis)?.0 ?? "").files.first?.tracks.first?.title == "夜に駆ける")
+        // A Japanese sheet of kanji only (東京) is still not Chinese.
+        let kanji = sheet(title: [0x93, 0x8C, 0x8B, 0x9E], performer: [0x93, 0x8C, 0x8B, 0x9E], track: [0x93, 0x8C, 0x8B, 0x9E])
+        #expect(read(kanji)?.1 == .shiftJIS)
+        // Windows-1251: Группа крови / Звезда по имени Солнце / Наутилус Помпилиус.
+        let cyrillic = sheet(title: [0xC3, 0xF0, 0xF3, 0xEF, 0xEF, 0xE0, 0x20, 0xEA, 0xF0, 0xEE, 0xE2, 0xE8],
+                             performer: [0xCD, 0xE0, 0xF3, 0xF2, 0xE8, 0xEB, 0xF3, 0xF1, 0x20, 0xCF, 0xEE, 0xEC, 0xEF, 0xE8, 0xEB, 0xE8, 0xF3, 0xF1],
+                             track: [0xC7, 0xE2, 0xE5, 0xE7, 0xE4, 0xE0, 0x20, 0xEF, 0xEE, 0x20, 0xE8, 0xEC, 0xE5, 0xED, 0xE8, 0x20, 0xD1, 0xEE, 0xEB, 0xED, 0xF6, 0xE5])
+        #expect(read(cyrillic)?.1 == .windowsCP1251)
+        #expect(CueSheet.parse(read(cyrillic)?.0 ?? "").files.first?.tracks.first?.title == "Звезда по имени Солнце")
+        // All-capital Cyrillic (ПЕРЕМЕН, КИНО, ДДТ) lands on GB 2312's common hanzi in pairs, and stays Cyrillic.
+        let capitals = sheet(title: [0xCF, 0xC5, 0xD0, 0xC5, 0xCC, 0xC5, 0xCD], performer: [0xCA, 0xC8, 0xCD, 0xCE], track: [0xC4, 0xC4, 0xD2])
+        #expect(read(capitals)?.1 == .windowsCP1251)
+        #expect(CueSheet.parse(read(capitals)?.0 ?? "").title == "ПЕРЕМЕН")
+        // Western: Mötley Crüe / Ångström Größe / Édith Piaf, and Émile Ólafur (capital accents, which is where a
+        // Chinese guess would come closest).
+        let western = sheet(title: [0x4D, 0xF6, 0x74, 0x6C, 0x65, 0x79, 0x20, 0x43, 0x72, 0xFC, 0x65],
+                            performer: [0xC5, 0x6E, 0x67, 0x73, 0x74, 0x72, 0xF6, 0x6D, 0x20, 0x47, 0x72, 0xF6, 0xDF, 0x65],
+                            track: [0xC9, 0x6D, 0x69, 0x6C, 0x65, 0x20, 0xD3, 0x6C, 0x61, 0x66, 0x75, 0x72])
+        #expect(read(western)?.1 == .windowsCP1252)
+        #expect(CueSheet.parse(read(western)?.0 ?? "").files.first?.tracks.first?.title == "Émile Ólafur")
     }
     @Test func numericCueOverflowIsRejected() {
         #expect(CueSheet.cdFrames("9223372036854775807:59:74") == nil)
