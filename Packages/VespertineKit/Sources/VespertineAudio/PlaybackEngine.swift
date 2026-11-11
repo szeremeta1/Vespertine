@@ -647,6 +647,12 @@ public final class PlaybackEngine: @unchecked Sendable {
         post(.barrier(done))
         _ = done.wait(timeout: .now() + timeout)
     }
+    /// Tests with a held output clock: wait for a skip to be handled before advancing the simulated device.
+    func waitForCommandsForTesting(timeout: TimeInterval) -> Bool {
+        let done = DispatchSemaphore(value: 0)
+        post(.barrier(done))
+        return done.wait(timeout: .now() + timeout) == .success
+    }
     public func seek(to seconds: TimeInterval) {
         guard seconds.isFinite else { return }
         fadeOutNow(pausing: false)
