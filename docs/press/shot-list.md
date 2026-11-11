@@ -44,7 +44,7 @@ JPEGs, the tour, the social previews) is derived from these by the scripts named
 
 ## Checks before a shot ships
 
-1. The build is 1.0.0 (Release), from the commit being released.
+1. The build is 1.0.1 (Release), from the commit being released.
 2. The signal path in the inspector agrees with Audio MIDI Setup (device rate and format) at the moment of capture.
 3. Every badge on screen is one the app earned on that file; no edited pixels inside the window.
 4. No real release is shown as fake hi-res.
