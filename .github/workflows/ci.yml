@@ -70,7 +70,9 @@ jobs:
 
   whitespace:
     name: No whitespace errors (Linux)
-    if: github.event_name == 'pull_request'
+    # On a push to main too (the squashed commit against its parent): skipped there, main's commits showed one check short
+    # of the pull request's (13 of 14).
+    if: github.event_name == 'pull_request' || github.event_name == 'push'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -78,6 +80,7 @@ jobs:
         with:
           fetch-depth: 2
       # A pull request is checked out as its test merge into main, so the first parent is main and this is the PR's diff.
+      # A push to main is one squashed commit: its first parent is main before it.
       - name: No whitespace errors
         run: git diff --check HEAD^1 HEAD
 
