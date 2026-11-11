@@ -321,6 +321,19 @@ struct NetworkTests {
         #expect(cache.usage().cachedFiles == 1)
     }
 
+    @Test("A song's file URL is made from its path alone: nothing asks the file system, which on a share that stopped answering never returns")
+    func fileURLAsksNothing() throws {
+        // Foundation makes a URL from a path with no "is it a folder" answer by asking the file system (lstat). Seen from here: a path
+        // that is a folder on disk then gives a folder's URL. The song's URL must not depend on what is on disk.
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-url-\(UUID())/Looks Like A Song.flac", isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: folder.deletingLastPathComponent()) }
+        #expect(URL(fileURLWithPath: folder.path).hasDirectoryPath, "the plain initializer asked the file system (this is what must be avoided)")
+        let track = Track.stub(path: folder.path)
+        #expect(!track.fileURL.hasDirectoryPath, "the song's URL was made without asking")
+        #expect(track.fileURL.path == folder.path)
+    }
+
     @Test("Copies of songs skipped past stop; queued ones are dropped; Keep Offline copies carry on")
     func cacheKeepOnly() async throws {
         signal(SIGPIPE, SIG_IGN)

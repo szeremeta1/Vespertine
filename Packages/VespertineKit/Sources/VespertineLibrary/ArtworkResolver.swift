@@ -57,7 +57,7 @@ public final class ArtworkResolver: Sendable {
         if let known, store.hasImage(known) { return ResolvedArtwork(key: known, source: .library) }
 
         // 2. The file's own picture, 3. the folder's image.
-        let file = URL(fileURLWithPath: track.filePath)
+        let file = track.fileURL
         if let found = readFromFile(file, discImage: Self.isDiscImage(track)) {
             if persist, let id = track.id, let key = found.key { remember(key, forTrack: id, replacing: known) }
             return found
@@ -111,7 +111,7 @@ public final class ArtworkResolver: Sendable {
     }
 
     static func isDiscImage(_ track: Track) -> Bool {
-        let ext = URL(fileURLWithPath: track.filePath).pathExtension.lowercased()
+        let ext = (track.filePath as NSString).pathExtension.lowercased()
         return SourceInspector.discImageExtensions.contains(ext) || SourceInspector.dvdFolderExtensions.contains(ext)
     }
 

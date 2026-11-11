@@ -387,7 +387,7 @@ final class LibraryStore {
 
     private static func scanFailureMessage(_ error: Error) -> String {
         if case LibraryScanner.ScanError.notResponding(let path) = error {
-            return String(localized: "The scan stopped because the share didn’t answer while reading “\(URL(fileURLWithPath: path).lastPathComponent)”. Nothing was marked missing. Rescan to try again.",
+            return String(localized: "The scan stopped because the share didn’t answer while reading “\((path as NSString).lastPathComponent)”. Nothing was marked missing. Rescan to try again.",
                           comment: "%@ is the name of the folder or file on a network share that didn't answer during a library scan.")
         }
         return error.localizedDescription

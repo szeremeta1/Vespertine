@@ -176,7 +176,9 @@ public final class NetworkCache: @unchecked Sendable {
         let pinned = queue.contains { $0.key == key && $0.pinned }
         queue.removeAll { $0.key == key }
         cancelled.remove(key)
-        let job = Job(key: key, remote: URL(fileURLWithPath: track.filePath), size: track.fileSize, pinned: pinned)
+        // `fileURL` is made from the path alone. A URL made without saying "not a folder" asks the file system which it is, and
+        // this runs on the main thread for the song that plays: on a share that has stopped answering, that question froze the window.
+        let job = Job(key: key, remote: track.fileURL, size: track.fileSize, pinned: pinned)
         active[key] = job
         lock.unlock()
         Self.downloads.async { [self] in
@@ -226,7 +228,7 @@ public final class NetworkCache: @unchecked Sendable {
                 cancelled.remove(key)
                 continue
             }
-            queue.append(Job(key: key, remote: URL(fileURLWithPath: t.filePath, isDirectory: false), size: t.fileSize, pinned: offline))
+            queue.append(Job(key: key, remote: t.fileURL, size: t.fileSize, pinned: offline))
         }
         lock.unlock()
         save()
