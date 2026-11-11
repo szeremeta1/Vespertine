@@ -1630,9 +1630,8 @@ public final class PlaybackEngine: @unchecked Sendable {
                               roomCorrection: room?.name,
                               bypassedRoomCorrection: room == nil ? settings.roomCorrection(for: device)?.name : nil)
         path.roomFiltersSkipped = room?.filtersTooLong(sampleRate: session.applied.sampleRate, channelCount: plan.channels) ?? false
-        if let resources = session.groupResources {
+        if let playing = routingGroup(for: device) ?? session.groupResources?.group {
             // A speaker group: the DACs that carry this song, each as read back from it, and what is done to the samples.
-            let playing = routingGroup(for: device) ?? resources.group
             let content = plan.channels == playing.totalChannels ? GroupRouting.content(source: probed.format, group: playing) : nil
             let stage = GroupSignalPath.stage(room: chain(room, session: session), used: content?.usedOutputs ?? Array(0..<max(plan.channels, 0)),
                                               equalizer: path.equalizer != nil, digitalVolumeDB: settings.digitalVolume(for: device), replayGainDB: path.replayGainDB)

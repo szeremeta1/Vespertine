@@ -49,10 +49,7 @@ struct RoomRenderSwitchTests {
                 #expect(snapshot.state == state)
                 #expect(abs(snapshot.position - position) < 0.01)
                 #expect(rig.opens.withLock { $0 } == opens + 1)
-                let path = try #require(snapshot.signalPath)
-                let content = GroupRouting.content(source: path.source, group: group)
-                let readback = GroupSignalPath.make(group: group, applied: path.applied, source: path.source,
-                                                   plan: path.plan, stage: .none, content: content)
+                let readback = try #require(snapshot.signalPath?.group)
                 #expect((readback.render != nil) == enabled)
                 #expect(readback.badges.contains("ROOM RENDER") == enabled)
                 if enabled {
