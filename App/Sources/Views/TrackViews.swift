@@ -7,10 +7,60 @@ import AppKit
 import VespertineLibrary
 import SwiftUI
 
-struct TrackRow: Identifiable, Hashable {
-    let track: Track
-    let index: Int
-    var id: Int64 { Int64(index) }
+/// A row of a track table: a place in the table, and what is shown there now.
+///
+/// A row's identity and value are its place, not its song. SwiftUI applies a change of a table's rows to AppKit row by
+/// row, and compares and copies every row whenever one of them changes: with a whole library re-sorted that was every
+/// row moved (and, at worst, built and measured), seconds to minutes of the main thread. So a sort, or a rescan, leaves
+/// the table's rows as they are and changes the songs in their slots, which only the rows on screen are watching.
+nonisolated struct TrackRow: Identifiable, Hashable, Sendable {
+    /// A song of the list, held by reference: sorting moves pointers, not everything the library knows about a song.
+    final class Song: Sendable {
+        let track: Track
+        init(_ track: Track) { self.track = track }
+    }
+
+    /// What the cells of a table watch: counts the times any of its places came to show something else.
+    @Observable
+    final class Changes: @unchecked Sendable {
+        fileprivate(set) var count = 0
+    }
+
+    /// What one place in the table shows. Read and changed on the main thread only.
+    final class Slot: @unchecked Sendable {
+        fileprivate var song: Song
+        fileprivate var index: Int
+        fileprivate let changes: Changes
+
+        init(_ song: Song, index: Int, changes: Changes) {
+            self.song = song
+            self.index = index
+            self.changes = changes
+        }
+
+        /// Whether the place shows something else from now on. The caller counts that in `changes`, once for the table.
+        func show(_ song: Song, index: Int) -> Bool {
+            guard self.song !== song || self.index != index else { return false }
+            self.song = song
+            self.index = index
+            return true
+        }
+    }
+
+    /// The row's place in the table as shown.
+    let id: Int64
+    let slot: Slot
+
+    /// The song shown here. A cell that reads it is drawn again when the place shows another song.
+    var track: Track { _ = slot.changes.count; return slot.song.track }
+    /// The song's place in the list (in the whole playlist, for a filtered one), whatever the sort.
+    var index: Int { _ = slot.changes.count; return slot.index }
+    /// The same two as they are now, for passes over a whole list: nothing is watched, and no song is copied.
+    var trackID: Int64? { slot.song.track.id }
+    var place: Int { slot.index }
+
+    static func == (a: TrackRow, b: TrackRow) -> Bool { a.id == b.id && a.slot === b.slot }
+    func hash(into hasher: inout Hasher) { hasher.combine(id) }
 }
 
 struct TrackTable: View {
@@ -32,13 +82,14 @@ struct TrackTable: View {
     @State private var selectedEntries: [Int64: Set<Int>] = [:]
     /// A selection this table set itself, to follow the app's (`mirror`), not one made by clicking it.
     @State private var mirrored: Set<Int64>?
+    /// The selected rows' places in the list (`TrackRow.index`), which a sort doesn't change: after one, the same
+    /// entries are selected again where they are now.
+    @State private var selectedPlaces = Set<Int>()
     @State private var sortOrder: [KeyPathComparator<TrackRow>] = []
     @State private var sorted = SortedRows()
 
-    private var rows: [TrackRow] { sorted.rows(tracks: tracks, positions: positions, order: sortOrder) }
-
     /// Album pages of multi-disc albums number tracks "2·1", "2·2"…, so disc 2 doesn't look like the list restarting.
-    private var numbersDiscs: Bool { !showAlbum && Set(tracks.compactMap(\.discNumber)).count > 1 }
+    private func numbersDiscs(_ tracks: [Track]) -> Bool { !showAlbum && Set(tracks.compactMap(\.discNumber)).count > 1 }
 
     private func number(_ track: Track, discs: Bool) -> String {
         guard let n = track.trackNumber else { return "–" }
@@ -46,8 +97,11 @@ struct TrackTable: View {
     }
 
     var body: some View {
-        let rows = self.rows
-        let discs = numbersDiscs
+        // What the table shows: the list in its sort order. A long list is sorted off the main thread, and until that is
+        // done the table goes on showing the rows it had, with the list they were made from.
+        let content = sorted.content(tracks: self.tracks, positions: positions, allTracks: self.allTracks, order: sortOrder)
+        let rows = content.rows, tracks = content.tracks, allTracks = content.allTracks
+        let discs = numbersDiscs(tracks)
         Table(rows, selection: $selection, sortOrder: $sortOrder) {
             // Ideal widths add up to about 810 pt: what's left beside the sidebar and inspector in a 1440 pt window.
             TableColumn("#", value: \.index) { row in
@@ -117,7 +171,7 @@ struct TrackTable: View {
         .contextMenu(forSelectionType: Int64.self) { ids in
             let chosenRows = rows.filter { ids.contains($0.id) }
             let chosen = chosenRows.map(\.track)
-            if !chosen.isEmpty { TrackMenu(tracks: chosen, playlist: reorderable, all: allTracks ?? tracks, positions: Set(chosenRows.map(\.index))) }
+            if !chosen.isEmpty { TrackMenu(tracks: chosen, playlist: reorderable, all: allTracks ?? tracks, positions: Set(chosenRows.map(\.place))) }
         } primaryAction: { ids in
             // Double-clicking a row of a multi-selection gets the whole selection: play the row clicked, not whichever
             // song the set happens to list first (else the first selected, in the order shown).
@@ -125,16 +179,21 @@ struct TrackTable: View {
             guard let index = clicked ?? rows.firstIndex(where: { ids.contains($0.id) }) else { return }
             model.player.play(rows.map(\.track), startAt: index, transitions: model.library.transitions(of: reorderable))
         }
-        .onAppear { mirror(Set(rows.filter { model.selectedTrackIDs.contains($0.track.id ?? -1) }.map(\.id))) }
+        .onAppear { mirror(Set(rows.filter { model.selectedTrackIDs.contains($0.trackID ?? -1) }.map(\.id))) }
         .onChange(of: model.selectedTrackIDs) { _, new in
-            let selectedTracks = Set(rows.filter { selection.contains($0.id) }.compactMap { $0.track.id })
+            let selectedTracks = Set(rows.filter { selection.contains($0.id) }.compactMap(\.trackID))
             guard selectedTracks != new else { return }
-            mirror(Set(rows.filter { new.contains($0.track.id ?? -1) }.map(\.id)))
+            mirror(Set(rows.filter { new.contains($0.trackID ?? -1) }.map(\.id)))
         }
-        .onChange(of: tracks) {
-            // Rows are numbered by their place in the list: when the list changes (a scan adds a song above), select the
-            // same entries again rather than the same places, or Play, Return and Remove would act on whatever moved there.
-            mirror(Self.rows(for: selectedEntries, in: rows.map { ($0.id, $0.track.id) }))
+        .onChange(of: [content.list, content.arrangement]) { old, new in
+            // Rows are numbered by their place in the table: when the list changes (a scan adds a song above) or is sorted,
+            // select the same entries again rather than the same places, or Play, Return and Remove would act on whatever
+            // moved there.
+            if old.first == new.first {
+                mirror(Set(rows.filter { selectedPlaces.contains($0.place) }.map(\.id)))
+            } else {
+                mirror(Self.rows(for: selectedEntries, in: rows.map { ($0.id, $0.trackID) }))
+            }
         }
         .onChange(of: selection) { old, new in
             Self.focusClickedTable()
@@ -144,13 +203,14 @@ struct TrackTable: View {
                 selection = [rows[index].id]
                 return
             }
-            selectedEntries = Self.entries(new, in: rows.map { ($0.id, $0.track.id) })
+            selectedEntries = Self.entries(new, in: rows.map { ($0.id, $0.trackID) })
+            selectedPlaces = Set(rows.filter { new.contains($0.id) }.map(\.place))
             // Only a selection made here is the app's new selection. Pages kept alive underneath (Favorites under an
             // album, Songs under search results) follow the selection too; when they wrote back their share of it, a
             // Shift- or Command-click selection on the page in front shrank to the songs both pages list.
             defer { mirrored = nil }
             guard new != mirrored else { return }
-            model.selectedTrackIDs = Set(rows.filter { new.contains($0.id) }.compactMap { $0.track.id })
+            model.selectedTrackIDs = Set(rows.filter { new.contains($0.id) }.compactMap(\.trackID))
             if !new.isEmpty, model.inspectorTab == .nowPlaying, model.player.current == nil { model.inspectorTab = .details }
         }
         .onKeyPress(.return) {
@@ -221,19 +281,181 @@ extension TrackTable {
     }
 }
 
+/// What a track table shows: the rows in their sort order, with the list they were made from.
+struct TableContent {
+    var rows: [TrackRow] = []
+    var tracks: [Track] = []
+    var allTracks: [Track]? = nil
+    /// Counts the lists shown: other songs get a new number, the same songs in another order keep theirs.
+    var list = 0
+    /// Counts every change of the rows, a sort included.
+    var arrangement = 0
+}
+
 /// The table's rows in their sort order, kept between evaluations of the table: one click re-evaluates it several times
 /// (the selection, the inspector), and sorting a whole library each time was most of what a click cost.
+///
+/// A long list is sorted off the main thread (sorting 20,000 titles takes a few hundred milliseconds): the table shows
+/// what it showed until the new order is ready, then is evaluated again.
+@Observable
 final class SortedRows {
-    private var key: (tracks: [Track], positions: [Int]?, order: [KeyPathComparator<TrackRow>])?
-    private var cached: [TrackRow] = []
+    typealias Key = (tracks: [Track], positions: [Int]?, order: [KeyPathComparator<TrackRow>])
 
-    func rows(tracks: [Track], positions: [Int]?, order: [KeyPathComparator<TrackRow>]) -> [TrackRow] {
+    /// Lists up to this long are sorted at once, on the main thread: an album, most playlists.
+    nonisolated static let immediateLimit = 1000
+
+    /// Changes when a sort done off the main thread is ready, which has the table evaluated again.
+    private var landed = 0
+    @ObservationIgnored private var key: Key?
+    @ObservationIgnored private var shown = TableContent()
+    @ObservationIgnored private var pending: (key: Key, task: Task<Void, Never>)?
+    /// The list's songs as rows hold them, kept from one sort of a list to the next.
+    @ObservationIgnored private var songs: (tracks: [Track], songs: [TrackRow.Song])?
+    /// The table's places, kept for as long as the table: a row is the same row whatever it shows.
+    @ObservationIgnored private var rows: [TrackRow] = []
+    @ObservationIgnored private let changes = TrackRow.Changes()
+
+    /// Whether a sort is being worked out off the main thread.
+    var isSorting: Bool { pending != nil }
+
+    func content(tracks: [Track], positions: [Int]?, allTracks: [Track]? = nil, order: [KeyPathComparator<TrackRow>]) -> TableContent {
+        _ = landed
         // Usually the very same array as last time, which compares equal at once.
-        if let key, key.order == order, key.positions == positions, key.tracks == tracks { return cached }
-        let base = tracks.enumerated().map { TrackRow(track: $1, index: positions?[$0] ?? $0) }
-        cached = order.isEmpty ? base : base.sorted(using: order)
-        key = (tracks, positions, order)
-        return cached
+        func matches(_ key: Key) -> Bool { key.order == order && key.positions == positions && key.tracks == tracks }
+        if let key, matches(key) {
+            pending?.task.cancel()
+            pending = nil
+            shown.allTracks = allTracks
+            return shown
+        }
+        if let pending, matches(pending.key) { return shown }
+        pending?.task.cancel()
+        pending = nil
+        let key: Key = (tracks, positions, order)
+        let known = songs.flatMap { $0.tracks == tracks ? $0.songs : nil }
+        guard !order.isEmpty else {
+            show(known ?? tracks.map(TrackRow.Song.init), in: nil, for: key, allTracks: allTracks)
+            return shown
+        }
+        guard let columns = TrackSort.columns(order, tracks: tracks, positions: positions) else {
+            // A sort TrackSort has no values for: compare rows of the list themselves.
+            let songs = known ?? tracks.map(TrackRow.Song.init)
+            let apart = TrackRow.Changes()
+            let unsorted = songs.indices.map { TrackRow(id: Int64($0), slot: TrackRow.Slot(songs[$0], index: positions?[$0] ?? $0, changes: apart)) }
+            show(songs, in: unsorted.sorted(using: order).map { Int($0.id) }, for: key, allTracks: allTracks)
+            return shown
+        }
+        guard tracks.count > Self.immediateLimit else {
+            show(known ?? tracks.map(TrackRow.Song.init), in: TrackSort.order(columns, count: tracks.count), for: key, allTracks: allTracks)
+            return shown
+        }
+        let task = Task { [weak self] in
+            let (sorted, songs) = await Task.detached(priority: .userInitiated) {
+                (TrackSort.order(columns, count: tracks.count), known ?? tracks.map(TrackRow.Song.init))
+            }.value
+            guard !Task.isCancelled, let self else { return }
+            self.pending = nil
+            self.show(songs, in: sorted, for: key, allTracks: allTracks)
+            self.landed += 1
+        }
+        pending = (key, task)
+        return shown
+    }
+
+    /// Puts the list's songs in the table's places, in `order` (as they are, when nil).
+    private func show(_ songs: [TrackRow.Song], in order: [Int]?, for key: Key, allTracks: [Track]?) {
+        var changed = false
+        for place in songs.indices {
+            let from = order?[place] ?? place
+            let index = key.positions?[from] ?? from
+            if place < rows.count {
+                if rows[place].slot.show(songs[from], index: index) { changed = true }
+            } else {
+                rows.append(TrackRow(id: Int64(place), slot: TrackRow.Slot(songs[from], index: index, changes: changes)))
+            }
+        }
+        if changed { changes.count += 1 }
+        if rows.count > songs.count { rows.removeLast(rows.count - songs.count) }
+        let sameList = self.key.map { $0.positions == key.positions && $0.tracks == key.tracks } ?? false
+        shown = TableContent(rows: rows, tracks: key.tracks, allTracks: allTracks, list: shown.list + (sameList ? 0 : 1), arrangement: shown.arrangement + 1)
+        self.key = key
+        self.songs = (key.tracks, songs)
+    }
+}
+
+/// The order a sort puts a list in, worked out from the sorted columns' values alone, so it can run off the main thread
+/// and never moves whole songs around while it sorts.
+nonisolated enum TrackSort {
+    /// One sorted column: its value in every row of the list, and the direction.
+    struct Column: Sendable {
+        enum Values: Sendable {
+            case numbers([Double])
+            case text([String])
+        }
+        var values: Values
+        var forward: Bool
+    }
+
+    /// The columns of `order`, most significant first. nil when one of them isn't a column of the track table.
+    @MainActor static func columns(_ order: [KeyPathComparator<TrackRow>], tracks: [Track], positions: [Int]?) -> [Column]? {
+        var columns: [Column] = []
+        for comparator in order {
+            let values: Column.Values
+            let keyPath = comparator.keyPath
+            if keyPath == \TrackRow.index {
+                values = .numbers(tracks.indices.map { Double(positions?[$0] ?? $0) })
+            } else if keyPath == \TrackRow.track.sampleRate {
+                values = .numbers(tracks.map(\.sampleRate))
+            } else if keyPath == \TrackRow.track.duration {
+                values = .numbers(tracks.map(\.duration))
+            } else if keyPath == \TrackRow.track.title {
+                values = .text(tracks.map(\.title))
+            } else if keyPath == \TrackRow.track.displayArtist {
+                values = .text(tracks.map(\.displayArtist))
+            } else if keyPath == \TrackRow.track.displayAlbum {
+                values = .text(tracks.map(\.displayAlbum))
+            } else {
+                return nil
+            }
+            columns.append(Column(values: values, forward: comparator.order == .forward))
+        }
+        return columns
+    }
+
+    /// Each string's place among the different strings, in the order the table's text columns sort by (as the Finder
+    /// sorts names: "Track 9" before "Track 10"). Strings that order compares as the same share a place. Comparing
+    /// places is what makes a long sort quick: the slow comparison runs once per different string, not per pair of rows.
+    static func ranks(_ strings: [String]) -> [Double] {
+        let comparator = String.StandardComparator.localizedStandard
+        let different = Set(strings).sorted { comparator.compare($0, $1) == .orderedAscending }
+        var rank: [String: Double] = [:]
+        rank.reserveCapacity(different.count)
+        var place = 0.0
+        for (i, string) in different.enumerated() {
+            if i > 0, comparator.compare(different[i - 1], string) != .orderedSame { place += 1 }
+            rank[string] = place
+        }
+        return strings.map { rank[$0] ?? 0 }
+    }
+
+    /// The rows' places in the list, in the order `columns` sort them: rows that every column holds equal stay in the
+    /// list's order, as a stable sort leaves them.
+    static func order(_ columns: [Column], count: Int) -> [Int] {
+        let columns: [(values: [Double], forward: Bool)] = columns.map { column in
+            switch column.values {
+            case .numbers(let numbers): (numbers, column.forward)
+            case .text(let strings): (ranks(strings), column.forward)
+            }
+        }
+        var order = Array(0..<count)
+        order.sort { a, b in
+            for column in columns {
+                let x = column.values[a], y = column.values[b]
+                if x != y { return column.forward ? x < y : x > y }
+            }
+            return a < b
+        }
+        return order
     }
 }
 

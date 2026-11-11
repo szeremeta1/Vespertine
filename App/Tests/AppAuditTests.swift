@@ -189,7 +189,7 @@ struct AppAuditTests {
         settings.replayGain = .track
         player.refreshReplayGain()
         #expect(player.queue.map(\.id) == reordered)
-        let duplicateRows = [TrackRow(track: tracks[0], index: 0), TrackRow(track: tracks[0], index: 1)]
+        let duplicateRows = SortedRows().content(tracks: [tracks[0], tracks[0]], positions: nil, order: []).rows
         #expect(duplicateRows[0].id != duplicateRows[1].id)
         player.stop()
     }
