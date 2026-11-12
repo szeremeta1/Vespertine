@@ -473129,281 +473129,6 @@
         }
       }
     },
-    "Vespertine never sends anything in the background unless you turn it on here.": {
-      "extractionState": "manual",
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "እዚህ ካላበሩት በስተቀር Vespertine ከበስተጀርባ ምንም ነገር አይልክም።"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "لا يرسل Vespertine أي شيء في الخلفية أبدًا ما لم تفعّل ذلك هنا."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "আপনি এখানে চালু না করলে Vespertine ব্যাকগ্রাউন্ডে কিছুই পাঠায় না।"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine nikdy nic neodesílá na pozadí, pokud to tady nezapnete."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine sender aldrig noget i baggrunden, medmindre du slår det til her."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine sendet nie etwas im Hintergrund, außer du aktivierst es hier."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Το Vespertine δεν στέλνει ποτέ τίποτα στο παρασκήνιο, εκτός αν το ενεργοποιήσετε εδώ."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine never sends anything in the background unless you turn it on here."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine nunca envía nada en segundo plano a menos que lo actives aquí."
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine هرگز چیزی را در پس‌زمینه ارسال نمی‌کند، مگر اینکه اینجا آن را روشن کنید."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine ei koskaan lähetä mitään taustalla, ellet ota sitä käyttöön tässä."
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Walang ipinapadala ang Vespertine sa background maliban kung i-on mo ito rito."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine n’envoie jamais rien en arrière-plan, sauf si vous l’activez ici."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "તમે અહીં ચાલુ ન કરો ત્યાં સુધી Vespertine બૅકગ્રાઉન્ડમાં કશું મોકલતું નથી."
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine ba ya aika komai a bayan fage sai dai idan kun kunna shi a nan."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine אף פעם לא שולח שום דבר ברקע, אלא אם תפעיל זאת כאן."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "जब तक आप इसे यहाँ चालू न करें, Vespertine बैकग्राउंड में कुछ भी नहीं भेजता।"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A Vespertine soha nem küld semmit a háttérben, hacsak itt be nem kapcsolja."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine tidak pernah mengirim apa pun di latar belakang kecuali Anda mengaktifkannya di sini."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine non invia mai nulla in background, a meno che tu non lo attivi qui."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ここでオンにしない限り、Vespertineがバックグラウンドで何かを送信することはありません。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ನೀವು ಇಲ್ಲಿ ಆನ್ ಮಾಡದ ಹೊರತು Vespertine ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಏನನ್ನೂ ಕಳುಹಿಸುವುದಿಲ್ಲ."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "여기에서 켜지 않는 한 Vespertine은 백그라운드에서 아무것도 전송하지 않습니다."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "നിങ്ങൾ ഇവിടെ ഓണാക്കാത്തിടത്തോളം Vespertine പശ്ചാത്തലത്തിൽ ഒന്നും അയയ്ക്കില്ല."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "तुम्ही इथे चालू केल्याशिवाय Vespertine बॅकग्राउंडमध्ये काहीही पाठवत नाही."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine tidak pernah menghantar apa-apa di latar belakang melainkan anda mengaktifkannya di sini."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine sender aldri noe i bakgrunnen med mindre du slår det på her."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine verstuurt nooit iets op de achtergrond, tenzij je dat hier aanzet."
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਜਦੋਂ ਤੱਕ ਤੁਸੀਂ ਇਸਨੂੰ ਇੱਥੇ ਚਾਲੂ ਨਹੀਂ ਕਰਦੇ, Vespertine ਬੈਕਗ੍ਰਾਊਂਡ ਵਿੱਚ ਕੁਝ ਵੀ ਨਹੀਂ ਭੇਜਦਾ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine nigdy nic nie wysyła w tle, chyba że włączysz to tutaj."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O Vespertine nunca envia nada em segundo plano, a menos que você ative isso aqui."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O Vespertine nunca envia nada em segundo plano, a menos que o ative aqui."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine nu trimite niciodată nimic în fundal decât dacă activați acest lucru aici."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine skickar aldrig något i bakgrunden om du inte aktiverar det här."
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine haitumi chochote chinichini isipokuwa ukiwasha hapa."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "நீங்கள் இங்கே இயக்காத வரை Vespertine பின்னணியில் எதையும் அனுப்பாது."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "మీరు ఇక్కడ ఆన్ చేస్తే తప్ప Vespertine బ్యాక్‌గ్రౌండ్‌లో దేనినీ పంపదు."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine จะไม่ส่งข้อมูลใดๆ ในเบื้องหลัง เว้นแต่คุณจะเปิดใช้งานที่นี่"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine, burada açmadığınız sürece arka planda hiçbir şey göndermez."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine ніколи нічого не надсилає у фоні, якщо ви не ввімкнете це тут."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine پس منظر میں کبھی کچھ نہیں بھیجتا، جب تک آپ اسے یہاں آن نہ کریں۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine không bao giờ gửi bất cứ thứ gì trong nền trừ khi bạn bật ở đây."
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "除非你在這裡開啟，否則 Vespertine 絕不會在背景傳送任何內容。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "除非你在这里打开，否则 Vespertine 绝不会在后台发送任何内容。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "除非你在這裡開啟，否則 Vespertine 絕不會在背景中傳送任何內容。"
-          }
-        }
-      }
-    },
     "Vespertine plays every file bit-perfect, exactly as recorded, and tells you when anything changes that. Choose how it shares your DAC and handles volume.": {
       "extractionState": "manual",
       "localizations": {
@@ -563746,6 +563471,2686 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在等待 %@ 連接"
+          }
+        }
+      }
+    },
+    "Vespertine sends nothing in the background unless it’s switched on, here or in Settings.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እዚህ ወይም በቅንብሮች ውስጥ ካልበራ በስተቀር Vespertine ከበስተጀርባ ምንም ነገር አይልክም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يرسل Vespertine أي شيء في الخلفية ما لم يكن مفعّلًا، هنا أو في الإعدادات."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এখানে বা সেটিংসে চালু না থাকলে Vespertine ব্যাকগ্রাউন্ডে কিছুই পাঠায় না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine na pozadí nic neodesílá, pokud to není zapnuté – tady nebo v Nastavení."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine sender intet i baggrunden, medmindre det er slået til, her eller i Indstillinger."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine sendet nichts im Hintergrund, außer es ist eingeschaltet – hier oder in den Einstellungen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Vespertine δεν στέλνει τίποτα στο παρασκήνιο, εκτός αν είναι ενεργοποιημένο, εδώ ή στις Ρυθμίσεις."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine no envía nada en segundo plano a menos que esté activado, aquí o en Ajustes."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine هیچ چیزی را در پس‌زمینه ارسال نمی‌کند، مگر اینکه روشن باشد، اینجا یا در تنظیمات."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ei lähetä mitään taustalla, ellei sitä ole otettu käyttöön täällä tai Asetuksissa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang ipinapadala ang Vespertine sa background maliban kung naka-on ito, dito o sa Settings."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine n’envoie rien en arrière-plan, sauf si c’est activé, ici ou dans les Réglages."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "અહીં કે સેટિંગ્સમાં ચાલુ ન હોય ત્યાં સુધી Vespertine બૅકગ્રાઉન્ડમાં કશું મોકલતું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ba ya aika komai a bayan fage sai dai idan an kunna shi, a nan ko a cikin Saituna."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine לא שולח שום דבר ברקע, אלא אם זה מופעל, כאן או ב״הגדרות״."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जब तक यह चालू न हो, यहाँ या सेटिंग्ज़ में, Vespertine बैकग्राउंड में कुछ भी नहीं भेजता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Vespertine semmit sem küld a háttérben, hacsak nincs bekapcsolva itt vagy a Beállításokban."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine tidak mengirim apa pun di latar belakang kecuali diaktifkan, di sini atau di Pengaturan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine non invia nulla in background, a meno che non sia attivato, qui o in Impostazioni."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ここか「設定」でオンにしない限り、Vespertineがバックグラウンドで何かを送信することはありません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇಲ್ಲಿ ಅಥವಾ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಆನ್ ಆಗಿರದ ಹೊರತು Vespertine ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಏನನ್ನೂ ಕಳುಹಿಸುವುದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "여기나 설정에서 켜지 않는 한 Vespertine은 백그라운드에서 아무것도 전송하지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഇവിടെയോ ക്രമീകരണങ്ങളിലോ ഓണാക്കിയിട്ടില്ലെങ്കിൽ Vespertine പശ്ചാത്തലത്തിൽ ഒന്നും അയയ്ക്കില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हे चालू केल्याशिवाय, इथे किंवा सेटिंग्जमध्ये, Vespertine बॅकग्राउंडमध्ये काहीही पाठवत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine tidak menghantar apa-apa di latar belakang melainkan ia diaktifkan, di sini atau dalam Seting."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine sender ingenting i bakgrunnen med mindre det er slått på, her eller i Innstillinger."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine verstuurt niets op de achtergrond, tenzij het is aangezet, hier of in Instellingen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜਦੋਂ ਤੱਕ ਇਹ ਚਾਲੂ ਨਾ ਹੋਵੇ, ਇੱਥੇ ਜਾਂ ਸੈਟਿੰਗਾਂ ਵਿੱਚ, Vespertine ਬੈਕਗ੍ਰਾਊਂਡ ਵਿੱਚ ਕੁਝ ਵੀ ਨਹੀਂ ਭੇਜਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine nic nie wysyła w tle, chyba że jest to włączone – tutaj lub w Ustawieniach."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine não envia nada em segundo plano, a menos que esteja ativado, aqui ou nos Ajustes."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine não envia nada em segundo plano, a menos que esteja ativado, aqui ou nas Definições."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine nu trimite nimic în fundal decât dacă este activat, aici sau în Configurări."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine skickar ingenting i bakgrunden om det inte är påslaget, här eller i Inställningar."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine haitumi chochote chinichini isipokuwa kimewashwa, hapa au katika Mipangilio."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இங்கோ அமைப்புகளிலோ இயக்கப்படாத வரை Vespertine பின்னணியில் எதையும் அனுப்பாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఇక్కడ లేదా సెట్టింగ్‌లలో ఆన్ చేసి ఉంటే తప్ప Vespertine బ్యాక్‌గ్రౌండ్‌లో దేనినీ పంపదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine จะไม่ส่งสิ่งใดในเบื้องหลัง เว้นแต่จะเปิดไว้ ที่นี่หรือใน การตั้งค่า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine, burada ya da Ayarlar’da açılmadıkça arka planda hiçbir şey göndermez."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine нічого не надсилає у фоні, якщо це не ввімкнено — тут або в Параметрах."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine پس منظر میں کچھ نہیں بھیجتا، جب تک یہ آن نہ ہو، یہاں یا سیٹنگز میں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine không gửi gì trong nền trừ khi được bật, ở đây hoặc trong Cài đặt."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非在这里或“设置”中打开，否则 Vespertine 不会在后台发送任何内容。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非在這裡或「設定」中開啟，否則 Vespertine 不會在背景傳送任何內容。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非在這裡或「設定」中開啟，否則 Vespertine 不會在背景傳送任何內容。"
+          }
+        }
+      }
+    },
+    "Once a day, downloads the signed list of DACs known to play DSD natively, so a newly confirmed DAC needs no app update. Nothing about you is sent.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSDን በቀጥታ እንደሚያጫውቱ የሚታወቁ DACዎችን የተፈረመ ዝርዝር በቀን አንድ ጊዜ ያወርዳል፣ ስለዚህ አዲስ የተረጋገጠ DAC የመተግበሪያ ዝማኔ አያስፈልገውም። ስለ እርስዎ ምንም ነገር አይላክም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ينزّل مرة يوميًا القائمة الموقّعة لأجهزة DAC المعروف أنها تشغّل DSD أصليًا، كي لا يحتاج جهاز DAC مؤكَّد حديثًا إلى تحديث للتطبيق. لا يُرسَل أي شيء عنك."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "যেসব DAC নেটিভভাবে DSD চালায় বলে জানা আছে, তাদের স্বাক্ষরিত তালিকা দিনে একবার ডাউনলোড করে, যাতে নতুন নিশ্চিত হওয়া DAC-এর জন্য অ্যাপ আপডেট না লাগে। আপনার সম্পর্কে কিছুই পাঠানো হয় না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jednou denně stáhne podepsaný seznam DAC, o kterých je známo, že přehrávají DSD nativně, takže nově ověřený DAC nepotřebuje aktualizaci aplikace. Nic o vás se neodesílá."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Henter én gang om dagen den signerede liste over DAC’er, der vides at afspille DSD direkte, så en nybekræftet DAC ikke kræver en appopdatering. Intet om dig sendes."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lädt einmal am Tag die signierte Liste der DACs, die DSD bekanntermaßen nativ abspielen, damit ein neu bestätigter DAC kein App-Update braucht. Über dich wird nichts gesendet."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μία φορά την ημέρα, κατεβάζει την υπογεγραμμένη λίστα με τα DAC που είναι γνωστό ότι παίζουν DSD εγγενώς, ώστε ένα νέο επιβεβαιωμένο DAC να μη χρειάζεται ενημέρωση της εφαρμογής. Τίποτα για εσάς δεν αποστέλλεται."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una vez al día, descarga la lista firmada de DAC que se sabe que reproducen DSD de forma nativa, para que un DAC recién confirmado no necesite una actualización de la app. No se envía nada sobre ti."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روزی یک بار فهرست امضاشدهٔ DACهایی را که شناخته شده‌اند DSD را به‌صورت بومی پخش می‌کنند دانلود می‌کند، تا یک DAC تازه تأییدشده به به‌روزرسانی برنامه نیازی نداشته باشد. هیچ چیزی دربارهٔ شما ارسال نمی‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lataa kerran päivässä allekirjoitetun luettelon DAC:eista, joiden tiedetään toistavan DSD:tä natiivisti, joten juuri vahvistettu DAC ei tarvitse apin päivitystä. Sinusta ei lähetetä mitään."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minsan sa isang araw, dina-download ang naka-sign na listahan ng mga DAC na kilalang nagpe-play ng DSD nang native, kaya hindi na kailangan ng app update para sa bagong kumpirmadong DAC. Walang ipinapadalang anuman tungkol sa iyo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une fois par jour, télécharge la liste signée des DAC connus pour lire le DSD nativement, pour qu’un DAC nouvellement confirmé n’ait pas besoin d’une mise à jour de l’app. Rien sur vous n’est envoyé."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD નેટિવ રીતે વગાડવા માટે જાણીતા DAC ની સહી કરેલી સૂચિ દિવસમાં એક વાર ડાઉનલોડ કરે છે, જેથી નવા પુષ્ટિ થયેલા DAC માટે ઍપ અપડેટની જરૂર ન પડે. તમારા વિશે કશું મોકલાતું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sau ɗaya a rana, yana sauke jerin DAC da aka sa hannu waɗanda aka san suna kunna DSD kai tsaye, don kada sabon DAC da aka tabbatar ya buƙaci sabunta manhaja. Ba a aika komai game da ku."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פעם ביום מוריד את הרשימה החתומה של רכיבי DAC שידוע שהם מנגנים DSD באופן מקורי, כך שרכיב DAC שאושר לאחרונה לא דורש עדכון של היישום. שום מידע עליך לא נשלח."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दिन में एक बार उन DAC की हस्ताक्षरित सूची डाउनलोड करता है जो DSD को नेटिव रूप से चलाने के लिए जाने जाते हैं, ताकि नए पुष्ट DAC के लिए ऐप अपडेट की ज़रूरत न पड़े। आपके बारे में कुछ भी नहीं भेजा जाता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naponta egyszer letölti azoknak a DAC-oknak az aláírt listáját, amelyekről ismert, hogy natívan játsszák le a DSD-t, így egy újonnan megerősített DAC-hoz nem kell alkalmazásfrissítés. Rólad semmit nem küld."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sekali sehari, mengunduh daftar bertanda tangan berisi DAC yang diketahui memutar DSD secara native, sehingga DAC yang baru dikonfirmasi tidak memerlukan pembaruan app. Tidak ada informasi tentang Anda yang dikirim."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una volta al giorno scarica l’elenco firmato dei DAC noti per riprodurre il DSD in modo nativo, così un DAC appena confermato non richiede un aggiornamento dell’app. Nulla su di te viene inviato."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSDをネイティブ再生できることが確認されているDACの署名付きリストを1日1回ダウンロードします。新たに確認されたDACも、アプリをアップデートせずに使えます。あなたに関する情報は何も送信されません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD ಅನ್ನು ನೇಟಿವ್ ಆಗಿ ಪ್ಲೇ ಮಾಡುತ್ತವೆ ಎಂದು ತಿಳಿದಿರುವ DAC ಗಳ ಸಹಿ ಮಾಡಿದ ಪಟ್ಟಿಯನ್ನು ದಿನಕ್ಕೆ ಒಮ್ಮೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡುತ್ತದೆ, ಇದರಿಂದ ಹೊಸದಾಗಿ ದೃಢಪಡಿಸಿದ DAC ಗೆ ಆ್ಯಪ್ ಅಪ್‌ಡೇಟ್ ಬೇಕಾಗುವುದಿಲ್ಲ. ನಿಮ್ಮ ಬಗ್ಗೆ ಏನನ್ನೂ ಕಳುಹಿಸಲಾಗುವುದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD를 네이티브로 재생하는 것으로 알려진 DAC의 서명된 목록을 하루에 한 번 다운로드하므로, 새로 확인된 DAC도 앱 업데이트 없이 사용할 수 있습니다. 사용자에 관한 정보는 전송되지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD നേറ്റീവായി പ്ലേ ചെയ്യുമെന്ന് അറിയപ്പെടുന്ന DAC-കളുടെ ഒപ്പിട്ട ലിസ്റ്റ് ദിവസത്തിൽ ഒരിക്കൽ ഡൗൺലോഡ് ചെയ്യുന്നു, അതിനാൽ പുതുതായി സ്ഥിരീകരിച്ച DAC-ന് ആപ്പ് അപ്ഡേറ്റ് ആവശ്യമില്ല. നിങ്ങളെക്കുറിച്ച് ഒന്നും അയയ്ക്കില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD नेटिव्ह पद्धतीने वाजवतात असे माहीत असलेल्या DAC ची स्वाक्षरी केलेली यादी दिवसातून एकदा डाउनलोड करते, म्हणजे नव्याने निश्चित झालेल्या DAC साठी अॅप अपडेटची गरज पडत नाही. तुमच्याबद्दल काहीही पाठवले जात नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sekali sehari, memuat turun senarai bertandatangan DAC yang diketahui memainkan DSD secara asli, supaya DAC yang baru disahkan tidak memerlukan kemas kini apl. Tiada maklumat tentang anda dihantar."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laster ned den signerte listen over DAC-er som er kjent for å spille DSD direkte, én gang om dagen, så en nylig bekreftet DAC ikke trenger en appoppdatering. Ingenting om deg sendes."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Downloadt eens per dag de ondertekende lijst van DAC’s waarvan bekend is dat ze DSD native afspelen, zodat een nieuw bevestigde DAC geen app-update nodig heeft. Er wordt niets over jou verstuurd."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਦਿਨ ਵਿੱਚ ਇੱਕ ਵਾਰ ਉਹਨਾਂ DAC ਦੀ ਦਸਤਖ਼ਤ ਕੀਤੀ ਸੂਚੀ ਡਾਊਨਲੋਡ ਕਰਦਾ ਹੈ ਜੋ DSD ਨੂੰ ਨੇਟਿਵ ਤਰੀਕੇ ਨਾਲ ਚਲਾਉਣ ਲਈ ਜਾਣੇ ਜਾਂਦੇ ਹਨ, ਤਾਂ ਜੋ ਨਵੇਂ ਪੱਕੇ ਹੋਏ DAC ਲਈ ਐਪ ਅੱਪਡੇਟ ਦੀ ਲੋੜ ਨਾ ਪਵੇ। ਤੁਹਾਡੇ ਬਾਰੇ ਕੁਝ ਵੀ ਨਹੀਂ ਭੇਜਿਆ ਜਾਂਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raz dziennie pobiera podpisaną listę przetworników DAC, o których wiadomo, że odtwarzają DSD natywnie, więc nowo potwierdzony DAC nie wymaga aktualizacji aplikacji. Nic o Tobie nie jest wysyłane."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma vez por dia, baixa a lista assinada de DACs conhecidos por reproduzir DSD nativamente, para que um DAC recém-confirmado não precise de uma atualização do app. Nada sobre você é enviado."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma vez por dia, descarrega a lista assinada de DAC conhecidos por reproduzir DSD nativamente, para que um DAC recém-confirmado não precise de uma atualização da app. Nada sobre si é enviado."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O dată pe zi, descarcă lista semnată a DAC-urilor despre care se știe că redau DSD nativ, astfel încât un DAC nou confirmat nu are nevoie de o actualizare a aplicației. Nu se trimite nimic despre dvs."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hämtar en gång om dagen den signerade listan över DAC:ar som är kända för att spela DSD direkt, så att en nyligen bekräftad DAC inte behöver en appuppdatering. Inget om dig skickas."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mara moja kwa siku, hupakua orodha iliyotiwa sahihi ya DAC zinazojulikana kucheza DSD moja kwa moja, ili DAC iliyothibitishwa karibuni isihitaji sasisho la programu. Hakuna kinachotumwa kukuhusu."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD-ஐ நேட்டிவாக இயக்குவதாக அறியப்பட்ட DACகளின் கையொப்பமிட்ட பட்டியலை நாளுக்கு ஒருமுறை பதிவிறக்கும், இதனால் புதிதாக உறுதிசெய்யப்பட்ட DAC-க்கு ஆப் புதுப்பிப்பு தேவையில்லை. உங்களைப் பற்றி எதுவும் அனுப்பப்படாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSDను నేటివ్‌గా ప్లే చేస్తాయని తెలిసిన DACల సంతకం చేసిన జాబితాను రోజుకు ఒకసారి డౌన్‌లోడ్ చేస్తుంది, కాబట్టి కొత్తగా నిర్ధారించిన DACకి యాప్ అప్‌డేట్ అవసరం లేదు. మీ గురించి ఏదీ పంపబడదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ดาวน์โหลดรายการ DAC ที่ลงนามแล้ว ซึ่งทราบว่าเล่น DSD แบบเนทีฟได้ วันละครั้ง เพื่อให้ DAC ที่เพิ่งได้รับการยืนยันใช้งานได้โดยไม่ต้องอัปเดตแอป ไม่มีการส่งข้อมูลใดๆ เกี่ยวกับคุณ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Günde bir kez, DSD’yi yerel olarak çaldığı bilinen DAC’lerin imzalı listesini indirir; böylece yeni doğrulanan bir DAC için uygulama güncellemesi gerekmez. Sizinle ilgili hiçbir şey gönderilmez."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Раз на день завантажує підписаний список ЦАП, які, як відомо, відтворюють DSD нативно, тож нововідомий ЦАП не потребує оновлення застосунку. Нічого про вас не надсилається."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دن میں ایک بار ان DACs کی دستخط شدہ فہرست ڈاؤن لوڈ کرتا ہے جو DSD کو براہِ راست چلانے کے لیے جانے جاتے ہیں، تاکہ نئے تصدیق شدہ DAC کو ایپ اپ ڈیٹ کی ضرورت نہ پڑے۔ آپ کے بارے میں کچھ نہیں بھیجا جاتا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mỗi ngày một lần, tải danh sách có chữ ký gồm các DAC được biết là phát DSD gốc, để DAC mới được xác nhận không cần cập nhật ứng dụng. Không có thông tin nào về bạn được gửi đi."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天下载一次经签名的 DAC 列表，其中是已知能原生播放 DSD 的 DAC，这样新确认的 DAC 无需更新应用就能使用。不会发送任何关于你的信息。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天下載一次經簽署的 DAC 列表，其中是已知能原生播放 DSD 的 DAC，這樣新確認的 DAC 無需更新 App 就能使用。不會傳送任何關於你的資訊。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每天下載一次經簽署的 DAC 列表，其中是已知能原生播放 DSD 的 DAC，這樣新確認的 DAC 無需更新 App 就能使用。不會傳送任何關於你的資料。"
+          }
+        }
+      }
+    },
+    "Control it from your phone": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ከስልክዎ ይቆጣጠሩት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تحكّم فيه من هاتفك"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনার ফোন থেকে নিয়ন্ত্রণ করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ovládejte ho z telefonu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Styr det fra din telefon"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steuere es mit deinem Telefon"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ελέγξτε το από το τηλέφωνό σας"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contrólalo desde tu teléfono"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "با گوشی خود کنترلش کنید"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ohjaa sitä puhelimella"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontrolin ito mula sa iyong telepono"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contrôlez-le depuis votre téléphone"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમારા ફોનથી નિયંત્રિત કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sarrafa shi daga wayarku"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שליטה מהטלפון"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अपने फ़ोन से नियंत्रित करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Irányítsd a telefonodról"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kendalikan dari ponsel Anda"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controllalo dal telefono"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スマートフォンで操作"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮ್ಮ ಫೋನ್‌ನಿಂದ ನಿಯಂತ್ರಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "휴대폰으로 제어하기"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങളുടെ ഫോണിൽ നിന്ന് നിയന്ത്രിക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुमच्या फोनवरून नियंत्रित करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kawal dari telefon anda"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Styr den fra telefonen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bedien het met je telefoon"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਪਣੇ ਫ਼ੋਨ ਤੋਂ ਕੰਟਰੋਲ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Steruj nim z telefonu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controle pelo seu telefone"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controle-o a partir do telefone"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controlați-l de pe telefon"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Styr den från telefonen"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idhibiti kutoka kwa simu yako"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "உங்கள் ஃபோனிலிருந்து கட்டுப்படுத்துங்கள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీ ఫోన్ నుండి నియంత్రించండి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ควบคุมจากโทรศัพท์ของคุณ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefonunuzdan denetleyin"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Керуйте з телефона"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اپنے فون سے کنٹرول کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Điều khiển từ điện thoại"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用手机控制"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用手機控制"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用手機控制"
+          }
+        }
+      }
+    },
+    "Play, queue and browse your music from an iPhone or iPad across the room, over your own network.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ከክፍሉ ማዶ ሆነው በiPhone ወይም በiPad ሙዚቃዎን ያጫውቱ፣ ወረፋ ውስጥ ያስገቡ እና ያስሱ፣ በራስዎ አውታረ መረብ ላይ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شغّل موسيقاك وأضفها إلى قائمة الانتظار وتصفّحها من iPhone أو iPad من الطرف الآخر للغرفة، عبر شبكتك الخاصة."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ঘরের অন্য প্রান্ত থেকে iPhone বা iPad-এ আপনার মিউজিক চালান, কিউতে রাখুন আর ব্রাউজ করুন, আপনার নিজের নেটওয়ার্কেই।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehrávejte, řaďte do fronty a procházejte svou hudbu z iPhonu nebo iPadu z druhého konce místnosti, přes vlastní síť."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspil, sæt i kø og gennemse din musik fra en iPhone eller iPad på den anden side af rummet via dit eget netværk."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiele, reihe und durchsuche deine Musik von einem iPhone oder iPad aus quer durch den Raum, über dein eigenes Netzwerk."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Παίξτε, βάλτε στην ουρά και περιηγηθείτε στη μουσική σας από ένα iPhone ή iPad από την άλλη άκρη του δωματίου, μέσω του δικού σας δικτύου."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduce, pon en cola y explora tu música desde un iPhone o iPad al otro lado de la habitación, a través de tu propia red."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موسیقی خود را از آن سوی اتاق با iPhone یا iPad پخش کنید، به صف اضافه کنید و مرور کنید، از طریق شبکهٔ خودتان."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toista, lisää jonoon ja selaa musiikkiasi iPhonesta tai iPadista huoneen toiselta puolelta omassa verkossasi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I-play, i-queue at i-browse ang iyong musika mula sa iPhone o iPad sa kabilang dulo ng kuwarto, sa sarili mong network."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lancez, mettez en file d’attente et parcourez votre musique depuis un iPhone ou un iPad à l’autre bout de la pièce, sur votre propre réseau."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "રૂમના બીજા છેડેથી iPhone કે iPad પર તમારું સંગીત વગાડો, કતારમાં મૂકો અને બ્રાઉઝ કરો, તમારા પોતાના નેટવર્ક પર."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kunna, jera kuma duba waƙoƙinku daga iPhone ko iPad daga ɗaya gefen ɗaki, ta hanyar cibiyar sadarwarku."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נגן, הוסף לתור ודפדף במוזיקה שלך מ־iPhone או iPad מהצד השני של החדר, דרך הרשת שלך."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कमरे के दूसरे छोर से iPhone या iPad पर अपना संगीत चलाएँ, कतार में लगाएँ और ब्राउज़ करें, अपने ही नेटवर्क पर।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Játszd le, tedd sorba és böngészd a zenéidet iPhone-ról vagy iPadről a szoba másik végéből, a saját hálózatodon."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Putar, antrekan, dan jelajahi musik Anda dari iPhone atau iPad di seberang ruangan, melalui jaringan Anda sendiri."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riproduci, metti in coda e sfoglia la tua musica da un iPhone o iPad dall’altra parte della stanza, sulla tua rete."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "部屋のどこからでも、iPhoneやiPadで音楽の再生、キューへの追加、ブラウズができます。通信はご自宅のネットワーク内だけで行われます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಕೋಣೆಯ ಆ ಕಡೆಯಿಂದ iPhone ಅಥವಾ iPad ನಲ್ಲಿ ನಿಮ್ಮ ಸಂಗೀತವನ್ನು ಪ್ಲೇ ಮಾಡಿ, ಸರದಿಗೆ ಸೇರಿಸಿ ಮತ್ತು ಬ್ರೌಸ್ ಮಾಡಿ, ನಿಮ್ಮದೇ ನೆಟ್‌ವರ್ಕ್ ಮೂಲಕ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "방 건너편에서도 iPhone이나 iPad로 음악을 재생하고, 대기열에 추가하고, 둘러볼 수 있습니다. 모두 사용자의 네트워크 안에서 이루어집니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മുറിയുടെ മറ്റേ അറ്റത്തുനിന്ന് iPhone-ലോ iPad-ലോ നിങ്ങളുടെ സംഗീതം പ്ലേ ചെയ്യുക, ക്യൂവിൽ ചേർക്കുക, ബ്രൗസ് ചെയ്യുക, നിങ്ങളുടെ സ്വന്തം നെറ്റ്‌വർക്കിലൂടെ."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "खोलीच्या दुसऱ्या टोकावरून iPhone किंवा iPad वर तुमचे संगीत वाजवा, रांगेत लावा आणि ब्राउझ करा, तुमच्याच नेटवर्कवरून."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Main, beratur dan semak imbas muzik anda dari iPhone atau iPad di seberang bilik, melalui rangkaian anda sendiri."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spill av, legg i kø og bla i musikken din fra en iPhone eller iPad på andre siden av rommet, over ditt eget nettverk."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speel, zet in de wachtrij en blader door je muziek vanaf een iPhone of iPad aan de andere kant van de kamer, via je eigen netwerk."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਮਰੇ ਦੇ ਦੂਜੇ ਸਿਰੇ ਤੋਂ iPhone ਜਾਂ iPad 'ਤੇ ਆਪਣਾ ਸੰਗੀਤ ਚਲਾਓ, ਕਤਾਰ ਵਿੱਚ ਲਗਾਓ ਅਤੇ ਬ੍ਰਾਊਜ਼ ਕਰੋ, ਆਪਣੇ ਹੀ ਨੈੱਟਵਰਕ 'ਤੇ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarzaj, kolejkuj i przeglądaj swoją muzykę z iPhone’a lub iPada z drugiego końca pokoju, przez własną sieć."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduza, enfileire e navegue pela sua música de um iPhone ou iPad do outro lado da sala, pela sua própria rede."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduza, ponha em fila e explore a sua música a partir de um iPhone ou iPad do outro lado da sala, através da sua própria rede."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redați, puneți în coadă și răsfoiți muzica de pe un iPhone sau iPad din celălalt capăt al camerei, prin propria rețea."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spela, köa och bläddra i din musik från en iPhone eller iPad tvärs över rummet, via ditt eget nätverk."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cheza, panga foleni na vinjari muziki wako kutoka kwa iPhone au iPad ng'ambo ya chumba, kupitia mtandao wako mwenyewe."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அறையின் மறுமுனையிலிருந்து iPhone அல்லது iPad-இல் உங்கள் இசையை இயக்கலாம், வரிசையில் சேர்க்கலாம், உலாவலாம், உங்கள் சொந்த நெட்வொர்க் வழியாகவே."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "గదికి అవతలి వైపు నుండి iPhone లేదా iPadలో మీ సంగీతాన్ని ప్లే చేయండి, క్యూలో పెట్టండి, బ్రౌజ్ చేయండి, మీ సొంత నెట్‌వర్క్ ద్వారానే."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่น เพิ่มเข้าคิว และเรียกดูเพลงของคุณจาก iPhone หรือ iPad จากอีกฝั่งของห้อง ผ่านเครือข่ายของคุณเอง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Müziğinizi odanın öbür ucundan bir iPhone ya da iPad ile, kendi ağınız üzerinden çalın, sıraya ekleyin ve göz atın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворюйте, ставте в чергу та переглядайте свою музику з iPhone чи iPad з іншого кінця кімнати, через власну мережу."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کمرے کے دوسرے سرے سے iPhone یا iPad پر اپنی موسیقی چلائیں، قطار میں لگائیں اور براؤز کریں، اپنے ہی نیٹ ورک پر۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát, xếp hàng và duyệt nhạc từ iPhone hoặc iPad ở đầu kia căn phòng, qua mạng của chính bạn."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在房间另一头，用 iPhone 或 iPad 播放、排队和浏览你的音乐，全程只走你自己的网络。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在房間另一頭，用 iPhone 或 iPad 播放、排入佇列和瀏覽你的音樂，全程只透過你自己的網路。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在房間另一頭，用 iPhone 或 iPad 播放、加入待播清單和瀏覽你的音樂，全程只經你自己的網絡。"
+          }
+        }
+      }
+    },
+    "Phones connect over your local network only, encrypted, and only after you pair them. Volume follows the same rules as on this Mac.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ስልኮች የሚገናኙት በአካባቢያዊ አውታረ መረብዎ ብቻ፣ ተመስጥረው፣ እና እርስዎ ካጣመሯቸው በኋላ ብቻ ነው። የድምጽ መጠኑ በዚህ Mac ላይ ያሉትን ደንቦች ይከተላል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تتصل الهواتف عبر شبكتك المحلية فقط، بشكل مشفّر، وبعد إقرانها فقط. يتبع مستوى الصوت القواعد نفسها كما على هذا الماك."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ফোন শুধু আপনার লোকাল নেটওয়ার্কে, এনক্রিপ্ট করে, এবং আপনি পেয়ার করার পরেই সংযুক্ত হয়। ভলিউম এই Mac-এর মতো একই নিয়ম মেনে চলে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefony se připojují jen přes vaši místní síť, šifrovaně, a až poté, co je spárujete. Hlasitost se řídí stejnými pravidly jako na tomto Macu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoner forbinder kun via dit lokale netværk, krypteret, og først når du har parret dem. Lydstyrken følger de samme regler som på denne Mac."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefone verbinden sich nur über dein lokales Netzwerk, verschlüsselt und erst, nachdem du sie gekoppelt hast. Für die Lautstärke gelten dieselben Regeln wie auf diesem Mac."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τα τηλέφωνα συνδέονται μόνο μέσω του τοπικού σας δικτύου, κρυπτογραφημένα, και μόνο αφού τα αντιστοιχίσετε. Η ένταση ακολουθεί τους ίδιους κανόνες όπως σε αυτό το Mac."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los teléfonos se conectan solo a través de tu red local, cifrados, y solo después de enlazarlos. El volumen sigue las mismas reglas que en este Mac."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گوشی‌ها فقط از طریق شبکهٔ محلی شما، به‌صورت رمزگذاری‌شده و تنها پس از جفت‌کردن متصل می‌شوند. صدا از همان قواعدی پیروی می‌کند که روی این مک."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puhelimet yhdistävät vain paikallisen verkkosi kautta, salattuna, ja vasta kun olet muodostanut niistä parin. Äänenvoimakkuus noudattaa samoja sääntöjä kuin tässä Macissa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kumokonekta lang ang mga telepono sa iyong lokal na network, naka-encrypt, at pagkatapos mo lang silang i-pair. Sumusunod ang volume sa parehong mga patakaran tulad ng sa Mac na ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les téléphones se connectent uniquement via votre réseau local, de façon chiffrée, et seulement après que vous les avez jumelés. Le volume suit les mêmes règles que sur ce Mac."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ફોન ફક્ત તમારા લોકલ નેટવર્ક દ્વારા, એન્ક્રિપ્ટ થઈને, અને તમે પેર કરો પછી જ જોડાય છે. વોલ્યુમ આ Mac પરના જ નિયમો અનુસરે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wayoyi suna haɗawa ta cibiyar sadarwarku ta gida kawai, a ɓoye, kuma sai bayan kun haɗa su. Ƙarar sauti tana bin ƙa'idodi iri ɗaya kamar a wannan Mac."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "טלפונים מתחברים רק דרך הרשת המקומית שלך, בהצפנה, ורק אחרי שצימדת אותם. עוצמת השמע פועלת לפי אותם כללים כמו ב־Mac הזה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फ़ोन सिर्फ़ आपके लोकल नेटवर्क से, एन्क्रिप्ट होकर, और आपके पेयर करने के बाद ही जुड़ते हैं। वॉल्यूम उन्हीं नियमों पर चलता है जो इस Mac पर हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A telefonok csak a helyi hálózaton át, titkosítva csatlakoznak, és csak miután párosítottad őket. A hangerőre ugyanazok a szabályok vonatkoznak, mint ezen a Macen."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ponsel hanya terhubung melalui jaringan lokal Anda, terenkripsi, dan hanya setelah Anda memasangkannya. Volume mengikuti aturan yang sama seperti di Mac ini."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I telefoni si connettono solo tramite la rete locale, in modo cifrato, e solo dopo che li hai abbinati. Il volume segue le stesse regole di questo Mac."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スマートフォンはローカルネットワーク経由でのみ、暗号化して接続します。接続できるのはペアリングした後だけです。音量はこのMacと同じルールに従います。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಫೋನ್‌ಗಳು ನಿಮ್ಮ ಲೋಕಲ್ ನೆಟ್‌ವರ್ಕ್ ಮೂಲಕ ಮಾತ್ರ, ಎನ್‌ಕ್ರಿಪ್ಟ್ ಆಗಿ, ನೀವು ಪೇರ್ ಮಾಡಿದ ನಂತರವೇ ಸಂಪರ್ಕಿಸುತ್ತವೆ. ವಾಲ್ಯೂಮ್ ಈ Mac ನಲ್ಲಿರುವ ಅದೇ ನಿಯಮಗಳನ್ನು ಅನುಸರಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "휴대폰은 로컬 네트워크를 통해서만 암호화되어 연결되며, 페어링한 후에만 연결됩니다. 음량은 이 Mac과 같은 규칙을 따릅니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഫോണുകൾ നിങ്ങളുടെ ലോക്കൽ നെറ്റ്‌വർക്കിലൂടെ മാത്രം, എൻക്രിപ്റ്റ് ചെയ്ത്, നിങ്ങൾ പെയർ ചെയ്തതിനുശേഷം മാത്രം കണക്റ്റ് ചെയ്യും. വോളിയം ഈ Mac-ലെ അതേ നിയമങ്ങൾ പിന്തുടരും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फोन फक्त तुमच्या लोकल नेटवर्कवरून, एन्क्रिप्ट करून आणि तुम्ही पेअर केल्यानंतरच जोडले जातात. व्हॉल्यूम या Mac वरच्याच नियमांनुसार चालतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefon hanya bersambung melalui rangkaian setempat anda, disulitkan, dan hanya selepas anda memasangkannya. Kelantangan mengikut peraturan yang sama seperti pada Mac ini."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoner kobler seg bare til over det lokale nettverket ditt, kryptert, og bare etter at du har paret dem. Volumet følger de samme reglene som på denne Macen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoons maken alleen verbinding via je lokale netwerk, versleuteld, en pas nadat je ze hebt gekoppeld. Het volume volgt dezelfde regels als op deze Mac."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਫ਼ੋਨ ਸਿਰਫ਼ ਤੁਹਾਡੇ ਲੋਕਲ ਨੈੱਟਵਰਕ ਰਾਹੀਂ, ਇਨਕ੍ਰਿਪਟ ਹੋ ਕੇ, ਅਤੇ ਤੁਹਾਡੇ ਪੇਅਰ ਕਰਨ ਤੋਂ ਬਾਅਦ ਹੀ ਜੁੜਦੇ ਹਨ। ਵੌਲਯੂਮ ਉਹਨਾਂ ਹੀ ਨਿਯਮਾਂ 'ਤੇ ਚੱਲਦਾ ਹੈ ਜੋ ਇਸ Mac 'ਤੇ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefony łączą się tylko przez Twoją sieć lokalną, z szyfrowaniem, i dopiero po sparowaniu. Głośność podlega tym samym zasadom co na tym Macu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os telefones se conectam apenas pela sua rede local, com criptografia, e só depois de você emparelhá-los. O volume segue as mesmas regras que neste Mac."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os telemóveis ligam-se apenas através da sua rede local, de forma cifrada, e só depois de os emparelhar. O volume segue as mesmas regras que neste Mac."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoanele se conectează doar prin rețeaua locală, criptat, și numai după ce le asociați. Volumul urmează aceleași reguli ca pe acest Mac."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoner ansluter bara via ditt lokala nätverk, krypterat, och först när du har parkopplat dem. Volymen följer samma regler som på den här Macen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simu huunganishwa kupitia mtandao wako wa karibu pekee, zikiwa zimesimbwa, na baada tu ya kuziunganisha. Sauti hufuata sheria zilezile kama kwenye Mac hii."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஃபோன்கள் உங்கள் லோக்கல் நெட்வொர்க் வழியாக மட்டுமே, குறியாக்கத்துடன், நீங்கள் இணைத்த பிறகே இணைகின்றன. ஒலியளவு இந்த Mac-இல் உள்ள அதே விதிகளைப் பின்பற்றும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఫోన్‌లు మీ లోకల్ నెట్‌వర్క్ ద్వారా మాత్రమే, ఎన్‌క్రిప్ట్ అయి, మీరు పెయిర్ చేసిన తర్వాతే కనెక్ట్ అవుతాయి. వాల్యూమ్ ఈ Macలో ఉన్న నియమాలనే పాటిస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "โทรศัพท์จะเชื่อมต่อผ่านเครือข่ายภายในของคุณเท่านั้น โดยเข้ารหัส และหลังจากที่คุณจับคู่แล้วเท่านั้น ระดับเสียงเป็นไปตามกฎเดียวกับบน Mac เครื่องนี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefonlar yalnızca yerel ağınız üzerinden, şifreli olarak ve yalnızca onları eşledikten sonra bağlanır. Ses düzeyi bu Mac’tekiyle aynı kurallara uyar."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Телефони підключаються лише через вашу локальну мережу, із шифруванням, і тільки після того, як ви створите з ними пару. Гучність підпорядковується тим самим правилам, що й на цьому Mac."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فونز صرف آپ کے مقامی نیٹ ورک کے ذریعے، انکرپٹڈ، اور صرف پیئر کرنے کے بعد جڑتے ہیں۔ آواز انہی اصولوں پر چلتی ہے جیسے اس Mac پر۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Điện thoại chỉ kết nối qua mạng cục bộ của bạn, được mã hóa, và chỉ sau khi bạn ghép đôi. Âm lượng tuân theo cùng quy tắc như trên máy Mac này."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手机只通过你的本地网络连接，全程加密，且必须先配对。音量遵循与这台 Mac 相同的规则。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手機只透過你的本地網路連線，全程加密，且必須先配對。音量遵循與這台 Mac 相同的規則。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手機只經你的本地網絡連接，全程加密，而且必須先配對。音量遵循與這部 Mac 相同的規則。"
+          }
+        }
+      }
+    },
+    "For a Mac mini by the hi-fi: open Vespertine at login, keep the Mac awake and let a phone wake it. Each is its own switch in Settings › Remote, off until you turn it on.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ከሃይ-ፋይ አጠገብ ላለ Mac mini፦ በመግቢያ ጊዜ Vespertineን መክፈት፣ Macን ነቅቶ ማቆየት እና ስልክ እንዲቀሰቅሰው መፍቀድ። እያንዳንዱ በቅንብሮች › ሪሞት ውስጥ የራሱ ማብሪያ/ማጥፊያ አለው፣ እስኪያበሩት ድረስ ጠፍቶ ይቆያል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لجهاز Mac mini بجوار نظام الصوت: افتح Vespertine عند تسجيل الدخول، وأبقِ الماك مستيقظًا، ودع هاتفًا يوقظه. لكل منها مفتاح خاص في الإعدادات › التحكم عن بُعد، ويبقى متوقفًا حتى تشغّله."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "হাই-ফাইয়ের পাশে রাখা Mac mini-এর জন্য: লগ ইনে Vespertine খুলুন, Mac জাগিয়ে রাখুন আর ফোনকে সেটি জাগাতে দিন। প্রতিটির নিজস্ব সুইচ সেটিংস › রিমোট-এ আছে, আপনি চালু না করা পর্যন্ত বন্ধ থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro Mac mini u hi-fi sestavy: otevírat Vespertine při přihlášení, nechat Mac vzhůru a nechat telefon, aby ho probudil. Každá z těchto voleb má vlastní přepínač v Nastavení › Dálkové ovládání a je vypnutá, dokud ji nezapnete."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Til en Mac mini ved hi-fi-anlægget: åbn Vespertine ved login, hold Mac’en vågen, og lad en telefon vække den. Hver har sin egen kontakt i Indstillinger › Fjernbetjening og er slået fra, til du slår den til."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Für einen Mac mini neben der Hi-Fi-Anlage: Vespertine beim Anmelden öffnen, den Mac wach halten und ihn von einem Telefon aufwecken lassen. Jedes davon ist ein eigener Schalter unter Einstellungen › Fernbedienung, aus, bis du es einschaltest."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Για ένα Mac mini δίπλα στο ηχοσύστημα: άνοιγμα του Vespertine κατά τη σύνδεση, διατήρηση του Mac σε εγρήγορση και αφύπνιση από ένα τηλέφωνο. Το καθένα έχει τον δικό του διακόπτη στις Ρυθμίσεις › Τηλεχειρισμός, απενεργοποιημένο μέχρι να το ενεργοποιήσετε."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para un Mac mini junto al equipo de música: abrir Vespertine al iniciar sesión, mantener el Mac activo y dejar que un teléfono lo active. Cada uno tiene su propio interruptor en Ajustes › Control remoto, desactivado hasta que lo actives."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "برای یک Mac mini کنار سیستم صوتی: باز کردن Vespertine هنگام ورود، بیدار نگه داشتن مک و بیدار کردن آن با گوشی. هر کدام کلید جداگانهٔ خود را در تنظیمات › کنترل از راه دور دارد و تا وقتی روشنش نکنید خاموش است."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hifi-laitteiston viereiselle Mac minille: avaa Vespertine kirjautuessa, pidä Mac hereillä ja anna puhelimen herättää se. Jokaisella on oma kytkimensä kohdassa Asetukset › Kaukosäädin, pois päältä, kunnes otat sen käyttöön."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para sa Mac mini sa tabi ng hi-fi: buksan ang Vespertine sa pag-login, panatilihing gising ang Mac at hayaang gisingin ito ng telepono. May kanya-kanyang switch ang bawat isa sa Settings › Remote, naka-off hanggang i-on mo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pour un Mac mini près de la chaîne hi-fi : ouvrir Vespertine à l’ouverture de session, garder le Mac éveillé et laisser un téléphone le réveiller. Chacun a son propre interrupteur dans Réglages › Télécommande, désactivé jusqu’à ce que vous l’activiez."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "હાઇ-ફાઇ પાસે રાખેલા Mac mini માટે: લૉગ ઇન વખતે Vespertine ખોલો, Mac ને જાગતું રાખો અને ફોનને તેને જગાડવા દો. દરેકનો પોતાનો સ્વિચ સેટિંગ્સ › રિમોટ માં છે, જે તમે ચાલુ ન કરો ત્યાં સુધી બંધ રહે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Don Mac mini kusa da tsarin hi-fi: buɗe Vespertine lokacin shiga, kiyaye Mac a farke kuma bari waya ta tashe shi. Kowanne yana da maɓallinsa a cikin Saituna › Rimot, a kashe har sai kun kunna shi."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ל־Mac mini ליד מערכת ה־hi-fi: פתיחת Vespertine בהתחברות, השארת ה־Mac ער והשכמתו מטלפון. לכל אחד מהם מתג משלו ב״הגדרות״ › ״שלט רחוק״, כבוי עד שתפעיל אותו."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हाई-फ़ाई के पास रखे Mac mini के लिए: लॉग इन पर Vespertine खोलें, Mac को जागता रखें और फ़ोन को उसे जगाने दें। हर एक का अपना स्विच सेटिंग्ज़ › रिमोट में है, जो आपके चालू करने तक बंद रहता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A hifi mellett álló Mac minihez: a Vespertine megnyitása bejelentkezéskor, a Mac ébren tartása és felébresztése telefonról. Mindegyiknek saját kapcsolója van a Beállítások › Távirányító alatt, és ki van kapcsolva, amíg be nem kapcsolod."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk Mac mini di dekat perangkat hi-fi: buka Vespertine saat login, jaga Mac tetap aktif, dan biarkan ponsel membangunkannya. Masing-masing punya tombolnya sendiri di Pengaturan › Kendali Jauh, mati sampai Anda menyalakannya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per un Mac mini accanto all’impianto hi-fi: apri Vespertine al login, tieni il Mac sveglio e lascia che un telefono lo risvegli. Ognuna ha il suo interruttore in Impostazioni › Telecomando, spento finché non lo attivi."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オーディオ機器のそばに置いたMac mini向け：ログイン時にVespertineを開く、Macをスリープさせない、スマートフォンからスリープを解除する。それぞれ「設定」›「リモート」に専用のスイッチがあり、オンにするまではオフのままです。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹೈ-ಫೈ ಪಕ್ಕದಲ್ಲಿರುವ Mac mini ಗಾಗಿ: ಲಾಗಿನ್ ಆದಾಗ Vespertine ತೆರೆಯುವುದು, Mac ಅನ್ನು ಎಚ್ಚರವಾಗಿಡುವುದು ಮತ್ತು ಫೋನ್ ಅದನ್ನು ಎಬ್ಬಿಸಲು ಬಿಡುವುದು. ಪ್ರತಿಯೊಂದಕ್ಕೂ ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ರಿಮೋಟ್ ನಲ್ಲಿ ಪ್ರತ್ಯೇಕ ಸ್ವಿಚ್ ಇದೆ, ನೀವು ಆನ್ ಮಾಡುವವರೆಗೆ ಅದು ಆಫ್ ಆಗಿರುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오디오 시스템 옆의 Mac mini용: 로그인 시 Vespertine 열기, Mac 깨어 있게 유지하기, 휴대폰으로 깨우기. 각각 설정 › 리모트에 별도 스위치가 있으며 직접 켜기 전까지는 꺼져 있습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഹൈ-ഫൈയ്ക്കരികിലുള്ള Mac mini-ക്ക്: ലോഗിൻ ചെയ്യുമ്പോൾ Vespertine തുറക്കുക, Mac ഉണർന്നിരിക്കാൻ അനുവദിക്കുക, ഫോൺ ഉപയോഗിച്ച് അതിനെ ഉണർത്തുക. ഓരോന്നിനും ക്രമീകരണങ്ങൾ › റിമോട്ട് എന്നതിൽ സ്വന്തം സ്വിച്ചുണ്ട്, നിങ്ങൾ ഓണാക്കുന്നതുവരെ അത് ഓഫായിരിക്കും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हाय-फायजवळ ठेवलेल्या Mac mini साठी: लॉग इन करताना Vespertine उघडा, Mac जागा ठेवा आणि फोनला तो जागा करू द्या. प्रत्येकाचा स्वतःचा स्विच सेटिंग्ज › रिमोट मध्ये आहे, जो तुम्ही चालू करेपर्यंत बंद राहतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk Mac mini di sebelah sistem hi-fi: buka Vespertine semasa log masuk, pastikan Mac sentiasa berjaga dan biarkan telefon membangunkannya. Setiap satu ada suisnya sendiri dalam Seting › Kawalan Jauh, mati sehingga anda menghidupkannya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For en Mac mini ved stereoanlegget: åpne Vespertine ved pålogging, hold Macen våken og la en telefon vekke den. Hver har sin egen bryter i Innstillinger › Fjernkontroll, av til du slår den på."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voor een Mac mini bij de hifi-installatie: Vespertine openen bij het inloggen, de Mac wakker houden en een telefoon hem laten wekken. Elk heeft een eigen schakelaar in Instellingen › Afstandsbediening, uit tot je het aanzet."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹਾਈ-ਫਾਈ ਕੋਲ ਰੱਖੇ Mac mini ਲਈ: ਲੌਗ ਇਨ 'ਤੇ Vespertine ਖੋਲ੍ਹੋ, Mac ਨੂੰ ਜਾਗਦਾ ਰੱਖੋ ਅਤੇ ਫ਼ੋਨ ਨੂੰ ਇਸਨੂੰ ਜਗਾਉਣ ਦਿਓ। ਹਰੇਕ ਦਾ ਆਪਣਾ ਸਵਿੱਚ ਸੈਟਿੰਗਾਂ › ਰਿਮੋਟ ਵਿੱਚ ਹੈ, ਜੋ ਤੁਹਾਡੇ ਚਾਲੂ ਕਰਨ ਤੱਕ ਬੰਦ ਰਹਿੰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dla Maca mini przy zestawie hi-fi: otwieraj Vespertine przy logowaniu, nie pozwalaj Macowi zasnąć i pozwól telefonowi go wybudzić. Każda z tych opcji ma własny przełącznik w Ustawieniach › Pilot i jest wyłączona, dopóki jej nie włączysz."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para um Mac mini ao lado do som: abrir o Vespertine ao iniciar a sessão, manter o Mac acordado e deixar um telefone despertá-lo. Cada um tem seu próprio botão em Ajustes › Controle Remoto, desativado até você ativá-lo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para um Mac mini junto à aparelhagem: abrir o Vespertine ao iniciar sessão, manter o Mac acordado e deixar um telefone despertá-lo. Cada um tem o seu próprio interruptor em Definições › Controlo remoto, desativado até o ativar."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pentru un Mac mini lângă sistemul hi-fi: deschideți Vespertine la autentificare, țineți Mac-ul treaz și lăsați un telefon să-l trezească. Fiecare are propriul comutator în Configurări › Telecomandă, dezactivat până îl activați."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "För en Mac mini vid stereon: öppna Vespertine vid inloggning, håll Macen vaken och låt en telefon väcka den. Var och en har ett eget reglage i Inställningar › Fjärrkontroll, av tills du slår på det."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kwa Mac mini karibu na mfumo wa hi-fi: fungua Vespertine unapoingia, weka Mac macho na uruhusu simu kuiamsha. Kila moja ina swichi yake katika Mipangilio › Rimoti, imezimwa hadi uiwashe."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஹை-ஃபை அருகே உள்ள Mac mini-க்கு: உள்நுழையும்போது Vespertine-ஐத் திறப்பது, Mac-ஐ விழித்திருக்கச் செய்வது, ஃபோன் மூலம் அதை எழுப்புவது. ஒவ்வொன்றுக்கும் அமைப்புகள் › ரிமோட் இல் தனி ஸ்விட்ச் உள்ளது, நீங்கள் இயக்கும் வரை அது அணைந்தே இருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "హై-ఫై పక్కన ఉంచిన Mac mini కోసం: లాగిన్ అయినప్పుడు Vespertineను తెరవడం, Macను మేల్కొని ఉంచడం, ఫోన్‌తో దాన్ని మేల్కొల్పడం. ప్రతిదానికీ సెట్టింగ్‌లు › రిమోట్‌లో సొంత స్విచ్ ఉంది, మీరు ఆన్ చేసే వరకు అది ఆఫ్‌లోనే ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สำหรับ Mac mini ข้างชุดเครื่องเสียง: เปิด Vespertine เมื่อเข้าสู่ระบบ ให้ Mac ตื่นอยู่เสมอ และให้โทรศัพท์ปลุกเครื่องได้ แต่ละข้อมีสวิตช์ของตัวเองใน การตั้งค่า › รีโมต และปิดอยู่จนกว่าคุณจะเปิด"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hi-fi sisteminin yanındaki bir Mac mini için: oturum açıldığında Vespertine’i aç, Mac’i uyanık tut ve bir telefonun onu uyandırmasına izin ver. Her birinin Ayarlar › Uzaktan Kumanda’da kendi anahtarı vardır ve siz açana kadar kapalıdır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для Mac mini біля hi-fi системи: відкривати Vespertine під час входу, не давати Mac засинати й дозволити телефону його будити. Кожна з цих опцій має власний перемикач у Параметрах › Пульт і вимкнена, доки ви її не ввімкнете."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہائی فائی کے پاس رکھے Mac mini کے لیے: لاگ اِن پر Vespertine کھولیں، Mac کو جاگتا رکھیں اور فون کو اسے جگانے دیں۔ ہر ایک کا اپنا سوئچ سیٹنگز › ریموٹ میں ہے، جو آپ کے آن کرنے تک بند رہتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cho Mac mini đặt cạnh dàn hi-fi: mở Vespertine khi đăng nhập, giữ Mac luôn thức và cho phép điện thoại đánh thức nó. Mỗi mục có công tắc riêng trong Cài đặt › Điều khiển từ xa, tắt cho đến khi bạn bật."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "适用于放在音响旁的 Mac mini：登录时打开 Vespertine、让 Mac 保持唤醒、让手机唤醒它。每一项在“设置” › “遥控”中都有单独的开关，在你打开之前一直关闭。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "適用於放在音響旁的 Mac mini：登入時打開 Vespertine、讓 Mac 保持喚醒、讓手機喚醒它。每一項在「設定」›「遙控」中都有獨立的開關，在你開啟之前一直關閉。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "適用於放在音響旁的 Mac mini：登入時打開 Vespertine、讓 Mac 保持喚醒、讓手機喚醒它。每一項在「設定」›「遙控」中都有獨立的開關，在你開啟之前一直關閉。"
+          }
+        }
+      }
+    },
+    "Your speaker groups can be outputs of the Mac, for a browser, the TV app or a video player to play to. The first time one plays, macOS asks whether Vespertine Sound Helper may use the microphone: it only receives what your apps play there and never records. Allow it, or the group stays silent.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የድምጽ ማጉያ ቡድኖችዎ የMac ውፅዓቶች ሊሆኑ ይችላሉ፣ አሳሽ፣ የTV መተግበሪያ ወይም የቪዲዮ ማጫወቻ ሊያጫውትባቸው ይችላል። አንድ ቡድን ለመጀመሪያ ጊዜ ሲጫወት macOS Vespertine Sound Helper ማይክሮፎኑን መጠቀም ይችል እንደሆነ ይጠይቃል፦ መተግበሪያዎችዎ ወደዚያ የሚያጫውቱትን ብቻ ይቀበላል እና በጭራሽ አይቀዳም። ይፍቀዱለት፣ አለበለዚያ ቡድኑ ጸጥ ይላል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يمكن أن تكون مجموعات مكبرات الصوت مخارج للماك، يشغّل إليها متصفح أو تطبيق TV أو مشغّل فيديو. في أول مرة تعمل فيها مجموعة، يسأل macOS هل يُسمح لـ Vespertine Sound Helper باستخدام الميكروفون: فهو يستقبل فقط ما تشغّله تطبيقاتك هناك ولا يسجّل أبدًا. اسمح بذلك، وإلا ستبقى المجموعة صامتة."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনার স্পিকার গ্রুপ Mac-এর আউটপুট হতে পারে, যেখানে ব্রাউজার, TV অ্যাপ বা ভিডিও প্লেয়ার বাজাতে পারে। কোনো গ্রুপ প্রথমবার বাজলে macOS জিজ্ঞাসা করে Vespertine Sound Helper মাইক্রোফোন ব্যবহার করতে পারবে কি না: এটি শুধু আপনার অ্যাপগুলো সেখানে যা বাজায় তা-ই গ্রহণ করে এবং কখনো রেকর্ড করে না। অনুমতি দিন, নইলে গ্রুপটি নীরব থাকবে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vaše skupiny reproduktorů mohou být výstupy Macu, do kterých může přehrávat prohlížeč, aplikace TV nebo videopřehrávač. Když některá poprvé hraje, macOS se zeptá, jestli smí Vespertine Sound Helper používat mikrofon: přijímá jen to, co tam vaše aplikace přehrávají, a nikdy nenahrává. Povolte to, jinak skupina zůstane potichu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dine højttalergrupper kan være udgange på Mac’en, som en browser, TV-appen eller en videoafspiller kan afspille til. Første gang en spiller, spørger macOS, om Vespertine Sound Helper må bruge mikrofonen: den modtager kun det, dine apps afspiller dér, og optager aldrig. Tillad det, ellers forbliver gruppen tavs."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Lautsprechergruppen können Ausgänge des Mac sein, auf die ein Browser, die TV-App oder ein Videoplayer abspielt. Wenn eine zum ersten Mal spielt, fragt macOS, ob Vespertine Sound Helper das Mikrofon verwenden darf: Er empfängt nur, was deine Apps dorthin abspielen, und nimmt nie etwas auf. Erlaube es, sonst bleibt die Gruppe stumm."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Οι ομάδες ηχείων σας μπορούν να είναι έξοδοι του Mac, στις οποίες μπορεί να παίζει ένα πρόγραμμα περιήγησης, η εφαρμογή TV ή ένα πρόγραμμα αναπαραγωγής βίντεο. Την πρώτη φορά που παίζει μία, το macOS ρωτά αν το Vespertine Sound Helper μπορεί να χρησιμοποιήσει το μικρόφωνο: λαμβάνει μόνο ό,τι παίζουν εκεί οι εφαρμογές σας και δεν ηχογραφεί ποτέ. Επιτρέψτε το, αλλιώς η ομάδα μένει σιωπηλή."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus grupos de altavoces pueden ser salidas del Mac, a las que un navegador, la app TV o un reproductor de vídeo pueden enviar sonido. La primera vez que uno suena, macOS pregunta si Vespertine Sound Helper puede usar el micrófono: solo recibe lo que tus apps reproducen ahí y nunca graba. Permítelo o el grupo se quedará en silencio."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گروه‌های بلندگوی شما می‌توانند خروجی‌های مک باشند تا مرورگر، برنامهٔ TV یا یک پخش‌کنندهٔ ویدیو در آن‌ها پخش کند. نخستین بار که یک گروه پخش می‌کند، macOS می‌پرسد آیا Vespertine Sound Helper می‌تواند از میکروفون استفاده کند: فقط آنچه برنامه‌هایتان آنجا پخش می‌کنند را دریافت می‌کند و هرگز ضبط نمی‌کند. اجازه دهید، وگرنه گروه بی‌صدا می‌ماند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaiutinryhmistäsi voi tehdä Macin äänilähtöjä, joihin selain, TV-appi tai videosoitin voi toistaa. Kun ryhmä soi ensimmäisen kerran, macOS kysyy, saako Vespertine Sound Helper käyttää mikrofonia: se vastaanottaa vain sen, mitä appisi sinne toistavat, eikä koskaan tallenna. Salli se, tai ryhmä pysyy hiljaa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puwedeng maging mga output ng Mac ang iyong mga speaker group, para mag-play doon ang browser, ang TV app o ang isang video player. Sa unang beses na tumugtog ang isa, itatanong ng macOS kung puwedeng gamitin ng Vespertine Sound Helper ang mikropono: tinatanggap lang nito ang pine-play ng iyong mga app doon at hindi kailanman nagre-record. Payagan ito, kung hindi ay mananatiling tahimik ang group."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos groupes d’enceintes peuvent devenir des sorties du Mac, vers lesquelles un navigateur, l’app TV ou un lecteur vidéo peut lire. La première fois qu’un groupe joue, macOS demande si Vespertine Sound Helper peut utiliser le micro : il ne reçoit que ce que vos apps y envoient et n’enregistre jamais. Autorisez-le, sinon le groupe reste muet."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમારા સ્પીકર ગ્રુપ Mac ના આઉટપુટ બની શકે છે, જેના પર બ્રાઉઝર, TV ઍપ કે વિડિયો પ્લેયર વગાડી શકે. કોઈ ગ્રુપ પહેલી વાર વાગે ત્યારે macOS પૂછે છે કે Vespertine Sound Helper માઇક્રોફોન વાપરી શકે કે નહીં: તે ફક્ત તમારી ઍપ ત્યાં જે વગાડે તે જ મેળવે છે અને ક્યારેય રેકોર્ડ કરતું નથી. મંજૂરી આપો, નહીં તો ગ્રુપ શાંત રહેશે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙungiyoyin lasifikanku za su iya zama fitarwar Mac, inda burauza, manhajar TV ko mai kunna bidiyo za su iya kunnawa. A karo na farko da ɗaya ya kunna, macOS zai tambaya ko Vespertine Sound Helper zai iya amfani da makirufo: yana karɓar abin da manhajojinku ke kunnawa a can kawai kuma ba ya taɓa ɗaukar sauti. Ku ba da izini, in ba haka ba ƙungiyar za ta yi shiru."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קבוצות הרמקולים שלך יכולות להיות פלטים של ה־Mac, שאליהם דפדפן, יישום TV או נגן וידאו יכולים לנגן. בפעם הראשונה שקבוצה מנגנת, macOS שואל אם Vespertine Sound Helper רשאי להשתמש במיקרופון: הוא רק מקבל את מה שהיישומים שלך מנגנים לשם ולעולם לא מקליט. אשר זאת, אחרת הקבוצה תישאר שקטה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आपके स्पीकर ग्रुप Mac के आउटपुट बन सकते हैं, जिन पर ब्राउज़र, TV ऐप या वीडियो प्लेयर चला सकते हैं। जब कोई ग्रुप पहली बार बजता है, तो macOS पूछता है कि क्या Vespertine Sound Helper माइक्रोफ़ोन इस्तेमाल कर सकता है: यह सिर्फ़ वही लेता है जो आपके ऐप वहाँ चलाते हैं और कभी रिकॉर्ड नहीं करता। अनुमति दें, वरना ग्रुप चुप रहेगा।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A hangszórócsoportjaid a Mac kimenetei lehetnek, amelyekre egy böngésző, a TV app vagy egy videolejátszó játszhat le. Amikor egy csoport először szól, a macOS megkérdezi, használhatja-e a Vespertine Sound Helper a mikrofont: csak azt fogadja, amit az appjaid oda lejátszanak, és soha nem rögzít. Engedélyezd, különben a csoport néma marad."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grup speaker Anda bisa menjadi output Mac, tempat browser, app TV, atau pemutar video memutar suara. Saat pertama kali satu grup berbunyi, macOS menanyakan apakah Vespertine Sound Helper boleh menggunakan mikrofon: ia hanya menerima apa yang diputar app Anda di sana dan tidak pernah merekam. Izinkan, atau grup akan tetap diam."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I tuoi gruppi di altoparlanti possono diventare uscite del Mac, su cui un browser, l’app TV o un lettore video possono riprodurre. La prima volta che uno suona, macOS chiede se Vespertine Sound Helper può usare il microfono: riceve solo ciò che le tue app riproducono lì e non registra mai. Consentilo, altrimenti il gruppo resta muto."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スピーカーグループをMacの出力にすると、ブラウザ、TVアプリ、ビデオプレーヤーからそこへ再生できます。グループを初めて再生するとき、macOSはVespertine Sound Helperにマイクの使用を許可するかどうかを尋ねます。アプリがそこへ再生する音を受け取るだけで、録音することはありません。許可しないと、グループから音が出ません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮ್ಮ ಸ್ಪೀಕರ್ ಗುಂಪುಗಳು Mac ನ ಔಟ್‌ಪುಟ್‌ಗಳಾಗಬಹುದು, ಅವುಗಳಿಗೆ ಬ್ರೌಸರ್, TV ಆ್ಯಪ್ ಅಥವಾ ವೀಡಿಯೊ ಪ್ಲೇಯರ್ ಪ್ಲೇ ಮಾಡಬಹುದು. ಒಂದು ಗುಂಪು ಮೊದಲ ಬಾರಿ ಪ್ಲೇ ಆದಾಗ, Vespertine Sound Helper ಮೈಕ್ರೊಫೋನ್ ಬಳಸಬಹುದೇ ಎಂದು macOS ಕೇಳುತ್ತದೆ: ನಿಮ್ಮ ಆ್ಯಪ್‌ಗಳು ಅಲ್ಲಿಗೆ ಪ್ಲೇ ಮಾಡುವುದನ್ನು ಮಾತ್ರ ಅದು ಪಡೆಯುತ್ತದೆ ಮತ್ತು ಎಂದಿಗೂ ರೆಕಾರ್ಡ್ ಮಾಡುವುದಿಲ್ಲ. ಅನುಮತಿಸಿ, ಇಲ್ಲದಿದ್ದರೆ ಗುಂಪು ಮೌನವಾಗಿರುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스피커 그룹을 Mac의 출력으로 만들면 브라우저, TV 앱 또는 동영상 플레이어가 그곳으로 재생할 수 있습니다. 그룹이 처음 재생될 때 macOS가 Vespertine Sound Helper의 마이크 사용을 허용할지 묻습니다. 이 도우미는 앱이 그곳으로 재생하는 소리만 받으며 녹음하지 않습니다. 허용하지 않으면 그룹에서 소리가 나지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങളുടെ സ്പീക്കർ ഗ്രൂപ്പുകൾ Mac-ന്റെ ഔട്ട്‌പുട്ടുകളാകാം, അവയിലേക്ക് ബ്രൗസർ, TV ആപ്പ് അല്ലെങ്കിൽ വീഡിയോ പ്ലെയർ പ്ലേ ചെയ്യാം. ഒരു ഗ്രൂപ്പ് ആദ്യമായി പ്ലേ ചെയ്യുമ്പോൾ, Vespertine Sound Helper-ന് മൈക്രോഫോൺ ഉപയോഗിക്കാമോ എന്ന് macOS ചോദിക്കും: നിങ്ങളുടെ ആപ്പുകൾ അവിടേക്ക് പ്ലേ ചെയ്യുന്നത് മാത്രമേ അത് സ്വീകരിക്കൂ, ഒരിക്കലും റെക്കോർഡ് ചെയ്യില്ല. അനുവദിക്കുക, അല്ലെങ്കിൽ ഗ്രൂപ്പ് നിശ്ശബ്ദമായിരിക്കും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुमचे स्पीकर ग्रुप Mac चे आउटपुट होऊ शकतात, ज्यांवर ब्राउझर, TV अॅप किंवा व्हिडिओ प्लेयर वाजवू शकतात. एखादा ग्रुप पहिल्यांदा वाजतो तेव्हा macOS विचारते की Vespertine Sound Helper मायक्रोफोन वापरू शकतो का: तो फक्त तुमची अॅप्स तिथे वाजवतात तेच घेतो आणि कधीही रेकॉर्ड करत नाही. परवानगी द्या, नाहीतर ग्रुप शांत राहील."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kumpulan pembesar suara anda boleh menjadi output Mac, tempat pelayar, apl TV atau pemain video memainkan bunyi. Kali pertama satu kumpulan dimainkan, macOS bertanya sama ada Vespertine Sound Helper boleh menggunakan mikrofon: ia hanya menerima apa yang dimainkan oleh apl anda di situ dan tidak pernah merakam. Benarkan, atau kumpulan itu kekal senyap."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Høyttalergruppene dine kan være utganger på Macen, som en nettleser, TV-appen eller en videospiller kan spille til. Første gang en spiller, spør macOS om Vespertine Sound Helper kan bruke mikrofonen: den mottar bare det appene dine spiller dit, og tar aldri opp. Tillat det, ellers forblir gruppen stille."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je luidsprekergroepen kunnen uitgangen van de Mac zijn, waarop een browser, de TV-app of een videospeler kan afspelen. De eerste keer dat er een speelt, vraagt macOS of Vespertine Sound Helper de microfoon mag gebruiken: hij ontvangt alleen wat je apps daar afspelen en neemt nooit op. Sta het toe, anders blijft de groep stil."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਤੁਹਾਡੇ ਸਪੀਕਰ ਗਰੁੱਪ Mac ਦੇ ਆਉਟਪੁੱਟ ਬਣ ਸਕਦੇ ਹਨ, ਜਿਨ੍ਹਾਂ 'ਤੇ ਬ੍ਰਾਊਜ਼ਰ, TV ਐਪ ਜਾਂ ਵੀਡੀਓ ਪਲੇਅਰ ਚਲਾ ਸਕਦੇ ਹਨ। ਜਦੋਂ ਕੋਈ ਗਰੁੱਪ ਪਹਿਲੀ ਵਾਰ ਵੱਜਦਾ ਹੈ, ਤਾਂ macOS ਪੁੱਛਦਾ ਹੈ ਕਿ ਕੀ Vespertine Sound Helper ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਵਰਤ ਸਕਦਾ ਹੈ: ਇਹ ਸਿਰਫ਼ ਉਹੀ ਲੈਂਦਾ ਹੈ ਜੋ ਤੁਹਾਡੀਆਂ ਐਪਾਂ ਉੱਥੇ ਚਲਾਉਂਦੀਆਂ ਹਨ ਅਤੇ ਕਦੇ ਰਿਕਾਰਡ ਨਹੀਂ ਕਰਦਾ। ਇਜਾਜ਼ਤ ਦਿਓ, ਨਹੀਂ ਤਾਂ ਗਰੁੱਪ ਚੁੱਪ ਰਹੇਗਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twoje grupy głośników mogą być wyjściami Maca, na które może odtwarzać przeglądarka, aplikacja TV lub odtwarzacz wideo. Gdy któraś zagra po raz pierwszy, macOS zapyta, czy Vespertine Sound Helper może używać mikrofonu: odbiera tylko to, co odtwarzają tam Twoje aplikacje, i nigdy nie nagrywa. Zezwól na to, inaczej grupa pozostanie cicha."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seus grupos de alto-falantes podem ser saídas do Mac, para um navegador, o app TV ou um reprodutor de vídeo tocarem neles. Na primeira vez que um toca, o macOS pergunta se o Vespertine Sound Helper pode usar o microfone: ele só recebe o que seus apps tocam ali e nunca grava. Permita, ou o grupo fica em silêncio."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os seus grupos de altifalantes podem ser saídas do Mac, para um navegador, a app TV ou um leitor de vídeo reproduzirem neles. Na primeira vez que um toca, o macOS pergunta se o Vespertine Sound Helper pode usar o microfone: só recebe o que as suas apps reproduzem ali e nunca grava. Permita-o, ou o grupo fica em silêncio."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grupurile de boxe pot fi ieșiri ale Mac-ului, spre care pot reda un browser, aplicația TV sau un player video. Prima dată când unul cântă, macOS întreabă dacă Vespertine Sound Helper poate folosi microfonul: primește doar ce redau aplicațiile acolo și nu înregistrează niciodată. Permiteți, altfel grupul rămâne mut."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dina högtalargrupper kan vara utgångar på Macen, som en webbläsare, TV-appen eller en videospelare kan spela till. Första gången en spelar frågar macOS om Vespertine Sound Helper får använda mikrofonen: den tar bara emot det dina appar spelar dit och spelar aldrig in. Tillåt det, annars förblir gruppen tyst."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vikundi vyako vya spika vinaweza kuwa utoaji wa Mac, ambao kivinjari, programu ya TV au kicheza video kinaweza kuchezea. Mara ya kwanza kikundi kinapocheza, macOS huuliza kama Vespertine Sound Helper inaweza kutumia maikrofoni: hupokea tu kile programu zako zinachocheza hapo na kamwe hairekodi. Iruhusu, la sivyo kikundi kitabaki kimya."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "உங்கள் ஸ்பீக்கர் குழுக்கள் Mac-இன் வெளியீடுகளாக இருக்கலாம், அவற்றுக்கு உலாவி, TV ஆப் அல்லது வீடியோ பிளேயர் இயக்கலாம். ஒரு குழு முதல்முறை ஒலிக்கும்போது, Vespertine Sound Helper மைக்ரோஃபோனைப் பயன்படுத்தலாமா என macOS கேட்கும்: உங்கள் ஆப்கள் அங்கே இயக்குவதை மட்டுமே அது பெறும், ஒருபோதும் பதிவு செய்யாது. அனுமதியுங்கள், இல்லையெனில் குழு அமைதியாகவே இருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీ స్పీకర్ గ్రూప్‌లు Mac అవుట్‌పుట్‌లుగా ఉండవచ్చు, వాటికి బ్రౌజర్, TV యాప్ లేదా వీడియో ప్లేయర్ ప్లే చేయవచ్చు. ఒక గ్రూప్ మొదటిసారి ప్లే అయినప్పుడు, Vespertine Sound Helper మైక్రోఫోన్‌ను ఉపయోగించవచ్చా అని macOS అడుగుతుంది: మీ యాప్‌లు అక్కడ ప్లే చేసేదాన్ని మాత్రమే అది అందుకుంటుంది, ఎప్పుడూ రికార్డ్ చేయదు. అనుమతించండి, లేకపోతే గ్రూప్ నిశ్శబ్దంగానే ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กลุ่มลำโพงของคุณเป็นขาออกของ Mac ได้ ให้เบราว์เซอร์ แอป TV หรือโปรแกรมเล่นวิดีโอเล่นไปยังกลุ่มนั้น ครั้งแรกที่กลุ่มใดเล่น macOS จะถามว่า Vespertine Sound Helper ใช้ไมโครโฟนได้หรือไม่ มันรับเพียงเสียงที่แอปของคุณเล่นไปที่นั่น และไม่บันทึกเสียงเลย โปรดอนุญาต มิฉะนั้นกลุ่มจะเงียบ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoparlör gruplarınız, bir tarayıcının, TV uygulamasının ya da bir video oynatıcının çalabileceği Mac çıkışları olabilir. Bir grup ilk kez çaldığında macOS, Vespertine Sound Helper’ın mikrofonu kullanıp kullanamayacağını sorar: Yalnızca uygulamalarınızın oraya çaldığını alır ve asla kayıt yapmaz. İzin verin, yoksa grup sessiz kalır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ваші групи гучномовців можуть бути виходами Mac, на які може відтворювати браузер, застосунок TV чи відеоплеєр. Коли група вперше грає, macOS питає, чи може Vespertine Sound Helper використовувати мікрофон: він лише отримує те, що туди відтворюють ваші застосунки, і ніколи не записує. Дозвольте це, інакше група мовчатиме."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کے اسپیکر گروپس Mac کے آؤٹ پٹ بن سکتے ہیں، جن پر براؤزر، TV ایپ یا ویڈیو پلیئر چلا سکتا ہے۔ جب کوئی گروپ پہلی بار بجتا ہے تو macOS پوچھتا ہے کہ کیا Vespertine Sound Helper مائیکروفون استعمال کر سکتا ہے: یہ صرف وہی وصول کرتا ہے جو آپ کی ایپس وہاں چلاتی ہیں اور کبھی ریکارڈ نہیں کرتا۔ اجازت دیں، ورنہ گروپ خاموش رہے گا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Các nhóm loa của bạn có thể trở thành đầu ra của Mac, để trình duyệt, ứng dụng TV hoặc trình phát video phát tới. Lần đầu một nhóm phát, macOS hỏi Vespertine Sound Helper có được dùng micrô không: nó chỉ nhận những gì ứng dụng của bạn phát tới đó và không bao giờ ghi âm. Hãy cho phép, nếu không nhóm sẽ im lặng."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的扬声器组可以成为 Mac 的输出，供浏览器、TV App 或视频播放器向其播放。某个组第一次播放时，macOS 会询问是否允许 Vespertine Sound Helper 使用麦克风：它只接收你的 App 播放到那里的声音，从不录音。请允许，否则该组将没有声音。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的喇叭群組可以成為 Mac 的輸出，供瀏覽器、TV App 或影片播放器向其播放。某個群組第一次播放時，macOS 會詢問是否允許 Vespertine Sound Helper 使用麥克風：它只接收你的 App 播放到那裡的聲音，從不錄音。請允許，否則該群組將沒有聲音。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的喇叭群組可以成為 Mac 的輸出，供瀏覽器、TV App 或影片播放器向其播放。某個群組第一次播放時，macOS 會詢問是否允許 Vespertine Sound Helper 使用咪高峰：它只接收你的 App 播放到那裡的聲音，從不錄音。請允許，否則該群組將沒有聲音。"
+          }
+        }
+      }
+    },
+    "Two or more DACs? Speaker Groups (beta) in Settings › Playback play them as one surround system, and Mac Sound Output (beta) lets any app play to it.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሁለት ወይም ከዚያ በላይ DACዎች አሉዎት? በቅንብሮች › መጫወት ውስጥ ያሉት የድምጽ ማጉያ ቡድኖች (ቤታ) እንደ አንድ የሰራውንድ ሥርዓት ያጫውቷቸዋል፣ የMac ድምፅ ውፅዓት (ቤታ) ደግሞ ማንኛውም መተግበሪያ ወደዚያ እንዲያጫውት ያስችላል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لديك جهازا DAC أو أكثر؟ تشغّلها مجموعات مكبرات الصوت (تجريبي) في الإعدادات › التشغيل كنظام صوت محيطي واحد، ويتيح مخرج صوت الماك (تجريبي) لأي تطبيق التشغيل إليه."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "দুই বা তার বেশি DAC? সেটিংস › প্লেব্যাক-এর স্পিকার গ্রুপ (বিটা) সেগুলোকে একটি সারাউন্ড সিস্টেম হিসেবে বাজায়, আর Mac সাউন্ড আউটপুট (বিটা) যেকোনো অ্যাপকে তাতে বাজাতে দেয়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dva nebo více DAC? Skupiny reproduktorů (beta) v Nastavení › Přehrávání je přehrají jako jeden prostorový systém a Zvukový výstup Macu (beta) do něj nechá přehrávat jakoukoli aplikaci."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To eller flere DAC’er? Højttalergrupper (beta) i Indstillinger › Afspilning afspiller dem som ét surroundsystem, og Mac-lydudgang (beta) lader enhver app afspille til det."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zwei oder mehr DACs? Lautsprechergruppen (Beta) unter Einstellungen › Wiedergabe spielen sie als ein Surround-System, und Mac-Tonausgabe (Beta) lässt jede App darauf abspielen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δύο ή περισσότερα DAC; Οι Ομάδες ηχείων (beta) στις Ρυθμίσεις › Αναπαραγωγή τα παίζουν ως ένα σύστημα surround, και η Έξοδος ήχου Mac (beta) επιτρέπει σε κάθε εφαρμογή να παίζει σε αυτό."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Dos o más DAC? Grupos de altavoces (beta), en Ajustes › Reproducción, los hace sonar como un solo sistema envolvente, y Salida de sonido del Mac (beta) permite que cualquier app reproduzca en él."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دو DAC یا بیشتر دارید؟ گروه‌های بلندگو (بتا) در تنظیمات › پخش آن‌ها را مثل یک سیستم صدای فراگیر پخش می‌کند، و خروجی صدای مک (بتا) به هر برنامه‌ای اجازه می‌دهد در آن پخش کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaksi DAC:ia tai enemmän? Kaiutinryhmät (beta) kohdassa Asetukset › Toisto soittaa ne yhtenä surround-järjestelmänä, ja Macin äänilähtö (beta) antaa minkä tahansa apin toistaa siihen."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dalawa o higit pang DAC? Pinatutugtog sila ng Mga Speaker Group (beta) sa Settings › Playback bilang iisang surround system, at hinahayaan ng Mac Sound Output (beta) ang anumang app na mag-play dito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deux DAC ou plus ? Groupes d’enceintes (bêta), dans Réglages › Lecture, les fait jouer comme un seul système surround, et Sortie audio du Mac (bêta) permet à n’importe quelle app d’y lire."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "બે કે વધુ DAC? સેટિંગ્સ › પ્લેબૅક માંના સ્પીકર ગ્રુપ (બીટા) તેમને એક સરાઉન્ડ સિસ્ટમ તરીકે વગાડે છે, અને Mac સાઉન્ડ આઉટપુટ (બીટા) કોઈ પણ ઍપને તેના પર વગાડવા દે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DAC biyu ko fiye? Ƙungiyoyin Lasifika (beta) a cikin Saituna › Kunnawa suna kunna su a matsayin tsarin surround guda, kuma Fitar Sautin Mac (beta) yana bari kowace manhaja ta kunna masa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שני רכיבי DAC או יותר? קבוצות רמקולים (בטא) ב״הגדרות״ › ״השמעה״ מנגנות אותם כמערכת צליל היקפי אחת, ופלט צליל של ה-Mac (בטא) מאפשר לכל יישום לנגן אליה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दो या ज़्यादा DAC? सेटिंग्ज़ › प्लेबैक में स्पीकर ग्रुप (बीटा) उन्हें एक सराउंड सिस्टम की तरह बजाते हैं, और Mac साउंड आउटपुट (बीटा) किसी भी ऐप को उस पर चलाने देता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Két vagy több DAC? A Beállítások › Lejátszás alatti Hangszórócsoportok (béta) egyetlen térhangzású rendszerként szólaltatja meg őket, a Mac hangkimenet (béta) pedig bármely appnak lehetővé teszi, hogy arra játsszon le."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dua DAC atau lebih? Grup Speaker (beta) di Pengaturan › Pemutaran memutarnya sebagai satu sistem surround, dan Output Suara Mac (beta) memungkinkan app apa pun memutar ke sana."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Due o più DAC? Gruppi di altoparlanti (beta), in Impostazioni › Riproduzione, li fa suonare come un unico sistema surround, e Uscita audio del Mac (beta) permette a qualsiasi app di riprodurre su di esso."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DACが2台以上ありますか？「設定」›「再生」のスピーカーグループ（ベータ）でそれらを1つのサラウンドシステムとして鳴らせます。さらにMacのサウンド出力（ベータ）を使えば、どのアプリからもそこへ再生できます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಎರಡು ಅಥವಾ ಹೆಚ್ಚು DAC ಗಳಿವೆಯೇ? ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ಪ್ಲೇಬ್ಯಾಕ್ ನಲ್ಲಿನ ಸ್ಪೀಕರ್ ಗುಂಪುಗಳು (ಬೀಟಾ) ಅವುಗಳನ್ನು ಒಂದೇ ಸರೌಂಡ್ ವ್ಯವಸ್ಥೆಯಾಗಿ ಪ್ಲೇ ಮಾಡುತ್ತವೆ, ಮತ್ತು Mac ಧ್ವನಿ ಔಟ್‌ಪುಟ್ (ಬೀಟಾ) ಯಾವುದೇ ಆ್ಯಪ್ ಅದಕ್ಕೆ ಪ್ಲೇ ಮಾಡಲು ಬಿಡುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DAC가 두 대 이상인가요? 설정 › 재생의 스피커 그룹(베타)으로 하나의 서라운드 시스템처럼 재생하고, Mac 사운드 출력(베타)으로 어떤 앱이든 그곳으로 재생할 수 있습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "രണ്ടോ അതിലധികമോ DAC-കളുണ്ടോ? ക്രമീകരണങ്ങൾ › പ്ലേബാക്ക് എന്നതിലെ സ്പീക്കർ ഗ്രൂപ്പുകൾ (ബീറ്റ) അവയെ ഒരൊറ്റ സറൗണ്ട് സിസ്റ്റമായി പ്ലേ ചെയ്യും, Mac ശബ്ദ ഔട്ട്‌പുട്ട് (ബീറ്റ) ഏത് ആപ്പിനെയും അതിലേക്ക് പ്ലേ ചെയ്യാൻ അനുവദിക്കും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दोन किंवा अधिक DAC? सेटिंग्ज › प्लेबॅक मधील स्पीकर ग्रुप (बीटा) त्यांना एकाच सराउंड सिस्टीमप्रमाणे वाजवतात, आणि Mac साउंड आउटपुट (बीटा) कोणत्याही अॅपला त्यावर वाजवू देते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dua DAC atau lebih? Kumpulan Pembesar Suara (beta) dalam Seting › Main Balik memainkannya sebagai satu sistem bunyi sekeliling, dan Output Bunyi Mac (beta) membolehkan mana-mana apl bermain kepadanya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To eller flere DAC-er? Høyttalergrupper (beta) i Innstillinger › Avspilling spiller dem som ett surroundsystem, og Mac-lydutgang (beta) lar alle apper spille til det."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twee of meer DAC’s? Luidsprekergroepen (bèta) in Instellingen › Afspelen speelt ze af als één surroundsysteem, en Mac-geluidsuitvoer (bèta) laat elke app erop afspelen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਦੋ ਜਾਂ ਵੱਧ DAC? ਸੈਟਿੰਗਾਂ › ਪਲੇਬੈਕ ਵਿੱਚ ਸਪੀਕਰ ਗਰੁੱਪ (ਬੀਟਾ) ਉਹਨਾਂ ਨੂੰ ਇੱਕ ਸਰਾਊਂਡ ਸਿਸਟਮ ਵਾਂਗ ਵਜਾਉਂਦੇ ਹਨ, ਅਤੇ Mac ਸਾਊਂਡ ਆਉਟਪੁੱਟ (ਬੀਟਾ) ਕਿਸੇ ਵੀ ਐਪ ਨੂੰ ਉਸ 'ਤੇ ਚਲਾਉਣ ਦਿੰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dwa lub więcej przetworników DAC? Grupy głośników (beta) w Ustawieniach › Odtwarzanie odtwarzają je jako jeden system przestrzenny, a Wyjście dźwięku Maca (beta) pozwala każdej aplikacji na nim grać."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dois ou mais DACs? Grupos de alto-falantes (beta), em Ajustes › Reprodução, os toca como um único sistema surround, e Saída de som do Mac (beta) permite que qualquer app toque nele."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dois ou mais DAC? Grupos de altifalantes (beta), em Definições › Reprodução, reprodu-los como um único sistema surround, e Saída de som do Mac (beta) permite que qualquer app reproduza nele."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Două sau mai multe DAC-uri? Grupuri de boxe (beta) din Configurări › Redare le redă ca un singur sistem surround, iar Ieșire de sunet Mac (beta) permite oricărei aplicații să redea pe el."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Två eller fler DAC:ar? Högtalargrupper (beta) i Inställningar › Uppspelning spelar dem som ett surroundsystem, och Mac-ljudutgång (beta) låter alla appar spela till det."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DAC mbili au zaidi? Vikundi vya Spika (beta) katika Mipangilio › Uchezaji huzicheza kama mfumo mmoja wa sauti ya mzunguko, na Utoaji Sauti wa Mac (beta) huruhusu programu yoyote kuchezea humo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இரண்டு அல்லது அதற்கு மேற்பட்ட DACகளா? அமைப்புகள் › இயக்கம் இல் உள்ள ஸ்பீக்கர் குழுக்கள் (பீட்டா) அவற்றை ஒரே சரவுண்ட் அமைப்பாக இயக்கும், Mac ஒலி வெளியீடு (பீட்டா) எந்த ஆப்பும் அதற்கு இயக்க அனுமதிக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "రెండు లేదా అంతకంటే ఎక్కువ DACలా? సెట్టింగ్‌లు › ప్లేబ్యాక్‌లోని స్పీకర్ గ్రూప్‌లు (బీటా) వాటిని ఒకే సరౌండ్ సిస్టమ్‌గా ప్లే చేస్తాయి, Mac సౌండ్ అవుట్‌పుట్ (బీటా) ఏ యాప్ అయినా దానికి ప్లే చేసేలా చేస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "มี DAC ตั้งแต่สองตัวขึ้นไปใช่ไหม กลุ่มลำโพง (เบตา) ใน การตั้งค่า › การเล่น จะเล่นเป็นระบบเสียงรอบทิศทางชุดเดียว และ ขาออกเสียงของ Mac (เบตา) ให้แอปใดก็ได้เล่นไปยังระบบนั้น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İki ya da daha fazla DAC mi var? Ayarlar › Oynatma’daki Hoparlör Grupları (beta) onları tek bir surround sistemi olarak çalar, Mac Ses Çıkışı (beta) ise her uygulamanın ona çalmasını sağlar."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Два чи більше ЦАП? Групи гучномовців (бета) у Параметрах › Відтворення грають ними як однією системою об’ємного звуку, а Звуковий вихід Mac (бета) дає будь-якому застосунку відтворювати на неї."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دو یا زیادہ DACs؟ سیٹنگز › پلے بیک میں اسپیکر گروپس (بیٹا) انہیں ایک سراؤنڈ سسٹم کی طرح چلاتے ہیں، اور میک ساؤنڈ آؤٹ پٹ (بیٹا) کسی بھی ایپ کو اس پر چلانے دیتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Có hai DAC trở lên? Nhóm loa (beta) trong Cài đặt › Phát lại phát chúng như một hệ thống vòm duy nhất, và Đầu ra âm thanh của Mac (beta) cho phép mọi ứng dụng phát tới đó."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有两台或更多 DAC？“设置” › “播放”中的扬声器组（测试版）可将它们作为一套环绕声系统播放，Mac 声音输出（测试版）则让任何 App 都能向其播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有兩台或更多 DAC？「設定」›「播放」中的喇叭群組（測試版）可將它們作為一套環繞聲系統播放，Mac 聲音輸出（測試版）則讓任何 App 都能向其播放。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有兩部或以上 DAC？「設定」›「播放」中的喇叭群組（測試版）可將它們作為一套環迴立體聲系統播放，Mac 聲音輸出（測試版）則讓任何 App 都能向其播放。"
+          }
+        }
+      }
+    },
+    "Open Settings": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ቅንብሮችን ክፈት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فتح الإعدادات"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সেটিংস খুলুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otevřít Nastavení"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åbn Indstillinger"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen öffnen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Άνοιγμα Ρυθμίσεων"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Ajustes"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "باز کردن تنظیمات"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avaa Asetukset"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buksan ang Settings"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir les Réglages"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સેટિંગ્સ ખોલો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buɗe Saituna"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פתח את ״הגדרות״"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सेटिंग्ज़ खोलें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beállítások megnyitása"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buka Pengaturan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri Impostazioni"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "設定を開く"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ತೆರೆಯಿರಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설정 열기"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ക്രമീകരണങ്ങൾ തുറക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सेटिंग्ज उघडा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buka Seting"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åpne Innstillinger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Instellingen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸੈਟਿੰਗਾਂ ਖੋਲ੍ਹੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otwórz Ustawienia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Ajustes"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abrir Definições"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deschide Configurări"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öppna Inställningar"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fungua Mipangilio"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அமைப்புகளைத் திற"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "సెట్టింగ్‌లను తెరువు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เปิดการตั้งค่า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar’ı Aç"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відкрити Параметри"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سیٹنگز کھولیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mở Cài đặt"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打開設定"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打開設定"
+          }
+        }
+      }
+    },
+    "Phone remote": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የስልክ ሪሞት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التحكم عن بُعد بالهاتف"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ফোন রিমোট"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dálkové ovládání z telefonu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjernbetjening på telefonen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefon-Fernbedienung"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τηλεχειρισμός από τηλέφωνο"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control remoto en el teléfono"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کنترل از راه دور با گوشی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puhelinkaukosäädin"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remote sa telepono"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Télécommande sur téléphone"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ફોન રિમોટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rimot na waya"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שלט רחוק בטלפון"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फ़ोन रिमोट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefonos távirányító"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kendali jauh ponsel"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telecomando dal telefono"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スマートフォンのリモート"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಫೋನ್ ರಿಮೋಟ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "휴대폰 리모트"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഫോൺ റിമോട്ട്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फोन रिमोट"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kawalan jauh telefon"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjernkontroll på telefonen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoon als afstandsbediening"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਫ਼ੋਨ ਰਿਮੋਟ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilot w telefonie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controle remoto no telefone"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controlo remoto no telefone"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telecomandă pe telefon"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjärrkontroll i telefonen"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rimoti ya simu"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஃபோன் ரிமோட்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఫోన్ రిమోట్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รีโมตบนโทรศัพท์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefondan uzaktan kumanda"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пульт на телефоні"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فون ریموٹ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Điều khiển bằng điện thoại"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手机遥控"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手機遙控"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手機遙控"
           }
         }
       }

@@ -1,5 +1,6 @@
 //
-// Vespertine: first-run setup: music, output, sound and a few extras, shown once.
+// Vespertine: first-run setup: music, output, sound, a few extras and the phone remote, shown once (and again from the
+// Setup Assistant… menu item).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -26,12 +27,12 @@ struct MainRoot: View {
 }
 
 nonisolated enum SetupStep: Int, CaseIterable, Comparable {
-    case welcome, music, output, sound, extras, done
+    case welcome, music, output, sound, extras, remote, done
 
     static func < (a: SetupStep, b: SetupStep) -> Bool { a.rawValue < b.rawValue }
 
     /// The steps the progress bar names (welcome and done stand outside it).
-    static let named: [SetupStep] = [.music, .output, .sound, .extras]
+    static let named: [SetupStep] = [.music, .output, .sound, .extras, .remote]
 
     var title: LocalizedStringKey {
         switch self {
@@ -40,6 +41,7 @@ nonisolated enum SetupStep: Int, CaseIterable, Comparable {
         case .output: "Output"
         case .sound: "Sound"
         case .extras: "Extras"
+        case .remote: "Remote"
         case .done: "Done"
         }
     }
@@ -85,6 +87,10 @@ struct SetupFlow: View {
         }
         .sheet(isPresented: $model.showFindMusic) { FindMusicSheet().environment(model) }
         .sheet(isPresented: $model.showConnectServer) { ConnectServerSheet().environment(model) }
+        // The DoP test offered on the Output step, as the main window shows it.
+        .sheet(item: Binding(get: { model.dopSetup.target }, set: { if $0 == nil { model.dopSetup.close() } })) { target in
+            DoPTestSheet(device: target.device).environment(model)
+        }
         .overlay(alignment: .top) { ErrorBanner() }
     }
 
@@ -95,6 +101,7 @@ struct SetupFlow: View {
         case .output: SetupOutput()
         case .sound: SetupSound()
         case .extras: SetupExtras()
+        case .remote: SetupRemote()
         case .done: SetupDone { model.completeSetup() }
         }
     }
@@ -224,7 +231,7 @@ private struct SetupBackdrop: View {
     private var glowX: CGFloat {
         switch step {
         case .welcome, .done: 0.5
-        default: 0.28 + 0.12 * CGFloat(step.rawValue - 1)
+        default: 0.26 + 0.12 * CGFloat(step.rawValue - 1)
         }
     }
 
@@ -632,6 +639,7 @@ private struct SetupOutput: View {
         @Bindable var settings = model.settings
         let devices = model.devices.devices
         let recommended = OutputChoice.best(among: devices).flatMap { $0.transport == .builtIn || devices.count == 1 ? nil : $0.uid }
+        let dopDevice = dopCandidate
         VStack(spacing: 0) {
             SetupHeading(title: "Choose where it plays",
                          detail: "Pick your DAC, headphones or speakers. Vespertine remembers your choice and goes back to it whenever it's connected.",
@@ -651,7 +659,8 @@ private struct SetupOutput: View {
                 .animation(reduceMotion ? nil : .spring(response: 0.5, dampingFraction: 0.8), value: devices.map(\.uid))
             }
             .scrollIndicators(.never)
-            .frame(maxWidth: 620, maxHeight: 300)
+            // The list gives up some room while the DoP card is shown under it.
+            .frame(maxWidth: 620, maxHeight: dopDevice == nil ? 300 : 210)
             .fixedSize(horizontal: false, vertical: true)
             .padding(.top, 26)
             HStack(spacing: 8) {
@@ -678,7 +687,14 @@ private struct SetupOutput: View {
             .accessibilityHidden(settings.selectedDeviceUID == nil)
             .animation(.easeInOut(duration: 0.25), value: settings.selectedDeviceUID)
             .reveal(shown, delay: 0.36)
+            if let dopDevice {
+                SetupDoPCard(device: dopDevice)
+                    .frame(maxWidth: 620)
+                    .padding(.top, 14)
+                    .transition(.opacity)
+            }
         }
+        .animation(.easeInOut(duration: 0.3), value: dopDevice?.uid)
         .padding(.horizontal, 40)
         .onAppear {
             shown = true
@@ -686,6 +702,14 @@ private struct SetupOutput: View {
             withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) { pulse = true }
         }
         .onChange(of: settings.outputFallback) { model.syncEngine() }
+    }
+
+    /// The chosen DAC, when it may take DSD over PCM (DoP) and hasn't been tested or set either way: the same offer the
+    /// signal path shows the first time DSD is converted for it, made here, where the DAC was just picked.
+    private var dopCandidate: OutputDevice? {
+        guard let uid = model.settings.selectedDeviceUID, let device = model.devices.devices.first(where: { $0.uid == uid }),
+              model.dopSetup.hint(for: device) != .none else { return nil }
+        return device
     }
 
     private func row(_ uid: String?, name: String, detail: String, symbol: String, recommended: Bool = false, index: Int) -> some View {
@@ -715,6 +739,39 @@ private struct SetupOutput: View {
         .accessibilityValue(detail)
         .accessibilityAddTraits(selected ? .isSelected : [])
         .reveal(shown, delay: 0.12 + 0.05 * Double(min(index, 8)))
+    }
+}
+
+/// "Play DSD natively?" for the DAC just chosen, and the one-tap test (DoPTestConstants: a short, quiet clip, the DAC's
+/// own volume lowered to 20% for it). The words are the test card's, so they read the same here and under the signal path.
+private struct SetupDoPCard: View {
+    @Environment(AppModel.self) private var model
+    let device: OutputDevice
+
+    var body: some View {
+        let words = DoPTestConstants.wording
+        let hint = model.dopSetup.hint(for: device)
+        SetupCard(padding: 14) {
+            HStack(alignment: .center, spacing: 14) {
+                SetupSymbol(name: "waveform.path")
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(verbatim: words.offerTitle).font(Typeface.ui(14, weight: .semibold)).foregroundStyle(Palette.text)
+                    Text(verbatim: explanation(hint, words))
+                        .font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineSpacing(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 16)
+                Button(action: { model.dopSetup.begin(device) }) { Text(verbatim: words.testButton) }
+                    .buttonStyle(QuietButtonStyle())
+                    .fixedSize()
+            }
+        }
+        .accessibilityElement(children: .contain)
+    }
+
+    private func explanation(_ hint: DoPSetupHint, _ words: DoPTestConstants.Wording) -> String {
+        if case .suggestTest(let maker) = hint { return words.suggestBody(maker: maker) }
+        return words.offerBody
     }
 }
 
@@ -786,7 +843,7 @@ private struct SetupExtras: View {
         @Bindable var updater = updater
         VStack(spacing: 0) {
             SetupHeading(title: "A few extras",
-                         detail: "Vespertine never sends anything in the background unless you turn it on here.",
+                         detail: "Vespertine sends nothing in the background unless it’s switched on, here or in Settings.",
                          shown: shown)
             VStack(spacing: 12) {
                 SetupOption(symbol: "checkmark.seal", title: "Check each file's real quality",
@@ -811,12 +868,131 @@ private struct SetupExtras: View {
                     }
                     .reveal(shown, delay: 0.28)
                 }
+                // On by default, so it's shown with the other things that reach the network on their own.
+                SetupOption(symbol: "list.bullet.rectangle", title: "Update the list of DoP DACs",
+                            detail: "Once a day, downloads the signed list of DACs known to play DSD natively, so a newly confirmed DAC needs no app update. Nothing about you is sent.",
+                            on: settings.dopListUpdates) {
+                    Toggle("Update the list of DoP DACs", isOn: $settings.dopListUpdates).labelsHidden().toggleStyle(.switch).tint(Palette.brass)
+                        .onChange(of: settings.dopListUpdates) { if settings.dopListUpdates { model.dopSetup.refreshList() } }
+                }
+                .reveal(shown, delay: 0.36)
             }
             .frame(maxWidth: 680)
             .padding(.top, 28)
         }
         .padding(.horizontal, 40)
         .onAppear { shown = true }
+    }
+}
+
+// MARK: - Remote
+
+/// The phone remote, the options for a Mac without a screen, and Mac Sound Output (beta). Everything here is off until
+/// turned on; the remote's switch is the one in Settings › Remote.
+private struct SetupRemote: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.openSettings) private var openSettings
+    @State private var shown = false
+    @State private var pairing = false
+
+    private var server: RemoteServer { model.remote }
+
+    var body: some View {
+        let store = server.store
+        VStack(spacing: 0) {
+            SetupHeading(title: "Control it from your phone",
+                         detail: "Play, queue and browse your music from an iPhone or iPad across the room, over your own network.",
+                         shown: shown)
+            VStack(spacing: 12) {
+                SetupCard(selected: store.enabled) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack(alignment: .center, spacing: 14) {
+                            SetupSymbol(name: "iphone", selected: store.enabled)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Let phones control Vespertine").font(Typeface.ui(14, weight: .semibold)).foregroundStyle(Palette.text)
+                                Text("Phones connect over your local network only, encrypted, and only after you pair them. Volume follows the same rules as on this Mac.")
+                                    .font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineSpacing(2)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                            Spacer(minLength: 16)
+                            Toggle("Let phones control Vespertine", isOn: Binding(get: { store.enabled }, set: { store.enabled = $0; server.apply() }))
+                                .labelsHidden().toggleStyle(.switch).tint(Palette.brass)
+                        }
+                        if store.enabled {
+                            HStack(spacing: 12) {
+                                Button("Pair a Phone…") {
+                                    server.beginPairing()
+                                    pairing = true
+                                }
+                                .buttonStyle(QuietButtonStyle())
+                                .disabled(!server.isRunning)
+                                Text(status).font(Typeface.ui(11.5)).foregroundStyle(Palette.text3).lineLimit(2)
+                            }
+                            .padding(.leading, 54)
+                            .transition(.opacity)
+                        }
+                    }
+                }
+                .animation(.easeInOut(duration: 0.25), value: store.enabled)
+                .reveal(shown, delay: 0.12)
+                settingsCard(symbol: "macmini", title: "Mac without a screen",
+                             detail: "For a Mac mini by the hi-fi: open Vespertine at login, keep the Mac awake and let a phone wake it. Each is its own switch in Settings › Remote, off until you turn it on.",
+                             tab: .remote)
+                    .reveal(shown, delay: 0.2)
+                if model.settings.speakerGroupsFeature, let groups = model.speakerGroups?.groups, !groups.isEmpty {
+                    settingsCard(symbol: "hifispeaker.2", title: "Mac Sound Output (beta)",
+                                 detail: "Your speaker groups can be outputs of the Mac, for a browser, the TV app or a video player to play to. The first time one plays, macOS asks whether Vespertine Sound Helper may use the microphone: it only receives what your apps play there and never records. Allow it, or the group stays silent.",
+                                 tab: .playback)
+                        .reveal(shown, delay: 0.28)
+                }
+            }
+            .frame(maxWidth: 680)
+            .padding(.top, 28)
+            if !(model.settings.speakerGroupsFeature && !(model.speakerGroups?.groups.isEmpty ?? true)) {
+                Text("Two or more DACs? Speaker Groups (beta) in Settings › Playback play them as one surround system, and Mac Sound Output (beta) lets any app play to it.")
+                    .font(Typeface.ui(12)).foregroundStyle(Palette.text3)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 620)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 18)
+                    .reveal(shown, delay: 0.28)
+            }
+        }
+        .padding(.horizontal, 40)
+        .onAppear { shown = true }
+        .sheet(isPresented: $pairing, onDismiss: { server.endPairing() }) {
+            RemotePairingSheet(server: server) { pairing = false }
+        }
+    }
+
+    private var status: String {
+        switch server.status {
+        case .off, .starting: String(localized: "Starting…")
+        case .running: String(localized: "On. Phones on this network see this Mac as “\(RemoteServer.computerName)”.", comment: "Settings › Remote: %@ is the Mac's name.")
+        case .failed(let reason): String(localized: "The remote couldn’t start: \(reason)", comment: "Settings › Remote: %@ is macOS's reason.")
+        }
+    }
+
+    /// A feature set up in Settings, with a button that opens Settings on its tab.
+    private func settingsCard(symbol: String, title: LocalizedStringKey, detail: LocalizedStringKey, tab: SettingsTab) -> some View {
+        SetupCard {
+            HStack(alignment: .center, spacing: 14) {
+                SetupSymbol(name: symbol)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title).font(Typeface.ui(14, weight: .semibold)).foregroundStyle(Palette.text)
+                    Text(detail).font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineSpacing(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 16)
+                Button("Open Settings") {
+                    model.settingsTab = tab
+                    openSettings()
+                }
+                .buttonStyle(QuietButtonStyle())
+                .fixedSize()
+            }
+        }
+        .accessibilityElement(children: .contain)
     }
 }
 
@@ -875,6 +1051,8 @@ private struct SetupDone: View {
                 summary("lock.shield", "Exclusive access", model.settings.exclusiveMode ? String(localized: "On") : String(localized: "Off"), index: 2)
                 Hairline()
                 summary("dial.medium", "Volume leveling", model.settings.replayGain.localizedName, index: 3)
+                Hairline()
+                summary("iphone", "Phone remote", model.remote.store.enabled ? String(localized: "On") : String(localized: "Off"), index: 4)
             }
             .padding(.horizontal, 18)
             .background(RoundedRectangle(cornerRadius: 14).fill(Palette.surface.opacity(0.7)))

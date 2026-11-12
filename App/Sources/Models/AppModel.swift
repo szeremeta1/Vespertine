@@ -264,6 +264,8 @@ final class AppModel {
     var enrichAlbumKeys: [String]?
     /// First-run setup, in the main window in place of the library.
     var showSetup = false
+    /// The Settings window's tab showing.
+    var settingsTab: SettingsTab = .playback
 
     init(dataDirectory: URL? = nil) throws {
         let settings = AppSettings(dataDirectory: dataDirectory)
