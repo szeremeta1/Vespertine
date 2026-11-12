@@ -46,15 +46,19 @@ struct ArtworkView: View {
     let key: String?
     var size: Int = 300
     var cornerRadius: CGFloat = 6
+    /// Draw the music-note placeholder while there's no cover (off for backdrops).
+    var placeholder = true
     @State private var image: UIImage?
 
     var body: some View {
         ZStack {
             if let image {
                 Image(uiImage: image).resizable().scaledToFill()
+            } else if placeholder {
+                Rectangle().fill(Palette.raised)
+                Image(systemName: "music.note").font(.title2).foregroundStyle(Palette.text3)
             } else {
-                Rectangle().fill(Color.secondary.opacity(0.15))
-                Image(systemName: "music.note").font(.title2).foregroundStyle(.secondary)
+                Color.clear
             }
         }
         .aspectRatio(1, contentMode: .fit)

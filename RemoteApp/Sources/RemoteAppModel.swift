@@ -21,14 +21,31 @@ final class RemoteAppModel {
     var pairingError: String?
     var isPairing = false
     let artwork = ArtworkCache()
+    let settings = AppSettings()
+    let tiltSensor = TiltSensor()
+    /// This iPhone has a network at all (Wi-Fi, cellular or a VPN).
+    private(set) var isOnline = true
+    /// Which screen the remote opens on (set by a launch option in debug builds).
+    var startScreen: String?
 
     @ObservationIgnored private let keychain = PairingKeychain()
+    /// Pairings that are never saved (a made-up one for screenshots).
+    @ObservationIgnored private var transientPairings: Set<String> = []
     @ObservationIgnored private var linkWatch: Task<Void, Never>?
+    @ObservationIgnored private let pathMonitor = NWPathMonitor()
     private static let lastMacKey = "lastMac"
 
     init() {
         pairings = keychain.load().sorted { $0.pairedAt < $1.pairedAt }
         discovery.start()
+        pathMonitor.pathUpdateHandler = { [weak self] path in
+            let online = path.status == .satisfied
+            MainActor.assumeIsolated { self?.networkChanged(online: online) }
+        }
+        pathMonitor.start(queue: .main)
+        #if DEBUG
+        if applyLaunchOptions() { return }
+        #endif
         if let last = UserDefaults.standard.string(forKey: Self.lastMacKey), let pairing = pairings.first(where: { $0.serverID == last }) {
             choose(pairing)
         } else if pairings.count == 1 {
@@ -43,9 +60,11 @@ final class RemoteAppModel {
 
     func choose(_ pairing: SavedPairing) {
         session?.close()
-        let session = RemoteSession(pairing: pairing, clientName: deviceName) { [weak self] serverID in
-            self?.discovery.mac(serverID: serverID)?.endpoint
-        }
+        let serverID = pairing.serverID
+        let session = RemoteSession(pairing: pairing, clientName: deviceName, routes: { [weak self] in
+            self?.routes(to: serverID) ?? []
+        })
+        session.onConnected = { [weak self] _, address in self?.remember(address, for: serverID) }
         self.session = session
         artwork.session = session
         UserDefaults.standard.set(pairing.serverID, forKey: Self.lastMacKey)
@@ -74,12 +93,48 @@ final class RemoteAppModel {
 
     func forget(_ pairing: SavedPairing) {
         if session?.pairing.serverID == pairing.serverID { leave() }
-        keychain.remove(serverID: pairing.serverID)
+        if !transientPairings.contains(pairing.serverID) { keychain.remove(serverID: pairing.serverID) }
         pairings.removeAll { $0.serverID == pairing.serverID }
     }
 
     func isPaired(_ mac: DiscoveredMac) -> Bool {
         pairings.contains { $0.serverID == mac.serverID }
+    }
+
+    // MARK: Reaching a Mac
+
+    func pairing(serverID: String) -> SavedPairing? {
+        pairings.first { $0.serverID == serverID }
+    }
+
+    /// Every way to try a paired Mac now: Bonjour if it's on this network, then its typed and last known addresses.
+    func routes(to serverID: String) -> [RemoteRoute] {
+        pairing(serverID: serverID)?.routes(nearby: discovery.mac(serverID: serverID)?.endpoint) ?? []
+    }
+
+    /// Saves (or with nil, removes) the address the user typed for a Mac, and tries it at once.
+    func setAddress(_ address: RemoteAddress?, for serverID: String) {
+        guard let index = pairings.firstIndex(where: { $0.serverID == serverID }), pairings[index].address != address else { return }
+        pairings[index].address = address
+        save(pairings[index])
+        if session?.pairing.serverID == serverID { session?.networkChanged() }
+    }
+
+    /// Keeps where a Mac answered, for the next time Bonjour can't say.
+    private func remember(_ address: RemoteAddress?, for serverID: String) {
+        guard let address, let index = pairings.firstIndex(where: { $0.serverID == serverID }), pairings[index].lastKnown != address else { return }
+        pairings[index].lastKnown = address
+        save(pairings[index])
+    }
+
+    private func save(_ pairing: SavedPairing) {
+        guard !transientPairings.contains(pairing.serverID) else { return }
+        keychain.upsert(pairing)
+    }
+
+    private func networkChanged(online: Bool) {
+        isOnline = online
+        if online { session?.networkChanged() }
     }
 
     // MARK: Pairing
@@ -107,7 +162,7 @@ final class RemoteAppModel {
             }
             guard let self, !Task.isCancelled else { return }
             self.pendingLink = nil
-            self.pairingError = String(localized: "Couldn’t find “\(link.name)” on this network. Check that the iPhone and the Mac are on the same Wi-Fi network.")
+            self.pairingError = String(localized: "Couldn’t find “\(link.name)” on this network. Pair while the iPhone and the Mac are on the same Wi-Fi network; after that, you can reach the Mac from anywhere by its address.")
         }
     }
 
@@ -150,4 +205,31 @@ final class RemoteAppModel {
             break
         }
     }
+
+    // MARK: Screenshots
+
+    #if DEBUG
+    /// Sets the app up as the launch arguments ask (see LaunchOptions). True when it chose what to open.
+    private func applyLaunchOptions() -> Bool {
+        if let vinyl = LaunchOptions.vinyl { settings.vinyl = vinyl }
+        startScreen = LaunchOptions.screen
+        if startScreen == "coverFlow" { settings.albumsLayout = .coverFlow }
+        if LaunchOptions.samplePairing {
+            let sample = SavedPairing(serverID: "sample-mac", name: "Studio Mac mini", device: "phone-sample", key: Data(repeating: 1, count: 32),
+                                      address: RemoteAddress(host: "studio-mac.tail1a2b3.ts.net"),
+                                      lastKnown: RemoteAddress(host: "192.168.1.24", port: 52718))
+            transientPairings.insert(sample.serverID)
+            pairings.append(sample)
+        }
+        guard LaunchOptions.demo else { return LaunchOptions.samplePairing }
+        tryDemo()
+        if LaunchOptions.play, let session {
+            Task {
+                for _ in 0..<40 where !session.isConnected { try? await Task.sleep(for: .milliseconds(50)) }
+                await session.send(.play)
+            }
+        }
+        return true
+    }
+    #endif
 }

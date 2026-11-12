@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import UIKit
 import VespertineRemoteClient
 import VespertineRemoteProtocol
 
@@ -18,6 +19,7 @@ struct RootView: View {
                 MacsView()
             }
         }
+        .animation(.default, value: model.session == nil)
         .overlay {
             if model.pendingLink != nil || model.isPairing {
                 ProgressView("Pairing…")
@@ -33,21 +35,38 @@ struct MacsView: View {
     @Environment(RemoteAppModel.self) private var model
     @State private var pairing: DiscoveredMac?
     @State private var scanning = false
+    @State private var connection: SavedPairing?
+    @State private var showingSettings = false
 
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    header
+                        .listRowBackground(Color.clear)
+                        .listRowInsets(EdgeInsets())
+                }
                 if !model.pairings.isEmpty {
                     Section("Your Macs") {
                         ForEach(model.pairings) { saved in
-                            Button { model.choose(saved) } label: {
-                                HStack {
-                                    Label(saved.name, systemImage: "macmini")
-                                    Spacer()
-                                    if model.discovery.mac(serverID: saved.serverID) == nil {
-                                        Text("Not found").font(.caption).foregroundStyle(.secondary)
+                            HStack(spacing: 4) {
+                                Button { model.choose(saved) } label: {
+                                    HStack(spacing: 12) {
+                                        Image(systemName: "macmini").foregroundStyle(Palette.brass).frame(width: 28)
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(saved.name).font(.serif(.body, weight: .medium)).foregroundStyle(Palette.text)
+                                            Text(reach(saved)).font(.caption).foregroundStyle(Palette.text2)
+                                        }
+                                        Spacer(minLength: 0)
                                     }
+                                    .contentShape(Rectangle())
                                 }
+                                .buttonStyle(.plain)
+                                Button { connection = saved } label: {
+                                    Image(systemName: "info.circle").font(.title3)
+                                }
+                                .buttonStyle(.borderless)
+                                .accessibilityLabel(Text("Connection for “\(saved.name)”"))
                             }
                             .swipeActions {
                                 Button("Forget", role: .destructive) { model.forget(saved) }
@@ -60,7 +79,7 @@ struct MacsView: View {
                     if unpaired.isEmpty {
                         HStack(spacing: 12) {
                             ProgressView()
-                            Text("Looking for Macs…").foregroundStyle(.secondary)
+                            Text("Looking for Macs on this network…").foregroundStyle(Palette.text2)
                         }
                     }
                     ForEach(unpaired) { mac in
@@ -82,20 +101,68 @@ struct MacsView: View {
                 }
                 if let problem = model.discovery.problem, !problem.isEmpty {
                     Section {
-                        Text("Vespertine Remote can’t look for Macs. Allow it in Settings › Privacy & Security › Local Network.")
-                            .foregroundStyle(.secondary)
+                        Label {
+                            Text("Vespertine Remote can’t look for Macs. Allow it in Settings › Privacy & Security › Local Network.")
+                        } icon: {
+                            Image(systemName: "exclamationmark.triangle").foregroundStyle(Palette.copper)
+                        }
+                        .foregroundStyle(Palette.text2)
+                        if let url = URL(string: UIApplication.openSettingsURLString) {
+                            Link("Open Settings", destination: url)
+                        }
                     }
                 }
             }
-            .navigationTitle("Vespertine Remote")
+            .obsidianList()
+            .navigationTitle("Macs")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { showingSettings = true } label: { Image(systemName: "gearshape") }
+                        .accessibilityLabel(Text("Settings"))
+                }
+            }
             .sheet(item: $pairing) { mac in CodeEntryView(mac: mac) }
+            .sheet(item: $connection) { saved in MacConnectionView(serverID: saved.serverID) }
+            .sheet(isPresented: $showingSettings) { SettingsView() }
             .sheet(isPresented: $scanning) {
                 PairingScannerSheet { link in
                     scanning = false
                     model.pair(link: link)
                 }
             }
+            .onAppear {
+                if model.startScreen == "connection" { connection = model.pairings.last; model.startScreen = nil }
+                if model.startScreen == "settings" { showingSettings = true; model.startScreen = nil }
+            }
         }
+    }
+
+    private var header: some View {
+        VStack(spacing: 10) {
+            Crescent()
+                .fill(LinearGradient(colors: [Palette.brassHi, Palette.brass, Palette.brassLo], startPoint: .topLeading, endPoint: .bottomTrailing))
+                .frame(width: 56, height: 56)
+                .shadow(color: Palette.brass.opacity(0.35), radius: 18)
+                .accessibilityHidden(true)
+            Text(verbatim: "vespertine")
+                .font(.system(size: 30, weight: .light, design: .serif))
+                .foregroundStyle(Palette.text)
+            Text("The remote for Vespertine on your Mac")
+                .font(.footnote).foregroundStyle(Palette.text2)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.top, 12).padding(.bottom, 8)
+        .accessibilityElement(children: .combine)
+    }
+
+    /// How a paired Mac can be reached now, in a few words.
+    private func reach(_ saved: SavedPairing) -> String {
+        if model.discovery.mac(serverID: saved.serverID) != nil { return String(localized: "On this network") }
+        if let address = saved.address {
+            return address.kind == .tailscale ? String(localized: "By Tailscale: \(address.host)") : String(localized: "By address: \(address.host)")
+        }
+        return String(localized: "Not on this network")
     }
 }
 
@@ -126,6 +193,7 @@ struct CodeEntryView: View {
                     Section { Text(error).foregroundStyle(.red) }
                 }
             }
+            .obsidianList()
             .navigationTitle("Pair")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
