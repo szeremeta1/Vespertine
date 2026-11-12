@@ -84,10 +84,10 @@ Two or more USB DACs, played as one multichannel system: a Fosi ZD3 and a FiiO K
 - Only the clock leader's channels can be bit-perfect. Start offsets between DACs were repeatable to about 21 µs in typical runs, but 3 of 49 drift-corrected runs came in about 3.5 ms late, unexplained, and a follower crept steadily behind the leader (+13.5 ppm, 0.81 ms a minute, in one pair). The wizard can measure that rate and trim for it, but the trim has not been confirmed on hardware over its full 10 minutes.
 - PCM only: DSD is converted to PCM, Dolby and DTS bitstreams are decoded rather than passed through, and integer mode, "Match 16-bit sources" and head-tracked Spatial Audio don't apply to a group. On a group, Atmos plays its channel bed, not macOS's object rendering.
 - It is for speakers around one listening seat, not whole-home audio: Bluetooth and AirPlay outputs can't join (they add 100 ms or more of changing delay), and a macOS built-in output can join but is never bit-perfect.
-- The group has no volume of its own, and the volume keys don't control it: set each DAC's volume once, by hand.
+- In Vespertine the group has no volume of its own, and the volume keys don't control it: set each DAC's volume once, by hand. Published with Mac Sound Output (beta), for other apps' sound, it has a volume the keys set.
 - The screens for creating and editing groups are in English for now; the switch is in all 45 languages. The stereo-to-quad rows come from the routing rules, not a standard, and still need listening approval.
 
-[Speaker Groups in detail](docs/SPEAKER-GROUPS.md)
+[Speaker Groups in detail](docs/SPEAKER-GROUPS.md) · [Mac Sound Output (beta)](docs/MAC-SOUND-OUTPUT.md)
 
 ## Room correction
 
