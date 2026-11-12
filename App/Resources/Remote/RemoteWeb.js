@@ -156,16 +156,16 @@ function forget(prefix) { for (const key of [...cache.keys()]) if (key.startsWit
  * it's let go (or moved by a key). Values are 0…max.
  */
 function slider(node, options) {
-  let max = 1, value = 0, dragging = false;
+  let max = 1, value = 0, dragging = false, empty = false;
   const api = {
     get dragging() { return dragging; },
     get value() { return value; },
-    setMax(m) { max = Math.max(m, 0.0001); node.setAttribute("aria-valuemax", Math.round(options.scale ? max * options.scale : max)); paint(); },
-    set(v) { if (!dragging) { value = clamp(v); paint(); } },
+    setMax(m) { empty = !(m > 0); max = Math.max(m, 0.0001); if (empty) value = 0; node.setAttribute("aria-valuemax", Math.round(options.scale ? max * options.scale : max)); paint(); },
+    set(v) { if (!dragging) { value = empty ? 0 : clamp(v); paint(); } },
   };
   function clamp(v) { return Math.min(Math.max(v, 0), max); }
   function paint() {
-    node.style.setProperty("--v", max > 0 ? (value / max).toFixed(5) : 0);
+    node.style.setProperty("--v", empty ? 0 : (value / max).toFixed(5));
     node.setAttribute("aria-valuenow", Math.round(options.scale ? value * options.scale : value));
     if (options.text) node.setAttribute("aria-valuetext", options.text(value, max));
     if (options.paint) options.paint(value, max, dragging);

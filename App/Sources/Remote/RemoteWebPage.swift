@@ -120,7 +120,7 @@ enum RemoteWebPage {
         words["plurals"] = plurals
         let language = language
         let rtl = Locale.Language(identifier: language).characterDirection == .rightToLeft
-        // Arabic, Indic and Thai letters join or stack: spacing them apart breaks the words (as in the Mac's own labels).
+        // "unspaced": Arabic, Indic and Thai letters join or stack, so labels get no letter spacing (as in the Mac's own).
         return template
             .replacingOccurrences(of: "__STRINGS__", with: scriptJSON(words))
             .replacingOccurrences(of: "__LANG__", with: language)
@@ -203,7 +203,7 @@ enum RemoteWebIcon {
 
     /// A square PNG: obsidian from edge to edge (a phone cuts its own corners), the crescent in the middle. A maskable
     /// icon keeps the crescent inside the circle every launcher shows.
-    nonisolated static func png(size: Int, maskable: Bool) -> Data? {
+    static func png(size: Int, maskable: Bool) -> Data? {
         let space = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
         guard size > 0, size <= 1024,
               let context = CGContext(data: nil, width: size, height: size, bitsPerComponent: 8, bytesPerRow: 0, space: space,
