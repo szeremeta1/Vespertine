@@ -82,6 +82,7 @@ struct NowPlayingPanel: View {
                         StatusBadges(path: path).padding(.top, 16)
                         Hairline().padding(.top, 18)
                         SignalPathView(path: path, loopback: model.loopback.result(for: path)).padding(.top, 14)
+                        DoPSetupCard(path: path).padding(.top, 10)
                         if path.plan.mode == .bitstream, let bed = player.bedMeters, bed.names.count > 2 {
                             ChannelMetersView(bed: bed, bitstream: true, levels: model.player.channelLevels).padding(.top, 14)
                         } else if path.plan.channels > 2 || path.source.channels > 2 {

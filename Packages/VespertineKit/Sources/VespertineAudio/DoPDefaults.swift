@@ -14,7 +14,7 @@ public enum DoPDefaults {
     /// and model names in the UID. Core Audio UIDs of USB DACs look like `AppleUSBAudioEngine:<vendor>:<product>:<serial>:<n>`;
     /// the serial and interface differ per unit and port and are never looked at.
     public static func isKnownDoP(uid: String) -> Bool {
-        isKnownDoP(DoPDeviceIdentity(uid: uid))
+        isKnownDoP(USBIdentity.identity(forUID: uid))
     }
 
     /// The same, also by USB vendor and product ID when the identity carries them.
@@ -24,7 +24,7 @@ public enum DoPDefaults {
 
     /// Whether DoP is on for `uid`, given the user's explicit on and off choices.
     public static func isEnabled(uid: String, on: Set<String>, off: Set<String>) -> Bool {
-        isEnabled(DoPDeviceIdentity(uid: uid), on: on, off: off)
+        isEnabled(USBIdentity.identity(forUID: uid), on: on, off: off)
     }
 
     public static func isEnabled(_ identity: DoPDeviceIdentity, on: Set<String>, off: Set<String>, list: DoPDACList? = nil) -> Bool {
@@ -34,7 +34,7 @@ public enum DoPDefaults {
 
     /// The set the engine and device list use: explicit ons, plus connected known DACs the user hasn't turned off.
     public static func resolve(on: Set<String>, off: Set<String>, connected: Set<String>) -> Set<String> {
-        resolve(on: on, off: off, connectedDevices: connected.map { DoPDeviceIdentity(uid: $0) })
+        resolve(on: on, off: off, connectedDevices: connected.map { USBIdentity.identity(forUID: $0) })
     }
 
     public static func resolve(on: Set<String>, off: Set<String>, connectedDevices: [DoPDeviceIdentity], list: DoPDACList? = nil) -> Set<String> {

@@ -76,7 +76,7 @@ final class AppSettings {
     var outputFallback: OutputFallback { didSet { defaults.set(outputFallback.rawValue, forKey: "outputFallback") } }
     /// Explicit ons plus connected known DACs not turned off: what the engine and device list use.
     var effectiveDoPUIDs: Set<String> {
-        DoPDefaults.resolve(on: dopDeviceUIDs, off: dopOffDeviceUIDs, connected: OutputDevices.connectedUIDs())
+        DoPDefaults.resolve(on: dopDeviceUIDs, off: dopOffDeviceUIDs, connectedDevices: OutputDevices.connectedIdentities())
     }
     var dopDeviceUIDs: Set<String> { didSet { defaults.set(Array(dopDeviceUIDs), forKey: "dopDeviceUIDs") } }
     /// DACs known to take DoP (`DoPDefaults`) start with it on; a device turned off here stays off.

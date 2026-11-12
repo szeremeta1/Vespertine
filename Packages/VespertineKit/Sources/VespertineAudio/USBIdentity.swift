@@ -18,8 +18,9 @@ public enum USBIdentity {
         if let hit = cache.withLock({ $0[uid] }) { return hit }
         let ids = uid.hasPrefix("AppleUSBAudioEngine:") ? lookup(uid: uid) : nil
         let identity = DoPDeviceIdentity(uid: uid, usbVendorID: ids?.vendor, usbProductID: ids?.product)
-        // Only a successful read is kept: a device that is mid-enumeration may answer next time.
-        if ids != nil { cache.withLock { $0[uid] = identity } }
+        // Kept either way: the engine's UID exists only once its USB device is in the registry, so a miss here is the
+        // driver registering differently, not timing, and the DoP switch reads this on every redraw.
+        cache.withLock { $0[uid] = identity }
         return identity
     }
 
