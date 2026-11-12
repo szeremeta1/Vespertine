@@ -13,7 +13,7 @@ import CoreAudio
 import Foundation
 import os
 
-private let log = Logger(subsystem: "org.szeremeta.vespertine", category: "SystemOutput")
+private let systemOutputLog = Logger(subsystem: "org.szeremeta.vespertine", category: "SystemOutput")
 
 /// The app and the helper agree on these.
 public enum SystemOutputHandOff {
@@ -134,18 +134,18 @@ public final class SystemOutputService: @unchecked Sendable {
         let center = DistributedNotificationCenter.default()
         observers.append(center.addObserver(forName: SystemOutputHandOff.snapshotChanged, object: nil, queue: nil) { [weak self] _ in self?.poke() })
         observers.append(center.addObserver(forName: SystemOutputHandOff.taken, object: nil, queue: nil) { [weak self] note in
-            guard let (group, pid) = Self.handOff(note) else { return }
-            self?.queue.async { self?.take(group, by: pid) }
+            guard let service = self, let (group, pid) = Self.handOff(note) else { return }
+            service.queue.async { service.take(group, by: pid) }
         })
         observers.append(center.addObserver(forName: SystemOutputHandOff.returned, object: nil, queue: nil) { [weak self] note in
-            guard let (group, _) = Self.handOff(note) else { return }
-            self?.queue.async { if self?.handedOff[group] != nil { self?.returnedAt[group] = Date() } }
-            self?.queue.asyncAfter(deadline: .now() + SystemOutputHandOff.returnDelay) {
+            guard let service = self, let (group, _) = Self.handOff(note) else { return }
+            service.queue.async { if service.handedOff[group] != nil { service.returnedAt[group] = Date() } }
+            service.queue.asyncAfter(deadline: .now() + SystemOutputHandOff.returnDelay) {
                 // Taken again meanwhile (by the same app): it stays Vespertine's.
-                guard let self, self.returnedAt[group].map({ Date().timeIntervalSince($0) >= SystemOutputHandOff.returnDelay - 0.1 }) == true else { return }
-                self.returnedAt[group] = nil
-                self.handedOff[group] = nil
-                self.tick()
+                guard service.returnedAt[group].map({ Date().timeIntervalSince($0) >= SystemOutputHandOff.returnDelay - 0.1 }) == true else { return }
+                service.returnedAt[group] = nil
+                service.handedOff[group] = nil
+                service.tick()
             }
         })
         let timer = DispatchSource.makeTimerSource(queue: queue)
@@ -193,7 +193,7 @@ public final class SystemOutputService: @unchecked Sendable {
         returnedAt[group] = nil
         if let session = sessions.removeValue(forKey: group) {
             session.stop()
-            log.info("Mac Sound Output: Vespertine took the group over")
+            systemOutputLog.info("Mac Sound Output: Vespertine took the group over")
         }
         tick()
     }
@@ -217,7 +217,7 @@ public final class SystemOutputService: @unchecked Sendable {
         let driverLoaded = SystemOutputDriver.isLoaded
         if driverLoaded {
             do { try SystemOutputDriver.publish(SystemOutput.driverConfiguration(entries, latency: latency)) } catch {
-                log.error("Mac Sound Output: publishing failed: \(error.localizedDescription, privacy: .public)")
+                systemOutputLog.error("Mac Sound Output: publishing failed: \(error.localizedDescription, privacy: .public)")
             }
         }
         listen(entries)
@@ -294,7 +294,7 @@ public final class SystemOutputService: @unchecked Sendable {
         }
         let message = lastError?.localizedDescription ?? ""
         failures[id] = (Date(), message)
-        log.error("Mac Sound Output: could not play the group: \(message, privacy: .public)")
+        systemOutputLog.error("Mac Sound Output: could not play the group: \(message, privacy: .public)")
     }
 
     private func reloadSnapshot() {

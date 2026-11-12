@@ -18,7 +18,7 @@ import CoreAudio
 import Foundation
 import os
 
-private let log = Logger(subsystem: "org.szeremeta.vespertine", category: "SystemOutput")
+private let systemOutputLog = Logger(subsystem: "org.szeremeta.vespertine", category: "SystemOutput")
 
 final class SystemOutputSession: @unchecked Sendable {
     let entry: SystemOutputEntry
@@ -117,7 +117,7 @@ final class SystemOutputSession: @unchecked Sendable {
         let room = GroupDelay.chain(entry.room, group: group, resampled: resampled, rate: rate)
         RoomCorrectionPlayback.install(room, on: context, sampleRate: rate, channelCount: outputChannels)
         if !RoomCorrectionPlayback.installFilters(room?.impulseTaps(sampleRate: rate, channelCount: outputChannels), on: context) {
-            log.error("Not enough memory for the room correction filters; playing without them")
+            systemOutputLog.error("Not enough memory for the room correction filters; playing without them")
         }
 
         // The routing to start with: a stereo source until the input says otherwise.
@@ -147,7 +147,7 @@ final class SystemOutputSession: @unchecked Sendable {
             stop()
             throw CoreAudioError(started, "AudioDeviceStart")
         }
-        log.info("Mac Sound Output playing \(group.name, privacy: .private) at \(Int(rate)) Hz, \(self.inputLabels.count) channels in, \(self.outputChannels) out")
+        systemOutputLog.info("Mac Sound Output playing \(group.name, privacy: .private) at \(Int(rate)) Hz, \(self.inputLabels.count) channels in, \(self.outputChannels) out")
     }
 
     /// The group's DACs are all still there and running in the aggregate.
@@ -249,7 +249,10 @@ final class SystemOutputSession: @unchecked Sendable {
                     routing.process(inBuffer.baseAddress!, into: outBuffer.baseAddress!)
                 }
             }
-            if changed { state.withLock { $0.content = routing.content } }
+            if changed {
+                let content = routing.content
+                state.withLock { $0.content = content }
+            }
             output.withUnsafeBufferPointer { _ = nrt_ring_write(renderRing, $0.baseAddress!, UInt32(routing.hop)) }
         }
     }
