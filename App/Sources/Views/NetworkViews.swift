@@ -113,7 +113,7 @@ struct ConnectServerSheet: View {
                         .fixedSize(horizontal: false, vertical: true).lineLimit(3)
                 }
                 Spacer()
-                Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle())
+                Button("Cancel") { dismiss() }.buttonStyle(QuietButtonStyle()).keyboardShortcut(.cancelAction)
                 Button("Connect", action: connect)
                     .buttonStyle(BrassButtonStyle())
                     .keyboardShortcut(.defaultAction)
