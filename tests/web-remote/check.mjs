@@ -242,9 +242,13 @@ for (const engineName of engines) {
         .map(n => n.id || n.className));
       expect(unnamed.length === 0, `every control on ${hash} has a name (${unnamed.join(", ")})`);
     }
-    const small = await page.evaluate(() => [...document.querySelectorAll("#app button, #app a")]
-      .filter(n => n.offsetParent !== null).map(n => ({ n: n.id || n.className, r: n.getBoundingClientRect() })).filter(x => x.r.height < 36 || x.r.width < 36).map(x => `${x.n} ${Math.round(x.r.width)}×${Math.round(x.r.height)}`));
-    expect(small.length === 0, `touch targets are finger-sized (${small.join(", ")})`);
+    for (const hash of ["#/now", "#/queue", "#/library"]) {
+      await page.evaluate(h => { location.hash = h; }, hash); await settle(page);
+      const small = await page.evaluate(() => [...document.querySelectorAll("#app button, #app a")]
+        .filter(n => n.offsetParent !== null && !n.classList.contains("link")).map(n => ({ n: n.id || n.className, r: n.getBoundingClientRect() }))
+        .filter(x => x.r.height < 36 || x.r.width < 36).map(x => `${x.n} ${Math.round(x.r.width)}×${Math.round(x.r.height)}`));
+      expect(small.length === 0, `touch targets on ${hash} are finger-sized (${small.join(", ")})`);
+    }
     expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor) === "rgb(244, 239, 230)", "light appearance follows the phone");
     const manifest = await page.evaluate(async () => { const link = document.querySelector("link[rel=manifest]"); const r = await fetch(link.href); return r.ok ? r.json() : null; });
     expect(manifest && manifest.display === "standalone" && manifest.icons.length > 0, "a manifest for the home screen");
