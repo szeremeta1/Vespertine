@@ -287,16 +287,25 @@ final class ElementaryDolbySource: DolbyFrameSource {
     func next() throws -> DolbyFrames.Frame? {
         while true {
             if let f = DolbyFrames.frame(in: buffer, at: 0) { buffer.removeFirst(f.bytes.count); return f }
-            if buffer.count >= 2, !(buffer[0] == 0x0B && buffer[1] == 0x77), buffer.count > 4096 || eof {
-                // Resync: drop to the next sync word.
+            if buffer.count >= 2, damagedHeader || (!(buffer[0] == 0x0B && buffer[1] == 0x77) && (buffer.count > 4096 || eof)) {
+                // Resync: drop to the next sync word. A last byte that could start one stays for the next read.
                 if let i = (1..<buffer.count - 1).first(where: { buffer[$0] == 0x0B && buffer[$0 + 1] == 0x77 }) { buffer.removeFirst(i) }
-                else { buffer.removeAll() }
+                else { buffer.removeFirst(buffer.count - (!eof && buffer.last == 0x0B ? 1 : 0)) }
                 continue
             }
             if eof { return nil }
             let chunk = try handle.read(upToCount: 65_536) ?? Data()
             if chunk.isEmpty { eof = true } else { buffer += chunk; fileOffset += UInt64(chunk.count) }
         }
+    }
+
+    /// The buffer starts with a sync word whose header can never be a frame, however much more is read: without
+    /// this, waiting for the rest of such a frame would read to the end of the file and end the stream there.
+    private var damagedHeader: Bool {
+        guard buffer.count >= 6, buffer[0] == 0x0B, buffer[1] == 0x77 else { return false }
+        let bsid = buffer[5] >> 3
+        if bsid <= 10 { return buffer[4] >> 6 == 3 || Int(buffer[4] & 0x3F) >= DolbyFrames.ac3Words.count }
+        return bsid > 16
     }
 
     func seek(toSample sample: Int64) throws -> Int64 {
