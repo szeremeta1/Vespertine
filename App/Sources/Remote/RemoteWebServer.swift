@@ -39,7 +39,13 @@ final class RemoteWebServer {
             let parameters = NWParameters.tcp
             parameters.allowLocalEndpointReuse = true
             parameters.includePeerToPeer = false
-            let listener = (try? NWListener(using: parameters, on: NWEndpoint.Port(rawValue: Self.preferredPort)!)) ?? (try NWListener(using: parameters))
+            // The usual port, or any free one when something else has it.
+            let listener: NWListener
+            if let preferred = try? NWListener(using: parameters, on: NWEndpoint.Port(rawValue: Self.preferredPort)!) {
+                listener = preferred
+            } else {
+                listener = try NWListener(using: parameters)
+            }
             listener.stateUpdateHandler = { [weak self] state in
                 MainActor.assumeIsolated {
                     guard let self, self.listener === listener else { return }
