@@ -11,10 +11,10 @@ name: Website
 on:
   push:
     branches: [main]
-    paths: [site/**, docs/FEATURES.md, scripts/check-localizations.py, .github/workflows/pages.yml]
+    paths: [site/**, docs/FEATURES.md, App/Resources/Localizable.xcstrings, scripts/check-localizations.py, .github/workflows/pages.yml]
   pull_request:
     branches: [main]
-    paths: [site/**, docs/FEATURES.md, scripts/check-localizations.py, .github/workflows/pages.yml]
+    paths: [site/**, docs/FEATURES.md, App/Resources/Localizable.xcstrings, scripts/check-localizations.py, .github/workflows/pages.yml]
   release:
     types: [published]
   workflow_dispatch:
