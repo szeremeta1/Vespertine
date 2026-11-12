@@ -20,4 +20,4 @@ SACD images: <any change to SACD ISO playback, and the discs or tests that check
 
 [All features](https://github.com/szeremeta1/Vespertine/blob/main/docs/FEATURES.md) · [Privacy](https://vespertineapp.com/privacy.html)
 
-Betas ship at most weekly; the 1.0 freeze starts November 3, 2026.
+Betas ship at most weekly.
