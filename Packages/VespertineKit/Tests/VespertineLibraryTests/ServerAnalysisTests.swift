@@ -51,6 +51,77 @@ struct ServerAnalysisTests {
         #expect(try db.rejudgeStoredAnalyses() == 0)
     }
 
+    /// A WAV of digital silence (a hidden-track gap, a "[silence]" track): its peak is minus infinity.
+    private func makeSilentWAV(_ url: URL) throws {
+        try makeWAV(url, rate: 96_000)
+        let handle = try FileHandle(forUpdating: url)
+        let size = try handle.seekToEnd()
+        // Everything after the header region: zeros decode as silence whatever the sample format.
+        try handle.seek(toOffset: 4096)
+        try handle.write(contentsOf: Data(count: Int(size) - 4096))
+        try handle.close()
+    }
+
+    @Test("A track of digital silence keeps its analysis, instead of being read again at every run and never counted as done")
+    func silentFileIsStored() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try makeSilentWAV(dir.appendingPathComponent("silence.wav"))
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        try await scanner.scan(db.addSource(LibrarySource(path: dir.path, mode: .reference)))
+        let track = try #require(try db.allTracks().first)
+
+        let done = try FileAnalyzer.analyzeWithProfile(url: track.fileURL)
+        #expect(done.analysis.peakDBFS == -.infinity && done.analysis.verdict == .notApplicable)
+        try db.saveAnalysis(done.analysis, filePath: track.filePath)
+        if let profile = done.profile { try db.saveTransitionProfiles([(profile, track.filePath)]) }
+
+        let stored = try #require(try db.storedAnalysis(for: track))
+        #expect(stored.isCurrent && stored.analysis.peakDBFS == -.infinity && stored.analysis.verdict == .notApplicable)
+        #expect(try db.allTracks().first?.analysisVerdict == "notApplicable")
+        if done.profile != nil { #expect(try db.tracksNeedingAnalysis().isEmpty) }
+        // Reading the file's tags again finds the stored result and keeps the verdict.
+        try await scanner.refresh(trackIDs: [try #require(track.id)])
+        #expect(try db.allTracks().first?.analysisVerdict == "notApplicable")
+    }
+
+    @Test("One silent track in a server's index doesn't stop the rest of its results from being imported")
+    func silentRecordInTheIndex() async throws {
+        let dir = try tempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        try makeWAV(dir.appendingPathComponent("a.wav"), rate: 96_000)
+        try makeSilentWAV(dir.appendingPathComponent("b.wav"))
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        var share = LibrarySource(path: dir.path, mode: .reference)
+        share.remoteURL = "smb://server/music"
+        let source = try db.addSource(share)
+        try await scanner.scan(source)
+        let a = try #require(try db.allTracks().first { $0.filePath.hasSuffix("a.wav") })
+        let b = try #require(try db.allTracks().first { $0.filePath.hasSuffix("b.wav") })
+
+        // As `vespertine-analyze` writes it: non-finite numbers as "inf", "-inf" and "nan".
+        let silent = FileAnalysis(claimedBitDepth: 24, effectiveBitDepth: nil, sampleRate: 96_000, bandwidthHz: 0, peakDBFS: -.infinity,
+                                  clippedSamples: 0, verdict: .notApplicable, summary: "silence", spectrum: [-160, -160],
+                                  version: FileAnalysis.currentVersion, confidence: 0)
+        let encoder = JSONEncoder()
+        encoder.nonConformingFloatEncodingStrategy = .convertToString(positiveInfinity: "inf", negativeInfinity: "-inf", nan: "nan")
+        let record: [String: Any] = ["path": "b.wav", "size": b.fileSize, "mtime": b.modifiedAt.timeIntervalSince1970,
+                                     "analysis": try JSONSerialization.jsonObject(with: encoder.encode(silent))]
+        var text = try line(path: "a.wav", size: a.fileSize, mtime: a.modifiedAt.timeIntervalSince1970, verdict: .genuine)
+        text += String(decoding: try JSONSerialization.data(withJSONObject: record), as: UTF8.self) + "\n"
+        let index = dir.appendingPathComponent(".vespertine")
+        try FileManager.default.createDirectory(at: index, withIntermediateDirectories: true)
+        try text.write(to: index.appendingPathComponent("analysis.jsonl"), atomically: true, encoding: .utf8)
+
+        #expect(try ServerAnalysisImporter().importNew(for: source, into: db) == 2)
+        #expect(try db.storedAnalysis(for: a)?.analysis.verdict == .genuine)
+        #expect(try db.storedAnalysis(for: b)?.analysis.peakDBFS == -.infinity)
+    }
+
     @Test("A server still on an older analyzer has its results judged anew on import")
     func olderServerRecordsAreRejudged() async throws {
         let dir = try tempDir()

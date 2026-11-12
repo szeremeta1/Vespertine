@@ -682,7 +682,7 @@ public actor LibraryScanner {
                         """, arguments: [existing.id, track.fileSize, track.modifiedAt]) : nil
                     // The stored analysis still describes the file: take the verdict from it, not from the old row
                     // (which may have lost it), so a re-read can never drop a badge.
-                    if let stored, let analysis = try? JSONDecoder().decode(FileAnalysis.self, from: stored) {
+                    if let stored, let analysis = try? LibraryDatabase.analysisDecoder().decode(FileAnalysis.self, from: stored) {
                         track.effectiveBitDepth = analysis.effectiveBitDepth
                         track.bandwidthHz = analysis.bandwidthHz
                         track.analysisVerdict = analysis.verdict.rawValue
