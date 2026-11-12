@@ -417,7 +417,7 @@ static CFArrayRef CopyConfiguration(void) {
 // that nothing carries to the speakers.
 static void ExpireStaleDevices(void) {
     UInt64 now = mach_absolute_time();
-    UInt64 limit = (UInt64)(gHostClockFrequency * kRefreshTimeoutSeconds);
+    UInt64 limit = (UInt64)(gHostClockFrequency * (Float64)kRefreshTimeoutSeconds);
     bool changed = false;
     pthread_mutex_lock(&gStateMutex);
     for (UInt32 s = 0; s < kMaxSlots; s++) {

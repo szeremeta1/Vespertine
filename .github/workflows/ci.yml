@@ -142,7 +142,7 @@ jobs:
               tests/sound-driver-audit.c -o "sound-driver-audit-${sanitizer//,/}"
             "./sound-driver-audit-${sanitizer//,/}"
           done
-          clang -std=c11 -Wall -Wextra -Werror -c Driver/VespertineSound/VespertineSound.c -o /dev/null
+          clang -std=c11 -Wall -Wextra -Wenum-float-conversion -Werror -c Driver/VespertineSound/VespertineSound.c -o /dev/null
           clang --analyze -Xclang -analyzer-werror -std=c11 Driver/VespertineSound/VespertineSound.c -o /dev/null
       - name: Release scripts parse
         if: ${{ !cancelled() }}
