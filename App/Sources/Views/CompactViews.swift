@@ -519,12 +519,20 @@ struct UpdateSettings: View {
 }
 
 struct AboutSettings: View {
+    /// "1.1.0 (68)": the marketing version and the build number, as macOS's own About panels show them.
+    private static var version: String {
+        let info = Bundle.main.infoDictionary ?? [:]
+        let short = info["CFBundleShortVersionString"] as? String ?? "–"
+        guard let build = info["CFBundleVersion"] as? String, !build.isEmpty else { return short }
+        return "\(short) (\(build))"
+    }
+
     var body: some View {
         VStack(spacing: 10) {
             Image(nsImage: NSApp.applicationIconImage).resizable().frame(width: 96, height: 96)
             Text(verbatim: "Vespertine").font(Typeface.serif(28))
-            Text("Version \(Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "–")")
-                .font(Typeface.mono(11)).foregroundStyle(.secondary)
+            Text("Version \(Self.version)")
+                .font(Typeface.mono(11)).foregroundStyle(.secondary).textSelection(.enabled)
             Text("Free software under the GNU General Public License v3.\nDecoding by SFBAudioEngine (MIT), libFLAC, WavPack, Monkey's Audio, libopus, libvorbis, mpg123, TagLib.\nDatabase by GRDB (MIT).")
                 .font(.caption).multilineTextAlignment(.center).foregroundStyle(.secondary)
             Text("Made with ❤️ in Boston")
