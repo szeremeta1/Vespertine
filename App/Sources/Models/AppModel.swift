@@ -191,7 +191,9 @@ final class AppModel {
 
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = []; searchText = "" } } }
     var path: [DetailRoute] = [] { didSet { carryFilter(from: oldValue) } }
-    var searchText = ""
+    /// Typing a search shows its results (on top of any album or artist page you were on). Cleared here rather than by the
+    /// window watching the text, which ran after the change and so also threw away a page opened in the same step.
+    var searchText = "" { didSet { if searchText != oldValue { path = [] } } }
     /// Each page's filter (see Browsing.swift). The sidebar's pages keep theirs across launches.
     var filters: [FilterScope: LibraryFilter] = [:] { didSet { if filters != oldValue { saveFilters() } } }
     /// Where filters are saved; nil for QA runs on a test library (`-VespertineDataDirectory`), so screenshots

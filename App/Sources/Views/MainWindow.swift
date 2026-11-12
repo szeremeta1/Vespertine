@@ -45,8 +45,6 @@ struct MainWindow: View {
         .background(Palette.window)
         .tint(Palette.brass)
         .searchable(text: $model.searchText, placement: .toolbar, prompt: "Search albums, artists and songs")
-        // Typing a search shows its results (on top of any album or artist page you were on).
-        .onChange(of: model.searchText) { model.path = [] }
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button { _ = model.path.popLast() } label: { Label("Back", systemImage: "chevron.backward") }
