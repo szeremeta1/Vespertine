@@ -29,6 +29,21 @@ async function visitor(languages, storage, userAgent) {
   return context;
 }
 const path = (page) => new URL(page.url()).pathname + new URL(page.url()).hash;
+/** Opens the language menu and waits until its toggle handler has scrolled the current language into view. Clicking
+ *  a language before that races the scroll: Playwright scrolls the target into view, then the handler scrolls the
+ *  list back to the current language, and the click lands on whatever is under the pointer by then. */
+async function openMenu(page) {
+  await page.evaluate(() => {
+    const menu = document.querySelector('.lang');
+    window.__langMenuSettled = new Promise((r) => menu.addEventListener('toggle', () => requestAnimationFrame(() => r()), { once: true }));
+  });
+  await page.locator('.lang__btn').click();
+  await page.evaluate(() => window.__langMenuSettled);
+}
+/** Picks a language in the open menu and waits for the page it leads to. */
+async function pick(page, lang, url) {
+  await Promise.all([page.waitForURL(url), page.locator(`.lang__list a[lang="${lang}"]`).click()]);
+}
 
 // ---- Detection on the first visit to / ----
 const cases = [
@@ -142,9 +157,8 @@ for (const [langs, storage, label] of [[['de-DE'], null, 'German browser'], [['e
   await page.keyboard.press('Escape');
   check('Escape closes the menu and returns focus', !(await page.locator('.lang').evaluate((d) => d.open)) && (await page.evaluate(() => document.activeElement?.classList.contains('lang__btn'))));
   // Pick Japanese: same page, Japanese, remembered.
-  await summary.click();
-  await page.locator('.lang__list a[lang="ja"]').click();
-  await page.waitForURL(`${BASE}/ja/press.html`);
+  await openMenu(page);
+  await pick(page, 'ja', `${BASE}/ja/press.html`);
   check('picking 日本語 on the German press kit opens the Japanese press kit', path(page) === '/ja/press.html', path(page));
   check('…with <html lang="ja">', (await page.locator('html').getAttribute('lang')) === 'ja');
   check('…and remembers it', (await page.evaluate(() => localStorage.getItem('vespertine-lang'))) === 'ja');
@@ -152,9 +166,8 @@ for (const [langs, storage, label] of [[['de-DE'], null, 'German browser'], [['e
   check('…so / now opens /ja/ (browser says de)', path(page) === '/ja/', path(page));
   // Back to English from the Japanese home page, with a section in the URL.
   await page.goto(`${BASE}/ja/#faq`);
-  await page.locator('.lang__btn').click();
-  await page.locator('.lang__list a[lang="en"]').click();
-  await page.waitForURL((u) => u.pathname === '/');
+  await openMenu(page);
+  await pick(page, 'en', (u) => u.pathname === '/');
   check('picking English keeps the section (#faq)', path(page) === '/#faq', path(page));
   await page.goto(`${BASE}/`);
   check('…and / stays English afterwards', path(page) === '/', path(page));
