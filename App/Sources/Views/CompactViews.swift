@@ -172,6 +172,7 @@ struct SettingsView: View {
             LibrarySettings().tabItem { Label("Library", systemImage: "books.vertical") }
             NetworkSettings().tabItem { Label("Network", systemImage: "server.rack") }
             OnlineSettings().tabItem { Label("Online", systemImage: "globe") }
+            RemoteSettingsView().tabItem { Label("Remote", systemImage: "iphone") }
             UpdateSettings().tabItem { Label("Updates", systemImage: "arrow.down.circle") }
             AboutSettings().tabItem { Label("About", systemImage: "info.circle") }
         }

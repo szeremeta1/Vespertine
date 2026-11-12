@@ -71,6 +71,17 @@ jobs:
       - name: Test
         run: swift test --package-path Packages/VespertineAnalysis
 
+  remote-protocol-linux:
+    name: Remote protocol (Linux)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container: swift:6.2-noble@sha256:eccc7a97f9b9881d9659e2e788081fd7675f86d39793b51200bfb178398b3784
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The message format and pairing links; the TLS and pairing-key tests need Apple's frameworks and run on macOS.
+      - name: Test
+        run: swift test --package-path Packages/VespertineRemoteKit
+
   whitespace:
     name: No whitespace errors (Linux)
     # On a push to main too (the squashed commit against its parent): skipped there, main's commits showed one check short
@@ -113,6 +124,9 @@ jobs:
         run: scripts/run-with-watchdog.sh 900 swift test --package-path Packages/VespertineKit -c release
       - name: Analysis core tests (macOS, with the app-parity tests)
         run: swift test --package-path Packages/VespertineAnalysis
+      # The phone remote's protocol, with its TLS pre-shared-key WebSocket tested end to end on the loopback.
+      - name: Remote protocol tests (macOS)
+        run: scripts/run-with-watchdog.sh 300 swift test --package-path Packages/VespertineRemoteKit
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: github.ref == 'refs/heads/main' && steps.kit-cache.outputs.cache-hit != 'true'
         with:
@@ -175,8 +189,12 @@ jobs:
           restore-keys: spm-app-${{ runner.os }}-
       - name: App tests
         run: |
+          # The build log runs past what the log viewer keeps, so a failure repeats the compiler's errors at the end.
+          set -o pipefail
+          mkdir -p build
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Debug -destination 'platform=macOS' \
-            -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile CODE_SIGNING_ALLOWED=NO test
+            -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile CODE_SIGNING_ALLOWED=NO test 2>&1 | tee build/app-tests.log \
+            || { echo "::group::Errors"; grep -E ': error: |While evaluating request|While emitting' build/app-tests.log | sort -u; echo "::endgroup::"; exit 1; }
       - name: Universal Release build
         run: |
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -destination 'generic/platform=macOS' \
@@ -186,6 +204,13 @@ jobs:
           for arch in arm64 x86_64; do lipo "$app/Contents/MacOS/Vespertine" -verify_arch $arch; done
           test -f "$app/Contents/Resources/LICENSE" && test -f "$app/Contents/Resources/THIRD-PARTY-NOTICES.md"
           test -f "$app/Contents/Resources/Licenses/FFmpeg-LGPL-2.1.txt" && test -f "$app/Contents/Resources/Licenses/SFBAudioEngine-ACKNOWLEDGMENTS.md"
+      - name: iPhone and iPad remote builds
+        run: |
+          set -o pipefail
+          xcodegen generate --spec RemoteApp/project.yml
+          xcodebuild -project RemoteApp/VespertineRemote.xcodeproj -scheme VespertineRemote -configuration Debug \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build/CI-iOS CODE_SIGNING_ALLOWED=NO build 2>&1 | tee build/remote-ios.log \
+            || { echo "::group::Errors"; grep -E ': error: |While evaluating request|While emitting' build/remote-ios.log | sort -u; echo "::endgroup::"; exit 1; }
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: github.ref == 'refs/heads/main' && steps.app-cache.outputs.cache-hit != 'true'
         with:
