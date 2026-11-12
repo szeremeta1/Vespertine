@@ -1,0 +1,197 @@
+<!doctype html>
+<!--
+  Vespertine: the web remote's page. RemoteWebPage.swift puts RemoteWeb.css and RemoteWeb.js into it and sends the three
+  as one page, with its words in the Mac's language.
+  SPDX-License-Identifier: GPL-3.0-or-later
+-->
+<html lang="__LANG__" dir="__DIR__" class="__SPACED__">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#09090A" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F4EFE6" media="(prefers-color-scheme: light)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vespertine">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Vespertine</title>
+<style>
+/*__STYLE__*/
+</style>
+</head>
+<body>
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <symbol id="i-mark" viewBox="0 0 512 512"><path d="M473.82 390.01C441.48 409.04 403.76 419.84 363.52 419.84C241.93 419.84 143.36 321.27 143.36 199.68C143.36 111.66 195.01 35.71 269.78 0.70C265.28 0.12 260.65 0 256 0C114.62 0 0 114.62 0 256C0 397.38 114.62 512 256 512C348.18 512 428.99 463.28 473.82 390.01Z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.2v13.6a1 1 0 0 0 1.52.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2Z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="4.5" width="4.4" height="15" rx="1.2"/><rect x="13.6" y="4.5" width="4.4" height="15" rx="1.2"/></symbol>
+  <symbol id="i-next" viewBox="0 0 24 24"><path d="M4 6.3v11.4a.9.9 0 0 0 1.4.75l8.4-5.7a.9.9 0 0 0 0-1.5L5.4 5.55A.9.9 0 0 0 4 6.3Z"/><rect x="16.4" y="5" width="3.2" height="14" rx="1"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M20 6.3v11.4a.9.9 0 0 1-1.4.75l-8.4-5.7a.9.9 0 0 1 0-1.5l8.4-5.7a.9.9 0 0 1 1.4.75Z"/><rect x="4.4" y="5" width="3.2" height="14" rx="1"/></symbol>
+  <symbol id="i-shuffle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3.2c2 0 3.2.9 4.3 2.6l3 4.8c1.100 1.700 2.300 2.600 4.300 2.600H21"/><path d="M3 17h3.200c1.300 0 2.300-.400 3.100-1.200M14.600 8.200C15.400 7.400 16.400 7 17.800 7H21"/><path d="m18.300 4.300 2.700 2.700-2.700 2.700M18.300 14.300l2.700 2.700-2.700 2.700"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.500V10a3.500 3.500 0 0 1 3.500-3.500H20M20 12.500V14a3.500 3.500 0 0 1-3.500 3.500H4"/><path d="m17.300 3.800 2.700 2.700-2.700 2.700M6.700 14.800 4 17.500l2.700 2.700"/></symbol>
+  <symbol id="i-repeat1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11.500V10a3.500 3.500 0 0 1 3.500-3.500H20M20 12.500V14a3.500 3.500 0 0 1-3.500 3.500H4"/><path d="m17.300 3.800 2.700 2.700-2.700 2.700M6.700 14.800 4 17.500l2.700 2.700"/><path d="M11 10.600l1.300-.8v4.600" stroke-width="1.700"/></symbol>
+  <symbol id="i-blend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.500h4.500c5.500 0 7.500 11 13.500 11M3 17.500h4.500c2 0 3.400-1.300 4.500-3M21 6.500c-2.200 0-3.800 1.400-5 3.200"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 20.300s-7.800-4.600-7.800-10.300A4.300 4.300 0 0 1 12 7.600 4.300 4.300 0 0 1 19.800 10c0 5.700-7.800 10.300-7.800 10.300Z"/></symbol>
+  <symbol id="i-heart-fill" viewBox="0 0 24 24"><path d="M12 20.800a1 1 0 0 1-.5-.14C11.160 20.460 3.400 15.800 3.400 10A5.100 5.100 0 0 1 12 6.300 5.100 5.100 0 0 1 20.600 10c0 5.800-7.760 10.460-8.100 10.660a1 1 0 0 1-.5.140Z"/></symbol>
+  <symbol id="i-speaker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.700v4.600h3.200l4.300 3.500V6.200L7.200 9.700H4Z" fill="currentColor"/><path d="M15.200 9.200a4 4 0 0 1 0 5.600M17.800 6.600a7.600 7.600 0 0 1 0 10.800"/></symbol>
+  <symbol id="i-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.700v4.600h3.200l4.300 3.500V6.200L7.200 9.700H4Z" fill="currentColor"/><path d="m15.500 9.500 5 5M20.500 9.500l-5 5"/></symbol>
+  <symbol id="i-quiet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9.700v4.600h3.200l4.300 3.500V6.200l-4.300 3.500H7Z" fill="currentColor"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5.500" cy="12" r="1.800"/><circle cx="12" cy="12" r="1.800"/><circle cx="18.500" cy="12" r="1.800"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M14.500 5 7.500 12l7 7"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.500 6 6 6-6 6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.800" cy="10.800" r="6.300"/><path d="m15.600 15.600 4.400 4.400"/></symbol>
+  <symbol id="i-library" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linejoin="round"><rect x="3.500" y="3.500" width="7" height="7" rx="1.600"/><rect x="13.500" y="3.500" width="7" height="7" rx="1.600"/><rect x="3.500" y="13.500" width="7" height="7" rx="1.600"/><rect x="13.500" y="13.500" width="7" height="7" rx="1.600"/></symbol>
+  <symbol id="i-queue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6.500h16M4 12h10M4 17.500h10"/><path d="M17.500 11.300v7.400l4-3.700-4-3.700Z" fill="currentColor" stroke-width="1" stroke-linejoin="round"/></symbol>
+  <symbol id="i-disc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.900"><circle cx="12" cy="12" r="8.500"/><circle cx="12" cy="12" r="2.600"/></symbol>
+  <symbol id="i-grip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 8.500h14M5 12h14M5 15.500h14"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.100" stroke-linecap="round"><path d="m6.500 6.500 11 11M17.500 6.500l-11 11"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.300" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.500 4.500 4.500L19 7.500"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.100" stroke-linecap="round"><path d="M12 5.500v13M5.500 12h13"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.100" stroke-linecap="round"><path d="M5.500 12h13"/></symbol>
+  <symbol id="i-playnext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 12h9M11 17.500h9M4 6.500h16"/><path d="m4 11.500 3.200 3.300L4 18"/></symbol>
+  <symbol id="i-addqueue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6.500h16M4 12h9M4 17.500h7M17.500 13v7M14 16.500h7"/></symbol>
+  <symbol id="i-playlist" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.500h11M4 11.500h8M4 16.500h5"/><path d="M19.500 5v10.200"/><circle cx="17" cy="16.200" r="2.500" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-album" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2.500"/><circle cx="12" cy="12" r="3.200"/></symbol>
+  <symbol id="i-person" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linecap="round"><circle cx="12" cy="8.300" r="3.600"/><path d="M4.800 19.600c.9-3.300 3.700-5.100 7.200-5.100s6.300 1.800 7.200 5.100"/></symbol>
+  <symbol id="i-output" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2.500"/><circle cx="12" cy="14.300" r="3"/><circle cx="12" cy="7.300" r="1.100" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.100" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5.500M6 11l6-6 6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.100" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v13.500M6 13l6 6 6-6"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.900" stroke-linecap="round" stroke-linejoin="round"><path d="M4.500 7h15M9.500 7V4.800h5V7M6.500 7l.8 12.200h9.400L17.500 7"/></symbol>
+</svg>
+
+<div id="banner" class="banner" role="status" hidden></div>
+
+<!-- Pairing: the 6-digit code from the Mac's Settings › Remote. -->
+<main id="pairing" class="pairing" hidden>
+  <svg class="pair-mark" aria-hidden="true"><use href="#i-mark"/></svg>
+  <p class="wordmark" aria-hidden="true">vespertine</p>
+  <h1 data-t="pairTitle"></h1>
+  <p class="dim" data-t="pairHelp" id="pairHelp"></p>
+  <form id="pairForm" autocomplete="off">
+    <input id="code" class="code" inputmode="numeric" pattern="[0-9 ]*" autocomplete="one-time-code" maxlength="7" placeholder="000 000" aria-describedby="pairHelp pairError" enterkeyhint="go">
+    <button id="pairButton" class="btn brass wide" type="submit" data-t="pair"></button>
+  </form>
+  <p id="pairError" class="error" role="alert"></p>
+</main>
+
+<div id="app" class="app" hidden>
+  <div id="backdrop" class="backdrop" aria-hidden="true"><div class="backdrop-art" id="backdropA"></div><div class="backdrop-art" id="backdropB"></div></div>
+
+  <!-- Now Playing: the cover first, as in the Mac's window. -->
+  <section id="view-now" class="view now" aria-labelledby="nowHeading" hidden>
+    <h1 id="nowHeading" class="sr" data-t="nowPlaying"></h1>
+    <div class="now-inner">
+      <div class="now-art"><div class="cover-wrap" id="coverWrap"><img id="cover" class="cover" alt="" decoding="async"><div class="cover-empty" aria-hidden="true"><svg><use href="#i-mark"/></svg></div></div></div>
+      <div class="now-controls">
+        <div class="titles">
+          <div class="grow">
+            <h2 id="title" class="serif now-title"></h2>
+            <p id="subtitle" class="now-sub"><button id="artistLink" class="link"></button><span id="subDash" aria-hidden="true"> — </span><button id="albumLink" class="link"></button></p>
+          </div>
+          <button id="heart" class="icon-btn" hidden><svg class="i"><use href="#i-heart"/></svg></button>
+        </div>
+        <div id="signal" class="chips" role="group"></div>
+
+        <div class="scrub">
+          <div id="position" class="slider" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0"><div class="track"><div class="fill"></div></div><div class="thumb"></div><output class="bubble" aria-hidden="true"></output></div>
+          <div class="times" aria-hidden="true"><span id="elapsed">0:00</span><span id="remaining">-0:00</span></div>
+        </div>
+
+        <div class="transport">
+          <button id="shuffle" class="icon-btn mode" aria-pressed="false"><svg class="i"><use href="#i-shuffle"/></svg></button>
+          <button id="prev" class="icon-btn big"><svg class="i"><use href="#i-prev"/></svg></button>
+          <button id="playpause" class="playpause"><svg class="i" id="playIcon"><use href="#i-play"/></svg><span class="spinner" aria-hidden="true"></span></button>
+          <button id="next" class="icon-btn big"><svg class="i"><use href="#i-next"/></svg></button>
+          <button id="repeat" class="icon-btn mode" aria-pressed="false"><svg class="i"><use href="#i-repeat"/></svg></button>
+        </div>
+
+        <div id="volumeRow" class="volume">
+          <button id="mute" class="icon-btn small"><svg class="i"><use href="#i-speaker"/></svg></button>
+          <div id="volume" class="slider" role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="track"><div class="fill"></div></div><div class="thumb"></div></div>
+          <button id="volDown" class="icon-btn small" hidden><svg class="i"><use href="#i-minus"/></svg></button>
+          <button id="volUp" class="icon-btn small" hidden><svg class="i"><use href="#i-plus"/></svg></button>
+          <span id="volumeValue" class="mono volume-value" aria-hidden="true"></span>
+        </div>
+        <p id="fixed" class="note" data-t="fixedVolume" hidden></p>
+
+        <div class="now-foot">
+          <button id="outputButton" class="pill-btn"><svg class="i"><use href="#i-output"/></svg><span id="outputName" class="ell"></span></button>
+          <button id="transitions" class="pill-btn" aria-pressed="false" hidden><svg class="i"><use href="#i-blend"/></svg><span data-t="transitions"></span></button>
+        </div>
+        <p id="waiting" class="note copper" role="status" hidden></p>
+        <p id="playerError" class="note error" role="status" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Library: albums, artists, songs, playlists, favorites; an album, an artist or a playlist opens over it. -->
+  <section id="view-library" class="view" aria-labelledby="libraryHeading" hidden>
+    <header class="bar"><h1 id="libraryHeading" class="serif bar-title" data-t="library"></h1><span id="macName" class="bar-sub ell"></span></header>
+    <div class="segments" role="tablist" id="segments">
+      <button role="tab" data-seg="albums" data-t="albums"></button>
+      <button role="tab" data-seg="artists" data-t="artists"></button>
+      <button role="tab" data-seg="songs" data-t="songs"></button>
+      <button role="tab" data-seg="playlists" data-t="playlists"></button>
+      <button role="tab" data-seg="favorites" data-t="favorites"></button>
+    </div>
+    <div id="libraryBody" class="body" role="tabpanel"></div>
+  </section>
+
+  <section id="view-detail" class="view" hidden>
+    <header class="bar over"><button id="detailBack" class="icon-btn"><svg class="i flip"><use href="#i-back"/></svg></button><span id="detailBarTitle" class="bar-mid ell" aria-hidden="true"></span><button id="detailMore" class="icon-btn"><svg class="i"><use href="#i-more"/></svg></button></header>
+    <div id="detailBody" class="body"></div>
+  </section>
+
+  <section id="view-search" class="view" aria-labelledby="searchHeading" hidden>
+    <header class="bar"><h1 id="searchHeading" class="serif bar-title" data-t="searchTab"></h1></header>
+    <div class="search-field">
+      <svg class="i" aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="search" type="search" enterkeyhint="search" autocapitalize="off" autocorrect="off" spellcheck="false">
+      <button id="searchClear" class="icon-btn small" hidden><svg class="i"><use href="#i-close"/></svg></button>
+    </div>
+    <div id="searchBody" class="body" aria-live="polite"></div>
+  </section>
+
+  <section id="view-queue" class="view" aria-labelledby="queueHeading" hidden>
+    <header class="bar"><h1 id="queueHeading" class="serif bar-title" data-t="queue"></h1><button id="clearQueue" class="btn quiet compact" data-t="clear" hidden></button></header>
+    <div id="queueBody" class="body"></div>
+  </section>
+
+  <!-- The song playing, under every screen but Now Playing. -->
+  <div id="mini" class="mini" hidden>
+    <div class="mini-progress" aria-hidden="true"><div id="miniFill"></div></div>
+    <button id="miniOpen" class="mini-open"><img id="miniCover" class="thumb" alt=""><span class="grow"><span id="miniTitle" class="serif ell"></span><span id="miniArtist" class="dim small ell"></span></span></button>
+    <button id="miniPlay" class="icon-btn"><svg class="i"><use href="#i-play"/></svg></button>
+    <button id="miniNext" class="icon-btn"><svg class="i"><use href="#i-next"/></svg></button>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <a href="#/now" data-tab="now"><svg class="i"><use href="#i-disc"/></svg><span data-t="nowPlaying"></span></a>
+    <a href="#/library" data-tab="library"><svg class="i"><use href="#i-library"/></svg><span data-t="library"></span></a>
+    <a href="#/search" data-tab="search"><svg class="i"><use href="#i-search"/></svg><span data-t="searchTab"></span></a>
+    <a href="#/queue" data-tab="queue"><svg class="i"><use href="#i-queue"/></svg><span data-t="queue"></span></a>
+  </nav>
+</div>
+
+<!-- A sheet from the bottom: a song's actions, the outputs, the playlists to add to. -->
+<div id="scrim" class="scrim" hidden></div>
+<div id="sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <div class="sheet-grab" aria-hidden="true"></div>
+  <header class="sheet-head"><div id="sheetHead" class="grow"><h2 id="sheetTitle" class="serif"></h2></div><button id="sheetClose" class="icon-btn small"><svg class="i"><use href="#i-close"/></svg></button></header>
+  <div id="sheetBody" class="sheet-body"></div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+const L = __STRINGS__;
+</script>
+<script>
+/*__SCRIPT__*/
+</script>
+</body>
+</html>

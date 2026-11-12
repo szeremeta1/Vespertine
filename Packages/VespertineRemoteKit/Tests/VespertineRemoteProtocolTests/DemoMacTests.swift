@@ -108,6 +108,59 @@ struct DemoMacTests {
         #expect(pushes.lastQueue?.current?.track.favorite == !song.favorite)
     }
 
+    @Test func listsSongsInPages() async throws {
+        let (mac, _) = try await opened()
+        guard case .songs(let first, let total) = try await ask(mac, .songs(offset: 0, limit: 10)) else { Issue.record("no songs"); return }
+        #expect(first.count == 10 && total > 10)
+        #expect(first.map(\.title) == first.map(\.title).sorted())
+        guard case .songs(let last, _) = try await ask(mac, .songs(offset: total - 3, limit: 10)) else { Issue.record("no songs"); return }
+        #expect(last.count == 3)
+        guard case .songs(let past, _) = try await ask(mac, .songs(offset: total + 50, limit: 10)) else { Issue.record("no songs"); return }
+        #expect(past.isEmpty)
+        guard case .songs(let negative, _) = try await ask(mac, .songs(offset: -5, limit: -1)) else { Issue.record("no songs"); return }
+        #expect(negative.count == 1 && negative.first == first.first)
+    }
+
+    @Test func findsInGroups() async throws {
+        let (mac, _) = try await opened()
+        guard case .found(let nocturne) = try await ask(mac, .find(text: "nocturne", limit: 50)) else { Issue.record("no results"); return }
+        #expect(nocturne.tracks.count == 6)
+        #expect(nocturne.albums.map(\.title) == ["Nocturnes for a Small Room"])
+        guard case .found(let artist) = try await ask(mac, .find(text: "LINDQVIST", limit: 50)) else { Issue.record("no results"); return }
+        #expect(artist.artists.map(\.name) == ["Theo Lindqvist"])
+        #expect(!artist.albums.isEmpty && !artist.tracks.isEmpty)
+        guard case .found(let playlist) = try await ask(mac, .find(text: "late", limit: 50)) else { Issue.record("no results"); return }
+        #expect(playlist.playlists.map(\.name) == ["Late Night"])
+        guard case .found(let limited) = try await ask(mac, .find(text: "a", limit: 2)) else { Issue.record("no results"); return }
+        #expect(limited.tracks.count == 2 && limited.albums.count <= 2)
+        #expect(try await ask(mac, .find(text: "   ", limit: 50)) == .found(SearchResults(tracks: [], albums: [], artists: [], playlists: [])))
+    }
+
+    @Test func playlistsSayWhatTheyHoldAndTakeMore() async throws {
+        let (mac, pushes) = try await opened()
+        guard case .playlists(let lists) = try await ask(mac, .playlists) else { Issue.record("no playlists"); return }
+        let late = try #require(lists.first { !$0.smart }), smart = try #require(lists.first { $0.smart })
+        #expect(late.trackCount == 14)
+        #expect((1...4).contains(late.artworkKeys?.count ?? 0))
+        guard case .songs(let songs, _) = try await ask(mac, .songs(offset: 0, limit: 2)) else { Issue.record("no songs"); return }
+        let ids = songs.compactMap(\.id)
+
+        #expect(try await ask(mac, .addToPlaylist(id: late.id, ids: ids)) == .ok)
+        guard case .tracks(let longer) = try await ask(mac, .playlistTracks(id: late.id)) else { Issue.record("no tracks"); return }
+        #expect(longer.count == 16 && longer.suffix(2).map(\.id) == ids)
+        // A smart playlist's rules choose its songs; a playlist or songs that aren't there are refused.
+        #expect(try await ask(mac, .addToPlaylist(id: smart.id, ids: ids)) != .ok)
+        #expect(try await ask(mac, .addToPlaylist(id: 999, ids: ids)) != .ok)
+        #expect(try await ask(mac, .addToPlaylist(id: late.id, ids: [-1])) != .ok)
+
+        guard case .playlists(let more) = try await ask(mac, .createPlaylist(name: "  Sunday  ", ids: ids)) else { Issue.record("not made"); return }
+        let sunday = try #require(more.last)
+        #expect(more.count == lists.count + 1 && sunday.name == "Sunday" && sunday.trackCount == 2 && !sunday.smart)
+        #expect(try await ask(mac, .createPlaylist(name: " ", ids: [])) != .ok)
+        #expect(try await ask(mac, .playPlaylist(id: sunday.id, shuffled: false)) == .ok)
+        #expect(pushes.lastQueue?.current?.track.id == ids[0])
+    }
+
     @Test func refusesOnceClosed() async throws {
         let (mac, _) = try await opened()
         var closed = false

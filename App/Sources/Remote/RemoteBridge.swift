@@ -108,6 +108,45 @@ struct RemoteBridge {
                      hiRes: album.isHiRes, dsd: album.isDSD, multichannel: album.isMultichannel)
     }
 
+    /// A playlist as a remote lists it: its name, how many songs it has, and up to four of their covers for a tile.
+    func playlistSummary(_ playlist: Playlist) -> PlaylistSummary? {
+        guard let id = playlist.id else { return nil }
+        let tracks = library.tracks(in: playlist)
+        var covers: [String] = []
+        for track in tracks {
+            guard covers.count < 4 else { break }
+            if let key = model.artworkKey(track), !covers.contains(key) { covers.append(key) }
+        }
+        return PlaylistSummary(id: id, name: playlist.name.libraryDisplayName, smart: playlist.isSmart, trackCount: tracks.count, artworkKeys: covers)
+    }
+
+    /// The most songs one command adds to a playlist.
+    static let playlistBatch = 5_000
+
+    /// Every song by title, kept until the library changes: a remote asks for it a page at a time.
+    private static var songList: (library: ObjectIdentifier, revision: Int, count: Int, tracks: [Track])?
+
+    static func songs(of library: LibraryStore) -> [Track] {
+        let id = ObjectIdentifier(library)
+        if let songList, songList.library == id, songList.revision == library.revision, songList.count == library.stats.tracks {
+            return songList.tracks
+        }
+        let tracks = byTitle(library.allTracks())
+        songList = (id, library.revision, library.stats.tracks, tracks)
+        return tracks
+    }
+
+    /// Songs in the order a list of titles reads: by title as the Finder would sort it, then artist and album.
+    nonisolated static func byTitle(_ tracks: [Track]) -> [Track] {
+        tracks.sorted { a, b in
+            let order = a.title.localizedStandardCompare(b.title)
+            if order != .orderedSame { return order == .orderedAscending }
+            let artist = a.displayArtist.localizedStandardCompare(b.displayArtist)
+            if artist != .orderedSame { return artist == .orderedAscending }
+            return (a.albumKey, a.discNumber ?? 0, a.trackNumber ?? 0, a.id ?? 0) < (b.albumKey, b.discNumber ?? 0, b.trackNumber ?? 0, b.id ?? 0)
+        }
+    }
+
     // MARK: Commands
 
     /// Carries out a command (everything but the session ones and artwork, which the connection handles).
@@ -178,7 +217,7 @@ struct RemoteBridge {
             let albums = library.albums(artist: name)
             return .albums(items: albums.map(albumSummary), total: albums.count)
         case .playlists:
-            return .playlists(items: library.playlists.compactMap { p in p.id.map { PlaylistSummary(id: $0, name: p.name.libraryDisplayName, smart: p.isSmart) } })
+            return .playlists(items: library.playlists.compactMap(playlistSummary))
         case .playlistTracks(let id):
             guard let playlist = library.playlists.first(where: { $0.id == id }) else { return notInLibrary }
             return .tracks(items: library.tracks(in: playlist).map(trackSummary))
@@ -188,6 +227,49 @@ struct RemoteBridge {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else { return .tracks(items: []) }
             return .tracks(items: library.search(trimmed).prefix(min(max(1, limit), 500)).map(trackSummary))
+
+        case .songs(let offset, let limit):
+            let songs = Self.songs(of: library)
+            let start = min(max(0, offset), songs.count)
+            let end = min(start + min(max(1, limit), 500), songs.count)
+            return .songs(items: songs[start..<end].map(trackSummary), total: songs.count)
+        case .find(let text, let limit):
+            let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { return .found(SearchResults(tracks: [], albums: [], artists: [], playlists: [])) }
+            let limit = min(max(1, limit), 500)
+            let words = trimmed.split(whereSeparator: \.isWhitespace).map(String.init)
+            // Names are matched the way the search field matches songs: every word, anywhere, whatever its case or accents.
+            func matches(_ names: String...) -> Bool {
+                words.allSatisfy { word in names.contains { $0.range(of: word, options: [.caseInsensitive, .diacriticInsensitive]) != nil } }
+            }
+            return .found(SearchResults(
+                tracks: library.search(trimmed).prefix(limit).map(trackSummary),
+                albums: library.albums.lazy.filter { matches($0.title.libraryDisplayName, $0.artist.libraryDisplayName) }.prefix(limit).map(albumSummary),
+                artists: library.artists.lazy.filter { matches($0.name.libraryDisplayName) }.prefix(limit)
+                    .map { ArtistSummary(name: $0.name.libraryDisplayName, albumCount: $0.albumCount, artworkKey: $0.artworkKey) },
+                playlists: library.playlists.lazy.filter { matches($0.name.libraryDisplayName) }.prefix(limit).compactMap(playlistSummary)))
+
+        case .addToPlaylist(let id, let ids):
+            guard let playlist = library.playlists.first(where: { $0.id == id }) else { return notInLibrary }
+            guard !playlist.isSmart else {
+                return .failed(reason: String(localized: "A smart playlist chooses its own songs. Pick another playlist.", comment: "Remote control: the phone tried to add songs to a smart playlist."))
+            }
+            let found = ordered(ids).compactMap(\.id)
+            guard !found.isEmpty else { return notInLibrary }
+            library.append(Array(found.prefix(Self.playlistBatch)), to: playlist)
+        case .createPlaylist(let name, let ids):
+            let trimmed = String(name.trimmingCharacters(in: .whitespacesAndNewlines).prefix(200))
+            guard !trimmed.isEmpty else {
+                return .failed(reason: String(localized: "A playlist needs a name.", comment: "Remote control: the phone asked for a new playlist without a name."))
+            }
+            let found = Array(ordered(ids).compactMap(\.id).prefix(Self.playlistBatch))
+            guard let made = library.createPlaylist(name: trimmed, trackIDs: found) else {
+                return .failed(reason: String(localized: "The playlist couldn’t be made.", comment: "Remote control: making a playlist from the phone failed."))
+            }
+            // The library's own list hears of the new playlist a moment later.
+            var all = library.playlists
+            if !all.contains(where: { $0.id == made.id }) { all.append(made) }
+            return .playlists(items: all.compactMap(playlistSummary))
 
         case .selectOutput(let uid):
             if let uid, !outputsState().outputs.contains(where: { $0.uid == uid }) {

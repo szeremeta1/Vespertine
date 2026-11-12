@@ -57,6 +57,8 @@ private let track = TrackSummary(id: 42, title: "So What", artist: "Miles Davis"
             .artists, .artistAlbums(name: "Miles Davis"), .playlists, .playlistTracks(id: 2), .favorites,
             .search(text: "blue", limit: 50), .artwork(key: "abc", size: 600), .selectOutput(uid: "u"), .selectOutput(uid: nil),
             .volume(action: .mute), .setVolume(level: 0.5), .setTransitions(on: true),
+            .songs(offset: 200, limit: 100), .find(text: "blue", limit: 20), .addToPlaylist(id: 2, ids: [4, 5]),
+            .createPlaylist(name: "Sunday", ids: []),
         ]
         for command in commands {
             let message = ClientMessage(id: 7, command: command)
@@ -82,8 +84,38 @@ private let track = TrackSummary(id: 42, title: "So What", artist: "Miles Davis"
             .reply(id: 7, result: .artists(items: [ArtistSummary(name: "Miles Davis", albumCount: 3, artworkKey: "a")])),
             .reply(id: 8, result: .playlists(items: [PlaylistSummary(id: 1, name: "Late", smart: true)])),
             .reply(id: 9, result: .artwork(key: "abc", size: 600, mimeType: "image/jpeg", data: Data([0xFF, 0xD8]))),
+            .reply(id: 10, result: .songs(items: [track], total: 4_812)),
+            .reply(id: 11, result: .found(SearchResults(
+                tracks: [track], albums: [], artists: [ArtistSummary(name: "Miles Davis", albumCount: 3, artworkKey: nil)],
+                playlists: [PlaylistSummary(id: 1, name: "Late", smart: false, trackCount: 12, artworkKeys: ["a", "b"])]))),
         ]
         for message in messages { #expect(try roundTrip(message) == message) }
+    }
+}
+
+@Suite struct Additions {
+    @Test func theNewCommandsKeepTheirShape() throws {
+        // The web remote writes these by hand too.
+        #expect(try json(RemoteCommand.songs(offset: 0, limit: 100)) == #"{"songs":{"limit":100,"offset":0}}"#)
+        #expect(try json(RemoteCommand.find(text: "blue", limit: 20)) == #"{"find":{"limit":20,"text":"blue"}}"#)
+        #expect(try json(RemoteCommand.addToPlaylist(id: 2, ids: [4, 5])) == #"{"addToPlaylist":{"id":2,"ids":[4,5]}}"#)
+        #expect(try json(RemoteCommand.createPlaylist(name: "Sunday", ids: [])) == #"{"createPlaylist":{"ids":[],"name":"Sunday"}}"#)
+        #expect(try json(RemoteReply.songs(items: [], total: 0)) == #"{"songs":{"items":[],"total":0}}"#)
+    }
+
+    @Test func aPlaylistFromAnOlderMacStillDecodes() throws {
+        // 1.1.0 sends only these three; a remote must take them, and say nothing it wasn't told.
+        let old = try RemoteProtocol.decoder().decode(PlaylistSummary.self, from: Data(#"{"id":7,"name":"Late","smart":false}"#.utf8))
+        #expect(old == PlaylistSummary(id: 7, name: "Late", smart: false))
+        #expect(old.trackCount == nil && old.artworkKeys == nil)
+        #expect(try json(old) == #"{"id":7,"name":"Late","smart":false}"#)
+        let new = PlaylistSummary(id: 7, name: "Late", smart: false, trackCount: 3, artworkKeys: ["a"])
+        #expect(try json(new) == #"{"artworkKeys":["a"],"id":7,"name":"Late","smart":false,"trackCount":3}"#)
+    }
+
+    @Test func theProtocolVersionStays() {
+        // Everything added is new commands and optional fields: nothing a 1.1.0 remote or Mac would misread.
+        #expect(RemoteProtocol.version == 1)
     }
 }
 
