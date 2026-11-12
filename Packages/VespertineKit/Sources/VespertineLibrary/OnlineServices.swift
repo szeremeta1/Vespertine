@@ -235,8 +235,9 @@ public actor ListenBrainzClient {
         return status
     }
 
-    public func submit(_ track: Track, kind: Kind, listenedAt: Date = .now) async throws {
-        guard let token = token(), !token.isEmpty else { return }
+    /// The body of a submission. `listenedAt` is when the song started playing; only a finished listen carries it
+    /// (ListenBrainz takes no time with "playing now").
+    static func submission(_ track: Track, kind: Kind, listenedAt: Date) -> [String: Any] {
         var metadata: [String: Any] = ["artist_name": track.displayArtist, "track_name": track.title]
         if let album = track.album { metadata["release_name"] = album }
         var info: [String: Any] = ["media_player": "Vespertine", "submission_client": "Vespertine", "duration": Int(track.duration)]
@@ -245,7 +246,13 @@ public actor ListenBrainzClient {
         metadata["additional_info"] = info
         var listen: [String: Any] = ["track_metadata": metadata]
         if kind == .single { listen["listened_at"] = Int(listenedAt.timeIntervalSince1970) }
-        let body: [String: Any] = ["listen_type": kind.rawValue, "payload": [listen]]
+        return ["listen_type": kind.rawValue, "payload": [listen]]
+    }
+
+    /// `listenedAt`: when the song started playing.
+    public func submit(_ track: Track, kind: Kind, listenedAt: Date = .now) async throws {
+        guard let token = token(), !token.isEmpty else { return }
+        let body = Self.submission(track, kind: kind, listenedAt: listenedAt)
 
         var request = URLRequest(url: URL(string: "https://api.listenbrainz.org/1/submit-listens")!)
         request.httpMethod = "POST"

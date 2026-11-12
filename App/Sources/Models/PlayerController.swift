@@ -783,8 +783,9 @@ final class PlayerController {
             scrobbledEntry = entry.id
             if let id = entry.track.id { library.markPlayed(id) }
             if settings.scrobble {
-                let track = entry.track
-                Task { try? await ListenBrainzClient.shared.submit(track, kind: .single) }
+                // ListenBrainz's `listened_at` is when the song started, not when it has counted as a listen.
+                let track = entry.track, startedAt = trackStartedAt
+                Task { try? await ListenBrainzClient.shared.submit(track, kind: .single, listenedAt: startedAt) }
             }
         }
         // macOS extrapolates the elapsed time from the rate; tell it again only when that drifts (a seek, a stall).
