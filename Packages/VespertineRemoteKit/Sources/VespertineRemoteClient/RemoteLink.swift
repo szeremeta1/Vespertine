@@ -28,6 +28,21 @@ final class RemoteLink: RemoteChannel {
         connection = NWConnection(to: endpoint, using: RemoteTransport.parameters(keys: [key]))
     }
 
+    /// The Mac's address and port as this connection reached it.
+    var remoteAddress: RemoteAddress? {
+        guard case .hostPort(let host, let port)? = connection.currentPath?.remoteEndpoint else { return nil }
+        let name: String
+        switch host {
+        case .name(let text, _): name = text
+        case .ipv4(let address): name = "\(address)"
+        case .ipv6(let address): name = "\(address)"
+        @unknown default: return nil
+        }
+        guard var parsed = RemoteAddress(parsing: name.contains(":") ? "[\(name)]" : name) else { return nil }
+        parsed.port = port.rawValue
+        return parsed
+    }
+
     /// Connects, and returns once TLS is up.
     func open(timeout: Duration = .seconds(10)) async throws {
         connection.stateUpdateHandler = { [weak self] state in

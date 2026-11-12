@@ -34,28 +34,55 @@ public final class RemoteSession {
     public private(set) var queue: QueueState?
     public private(set) var outputs: OutputsState?
 
+    /// How the Mac was reached, while connected (nil for the demo).
+    public private(set) var route: RemoteRoute.Kind?
+    /// When the phase last changed (for "trying again since…").
+    public private(set) var phaseSince = Date()
+
     /// How this phone introduces itself (shown in the Mac's list of paired phones).
     @ObservationIgnored public var clientName: String
-    /// Makes a new connection to the Mac (nil while it can't be found: its address can change between connections).
-    @ObservationIgnored private let makeChannel: @MainActor () -> (any RemoteChannel)?
+    /// Called once signed in, with the address the Mac answered at (to remember for next time).
+    @ObservationIgnored public var onConnected: (@MainActor (RemoteRoute.Kind?, RemoteAddress?) -> Void)?
+    /// How long a second way of reaching the Mac waits for the first before starting too.
+    @ObservationIgnored public var stagger: Duration = .milliseconds(1200)
+
+    private struct Candidate {
+        var kind: RemoteRoute.Kind?
+        var channel: any RemoteChannel
+    }
+
+    /// Makes new connections to the Mac, one per way of reaching it, best first (none while it can't be found: its
+    /// address can change between connections).
+    @ObservationIgnored private let makeChannels: @MainActor () -> [Candidate]
     @ObservationIgnored private var link: (any RemoteChannel)?
+    /// The connections being tried now.
+    @ObservationIgnored private var racing: [any RemoteChannel] = []
+    @ObservationIgnored private var generation = 0
     @ObservationIgnored private var retry: Task<Void, Never>?
     @ObservationIgnored private var attempts = 0
 
-    /// A session with a paired Mac; `resolve` finds the Mac's current address from its server ID.
-    public init(pairing: SavedPairing, clientName: String, resolve: @escaping @MainActor (String) -> NWEndpoint?) {
+    /// A session with a paired Mac; `routes` lists the ways to reach it now, best first. They're tried together,
+    /// each a little after the one before, and the first to answer wins.
+    public init(pairing: SavedPairing, clientName: String, routes: @escaping @MainActor () -> [RemoteRoute]) {
         self.pairing = pairing
         self.clientName = clientName
-        makeChannel = {
-            resolve(pairing.serverID).map { RemoteLink(endpoint: $0, key: pairing.presharedKey) }
+        makeChannels = {
+            routes().map { Candidate(kind: $0.kind, channel: RemoteLink(endpoint: $0.endpoint, key: pairing.presharedKey)) }
         }
+    }
+
+    /// A session with a paired Mac; `resolve` finds the Mac's current address from its server ID.
+    public convenience init(pairing: SavedPairing, clientName: String, resolve: @escaping @MainActor (String) -> NWEndpoint?) {
+        self.init(pairing: pairing, clientName: clientName, routes: {
+            resolve(pairing.serverID).map { [RemoteRoute(kind: .nearby, endpoint: $0)] } ?? []
+        })
     }
 
     /// A session over channels `makeChannel` makes (the demo Mac, tests).
     public init(pairing: SavedPairing, clientName: String, makeChannel: @escaping @MainActor () -> (any RemoteChannel)?) {
         self.pairing = pairing
         self.clientName = clientName
-        self.makeChannel = makeChannel
+        makeChannels = { makeChannel().map { [Candidate(kind: nil, channel: $0)] } ?? [] }
     }
 
     /// Whether this is the built-in demo rather than a real Mac.
@@ -63,51 +90,140 @@ public final class RemoteSession {
 
     public var isConnected: Bool { phase == .connected }
 
+    private func setPhase(_ new: Phase) {
+        guard phase != new else { return }
+        phase = new
+        phaseSince = Date()
+        if new != .connected { route = nil }
+    }
+
     /// Connects now (again), if not connected.
     public func connect() {
         retry?.cancel()
         retry = nil
-        guard link == nil, phase != .closed else { return }
-        guard let link = makeChannel() else {
-            phase = .unreachable("")
+        guard link == nil, racing.isEmpty, phase != .closed else { return }
+        let candidates = makeChannels()
+        guard !candidates.isEmpty else {
+            setPhase(.unreachable(""))
             scheduleRetry()
             return
         }
-        phase = .connecting
+        setPhase(.connecting)
+        generation += 1
+        let generation = generation
+        racing = candidates.map(\.channel)
+        Task {
+            let winner = await firstToOpen(candidates)
+            guard generation == self.generation, phase != .closed else {
+                winner?.channel.close()
+                return
+            }
+            racing = []
+            guard let winner else {
+                setPhase(.unreachable(""))
+                scheduleRetry()
+                return
+            }
+            await signIn(winner)
+        }
+    }
+
+    /// Opens the candidates (the first now, each next one `stagger` later or as soon as those before it have failed)
+    /// and returns the first that opens; the rest are closed. nil when none opens.
+    private func firstToOpen(_ candidates: [Candidate]) async -> Candidate? {
+        let stagger = stagger
+        let race = Race()
+        let winner = await withCheckedContinuation { (continuation: CheckedContinuation<Int?, Never>) in
+            for (index, candidate) in candidates.enumerated() {
+                Task { @MainActor in
+                    let start = ContinuousClock.now
+                    while index > 0, !race.won, race.failed < index, ContinuousClock.now - start < stagger * index {
+                        try? await Task.sleep(for: .milliseconds(40))
+                    }
+                    var opened = false
+                    if !race.won {
+                        opened = (try? await candidate.channel.open(timeout: .seconds(10))) != nil
+                    }
+                    if opened, !race.won {
+                        race.won = true
+                        continuation.resume(returning: index)
+                        return
+                    }
+                    candidate.channel.close()
+                    race.failed += 1
+                    if race.failed == candidates.count, !race.won {
+                        race.won = true
+                        continuation.resume(returning: nil)
+                    }
+                }
+            }
+        }
+        return winner.map { candidates[$0] }
+    }
+
+    @MainActor private final class Race {
+        var won = false
+        var failed = 0
+    }
+
+    private func signIn(_ candidate: Candidate) async {
+        let link = candidate.channel
         self.link = link
         link.onPush = { [weak self] message in self?.received(message) }
         link.onClose = { [weak self, weak link] reason in
-            guard let self, let link, self.link === link else { return }
-            self.link = nil
-            if self.phase == .connected || self.phase == .connecting {
-                self.phase = .unreachable(reason ?? "")
-                self.scheduleRetry()
-            }
+            guard let self, let link else { return }
+            self.lost(link, reason: reason)
         }
-        Task {
-            do {
-                try await link.open(timeout: .seconds(10))
-                let reply = try await link.request(.hello(device: pairing.device, name: clientName, protocolVersion: RemoteProtocol.version), timeout: .seconds(15))
-                guard self.link === link else { return }
-                if case .welcome(let info) = reply {
-                    server = info
-                    attempts = 0
-                    phase = .connected
-                } else {
-                    link.close()
-                }
-            } catch {
-                // onClose (or the goodbye) has set the phase.
-                if self.link === link { link.close() }
+        do {
+            let reply = try await link.request(.hello(device: pairing.device, name: clientName, protocolVersion: RemoteProtocol.version), timeout: .seconds(15))
+            guard self.link === link else { return }
+            if case .welcome(let info) = reply {
+                server = info
+                attempts = 0
+                setPhase(.connected)
+                route = candidate.kind
+                onConnected?(candidate.kind, link.remoteAddress)
+            } else {
+                link.close()
+                lost(link, reason: nil)
             }
+        } catch {
+            // Closed before or while signing in (a goodbye has set its own phase).
+            link.close()
+            lost(link, reason: nil)
         }
+    }
+
+    /// The connection in use ended.
+    private func lost(_ link: any RemoteChannel, reason: String?) {
+        guard self.link === link else { return }
+        self.link = nil
+        if phase == .connected || phase == .connecting {
+            setPhase(.unreachable(reason ?? ""))
+            scheduleRetry()
+        }
+    }
+
+    /// The network changed (Wi-Fi came back, a VPN connected): try now rather than at the next retry.
+    public func networkChanged() {
+        guard phase != .closed, phase != .unpaired, phase != .incompatible, !isConnected, link == nil, racing.isEmpty else { return }
+        attempts = 0
+        connect()
+    }
+
+    private func abandonAttempt() {
+        generation += 1
+        let trying = racing
+        racing = []
+        for channel in trying { channel.close() }
     }
 
     /// Disconnects for good (the app switched Mac or forgot this one).
     public func close() {
-        phase = .closed
+        setPhase(.closed)
         retry?.cancel()
         retry = nil
+        abandonAttempt()
         let link = self.link
         self.link = nil
         link?.close()
@@ -117,10 +233,11 @@ public final class RemoteSession {
     public func suspend() {
         retry?.cancel()
         retry = nil
+        abandonAttempt()
         let link = self.link
         self.link = nil
         link?.close()
-        if phase == .connected || phase == .connecting { phase = .unreachable("") }
+        if phase == .connected || phase == .connecting { setPhase(.unreachable("")) }
     }
 
     private func scheduleRetry() {
@@ -142,9 +259,9 @@ public final class RemoteSession {
         case .outputs(let state): outputs = state
         case .goodbye(let reason):
             switch reason {
-            case .notPaired, .deviceRemoved: phase = .unpaired
-            case .protocolMismatch: phase = .incompatible
-            case .serverStopped: phase = .unreachable("")
+            case .notPaired, .deviceRemoved: setPhase(.unpaired)
+            case .protocolMismatch: setPhase(.incompatible)
+            case .serverStopped: setPhase(.unreachable(""))
             }
             let link = self.link
             self.link = nil
