@@ -58,7 +58,7 @@ struct RemoteSettingsView: View {
             }
 
             Section {
-                Toggle("Open Vespertine at login", isOn: Binding(get: { loginItemOn }, set: setLoginItem))
+                Toggle("Open Vespertine at login", isOn: Binding(get: { loginItemOn }, set: { setLoginItem($0) }))
                 if loginItemNeedsApproval {
                     HStack {
                         Text("macOS needs you to allow Vespertine in Login Items.").font(.caption).foregroundStyle(.secondary)
@@ -67,7 +67,7 @@ struct RemoteSettingsView: View {
                 }
                 if let loginItemError { Text(loginItemError).font(.caption).foregroundStyle(.secondary) }
                 Toggle("Keep this Mac awake while the remote is on", isOn: Binding(get: { store.keepAwake }, set: { store.keepAwake = $0; server.apply() }))
-                Toggle("Wake for network access", isOn: Binding(get: { store.wakeForNetwork }, set: setWakeForNetwork))
+                Toggle("Wake for network access", isOn: Binding(get: { store.wakeForNetwork }, set: { setWakeForNetwork($0) }))
                     .disabled(wakeBusy)
                 if let wakeError { Text(wakeError).font(.caption).foregroundStyle(.secondary) }
             } header: {

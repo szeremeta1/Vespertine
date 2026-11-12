@@ -15,9 +15,13 @@ private final class EchoServer: @unchecked Sendable {
     let listener: NWListener
     private let queue = DispatchQueue(label: "remote-transport-test.server")
 
-    init(keys: [RemoteTransport.PresharedKey]) throws {
-        listener = try NWListener(using: RemoteTransport.parameters(keys: keys), on: .any)
+    init(keys: [RemoteTransport.PresharedKey], parameters: NWParameters? = nil) throws {
+        listener = try NWListener(using: parameters ?? RemoteTransport.parameters(keys: keys), on: .any)
         listener.newConnectionHandler = { [queue] connection in
+            connection.stateUpdateHandler = { state in
+                if case .failed(let error) = state { print("transport test: server connection failed: \(error)") }
+                if case .waiting(let error) = state { print("transport test: server connection waiting: \(error)") }
+            }
             connection.start(queue: queue)
             func receive() {
                 connection.receiveMessage { content, _, _, error in
@@ -61,8 +65,8 @@ private final class Once: @unchecked Sendable {
 }
 
 /// Connects with `key`, sends "hello", and returns the answer (nil: the connection failed or nothing came back in time).
-private func exchange(port: NWEndpoint.Port, key: RemoteTransport.PresharedKey) async -> String? {
-    let connection = NWConnection(host: "127.0.0.1", port: port, using: RemoteTransport.parameters(keys: [key]))
+private func exchange(port: NWEndpoint.Port, key: RemoteTransport.PresharedKey, parameters: NWParameters? = nil) async -> String? {
+    let connection = NWConnection(host: "127.0.0.1", port: port, using: parameters ?? RemoteTransport.parameters(keys: [key]))
     let queue = DispatchQueue(label: "remote-transport-test.client")
     defer { connection.cancel() }
     return await withCheckedContinuation { (continuation: CheckedContinuation<String?, Never>) in
@@ -71,21 +75,70 @@ private func exchange(port: NWEndpoint.Port, key: RemoteTransport.PresharedKey) 
         connection.stateUpdateHandler = { state in
             switch state {
             case .ready:
+                print("transport test: client ready (TLS and WebSocket up, if any)")
                 connection.send(content: Data("hello".utf8), contentContext: RemoteTransport.textContext, isComplete: true, completion: .contentProcessed { _ in })
                 connection.receiveMessage { content, _, _, error in
                     let text = error == nil ? content.map { String(decoding: $0, as: UTF8.self) } : nil
                     once.run { continuation.resume(returning: text) }
                 }
-            case .failed, .cancelled:
+            case .failed(let error):
+                print("transport test: client failed: \(error)")
                 once.run { continuation.resume(returning: nil) }
-            case .waiting:
+            case .cancelled:
+                once.run { continuation.resume(returning: nil) }
+            case .waiting(let error):
                 // TLS refused (a wrong key) shows as waiting on some systems: it won't get better by itself.
+                print("transport test: client waiting: \(error)")
                 once.run { continuation.resume(returning: nil) }
             default:
                 break
             }
         }
         connection.start(queue: queue)
+    }
+}
+
+/// Builds the transport with parts switched on or off, to see which part a failure comes from.
+private func variant(keys: [RemoteTransport.PresharedKey], tls: Bool, versionLimits: Bool, websocket: Bool) -> NWParameters {
+    let tcp = NWProtocolTCP.Options()
+    let parameters: NWParameters
+    if tls {
+        let options = NWProtocolTLS.Options()
+        let security = options.securityProtocolOptions
+        for psk in keys {
+            let key = psk.key.withUnsafeBytes { DispatchData(bytes: $0) }
+            let identity = Data(psk.identity.utf8).withUnsafeBytes { DispatchData(bytes: $0) }
+            sec_protocol_options_add_pre_shared_key(security, key as __DispatchData, identity as __DispatchData)
+        }
+        sec_protocol_options_append_tls_ciphersuite(security, tls_ciphersuite_t(rawValue: UInt16(TLS_PSK_WITH_AES_128_GCM_SHA256))!)
+        if versionLimits {
+            sec_protocol_options_set_min_tls_protocol_version(security, .TLSv12)
+            sec_protocol_options_set_max_tls_protocol_version(security, .TLSv12)
+        }
+        parameters = NWParameters(tls: options, tcp: tcp)
+    } else {
+        parameters = NWParameters(tls: nil, tcp: tcp)
+    }
+    if websocket {
+        let options = NWProtocolWebSocket.Options()
+        options.autoReplyPing = true
+        parameters.defaultProtocolStack.applicationProtocols.insert(options, at: 0)
+    }
+    return parameters
+}
+
+@Suite(.serialized) struct TransportParts {
+    let key = RemoteTransport.PresharedKey(identity: "phone-alex", key: Data(repeating: 0xA1, count: 32))
+
+    /// Reports which combinations get a message through (diagnostic: prints, and only the plain WebSocket must work).
+    @Test func whichPartsWork() async throws {
+        for (tls, limits, websocket) in [(false, false, true), (true, true, false), (true, false, false), (true, false, true), (true, true, true)] {
+            let server = try EchoServer(keys: [key], parameters: variant(keys: [key], tls: tls, versionLimits: limits, websocket: websocket))
+            let port = try await server.start()
+            let answer = await exchange(port: port, key: key, parameters: variant(keys: [key], tls: tls, versionLimits: limits, websocket: websocket))
+            print("transport test: tls=\(tls) tls12only=\(limits) websocket=\(websocket) -> \(answer ?? "nil")")
+            if !tls { #expect(answer == "echo: hello") }
+        }
     }
 }
 

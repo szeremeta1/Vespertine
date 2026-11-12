@@ -194,7 +194,7 @@ jobs:
           mkdir -p build
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Debug -destination 'platform=macOS' \
             -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile CODE_SIGNING_ALLOWED=NO test 2>&1 | tee build/app-tests.log \
-            || { echo "::group::Errors"; grep -E ': error: ' build/app-tests.log | sort -u; echo "::endgroup::"; exit 1; }
+            || { echo "::group::Errors"; grep -E ': error: |While evaluating request|While emitting' build/app-tests.log | sort -u; echo "::endgroup::"; exit 1; }
       - name: Universal Release build
         run: |
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -destination 'generic/platform=macOS' \
@@ -210,7 +210,7 @@ jobs:
           xcodegen generate --spec RemoteApp/project.yml
           xcodebuild -project RemoteApp/VespertineRemote.xcodeproj -scheme VespertineRemote -configuration Debug \
             -destination 'generic/platform=iOS Simulator' -derivedDataPath build/CI-iOS CODE_SIGNING_ALLOWED=NO build 2>&1 | tee build/remote-ios.log \
-            || { echo "::group::Errors"; grep -E ': error: ' build/remote-ios.log | sort -u; echo "::endgroup::"; exit 1; }
+            || { echo "::group::Errors"; grep -E ': error: |While evaluating request|While emitting' build/remote-ios.log | sort -u; echo "::endgroup::"; exit 1; }
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: github.ref == 'refs/heads/main' && steps.app-cache.outputs.cache-hit != 'true'
         with:
