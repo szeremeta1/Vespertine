@@ -338,7 +338,7 @@
         },
         {
           "name": "APE, WavPack, TTA",
-          "text": "Sans perte. Le DSD dans un fichier WavPack n’est pas pris en charge."
+          "text": "Sans perte."
         },
         {
           "name": "Opus, Vorbis, Musepack, MP3, AAC",

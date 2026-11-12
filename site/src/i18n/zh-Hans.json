@@ -338,7 +338,7 @@
         },
         {
           "name": "APE、WavPack、TTA",
-          "text": "无损。不支持封装在 WavPack 中的 DSD。"
+          "text": "无损。"
         },
         {
           "name": "Opus、Vorbis、Musepack、MP3、AAC",

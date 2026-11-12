@@ -338,7 +338,7 @@
         },
         {
           "name": "APE, WavPack, TTA",
-          "text": "무손실. WavPack 안의 DSD는 지원하지 않습니다."
+          "text": "무손실."
         },
         {
           "name": "Opus, Vorbis, Musepack, MP3, AAC",

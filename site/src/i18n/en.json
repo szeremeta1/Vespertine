@@ -338,7 +338,7 @@
         },
         {
           "name": "APE, WavPack, TTA",
-          "text": "Lossless. DSD inside WavPack isn’t supported."
+          "text": "Lossless."
         },
         {
           "name": "Opus, Vorbis, Musepack, MP3, AAC",
