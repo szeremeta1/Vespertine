@@ -72,7 +72,7 @@ struct SpatialExportSheet: View {
                 if let result, !result.written.isEmpty {
                     Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting(result.written) }.buttonStyle(QuietButtonStyle())
                 }
-                Button(result == nil ? String(localized: "Cancel") : String(localized: "Done")) { dismiss() }.buttonStyle(QuietButtonStyle()).keyboardShortcut(.cancelAction).disabled(running)
+                Button(result == nil ? String(localized: "Cancel") : String(localized: "Done")) { dismiss() }.buttonStyle(QuietButtonStyle()).keyboardShortcut(running ? nil : .cancelAction).disabled(running)
                 if result == nil {
                     Button("Export", action: export).buttonStyle(BrassButtonStyle()).keyboardShortcut(.defaultAction)
                         .disabled(running || eligible.isEmpty)
@@ -82,6 +82,8 @@ struct SpatialExportSheet: View {
         }
         .frame(width: 560)
         .background(Palette.panel)
+        // Escape must not close the sheet while files are still being written.
+        .interactiveDismissDisabled(running)
     }
 
     private func chooseFolder() {
