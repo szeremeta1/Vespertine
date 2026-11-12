@@ -50,12 +50,16 @@ public enum GroupAggregate {
         /// devices Core Audio takes the `latency-out` key without error and reads 0 back, and the property is not settable
         /// afterwards (checked on macOS 27), so a skew is corrected as a delay in the room correction chain instead.
         public var extraLatencyFrames: Double
+        /// The member only records (Mac Sound Output's capture side): it adds input channels, no output streams.
+        public var inputOnly: Bool
 
-        public init(uid: String, clockDomain: UInt32, driftQuality: Int = SpeakerGroup.Member.defaultDriftQuality, extraLatencyFrames: Double = 0) {
+        public init(uid: String, clockDomain: UInt32, driftQuality: Int = SpeakerGroup.Member.defaultDriftQuality, extraLatencyFrames: Double = 0,
+                    inputOnly: Bool = false) {
             self.uid = uid
             self.clockDomain = clockDomain
             self.driftQuality = driftQuality
             self.extraLatencyFrames = extraLatencyFrames
+            self.inputOnly = inputOnly
         }
     }
 
@@ -77,6 +81,8 @@ public enum GroupAggregate {
 
         /// At least one member is resampled to keep in step, so not every channel can be the file's own.
         public var isResampled: Bool { drift.contains(true) }
+        /// The members that play (every one but an input-only one).
+        public var outputMemberCount: Int { members.filter { !$0.inputOnly }.count }
     }
 
     /// The plan for these members. The leader may be any of them, wherever it stands in the order.
@@ -102,6 +108,16 @@ public enum GroupAggregate {
             Member(uid: $0.deviceUID, clockDomain: clockDomain($0.deviceUID), driftQuality: $0.driftQuality, extraLatencyFrames: $0.extraLatencyFrames)
         }
         return try plan(name: group.name, uid: uid ?? makeUID(groupID: group.id), members: members, leaderUID: group.clockLeaderUID, drift: mode)
+    }
+
+    /// The plan for a group playing what other apps send it (Mac Sound Output): the driver's capture device `captureUID` first, so
+    /// its channels are the aggregate's first input channels, then the group's members as `plan(for:)` has them. The capture
+    /// device runs on a clock of its own, so it is drift-corrected to follow the group's clock leader like any other follower.
+    public static func plan(for group: SpeakerGroup, capture captureUID: String, clockDomain: (String) -> UInt32) throws -> Plan {
+        let members = [Member(uid: captureUID, clockDomain: 0, inputOnly: true)] + group.members.map {
+            Member(uid: $0.deviceUID, clockDomain: clockDomain($0.deviceUID), driftQuality: $0.driftQuality, extraLatencyFrames: $0.extraLatencyFrames)
+        }
+        return try plan(name: group.name, uid: makeUID(groupID: group.id), members: members, leaderUID: group.clockLeaderUID)
     }
 
     /// The dictionary for `AudioHardwareCreateAggregateDevice`. Not stacked: stacked is a multi-output device, which sends the
@@ -167,7 +183,8 @@ public final class GroupAggregateDevice: @unchecked Sendable {
         let device = GroupAggregateDevice(id: id, plan: plan)
         let deadline = Date().addingTimeInterval(3)
         while Date() < deadline {
-            if DeviceQuery.outputStreams(id).count >= plan.members.count { return device }
+            if DeviceQuery.outputStreams(id).count >= plan.outputMemberCount,
+               DeviceQuery.inputStreams(id).count >= plan.members.count - plan.outputMemberCount { return device }
             usleep(20_000)
         }
         device.destroy()

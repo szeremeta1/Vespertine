@@ -181,6 +181,8 @@ final class AppModel {
     let settings: AppSettings
     /// The saved speaker groups; nil unless the Settings switch (Speaker Groups (beta)) is on.
     private(set) var speakerGroups: SpeakerGroupsModel?
+    /// Mac Sound Output (beta): speaker groups published as outputs of the Mac.
+    let systemOutput: SystemOutputModel
     let library: LibraryStore
     let player: PlayerController
     let devices: DeviceStore
@@ -265,6 +267,7 @@ final class AppModel {
         let arguments = LaunchArguments()
         let isolated = arguments.string(forKey: "VespertineDataDirectory") != nil && !arguments.bool(forKey: "VespertinePersistFilters")
         filtersURL = isolated ? nil : FilterStore.url(in: settings.dataDirectory)
+        systemOutput = SystemOutputModel(isolated: arguments.string(forKey: "VespertineDataDirectory") != nil)
         if let filtersURL { filters = FilterStore.load(from: filtersURL) }
         library = try LibraryStore(dataDirectory: settings.dataDirectory, automaticScanning: { [weak settings] in settings?.watchFolders ?? false })
         showSetup = Self.needsSetup(settings: settings, library: library, arguments: arguments)
@@ -558,7 +561,9 @@ final class AppModel {
     func syncEngine() {
         devices.dopUIDs = settings.effectiveDoPUIDs
         let device = plannedDevice
-        player.engine.update(settings: settings.engineSettings(groups: speakerGroups?.groups ?? []))
+        let engineSettings = settings.engineSettings(groups: speakerGroups?.groups ?? [])
+        player.engine.update(settings: engineSettings)
+        systemOutput.sync(groups: engineSettings.speakerGroups, settings: engineSettings)
         devices.watchVolume(of: device)
         player.resolveVersions()
     }

@@ -123,18 +123,29 @@ if ! $resume; then
   find "$app" -type d -name ru.lproj -prune -exec rm -rf {} +
   git rev-parse HEAD > "$out/built-from"
 
-  # Inside-out: frameworks first, then the app.
+  # Inside-out: frameworks, then Mac Sound Output's driver and helper, then the app. The driver is copied to
+  # /Library/Audio/Plug-Ins/HAL as it is, so its own signature is what coreaudiod checks.
+  sound_driver="$app/Contents/Library/Audio/VespertineSound.driver"
+  sound_helper="$app/Contents/Library/LoginItems/Vespertine Sound Helper.app"
+  for part in "$sound_driver" "$sound_helper"; do
+    [[ -d $part ]] || { print -u2 "Missing from the build: $part"; exit 1; }
+  done
   if [[ $identity == "-" ]]; then
     # Ad-hoc code has no Team ID, so hardened-runtime library validation would reject the
     # embedded frameworks. Local-only builds therefore skip the hardened runtime.
     sign_sparkle --sign -
     for fw in "$app"/Contents/Frameworks/*.framework; do codesign --force --sign - "$fw"; done
+    codesign --force --sign - "$sound_driver"
+    codesign --force --sign - --entitlements Helper/VespertineSoundHelper.entitlements "$sound_helper"
     codesign --force --sign - --entitlements App/Vespertine.entitlements "$app"
   else
     sign_sparkle --timestamp --options runtime "${keychain[@]}" --sign "$identity"
     for fw in "$app"/Contents/Frameworks/*.framework; do
       codesign --force --timestamp --options runtime "${keychain[@]}" --sign "$identity" "$fw"
     done
+    codesign --force --timestamp --options runtime "${keychain[@]}" --sign "$identity" "$sound_driver"
+    codesign --force --timestamp --options runtime "${keychain[@]}" --sign "$identity" \
+      --entitlements Helper/VespertineSoundHelper.entitlements "$sound_helper"
     codesign --force --timestamp --options runtime "${keychain[@]}" --sign "$identity" \
       --entitlements App/Vespertine.entitlements "$app"
   fi

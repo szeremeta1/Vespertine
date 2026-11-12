@@ -43,6 +43,22 @@ targets:
       - package: VespertineKit
         product: VespertineVisualizer
       - package: Sparkle
+      # Mac Sound Output (beta): the audio driver travels inside the app (Contents/Library/Audio) and is copied to
+      # /Library/Audio/Plug-Ins/HAL only when the user turns the feature on.
+      - target: VespertineSound
+        embed: true
+        codeSign: true
+        copy:
+          destination: wrapper
+          subpath: Contents/Library/Audio
+      # Mac Sound Output (beta): the helper that plays published groups with Vespertine closed, a login item registered
+      # (SMAppService) only while a group is published.
+      - target: VespertineSoundHelper
+        embed: true
+        codeSign: true
+        copy:
+          destination: wrapper
+          subpath: Contents/Library/LoginItems
     info:
       path: App/Info.plist
       properties:
@@ -101,6 +117,75 @@ targets:
         Debug:
           PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.Vespertine.dev
           VESPERTINE_DISPLAY_NAME: Vespertine Dev
+
+  # Mac Sound Output (beta): the Core Audio driver (an AudioServerPlugIn) that shows published speaker groups as outputs.
+  # Plain C, no Swift: it runs inside coreaudiod. See Driver/VespertineSound/VespertineSound.c.
+  VespertineSound:
+    type: bundle
+    platform: macOS
+    sources:
+      - path: Driver/VespertineSound
+        excludes: [Info.plist]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.vespertine.sound
+        PRODUCT_NAME: VespertineSound
+        WRAPPER_EXTENSION: driver
+        INFOPLIST_FILE: Driver/VespertineSound/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        GCC_C_LANGUAGE_STANDARD: c11
+        GCC_TREAT_WARNINGS_AS_ERRORS: YES
+        CLANG_ENABLE_OBJC_ARC: NO
+        SKIP_INSTALL: YES
+        OTHER_LDFLAGS: ["-framework", "CoreAudio", "-framework", "CoreFoundation"]
+
+  # Mac Sound Output (beta): the helper. No window or Dock icon; plays what other apps send a published group's output.
+  VespertineSoundHelper:
+    type: application
+    platform: macOS
+    sources:
+      - path: Helper/Sources
+      - path: Helper/Resources
+      # The app's strings: the helper's few are in the same catalog.
+      - path: App/Resources/Localizable.xcstrings
+    dependencies:
+      - package: VespertineKit
+        product: VespertineAudio
+    info:
+      path: Helper/Info.plist
+      properties:
+        CFBundleName: $(VESPERTINE_HELPER_NAME)
+        CFBundleDisplayName: $(VESPERTINE_HELPER_NAME)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSMinimumSystemVersion: $(MACOSX_DEPLOYMENT_TARGET)
+        LSUIElement: true
+        NSHumanReadableCopyright: "Copyright © 2026 Vespertine contributors. Free software under the GNU GPL, version 3 or later."
+        # What other apps play reaches the helper as the input of Vespertine's audio driver, which macOS counts as recording.
+        NSMicrophoneUsageDescription: "Vespertine Sound Helper receives what your apps play to a speaker group you published as a Mac sound output, and plays it on the group's speakers. It never records a microphone."
+    entitlements:
+      path: Helper/VespertineSoundHelper.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+        com.apple.security.device.audio-input: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.Vespertine.SoundHelper
+        PRODUCT_NAME: Vespertine Sound Helper
+        VESPERTINE_HELPER_NAME: Vespertine Sound Helper
+        ENABLE_HARDENED_RUNTIME: YES
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        SKIP_INSTALL: YES
+        SWIFT_STRICT_CONCURRENCY: complete
+        ENABLE_USER_SCRIPT_SANDBOXING: YES
+      configs:
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.Vespertine.SoundHelper.dev
+          VESPERTINE_HELPER_NAME: Vespertine Dev Sound Helper
 
   VespertineAppTests:
     type: bundle.unit-test
