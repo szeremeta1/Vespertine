@@ -47,7 +47,7 @@ Open Room Correction with the group as the output:
 
 ## Volume
 
-A group has no volume of its own. The volume keys do not control it, and the group is never made the Mac's sound output. Each DAC's own volume is set once, by hand: the editor has a slider for each DAC that has a volume Core Audio can set, written when it is let go, never saved or applied by Vespertine itself. The speakers' trims and the optional master volume (the in-app digital volume) are digital and make playback not bit-perfect.
+A group has no volume of its own in Vespertine. The volume keys do not control it while Vespertine plays it (a group published with [Mac Sound Output (beta)](MAC-SOUND-OUTPUT.md) is an output of the Mac with a volume the keys set, for what other apps play). Each DAC's own volume is set once, by hand: the editor has a slider for each DAC that has a volume Core Audio can set, written when it is let go, never saved or applied by Vespertine itself. The speakers' trims and the optional master volume (the in-app digital volume) are digital and make playback not bit-perfect.
 
 ## When a DAC goes away
 
