@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import VespertineLibrary
 import VespertineRemoteProtocol
 @testable import Vespertine
 
