@@ -277,6 +277,22 @@ struct BitstreamTests {
         #expect(decoder.concealedFrames == 1)
     }
 
+    @Test("A frame whose header is damaged behind a good sync word is skipped, and the rest of the file still plays")
+    func damagedHeaderInFile() throws {
+        let frames = DolbyFrames.frames(in: try fixture("dolby-digital-tones.ac3"))
+        // The fifth frame keeps its sync word but names a sample rate code that doesn't exist.
+        var damaged = frames.map(\.bytes)
+        damaged[4][4] |= 0xC0
+        let url = try temporaryFile(damaged.flatMap { $0 })
+        defer { try? FileManager.default.removeItem(at: url) }
+        let samples = try Self.carrier(try BitstreamDecoder.open(url: url))
+        var expected = frames.map(\.bytes)
+        expected.remove(at: 4)
+        let payloads = unpack(samples, lengthInBytes: false).map(\.payload)
+        #expect(payloads.count == expected.count)
+        #expect(payloads.elementsEqual(expected))
+    }
+
     @Test("DTS: the frame header decides the burst; no sync, a cut header, or an unsupported length is refused")
     func dtsRefusals() throws {
         for (nblks, type, period) in [(15, 11, 512), (31, 12, 1024), (63, 13, 2048)] {
