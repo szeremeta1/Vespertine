@@ -45,6 +45,9 @@ final class RemoteServer {
     @ObservationIgnored private var pairingTimeout: Task<Void, Never>?
     @ObservationIgnored private var failedPairingHandshakes = 0
     @ObservationIgnored private let keepAwake = RemoteKeepAwake()
+    @ObservationIgnored let web = RemoteWebServer()
+    /// The web remote's port while it's on (Settings shows the address).
+    private(set) var webPort: UInt16?
     @ObservationIgnored private var queueSignature: RemoteBridge.QueueSignature?
     @ObservationIgnored private var queueRevision = 0
     @ObservationIgnored private var lastQueue: QueueState?
@@ -57,6 +60,8 @@ final class RemoteServer {
 
     init(store: RemoteStore) {
         self.store = store
+        web.server = self
+        web.onPortChange = { [weak self] port in self?.webPort = port }
     }
 
     var isRunning: Bool { if case .running = status { true } else { false } }
@@ -64,6 +69,11 @@ final class RemoteServer {
     var serverInfo: ServerInfo {
         ServerInfo(name: Self.computerName, serverID: store.serverID,
                    appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")
+    }
+
+    /// This Mac's Bonjour host name ("Living-Room-Mac.local"), for the web remote's address.
+    static var localHostName: String {
+        ((SCDynamicStoreCopyLocalHostName(nil) as String?) ?? "localhost") + ".local"
     }
 
     static var computerName: String {
@@ -76,6 +86,7 @@ final class RemoteServer {
     func apply() {
         if store.enabled {
             if listener == nil { startListener() }
+            if store.webEnabled { web.start() } else { web.stop() }
         } else {
             stop()
         }
@@ -89,6 +100,7 @@ final class RemoteServer {
         connected.removeAll()
         listener?.cancel()
         listener = nil
+        web.stop()
         pushTask?.cancel()
         pushTask = nil
         status = .off
@@ -96,7 +108,7 @@ final class RemoteServer {
 
     /// The keys the listener accepts: every paired phone's, and the pairing keys while a window is open.
     private var acceptedKeys: [RemoteTransport.PresharedKey] {
-        var keys = store.devices.map { RemoteTransport.PresharedKey(identity: $0.id, key: $0.key) }
+        var keys = store.devices.filter { !$0.isWeb }.map { RemoteTransport.PresharedKey(identity: $0.id, key: $0.key) }
         if let pairing {
             keys.append(.init(identity: RemoteProtocol.pairingLinkIdentity, key: PairingKey.derive(secret: pairing.link.secret, serverID: store.serverID)))
             keys.append(.init(identity: RemoteProtocol.pairingCodeIdentity, key: PairingKey.derive(secret: pairing.code, serverID: store.serverID)))
@@ -225,8 +237,52 @@ final class RemoteServer {
     func remove(_ id: String) {
         store.remove(id)
         for client in clients.values where client.device == id { client.close(saying: .deviceRemoved) }
+        web.disconnect(device: id)
         connected.remove(id)
         if listener != nil { startListener() }
+    }
+
+    enum BrowserPairingFailure: Error {
+        case notPairing, wrongCode
+
+        var message: String {
+            switch self {
+            case .notPairing: String(localized: "Pairing has ended on the Mac. Open Settings › Remote there and choose Pair a Phone again.", comment: "Remote control: a phone tried to pair after the pairing window closed.")
+            case .wrongCode: String(localized: "That code didn’t work. Check the code on the Mac, or choose Pair a Phone there again for a new one.", comment: "Web remote: the code typed in the browser is wrong.")
+            }
+        }
+    }
+
+    /// A browser typed the pairing code: it gets a token for its cookie (stored here only as a hash).
+    func pairBrowser(code: String, name: String?) -> Result<String, BrowserPairingFailure> {
+        guard let pairing else { return .failure(.notPairing) }
+        let typed = PairingSecret.normalizedCode(code)
+        guard RemoteWebServer.constantTimeEqual(Data(typed.utf8), Data(pairing.code.utf8)) else {
+            failedPairingHandshakes += 1
+            if failedPairingHandshakes >= Self.pairingAttempts { endPairing() }
+            return .failure(.wrongCode)
+        }
+        let token = PairingSecret.makeLinkSecret() + PairingSecret.makeLinkSecret()
+        let cleanName = String((name ?? "").trimmingCharacters(in: .whitespacesAndNewlines).prefix(80))
+        let displayName = cleanName.isEmpty ? String(localized: "Web browser", comment: "Settings › Remote: name of a paired web browser.") : cleanName
+        let id = "web-" + UUID().uuidString.lowercased()
+        store.add(PairedRemote(id: id, name: displayName, key: RemoteWebServer.hash(token), pairedAt: .now, lastSeen: .now, web: true))
+        justPaired = displayName
+        endPairing()
+        return .success(token)
+    }
+
+    /// A browser's event stream opened or closed.
+    func webDevicesChanged() {
+        let webDevices = web.connectedDevices
+        for device in webDevices { store.touch(device, name: store.device(device)?.name ?? "") }
+        let appDevices = Set(clients.values.compactMap { $0.isSignedIn ? $0.device : nil })
+        connected = appDevices.union(webDevices)
+    }
+
+    /// Pushes right away (after a web command), rather than at the next tick.
+    func pushSoon() {
+        Task { [weak self] in self?.push() }
     }
 
     // MARK: Connections
@@ -240,7 +296,9 @@ final class RemoteServer {
 
     fileprivate func ended(_ client: RemoteClient, handshakeFailed: Bool) {
         clients[ObjectIdentifier(client)] = nil
-        if let device = client.device, !clients.values.contains(where: { $0.device == device }) { connected.remove(device) }
+        if let device = client.device, !clients.values.contains(where: { $0.device == device }), !web.connectedDevices.contains(device) {
+            connected.remove(device)
+        }
         if handshakeFailed, pairing != nil {
             failedPairingHandshakes += 1
             if failedPairingHandshakes >= Self.pairingAttempts { endPairing() }
@@ -248,7 +306,7 @@ final class RemoteServer {
     }
 
     fileprivate func authenticated(_ client: RemoteClient, device: String, name: String) -> Bool {
-        guard store.device(device) != nil else { return false }
+        guard let paired = store.device(device), !paired.isWeb else { return false }
         store.touch(device, name: name)
         connected.insert(device)
         return true
@@ -259,7 +317,7 @@ final class RemoteServer {
     /// Sends each signed-in phone what changed since it last heard: playback, the queue, the outputs.
     private func push() {
         let signedIn = clients.values.filter(\.isSignedIn)
-        guard !signedIn.isEmpty, let model else { return }
+        guard !signedIn.isEmpty || web.hasListeners, let model else { return }
         let bridge = RemoteBridge(model: model)
         let player = bridge.playerState()
         let signature = bridge.queueSignature
@@ -271,10 +329,11 @@ final class RemoteServer {
         let outputs = bridge.outputsState()
         lastOutputs = outputs
         for client in signedIn { client.update(player: player, queue: lastQueue, outputs: outputs) }
+        web.push(player: player, queue: lastQueue, outputs: outputs)
     }
 
     /// Everything, for a phone that just signed in.
-    fileprivate func snapshot(_ bridge: RemoteBridge) -> (PlayerState, QueueState, OutputsState) {
+    func snapshot(_ bridge: RemoteBridge) -> (PlayerState, QueueState, OutputsState) {
         let signature = bridge.queueSignature
         if signature != queueSignature || lastQueue == nil {
             queueSignature = signature

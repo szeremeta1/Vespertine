@@ -35,6 +35,17 @@ struct RemoteSettingsView: View {
             }
 
             if store.enabled {
+                Section {
+                    Toggle("Also allow web browsers", isOn: Binding(get: { store.webEnabled }, set: { store.webEnabled = $0; server.apply() }))
+                    if store.webEnabled, let port = server.webPort {
+                        Text(verbatim: "http://\(RemoteServer.localHostName):\(port)")
+                            .font(.callout.monospaced()).textSelection(.enabled)
+                    }
+                } footer: {
+                    Text("A browser on any phone, tablet or computer on this network can open this address and pair with the same code as a phone. The web remote isn’t encrypted like the app: use it only on a network you trust.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+
                 Section("Paired phones") {
                     if store.devices.isEmpty {
                         Text("No phones yet.").foregroundStyle(.secondary)

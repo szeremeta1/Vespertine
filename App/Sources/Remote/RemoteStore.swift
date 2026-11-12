@@ -14,6 +14,10 @@ nonisolated struct PairedRemote: Codable, Equatable, Identifiable, Sendable {
     var key: Data
     var pairedAt: Date
     var lastSeen: Date?
+    /// A web browser rather than the app: `key` is then the SHA-256 of the browser's cookie, not a TLS key.
+    var web: Bool?
+
+    var isWeb: Bool { web == true }
 }
 
 /// The remote server's switches (UserDefaults, all off by default) and its files in the library's data folder: this Mac's
@@ -23,6 +27,8 @@ nonisolated struct PairedRemote: Codable, Equatable, Identifiable, Sendable {
 final class RemoteStore {
     /// The remote server runs (Settings › Remote). Off by default.
     var enabled: Bool { didSet { defaults.set(enabled, forKey: Keys.enabled) } }
+    /// Web browsers on this network can use the remote too (a page served by this Mac). Off by default.
+    var webEnabled: Bool { didSet { defaults.set(webEnabled, forKey: Keys.webEnabled) } }
     /// Hold off idle sleep while the server runs, so a paused Mac stays reachable. Off by default.
     var keepAwake: Bool { didSet { defaults.set(keepAwake, forKey: Keys.keepAwake) } }
     /// Settings › Remote turned on macOS's Wake for network access (and what it was before, to put back). Off by default.
@@ -39,6 +45,7 @@ final class RemoteStore {
 
     private enum Keys {
         static let enabled = "remoteEnabled"
+        static let webEnabled = "remoteWebEnabled"
         static let keepAwake = "remoteKeepAwake"
         static let wakeForNetwork = "remoteWakeForNetwork"
         static let wakeBefore = "remoteWakeForNetworkBefore"
@@ -46,8 +53,9 @@ final class RemoteStore {
 
     init(dataDirectory: URL, defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        defaults.register(defaults: [Keys.enabled: false, Keys.keepAwake: false, Keys.wakeForNetwork: false])
+        defaults.register(defaults: [Keys.enabled: false, Keys.webEnabled: false, Keys.keepAwake: false, Keys.wakeForNetwork: false])
         enabled = defaults.bool(forKey: Keys.enabled)
+        webEnabled = defaults.bool(forKey: Keys.webEnabled)
         keepAwake = defaults.bool(forKey: Keys.keepAwake)
         wakeForNetwork = defaults.bool(forKey: Keys.wakeForNetwork)
         wakeForNetworkBefore = defaults.object(forKey: Keys.wakeBefore) as? Bool

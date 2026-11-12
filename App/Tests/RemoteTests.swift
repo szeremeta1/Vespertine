@@ -17,6 +17,7 @@ struct RemoteTests {
         let defaults = UserDefaults(suiteName: "vespertine-remote-test-\(UUID().uuidString)")!
         let store = RemoteStore(dataDirectory: try temporaryFolder(), defaults: defaults)
         #expect(!store.enabled)
+        #expect(!store.webEnabled)
         #expect(!store.keepAwake)
         #expect(!store.wakeForNetwork)
         #expect(store.devices.isEmpty)
@@ -67,5 +68,33 @@ struct RemoteTests {
         #expect(await RemoteBridge.artwork(key: "../../etc/passwd", size: 600, store: store) == nil)
         #expect(await RemoteBridge.artwork(key: "a/b", size: 600, store: store) == nil)
         #expect(await RemoteBridge.artwork(key: "", size: 600, store: store) == nil)
+    }
+
+    @Test func webRequestsParseOnlyWhenComplete() throws {
+        let head = "POST /command?x=1 HTTP/1.1\r\nHost: mac.local\r\nContent-Type: application/json\r\nCookie: a=1; vespertine-remote=abc\r\nContent-Length: 13\r\n\r\n"
+        #expect(HTTPRequest(Data(head.utf8)) == nil)
+        #expect(HTTPRequest(Data((head + "{\"play\":").utf8)) == nil)
+        let request = try #require(HTTPRequest(Data((head + "{\"play\":{}}").utf8)))
+        #expect(request.method == "POST")
+        #expect(request.path == "/command")
+        #expect(request.query["x"] == "1")
+        #expect(request.isJSON)
+        #expect(request.cookies["vespertine-remote"] == "abc")
+        #expect(String(decoding: request.body, as: UTF8.self) == "{\"play\":{}}")
+        #expect(HTTPRequest(Data("GET / HTTP/1.1\r\n\r\n".utf8))?.path == "/")
+    }
+
+    @Test func browserTokensCompareWholly() {
+        let hash = RemoteWebServer.hash("token")
+        #expect(RemoteWebServer.constantTimeEqual(hash, RemoteWebServer.hash("token")))
+        #expect(!RemoteWebServer.constantTimeEqual(hash, RemoteWebServer.hash("tokem")))
+        #expect(!RemoteWebServer.constantTimeEqual(hash, Data()))
+    }
+
+    @Test func theWebPageCarriesItsWordsSafely() {
+        let page = RemoteWebPage.html(serverName: "</script><script>alert(1)</script>")
+        #expect(!page.contains("</script><script>alert(1)"))
+        #expect(page.contains("const L = {"))
+        #expect(!page.contains("__STRINGS__"))
     }
 }
