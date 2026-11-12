@@ -748,6 +748,8 @@ struct SearchResultsView: View {
         .background(Palette.window)
         .task(id: "\(query)#\(model.library.revision)") {
             try? await Task.sleep(for: .milliseconds(120))
+            // Typing on, or a scan changing the library again, cancels this and starts another: only the last one searches.
+            guard !Task.isCancelled else { return }
             results = SongList(model.library.search(query), model: model)
             let words = query.split(whereSeparator: \.isWhitespace).map(String.init)
             func matches(_ text: String) -> Bool { words.allSatisfy { text.localizedStandardContains($0) } }
