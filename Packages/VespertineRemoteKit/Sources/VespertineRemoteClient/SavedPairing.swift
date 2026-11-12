@@ -16,13 +16,30 @@ public struct SavedPairing: Codable, Sendable, Equatable, Identifiable {
     public var device: String
     public var key: Data
     public var pairedAt: Date
+    /// An address the user typed for this Mac (its Tailscale name, say), for when Bonjour doesn't find it.
+    public var address: RemoteAddress?
+    /// Where the last connection to this Mac went. The Mac's port can change when Vespertine restarts, and nothing but
+    /// Bonjour announces it, so the phone remembers it from each connection.
+    public var lastKnown: RemoteAddress?
 
-    public init(serverID: String, name: String, device: String, key: Data, pairedAt: Date = .now) {
+    public init(serverID: String, name: String, device: String, key: Data, pairedAt: Date = .now,
+                address: RemoteAddress? = nil, lastKnown: RemoteAddress? = nil) {
         self.serverID = serverID
         self.name = name
         self.device = device
         self.key = key
         self.pairedAt = pairedAt
+        self.address = address
+        self.lastKnown = lastKnown
+    }
+
+    /// The addresses to try besides Bonjour, most likely first: the typed one (with the last known port if it has
+    /// none), then the last known one. Addresses without a port are left out.
+    public var savedAddresses: [RemoteAddress] {
+        var out: [RemoteAddress] = []
+        if let typed = address?.withPort(from: lastKnown), typed.port != nil { out.append(typed) }
+        if let lastKnown, lastKnown.port != nil, !out.contains(lastKnown) { out.append(lastKnown) }
+        return out
     }
 
     public var presharedKey: RemoteTransport.PresharedKey {

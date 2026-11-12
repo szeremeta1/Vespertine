@@ -26,4 +26,56 @@ public protocol RemoteChannel: AnyObject {
     /// Sends `command` and waits for the reply.
     func request(_ command: RemoteCommand, timeout: Duration) async throws -> RemoteReply
     func close()
+    /// Where the channel ended up connected, once open (nil when that means nothing: the demo).
+    var remoteAddress: RemoteAddress? { get }
 }
+
+public extension RemoteChannel {
+    var remoteAddress: RemoteAddress? { nil }
+}
+
+#if canImport(Network)
+import Network
+
+/// One way to reach a paired Mac.
+public struct RemoteRoute: Sendable, Equatable {
+    public enum Kind: String, Sendable, Equatable {
+        /// Found on this network by Bonjour.
+        case nearby
+        /// The address the user typed for the Mac.
+        case address
+        /// Where the Mac answered last time.
+        case lastKnown
+    }
+
+    public var kind: Kind
+    public var endpoint: NWEndpoint
+    /// The typed or remembered address behind `endpoint` (nil for Bonjour).
+    public var address: RemoteAddress?
+
+    public init(kind: Kind, endpoint: NWEndpoint, address: RemoteAddress? = nil) {
+        self.kind = kind
+        self.endpoint = endpoint
+        self.address = address
+    }
+
+    /// A route to a typed or remembered address; nil while its port isn't known.
+    public init?(kind: Kind, address: RemoteAddress) {
+        guard let number = address.port, let port = NWEndpoint.Port(rawValue: number) else { return nil }
+        self.init(kind: kind, endpoint: .hostPort(host: NWEndpoint.Host(address.host), port: port), address: address)
+    }
+}
+
+public extension SavedPairing {
+    /// Every way to try this Mac now: Bonjour's endpoint if it's on this network, then the saved addresses.
+    func routes(nearby: NWEndpoint?) -> [RemoteRoute] {
+        var out: [RemoteRoute] = []
+        if let nearby { out.append(RemoteRoute(kind: .nearby, endpoint: nearby)) }
+        let typed = address?.withPort(from: lastKnown)
+        for saved in savedAddresses {
+            if let route = RemoteRoute(kind: saved == typed ? .address : .lastKnown, address: saved) { out.append(route) }
+        }
+        return out
+    }
+}
+#endif
