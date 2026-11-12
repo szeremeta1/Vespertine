@@ -24,6 +24,13 @@ final class LoopbackTest {
     private(set) var report: LoopbackReport?
     private(set) var error: String?
     private(set) var saved: [LoopbackSavedResult]
+    /// Run Test was pressed and macOS hasn't said yet whether Vespertine may record (its prompt can stay up for half a
+    /// minute): a second press starts nothing.
+    private(set) var starting = false
+    /// Counts starts given up (`reset`, as closing the sheet does): one that was waiting for macOS's answer stops there.
+    @ObservationIgnored private var startsGivenUp = 0
+    /// Asks macOS whether Vespertine may record (tests answer for it).
+    @ObservationIgnored var permission: @MainActor () async -> LoopbackPermission.Answer = { await LoopbackPermission.check() }
 
     @ObservationIgnored private let store: LoopbackResultStore
     let appVersion: String
@@ -52,6 +59,8 @@ final class LoopbackTest {
 
     func reset() {
         guard phase != .running else { return }
+        startsGivenUp += 1
+        starting = false
         phase = .setup
         done = []
         report = nil
@@ -62,14 +71,7 @@ final class LoopbackTest {
     /// Pauses the player (and lets go of the device when it's playing to the test's own), then runs every case
     /// off the main thread.
     func run(on output: OutputDevice, player: PlayerController) async {
-        guard phase != .running else { return }
-        reset()
-        // Unanswered isn't a refusal: try anyway, and a silent capture says "no signal reached the input".
-        guard await LoopbackPermission.check() != .denied else {
-            error = LoopbackError.permissionDenied.localizedDescription
-            phase = .finished
-            return
-        }
+        guard await mayStart() else { return }
         if player.outputDevice?.uid == output.uid { player.stop() } else if player.isPlaying { player.togglePlayPause() }
         let cases = LoopbackPlan.cases(rates: output.capabilities.sampleRates, mode: mode)
         guard !cases.isEmpty else {
@@ -100,6 +102,26 @@ final class LoopbackTest {
         }
         currentCase = nil
         phase = .finished
+    }
+
+    /// Waits for macOS's answer on recording. False when no test may start now: one is running or already waiting
+    /// here, recording was refused (the sheet then says so), or the start was given up while waiting.
+    func mayStart() async -> Bool {
+        guard phase != .running, !starting else { return false }
+        reset()
+        starting = true
+        let start = startsGivenUp
+        let answer = await permission()
+        // Cancelled, or the sheet was closed, while macOS's prompt was up: nothing starts.
+        guard start == startsGivenUp else { return false }
+        starting = false
+        // Unanswered isn't a refusal: try anyway, and a silent capture says "no signal reached the input".
+        guard answer != .denied else {
+            error = LoopbackError.permissionDenied.localizedDescription
+            phase = .finished
+            return false
+        }
+        return true
     }
 
     func copyReport() {
