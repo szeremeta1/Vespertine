@@ -39,8 +39,10 @@ public enum FilenameParser {
         let parts = name.components(separatedBy: " - ").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
 
         func splitNumber(_ s: String) -> (Int?, String) {
-            // "01 Title", "01. Title", "01-Title", "1) Title"
-            guard let r = s.range(of: #"^(\d{1,3})[\s.\-)_]+"#, options: .regularExpression) else { return (nil, s) }
+            // "01 Title", "01. Title", "01-Title", "1) Title", "7. Title". A number that isn't zero-padded needs a
+            // separator after it, as in `MetadataReader.trackNumber(fromFileName:)`: "50 Cent", "3 Doors Down" and
+            // "7 Rings" are names, and read as numbers they were filed and tagged as "Cent", "Doors Down" and "Rings".
+            guard let r = s.range(of: #"^(0\d{1,2}[\s.\-)_]+|\d{1,3}\s*[.\-)_][\s.\-)_]*)"#, options: .regularExpression) else { return (nil, s) }
             let digits = s[r].filter(\.isNumber)
             return (Int(digits), String(s[r.upperBound...]).trimmingCharacters(in: .whitespaces))
         }

@@ -213,6 +213,17 @@ struct FindAndEnrichTests {
         ("04-Under My Thumb.flac", nil, nil, 4, "Under My Thumb"),
         ("13. Otto Klemperer Feat. Lucia Popp - Die Zauberflöte.flac", "Otto Klemperer Feat. Lucia Popp", nil, 13, "Die Zauberflöte"),
         ("Yarin Primak - Special Vibe [nDZIyPILowE].wav", "Yarin Primak", nil, nil, "Special Vibe"),
+        // A number that starts a name is part of it; a zero-padded one, or one with a separator, is a track number.
+        ("50 Cent - In da Club.mp3", "50 Cent", nil, nil, "In da Club"),
+        ("3 Doors Down - Kryptonite.flac", "3 Doors Down", nil, nil, "Kryptonite"),
+        ("Ariana Grande - 7 Rings.flac", "Ariana Grande", nil, nil, "7 Rings"),
+        ("Jay-Z - The Black Album - 99 Problems.flac", "Jay-Z", "The Black Album", nil, "99 Problems"),
+        ("99 Luftballons.mp3", nil, nil, nil, "99 Luftballons"),
+        ("7. Title.flac", nil, nil, 7, "Title"),
+        ("1) Title.flac", nil, nil, 1, "Title"),
+        ("7 - Title.flac", nil, nil, 7, "Title"),
+        ("03 Doors Down - Kryptonite.flac", "Doors Down", nil, 3, "Kryptonite"),
+        ("Artist - Album - 7. Title.flac", "Artist", "Album", 7, "Title"),
     ] as [(String, String?, String?, Int?, String)])
     func parse(name: String, artist: String?, album: String?, number: Int?, title: String) {
         let t = FilenameParser.parse(URL(fileURLWithPath: "/tmp/" + name))
