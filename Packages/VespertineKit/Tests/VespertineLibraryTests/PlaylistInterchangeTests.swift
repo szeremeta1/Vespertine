@@ -51,6 +51,27 @@ struct PlaylistInterchangeTests {
         #expect(entries[1].title == nil)
     }
 
+    @Test("A relative path whose first folder has a colon in its name is a file, not a web address")
+    func colonInAFolderName() {
+        let base = URL(fileURLWithPath: "/Music/Lists")
+        let text = """
+        #EXTM3U
+        #EXTINF:312,AC/DC - Hells Bells
+        AC:DC - Back in Black/01 Hells Bells.flac
+        AC:DC/02.flac
+        Mozart: Requiem/01 Introitus.flac
+        disc:1.flac
+        https://stream.example.com/live
+        rtsp://stream.example.com/live
+        file:/Users/me/Music/e.flac
+        """
+        let entries = M3U.entries(text, base: base)
+        #expect(entries.map(\.path) == ["/Music/Lists/AC:DC - Back in Black/01 Hells Bells.flac", "/Music/Lists/AC:DC/02.flac",
+                                        "/Music/Lists/Mozart: Requiem/01 Introitus.flac", "/Music/Lists/disc:1.flac",
+                                        "/Users/me/Music/e.flac"])
+        #expect(entries[0].artist == "AC/DC" && entries[0].title == "Hells Bells")
+    }
+
     @Test("Export writes an extended M3U that reads back as the same files")
     func writeM3U() async throws {
         let (db, dir) = try await library()

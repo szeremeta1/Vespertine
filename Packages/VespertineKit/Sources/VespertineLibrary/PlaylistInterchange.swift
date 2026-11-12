@@ -55,7 +55,10 @@ public enum M3U {
             if line.hasPrefix("#") { continue }
             var entry = pending ?? PlaylistEntry()
             pending = nil
-            if let url = URL(string: line), let scheme = url.scheme?.lowercased(), scheme.count > 1 {
+            // A URL names its host after "//" (or is a file: URL). A relative path whose first folder has a colon in it
+            // ("AC:DC/…", the name Finder shows as "AC/DC") only looks like one, and is a path.
+            if let url = URL(string: line), let scheme = url.scheme?.lowercased(), scheme.count > 1,
+               scheme == "file" || line.dropFirst(scheme.count).hasPrefix("://") {
                 guard scheme == "file" else { continue }   // http streams and the like aren't songs in the library
                 entry.path = url.standardizedFileURL.path
             } else {
