@@ -143,6 +143,9 @@ if ! $resume; then
     for fw in "$app"/Contents/Frameworks/*.framework; do
       codesign --force --timestamp --options runtime "${keychain[@]}" --sign "$identity" "$fw"
     done
+    for fw in "$sound_helper"/Contents/Frameworks/*.framework; do
+      codesign --force --timestamp --options runtime "${keychain[@]}" --sign "$identity" "$fw"
+    done
     codesign --force --timestamp --options runtime "${keychain[@]}" --sign "$identity" "$sound_driver"
     codesign --force --timestamp --options runtime "${keychain[@]}" --sign "$identity" \
       --entitlements Helper/VespertineSoundHelper.entitlements "$sound_helper"
