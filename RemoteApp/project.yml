@@ -35,7 +35,8 @@ targets:
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSRequiresIPhoneOS: true
         ITSAppUsesNonExemptEncryption: false
-        UILaunchScreen: {}
+        UILaunchScreen:
+          UIColorName: LaunchBackground
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
@@ -60,3 +61,32 @@ targets:
         SWIFT_APPROACHABLE_CONCURRENCY: YES
         SWIFT_STRICT_CONCURRENCY: complete
         SWIFT_EMIT_LOC_STRINGS: YES
+  VespertineRemoteTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: VespertineRemote
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.VespertineRemoteTests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/VespertineRemote.app/VespertineRemote
+        BUNDLE_LOADER: $(TEST_HOST)
+        DEVELOPMENT_TEAM: 7WMQ9ZV6V8
+        SWIFT_STRICT_CONCURRENCY: complete
+schemes:
+  VespertineRemote:
+    build:
+      targets:
+        VespertineRemote: all
+        VespertineRemoteTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - VespertineRemoteTests
+    archive:
+      config: Release

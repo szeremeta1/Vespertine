@@ -8,6 +8,8 @@ import VespertineRemoteClient
 import VespertineRemoteProtocol
 
 struct NowPlayingView: View {
+    @Environment(RemoteAppModel.self) private var model
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let session: RemoteSession
     @State private var feedback = CommandFeedback()
     @State private var scrubbing: Double?
@@ -22,40 +24,81 @@ struct NowPlayingView: View {
                 Group {
                     if wide {
                         HStack(alignment: .center, spacing: 32) {
-                            cover.frame(maxWidth: min(geometry.size.height - 80, 520))
+                            cover.frame(maxWidth: min(geometry.size.height - 60, 520))
                             controls
                         }
                     } else {
-                        VStack(spacing: 24) {
-                            cover.frame(maxWidth: 520)
+                        VStack(spacing: 22) {
+                            cover.frame(maxWidth: min(520, max(220, geometry.size.height - 430)))
                             controls
                         }
                     }
                 }
-                .padding()
-                .frame(minHeight: geometry.size.height)
+                .padding(.horizontal, 24).padding(.vertical, 12)
+                .frame(maxWidth: .infinity, minHeight: geometry.size.height)
             }
+            .scrollBounceBehavior(.basedOnSize)
         }
+        .background(backdrop)
         .feedback(feedback)
+        .sensoryFeedback(.impact(weight: .light), trigger: player?.playback)
+        .sensoryFeedback(.selection, trigger: player?.nowPlaying?.entry)
+    }
+
+    /// The cover's colours, far out of focus, over obsidian.
+    private var backdrop: some View {
+        ZStack {
+            Palette.base
+            ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: 160, cornerRadius: 0, placeholder: false)
+                .scaleEffect(1.6)
+                .blur(radius: 70)
+                .opacity(0.42)
+            LinearGradient(colors: [Palette.base.opacity(0.15), Palette.base.opacity(0.9)], startPoint: .top, endPoint: .bottom)
+        }
+        .ignoresSafeArea()
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.8), value: player?.nowPlaying?.track.artworkKey)
+        .accessibilityHidden(true)
     }
 
     private var cover: some View {
-        ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: 1000, cornerRadius: 12)
-            .shadow(radius: 12)
+        ZStack(alignment: .topTrailing) {
+            Group {
+                if model.settings.vinyl {
+                    VinylView(session: session)
+                        .transition(reduceMotion ? .opacity : .scale(scale: 0.92).combined(with: .opacity))
+                } else {
+                    ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: 1000, cornerRadius: 10)
+                        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
+                        .shadow(color: .black.opacity(0.55), radius: 24, y: 14)
+                        .transition(reduceMotion ? .opacity : .scale(scale: 0.92).combined(with: .opacity))
+                }
+            }
+            Button {
+                withAnimation(reduceMotion ? nil : .spring(duration: 0.45)) { model.settings.vinyl.toggle() }
+            } label: {
+                Image(systemName: model.settings.vinyl ? "photo" : "record.circle")
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(Palette.text)
+                    .frame(width: 38, height: 38)
+                    .background(.ultraThinMaterial, in: Circle())
+                    .overlay(Circle().strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
+            }
+            .buttonStyle(.plain)
+            .padding(model.settings.vinyl ? 0 : 10)
+            .accessibilityLabel(model.settings.vinyl ? Text("Show the Cover") : Text("Show a Record"))
+            .sensoryFeedback(.selection, trigger: model.settings.vinyl)
+        }
     }
 
     private var controls: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 18) {
             titles
             scrubber
             transport
             modes
             volume
-            if let output = player?.output {
-                Label(output, systemImage: "hifispeaker").font(.caption).foregroundStyle(.secondary)
-            }
             if let waiting = player?.waitingFor {
-                Text("Waiting for “\(waiting)” to connect").font(.caption).foregroundStyle(.orange)
+                Text("Waiting for “\(waiting)” to connect").font(.caption).foregroundStyle(Palette.copper)
             }
             if let error = player?.error, !error.isEmpty {
                 Text(error).font(.caption).foregroundStyle(.red).multilineTextAlignment(.center)
@@ -66,35 +109,57 @@ struct NowPlayingView: View {
 
     @ViewBuilder private var titles: some View {
         if let track = player?.nowPlaying?.track {
-            VStack(spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .firstTextBaseline) {
-                    Text(track.title).font(.title2.bold()).lineLimit(2)
+                    Text(track.title).font(.serif(.title2, weight: .semibold)).foregroundStyle(Palette.text).lineLimit(2)
                     Spacer()
                     if let id = track.id {
                         Button {
                             feedback.run(session, .setFavorite(ids: [id], on: !track.favorite))
                         } label: {
                             Image(systemName: track.favorite ? "heart.fill" : "heart")
+                                .font(.title3)
+                                .foregroundStyle(track.favorite ? Palette.brass : Palette.text2)
+                                .frame(width: 44, height: 44, alignment: .trailing)
+                                .contentShape(Rectangle())
                         }
+                        .buttonStyle(.plain)
                         .accessibilityLabel(track.favorite ? Text("Remove from Favorites") : Text("Add to Favorites"))
+                        .sensoryFeedback(.success, trigger: track.favorite)
                     }
                 }
-                HStack {
-                    Text("\(track.artist) — \(track.album)").foregroundStyle(.secondary).lineLimit(1)
-                    Spacer()
-                }
-                HStack(spacing: 8) {
-                    Text(track.format)
-                    if let signal = player?.signal {
-                        Text(signal.badge)
-                            .foregroundStyle(signal.bitPerfect ? Color.accentColor : Color.secondary)
-                    }
-                    Spacer()
-                }
-                .font(.caption.monospaced()).foregroundStyle(.secondary)
+                Text("\(track.artist) — \(track.album)").font(.subheadline).foregroundStyle(Palette.text2).lineLimit(1)
+                signalPath(track)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         } else {
-            Text("Nothing playing").font(.title3).foregroundStyle(.secondary)
+            VStack(spacing: 6) {
+                Text("Nothing playing").font(.serif(.title3)).foregroundStyle(Palette.text2)
+                Text("Choose something in the Library.").font(.footnote).foregroundStyle(Palette.text3)
+            }
+        }
+    }
+
+    /// The signal path, as the Mac's badge says it: what the file is, what the DAC receives, and where it plays.
+    private func signalPath(_ track: TrackSummary) -> some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 6) { signalChips(track, output: true) }
+            HStack(spacing: 6) { signalChips(track, output: false) }
+        }
+        .padding(.top, 2)
+        .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder private func signalChips(_ track: TrackSummary, output: Bool) -> some View {
+        Chip(text: track.format)
+        if let signal = player?.signal {
+            Chip(text: signal.badge, highlighted: signal.bitPerfect)
+            if !signal.deviceFormat.isEmpty, !track.format.hasSuffix(signal.deviceFormat) {
+                Chip(text: "→ " + signal.deviceFormat)
+            }
+        }
+        if output, let name = player?.output {
+            Label(name, systemImage: "hifispeaker").font(.caption2).foregroundStyle(Palette.text3).lineLimit(1)
         }
     }
 
@@ -111,66 +176,75 @@ struct NowPlayingView: View {
                         Task { try? await Task.sleep(for: .seconds(1)); scrubbing = nil }
                     }
                 })
-                .disabled(duration <= 0)
+                .tint(Palette.brass)
+                .disabled(duration <= 0 || !session.isConnected)
                 .accessibilityLabel(Text("Position"))
+                .accessibilityValue(Text("\(formatTime(position)) of \(formatTime(duration))"))
                 HStack {
                     Text(formatTime(position))
                     Spacer()
                     Text("-" + formatTime(max(duration - position, 0)))
                 }
-                .font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                .font(.signal(.caption2)).foregroundStyle(Palette.text2)
+                .accessibilityHidden(true)
             }
         }
     }
 
     private var transport: some View {
-        HStack(spacing: 44) {
-            Button { feedback.run(session, .previous) } label: { Image(systemName: "backward.fill") }
-                .accessibilityLabel(Text("Previous"))
+        HStack(spacing: 40) {
+            Button { feedback.run(session, .previous) } label: {
+                Image(systemName: "backward.fill").frame(width: 56, height: 56).contentShape(Rectangle())
+            }
+            .accessibilityLabel(Text("Previous"))
             Button { feedback.run(session, .playPause) } label: {
-                Image(systemName: player?.playback == .playing ? "pause.circle.fill" : "play.circle.fill")
-                    .font(.system(size: 64))
+                PlayPauseFace(playing: player?.playback == .playing, loading: player?.loading == true)
             }
             .accessibilityLabel(player?.playback == .playing ? Text("Pause") : Text("Play"))
-            Button { feedback.run(session, .next) } label: { Image(systemName: "forward.fill") }
-                .accessibilityLabel(Text("Next"))
+            Button { feedback.run(session, .next) } label: {
+                Image(systemName: "forward.fill").frame(width: 56, height: 56).contentShape(Rectangle())
+            }
+            .accessibilityLabel(Text("Next"))
         }
         .font(.title)
+        .foregroundStyle(Palette.text)
+        .buttonStyle(.plain)
+        .disabled(!session.isConnected)
+        .opacity(session.isConnected ? 1 : 0.5)
+    }
+
+    private var modes: some View {
+        HStack(spacing: 0) {
+            modeButton("shuffle", on: player?.shuffle == true, label: Text("Shuffle")) {
+                .setShuffle(on: !(player?.shuffle ?? false))
+            }
+            modeButton(player?.repeatMode == .one ? "repeat.1" : "repeat", on: !(player?.repeatMode == .off || player == nil), label: Text("Repeat"),
+                       value: Self.repeatValue(player?.repeatMode ?? .off)) {
+                .setRepeat(mode: Self.nextRepeat(after: player?.repeatMode ?? .off))
+            }
+            if let transitions = player?.transitions {
+                modeButton("arrow.triangle.merge", on: transitions, label: Text("Transitions")) { .setTransitions(on: !transitions) }
+            }
+            Button { feedback.run(session, .stop) } label: {
+                Image(systemName: "stop.fill").foregroundStyle(Palette.text2).frame(maxWidth: .infinity, minHeight: 44).contentShape(Rectangle())
+            }
+            .accessibilityLabel(Text("Stop"))
+        }
+        .font(.body)
         .buttonStyle(.plain)
         .disabled(!session.isConnected)
     }
 
-    private var modes: some View {
-        HStack(spacing: 28) {
-            Button {
-                feedback.run(session, .setShuffle(on: !(player?.shuffle ?? false)))
-            } label: {
-                Image(systemName: "shuffle").foregroundStyle(player?.shuffle == true ? Color.accentColor : Color.secondary)
+    private func modeButton(_ symbol: String, on: Bool, label: Text, value: Text? = nil, command: @escaping () -> RemoteCommand) -> some View {
+        Button { feedback.run(session, command()) } label: {
+            VStack(spacing: 4) {
+                Image(systemName: symbol).foregroundStyle(on ? Palette.brass : Palette.text2)
+                Circle().fill(on ? Palette.brass : .clear).frame(width: 3, height: 3)
             }
-            .accessibilityLabel(Text("Shuffle"))
-            .accessibilityValue(player?.shuffle == true ? Text("On") : Text("Off"))
-            Button {
-                feedback.run(session, .setRepeat(mode: Self.nextRepeat(after: player?.repeatMode ?? .off)))
-            } label: {
-                Image(systemName: player?.repeatMode == .one ? "repeat.1" : "repeat")
-                    .foregroundStyle(player?.repeatMode == .off || player == nil ? Color.secondary : Color.accentColor)
-            }
-            .accessibilityLabel(Text("Repeat"))
-            if let transitions = player?.transitions {
-                Button {
-                    feedback.run(session, .setTransitions(on: !transitions))
-                } label: {
-                    Image(systemName: "arrow.triangle.merge").foregroundStyle(transitions ? Color.accentColor : Color.secondary)
-                }
-                .accessibilityLabel(Text("Transitions"))
-                .accessibilityValue(transitions ? Text("On") : Text("Off"))
-            }
-            Button { feedback.run(session, .stop) } label: { Image(systemName: "stop.fill").foregroundStyle(.secondary) }
-                .accessibilityLabel(Text("Stop"))
+            .frame(maxWidth: .infinity, minHeight: 44).contentShape(Rectangle())
         }
-        .font(.title3)
-        .buttonStyle(.plain)
-        .disabled(!session.isConnected)
+        .accessibilityLabel(label)
+        .accessibilityValue(value ?? (on ? Text("On") : Text("Off")))
     }
 
     static func nextRepeat(after mode: RepeatModeValue) -> RepeatModeValue {
@@ -181,16 +255,25 @@ struct NowPlayingView: View {
         }
     }
 
+    static func repeatValue(_ mode: RepeatModeValue) -> Text {
+        switch mode {
+        case .off: Text("Off")
+        case .all: Text("All")
+        case .one: Text("One Song")
+        }
+    }
+
     @ViewBuilder private var volume: some View {
         if let volume = player?.volume {
             switch volume.route {
             case .fixed:
                 Label("Fixed volume: set the level on your amplifier or DAC", systemImage: "speaker.slash")
-                    .font(.caption).foregroundStyle(.secondary)
+                    .font(.caption).foregroundStyle(Palette.text2)
             case .hardware, .software:
                 HStack(spacing: 12) {
                     Button { feedback.run(session, .volume(action: .mute)) } label: {
                         Image(systemName: volume.muted ? "speaker.slash.fill" : "speaker.fill")
+                            .frame(width: 36, height: 44).contentShape(Rectangle())
                     }
                     .accessibilityLabel(volume.muted ? Text("Unmute") : Text("Mute"))
                     if let level = volume.level {
@@ -200,15 +283,23 @@ struct NowPlayingView: View {
                                 Task { try? await Task.sleep(for: .seconds(1)); volumeDrag = nil }
                             }
                         })
+                        .tint(Palette.text2)
                         .accessibilityLabel(Text("Volume"))
+                        Image(systemName: "speaker.wave.3.fill").foregroundStyle(Palette.text3).accessibilityHidden(true)
                     } else {
                         Spacer()
-                        Button { feedback.run(session, .volume(action: .down)) } label: { Image(systemName: "minus") }
-                            .accessibilityLabel(Text("Volume Down"))
-                        Button { feedback.run(session, .volume(action: .up)) } label: { Image(systemName: "plus") }
-                            .accessibilityLabel(Text("Volume Up"))
+                        Button { feedback.run(session, .volume(action: .down)) } label: {
+                            Image(systemName: "minus").frame(width: 44, height: 44).contentShape(Rectangle())
+                        }
+                        .accessibilityLabel(Text("Volume Down"))
+                        Button { feedback.run(session, .volume(action: .up)) } label: {
+                            Image(systemName: "plus").frame(width: 44, height: 44).contentShape(Rectangle())
+                        }
+                        .accessibilityLabel(Text("Volume Up"))
                     }
                 }
+                .font(.footnote)
+                .foregroundStyle(Palette.text2)
                 .buttonStyle(.plain)
                 .disabled(!session.isConnected)
             }

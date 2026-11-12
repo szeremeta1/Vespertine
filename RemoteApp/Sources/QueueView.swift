@@ -45,6 +45,7 @@ struct QueueView: View {
                     ProgressView()
                 }
             }
+            .obsidianList()
             .navigationTitle("Queue")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { EditButton() }
