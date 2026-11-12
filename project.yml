@@ -87,7 +87,7 @@ targets:
         NSHumanReadableCopyright: "Copyright © 2026 Vespertine contributors. Free software under the GNU GPL, version 3 or later."
         # Network shares are probed and mounted over the local network (or a VPN); without this string
         # macOS's Local Network prompt has no explanation, and a denied or unanswered prompt looks like an offline server.
-        NSLocalNetworkUsageDescription: "Vespertine connects to the music servers and network shares you add, on your network or over a VPN."
+        NSLocalNetworkUsageDescription: "Vespertine connects to the music servers and network shares you add, on your network or over a VPN. If you turn on Remote, the phones and browsers you pair can control it too."
         # The phone remote (Settings › Remote, off by default) advertises this Mac on Bonjour for the Vespertine Remote app.
         NSBonjourServices: ["_vespertine._tcp"]
         # Room measurement, the loopback self-test and Mac Sound Output. macOS attributes the sound helper's input to
