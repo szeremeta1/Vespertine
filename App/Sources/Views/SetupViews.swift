@@ -793,6 +793,8 @@ private struct SetupExtras: View {
                             detail: "Analyzes new music in the background for upsampling, padded bits and lossy sources sold as hi-res. Results are saved, so nothing is analyzed twice.",
                             on: settings.autoAnalyze) {
                     Toggle("Check each file's real quality", isOn: $settings.autoAnalyze).labelsHidden().toggleStyle(.switch).tint(Palette.brass)
+                        // As in Settings: music already scanned at the Music step starts being checked now, not at the next scan.
+                        .onChange(of: settings.autoAnalyze) { if settings.autoAnalyze { model.analysis.analyzeLibrary() } }
                 }
                 .reveal(shown, delay: 0.12)
                 SetupOption(symbol: "photo.on.rectangle", title: "Cover art from the Cover Art Archive",
