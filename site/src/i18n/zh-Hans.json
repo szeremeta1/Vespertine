@@ -714,6 +714,7 @@
     "onlineTitle": "应用何时联网",
     "online": [
       "<strong>检查更新。</strong>Vespertine 大约每天一次向 GitHub 获取更新源，在你选择“检查更新”时也会获取。与任何下载一样，GitHub 会看到你的 IP 地址。你可以在“设置”中关闭自动检查。",
+      "<strong>DoP DAC 列表。</strong>Vespertine 大约每天一次从其 GitHub 发布页下载一份简短列表，列出已知可通过 PCM 传输 DSD（DoP）的 DAC，让新确认的 DAC 也能播放原生 DSD。它不会发送任何关于你的信息；与任何下载一样，GitHub 会看到你的 IP 地址。你可以在“设置” › “更新”中关闭此功能。",
       "<strong>MusicBrainz 和 Cover Art Archive。</strong>仅当你使用“在 MusicBrainz 上查找”或“补全元数据”时（“在这台 Mac 上查找音乐”会为其添加的音乐提供补全选项，这是一个可以取消勾选的复选框），Vespertine 才会将要查找的专辑名、艺人名和音轨名发送到 musicbrainz.org。如果在“设置”中打开了“获取封面”，它会从 coverartarchive.org 下载封面，后者通过 Internet Archive（archive.org）提供这些封面。MusicBrainz 和 Cover Art Archive 由 MetaBrainz Foundation 运营。",
       "<strong>ListenBrainz。</strong>仅当你打开 Scrobble 功能并输入令牌后，Vespertine 才会把你播放的歌曲发送到 listenbrainz.org：标题、艺人、专辑、时长，以及文件中带有的 MusicBrainz ID。歌曲开始时它会发送“正在播放”，在你听完一半或听满四分钟后，会发送一条带有时间的收听记录。",
       "<strong>Discord。</strong>仅当你在“设置”中打开 Discord 状态后，Vespertine 才会通过一条只在你的 Mac 内部进行的连接，告诉你 Mac 上的 Discord 应用正在播放什么：标题、艺人、专辑、格式和进度。Discord 会把它作为你的状态显示给能看到你动态的人。为了显示专辑封面，Vespertine 会按名称查找封面，因为 Discord 只能显示来自网络的图像：如果你的文件带有 MusicBrainz 发行版本 ID，就在 coverartarchive.org 上查找，否则在 Apple 的 iTunes Search（itunes.apple.com）中查找，后者会收到艺人名和专辑名。随后 Discord 会从那里下载封面。你可以关闭封面显示，你的文件及其封面永远不会被上传。",
