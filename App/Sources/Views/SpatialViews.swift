@@ -72,7 +72,7 @@ struct SpatialExportSheet: View {
                 if let result, !result.written.isEmpty {
                     Button("Show in Finder") { NSWorkspace.shared.activateFileViewerSelecting(result.written) }.buttonStyle(QuietButtonStyle())
                 }
-                Button(result == nil ? String(localized: "Cancel") : String(localized: "Done")) { dismiss() }.buttonStyle(QuietButtonStyle()).disabled(running)
+                Button(result == nil ? String(localized: "Cancel") : String(localized: "Done")) { dismiss() }.buttonStyle(QuietButtonStyle()).keyboardShortcut(.cancelAction).disabled(running)
                 if result == nil {
                     Button("Export", action: export).buttonStyle(BrassButtonStyle()).keyboardShortcut(.defaultAction)
                         .disabled(running || eligible.isEmpty)
