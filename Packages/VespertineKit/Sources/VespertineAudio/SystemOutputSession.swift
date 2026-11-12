@@ -68,7 +68,9 @@ final class SystemOutputSession: @unchecked Sendable {
             guard let device = listed.first(where: { $0.uid == member.deviceUID }) else { throw GroupMemberError.gone(member.name) }
             devices.append(device)
         }
-        let members = try GroupMemberSession.begin(devices: devices, rate: rate, exclusive: entry.exclusive)
+        // Never held (hog mode): macOS can't make a hogged DAC the Mac's output, so the Sound menu would spin on it (see
+        // `SystemOutputPolicy`). The service lets the group go when a member is wanted by someone else instead.
+        let members = try GroupMemberSession.begin(devices: devices, rate: rate, exclusive: SystemOutputPolicy.holdsMembers(entry))
         if let wrong = GroupApplied.memberNotAt(rate, members.members) {
             members.release()
             throw GroupMemberError.rateRefused(uid: wrong, name: devices.first { $0.uid == wrong }?.name ?? wrong, rate: rate)
