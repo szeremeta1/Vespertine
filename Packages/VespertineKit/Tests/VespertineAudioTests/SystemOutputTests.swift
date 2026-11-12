@@ -107,7 +107,8 @@ struct SystemOutputTests {
         #expect(d.content == .stereo)
         let front: [Float] = [0.5, 0.5, 0, 0, 0, 0]
         let film: [Float] = [0.5, 0.5, 0.2, 0, 0.01, 0.01]
-        #expect(d.update(peaks: film, seconds: 0.05))
+        let switched = d.update(peaks: film, seconds: 0.05)
+        #expect(switched)
         #expect(d.content == .multichannel)
         // A quiet stretch of the film: still surround after a few seconds.
         for _ in 0..<100 { _ = d.update(peaks: front, seconds: 0.05) }
@@ -123,7 +124,8 @@ struct SystemOutputTests {
     @Test("A two-channel output is always stereo")
     func stereoOutputDetector() {
         var d = SystemOutputContentDetector(input: [kAudioChannelLabel_Left, kAudioChannelLabel_Right])
-        #expect(!d.update(peaks: [1, 1], seconds: 1))
+        let switched = d.update(peaks: [1, 1], seconds: 1)
+        #expect(!switched)
         #expect(d.content == .stereo)
     }
 
