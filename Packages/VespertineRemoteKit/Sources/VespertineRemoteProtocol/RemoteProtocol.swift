@@ -2,7 +2,7 @@
 // Vespertine: the remote protocol's constants and the messages a remote and the Mac exchange.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
-// A remote (the iPhone or iPad app) finds a Mac on Bonjour, opens one WebSocket to it over TLS with a pre-shared key, and
+// A remote (the iPhone or iPad app) finds a Mac on Bonjour, opens one connection to it over TLS with a pre-shared key, and
 // sends `ClientMessage`s as JSON text. The Mac answers each with a `ServerMessage.reply` carrying the same `id`, and pushes
 // `ServerMessage.player`, `.queue` and `.outputs` whenever what they describe changes.
 //

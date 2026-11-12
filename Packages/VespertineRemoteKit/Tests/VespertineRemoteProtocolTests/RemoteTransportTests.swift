@@ -1,5 +1,5 @@
 //
-// Vespertine: the remote's TLS pre-shared-key WebSocket, end to end on this Mac's loopback: a listener holding several
+// Vespertine: the remote's TLS pre-shared-key connection, end to end on this Mac's loopback: a listener holding several
 // keys lets in a phone with any one of them, and refuses a wrong key or a key under another phone's identity.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
@@ -75,7 +75,7 @@ private func exchange(port: NWEndpoint.Port, key: RemoteTransport.PresharedKey, 
         connection.stateUpdateHandler = { state in
             switch state {
             case .ready:
-                print("transport test: client ready (TLS and WebSocket up, if any)")
+                print("transport test: client ready (TLS and framing up, if any)")
                 connection.send(content: Data("hello".utf8), contentContext: RemoteTransport.textContext, isComplete: true, completion: .contentProcessed { _ in })
                 connection.receiveMessage { content, _, _, error in
                     let text = error == nil ? content.map { String(decoding: $0, as: UTF8.self) } : nil
@@ -99,7 +99,7 @@ private func exchange(port: NWEndpoint.Port, key: RemoteTransport.PresharedKey, 
 }
 
 /// Builds the transport with parts switched on or off, to see which part a failure comes from.
-private func variant(keys: [RemoteTransport.PresharedKey], tls: Bool, versionLimits: Bool, websocket: Bool) -> NWParameters {
+private func variant(keys: [RemoteTransport.PresharedKey], tls: Bool, versionLimits: Bool, framing: Bool) -> NWParameters {
     let tcp = NWProtocolTCP.Options()
     let parameters: NWParameters
     if tls {
@@ -119,10 +119,8 @@ private func variant(keys: [RemoteTransport.PresharedKey], tls: Bool, versionLim
     } else {
         parameters = NWParameters(tls: nil, tcp: tcp)
     }
-    if websocket {
-        let options = NWProtocolWebSocket.Options()
-        options.autoReplyPing = true
-        parameters.defaultProtocolStack.applicationProtocols.insert(options, at: 0)
+    if framing {
+        parameters.defaultProtocolStack.applicationProtocols.insert(NWProtocolFramer.Options(definition: RemoteFrame.definition), at: 0)
     }
     return parameters
 }
@@ -130,15 +128,24 @@ private func variant(keys: [RemoteTransport.PresharedKey], tls: Bool, versionLim
 @Suite(.serialized) struct TransportParts {
     let key = RemoteTransport.PresharedKey(identity: "phone-alex", key: Data(repeating: 0xA1, count: 32))
 
-    /// Reports which combinations get a message through (diagnostic: prints, and only the plain WebSocket must work).
+    /// Reports which combinations get a message through (diagnostic: prints; without TLS it must work). Without the
+    /// framing a message only ends when the stream does, so those combinations time out by design.
     @Test func whichPartsWork() async throws {
-        for (tls, limits, websocket) in [(false, false, true), (true, true, false), (true, false, false), (true, false, true), (true, true, true)] {
-            let server = try EchoServer(keys: [key], parameters: variant(keys: [key], tls: tls, versionLimits: limits, websocket: websocket))
+        for (tls, limits, framing) in [(false, false, true), (true, true, true), (true, false, true), (true, true, false)] {
+            let server = try EchoServer(keys: [key], parameters: variant(keys: [key], tls: tls, versionLimits: limits, framing: framing))
             let port = try await server.start()
-            let answer = await exchange(port: port, key: key, parameters: variant(keys: [key], tls: tls, versionLimits: limits, websocket: websocket))
-            print("transport test: tls=\(tls) tls12only=\(limits) websocket=\(websocket) -> \(answer ?? "nil")")
+            let answer = await exchange(port: port, key: key, parameters: variant(keys: [key], tls: tls, versionLimits: limits, framing: framing))
+            print("transport test: tls=\(tls) tls12only=\(limits) framing=\(framing) -> \(answer ?? "nil")")
             if !tls { #expect(answer == "echo: hello") }
+            withExtendedLifetime(server) {}
         }
+    }
+
+    @Test func headersCarryTheLength() {
+        for length in [0, 1, 255, 256, 70_000, RemoteProtocol.maximumMessageSize] {
+            #expect(RemoteFrame.length(of: RemoteFrame.header(length: length)) == length)
+        }
+        #expect(RemoteFrame.header(length: 0x01020304) == Data([1, 2, 3, 4]))
     }
 }
 
@@ -151,6 +158,7 @@ private func variant(keys: [RemoteTransport.PresharedKey], tls: Bool, versionLim
         let port = try await server.start()
         #expect(await exchange(port: port, key: alex) == "echo: hello")
         #expect(await exchange(port: port, key: ipad) == "echo: hello")
+        withExtendedLifetime(server) {}
     }
 
     @Test func wrongKeysAreRefused() async throws {
@@ -160,6 +168,7 @@ private func variant(keys: [RemoteTransport.PresharedKey], tls: Bool, versionLim
         // Another phone's identity with this phone's key.
         #expect(await exchange(port: port, key: .init(identity: "phone-alex", key: ipad.key)) == nil)
         #expect(await exchange(port: port, key: .init(identity: "phone-unknown", key: alex.key)) == nil)
+        withExtendedLifetime(server) {}
     }
 
     @Test func pairingKeysWork() async throws {
@@ -170,6 +179,7 @@ private func variant(keys: [RemoteTransport.PresharedKey], tls: Bool, versionLim
         #expect(await exchange(port: port, key: pairing) == "echo: hello")
         let wrongCode = RemoteTransport.PresharedKey(identity: RemoteProtocol.pairingCodeIdentity, key: PairingKey.derive(secret: "000000", serverID: "S1"))
         #expect(await exchange(port: port, key: wrongCode) == nil)
+        withExtendedLifetime(server) {}
     }
 }
 #endif

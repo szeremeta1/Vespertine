@@ -1,5 +1,5 @@
 //
-// Vespertine Remote: one TLS (pre-shared key) + WebSocket connection to a Mac, with requests that await their replies.
+// Vespertine Remote: one TLS (pre-shared key) connection (length-framed JSON) to a Mac, with requests that await their replies.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
@@ -28,7 +28,7 @@ final class RemoteLink: RemoteChannel {
         connection = NWConnection(to: endpoint, using: RemoteTransport.parameters(keys: [key]))
     }
 
-    /// Connects, and returns once TLS and the WebSocket are up.
+    /// Connects, and returns once TLS is up.
     func open(timeout: Duration = .seconds(10)) async throws {
         connection.stateUpdateHandler = { [weak self] state in
             MainActor.assumeIsolated { self?.changed(state) }
@@ -86,14 +86,13 @@ final class RemoteLink: RemoteChannel {
     }
 
     private func receive() {
-        connection.receiveMessage { [weak self] content, context, _, error in
-            let metadata = context?.protocolMetadata(definition: NWProtocolWebSocket.definition) as? NWProtocolWebSocket.Metadata
-            let opcode = metadata?.opcode
-            let failed = error != nil
+        connection.receiveMessage { [weak self] content, _, isComplete, error in
+            // No content on a complete receive: the Mac closed the connection.
+            let ended = error != nil || (content == nil && isComplete)
             MainActor.assumeIsolated {
                 guard let self, !self.isClosed else { return }
-                if failed || opcode == .close { self.close(); return }
-                if let content, opcode == .text || opcode == nil { self.handle(content) }
+                if ended { self.close(); return }
+                if let content { self.handle(content) }
                 self.receive()
             }
         }

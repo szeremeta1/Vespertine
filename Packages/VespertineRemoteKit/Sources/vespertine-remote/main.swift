@@ -90,9 +90,9 @@ final class Link: @unchecked Sendable {
     }
 
     private func receive() {
-        connection.receiveMessage { [weak self] content, _, _, error in
+        connection.receiveMessage { [weak self] content, _, isComplete, error in
             guard let self else { return }
-            if error != nil { self.arrived.signal(); return }
+            if error != nil || (content == nil && isComplete) { self.arrived.signal(); return }
             if let content, let message = try? RemoteProtocol.decoder().decode(ServerMessage.self, from: content) {
                 switch message {
                 case .reply(let id, let result):

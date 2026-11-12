@@ -106,6 +106,7 @@ private func waitUntil(_ condition: () -> Bool, seconds: Double = 5) async -> Bo
         #expect(await session.send(.playPause) == .ok)
         session.close()
         #expect(session.phase == .closed)
+        withExtendedLifetime(mac) {}
     }
 
     @Test func aRemovedPhoneCantSignIn() async throws {
@@ -119,6 +120,7 @@ private func waitUntil(_ condition: () -> Bool, seconds: Double = 5) async -> Bo
         #expect(await waitUntil { if case .unreachable = session.phase { true } else { false } })
         #expect(!session.isConnected)
         session.close()
+        withExtendedLifetime(mac) {}
     }
 }
 #endif

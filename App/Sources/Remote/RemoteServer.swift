@@ -1,6 +1,6 @@
 //
 // Vespertine: the remote server. Off until Settings › Remote turns it on; then it advertises this Mac on Bonjour, lets a
-// phone pair while the pairing window is open, and serves paired phones over TLS (a pre-shared key per phone) + WebSocket.
+// phone pair while the pairing window is open, and serves paired phones over TLS (a pre-shared key per phone) with length-framed JSON messages.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // Everything here runs on the main queue: the listener, every connection and the push loop. The traffic is small (a few
@@ -406,14 +406,13 @@ final class RemoteClient {
     }
 
     private func receive() {
-        connection.receiveMessage { [weak self] content, context, _, error in
-            let metadata = context?.protocolMetadata(definition: NWProtocolWebSocket.definition) as? NWProtocolWebSocket.Metadata
-            let opcode = metadata?.opcode
-            let failed = error != nil
+        connection.receiveMessage { [weak self] content, _, isComplete, error in
+            // No content on a complete receive: the phone closed the connection.
+            let ended = error != nil || (content == nil && isComplete)
             MainActor.assumeIsolated {
                 guard let self, !self.closed else { return }
-                if failed || opcode == .close { self.finish(); return }
-                if opcode == .text, let content { self.handle(content) }
+                if ended { self.finish(); return }
+                if let content { self.handle(content) }
                 self.receive()
             }
         }
