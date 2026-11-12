@@ -52,7 +52,7 @@ struct DemoMacTests {
         guard case .tracks(let songs) = try await ask(mac, .albumTracks(key: page[0].key)) else { Issue.record("no tracks"); return }
         #expect(songs.first?.trackNumber == 1)
         guard case .tracks(let found) = try await ask(mac, .search(text: "nocturne", limit: 50)) else { Issue.record("no search"); return }
-        #expect(found.count == 4)
+        #expect(found.count == 6) // every song on "Nocturnes for a Small Room"
         guard case .artwork(_, _, let type, _) = try await ask(mac, .artwork(key: page[0].artworkKey!, size: 300)) else { Issue.record("no art"); return }
         #expect(type == "image/png")
         #expect(try await ask(mac, .artwork(key: "../nope", size: 300)) == .failed(reason: ""))
