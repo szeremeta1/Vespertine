@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-CATALOGS = [ROOT / "App/Resources/Localizable.xcstrings", ROOT / "App/Resources/InfoPlist.xcstrings"]
+CATALOGS = [ROOT / "App/Resources/Localizable.xcstrings", ROOT / "App/Resources/InfoPlist.xcstrings", ROOT / "Helper/Resources/InfoPlist.xcstrings"]
 
 # The languages Vespertine ships, besides English. Russian is deliberately not one of them.
 LANGUAGES = [
@@ -128,7 +128,7 @@ def check(path, problems):
 # Where a string literal in the source becomes a key of Localizable.xcstrings: the SwiftUI views and modifiers that
 # take a LocalizedStringKey, String(localized:) (the packages' too: they look their text up in the app's main bundle)
 # and the analysis package's localized(_:). The first argument may be a ternary between two literals.
-SOURCES = ["App/Sources/**/*.swift", "Packages/*/Sources/**/*.swift"]
+SOURCES = ["App/Sources/**/*.swift", "Helper/Sources/**/*.swift", "Packages/*/Sources/**/*.swift"]
 LOCALIZING = re.compile(
     r'(?:\b(?:Text|Button|Label|Toggle|Section|Picker|LabeledContent|Menu|TextField|SecureField|Link|GroupBox'
     r'|DisclosureGroup|ContentUnavailableView|Stepper|ProgressView)\(|\.(?:navigationTitle|help|accessibilityLabel'

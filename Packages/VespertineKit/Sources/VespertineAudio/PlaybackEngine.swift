@@ -91,6 +91,9 @@ public struct EngineSettings: Sendable, Equatable {
     public var dopDeviceUIDs: Set<String> = []
     public var ratePolicies: [String: RatePolicy] = [:]
     public var releaseExclusiveAfterPause: TimeInterval = 30
+    /// Speaker groups published with Mac Sound Output: paused on one, Vespertine gives it back to the other apps soon
+    /// (`publishedGroupPauseHold`), so their sound is heard again.
+    public var systemOutputGroupIDs: Set<UUID> = []
     /// nil = no software volume (hardware or fixed).
     public var digitalVolumeDB: Double?
     /// Outputs with their own volume control get no digital volume. Decided for the output that's actually
@@ -825,6 +828,11 @@ public final class PlaybackEngine: @unchecked Sendable {
                       Date().timeIntervalSince(pausedAt) > Self.pauseHold(release: settings.releaseExclusiveAfterPause,
                                                                            running: session.isRunning) {
                 park()
+            } else if state == .paused, let pausedAt, let group = session?.groupResources?.group,
+                      settings.systemOutputGroupIDs.contains(group.id),
+                      Date().timeIntervalSince(pausedAt) > min(settings.releaseExclusiveAfterPause, Self.publishedGroupPauseHold) {
+                // A group published with Mac Sound Output: other apps' sound to it is heard again a moment into a pause.
+                park()
             }
             publishSnapshot()
 
@@ -1212,7 +1220,11 @@ public final class PlaybackEngine: @unchecked Sendable {
         standingIn = nil
         // Following the default: stay on the device we already hold (our hog moved the system default away from it).
         if settings.deviceUID == nil, let current = sessionDevice, let alive = devices.first(where: { $0.id == current.id }) { return alive }
-        return devices.first(where: \.isDefault) ?? devices.first
+        if let isDefault = devices.first(where: \.isDefault) { return isDefault }
+        // The Mac's sound output is a speaker group published with Mac Sound Output: Vespertine plays that group itself.
+        if let group = SystemOutput.defaultOutputGroup(among: settings.speakerGroups) { return try resolveGroup(group, among: devices) }
+        // The default isn't one Vespertine lists: never a virtual output (a call app's cable) when a real one is there.
+        return OutputChoice.best(among: devices)
     }
 
     private func listOutputs() -> [OutputDevice] {
@@ -1760,6 +1772,8 @@ public final class PlaybackEngine: @unchecked Sendable {
         running ? min(release, maxRunningPause) : release
     }
     static let maxRunningPause: TimeInterval = 600
+    /// How long a pause keeps a speaker group published with Mac Sound Output from the other apps playing to it.
+    static let publishedGroupPauseHold: TimeInterval = 5
 
     /// Frees the device after a long pause but remembers where we were.
     private func park() {

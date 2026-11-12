@@ -11,7 +11,7 @@ import CVespertineRT
 import Foundation
 
 /// One output channel's correction.
-public struct RoomChannelPlayback: Hashable, Sendable {
+public struct RoomChannelPlayback: Hashable, Sendable, Codable {
     public var delayMs: Double
     public var levelDB: Double
     public var bands: [EQBand]
@@ -40,7 +40,7 @@ public struct RoomChannelPlayback: Hashable, Sendable {
     public var isActive: Bool { delayMs > 0 || levelDB != 0 || bands.contains(where: \.isActive) || impulse != nil || inverted || advancePPM > 0 }
 }
 
-public struct RoomCorrectionPlayback: Hashable, Sendable {
+public struct RoomCorrectionPlayback: Hashable, Sendable, Codable {
     /// The profile the filters come from.
     public var profileID: UUID
     public var name: String

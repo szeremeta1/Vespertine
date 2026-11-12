@@ -40,6 +40,16 @@ public enum GroupPresets {
         }
     }
 
+    /// The layout a new group starts with, so it plays (and can be a Mac sound output) before anyone opens the editor: ITU 5.1 on six
+    /// channels or more, a quad on four or five, nothing on fewer. Each output's channels are taken in order.
+    public static func startingPreset(for group: SpeakerGroup) -> Preset? {
+        switch group.totalChannels {
+        case 6...: .itu51
+        case 4...: .quad
+        default: nil
+        }
+    }
+
     /// The presets that fit the group's channels.
     public static func available(for group: SpeakerGroup) -> [Preset] {
         Preset.allCases.filter { $0.layout.count <= group.totalChannels }

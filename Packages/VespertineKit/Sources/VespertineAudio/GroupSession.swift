@@ -106,6 +106,8 @@ final class GroupSessionResources: @unchecked Sendable {
     /// aggregate behind. `devices` are the group's members in the group's order.
     static func open(group: SpeakerGroup, devices: [OutputDevice], rate: Double, exclusive: Bool,
                      drift: GroupAggregate.DriftMode = .byClockDomain) throws -> GroupSessionResources {
+        // Mac Sound Output: if the helper plays this group for other apps, it lets go of the DACs first.
+        SystemOutputHandOff.claim(group.id)
         let members = try GroupMemberSession.begin(devices: devices, rate: rate, exclusive: exclusive)
         if let wrong = GroupApplied.memberNotAt(rate, members.members) {
             members.release()
@@ -132,6 +134,7 @@ final class GroupSessionResources: @unchecked Sendable {
         released = true
         aggregate.destroy()
         members.release(keepHolding: keepHolding)
+        SystemOutputHandOff.giveBack(group.id)
     }
 
     deinit { release() }

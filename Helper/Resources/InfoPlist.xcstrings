@@ -1,0 +1,558 @@
+{
+  "sourceLanguage": "en",
+  "version": "1.0",
+  "strings": {
+    "CFBundleDisplayName": {
+      "comment": "Bundle display name",
+      "shouldTranslate": false
+    },
+    "CFBundleName": {
+      "comment": "Bundle name",
+      "shouldTranslate": false
+    },
+    "NSHumanReadableCopyright": {
+      "comment": "Copyright (human-readable)",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 የVespertine አበርካቾች። በGNU GPL ስሪት 3 ወይም ከዚያ በኋላ ባለ ስሪት ስር የሚሰራጭ ነፃ ሶፍትዌር።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 المساهمون في Vespertine. برنامج حر مرخّص بموجب GNU GPL، الإصدار 3 أو أحدث."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine-এর অবদানকারীরা। GNU GPL, সংস্করণ 3 বা পরবর্তী সংস্করণের অধীনে মুক্ত সফটওয়্যার।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 přispěvatelé projektu Vespertine. Svobodný software šířený pod licencí GNU GPL verze 3 nebo novější."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine-bidragydere. Fri software under GNU GPL, version 3 eller nyere."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine-Mitwirkende. Freie Software unter der GNU GPL, Version 3 oder neuer."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Συντελεστές του Vespertine. Ελεύθερο λογισμικό υπό την άδεια GNU GPL, έκδοση 3 ή νεότερη."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine contributors. Free software under the GNU GPL, version 3 or later."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 colaboradores de Vespertine. Software libre bajo la GNU GPL, versión 3 o posterior."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 مشارکت‌کنندگان Vespertine. نرم‌افزار آزاد تحت GNU GPL، نسخهٔ 3 یا بالاتر."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertinen kehittäjät. Vapaa ohjelmisto, GNU GPL -lisenssin versio 3 tai uudempi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Mga kontribyutor ng Vespertine. Malayang software sa ilalim ng GNU GPL, bersyon 3 o mas bago."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Les contributeurs de Vespertine. Logiciel libre distribué sous licence GNU GPL, version 3 ou ultérieure."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine ના યોગદાનકર્તાઓ. GNU GPL, આવૃત્તિ 3 અથવા પછીની આવૃત્તિ હેઠળ મુક્ત સૉફ્ટવેર."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Masu ba da gudummawa ga Vespertine. Manhaja ta ’yanci a ƙarƙashin GNU GPL, siga ta 3 ko wadda ta biyo baya."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 התורמים ל־Vespertine. תוכנה חופשית בכפוף לרישיון GNU GPL, גרסה 3 ואילך."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine के योगदानकर्ता। GNU GPL, संस्करण 3 या बाद के संस्करण के अंतर्गत मुक्त सॉफ़्टवेयर।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 A Vespertine közreműködői. Szabad szoftver a GNU GPL 3-as vagy újabb verziója alatt."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Kontributor Vespertine. Perangkat lunak bebas di bawah GNU GPL, versi 3 atau yang lebih baru."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Contributori di Vespertine. Software libero distribuito con licenza GNU GPL, versione 3 o successiva."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertineコントリビューター。GNU GPLバージョン3以降のもとで提供される自由ソフトウェアです。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine ಕೊಡುಗೆದಾರರು. GNU GPL, ಆವೃತ್ತಿ 3 ಅಥವಾ ನಂತರದ ಆವೃತ್ತಿಯ ಅಡಿಯಲ್ಲಿ ಮುಕ್ತ ತಂತ್ರಾಂಶ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine 기여자. GNU GPL 버전 3 이상에 따라 배포되는 자유 소프트웨어입니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine സംഭാവകർ. GNU GPL, പതിപ്പ് 3 അല്ലെങ്കിൽ പിന്നീടുള്ള പതിപ്പിന് കീഴിലുള്ള സ്വതന്ത്ര സോഫ്റ്റ്‌വെയർ."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine चे योगदानकर्ते. GNU GPL, आवृत्ती 3 किंवा त्यानंतरच्या आवृत्तीअंतर्गत मुक्त सॉफ्टवेअर."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Penyumbang Vespertine. Perisian bebas di bawah GNU GPL, versi 3 atau lebih baharu."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine-bidragsytere. Fri programvare under GNU GPL, versjon 3 eller nyere."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine-bijdragers. Vrije software onder de GNU GPL, versie 3 of later."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine ਦੇ ਯੋਗਦਾਨੀ। GNU GPL, ਸੰਸਕਰਨ 3 ਜਾਂ ਬਾਅਦ ਵਾਲੇ ਸੰਸਕਰਨ ਅਧੀਨ ਮੁਕਤ ਸਾਫ਼ਟਵੇਅਰ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Współtwórcy Vespertine. Wolne oprogramowanie na licencji GNU GPL w wersji 3 lub nowszej."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Colaboradores do Vespertine. Software livre sob a GNU GPL, versão 3 ou posterior."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Colaboradores do Vespertine. Software livre ao abrigo da GNU GPL, versão 3 ou posterior."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Contributorii Vespertine. Software liber distribuit sub licența GNU GPL, versiunea 3 sau ulterioară."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertines bidragsgivare. Fri programvara under GNU GPL, version 3 eller senare."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Wachangiaji wa Vespertine. Programu huru chini ya GNU GPL, toleo la 3 au la baadaye."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine பங்களிப்பாளர்கள். GNU GPL, பதிப்பு 3 அல்லது அதற்குப் பிந்தைய பதிப்பின் கீழ் உள்ள கட்டற்ற மென்பொருள்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine కంట్రిబ్యూటర్‌లు. GNU GPL, వెర్షన్ 3 లేదా తదుపరి వెర్షన్ కింద స్వేచ్ఛా సాఫ్ట్‌వేర్."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 ผู้ร่วมพัฒนา Vespertine ซอฟต์แวร์เสรีภายใต้ GNU GPL เวอร์ชัน 3 ขึ้นไป"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine katkıda bulunanları. GNU GPL sürüm 3 veya sonrası kapsamında özgür yazılım."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Учасники проєкту Vespertine. Вільне програмне забезпечення за ліцензією GNU GPL версії 3 або новішої."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine کے معاونین۔ GNU GPL، ورژن 3 یا بعد کے ورژن کے تحت آزاد سافٹ ویئر۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Những người đóng góp cho Vespertine. Phần mềm tự do theo giấy phép GNU GPL, phiên bản 3 trở lên."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine 貢獻者。根據 GNU GPL 第 3 版或更新版本授權的自由軟件。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine 贡献者。依据 GNU GPL 第 3 版或更高版本授权的自由软件。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copyright © 2026 Vespertine 貢獻者。依據 GNU GPL 第 3 版或更新版本授權的自由軟體。"
+          }
+        }
+      }
+    },
+    "NSMicrophoneUsageDescription": {
+      "comment": "Privacy - Microphone Usage Description: the helper reads the driver's hidden input, never a microphone.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper መተግበሪያዎችዎ እንደ Mac ድምፅ ውፅዓት ያተሙት የድምጽ ማጉያ ቡድን ላይ የሚያጫውቱትን ይቀበላል፣ በቡድኑ የድምጽ ማጉያዎች ላይም ያጫውተዋል። ማይክሮፎን በጭራሽ አይቀዳም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يستقبل Vespertine Sound Helper ما تشغّله تطبيقاتك على مجموعة مكبرات صوت نشرتها كمخرج صوت للماك، ويشغّله على مكبرات المجموعة. لا يسجّل من الميكروفون أبدًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper আপনার অ্যাপগুলো Mac সাউন্ড আউটপুট হিসেবে প্রকাশ করা স্পিকার গ্রুপে যা বাজায় তা গ্রহণ করে এবং গ্রুপের স্পিকারে বাজায়। এটি কখনো মাইক্রোফোন রেকর্ড করে না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper přijímá, co vaše aplikace přehrávají do skupiny reproduktorů zveřejněné jako zvukový výstup Macu, a přehrává to na jejích reproduktorech. Nikdy nenahrává z mikrofonu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper modtager det, dine apps afspiller til en højttalergruppe, du har udgivet som Mac-lydudgang, og afspiller det på gruppens højttalere. Den optager aldrig en mikrofon."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper empfängt, was deine Apps an eine als Mac-Tonausgabe veröffentlichte Lautsprechergruppe senden, und spielt es auf deren Lautsprechern ab. Er nimmt nie ein Mikrofon auf."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Vespertine Sound Helper λαμβάνει ό,τι παίζουν οι εφαρμογές σας σε μια ομάδα ηχείων που δημοσιεύσατε ως έξοδο ήχου του Mac και το παίζει στα ηχεία της ομάδας. Δεν ηχογραφεί ποτέ από μικρόφωνο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper recibe lo que tus apps reproducen en un grupo de altavoces publicado como salida de sonido del Mac y lo reproduce en sus altavoces. Nunca graba un micrófono."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper آنچه برنامه‌هایتان روی گروه بلندگویی که به‌عنوان خروجی صدای مک منتشر کرده‌اید پخش می‌کنند دریافت می‌کند و روی بلندگوهای گروه پخش می‌کند. هرگز از میکروفون ضبط نمی‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper vastaanottaa sen, mitä appisi toistavat Macin äänilähdöksi julkaistuun kaiutinryhmään, ja toistaa sen ryhmän kaiuttimissa. Se ei koskaan tallenna mikrofonia."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tinatanggap ng Vespertine Sound Helper ang pinapatugtog ng iyong mga app sa isang speaker group na inilathala mo bilang sound output ng Mac, at pinapatugtog ito sa mga speaker ng group. Hindi ito kailanman nagre-record ng mikropono."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper reçoit ce que vos apps jouent sur un groupe d’enceintes publié comme sortie audio du Mac, et le joue sur les enceintes du groupe. Il n’enregistre jamais de micro."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac સાઉન્ડ આઉટપુટ તરીકે તમે પ્રકાશિત કરેલા સ્પીકર ગ્રુપ પર તમારી ઍપ જે વગાડે તે Vespertine Sound Helper મેળવે છે અને ગ્રુપના સ્પીકર પર વગાડે છે. તે ક્યારેય માઇક્રોફોન રેકોર્ડ કરતો નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper yana karɓar abin da manhajojinka ke kunnawa a ƙungiyar lasifika da ka wallafa a matsayin fitar sautin Mac, kuma yana kunna shi a lasifikar ƙungiyar. Ba ya taɓa ɗaukar sauti daga makirufo."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper מקבל את מה שהאפליקציות שלך מנגנות לקבוצת רמקולים שפרסמת כפלט צליל של ה-Mac, ומנגן אותו ברמקולי הקבוצה. הוא אף פעם לא מקליט ממיקרופון."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper वह प्राप्त करता है जो आपके ऐप Mac साउंड आउटपुट के रूप में प्रकाशित स्पीकर ग्रुप पर चलाते हैं, और उसे ग्रुप के स्पीकरों पर चलाता है। यह कभी माइक्रोफ़ोन रिकॉर्ड नहीं करता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Vespertine Sound Helper fogadja, amit az appjaid egy Mac-hangkimenetként közzétett hangszórócsoportra játszanak, és a csoport hangszóróin lejátssza. Soha nem rögzít mikrofont."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper menerima apa yang diputar app Anda ke grup speaker yang Anda terbitkan sebagai output suara Mac, lalu memutarnya di speaker grup. Ia tidak pernah merekam mikrofon."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper riceve ciò che le tue app riproducono su un gruppo di altoparlanti pubblicato come uscita audio del Mac e lo riproduce sui suoi altoparlanti. Non registra mai da un microfono."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helperは、Macのサウンド出力として公開したスピーカーグループにアプリが再生する音を受け取り、グループのスピーカーで再生します。マイクを録音することはありません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ಧ್ವನಿ ಔಟ್‌ಪುಟ್ ಆಗಿ ನೀವು ಪ್ರಕಟಿಸಿದ ಸ್ಪೀಕರ್ ಗುಂಪಿಗೆ ನಿಮ್ಮ ಆ್ಯಪ್‌ಗಳು ಪ್ಲೇ ಮಾಡುವುದನ್ನು Vespertine Sound Helper ಸ್ವೀಕರಿಸಿ, ಗುಂಪಿನ ಸ್ಪೀಕರ್‌ಗಳಲ್ಲಿ ಪ್ಲೇ ಮಾಡುತ್ತದೆ. ಅದು ಎಂದಿಗೂ ಮೈಕ್ರೊಫೋನ್ ರೆಕಾರ್ಡ್ ಮಾಡುವುದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper는 Mac 사운드 출력으로 게시한 스피커 그룹에 앱이 재생하는 소리를 받아 그룹의 스피커로 재생합니다. 마이크를 녹음하지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ശബ്ദ ഔട്ട്‌പുട്ടായി നിങ്ങൾ പ്രസിദ്ധീകരിച്ച സ്പീക്കർ ഗ്രൂപ്പിലേക്ക് നിങ്ങളുടെ ആപ്പുകൾ പ്ലേ ചെയ്യുന്നത് Vespertine Sound Helper സ്വീകരിച്ച് ഗ്രൂപ്പിന്റെ സ്പീക്കറുകളിൽ പ്ലേ ചെയ്യുന്നു. അത് ഒരിക്കലും മൈക്രോഫോൺ റെക്കോർഡ് ചെയ്യില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac साउंड आउटपुट म्हणून तुम्ही प्रकाशित केलेल्या स्पीकर ग्रुपवर तुमची ॲप जे वाजवतात ते Vespertine Sound Helper स्वीकारतो आणि ग्रुपच्या स्पीकरवर वाजवतो. तो कधीही मायक्रोफोन रेकॉर्ड करत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper menerima apa yang dimainkan apl anda kepada kumpulan pembesar suara yang anda terbitkan sebagai output bunyi Mac, dan memainkannya pada pembesar suara kumpulan itu. Ia tidak pernah merakam mikrofon."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper mottar det appene dine spiller til en høyttalergruppe du har publisert som Mac-lydutgang, og spiller det på gruppens høyttalere. Den tar aldri opp fra en mikrofon."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper ontvangt wat je apps afspelen op een luidsprekergroep die je als Mac-geluidsuitvoer hebt gepubliceerd, en speelt het af op de luidsprekers van de groep. Hij neemt nooit een microfoon op."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ਸਾਊਂਡ ਆਉਟਪੁੱਟ ਵਜੋਂ ਤੁਹਾਡੇ ਪ੍ਰਕਾਸ਼ਿਤ ਕੀਤੇ ਸਪੀਕਰ ਗਰੁੱਪ 'ਤੇ ਤੁਹਾਡੀਆਂ ਐਪਾਂ ਜੋ ਚਲਾਉਂਦੀਆਂ ਹਨ, ਉਸਨੂੰ Vespertine Sound Helper ਪ੍ਰਾਪਤ ਕਰਦਾ ਹੈ ਅਤੇ ਗਰੁੱਪ ਦੇ ਸਪੀਕਰਾਂ 'ਤੇ ਚਲਾਉਂਦਾ ਹੈ। ਇਹ ਕਦੇ ਵੀ ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਰਿਕਾਰਡ ਨਹੀਂ ਕਰਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper odbiera to, co twoje aplikacje odtwarzają na grupie głośników opublikowanej jako wyjście dźwięku Maca, i odtwarza to na jej głośnikach. Nigdy nie nagrywa z mikrofonu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine Sound Helper recebe o que seus apps tocam em um grupo de alto-falantes publicado como saída de som do Mac e o toca nos alto-falantes do grupo. Ele nunca grava um microfone."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine Sound Helper recebe o que as suas apps reproduzem num grupo de colunas publicado como saída de som do Mac e reprodu-lo nas colunas do grupo. Nunca grava um microfone."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper primește ce redau aplicațiile tale pe un grup de difuzoare publicat ca ieșire de sunet Mac și îl redă pe difuzoarele grupului. Nu înregistrează niciodată un microfon."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper tar emot det dina appar spelar till en högtalargrupp som du publicerat som Mac-ljudutgång och spelar det i gruppens högtalare. Den spelar aldrig in en mikrofon."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper hupokea kile programu zako zinachocheza kwenye kikundi cha spika ulichochapisha kama utoaji sauti wa Mac, na hukicheza kwenye spika za kikundi. Haurekodi maikrofoni kamwe."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ஒலி வெளியீடாக நீங்கள் வெளியிட்ட ஸ்பீக்கர் குழுவில் உங்கள் ஆப்கள் இயக்குவதை Vespertine Sound Helper பெற்று, குழுவின் ஸ்பீக்கர்களில் இயக்குகிறது. அது ஒருபோதும் மைக்ரோஃபோனைப் பதிவு செய்யாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac సౌండ్ అవుట్‌పుట్‌గా మీరు ప్రచురించిన స్పీకర్ గ్రూప్‌కు మీ యాప్‌లు ప్లే చేసేదాన్ని Vespertine Sound Helper స్వీకరించి, గ్రూప్ స్పీకర్‌లలో ప్లే చేస్తుంది. ఇది ఎప్పుడూ మైక్రోఫోన్‌ను రికార్డ్ చేయదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper รับเสียงที่แอปของคุณเล่นไปยังกลุ่มลำโพงที่คุณเผยแพร่เป็นขาออกเสียงของ Mac แล้วเล่นบนลำโพงของกลุ่ม และไม่เคยบันทึกเสียงจากไมโครโฟน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper, uygulamalarınızın Mac ses çıkışı olarak yayınladığınız bir hoparlör grubuna çaldığını alır ve grubun hoparlörlerinde çalar. Hiçbir zaman mikrofon kaydetmez."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper отримує те, що ваші програми відтворюють на групу динаміків, опубліковану як звуковий вихід Mac, і відтворює це на її динаміках. Він ніколи не записує з мікрофона."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper وہ وصول کرتا ہے جو آپ کی ایپس میک ساؤنڈ آؤٹ پٹ کے طور پر شائع کردہ اسپیکر گروپ پر چلاتی ہیں، اور اسے گروپ کے اسپیکرز پر چلاتا ہے۔ یہ کبھی مائیکروفون ریکارڈ نہیں کرتا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper nhận những gì ứng dụng của bạn phát tới một nhóm loa bạn đã công bố làm đầu ra âm thanh của Mac, rồi phát trên các loa của nhóm. Nó không bao giờ ghi âm từ micrô."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper 會接收你的 App 播放到你發佈為 Mac 聲音輸出的喇叭群組的聲音，並在群組的喇叭上播放。它從不錄製咪高峰。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper 接收您的 App 向作为 Mac 声音输出发布的扬声器组播放的声音，并在该组的扬声器上播放。它从不录制麦克风。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Sound Helper 會接收你的 App 播放到你發佈為 Mac 聲音輸出之喇叭群組的聲音，並在群組的喇叭上播放。它從不錄製麥克風。"
+          }
+        }
+      }
+    }
+  }
+}

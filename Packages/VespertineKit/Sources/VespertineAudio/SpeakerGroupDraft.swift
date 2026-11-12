@@ -39,6 +39,9 @@ public struct GroupCandidate: Equatable, Sendable, Identifiable {
 }
 
 public enum GroupCandidates {
+    /// Vespertine Dev (a `.dev` bundle), where software devices may join a group so groups can be tried without DACs.
+    static let developmentBuild = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
+
     /// Whether an output may join a group, and the reason when it may not.
     public static func candidate(for device: OutputDevice) -> GroupCandidate {
         let channels = device.capabilities.outputChannels
@@ -50,6 +53,9 @@ public enum GroupCandidates {
             eligibility = .refused(String(localized: "It adds 100 ms or more of delay that changes, so it can't be kept in step with the others."))
         case .aggregate:
             eligibility = .refused(String(localized: "It is already a combined output."))
+        case .virtual where developmentBuild:
+            // Vespertine Dev only: software devices (BlackHole, Vespertine Loopback) stand in for DACs when testing without hardware.
+            eligibility = .warning(String(localized: "This kind of connection hasn't been tested with groups."))
         case .virtual:
             eligibility = .refused(String(localized: "It is a software device, not a speaker output."))
         case .builtIn:
