@@ -247,9 +247,9 @@ struct RemoteBridge {
         guard let store, !key.isEmpty, key.count <= 128,
               key.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }) else { return nil }
         let url = store.url(for: key, minimumSize: min(max(size, 1), 2048))
-        return await Task.detached(priority: .userInitiated) { () -> (String, Data)? in
+        return await Task.detached(priority: .userInitiated) { () -> (mimeType: String, data: Data)? in
             guard let data = try? Data(contentsOf: url), data.count <= RemoteProtocol.maximumMessageSize / 2 else { return nil }
-            return (mimeType(of: data), data)
+            return (mimeType: mimeType(of: data), data: data)
         }.value
     }
 
