@@ -189,8 +189,12 @@ jobs:
           restore-keys: spm-app-${{ runner.os }}-
       - name: App tests
         run: |
+          # The build log runs past what the log viewer keeps, so a failure repeats the compiler's errors at the end.
+          set -o pipefail
+          mkdir -p build
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Debug -destination 'platform=macOS' \
-            -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile CODE_SIGNING_ALLOWED=NO test
+            -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile CODE_SIGNING_ALLOWED=NO test 2>&1 | tee build/app-tests.log \
+            || { echo "::group::Errors"; grep -E ': error: ' build/app-tests.log | sort -u; echo "::endgroup::"; exit 1; }
       - name: Universal Release build
         run: |
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -destination 'generic/platform=macOS' \
