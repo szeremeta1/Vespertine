@@ -116,7 +116,10 @@ struct NetworkTests {
         }
         #expect(value == -1)
         #expect(Date().timeIntervalSince(started) < 60, "a hang detector, not a latency bound")
-        #expect(await NetworkVolume.waiting(atMost: 30, otherwise: -1) { 7 } == 7, "work that finishes in time gives its answer")
+        // Work that finishes gives its own answer. What ends this wait is the work, not the clock: the work needs a turn
+        // on Swift's shared threads, which the rest of the package's tests can hold for minutes on a loaded CI machine
+        // (30 s ran out there), so the deadline is one only work that never ran at all could reach.
+        #expect(await NetworkVolume.waiting(atMost: 300, otherwise: -1) { 7 } == 7, "work that finishes in time gives its answer")
     }
 
     @Test("Network reads are spread across folders")
