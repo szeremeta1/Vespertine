@@ -1,0 +1,46 @@
+# CodeQL code scanning (replaces GitHub's default setup, which has to be switched off in Settings > Code security for
+# this file's results to upload). The languages that build nothing (build mode none) run on Linux on every pull request
+# and every push to main. Swift needs a Mac and a build, and this account runs only two macOS jobs at a time, which the
+# CI app and engine tests already wait for, so Swift gets its own workflow (codeql-swift.yml): on pull requests that
+# change Swift, once a week on main, and on demand. The default setup scanned Swift on every push to main and cancelled
+# the scan on the next push, so a busy night showed a red X on nearly every commit.
+name: CodeQL
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to a pull request cancels its older scan; every push to main is scanned (a group of its own commit).
+concurrency:
+  group: codeql-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [actions, c-cpp, javascript-typescript, python]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+      - uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: /language:${{ matrix.language }}
