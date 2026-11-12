@@ -15,9 +15,11 @@ public enum DoPDefaults {
     /// - Fosi Audio ZD3 (XMOS XU316, USB ID 152a:889b): lists 44.1 kHz to 768 kHz at 24 and 32 bit, so the DoP
     ///   carriers for DSD64, DSD128 and DSD256 exist; the vendor lists DSD512, which macOS can't carry (it would
     ///   need a 1411.2 kHz carrier). See docs/DEVICES.md for what was checked on hardware.
+    /// - iBasso DC07 Pro: DSD64 over DoP confirmed by its owner (issue #247), UID as macOS reports it.
     static let knownDoPPrefixes = [
         "AppleUSBAudioEngine:FIIO:FiiO K11:",
         "AppleUSBAudioEngine:XMOS:Fosi Audio ZD3:",
+        "AppleUSBAudioEngine:iBasso:iBasso DC07 Pro:",
     ]
 
     public static func isKnownDoP(uid: String) -> Bool {

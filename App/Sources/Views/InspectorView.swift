@@ -82,6 +82,7 @@ struct NowPlayingPanel: View {
                         StatusBadges(path: path).padding(.top, 16)
                         Hairline().padding(.top, 18)
                         SignalPathView(path: path, loopback: model.loopback.result(for: path)).padding(.top, 14)
+                        DoPOffer(path: path).padding(.top, 10)
                         if path.plan.mode == .bitstream, let bed = player.bedMeters, bed.names.count > 2 {
                             ChannelMetersView(bed: bed, bitstream: true, levels: model.player.channelLevels).padding(.top, 14)
                         } else if path.plan.channels > 2 || path.source.channels > 2 {
@@ -318,6 +319,36 @@ struct SignalPathView: View {
 
     private func channelName(_ n: Int) -> String {
         n > 2 ? ChannelLayouts.name(channels: n) : (n == 1 ? String(localized: "mono") : String(localized: "stereo"))
+    }
+}
+
+/// DSD converted to PCM only because DoP is off for this output, which could carry it: the output's DoP switch, right
+/// where the conversion shows, so a DoP DAC that isn't on the known list (`DoPDefaults`) is one click from native DSD.
+/// Turning it on re-plans the song as DoP and this goes away.
+struct DoPOffer: View {
+    @Environment(AppModel.self) private var model
+    let path: SignalPath
+
+    private var device: OutputDevice? {
+        guard path.plan.dopAvailable, path.group == nil else { return nil }
+        return model.devices.devices.first { $0.uid == path.deviceUID && ($0.transport == .usb || $0.transport == .thunderbolt) }
+    }
+
+    var body: some View {
+        if let device, !model.settings.isDoPOn(device.uid) {
+            Toggle(isOn: Binding(get: { model.settings.isDoPOn(device.uid) },
+                                 set: { on in
+                                     model.settings.setDoP(on, for: device.uid)
+                                     model.syncEngine()
+                                 })) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("DSD over PCM (DoP)").font(Typeface.ui(12)).foregroundStyle(Palette.text)
+                    Text("Only turn this on if your DAC supports DoP. Otherwise DSD is converted to PCM.")
+                        .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .toggleStyle(.switch).controlSize(.mini)
+        }
     }
 }
 

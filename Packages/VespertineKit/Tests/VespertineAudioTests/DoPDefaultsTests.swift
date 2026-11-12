@@ -34,6 +34,8 @@ struct DoPDefaultsTests {
     func serialIndependent() {
         #expect(DoPDefaults.isKnownDoP(uid: "AppleUSBAudioEngine:XMOS:Fosi Audio ZD3:9999999:3"))
         #expect(!DoPDefaults.isKnownDoP(uid: "AppleUSBAudioEngine:XMOS:Fosi Audio ZD2:2142200:1"))
+        #expect(DoPDefaults.isKnownDoP(uid: "AppleUSBAudioEngine:iBasso:iBasso DC07 Pro:0000000:2"))
+        #expect(!DoPDefaults.isKnownDoP(uid: "AppleUSBAudioEngine:iBasso:iBasso DC03 Pro:0000000:1"))
     }
 
     @Test("An explicit off wins over the default, and an explicit on works for any device")
