@@ -330,27 +330,43 @@ final class PlayerController {
         start(queue[i])
     }
 
+    /// The last song of what was playing (not one you added) that had its turn before shuffle was turned on: where
+    /// the album carries on from when shuffle is turned off during a song you added.
+    @ObservationIgnored private var shuffledAfter: UUID?
+
     /// Shuffling mixes what was playing, never the songs you added to Playing Next: they still come next, in
-    /// your order. Turning shuffle off puts the rest back in its order, after them.
+    /// your order, and the ones that already had their turn stay behind the song playing. Turning shuffle off puts
+    /// the rest back in its order, after them.
     private func applyShuffle(keepingCurrent: Bool = true) {
         guard !queue.isEmpty else { return }
         let current = self.current
         let next = Array(playingNext)
         let nextIDs = Set(next.map(\.id))
+        // Songs you added that aren't playing or coming next had their turn: they don't play a second time.
+        let passed = queue.filter { $0.queuedByUser && $0.id != current?.id && !nextIDs.contains($0.id) }
+        // The last song before (or at) the one playing that you didn't add.
+        let lastOwn = currentIndex.flatMap { i in queue.indices.contains(i) ? queue[...i].last { !$0.queuedByUser }?.id : nil }
         if shuffle {
-            var rest = queue.filter { $0.id != current?.id && !nextIDs.contains($0.id) }
+            if let lastOwn { shuffledAfter = lastOwn }
+            var rest = queue.filter { !$0.queuedByUser && $0.id != current?.id }
             rest.shuffle()
-            queue = (current.map { [$0] } ?? []) + next + rest
-            currentIndex = current == nil ? nil : 0
+            queue = passed + (current.map { [$0] } ?? []) + next + rest
+            currentIndex = current == nil ? nil : passed.count
+        } else if let current {
+            // Songs you added sit at the end of `originalOrder` wherever they played, so they can't mark the place.
+            // What was playing carries on after the song playing, or, during a song you added, after the last one
+            // of its own that had its turn.
+            let added = Set(queue.lazy.filter(\.queuedByUser).map(\.id))
+            let own = originalOrder.filter { !added.contains($0.id) }
+            let place = (lastOwn ?? shuffledAfter).flatMap { id in own.firstIndex { $0.id == id } }
+            var before = place.map { Array(own[...$0]) } ?? []
+            let after = place.map { Array(own[($0 + 1)...]) } ?? own
+            if !current.queuedByUser, before.last?.id == current.id { before.removeLast() }
+            queue = before + passed + [current] + next + after
+            currentIndex = before.count + passed.count
         } else {
-            let ordered = originalOrder.filter { !nextIDs.contains($0.id) }
-            if let current, let c = ordered.firstIndex(where: { $0.id == current.id }) {
-                queue = Array(ordered[...c]) + next + Array(ordered[(c + 1)...])
-                currentIndex = c
-            } else {
-                queue = originalOrder
-                currentIndex = current.flatMap { c in queue.firstIndex { $0.id == c.id } }
-            }
+            queue = originalOrder
+            currentIndex = nil
         }
         syncMirror()
     }
