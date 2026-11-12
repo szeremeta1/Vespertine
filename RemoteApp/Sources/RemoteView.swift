@@ -15,6 +15,22 @@ struct RemoteView: View {
     @State private var tab: Tab = .nowPlaying
 
     var body: some View {
+        VStack(spacing: 0) {
+            ConnectionBanner(session: session)
+            tabs
+        }
+        .background(Palette.surface.ignoresSafeArea(edges: .top))
+        .onAppear {
+            switch model.startScreen {
+            case "library", "albums", "coverFlow", "album", "artists": tab = .library
+            case "queue": tab = .queue
+            case "output": tab = .output
+            default: break
+            }
+        }
+    }
+
+    private var tabs: some View {
         TabView(selection: $tab) {
             NowPlayingView(session: session)
                 .tabItem { Label("Now Playing", systemImage: "play.circle") }
@@ -31,17 +47,6 @@ struct RemoteView: View {
                 .miniPlayer(session: session) { tab = .nowPlaying }
                 .tabItem { Label("Output", systemImage: "hifispeaker") }
                 .tag(Tab.output)
-        }
-        .safeAreaInset(edge: .top, spacing: 0) {
-            ConnectionBanner(session: session)
-        }
-        .onAppear {
-            switch model.startScreen {
-            case "library", "albums", "coverFlow", "album", "artists": tab = .library
-            case "queue": tab = .queue
-            case "output": tab = .output
-            default: break
-            }
         }
     }
 }
