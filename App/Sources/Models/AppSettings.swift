@@ -100,7 +100,10 @@ final class AppSettings {
     /// While an output is muted from the Controls menu: the level Mute brings back (output UID → 0…1).
     var appVolumeRestore: [String: Double] { didSet { defaults.set(appVolumeRestore, forKey: "appVolumeRestore") } }
     var defaultImportMode: ImportMode { didSet { defaults.set(defaultImportMode.rawValue, forKey: "importMode") } }
-    var managedFolderPath: String { didSet { defaults.set(managedFolderPath, forKey: "managedFolder") } }
+    /// An isolated QA run (`-VespertineDataDirectory`) keeps imported copies inside its data directory and never saves a
+    /// changed folder, so a test import can't land in, or repoint, the real managed folder.
+    var managedFolderPath: String { didSet { if !isolatedRun { defaults.set(managedFolderPath, forKey: "managedFolder") } } }
+    private let isolatedRun: Bool
     /// Scan for new music by itself: watch local folders, look again at launch, and recheck network shares now and then.
     /// Off by default; "Rescan Library" and each source's Rescan always work. (The key keeps its old name.)
     var watchFolders: Bool { didSet { defaults.set(watchFolders, forKey: "watchFolders") } }
@@ -234,7 +237,10 @@ final class AppSettings {
         appVolumeRestore = defaults.dictionary(forKey: "appVolumeRestore") as? [String: Double] ?? [:]
         defaultImportMode = ImportMode(rawValue: defaults.string(forKey: "importMode") ?? "") ?? .copyAndOrganize
         let music = FileManager.default.urls(for: .musicDirectory, in: .userDomainMask)[0]
-        managedFolderPath = defaults.string(forKey: "managedFolder") ?? music.appendingPathComponent("Vespertine").path
+        isolatedRun = dataDirectory == nil && LaunchArguments().string(forKey: "VespertineDataDirectory") != nil
+        managedFolderPath = isolatedRun
+            ? resolvedDataDirectory.appendingPathComponent("Music", isDirectory: true).path
+            : defaults.string(forKey: "managedFolder") ?? music.appendingPathComponent("Vespertine").path
         watchFolders = defaults.bool(forKey: "watchFolders")
         fetchArtworkOnline = defaults.bool(forKey: "fetchArtworkOnline")
         scrobble = defaults.bool(forKey: "scrobble")
