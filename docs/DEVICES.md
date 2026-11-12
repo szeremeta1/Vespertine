@@ -6,10 +6,12 @@ What Vespertine has been run on, and what each test did and did not show. A **re
 |---|---|---|---|---|
 | FiiO K11 | USB | PCM at every rate to 384 kHz, DSD to DSD128 over DoP, 32-bit integer mode | BIT-PERFECT badge shown (app readback) | Reported |
 | Fosi Audio ZD3 | USB (XMOS XU316, 152a:889b) | **Output formats read from Core Audio on 2026-10-28:** PCM 44.1 kHz to 768 kHz at 24 and 32 bit, so the DoP carriers for DSD64, DSD128 and DSD256 (176.4, 352.8, 705.6 kHz) exist. Planning for those is unit-tested; DSD512 would need a 1411.2 kHz carrier and is converted to PCM | DSD played over DoP on 2026-10-28; the ZD3's display showed DSD (owner report, Vespertine 0.13.2). PCM playback tested up to 768 kHz and DSD up to DSD256, natively over DoP (owner report, 2026-10-28). DoP is on by default for it, see [DoPDefaults](../Packages/VespertineKit/Sources/VespertineAudio/DoPDefaults.swift) | Tested (owner report), 2026-10-28 |
-| iBasso DC07 Pro | USB-C | DSD64 (DSDIFF) with DoP switched on, Vespertine 1.0.1 on macOS 27.2.1 | Played as native DSD over DoP; with DoP off it was converted to PCM (user report, [#247](https://github.com/szeremeta1/Vespertine/issues/247)). DoP is on by default for it, see [DoPDefaults](../Packages/VespertineKit/Sources/VespertineAudio/DoPDefaults.swift) | Reported (user), 2026-11-11 |
+| iBasso DC07 Pro | USB-C | DSD64 (DSDIFF) with DoP switched on, Vespertine 1.0.1 on macOS 27.2.1 | Played as native DSD over DoP; with DoP off it was converted to PCM (user report, [#247](https://github.com/szeremeta1/Vespertine/issues/247)). DoP is on by default for it, see [`dop-dacs.json`](../Packages/VespertineKit/Sources/VespertineAudio/Resources/dop-dacs.json) | Reported (user), 2026-11-11 |
 | AirPods Max | USB-C and Bluetooth | 48 kHz lossless over USB-C; AAC reported over Bluetooth | As documented in [FEATURES](FEATURES.md) | Tested |
 | MacBook Pro speakers | Built in | Stereo playback | Plays | Tested |
 | **Sony TV (HDMI)** | HDMI, exclusive (hog) mode | **Six-channel 5.1 FLAC, 7.1 FLAC folded to 5.1, and 5.1 DSD64 converted to PCM, and Dolby Atmos rendered by macOS (tentative)** | **Each of the six channels went to its matching speaker position; BIT-PERFECT shown** | **Reported, 2026-10-19** |
+
+DACs known to decode DoP, with the source for each entry, are listed in [`dop-dacs.json`](../Packages/VespertineKit/Sources/VespertineAudio/Resources/dop-dacs.json); [DOP-AUTO-SETUP.md](DOP-AUTO-SETUP.md) explains the list, the one-tap DoP test for DACs that aren't on it, and how to add one.
 
 ## Sony TV over HDMI (first multichannel result)
 

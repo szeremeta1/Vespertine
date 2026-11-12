@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "revision": 1,
+  "comment": "DACs confirmed to decode DoP, and makers known for DSD DACs. Every entry needs an https source saying where the claim comes from. Matching never uses the unit serial. See docs/DOP-AUTO-SETUP.md.",
+  "dacs": [
+    {
+      "id": "fiio-k11",
+      "name": "FiiO K11",
+      "uidVendor": "FIIO",
+      "uidProduct": "FiiO K11",
+      "evidence": "hardware",
+      "source": "https://github.com/szeremeta1/Vespertine/blob/main/docs/DEVICES.md (DSD to DSD128 played over DoP on a K11; the old allow list entry); FiiO's own spec page https://www.fiio.com/k11_parameters lists DSD256 over USB",
+      "note": "Was in DoPDefaults.knownDoPPrefixes before this list existed."
+    },
+    {
+      "id": "fosi-audio-zd3",
+      "name": "Fosi Audio ZD3",
+      "uidVendor": "XMOS",
+      "uidProduct": "Fosi Audio ZD3",
+      "usbVendorID": "152a",
+      "usbProductID": "889b",
+      "evidence": "hardware",
+      "source": "https://github.com/szeremeta1/Vespertine/blob/main/docs/DEVICES.md (owner played DSD to DSD256 over DoP on a ZD3 on 2026-10-28; USB ID 152a:889b and the Core Audio rates are recorded there)",
+      "note": "Was in DoPDefaults.knownDoPPrefixes before this list existed. DSD512 would need a 1411.2 kHz carrier macOS can't carry."
+    },
+    {
+      "id": "ibasso-dc07-pro",
+      "name": "iBasso DC07 Pro",
+      "uidVendor": "iBasso",
+      "uidProduct": "iBasso DC07 Pro",
+      "usbVendorID": "2fc6",
+      "usbProductID": "f0b7",
+      "evidence": "owner-report",
+      "source": "https://github.com/szeremeta1/Vespertine/issues/247 (the owner of a DC07 Pro reports DSD64 played as PCM until DoP was switched on, then natively, and gives the Core Audio UID); USB ID 2fc6:f0b7 from https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (DEVICE_FLG 0x2fc6, 0xf0b7, \"iBasso DC07 Pro\")",
+      "note": "iBasso's own pages list DSD but do not use the word DoP; the evidence is the report."
+    }
+  ],
+  "makers": [
+    {
+      "id": "fiio",
+      "name": "FiiO",
+      "usbVendorID": "2972",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0x2972, \"FiiO devices\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)",
+      "uidVendors": [
+        "FIIO",
+        "FiiO"
+      ]
+    },
+    {
+      "id": "ibasso",
+      "name": "iBasso",
+      "usbVendorID": "2fc6",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0x2fc6, \"Comture-inc devices; the same file has DEVICE_FLG 0x2fc6 0xf0b7 \"iBasso DC07 Pro\" and 0xf0b5 \"iBasso DC-Elite\"\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)",
+      "uidVendors": [
+        "iBasso"
+      ]
+    },
+    {
+      "id": "mytek",
+      "name": "Mytek",
+      "usbVendorID": "25ce",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0x25ce, \"Mytek devices\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)"
+    },
+    {
+      "id": "gustard",
+      "name": "Gustard",
+      "usbVendorID": "292b",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0x292b, \"Gustard/Ess based devices\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)"
+    },
+    {
+      "id": "cayin",
+      "name": "Cayin",
+      "usbVendorID": "2d87",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0x2d87, \"Cayin device\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)"
+    },
+    {
+      "id": "hiby",
+      "name": "HiBy",
+      "usbVendorID": "c502",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0xc502, \"HiBy devices\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)"
+    },
+    {
+      "id": "auralic",
+      "name": "AURALiC",
+      "usbVendorID": "1511",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0x1511, \"AURALiC\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)"
+    },
+    {
+      "id": "ta",
+      "name": "T+A",
+      "usbVendorID": "2ab6",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0x2ab6, \"T+A devices\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)"
+    },
+    {
+      "id": "mcintosh",
+      "name": "McIntosh",
+      "usbVendorID": "2afd",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0x2afd, \"McIntosh Laboratory, Inc.\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)"
+    },
+    {
+      "id": "musical-fidelity",
+      "name": "Musical Fidelity",
+      "usbVendorID": "2772",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0x2772, \"Musical Fidelity devices\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)"
+    },
+    {
+      "id": "msb",
+      "name": "MSB Technology",
+      "usbVendorID": "35f4",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0x35f4, \"MSB Technology\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)"
+    },
+    {
+      "id": "playback-design",
+      "name": "Playback Design",
+      "usbVendorID": "23ba",
+      "source": "https://github.com/torvalds/linux/blob/master/sound/usb/quirks.c (VENDOR_FLG 0x23ba, \"Playback Design\", QUIRK_FLAG_DSD_RAW: the Linux USB audio driver treats this vendor's DACs as raw-DSD devices)"
+    }
+  ],
+  "revoked": []
+}

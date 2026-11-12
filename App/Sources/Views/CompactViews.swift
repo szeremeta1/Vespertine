@@ -478,9 +478,11 @@ struct OnlineSettings: View {
 
 struct UpdateSettings: View {
     @Environment(AppUpdater.self) private var updater
+    @Environment(AppModel.self) private var model
 
     var body: some View {
         @Bindable var updater = updater
+        @Bindable var s = model.settings
         Form {
             Section("Software Update") {
                 Toggle("Automatically check for updates", isOn: $updater.automaticallyChecks)
@@ -493,6 +495,12 @@ struct UpdateSettings: View {
                     }
                 }
                 Text("Updates come from Vespertine's GitHub releases. Each one is signed by the developer and verified before it is installed.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
+            Section("DoP DACs") {
+                Toggle("Update the list of DoP DACs", isOn: $s.dopListUpdates)
+                    .onChange(of: s.dopListUpdates) { if s.dopListUpdates { model.dopSetup.refreshList() } }
+                Text("Once a day, Vespertine downloads the list of DACs known to play DSD over PCM (DoP) from its GitHub releases, so a newly confirmed DAC plays DSD natively without an app update. The list is signed by the developer and checked before it is used. Nothing about you or your Mac is sent.")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
