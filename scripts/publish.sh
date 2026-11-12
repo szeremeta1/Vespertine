@@ -37,7 +37,19 @@ cp "$dmg" "$feed/"
 # Carry forward the existing feed so older versions stay listed. Its channel title is carried over from the feed's
 # Nocturne days; it's fixed here, before generate_appcast, because nothing may edit the appcast after it's written:
 # with a signed feed (SURequireSignedFeed) any later edit breaks the signature and every installed copy's updates.
-gh release download --repo "$repo" --pattern appcast.xml --dir "$feed" 2>/dev/null || print "No existing appcast; starting a new one."
+# Only "there is no release yet" or "the latest release carries no appcast.xml" means there is no feed to carry
+# forward. Any other failure (no network, an expired login, GitHub answering with an error) stops here: going on
+# would publish a feed without the older versions and skip the appcast half of the build-number check below.
+if ! download_error=$(gh release download --repo "$repo" --pattern appcast.xml --dir "$feed" 2>&1 >/dev/null); then
+  case $download_error in
+    (*"release not found"*|*"no assets match the file pattern"*|*"no assets to download"*)
+      print "No existing appcast; starting a new one." ;;
+    (*)
+      print -u2 "Can't download the existing appcast.xml from the latest release of $repo, so nothing is published:"
+      print -u2 -r -- "  ${download_error:-gh release download failed without a message}"
+      exit 1 ;;
+  esac
+fi
 [[ ! -f "$feed/appcast.xml" ]] || /usr/bin/sed -i '' 's|<title>Nocturne</title>|<title>Vespertine</title>|' "$feed/appcast.xml"
 # Entries for 0.8.0 and older are dropped from the carried-over feed here, for the same reason: generate_appcast signs
 # whatever is in the feed it is given. Newer entries, including every informational one, are left as they are.
@@ -147,8 +159,15 @@ if current=$(gh api "repos/$tap/contents/$cask" 2>/dev/null); then
   blob=$(print -r -- "$current" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["sha"])')
   body=$(print -r -- "$current" | /usr/bin/python3 -c 'import json,sys,base64; print(base64.b64decode(json.load(sys.stdin)["content"]).decode(), end="")' \
     | /usr/bin/sed -E "s/^  version \".*\"/  version \"$version\"/; s/^  sha256 \".*\"/  sha256 \"$sha\"/; s/^  depends_on macos: .*/  depends_on macos: \">= :sonoma\"/; s|^  homepage \".*\"|  homepage \"https://vespertineapp.com/\"|")
-  gh api -X PUT "repos/$tap/contents/$cask" -f message="vespertine $version" -f sha="$blob" \
-    -f content="$(print -r -- "$body" | base64)" >/dev/null && print "Homebrew cask updated to $version."
+  # The release is already out by now, so a failure here is a warning, never a reason to stop.
+  if cask_error=$(gh api -X PUT "repos/$tap/contents/$cask" -f message="vespertine $version" -f sha="$blob" \
+      -f content="$(print -r -- "$body" | base64)" 2>&1 >/dev/null); then
+    print "Homebrew cask updated to $version."
+  else
+    print -u2 "WARNING: the Homebrew cask in $tap was NOT updated to $version (the release itself is published)."
+    print -u2 "  Set version \"$version\" and sha256 \"$sha\" in $cask by hand."
+    print -u2 -r -- "  ${cask_error:-gh api failed without a message}"
+  fi
 else
   print -u2 "Homebrew cask not found in $tap; update it by hand."
 fi
