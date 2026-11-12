@@ -84,8 +84,9 @@ final class Link: @unchecked Sendable {
     }
 
     func open() {
-        if ready.wait(timeout: .now() + 10) == .timedOut { fail("Couldn't reach the Mac.") }
-        if let failed { fail("Couldn't connect: \(failed) (a wrong code or key shows as a TLS error).") }
+        let wrongCode = "Couldn't connect. Check the 6-digit code, or choose Pair a Phone on the Mac for a new one."
+        if ready.wait(timeout: .now() + 10) == .timedOut { fail(wrongCode) }
+        if let failed { fail("\(wrongCode) (\(failed))") }
         receive()
     }
 
