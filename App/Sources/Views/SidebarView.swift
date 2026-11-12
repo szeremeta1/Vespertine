@@ -168,6 +168,7 @@ struct SidebarView: View {
         .alert("Rename Playlist", isPresented: Binding(get: { renaming != nil }, set: { if !$0 { renaming = nil } })) {
             TextField("Name", text: $newName)
             Button("Rename") { if let p = renaming, newName != p.name.libraryDisplayName { model.library.renamePlaylist(p, to: newName) }; renaming = nil }
+                .disabled(newName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             Button("Cancel", role: .cancel) { renaming = nil }
         }
         .alert(deleteTitle, isPresented: Binding(get: { deletingPlaylist != nil }, set: { if !$0 { deletingPlaylist = nil } }),

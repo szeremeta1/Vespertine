@@ -675,7 +675,11 @@ final class LibraryStore {
         playlistTransitions = stored.compactMapValues { TransitionOverride(storedValue: $0) }
     }
 
-    func renamePlaylist(_ playlist: Playlist, to name: String) { if let id = playlist.id { try? database.renamePlaylist(id, to: name) } }
+    /// A playlist always has a name: an empty one (or only spaces) is ignored and the playlist keeps the name it had.
+    func renamePlaylist(_ playlist: Playlist, to name: String) {
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, let id = playlist.id else { return }
+        try? database.renamePlaylist(id, to: name)
+    }
     func updateRules(_ playlist: Playlist, _ rules: SmartRules) {
         if let id = playlist.id { try? database.updateSmartRules(id, rules); revision += 1 }
     }
