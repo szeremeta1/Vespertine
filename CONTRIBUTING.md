@@ -4,7 +4,7 @@ Thanks for helping. Vespertine is a one-maintainer project, so the most useful t
 
 ## Release cadence
 
-Betas ship at most weekly; the 1.0 freeze starts November 3, 2026.
+Betas ship at most weekly.
 
 ## Reports
 
