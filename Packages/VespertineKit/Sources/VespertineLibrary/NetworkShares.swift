@@ -54,6 +54,8 @@ public struct NetworkShare: Sendable, Hashable, Codable {
         let parts = c.path.split(separator: "/").map { String($0).removingPercentEncoding ?? String($0) }
         let user = c.user?.removingPercentEncoding
         guard host.rangeOfCharacter(from: .whitespacesAndNewlines) == nil else { return nil }
+        // A port is 1 to 65535; a slip of the finger ("nas.local:445000") is no address.
+        if let port = c.port, !(1...65535).contains(port) { return nil }
         switch scheme {
         case "smb", "cifs":
             guard let share = parts.first else { return nil }
@@ -258,7 +260,7 @@ public enum NetworkVolume {
 
     /// Quick TCP check, so an offline server fails in seconds instead of NetFS's long timeouts.
     public static func isReachable(_ share: NetworkShare, timeout: TimeInterval = 4) async -> Bool {
-        guard let port = NWEndpoint.Port(rawValue: UInt16(share.port ?? share.defaultPort)) else { return false }
+        guard let number = UInt16(exactly: share.port ?? share.defaultPort), let port = NWEndpoint.Port(rawValue: number) else { return false }
         let connection = NWConnection(host: NWEndpoint.Host(share.host), port: port, using: .tcp)
         let once = ResumeOnce()
         return await withCheckedContinuation { (continuation: CheckedContinuation<Bool, Never>) in

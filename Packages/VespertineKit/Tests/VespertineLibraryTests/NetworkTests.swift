@@ -36,6 +36,19 @@ struct NetworkTests {
         #expect(NetworkShare(string: "ftp://host/x") == nil)
     }
 
+    @Test("An address with a port no server can have isn't an address, and never reaches the connection (it used to crash there)")
+    func impossiblePorts() async throws {
+        let custom = try #require(NetworkShare(string: "smb://nas.local:8445/Music"))
+        #expect(custom.port == 8445 && custom.urlString == "smb://nas.local:8445/Music")
+        #expect(try #require(NetworkShare(string: "https://dav.example.com:65535/dav")).port == 65535)
+        for address in ["smb://nas.local:445000/Music", "nas.local:65536/Music", "smb://nas.local:0/Music", "https://dav.example.com:99999/dav"] {
+            #expect(NetworkShare(string: address) == nil, "\(address)")
+        }
+        // A share that carries such a port anyway (made in code, or stored by hand) is unreachable, not a crash.
+        let stored = NetworkShare(kind: .smb, host: "192.0.2.1", port: 445_000, share: "Music")
+        #expect(await NetworkVolume.isReachable(stored, timeout: 0.2) == false)
+    }
+
     @Test("Only mounts Vespertine recorded making (or in the old mount folder) count as its own")
     func ownMounts() throws {
         let base = URL(fileURLWithPath: "/tmp/vespertine-own-mounts-\(UUID().uuidString)/Shares", isDirectory: true)
