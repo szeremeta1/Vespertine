@@ -47,6 +47,7 @@ a { color: inherit; text-decoration: none; }
 img { display: block; }
 :focus { outline: none; }
 :focus-visible { outline: 2px solid var(--brass-hi); outline-offset: 2px; border-radius: 6px; }
+input:focus-visible { outline: none; }
 @media (prefers-color-scheme: light) { :focus-visible { outline-color: var(--accent); } }
 
 .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
@@ -161,7 +162,6 @@ img { display: block; }
 .mini-open .serif { font-size: 15px; font-weight: 500; }
 .mini-progress { position: absolute; inset: 0 0 auto 0; height: 2px; background: var(--hair); overflow: hidden; }
 .mini-progress div { height: 100%; background: var(--brass); transform-origin: 0 50%; transform: scaleX(0); }
-[dir=rtl] .mini-progress div { transform-origin: 100% 50%; }
 .thumb-img, .thumb { width: 44px; height: 44px; border-radius: 5px; object-fit: cover; background: var(--raised); flex: none; }
 .mini .thumb { background: var(--surface); }
 
@@ -195,7 +195,10 @@ img { display: block; }
 .now-controls { width: 100%; display: flex; flex-direction: column; gap: 10px; flex: none; }
 .titles { display: flex; align-items: center; gap: 8px; min-height: 56px; }
 .now-title { font-size: 23px; font-weight: 600; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
-.now-sub { color: var(--text2); font-size: 15px; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.now-sub { color: var(--text2); font-size: 15px; margin-top: 3px; display: flex; white-space: nowrap; min-width: 0; }
+.now-sub .link { display: block; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 0 1 auto; }
+.now-sub #artistLink { flex-shrink: 0; max-width: 58%; }
+.now-sub span { flex: none; white-space: pre; }
 #heart.on { color: var(--accent); }
 #heart.pop .i { animation: pop .35s var(--spring); }
 @keyframes pop { 40% { transform: scale(1.35); } }
@@ -218,28 +221,26 @@ img { display: block; }
 .slider { position: relative; height: 32px; flex: 1; min-width: 0; touch-action: none; cursor: pointer; --v: 0; user-select: none; -webkit-user-select: none; }
 .slider .track { position: absolute; inset: 50% 0 auto 0; height: 4px; margin-top: -2px; border-radius: 4px; background: var(--hair-strong); overflow: hidden; transition: height .18s var(--ease), margin .18s var(--ease); }
 .slider .fill { height: 100%; background: linear-gradient(90deg, var(--brass), var(--brass-hi)); transform-origin: 0 50%; transform: scaleX(var(--v)); will-change: transform; }
-[dir=rtl] .slider .fill { transform-origin: 100% 50%; background: linear-gradient(270deg, var(--brass), var(--brass-hi)); }
 .slider .thumb {
-  position: absolute; top: 50%; inset-inline-start: calc(var(--v) * 100%); width: 14px; height: 14px; margin: -7px; border-radius: 50%;
+  position: absolute; top: 50%; left: calc(var(--v) * 100%); width: 14px; height: 14px; margin: -7px; border-radius: 50%;
   background: var(--text); box-shadow: 0 1px 4px var(--shadow); transition: transform .18s var(--spring); pointer-events: none;
 }
 .slider.drag .track { height: 8px; margin-top: -4px; }
 .slider.drag .thumb { transform: scale(1.5); }
 .slider[aria-disabled=true] { opacity: .4; pointer-events: none; }
 .slider .bubble {
-  position: absolute; bottom: 30px; inset-inline-start: calc(var(--v) * 100%); transform: translateX(-50%) scale(.8); opacity: 0;
+  position: absolute; bottom: 30px; left: calc(var(--v) * 100%); transform: translateX(-50%) scale(.8); opacity: 0;
   padding: 4px 8px; border-radius: 7px; background: var(--raised); box-shadow: inset 0 0 0 1px var(--hair-strong), 0 6px 16px var(--shadow);
   font: 600 13px var(--mono); pointer-events: none; transition: opacity .15s, transform .15s var(--ease); white-space: nowrap;
 }
-[dir=rtl] .slider .bubble { transform: translateX(50%) scale(.8); }
 .slider.drag .bubble { opacity: 1; transform: translateX(-50%) scale(1); }
-[dir=rtl] .slider.drag .bubble { transform: translateX(50%) scale(1); }
+/* Playback controls read the same way in every language: a song runs left to right, and Next points right. */
+.scrub, .transport, .volume, .mini-progress { direction: ltr; }
 .scrub { margin-top: 2px; }
 .times { display: flex; justify-content: space-between; font: 11.5px var(--mono); font-variant-numeric: tabular-nums; color: var(--text2); margin-top: -4px; }
 .unspaced .times { font-family: var(--ui); }
 
 .transport { display: flex; align-items: center; justify-content: space-between; margin: 2px -6px; }
-[dir=rtl] .transport #prev .i, [dir=rtl] .transport #next .i, [dir=rtl] #miniNext .i { transform: scaleX(-1); }
 .mode { color: var(--text3); position: relative; }
 .mode[aria-pressed=true]::after { content: ""; position: absolute; bottom: 4px; left: 50%; width: 4px; height: 4px; margin-left: -2px; border-radius: 50%; background: currentColor; }
 .playpause {
@@ -254,7 +255,7 @@ img { display: block; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .volume { display: flex; align-items: center; gap: 4px; margin-inline: -10px; }
-.volume-value { width: 34px; text-align: end; font-size: 11.5px; color: var(--text3); margin-inline-end: 10px; }
+.volume-value { width: 34px; text-align: right; font-size: 11.5px; color: var(--text3); margin-right: 10px; }
 .note { font-size: 12.5px; color: var(--text3); text-align: center; }
 .note.copper { color: var(--copper); }
 .note.error { color: var(--danger); }
@@ -267,11 +268,27 @@ img { display: block; }
 .pill-btn .i { width: 17px; height: 17px; }
 .pill-btn[aria-pressed=true] { color: var(--accent); background: var(--accent-wash); box-shadow: inset 0 0 0 1px var(--accent-line); }
 
+/* A short screen (a small phone, a phone on its side): everything a little closer, so it all fits without scrolling. */
+@media (max-height: 640px) {
+  .now-inner { gap: 8px; padding-top: calc(8px + var(--safe-t)); padding-bottom: 8px; }
+  .now-controls { gap: 6px; }
+  .cover-wrap { width: min(100%, max(96px, calc(100vh - 452px))); width: min(100%, max(96px, calc(100dvh - 452px))); border-radius: 9px; }
+  .titles { min-height: 48px; }
+  .now-title { font-size: 20px; -webkit-line-clamp: 1; }
+  .playpause { width: 62px; height: 62px; }
+  .playpause .i { width: 27px; height: 27px; }
+  .playpause .spinner { inset: 18px; }
+  .icon-btn.big { width: 52px; height: 52px; }
+  .slider { height: 28px; }
+  .pill-btn { min-height: 32px; }
+  .tabs a { padding: 6px 2px 5px; }
+}
+
 /* Wide and short screens (a phone on its side, a tablet): the cover beside the controls. */
 @media (min-width: 700px) and (min-aspect-ratio: 11/10) {
   .now-inner { flex-direction: row; max-width: 1040px; gap: 40px; align-items: center; padding-inline: 32px; }
   .now-art { flex: 1 1 0; height: 100%; }
-  .cover-wrap { width: min(100%, calc(100vh - 150px)); width: min(100%, calc(100dvh - 150px)); }
+  .cover-wrap { width: min(100%, calc(100vh - 130px)); width: min(100%, calc(100dvh - 130px)); }
   .now-controls { flex: 1 1 0; max-width: 480px; }
 }
 
@@ -310,6 +327,7 @@ img { display: block; }
 .row { position: relative; display: flex; align-items: center; min-height: 60px; padding-inline: 16px 4px; gap: 0; }
 .row + .row::before, .row.ruled::before { content: ""; position: absolute; top: 0; inset-inline: 74px 0; height: 1px; background: var(--hair); }
 .row.numbered + .row.numbered::before { inset-inline-start: 52px; }
+.row.numbered, .row.numbered .row-main { min-height: 54px; }
 .row-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; min-height: 60px; padding-block: 7px; border-radius: 8px; transition: opacity .12s; }
 .row-main:active { opacity: .55; }
 .row-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
