@@ -347,10 +347,9 @@ struct DeviceSettings: View {
                 .toggleStyle(.switch).controlSize(.mini)
             }
             if device.transport == .usb || device.transport == .thunderbolt {
-                Toggle(isOn: Binding(get: { DoPDefaults.isEnabled(uid: device.uid, on: settings.dopDeviceUIDs, off: settings.dopOffDeviceUIDs) },
+                Toggle(isOn: Binding(get: { settings.isDoPOn(device.uid) },
                                      set: { on in
-                                         if on { settings.dopDeviceUIDs.insert(device.uid); settings.dopOffDeviceUIDs.remove(device.uid) }
-                                         else { settings.dopDeviceUIDs.remove(device.uid); settings.dopOffDeviceUIDs.insert(device.uid) }
+                                         settings.setDoP(on, for: device.uid)
                                          model.syncEngine()
                                      })) {
                     VStack(alignment: .leading, spacing: 1) {
