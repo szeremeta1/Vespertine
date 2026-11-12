@@ -61,7 +61,7 @@ struct NowPlayingView: View {
     }
 
     private var cover: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack(alignment: .topLeading) {
             Group {
                 if model.settings.vinyl {
                     VinylView(session: session)

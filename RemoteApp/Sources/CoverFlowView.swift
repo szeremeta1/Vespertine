@@ -32,7 +32,7 @@ struct CoverFlowView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let side = min(geometry.size.width * 0.62, max(120, geometry.size.height - 250), 420)
+            let side = min(geometry.size.width * 0.6, max(110, (geometry.size.height - 230) / 1.42), 420)
             let layout = CoverFlowLayout(coverSide: side, flat: reduceMotion)
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
@@ -40,9 +40,9 @@ struct CoverFlowView: View {
                     .frame(height: side * 1.42)
                 caption
                     .padding(.top, 4)
-                Spacer(minLength: 0)
                 scrubber
-                    .padding(.horizontal, 24).padding(.bottom, 10)
+                    .padding(.horizontal, 28).padding(.top, 14)
+                Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity)
         }
@@ -59,10 +59,18 @@ struct CoverFlowView: View {
         .onChange(of: front) { _, new in
             if new >= albums.count - 12 { loadMore() }
         }
-        .onChange(of: albums.count) { _, count in
+        .onChange(of: albums.count) { old, count in
             position = min(position, Double(max(count - 1, 0)))
+            #if DEBUG
+            if LaunchOptions.tilt != nil, old == 0 { position = Double(min(3, max(count - 1, 0))) }
+            #endif
         }
-        .onAppear { sense(scenePhase == .active) }
+        .onAppear {
+            sense(scenePhase == .active)
+            #if DEBUG
+            if LaunchOptions.tilt != nil, position == 0 { position = Double(min(3, max(albums.count - 1, 0))) }
+            #endif
+        }
         .onDisappear { sense(false) }
         .onChange(of: scenePhase) { _, phase in sense(phase == .active) }
         .onChange(of: followsTilt) { _, _ in sense(scenePhase == .active) }

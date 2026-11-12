@@ -102,7 +102,7 @@ struct AlbumsGrid: View {
         .navigationDestination(isPresented: Binding(get: { sample != nil }, set: { if !$0 { sample = nil } })) {
             if let sample { AlbumView(session: session, album: sample) }
         }
-        .task {
+        .task(id: session.isConnected) {
             if albums.isEmpty { await loadMore() }
             if model.startScreen == "album" { model.startScreen = nil; sample = albums.first }
         }
@@ -188,7 +188,7 @@ struct AlbumView: View {
         .obsidianList()
         .navigationBarTitleDisplayMode(.inline)
         .feedback(feedback)
-        .task { if case .tracks(let items) = await session.send(.albumTracks(key: album.key)) { tracks = items } }
+        .task(id: session.isConnected) { if tracks.isEmpty, case .tracks(let items) = await session.send(.albumTracks(key: album.key)) { tracks = items } }
     }
 }
 
@@ -212,7 +212,7 @@ struct ArtistsList: View {
         .obsidianList()
         .searchable(text: $filter)
         .navigationTitle("Artists")
-        .task { if case .artists(let items) = await session.send(.artists) { artists = items } }
+        .task(id: session.isConnected) { if case .artists(let items) = await session.send(.artists) { artists = items } }
     }
 }
 
@@ -231,7 +231,7 @@ struct PlaylistsList: View {
         }
         .obsidianList()
         .navigationTitle("Playlists")
-        .task { if case .playlists(let items) = await session.send(.playlists) { playlists = items } }
+        .task(id: session.isConnected) { if case .playlists(let items) = await session.send(.playlists) { playlists = items } }
     }
 }
 
@@ -250,7 +250,7 @@ struct TrackListView: View {
         }
         .obsidianList()
         .navigationTitle(title)
-        .task { if case .tracks(let items) = await session.send(load) { tracks = items } }
+        .task(id: session.isConnected) { if case .tracks(let items) = await session.send(load) { tracks = items } }
     }
 }
 
