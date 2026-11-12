@@ -18,7 +18,10 @@
 # - draft pull requests get the Linux jobs only. The macOS jobs run when the PR is marked ready for review, or on
 #   demand (Actions > CI > Run workflow, on the PR's branch);
 # - a newer push to the same pull request cancels the run in progress. Pushes to main never cancel each other: each
-#   push runs only the jobs its own diff needs, so a cancelled main run would leave its commit's macOS jobs untested;
+#   push runs only the jobs its own diff needs, so a cancelled main run would leave its commit's macOS jobs untested.
+#   So a push to main gets a concurrency group of its own commit: in one shared group GitHub keeps only one waiting
+#   run, and each newer push cancels the waiting one even with cancel-in-progress off (four merges in a row while a
+#   long run was going left three of them untested and the README badge red);
 # - pull requests restore the SwiftPM caches but only main saves them, so per-PR copies (0.7 to 1.3 GB each) don't
 #   push main's out of the repository's 10 GB cache;
 # - every job has a timeout of about twice its longest run so far, so a hung test can't hold a runner for an hour.
@@ -37,7 +40,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
