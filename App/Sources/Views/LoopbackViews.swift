@@ -219,6 +219,15 @@ struct LoopbackTestSheet: View {
             case .finished:
                 Button("Run Again") { copied = false; test.reset() }.buttonStyle(QuietButtonStyle())
                 Button("Done") { dismiss() }.buttonStyle(BrassButtonStyle()).keyboardShortcut(.defaultAction)
+                    // Escape closes the results too. Done holds Return and a button takes one shortcut, so a second, unseen one holds Escape.
+                    .background {
+                        Button("Done") { dismiss() }
+                            .keyboardShortcut(.cancelAction)
+                            .opacity(0)
+                            .allowsHitTesting(false)
+                            .focusable(false)
+                            .accessibilityHidden(true)
+                    }
             }
         }
         .padding(.horizontal, 22)
