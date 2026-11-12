@@ -114,7 +114,7 @@ final class DeviceStore {
 
     func device(uid: String?) -> OutputDevice? {
         if let uid, let d = devices.first(where: { $0.uid == uid }) { return d }
-        return devices.first(where: \.isDefault) ?? devices.first
+        return devices.first(where: \.isDefault) ?? OutputChoice.best(among: devices)
     }
 
     func watchVolume(of device: OutputDevice?) {
@@ -181,6 +181,8 @@ final class AppModel {
     let settings: AppSettings
     /// The saved speaker groups; nil unless the Settings switch (Speaker Groups (beta)) is on.
     private(set) var speakerGroups: SpeakerGroupsModel?
+    /// Mac Sound Output (beta): speaker groups published as outputs of the Mac.
+    let systemOutput: SystemOutputModel
     let library: LibraryStore
     let player: PlayerController
     let devices: DeviceStore
@@ -267,6 +269,7 @@ final class AppModel {
         let arguments = LaunchArguments()
         let isolated = arguments.string(forKey: "VespertineDataDirectory") != nil && !arguments.bool(forKey: "VespertinePersistFilters")
         filtersURL = isolated ? nil : FilterStore.url(in: settings.dataDirectory)
+        systemOutput = SystemOutputModel(isolated: arguments.string(forKey: "VespertineDataDirectory") != nil)
         if let filtersURL { filters = FilterStore.load(from: filtersURL) }
         library = try LibraryStore(dataDirectory: settings.dataDirectory, automaticScanning: { [weak settings] in settings?.watchFolders ?? false })
         showSetup = Self.needsSetup(settings: settings, library: library, arguments: arguments)
@@ -311,6 +314,8 @@ final class AppModel {
         }
         followChosenOutput()
         player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
+        // Which groups are published decides how long a pause keeps one from the other apps.
+        systemOutput.onPublishedChanged = { [weak self] in self?.syncEngine() }
         library.bundlesCopiesByDefault = settings.bundleCopies
         if settings.speakerGroupsFeature {
             speakerGroups = SpeakerGroupsSwitch.apply(true, to: settings, current: nil, onChange: groupsChanged)
@@ -413,7 +418,12 @@ final class AppModel {
     /// Where the next song would play: the chosen output, or while it isn't connected, the one that stands in for it
     /// (Settings → Playback; nil when set to wait for it, and while playback waits for one that dropped out mid-song).
     var plannedDevice: OutputDevice? {
-        guard let uid = settings.selectedDeviceUID else { return devices.device(uid: nil) }
+        guard let uid = settings.selectedDeviceUID else {
+            // Following the Mac's sound output while it is a group published with Mac Sound Output: that group plays.
+            if !devices.devices.contains(where: \.isDefault), let groups = speakerGroups?.groups,
+               let group = SystemOutput.defaultOutputGroup(among: groups) { return groupOutput(group) }
+            return devices.device(uid: nil)
+        }
         // A speaker group is chosen like an output: it is ready when all of its outputs are connected.
         if let group = chosenGroup { return groupOutput(group) }
         if let chosen = devices.devices.first(where: { $0.uid == uid }) { return chosen }
@@ -563,7 +573,10 @@ final class AppModel {
     func syncEngine() {
         devices.dopUIDs = settings.effectiveDoPUIDs
         let device = plannedDevice
-        player.engine.update(settings: settings.engineSettings(groups: speakerGroups?.groups ?? []))
+        var engineSettings = settings.engineSettings(groups: speakerGroups?.groups ?? [])
+        engineSettings.systemOutputGroupIDs = Set(engineSettings.speakerGroups.map(\.id).filter { systemOutput.choice(for: $0).published })
+        player.engine.update(settings: engineSettings)
+        systemOutput.sync(groups: engineSettings.speakerGroups, settings: engineSettings)
         devices.watchVolume(of: device)
         player.resolveVersions()
     }

@@ -139,6 +139,11 @@ enum DeviceQuery {
         (try? HAL.getArray(device, .output(kAudioDevicePropertyStreams), of: AudioStreamID.self)) ?? []
     }
 
+    static func inputStreams(_ device: AudioObjectID) -> [AudioStreamID] {
+        (try? HAL.getArray(device, .init(mSelector: kAudioDevicePropertyStreams, mScope: kAudioObjectPropertyScopeInput, mElement: kAudioObjectPropertyElementMain),
+                           of: AudioStreamID.self)) ?? []
+    }
+
     static func outputChannelCount(_ device: AudioObjectID) -> Int {
         var address = AudioObjectPropertyAddress.output(kAudioDevicePropertyStreamConfiguration)
         var size: UInt32 = 0
@@ -266,7 +271,7 @@ enum DeviceQuery {
     /// UIDs of the connected outputs: cheap, no formats read.
     static func outputUIDs() -> Set<String> {
         Set(allDeviceIDs().filter { outputChannelCount($0) > 0 }.compactMap { HAL.getString($0, .global(kAudioDevicePropertyDeviceUID)) }
-            .filter { !GroupAggregate.isGroupAggregateUID($0) })
+            .filter { !GroupAggregate.isGroupAggregateUID($0) && !SystemOutput.isSystemOutputUID($0) })
     }
 
     static func outputDevices(dopEnabledUIDs: Set<String>) -> [OutputDevice] {
@@ -275,5 +280,8 @@ enum DeviceQuery {
             .filter { $0.transport != .aggregate || !$0.name.hasPrefix("CADefaultDeviceAggregate") }
             // The aggregate a speaker group plays through is how the group plays, not an output to choose.
             .filter { !GroupAggregate.isGroupAggregateUID($0.uid) }
+            // Mac Sound Output's own outputs: playing to one from Vespertine would go round through the helper to the group it
+            // stands for, so Vespertine plays the group itself.
+            .filter { !SystemOutput.isSystemOutputUID($0.uid) }
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Mac Sound Output (beta): the helper as a launch agent (SMAppService.agent), so launchd starts it again if it ends any way
+     but cleanly. Vespertine registers the one named after its own bundle ID (this one for Vespertine Dev). -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>org.szeremeta.Vespertine.SoundHelper.dev</string>
+	<key>BundleProgram</key>
+	<string>Contents/Library/LoginItems/Vespertine Sound Helper.app/Contents/MacOS/Vespertine Sound Helper</string>
+	<key>AssociatedBundleIdentifiers</key>
+	<array>
+		<string>org.szeremeta.Vespertine.dev</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
+	<key>ThrottleInterval</key>
+	<integer>5</integer>
+	<key>ProcessType</key>
+	<string>Interactive</string>
+	<key>LimitLoadToSessionType</key>
+	<string>Aqua</string>
+</dict>
+</plist>

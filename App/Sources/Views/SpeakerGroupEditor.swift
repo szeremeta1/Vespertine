@@ -9,16 +9,24 @@ import VespertineAudio
 struct SpeakerGroupEditor: View {
     let groups: SpeakerGroupsModel
     @State private var group: SpeakerGroup
+    @State private var name: String
     @Environment(\.dismiss) private var dismiss
 
     init(groups: SpeakerGroupsModel, group: SpeakerGroup) {
         self.groups = groups
         _group = State(initialValue: group)
+        _name = State(initialValue: group.name)
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(verbatim: group.name).font(.title3.weight(.semibold))
+            // The group's name, also the name of its Mac sound output. An empty name keeps the last one.
+            TextField(text: $name, prompt: Text("Name")) { Text("Name") }
+                .textFieldStyle(.plain).font(.title3.weight(.semibold))
+                .onChange(of: name) { _, new in
+                    let trimmed = new.trimmingCharacters(in: .whitespacesAndNewlines)
+                    if !trimmed.isEmpty, trimmed != group.name { group.name = trimmed }
+                }
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
                     RoomCanvasView(group: $group)

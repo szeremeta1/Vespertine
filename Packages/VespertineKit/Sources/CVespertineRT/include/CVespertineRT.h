@@ -304,6 +304,42 @@ OSStatus nrt_capture_ioproc(AudioObjectID inDevice,
                             const AudioTimeStamp *_Nonnull inOutputTime,
                             void *_Nullable inClientData);
 
+// MARK: - Live input (Mac Sound Output): what other apps play, routed onto a speaker group in the same I/O cycle
+
+/// Most input or output channels a live router takes (the speaker-group engine's limit).
+#define NRT_LIVE_MAX_CHANNELS 16u
+
+typedef struct NRTLive NRTLive;
+
+/// One I/O cycle of an aggregate whose first input channels are what other apps play (`capture`, recording into a ring
+/// of the input's channel count) and whose outputs are the group's DACs (`ctx`, rendering from a ring of the group's
+/// channel count). Each cycle the input is recorded, routed by a gain matrix into the render ring, then rendered, so
+/// the sound leaves in the cycle it arrived. While diverted, the input stays in the capture ring for a worker thread
+/// (the stereo upmixer), which writes the render ring itself.
+NRTLive *_Nullable nrt_live_create(NRTCapture *_Nonnull capture, NRTRing *_Nonnull captureRing,
+                                   NRTRenderContext *_Nonnull ctx, NRTRing *_Nonnull renderRing, uint32_t maxFramesPerSlice);
+void nrt_live_destroy(NRTLive *_Nullable live);
+/// Sets the routing: `gains[out * inChannels + in]`, for the render ring's channels by the capture ring's. Safe while the
+/// device runs: the I/O thread moves to the new matrix over one cycle (a short crossfade, so a change never clicks).
+/// Waits (briefly) for the I/O thread to take a previous change first. Returns false for a size it can't hold.
+bool nrt_live_set_matrix(NRTLive *_Nonnull live, const float *_Nonnull gains, uint32_t outChannels, uint32_t inChannels);
+/// Leaves the input in the capture ring (true) or routes it in the I/O cycle (false).
+void nrt_live_set_diverted(NRTLive *_Nonnull live, bool diverted);
+/// The loudest sample of input channel `channel` since the last call (0 when routed nothing), then starts again.
+float nrt_live_take_peak(NRTLive *_Nonnull live, uint32_t channel);
+/// Routes `frames` of interleaved input through the current matrix into `out` (render-ring channels), as the I/O thread
+/// does. For the worker thread and tests; not for use while the I/O thread routes.
+void nrt_live_route(NRTLive *_Nonnull live, const float *_Nonnull in, float *_Nonnull out, uint32_t frames);
+
+/// Pass to AudioDeviceCreateIOProcID with the live router as client data.
+OSStatus nrt_live_ioproc(AudioObjectID inDevice,
+                         const AudioTimeStamp *_Nonnull inNow,
+                         const AudioBufferList *_Nonnull inInputData,
+                         const AudioTimeStamp *_Nonnull inInputTime,
+                         AudioBufferList *_Nonnull outOutputData,
+                         const AudioTimeStamp *_Nonnull inOutputTime,
+                         void *_Nullable inClientData);
+
 /// Renders `frames` into a caller buffer exactly as the IOProc would (used by tests).
 void nrt_context_render_interleaved(NRTRenderContext *_Nonnull ctx, float *_Nonnull out,
                                     uint32_t frames, uint32_t outChannels);

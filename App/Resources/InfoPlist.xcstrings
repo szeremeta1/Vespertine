@@ -558,6 +558,281 @@
           }
         }
       }
+    },
+    "NSMicrophoneUsageDescription": {
+      "comment": "Privacy - Microphone Usage Description",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine የድምፅ ግብዓትን የሚጠቀመው እርስዎ ለሚጀምሩት ብቻ ነው፦ የክፍል ልኬት የመለኪያ ማይክሮፎንዎን ይቀዳል፣ የloopback ሙከራው ምናባዊ loopback መሣሪያን ይቀዳል፣ እና Mac Sound Output መተግበሪያዎችዎ ወደ ያተሙት የድምፅ ማጉያ ቡድን የሚያጫውቱትን ተቀብሎ በቡድኑ ድምፅ ማጉያዎች ላይ ያጫውታል። ሌላ ምንም አይቀዳም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يستخدم Vespertine إدخال الصوت فقط لما تبدؤه أنت: يسجّل قياس الغرفة ميكروفون القياس، ويسجّل اختبار الحلقة جهاز حلقة افتراضيًا، ويستقبل مخرج صوت Mac ما تشغّله تطبيقاتك على مجموعة سماعات نشرتها ليشغّله على سماعات المجموعة. لا يُسجَّل أي شيء آخر."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine অডিও ইনপুট শুধু আপনি যা শুরু করেন তার জন্য ব্যবহার করে: রুম পরিমাপ আপনার পরিমাপ মাইক্রোফোন রেকর্ড করে, লুপব্যাক পরীক্ষা একটি ভার্চুয়াল লুপব্যাক ডিভাইস রেকর্ড করে, এবং Mac সাউন্ড আউটপুট আপনার প্রকাশিত স্পিকার গ্রুপে আপনার অ্যাপগুলো যা বাজায় তা গ্রহণ করে গ্রুপের স্পিকারে বাজায়। আর কিছু রেকর্ড করা হয় না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine používá zvukový vstup jen pro to, co sami spustíte: měření místnosti nahrává měřicí mikrofon, test smyčky nahrává virtuální smyčkové zařízení a Zvukový výstup Macu přijímá to, co vaše aplikace přehrávají do zveřejněné skupiny reproduktorů, aby to přehrál na jejích reproduktorech. Nic jiného se nenahrává."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine bruger kun lydinput til det, du selv starter: en rummåling optager din målemikrofon, loopback-testen optager en virtuel loopback-enhed, og Mac-lydudgang modtager det, dine apps afspiller til en højttalergruppe, du har udgivet, og afspiller det på gruppens højttalere. Intet andet optages."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine nutzt den Audioeingang nur für das, was du startest: Eine Raummessung nimmt dein Messmikrofon auf, der Loopback-Test nimmt ein virtuelles Loopback-Gerät auf, und die Mac-Tonausgabe empfängt, was deine Apps an eine veröffentlichte Lautsprechergruppe senden, um es auf deren Lautsprechern abzuspielen. Sonst wird nichts aufgenommen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Vespertine χρησιμοποιεί την είσοδο ήχου μόνο για ό,τι ξεκινάτε εσείς: η μέτρηση χώρου ηχογραφεί το μικρόφωνο μέτρησης, η δοκιμή βρόχου ηχογραφεί μια εικονική συσκευή βρόχου και η Έξοδος ήχου Mac λαμβάνει ό,τι παίζουν οι εφαρμογές σας σε μια ομάδα ηχείων που δημοσιεύσατε, για να το παίξει στα ηχεία της. Τίποτα άλλο δεν ηχογραφείται."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine uses audio input only for what you start: a room measurement records your measurement microphone, the loopback test records a virtual loopback device, and Mac Sound Output receives what your apps play to a speaker group you published, to play it on the group's speakers. Nothing else is recorded."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine usa la entrada de audio solo para lo que tú inicias: una medición de la sala graba tu micrófono de medición, la prueba de bucle graba un dispositivo de bucle virtual y la Salida de sonido del Mac recibe lo que tus apps reproducen en un grupo de altavoces publicado para reproducirlo en sus altavoces. No se graba nada más."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ورودی صدا را فقط برای کارهایی که خودتان شروع می‌کنید استفاده می‌کند: اندازه‌گیری اتاق میکروفون اندازه‌گیری را ضبط می‌کند، آزمون حلقه یک دستگاه حلقهٔ مجازی را ضبط می‌کند، و خروجی صدای Mac آنچه برنامه‌هایتان روی گروه بلندگوی منتشرشده پخش می‌کنند را دریافت می‌کند تا روی بلندگوهای گروه پخش کند. هیچ چیز دیگری ضبط نمی‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine käyttää äänituloa vain siihen, minkä itse käynnistät: huonemittaus tallentaa mittausmikrofonia, silmukkatesti tallentaa virtuaalista silmukkalaitetta ja Macin äänilähtö vastaanottaa sen, mitä apit toistavat julkaisemaasi kaiutinryhmään, ja toistaa sen ryhmän kaiuttimista. Mitään muuta ei tallenneta."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ginagamit lang ng Vespertine ang audio input para sa sinisimulan mo: nire-record ng room measurement ang iyong measurement microphone, nire-record ng loopback test ang isang virtual loopback device, at tinatanggap ng Mac Sound Output ang pine-play ng iyong mga app sa isang speaker group na na-publish mo para i-play ito sa mga speaker ng grupo. Wala nang ibang nire-record."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine n’utilise l’entrée audio que pour ce que vous lancez : une mesure de la pièce enregistre votre micro de mesure, le test de bouclage enregistre un périphérique de bouclage virtuel, et la Sortie audio du Mac reçoit ce que vos apps jouent sur un groupe d’enceintes publié pour le jouer sur ses enceintes. Rien d’autre n’est enregistré."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ઑડિયો ઇનપુટનો ઉપયોગ ફક્ત તમે શરૂ કરો તે માટે કરે છે: રૂમ માપન તમારો માપન માઇક્રોફોન રેકોર્ડ કરે છે, લૂપબૅક પરીક્ષણ વર્ચ્યુઅલ લૂપબૅક ઉપકરણ રેકોર્ડ કરે છે, અને Mac સાઉન્ડ આઉટપુટ તમારી ઍપ્સ તમે પ્રકાશિત કરેલા સ્પીકર જૂથ પર જે વગાડે તે મેળવીને જૂથના સ્પીકર પર વગાડે છે. બીજું કંઈ રેકોર્ડ થતું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine yana amfani da shigar sauti ne kawai don abin da kuka fara: auna ɗaki yana naɗar makirufon aunawa, gwajin loopback yana naɗar na'urar loopback ta kama-da-wane, kuma Fitar Sautin Mac tana karɓar abin da manhajojinku ke kunnawa zuwa rukunin lasifika da kuka wallafa domin ta kunna shi a lasifikan rukunin. Ba a naɗar wani abu dabam."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‏Vespertine משתמש בקלט שמע רק למה שאתם מפעילים: מדידת חדר מקליטה את מיקרופון המדידה, בדיקת הלולאה מקליטה התקן לולאה וירטואלי, ופלט הקול של ה‑Mac מקבל את מה שהיישומים שלכם מנגנים לקבוצת רמקולים שפרסמתם כדי לנגן אותו ברמקולים של הקבוצה. שום דבר אחר לא מוקלט."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ऑडियो इनपुट का उपयोग केवल उसके लिए करता है जो आप शुरू करते हैं: रूम मापन आपके मापन माइक्रोफ़ोन को रिकॉर्ड करता है, लूपबैक परीक्षण एक वर्चुअल लूपबैक डिवाइस को रिकॉर्ड करता है, और Mac साउंड आउटपुट आपके ऐप्स द्वारा प्रकाशित स्पीकर समूह पर चलाई गई ध्वनि प्राप्त करके समूह के स्पीकर पर चलाता है। और कुछ भी रिकॉर्ड नहीं होता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Vespertine csak arra használja a hangbemenetet, amit te indítasz: a szobamérés a mérőmikrofont rögzíti, a visszacsatolási teszt egy virtuális loopback eszközt rögzít, a Mac hangkimenet pedig fogadja, amit az appjaid egy közzétett hangszórócsoportra játszanak, és lejátssza a csoport hangszóróin. Mást nem rögzít."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine menggunakan input audio hanya untuk yang Anda mulai: pengukuran ruangan merekam mikrofon pengukuran Anda, uji loopback merekam perangkat loopback virtual, dan Output Suara Mac menerima apa yang diputar app Anda ke grup speaker yang Anda terbitkan untuk memutarnya di speaker grup. Tidak ada hal lain yang direkam."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine usa l’ingresso audio solo per ciò che avvii tu: una misurazione della stanza registra il microfono di misura, il test di loopback registra un dispositivo loopback virtuale e l’Uscita audio del Mac riceve ciò che le tue app riproducono su un gruppo di altoparlanti pubblicato, per riprodurlo sui suoi altoparlanti. Nient’altro viene registrato."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineがオーディオ入力を使うのは、あなたが開始した操作だけです。ルーム測定は測定用マイクを録音し、ループバックテストは仮想ループバックデバイスを録音し、Macのサウンド出力は公開したスピーカーグループにアプリが再生する音を受け取ってグループのスピーカーで再生します。それ以外は録音しません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ಆಡಿಯೋ ಇನ್‌ಪುಟ್ ಅನ್ನು ನೀವು ಪ್ರಾರಂಭಿಸುವುದಕ್ಕೆ ಮಾತ್ರ ಬಳಸುತ್ತದೆ: ಕೋಣೆ ಮಾಪನವು ನಿಮ್ಮ ಮಾಪನ ಮೈಕ್ರೊಫೋನ್ ಅನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡುತ್ತದೆ, ಲೂಪ್‌ಬ್ಯಾಕ್ ಪರೀಕ್ಷೆ ವರ್ಚುವಲ್ ಲೂಪ್‌ಬ್ಯಾಕ್ ಸಾಧನವನ್ನು ರೆಕಾರ್ಡ್ ಮಾಡುತ್ತದೆ, ಮತ್ತು Mac ಸೌಂಡ್ ಔಟ್‌ಪುಟ್ ನಿಮ್ಮ ಆ್ಯಪ್‌ಗಳು ನೀವು ಪ್ರಕಟಿಸಿದ ಸ್ಪೀಕರ್ ಗುಂಪಿಗೆ ಪ್ಲೇ ಮಾಡುವುದನ್ನು ಸ್ವೀಕರಿಸಿ ಗುಂಪಿನ ಸ್ಪೀಕರ್‌ಗಳಲ್ಲಿ ಪ್ಲೇ ಮಾಡುತ್ತದೆ. ಬೇರೆ ಏನನ್ನೂ ರೆಕಾರ್ಡ್ ಮಾಡುವುದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine은 사용자가 시작한 작업에만 오디오 입력을 사용합니다. 룸 측정은 측정용 마이크를 녹음하고, 루프백 테스트는 가상 루프백 기기를 녹음하며, Mac 사운드 출력은 게시한 스피커 그룹에 앱이 재생하는 소리를 받아 그룹의 스피커로 재생합니다. 그 밖에는 아무것도 녹음하지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങൾ ആരംഭിക്കുന്നവയ്ക്കായി മാത്രമാണ് Vespertine ഓഡിയോ ഇൻപുട്ട് ഉപയോഗിക്കുന്നത്: റൂം അളക്കൽ നിങ്ങളുടെ അളക്കൽ മൈക്രോഫോൺ റെക്കോർഡ് ചെയ്യുന്നു, ലൂപ്പ്ബാക്ക് പരിശോധന ഒരു വെർച്വൽ ലൂപ്പ്ബാക്ക് ഉപകരണം റെക്കോർഡ് ചെയ്യുന്നു, Mac സൗണ്ട് ഔട്ട്‌പുട്ട് നിങ്ങൾ പ്രസിദ്ധീകരിച്ച സ്പീക്കർ ഗ്രൂപ്പിലേക്ക് ആപ്പുകൾ പ്ലേ ചെയ്യുന്നത് സ്വീകരിച്ച് ഗ്രൂപ്പിന്റെ സ്പീക്കറുകളിൽ പ്ലേ ചെയ്യുന്നു. മറ്റൊന്നും റെക്കോർഡ് ചെയ്യുന്നില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ऑडिओ इनपुट फक्त तुम्ही सुरू केलेल्या गोष्टींसाठी वापरते: खोली मापन तुमचा मापन मायक्रोफोन रेकॉर्ड करते, लूपबॅक चाचणी आभासी लूपबॅक डिव्हाइस रेकॉर्ड करते, आणि Mac साउंड आउटपुट तुमची अ‍ॅप्स तुम्ही प्रकाशित केलेल्या स्पीकर गटावर जे वाजवतात ते घेऊन गटाच्या स्पीकरवर वाजवते. इतर काहीही रेकॉर्ड होत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine menggunakan input audio hanya untuk perkara yang anda mulakan: pengukuran bilik merakam mikrofon pengukuran anda, ujian gelung balik merakam peranti gelung balik maya, dan Output Bunyi Mac menerima apa yang dimainkan oleh app anda ke kumpulan pembesar suara yang anda terbitkan untuk memainkannya pada pembesar suara kumpulan itu. Tiada perkara lain dirakam."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine bruker lydinngang bare til det du selv starter: en rommåling tar opp målemikrofonen din, loopback-testen tar opp en virtuell loopback-enhet, og Mac-lydutgang mottar det appene dine spiller til en høyttalergruppe du har publisert, og spiller det på gruppens høyttalere. Ingenting annet tas opp."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine gebruikt de audio-invoer alleen voor wat je zelf start: een ruimtemeting neemt je meetmicrofoon op, de loopbacktest neemt een virtueel loopbackapparaat op en Mac-geluidsuitvoer ontvangt wat je apps afspelen op een gepubliceerde luidsprekergroep, om het op de luidsprekers van de groep af te spelen. Verder wordt niets opgenomen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਆਡੀਓ ਇਨਪੁਟ ਸਿਰਫ਼ ਉਸ ਲਈ ਵਰਤਦਾ ਹੈ ਜੋ ਤੁਸੀਂ ਸ਼ੁਰੂ ਕਰਦੇ ਹੋ: ਕਮਰੇ ਦਾ ਮਾਪ ਤੁਹਾਡੇ ਮਾਪ ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਨੂੰ ਰਿਕਾਰਡ ਕਰਦਾ ਹੈ, ਲੂਪਬੈਕ ਟੈਸਟ ਇੱਕ ਵਰਚੁਅਲ ਲੂਪਬੈਕ ਡਿਵਾਈਸ ਨੂੰ ਰਿਕਾਰਡ ਕਰਦਾ ਹੈ, ਅਤੇ Mac ਸਾਊਂਡ ਆਉਟਪੁੱਟ ਤੁਹਾਡੀਆਂ ਐਪਾਂ ਵੱਲੋਂ ਤੁਹਾਡੇ ਪ੍ਰਕਾਸ਼ਿਤ ਸਪੀਕਰ ਸਮੂਹ ਤੇ ਚਲਾਈ ਆਵਾਜ਼ ਲੈ ਕੇ ਸਮੂਹ ਦੇ ਸਪੀਕਰਾਂ ਤੇ ਚਲਾਉਂਦਾ ਹੈ। ਹੋਰ ਕੁਝ ਵੀ ਰਿਕਾਰਡ ਨਹੀਂ ਹੁੰਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine używa wejścia audio tylko do tego, co sam uruchomisz: pomiar pomieszczenia nagrywa mikrofon pomiarowy, test pętli nagrywa wirtualne urządzenie pętli, a Wyjście dźwięku Maca odbiera to, co aplikacje odtwarzają na opublikowanej grupie głośników, i odtwarza to na jej głośnikach. Nic innego nie jest nagrywane."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine usa a entrada de áudio só para o que você inicia: uma medição da sala grava seu microfone de medição, o teste de loopback grava um dispositivo de loopback virtual e a Saída de som do Mac recebe o que seus apps tocam em um grupo de alto-falantes publicado para tocá-lo nos alto-falantes do grupo. Nada mais é gravado."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine usa a entrada de áudio apenas para o que inicia: uma medição da sala grava o seu microfone de medição, o teste de loopback grava um dispositivo de loopback virtual e a Saída de som do Mac recebe o que as suas apps reproduzem num grupo de colunas publicado para o reproduzir nas colunas do grupo. Nada mais é gravado."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine folosește intrarea audio doar pentru ce pornești tu: o măsurare a camerei înregistrează microfonul de măsurare, testul de buclă înregistrează un dispozitiv de buclă virtual, iar Ieșirea de sunet Mac primește ce redau aplicațiile tale pe un grup de difuzoare publicat, pentru a-l reda pe difuzoarele grupului. Nimic altceva nu este înregistrat."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine använder ljudingången bara för det du själv startar: en rumsmätning spelar in din mätmikrofon, loopback-testet spelar in en virtuell loopback-enhet och Mac-ljudutgång tar emot det dina appar spelar till en högtalargrupp du har publicerat och spelar upp det i gruppens högtalare. Inget annat spelas in."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine hutumia ingizo la sauti kwa unachoanzisha tu: kipimo cha chumba hurekodi maikrofoni yako ya kupimia, jaribio la loopback hurekodi kifaa pepe cha loopback, na Toleo la Sauti la Mac hupokea kile programu zako zinachocheza kwa kikundi cha spika ulichochapisha ili kukicheza kwenye spika za kikundi. Hakuna kingine kinachorekodiwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "நீங்கள் தொடங்குவதற்கு மட்டுமே Vespertine ஆடியோ உள்ளீட்டைப் பயன்படுத்துகிறது: அறை அளவீடு உங்கள் அளவீட்டு மைக்ரோஃபோனைப் பதிவுசெய்கிறது, லூப்பேக் சோதனை ஒரு மெய்நிகர் லூப்பேக் சாதனத்தைப் பதிவுசெய்கிறது, Mac ஒலி வெளியீடு நீங்கள் வெளியிட்ட ஸ்பீக்கர் குழுவுக்கு உங்கள் ஆப்ஸ் இயக்குவதைப் பெற்று குழுவின் ஸ்பீக்கர்களில் இயக்குகிறது. வேறு எதுவும் பதிவுசெய்யப்படுவதில்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీరు ప్రారంభించే వాటికి మాత్రమే Vespertine ఆడియో ఇన్‌పుట్‌ను ఉపయోగిస్తుంది: గది కొలత మీ కొలత మైక్రోఫోన్‌ను రికార్డ్ చేస్తుంది, లూప్‌బ్యాక్ పరీక్ష వర్చువల్ లూప్‌బ్యాక్ పరికరాన్ని రికార్డ్ చేస్తుంది, మరియు Mac సౌండ్ అవుట్‌పుట్ మీరు ప్రచురించిన స్పీకర్ సమూహానికి మీ యాప్‌లు ప్లే చేసేదాన్ని స్వీకరించి సమూహ స్పీకర్లలో ప్లే చేస్తుంది. మరేదీ రికార్డ్ కాదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ใช้อินพุตเสียงเฉพาะสิ่งที่คุณเริ่มเองเท่านั้น: การวัดห้องจะบันทึกไมโครโฟนวัดเสียงของคุณ การทดสอบลูปแบ็กจะบันทึกอุปกรณ์ลูปแบ็กเสมือน และเอาต์พุตเสียงของ Mac จะรับเสียงที่แอปของคุณเล่นไปยังกลุ่มลำโพงที่คุณเผยแพร่ เพื่อเล่นบนลำโพงของกลุ่ม ไม่มีการบันทึกสิ่งอื่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ses girişini yalnızca sizin başlattığınız işler için kullanır: oda ölçümü ölçüm mikrofonunuzu kaydeder, geri döngü testi sanal bir geri döngü aygıtını kaydeder ve Mac Ses Çıkışı, uygulamalarınızın yayımladığınız bir hoparlör grubuna çaldığını alıp grubun hoparlörlerinde çalar. Başka hiçbir şey kaydedilmez."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine використовує аудіовхід лише для того, що ви запускаєте: вимірювання кімнати записує ваш вимірювальний мікрофон, тест петлі записує віртуальний петльовий пристрій, а Звуковий вихід Mac отримує те, що ваші програми відтворюють на опублікованій групі динаміків, щоб відтворити це на її динаміках. Більше нічого не записується."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine آڈیو اِن پُٹ صرف اُن کاموں کے لیے استعمال کرتا ہے جو آپ شروع کریں: کمرے کی پیمائش آپ کا پیمائشی مائیکروفون ریکارڈ کرتی ہے، لوپ بیک ٹیسٹ ایک ورچوئل لوپ بیک ڈیوائس ریکارڈ کرتا ہے، اور Mac ساؤنڈ آؤٹ پُٹ وہ آواز وصول کرتا ہے جو آپ کی ایپس آپ کے شائع کردہ اسپیکر گروپ پر چلاتی ہیں تاکہ اسے گروپ کے اسپیکرز پر چلائے۔ اور کچھ ریکارڈ نہیں ہوتا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine chỉ dùng đầu vào âm thanh cho những gì bạn bắt đầu: đo phòng ghi âm micrô đo của bạn, kiểm tra loopback ghi âm một thiết bị loopback ảo, và Đầu ra âm thanh Mac nhận những gì ứng dụng của bạn phát tới một nhóm loa bạn đã công bố để phát trên loa của nhóm. Không ghi âm gì khác."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 只會為你開始的操作使用音訊輸入：房間量測會錄製你的量測咪高峰，迴送測試會錄製虛擬迴送裝置，而 Mac 聲音輸出會接收你的 App 向你發佈的喇叭組播放的聲音，並在該組的喇叭上播放。除此之外不會錄製任何內容。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 仅在你启动的操作中使用音频输入：房间测量会录制你的测量麦克风，回环测试会录制虚拟回环设备，Mac 声音输出会接收你的 App 向你发布的扬声器组播放的声音，并在该组的扬声器上播放。不会录制其他任何内容。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 只會為你開始的操作使用音訊輸入：房間測量會錄製你的測量麥克風，迴送測試會錄製虛擬迴送裝置，而 Mac 聲音輸出會接收你的 App 向你發布的揚聲器組播放的聲音，並在該組的揚聲器上播放。除此之外不會錄製任何內容。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

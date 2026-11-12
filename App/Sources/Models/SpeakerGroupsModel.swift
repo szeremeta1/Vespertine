@@ -39,7 +39,9 @@ final class SpeakerGroupsModel {
     /// Saves the group a finished draft makes; nil when the draft isn't ready.
     @discardableResult
     func create(_ draft: SpeakerGroupDraft) -> SpeakerGroup? {
-        guard let group = draft.makeGroup() else { return nil }
+        guard var group = draft.makeGroup() else { return nil }
+        // Speakers placed from the start (the editor's presets), so the group plays as soon as it is made.
+        if let preset = GroupPresets.startingPreset(for: group), let placed = GroupPresets.apply(preset, to: group) { group = placed }
         onNewGroup?(group, nil)
         upsert(group)
         return group
