@@ -88,8 +88,10 @@ struct ShareCloseTests {
         // The share goes quiet. Play is pressed on some other song: the copied next one is let go, and its file closed.
         latch.hold()
         cache.warm(key: "other", url: URL(fileURLWithPath: "/share/other.flac"), press: true) { true }
-        let closing = await eventually { latch.closesWaiting > 0 }
-        #expect(closing, "the next song's file is being closed on the quiet share")
+        // Setup too: the close is handed to a background thread, which a busy runner may take minutes to provide (20 s
+        // ran out there). The wait ends when the close has reached the share; the press below is what is being tested.
+        let closing = await eventually(300) { latch.closesWaiting > 0 }
+        try #require(closing, "the next song's file is being closed on the quiet share")
 
         // Play pressed again (the caller's thread: the interface). It must come back while that close still waits.
         let back = returns { cache.warm(key: "third", url: URL(fileURLWithPath: "/share/third.flac"), press: true) { true } }

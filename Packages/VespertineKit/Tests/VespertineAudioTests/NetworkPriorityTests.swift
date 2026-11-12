@@ -171,8 +171,10 @@ struct NetworkPriorityTests {
         let scan = ScanLoad(link: link, gate: gate)
         defer { Task { await scan.stop() } }
         // The scan is under way. Waited for as a condition with patience for a starved machine, and failing here with what is
-        // missing, not hanging until the job's watchdog (these requests need pool threads, which other tests can hold for a while).
-        let underWay = await waitFor(patience: 90) { link.count(.scan) >= 5 }
+        // missing, not hanging until the job's watchdog (these requests need pool threads, which other tests can hold for
+        // minutes: 90 s ran out on a CI machine whose whole test run stood still for two). The patience is spent only when
+        // the scan has not started; nothing below is measured against it.
+        let underWay = await waitFor(patience: 300) { link.count(.scan) >= 5 }
         try #require(underWay, "the scan never got going: \(link.count(.scan)) of its requests went over the link")
 
         // Where on the wire play is pressed, and what goes over it until the song is local. Counted in requests,
