@@ -214,6 +214,7 @@ final class RemoteAppModel {
         if let vinyl = LaunchOptions.vinyl { settings.vinyl = vinyl }
         startScreen = LaunchOptions.screen
         if startScreen == "coverFlow" { settings.albumsLayout = .coverFlow }
+        if startScreen == "albums" || startScreen == "album" { settings.albumsLayout = .grid }
         if LaunchOptions.samplePairing {
             let sample = SavedPairing(serverID: "sample-mac", name: "Studio Mac mini", device: "phone-sample", key: Data(repeating: 1, count: 32),
                                       address: RemoteAddress(host: "studio-mac.tail1a2b3.ts.net"),

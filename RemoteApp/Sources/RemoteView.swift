@@ -88,7 +88,7 @@ struct MiniPlayer: View {
             .foregroundStyle(Palette.text)
             .disabled(!session.isConnected)
             .padding(.leading, 10).padding(.trailing, 6).padding(.vertical, 7)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(alignment: .bottom) { MiniProgress(session: session).padding(.horizontal, 14) }
             .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
             .padding(.horizontal, 10).padding(.bottom, 6)

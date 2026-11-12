@@ -92,6 +92,24 @@ The opt-in loopback tests (`VESPERTINE_GROUP_LOOPBACK=1 swift test --filter Grou
 
 `scripts/qa-run.sh` and `App/Sources/App/DeveloperHooks.swift` hold the launch arguments used for visual QA. They can open albums, artists and genres, start playback or a shuffle, set any page's filters, select inspector tabs and render windows to PNG, which works even while the screen is locked.
 
+## The iPhone and iPad remote
+
+`RemoteApp/` is the remote that controls Vespertine on a Mac (Settings › Remote); `Packages/VespertineRemoteKit` holds the protocol and the phone's side of it.
+
+```bash
+swift test --package-path Packages/VespertineRemoteKit        # protocol, pairing, sessions and routes, on the loopback
+xcodegen generate --spec RemoteApp/project.yml
+xcodebuild -project RemoteApp/VespertineRemote.xcodeproj -scheme VespertineRemote \
+  -destination 'platform=iOS Simulator,id=<UDID>' CODE_SIGNING_ALLOWED=NO test   # the app's own tests
+scripts/shoot-ios.sh <UDID> build/ios-shots                    # every screen, from the built-in demo
+```
+
+- **Reaching a Mac.** Bonjour finds a Mac on the same network. A paired Mac can also have a typed address (its Tailscale name, say), and the phone remembers where the Mac last answered. A session tries all of them, each a little after the one before, and uses the first that answers (`RemoteSession`, `SavedPairing.routes`). The Mac's port isn't fixed and only Bonjour announces it, so a typed address without a port borrows the port from the last connection.
+- **Cover Flow** (`CoverFlowLayout`, `CoverFlowView`) shifts its perspective with the device's tilt, read from Core Motion only while it's on screen (`TiltSensor`, `TiltFilter`). With Reduce Motion on it lies flat and doesn't follow the device.
+- **The record in Now Playing** (`VinylView`, `VinylGeometry`) turns with the playback position the Mac reports. It isn't drawn from the sound: the phone hears none of it.
+- **Screenshots and trying screens** in the Simulator use the debug-only launch arguments in `RemoteApp/Sources/LaunchOptions.swift` (`-VTDemo YES -VTScreen coverFlow -VTTilt "0.9,0.6"`): the Simulator has no gyroscope, so `-VTTilt` stands in for one.
+- `docs/design/ios-icon-proposals/` holds icon proposals drawn by `scripts/make-ios-icon-proposals.swift`. They aren't the app's icon until one is chosen.
+
 ## Website
 
 The website (vespertineapp.com) is an Astro site in `site/`: `cd site && npm ci && npm run dev`. Its version, download link and "What's new" come from the GitHub releases at build time, and publishing a release rebuilds it, so a release needs no website edit. Feature, format and FAQ wording lives in `site/src/data/content.ts`; keep it in step with this folder's docs. [site/README.md](../site/README.md) has the rest.

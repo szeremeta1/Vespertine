@@ -104,7 +104,7 @@ struct AlbumsGrid: View {
         }
         .task(id: session.isConnected) {
             if albums.isEmpty { await loadMore() }
-            if model.startScreen == "album" { model.startScreen = nil; sample = albums.first }
+            if model.startScreen == "album", let first = albums.first { model.startScreen = nil; sample = first }
         }
     }
 
