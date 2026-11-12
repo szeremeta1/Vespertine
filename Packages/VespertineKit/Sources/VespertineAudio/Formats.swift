@@ -137,6 +137,9 @@ public struct OutputPlan: Sendable, Hashable {
     public var resamples: Bool { abs(decodedSampleRate - deviceSampleRate) > 0.5 }
     public var dsdConvertedToPCM: Bool
     public var reason: String
+    /// DSD converted to PCM only because DoP is off for this device, which offers the DoP carrier rate at 24-bit
+    /// integer: switching DoP on would play it natively (if the DAC understands DoP). The signal path offers that switch.
+    public var dopAvailable = false
     /// Channels the device receives when they differ from `channels` (Spatial Audio renders to 2).
     public var deviceChannelCount: Int? = nil
     /// Multichannel rendered for headphones with Spatial Audio.

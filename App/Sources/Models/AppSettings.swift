@@ -81,6 +81,11 @@ final class AppSettings {
     var dopDeviceUIDs: Set<String> { didSet { defaults.set(Array(dopDeviceUIDs), forKey: "dopDeviceUIDs") } }
     /// DACs known to take DoP (`DoPDefaults`) start with it on; a device turned off here stays off.
     var dopOffDeviceUIDs: Set<String> { didSet { defaults.set(Array(dopOffDeviceUIDs), forKey: "dopOffDeviceUIDs") } }
+    func isDoPOn(_ uid: String) -> Bool { DoPDefaults.isEnabled(uid: uid, on: dopDeviceUIDs, off: dopOffDeviceUIDs) }
+    /// The output's "DSD over PCM (DoP)" switch: an explicit choice either way, remembered over `DoPDefaults`.
+    func setDoP(_ on: Bool, for uid: String) {
+        if on { dopDeviceUIDs.insert(uid); dopOffDeviceUIDs.remove(uid) } else { dopDeviceUIDs.remove(uid); dopOffDeviceUIDs.insert(uid) }
+    }
     /// Outputs with an AV receiver: Dolby and DTS are sent to them untouched.
     var bitstreamDeviceUIDs: Set<String> { didSet { defaults.set(Array(bitstreamDeviceUIDs), forKey: "bitstreamDeviceUIDs") } }
     /// Spatialize stereo, per device (empty = off everywhere: the original stays the default).

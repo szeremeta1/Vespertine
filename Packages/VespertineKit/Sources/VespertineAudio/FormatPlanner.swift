@@ -160,9 +160,12 @@ public enum FormatPlanner {
                 : device.supportsDoP
                 ? "DoP needs \(SampleRate.format(carrier)) kHz, which this device can't do; converted to PCM"
                 : "Device is PCM-only (DoP off); DSD converted to PCM"
-            return OutputPlan(mode: .pcm, deviceSampleRate: rate, decodedSampleRate: pcmRate,
-                              physicalBitDepth: device.bestIntegerBitDepth(at: rate), channels: channels,
-                              dsdConvertedToPCM: true, reason: why)
+            var plan = OutputPlan(mode: .pcm, deviceSampleRate: rate, decodedSampleRate: pcmRate,
+                                  physicalBitDepth: device.bestIntegerBitDepth(at: rate), channels: channels,
+                                  dsdConvertedToPCM: true, reason: why)
+            plan.dopAvailable = !dsdToPCMForRoom && !dsdToPCMForTransitions && !device.supportsDoP
+                && channels == source.channels && device.supports(rate: carrier) && dopDepth >= 24
+            return plan
         }
 
         let rate = chooseRate(for: source.sampleRate, device: device, policy: policy)
