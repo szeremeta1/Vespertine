@@ -23,6 +23,8 @@ What other apps send is played by **Vespertine Sound Helper**, a small app insid
 - **Login Items.** macOS may ask you to allow it in System Settings › General › Login Items (it is listed under Vespertine); Vespertine's settings say so and open that pane.
 - **The microphone prompt.** The first time a group plays, macOS asks whether Vespertine may use the microphone (macOS asks for Vespertine, since the helper is part of it). The driver hands the helper what apps play as an audio input, which macOS counts as recording. The helper reads only that input, never a microphone. Refusing means the group stays silent.
 - **Idle.** The group's DACs are taken only while an app plays to the output, and let go 30 seconds after it stops.
+- **The DACs stay choosable.** The helper never takes the DACs exclusively (whatever Exclusive Mode says for Vespertine's own playback), so each one can still be chosen on its own in the Sound menu while the group is on. When you choose one of them, or another app holds one exclusively, the group stops playing and leaves it alone until that changes.
+- **A layout change keeps the volume.** Changing "Channels it offers" rebuilds the output; its volume and mute are put back as they were.
 
 ## How it plays
 
