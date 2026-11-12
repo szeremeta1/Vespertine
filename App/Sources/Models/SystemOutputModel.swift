@@ -43,16 +43,25 @@ final class SystemOutputModel {
     /// A QA run on a test library (`-VespertineDataDirectory`) never installs, registers or publishes anything.
     @ObservationIgnored let isolated: Bool
     @ObservationIgnored private var lastSnapshot: SystemOutputSnapshot?
+    /// What the helper was last asked to be (running or not): nil until the first sync after launch.
+    @ObservationIgnored private var helperWanted: Bool?
     @ObservationIgnored private var lastInputs: (groups: [SpeakerGroup], settings: EngineSettings)?
     @ObservationIgnored private var observer: NSObjectProtocol?
+    /// Where the snapshot and status are exchanged with the helper: the shared folder, or a test's own.
+    @ObservationIgnored private let handOff: URL
+    @ObservationIgnored private let handOffDirectory: URL?
+    /// Tests: stands in for `setHelperRunning` (the real one asks macOS's service manager, and registers a launch agent).
+    @ObservationIgnored var helperRunner: ((Bool) -> Void)?
 
     static let choicesKey = "systemOutputChoices"
     static let menuBarKey = "systemOutputMenuBarItem"
     static let helperBundleSuffix = ".SoundHelper"
 
-    init(defaults: UserDefaults = .standard, isolated: Bool) {
+    init(defaults: UserDefaults = .standard, isolated: Bool, handOffDirectory: URL? = nil) {
         self.defaults = defaults
         self.isolated = isolated
+        self.handOffDirectory = handOffDirectory
+        handOff = handOffDirectory ?? SystemOutputHandOff.directory
         let stored = defaults.data(forKey: Self.choicesKey).flatMap { try? JSONDecoder().decode([String: SystemOutputChoice].self, from: $0) } ?? [:]
         choices = Dictionary(uniqueKeysWithValues: stored.compactMap { key, value in UUID(uuidString: key).map { ($0, value) } })
         menuBarItem = defaults.bool(forKey: Self.menuBarKey)
@@ -97,17 +106,28 @@ final class SystemOutputModel {
                               exclusive: settings.exclusive)
         }
         let snapshot = SystemOutputSnapshot(entries: entries, menuBarItem: menuBarItem)
-        if snapshot != lastSnapshot {
+        let snapshotChanged = snapshot != lastSnapshot
+        if snapshotChanged {
             do {
-                try snapshot.write(to: SystemOutputSnapshot.url(in: SystemOutputHandOff.directory))
+                try snapshot.write(to: SystemOutputSnapshot.url(in: handOff))
                 lastSnapshot = snapshot
-                DistributedNotificationCenter.default().postNotificationName(SystemOutputHandOff.snapshotChanged, object: nil, userInfo: nil,
-                                                                             deliverImmediately: true)
+                // (A test's own folder tells no helper.)
+                if handOffDirectory == nil {
+                    DistributedNotificationCenter.default().postNotificationName(SystemOutputHandOff.snapshotChanged, object: nil, userInfo: nil,
+                                                                                 deliverImmediately: true)
+                }
             } catch {
                 lastError = error.localizedDescription
             }
         }
-        setHelperRunning(!entries.isEmpty && driver != .notInstalled)
+        let wantsHelper = !entries.isEmpty && driver != .notInstalled
+        // Asking the service manager about the helper takes several round trips to macOS, and this runs on the main thread for
+        // every step of the volume slider. It is asked again when the snapshot changed, when what is wanted of the helper
+        // changed, or while its state isn't settled (waiting for approval, a failure); not when nothing changed.
+        let settled = helper == .on || helper == .off
+        if !snapshotChanged, settled, helperWanted == wantsHelper { return }
+        helperWanted = wantsHelper
+        if let helperRunner { helperRunner(wantsHelper) } else { setHelperRunning(wantsHelper) }
     }
 
     private func resync() {
@@ -168,7 +188,7 @@ final class SystemOutputModel {
     func openLoginItemsSettings() { SMAppService.openSystemSettingsLoginItems() }
 
     private func readStatus() {
-        status = SystemOutputStatus.read(from: SystemOutputStatus.url(in: SystemOutputHandOff.directory))
+        status = SystemOutputStatus.read(from: SystemOutputStatus.url(in: handOff))
         refreshDriver()
     }
 
