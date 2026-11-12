@@ -88,6 +88,8 @@ struct MissingSongsAppTests {
         #expect(library.rescanForMissingFile(track) == true)
         for _ in 0..<200 where try songsInLibrary(library) < 2 { try await Task.sleep(for: .milliseconds(50)) }
         #expect(try songsInLibrary(library) == 2)
+        // The scan saves what it read before it marks what's gone: wait for its last step too, not just the new song.
+        for _ in 0..<200 where try library.database.allTracks().count != 1 { try await Task.sleep(for: .milliseconds(50)) }
         #expect(try library.database.allTracks().count == 1, "the old one is marked missing by that scan")
     }
 
