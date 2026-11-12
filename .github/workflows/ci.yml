@@ -14,8 +14,14 @@
 # - each macOS job runs only when the change touches something it reads (scripts/ci-changes.py decides, and runs
 #   everything when unsure). Changes only to the website, docs, root Markdown or issue templates run just the Linux
 #   jobs, so their required checks still report (a skipped job counts as passed). THIRD-PARTY-NOTICES.md and LICENSE
-#   ship inside the app, so they still run everything;
-# - draft pull requests get the Linux jobs only. The macOS jobs run when the PR is marked ready for review, or on
+#   ship inside the app, so they still run everything. A change to app code (App/, Packages/, Driver/, Helper/,
+#   RemoteApp/, project.yml, Package.swift and the like) ALWAYS runs both "App (macOS)" and "Engine, library and
+#   real-time C (macOS)"; scripts/test-ci-changes.py pins that;
+# - "macOS jobs ran when this change needed them (Linux)" is the backstop for the rule above: it fails when a macOS job
+#   the change needs was skipped (a draft pull request, a gate that misread a diff) or did not succeed, so a skipped
+#   macOS job can only ever mean that nothing it reads changed. Require it next to the macOS jobs;
+# - draft pull requests get the Linux jobs only, and that gate check fails on a draft whose change needs macOS, so it
+#   can't be merged by accident. The macOS jobs run when the PR is marked ready for review, or on
 #   demand (Actions > CI > Run workflow, on the PR's branch);
 # - a newer push to the same pull request cancels the run in progress. Pushes to main never cancel each other: each
 #   push runs only the jobs its own diff needs, so a cancelled main run would leave its commit's macOS jobs untested.
@@ -237,6 +243,10 @@ jobs:
         run: python3 verification/hardware/selftest.py
       - name: Studio evidence tools (parsers, signal-path checks, MEASURED/UNVERIFIED report)
         run: python3 verification/studio/test_evidence.py
+      # Not verification either: the macOS-job gate's own tests (every app-code path must run App and Engine).
+      - name: macOS job gate tests
+        if: ${{ !cancelled() }}
+        run: python3 scripts/test-ci-changes.py
       # Not verification, but a Linux job every change runs (no path filter), so a catalog or Swift string change
       # can't skip it: every string translated, placeholders matching, every localized literal in the catalog.
       - name: String Catalogs complete
@@ -348,3 +358,35 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - name: Carriers against FFmpeg's S/PDIF demuxer and the carrier scanner
         run: python3 verification/oracles/iec61937/check_carriers.py verification-carriers
+
+  # The backstop for the path filter. Runs always (even when a job it watches failed, was skipped or was cancelled)
+  # and fails unless every macOS job this change needs succeeded. A skipped macOS job is accepted only when the
+  # filter says the change doesn't touch what it reads. On a draft pull request the macOS jobs are skipped by design,
+  # so this check is red there until the PR is marked ready for review and the macOS jobs have run.
+  macos-gate:
+    name: macOS jobs ran when this change needed them (Linux)
+    needs: [changes, packages-macos, app-macos, verification-macos]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      NEEDS: ${{ toJSON(needs) }}
+    steps:
+      - name: Every needed macOS job ran and passed
+        run: |
+          fail=0
+          result() { jq -r --arg j "$1" '.[$j].result' <<<"$NEEDS"; }
+          if [ "$(result changes)" != success ]; then
+            echo "::error::The path filter itself did not succeed ($(result changes)): treat every macOS job as needed."
+            fail=1
+          fi
+          for pair in packages-macos:packages app-macos:app verification-macos:verification; do
+            job=${pair%%:*}; out=${pair##*:}
+            res=$(result "$job"); need=$(jq -r --arg o "$out" '.changes.outputs[$o] // "true"' <<<"$NEEDS")
+            echo "$job: result=$res, needed=$need"
+            if [ "$res" = success ]; then continue; fi
+            if [ "$res" = skipped ] && [ "$need" = false ]; then continue; fi
+            echo "::error::$job is $res but this change needs it (needed=$need). Mark the pull request ready for review, or run CI from Actions on its branch."
+            fail=1
+          done
+          exit $fail
