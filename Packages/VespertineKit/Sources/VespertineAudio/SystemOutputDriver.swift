@@ -41,9 +41,18 @@ public enum SystemOutputDriver {
     /// The driver is loaded (installed, and the audio server started since it was).
     public static var isLoaded: Bool { plugIn() != nil }
 
-    /// The installed driver's version (its bundle's short version), nil when it isn't installed.
-    public static func installedVersion(at url: URL = installedURL) -> String? {
-        Bundle(url: url)?.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
+    /// A driver bundle's build number (CFBundleVersion), nil when there is none at `url`. Read from its Info.plist directly, so a
+    /// driver replaced while the app runs reads as the new one (Bundle caches).
+    public static func buildNumber(at url: URL = installedURL) -> String? {
+        let plist = url.appendingPathComponent("Contents/Info.plist")
+        guard let data = try? Data(contentsOf: plist),
+              let info = try? PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any] else { return nil }
+        return info["CFBundleVersion"] as? String
+    }
+
+    /// The driver inside Vespertine.app (Contents/Library/Audio), what installing copies.
+    public static func bundledURL(in app: URL = Bundle.main.bundleURL) -> URL {
+        app.appendingPathComponent("Contents/Library/Audio", isDirectory: true).appendingPathComponent(bundleName, isDirectory: true)
     }
 
     /// Publishes exactly `configuration` (`SystemOutput.driverConfiguration`): outputs not in it go away, the rest are

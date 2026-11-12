@@ -27,6 +27,36 @@ public enum SystemOutputHandOff {
     public static let statusChanged = Notification.Name("org.szeremeta.vespertine.systemOutput.statusChanged")
     public static let groupKey = "group"
     public static let pidKey = "pid"
+    /// After the app gives a group back, the helper waits this long before playing it again: the app often takes it straight back
+    /// (the next song at another rate opens the group again).
+    public static let returnDelay: TimeInterval = 3
+
+    /// The folder this build of Vespertine (or of the helper) meets the other in.
+    public static var directory: URL { SystemOutputSnapshot.directory(development: Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true) }
+
+    /// Vespertine is about to play `groupID` itself: if the helper plays it now, it is asked to let go, and this waits (two seconds
+    /// at most) until it has. Returns at once when the helper doesn't have the group.
+    public static func claim(_ groupID: UUID) {
+        let statusURL = SystemOutputStatus.url(in: directory)
+        func helperPlays() -> Bool {
+            SystemOutputStatus.read(from: statusURL)?.groups.contains { $0.groupID == groupID && $0.state == .playing } == true
+        }
+        guard let status = SystemOutputStatus.read(from: statusURL), status.groups.contains(where: { $0.groupID == groupID }) else { return }
+        post(taken, groupID)
+        let deadline = Date().addingTimeInterval(2)
+        while helperPlays(), Date() < deadline { usleep(20_000) }
+    }
+
+    /// Vespertine has stopped playing `groupID`.
+    public static func giveBack(_ groupID: UUID) {
+        guard SystemOutputStatus.read(from: SystemOutputStatus.url(in: directory))?.groups.contains(where: { $0.groupID == groupID }) == true else { return }
+        post(returned, groupID)
+    }
+
+    private static func post(_ name: Notification.Name, _ groupID: UUID) {
+        DistributedNotificationCenter.default().postNotificationName(
+            name, object: nil, userInfo: [groupKey: groupID.uuidString, pidKey: NSNumber(value: getpid())], deliverImmediately: true)
+    }
 }
 
 /// What the helper is doing with each published group, for the app's settings and the menu bar item.
@@ -55,6 +85,8 @@ public struct SystemOutputStatus: Codable, Hashable, Sendable {
 
     public var driverLoaded: Bool
     public var groups: [Group]
+    /// The user wants the helper's menu bar item.
+    public var menuBarItem: Bool
     public var updated: Date
 
     public static func url(in directory: URL) -> URL { directory.appendingPathComponent("Mac Sound Output status.json") }
@@ -83,6 +115,8 @@ public final class SystemOutputService: @unchecked Sendable {
     private var failures: [UUID: (date: Date, message: String)] = [:]
     /// Groups Vespertine plays itself, and the pid of the app that took them.
     private var handedOff: [UUID: pid_t] = [:]
+    /// When the app gave a group back (it is played again `SystemOutputHandOff.returnDelay` later, unless taken again).
+    private var returnedAt: [UUID: Date] = [:]
     private var latency: [String: Int] = [:]
     private var lastStatus: SystemOutputStatus?
     private var observers: [NSObjectProtocol] = []
@@ -91,7 +125,7 @@ public final class SystemOutputService: @unchecked Sendable {
     /// Called on the service's queue whenever the status changes (the menu bar item).
     public var onStatus: (@Sendable (SystemOutputStatus) -> Void)?
 
-    /// `directory`: the app's data directory, where the snapshot is.
+    /// `directory`: where the app writes the snapshot (`SystemOutputSnapshot.directory(development:)`).
     public init(directory: URL) {
         self.directory = directory
     }
@@ -105,7 +139,14 @@ public final class SystemOutputService: @unchecked Sendable {
         })
         observers.append(center.addObserver(forName: SystemOutputHandOff.returned, object: nil, queue: nil) { [weak self] note in
             guard let (group, _) = Self.handOff(note) else { return }
-            self?.queue.async { self?.handedOff[group] = nil; self?.tick() }
+            self?.queue.async { if self?.handedOff[group] != nil { self?.returnedAt[group] = Date() } }
+            self?.queue.asyncAfter(deadline: .now() + SystemOutputHandOff.returnDelay) {
+                // Taken again meanwhile (by the same app): it stays Vespertine's.
+                guard let self, self.returnedAt[group].map({ Date().timeIntervalSince($0) >= SystemOutputHandOff.returnDelay - 0.1 }) == true else { return }
+                self.returnedAt[group] = nil
+                self.handedOff[group] = nil
+                self.tick()
+            }
         })
         let timer = DispatchSource.makeTimerSource(queue: queue)
         timer.schedule(deadline: .now(), repeating: SystemOutput.refreshSeconds)
@@ -128,6 +169,16 @@ public final class SystemOutputService: @unchecked Sendable {
         observers = []
     }
 
+    /// Makes the group's output the Mac's output (the menu bar item's choice).
+    public func makeDefault(_ groupID: UUID) {
+        queue.async { [self] in
+            guard let entry = snapshot.entries.first(where: { $0.group.id == groupID }),
+                  let device = SystemOutputDriver.device(uid: entry.deviceUID) else { return }
+            try? HAL.set(AudioObjectID(kAudioObjectSystemObject), .global(kAudioHardwarePropertyDefaultOutputDevice), device)
+            tick()
+        }
+    }
+
     /// Look again now (a snapshot change, an app starting to play, a rate change).
     public func poke() { queue.async { [weak self] in self?.tick() } }
 
@@ -139,6 +190,7 @@ public final class SystemOutputService: @unchecked Sendable {
 
     private func take(_ group: UUID, by pid: pid_t) {
         handedOff[group] = pid
+        returnedAt[group] = nil
         if let session = sessions.removeValue(forKey: group) {
             session.stop()
             log.info("Mac Sound Output: Vespertine took the group over")
@@ -211,7 +263,7 @@ public final class SystemOutputService: @unchecked Sendable {
             }
             groups.append(status)
         }
-        writeStatus(SystemOutputStatus(driverLoaded: driverLoaded, groups: groups, updated: now))
+        writeStatus(SystemOutputStatus(driverLoaded: driverLoaded, groups: groups, menuBarItem: snapshot.menuBarItem, updated: now))
     }
 
     private func start(_ entry: SystemOutputEntry, output: AudioObjectID) {
@@ -261,6 +313,7 @@ public final class SystemOutputService: @unchecked Sendable {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         encoder.dateEncodingStrategy = .iso8601
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         if let data = try? encoder.encode(status) { try? data.write(to: SystemOutputStatus.url(in: directory), options: .atomic) }
         DistributedNotificationCenter.default().postNotificationName(SystemOutputHandOff.statusChanged, object: nil, userInfo: nil, deliverImmediately: true)
         onStatus?(status)

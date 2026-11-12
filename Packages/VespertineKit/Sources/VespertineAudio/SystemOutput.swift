@@ -122,13 +122,24 @@ public struct SystemOutputSnapshot: Codable, Hashable, Sendable {
     public static let currentVersion = 1
     public var version: Int
     public var entries: [SystemOutputEntry]
+    /// Show the helper's item in the menu bar (off by default).
+    public var menuBarItem: Bool
 
-    public init(entries: [SystemOutputEntry]) {
+    public init(entries: [SystemOutputEntry], menuBarItem: Bool = false) {
         version = Self.currentVersion
         self.entries = entries
+        self.menuBarItem = menuBarItem
     }
 
     public static func url(in directory: URL) -> URL { directory.appendingPathComponent("Mac Sound Output.json") }
+
+    /// Where the app and the helper meet: a folder of its own in Application Support, so the helper finds it without being told.
+    /// Development builds (`development`) have their own, as they have their own library.
+    public static func directory(development: Bool) -> URL {
+        let support = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+            ?? URL(fileURLWithPath: NSHomeDirectory()).appendingPathComponent("Library/Application Support", isDirectory: true)
+        return support.appendingPathComponent(development ? "Vespertine Dev Mac Sound Output" : "Vespertine Mac Sound Output", isDirectory: true)
+    }
 
     /// nil for a missing or unreadable file (the helper then publishes nothing).
     public static func read(from url: URL) -> SystemOutputSnapshot? {
