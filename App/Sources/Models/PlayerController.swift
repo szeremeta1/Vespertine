@@ -484,12 +484,19 @@ final class PlayerController {
     private var nowPlayingAnchor: (position: TimeInterval, at: Date)?
     /// A seek in flight: the position you dragged to, until the engine gets there.
     private var requestedPosition: (seconds: TimeInterval, at: Date)?
+    /// The queue played to its end by itself: Play then starts it over from its first song. Cleared by starting a song.
+    @ObservationIgnored private var playedToEnd = false
+    /// A song failed since the last one started. The engine reports the queue's end after a last song that couldn't
+    /// play as well; Play then tries that song again, as before.
+    @ObservationIgnored private var failedSinceStart = false
 
     private func start(_ entry: QueueEntry) {
         requested = entry.id
         requestedState = nil
         seekRestart = nil
         requestedPosition = nil
+        playedToEnd = false
+        failedSinceStart = false
         position = 0
         duration = entry.track.duration
         // The signal path, meters and Now Playing describe the new song from now on (it's still opening).
@@ -510,7 +517,9 @@ final class PlayerController {
         case .playing: pause()
         case .paused: request(.playing); engine.resume()
         case .stopped:
-            if let current { start(current) }
+            // After the queue played to its end, Play starts it from the first song, as Apple Music does.
+            if playedToEnd, currentIndex == queue.count - 1, let first = queue.first { currentIndex = 0; start(first) }
+            else if let current { start(current) }
             else if let first = queue.first { currentIndex = 0; start(first) }
         }
     }
@@ -573,6 +582,8 @@ final class PlayerController {
             if let requested, requested != item.id { return }
             let fresh = requested != nil   // the song just chosen: a new play, even if it was seeked while opening
             requested = nil
+            playedToEnd = false
+            failedSinceStart = false
             if let i = queue.firstIndex(where: { $0.id == item.id }) { currentIndex = i }
             if !fresh, seekRestart == item.id {
                 seekRestart = nil
@@ -592,11 +603,13 @@ final class PlayerController {
                 Task { try? await ListenBrainzClient.shared.submit(track, kind: .playingNow) }
             }
         case .queueEnded:
+            playedToEnd = !failedSinceStart
             seekRestart = nil
             updateNowPlayingInfo()
         case .failed(let item, let message):
             if let requested, let item, requested != item.id { return }   // about a song skipped past
             requested = nil
+            failedSinceStart = true
             let track = queue.first { $0.id == item?.id }?.track ?? current?.track
             if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
                 lastError = String(localized: "“\(track.title)” is on a network share that isn’t connected. Vespertine reconnects automatically when the server is reachable.")
