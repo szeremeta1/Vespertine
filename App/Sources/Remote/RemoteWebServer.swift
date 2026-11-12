@@ -127,7 +127,7 @@ final class RemoteWebServer {
             }
         case ("POST", "/pair"):
             guard request.isJSON, let body = try? JSONDecoder().decode(PairRequest.self, from: request.body) else { return respond(connection, status: 400) }
-            switch server.pairBrowser(code: body.code, name: body.name) {
+            switch server.pairBrowser(code: body.code, name: body.name, userAgent: request.headers["user-agent"]) {
             case .success(let token):
                 respond(connection, status: 200, type: "application/json", body: Data("{}".utf8), headers: [
                     "Set-Cookie": "\(Self.cookieName)=\(token); Path=/; Max-Age=31536000; HttpOnly; SameSite=Strict",

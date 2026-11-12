@@ -24,10 +24,17 @@ enum RemoteWebPage {
             "more": String(localized: "More", comment: "Web remote: loads more albums."),
             "back": String(localized: "Back", comment: "Web remote: back from an album to the list."),
             "play": String(localized: "Play", comment: "Web remote: plays an album."),
+            // Words the Mac's own controls already use, here for the page's screen-reader labels.
+            "pause": String(localized: "Pause"),
+            "position": String(localized: "Position"),
+            "previous": String(localized: "Previous"),
+            "next": String(localized: "Next"),
+            "volumeUp": String(localized: "Volume Up"),
+            "volumeDown": String(localized: "Volume Down"),
             "shuffle": String(localized: "Shuffle", comment: "Web remote: shuffles an album, or the shuffle switch."),
             "repeat": String(localized: "Repeat", comment: "Web remote: the repeat button."),
-            "playNext": String(localized: "Play Next", comment: "Web remote: puts a song next in the queue."),
-            "addToQueue": String(localized: "Add to Queue", comment: "Web remote: adds a song at the end of the queue."),
+            "playNext": String(localized: "Play Next", comment: "Web remote: puts a song first in Playing Next, to play right after the current song (as on the Mac)."),
+            "addToQueue": String(localized: "Add to Queue", comment: "Web remote: adds a song to the end of Playing Next, after the songs already added and before the rest of the album (as on the Mac)."),
             "remove": String(localized: "Remove", comment: "Web remote: removes a song from the queue."),
             "clear": String(localized: "Clear Upcoming", comment: "Web remote: clears the songs after the one playing."),
             "playingNext": String(localized: "Playing Next", comment: "Web remote: queue section."),
@@ -117,9 +124,9 @@ h2 { font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(-
     <input id="position" type="range" min="0" max="1" step="0.1" value="0" aria-label="">
     <div class="times"><span id="elapsed">0:00</span><span id="remaining">0:00</span></div>
     <div class="row transport">
-      <button id="prev" aria-label="Previous">⏮</button>
-      <button id="playpause" class="big" aria-label="Play">▶</button>
-      <button id="next" aria-label="Next">⏭</button>
+      <button id="prev" aria-label="">⏮</button>
+      <button id="playpause" class="big" aria-label="">▶</button>
+      <button id="next" aria-label="">⏭</button>
     </div>
     <div class="row modes">
       <button id="shuffle" data-t="shuffle"></button>
@@ -169,7 +176,9 @@ const L = __STRINGS__;
 const $ = id => document.getElementById(id);
 document.title = L.title + " · " + L.mac;
 document.querySelectorAll("[data-t]").forEach(e => { e.textContent = L[e.dataset.t] || ""; });
-$("search").placeholder = L.search; $("position").setAttribute("aria-label", L.nowPlaying); $("volume").setAttribute("aria-label", L.volume);
+$("search").placeholder = L.search; $("position").setAttribute("aria-label", L.position); $("volume").setAttribute("aria-label", L.volume);
+$("prev").setAttribute("aria-label", L.previous); $("next").setAttribute("aria-label", L.next); $("playpause").setAttribute("aria-label", L.play);
+$("volDown").setAttribute("aria-label", L.volumeDown); $("volUp").setAttribute("aria-label", L.volumeUp);
 let player = null, queue = null, outputs = null, albums = [], albumTotal = null, openAlbum = null, scrubbing = false;
 
 function el(tag, attrs, ...kids) { const e = document.createElement(tag); Object.assign(e, attrs || {}); kids.forEach(k => e.append(k)); return e; }
@@ -201,7 +210,9 @@ function renderPlayer() {
   $("format").textContent = t ? t.format + (p.signal ? " · " + p.signal.badge : "") : "";
   const src = t ? art(t.artworkKey, 900) : "";
   if ($("cover").dataset.src !== src) { $("cover").dataset.src = src; if (src) $("cover").src = src; else $("cover").removeAttribute("src"); }
-  $("playpause").textContent = p && p.playback === "playing" ? "⏸" : "▶";
+  const playing = !!(p && p.playback === "playing");
+  $("playpause").textContent = playing ? "⏸" : "▶";
+  $("playpause").setAttribute("aria-label", playing ? L.pause : L.play);
   $("shuffle").classList.toggle("on", !!(p && p.shuffle));
   $("repeat").classList.toggle("on", !!(p && p.repeatMode !== "off"));
   $("repeat").textContent = L.repeat + (p && p.repeatMode === "one" ? " 1" : "");
@@ -318,7 +329,7 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
 
 $("pairButton").onclick = async () => {
   $("pairError").textContent = "";
-  const r = await fetch("/pair", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: $("code").value, name: navigator.platform || "" }) });
+  const r = await fetch("/pair", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: $("code").value }) });
   if (r.ok) return start();
   try { $("pairError").textContent = (await r.json()).error; } catch (e) {}
 };

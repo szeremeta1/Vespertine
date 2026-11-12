@@ -98,4 +98,34 @@ struct RemoteTests {
         #expect(page.contains("const L = {"))
         #expect(!page.contains("__STRINGS__"))
     }
+
+    // MARK: Polish: names and labels on the web remote
+
+    @Test func aPairedBrowserIsNamedFromItsUserAgent() {
+        func name(_ ua: String) -> String? { RemoteBrowserName.name(userAgent: ua) }
+        #expect(name("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36") == "Chrome on Mac")
+        #expect(name("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Safari/605.1.15") == "Safari on Mac")
+        #expect(name("Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1") == "Safari on iPhone")
+        #expect(name("Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/130.0.0.0 Mobile/15E148 Safari/604.1") == "Chrome on iPhone")
+        #expect(name("Mozilla/5.0 (iPad; CPU OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Mobile/15E148 Safari/604.1") == "Safari on iPad")
+        #expect(name("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0") == "Edge on Windows")
+        #expect(name("Mozilla/5.0 (X11; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0") == "Firefox on Linux")
+        #expect(name("Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36") == "Chrome on Android")
+    }
+
+    @Test func aUserAgentWeCannotReadGivesNoName() {
+        #expect(RemoteBrowserName.name(userAgent: "") == nil)
+        #expect(RemoteBrowserName.name(userAgent: "curl/8.7.1") == nil)
+    }
+
+    @Test func theWebPageNamesPauseAndPositionForScreenReaders() {
+        let page = RemoteWebPage.html(serverName: "Mac")
+        // Play/Pause says what a press does; the slider is a position, not "Now Playing".
+        #expect(page.contains("$(\"playpause\").setAttribute(\"aria-label\""))
+        #expect(page.contains("$(\"position\").setAttribute(\"aria-label\", L.position)"))
+        #expect(!page.contains("$(\"position\").setAttribute(\"aria-label\", L.nowPlaying)"))
+        #expect(page.contains("\"pause\":"))
+        // The browser's name comes from its user agent on the Mac, not from navigator.platform ("MacIntel").
+        #expect(!page.contains("navigator.platform"))
+    }
 }
