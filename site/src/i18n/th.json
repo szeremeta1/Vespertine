@@ -338,7 +338,7 @@
         },
         {
           "name": "APE, WavPack, TTA",
-          "text": "ไม่สูญเสียข้อมูล ไม่รองรับ DSD ที่อยู่ใน WavPack"
+          "text": "ไม่สูญเสียข้อมูล"
         },
         {
           "name": "Opus, Vorbis, Musepack, MP3, AAC",

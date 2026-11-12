@@ -338,7 +338,7 @@
         },
         {
           "name": "APE, WavPack, TTA",
-          "text": "無損。不支援 WavPack 內含的 DSD。"
+          "text": "無損。"
         },
         {
           "name": "Opus, Vorbis, Musepack, MP3, AAC",

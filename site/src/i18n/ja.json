@@ -338,7 +338,7 @@
         },
         {
           "name": "APE, WavPack, TTA",
-          "text": "ロスレス。WavPackに格納されたDSDには対応していません。"
+          "text": "ロスレス。"
         },
         {
           "name": "Opus, Vorbis, Musepack, MP3, AAC",
