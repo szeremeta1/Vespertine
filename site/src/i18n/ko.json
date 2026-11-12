@@ -714,6 +714,7 @@
     "onlineTitle": "앱이 온라인에 연결하는 경우",
     "online": [
       "<strong>업데이트 확인.</strong> Vespertine은 하루에 한 번 정도, 그리고 업데이트 확인을 선택할 때 GitHub에 업데이트 피드를 요청합니다. 여느 다운로드와 마찬가지로 GitHub는 사용자의 IP 주소를 알 수 있습니다. 자동 확인은 설정에서 끌 수 있습니다.",
+      "<strong>DoP DAC 목록.</strong> Vespertine은 하루에 한 번 정도 DSD over PCM(DoP) 재생이 확인된 DAC의 짧은 목록을 GitHub 릴리스에서 다운로드하여, 새로 확인된 DAC에서도 DSD를 네이티브로 재생할 수 있게 합니다. 사용자에 관한 정보는 전혀 보내지 않으며, 여느 다운로드와 마찬가지로 GitHub는 사용자의 IP 주소를 알 수 있습니다. 이 기능은 설정 › 업데이트에서 끌 수 있습니다.",
       "<strong>MusicBrainz 및 Cover Art Archive.</strong> MusicBrainz에서 찾기나 메타데이터 보완을 사용할 때에만(이 Mac에서 음악 찾기는 추가하는 음악에 대해 보완을 체크 상자로 제공하며, 선택을 해제할 수 있습니다) Vespertine은 조회하려는 앨범, 아티스트, 트랙 이름을 musicbrainz.org로 보냅니다. 설정에서 “커버 아트 가져오기”를 켜 두면 coverartarchive.org에서 커버를 다운로드하며, 이 커버는 Internet Archive(archive.org)에서 제공됩니다. MusicBrainz와 Cover Art Archive는 MetaBrainz Foundation이 운영합니다.",
       "<strong>ListenBrainz.</strong> 스크로블링을 켜고 토큰을 입력한 경우에만 Vespertine은 재생하는 노래의 제목, 아티스트, 앨범, 길이와 파일에 있는 경우 MusicBrainz ID를 listenbrainz.org로 보냅니다. 노래가 시작되면 “지금 재생 중”을 보내고, 노래의 절반 또는 4분을 들으면 재생 시각과 함께 청취 기록을 보냅니다.",
       "<strong>Discord.</strong> 설정에서 Discord 상태를 켠 경우에만, Vespertine은 Mac 밖으로 나가지 않는 연결을 통해 Mac의 Discord 앱에 재생 중인 항목의 제목, 아티스트, 앨범, 포맷, 진행 상황을 알려 줍니다. Discord는 이를 사용자의 활동을 볼 수 있는 사람들에게 상태로 표시합니다. Discord는 웹에 있는 이미지만 표시할 수 있으므로, Vespertine은 앨범 커버를 표시하기 위해 이름으로 커버를 검색합니다. 파일에 MusicBrainz 릴리스 ID가 있으면 coverartarchive.org에서, 그렇지 않으면 Apple의 iTunes Search(itunes.apple.com)에서 검색하며, 이때 iTunes Search에는 아티스트와 앨범 이름이 전달됩니다. 그러면 Discord가 그곳에서 커버를 다운로드합니다. 커버 표시는 끌 수 있으며, 파일과 그 커버는 절대 업로드되지 않습니다.",

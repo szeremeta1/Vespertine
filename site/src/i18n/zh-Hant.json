@@ -714,6 +714,7 @@
     "onlineTitle": "App 何時會連上網路",
     "online": [
       "<strong>檢查更新。</strong>Vespertine 大約每天一次，以及在你選擇「檢查更新」時，向 GitHub 取得更新資訊。如同任何下載，GitHub 會看到你的 IP 位址。你可以在「設定」中關閉自動檢查。",
+      "<strong>DoP DAC 清單。</strong>Vespertine 大約每天一次從其 GitHub 發行頁面下載一份簡短清單，列出已知可透過 PCM 傳送 DSD（DoP）的 DAC，讓新確認的 DAC 也能播放原生 DSD。它不會傳送任何關於你的資訊；如同任何下載，GitHub 會看到你的 IP 位址。你可以在「設定」›「更新」中關閉此功能。",
       "<strong>MusicBrainz 與 Cover Art Archive。</strong>只有在你使用「在 MusicBrainz 上查詢」或「補齊後設資料」時（「在這部 Mac 上尋找音樂」會為加入的音樂提供「補齊」選項，以可取消勾選的核取方塊呈現），Vespertine 才會將要查詢的專輯、藝人與曲目名稱傳送到 musicbrainz.org。若在「設定」中開啟「取得封面圖片」，則會從 coverartarchive.org 下載封面，這些封面由 Internet Archive（archive.org）提供。MusicBrainz 與 Cover Art Archive 均由 MetaBrainz Foundation 營運。",
       "<strong>ListenBrainz。</strong>只有在你開啟播放紀錄上傳功能並輸入權杖後，Vespertine 才會將你播放的歌曲傳送到 listenbrainz.org：標題、藝人、專輯、長度，以及檔案中若有的 MusicBrainz ID。歌曲開始時會傳送「正在播放」，當你聽完一半或聽滿四分鐘後，則傳送一筆附有時間的收聽紀錄。",
       "<strong>Discord。</strong>只有在你於「設定」中開啟 Discord 狀態後，Vespertine 才會透過只在你 Mac 上進行的連線，告訴你 Mac 上的 Discord App 正在播放什麼：標題、藝人、專輯、格式與播放進度。Discord 會將它顯示為你的狀態，讓能看到你活動的人看見。為了顯示專輯封面，Vespertine 會依名稱查詢封面，因為 Discord 只能顯示來自網路的圖片：若你的檔案帶有 MusicBrainz 發行版本 ID，會在 coverartarchive.org 上查詢；否則會使用 Apple 的 iTunes Search（itunes.apple.com），它會收到藝人與專輯名稱。接著 Discord 會從該處下載封面。你可以關閉封面，而且你的檔案及其封面都不會被上傳。",

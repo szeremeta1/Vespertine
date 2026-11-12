@@ -714,6 +714,7 @@
     "onlineTitle": "アプリがオンラインになるとき",
     "online": [
       "<strong>アップデートの確認。</strong>Vespertineは1日に1回程度、および「アップデートを確認」を選んだときに、GitHubにアップデートフィードを問い合わせます。通常のダウンロードと同じく、GitHubにはIPアドレスが伝わります。自動確認は「設定」でオフにできます。",
+      "<strong>DoP対応DACリスト。</strong>Vespertineは1日に1回程度、DSD over PCM（DoP）での再生が確認されているDACの短いリストをGitHubのリリースからダウンロードし、新たに確認されたDACでもDSDをネイティブ再生できるようにします。個人に関する情報は何も送信しません。通常のダウンロードと同じく、GitHubにはIPアドレスが伝わります。この機能は「設定」›「アップデート」でオフにできます。",
       "<strong>MusicBrainzとCover Art Archive。</strong>「MusicBrainzで検索」または「メタデータを補完」を使ったときだけ（「このMac上の音楽を探す」では、追加する音楽の補完をチェックボックスで提案し、チェックは外せます）、Vespertineは探しているアルバム名、アーティスト名、トラック名をmusicbrainz.orgに送信します。「設定」で「カバーアートを取得」をオンにしていると、coverartarchive.orgからカバーをダウンロードします。カバーはInternet Archive（archive.org）から配信されます。MusicBrainzとCover Art ArchiveはMetaBrainz Foundationが運営しています。",
       "<strong>ListenBrainz。</strong>Scrobbleをオンにしてトークンを入力した場合に限り、Vespertineは再生した曲のタイトル、アーティスト、アルバム、長さと、ファイルに含まれていればそのMusicBrainz IDをlistenbrainz.orgに送信します。曲の再生が始まると「再生中」を送り、曲の半分または4分を聴いた時点で、その時刻とともに再生記録を送ります。",
       "<strong>Discord。</strong>「設定」でDiscordステータスをオンにした場合に限り、VespertineはMacの中で完結する接続を通じて、Mac上のDiscordアプリに再生中の曲のタイトル、アーティスト、アルバム、フォーマット、再生の進行状況を伝えます。Discordはそれを、あなたのアクティビティを見られる人にステータスとして表示します。Discordはウェブ上の画像しか表示できないため、アルバムのカバーを表示するには、Vespertineが名前でカバーを検索します。ファイルにMusicBrainzリリースIDがあればcoverartarchive.orgで、なければAppleのiTunes Search（itunes.apple.com）で検索し、iTunes Searchにはアーティスト名とアルバム名が送られます。そのうえでDiscordがそこからカバーをダウンロードします。カバーの表示はオフにでき、ファイルやそのカバーがアップロードされることはありません。",
