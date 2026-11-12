@@ -188,6 +188,8 @@ final class AppModel {
     let analysis: AnalysisQueue
     let loopback: LoopbackTest
     let visualizer: VisualizerModel
+    /// DoP auto-setup: the hint, the one-tap test and the DAC list's refresh.
+    let dopSetup: DoPSetupModel
 
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = []; searchText = "" } } }
     var path: [DetailRoute] = [] { didSet { carryFilter(from: oldValue) } }
@@ -276,6 +278,7 @@ final class AppModel {
         DeviceRestore.afterCrash()
         player = PlayerController(library: library, settings: settings, shares: shares)
         visualizer = VisualizerModel(engine: player.engine)
+        dopSetup = DoPSetupModel(settings: settings, player: player)
         analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
         let streaming: @MainActor () -> Bool = { [weak player = self.player, weak shares = self.shares] in
             // Playing from a share, or just asked to (still loading): the network belongs to playback.
@@ -314,6 +317,8 @@ final class AppModel {
             speakerGroups?.followUSBPorts(amongUIDs: devices.devices.map(\.uid))
         }
         syncEngine()
+        dopSetup.onChoicesChanged = { [weak self] in self?.syncEngine() }
+        dopSetup.start()
         shares.start()
         analysis.start()
         // Hand the DAC back when Vespertine quits: stop, release exclusive access, then restore or

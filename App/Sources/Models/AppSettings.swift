@@ -76,7 +76,7 @@ final class AppSettings {
     var outputFallback: OutputFallback { didSet { defaults.set(outputFallback.rawValue, forKey: "outputFallback") } }
     /// Explicit ons plus connected known DACs not turned off: what the engine and device list use.
     var effectiveDoPUIDs: Set<String> {
-        DoPDefaults.resolve(on: dopDeviceUIDs, off: dopOffDeviceUIDs, connected: OutputDevices.connectedUIDs())
+        DoPDefaults.resolve(on: dopDeviceUIDs, off: dopOffDeviceUIDs, connectedDevices: OutputDevices.connectedIdentities())
     }
     var dopDeviceUIDs: Set<String> { didSet { defaults.set(Array(dopDeviceUIDs), forKey: "dopDeviceUIDs") } }
     /// DACs known to take DoP (`DoPDefaults`) start with it on; a device turned off here stays off.
@@ -116,6 +116,8 @@ final class AppSettings {
     var scrobble: Bool { didSet { defaults.set(scrobble, forKey: "scrobble") } }
     /// Show the song that's playing as the Discord status (through the Discord app on this Mac).
     var discordPresence: Bool { didSet { defaults.set(discordPresence, forKey: "discordPresence") } }
+    /// Once a day, fetch the signed list of DoP DACs from the latest GitHub release (`DoPDACListStore`). On by default.
+    var dopListUpdates: Bool { didSet { defaults.set(dopListUpdates, forKey: "dopListUpdates") } }
     /// Look the album up online for a cover the Discord status can show (Discord can only show public images).
     var discordArtwork: Bool { didSet { defaults.set(discordArtwork, forKey: "discordArtwork") } }
     var miniPlayerFloats: Bool { didSet { defaults.set(miniPlayerFloats, forKey: "miniPlayerFloats") } }
@@ -211,7 +213,7 @@ final class AppSettings {
         defaults.register(defaults: [
             "exclusiveMode": false, "atmosBySystem": true, "integerMode": true, "matchSixteenBit": false, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.copyAndOrganize.rawValue,
-            "watchFolders": false, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
+            "watchFolders": false, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "dopListUpdates": true, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
             "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "bundleCopies": false,
@@ -250,6 +252,7 @@ final class AppSettings {
         fetchArtworkOnline = defaults.bool(forKey: "fetchArtworkOnline")
         scrobble = defaults.bool(forKey: "scrobble")
         discordPresence = defaults.bool(forKey: "discordPresence")
+        dopListUpdates = defaults.bool(forKey: "dopListUpdates")
         discordArtwork = defaults.bool(forKey: "discordArtwork")
         miniPlayerFloats = defaults.bool(forKey: "miniPlayerFloats")
         skipNonMusic = defaults.bool(forKey: "skipNonMusic")

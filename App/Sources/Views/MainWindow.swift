@@ -90,6 +90,9 @@ struct MainWindow: View {
         .sheet(isPresented: $model.showLoopbackTest) {
             LoopbackTestSheet().environment(model)
         }
+        .sheet(item: Binding(get: { model.dopSetup.target }, set: { if $0 == nil { model.dopSetup.close() } })) { target in
+            DoPTestSheet(device: target.device).environment(model)
+        }
         .sheet(isPresented: Binding(get: { model.transitionsNote.isShown(in: .main) }, set: { if !$0 { model.transitionsNote.dismiss() } })) {
             TransitionsExplainerSheet()
         }

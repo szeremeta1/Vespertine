@@ -82,6 +82,7 @@ struct NowPlayingPanel: View {
                         StatusBadges(path: path).padding(.top, 16)
                         Hairline().padding(.top, 18)
                         SignalPathView(path: path, loopback: model.loopback.result(for: path)).padding(.top, 14)
+                        DoPSetupCard(path: path).padding(.top, 10)
                         DoPOffer(path: path).padding(.top, 10)
                         if path.plan.mode == .bitstream, let bed = player.bedMeters, bed.names.count > 2 {
                             ChannelMetersView(bed: bed, bitstream: true, levels: model.player.channelLevels).padding(.top, 14)
@@ -324,7 +325,8 @@ struct SignalPathView: View {
 
 /// DSD converted to PCM only because DoP is off for this output, which could carry it: the output's DoP switch, right
 /// where the conversion shows, so a DoP DAC that isn't on the known list (`DoPDefaults`) is one click from native DSD.
-/// Turning it on re-plans the song as DoP and this goes away.
+/// Turning it on re-plans the song as DoP and this goes away. Where the one-tap test card (`DoPSetupCard`) shows, it
+/// stands in for this: one DoP prompt at a time.
 struct DoPOffer: View {
     @Environment(AppModel.self) private var model
     let path: SignalPath
@@ -335,7 +337,7 @@ struct DoPOffer: View {
     }
 
     var body: some View {
-        if let device, !model.settings.isDoPOn(device.uid) {
+        if let device, !model.settings.isDoPOn(device.uid), model.dopSetup.hint(for: device) == .none {
             Toggle(isOn: Binding(get: { model.settings.isDoPOn(device.uid) },
                                  set: { on in
                                      model.settings.setDoP(on, for: device.uid)
