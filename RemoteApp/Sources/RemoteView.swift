@@ -35,6 +35,14 @@ struct ConnectionBanner: View {
 
     var body: some View {
         switch session.phase {
+        case .connected where session.isDemo:
+            HStack(spacing: 10) {
+                Text("Demo: a made-up library. Nothing plays.").font(.callout)
+                Spacer(minLength: 0)
+                Button("Leave Demo") { model.leave() }.font(.callout)
+            }
+            .padding(.horizontal).padding(.vertical, 10)
+            .background(.thinMaterial)
         case .connected, .closed:
             EmptyView()
         case .connecting:

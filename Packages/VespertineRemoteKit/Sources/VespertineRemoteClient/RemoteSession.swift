@@ -36,17 +36,30 @@ public final class RemoteSession {
 
     /// How this phone introduces itself (shown in the Mac's list of paired phones).
     @ObservationIgnored public var clientName: String
-    /// Finds the Mac's current address (it can change between connections).
-    @ObservationIgnored private let resolve: @MainActor (String) -> NWEndpoint?
-    @ObservationIgnored private var link: RemoteLink?
+    /// Makes a new connection to the Mac (nil while it can't be found: its address can change between connections).
+    @ObservationIgnored private let makeChannel: @MainActor () -> (any RemoteChannel)?
+    @ObservationIgnored private var link: (any RemoteChannel)?
     @ObservationIgnored private var retry: Task<Void, Never>?
     @ObservationIgnored private var attempts = 0
 
+    /// A session with a paired Mac; `resolve` finds the Mac's current address from its server ID.
     public init(pairing: SavedPairing, clientName: String, resolve: @escaping @MainActor (String) -> NWEndpoint?) {
         self.pairing = pairing
         self.clientName = clientName
-        self.resolve = resolve
+        makeChannel = {
+            resolve(pairing.serverID).map { RemoteLink(endpoint: $0, key: pairing.presharedKey) }
+        }
     }
+
+    /// A session over channels `makeChannel` makes (the demo Mac, tests).
+    public init(pairing: SavedPairing, clientName: String, makeChannel: @escaping @MainActor () -> (any RemoteChannel)?) {
+        self.pairing = pairing
+        self.clientName = clientName
+        self.makeChannel = makeChannel
+    }
+
+    /// Whether this is the built-in demo rather than a real Mac.
+    public var isDemo: Bool { pairing.serverID == DemoMac.serverID }
 
     public var isConnected: Bool { phase == .connected }
 
@@ -55,13 +68,12 @@ public final class RemoteSession {
         retry?.cancel()
         retry = nil
         guard link == nil, phase != .closed else { return }
-        guard let endpoint = resolve(pairing.serverID) else {
+        guard let link = makeChannel() else {
             phase = .unreachable("")
             scheduleRetry()
             return
         }
         phase = .connecting
-        let link = RemoteLink(endpoint: endpoint, key: pairing.presharedKey)
         self.link = link
         link.onPush = { [weak self] message in self?.received(message) }
         link.onClose = { [weak self, weak link] reason in
@@ -74,8 +86,8 @@ public final class RemoteSession {
         }
         Task {
             do {
-                try await link.open()
-                let reply = try await link.request(.hello(device: pairing.device, name: clientName, protocolVersion: RemoteProtocol.version))
+                try await link.open(timeout: .seconds(10))
+                let reply = try await link.request(.hello(device: pairing.device, name: clientName, protocolVersion: RemoteProtocol.version), timeout: .seconds(15))
                 guard self.link === link else { return }
                 if case .welcome(let info) = reply {
                     server = info
@@ -150,7 +162,7 @@ public final class RemoteSession {
             return .failed(reason: "")
         }
         do {
-            return try await link.request(command)
+            return try await link.request(command, timeout: .seconds(15))
         } catch {
             return .failed(reason: "")
         }

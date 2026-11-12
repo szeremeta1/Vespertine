@@ -559447,6 +559447,4308 @@
           }
         }
       }
+    },
+    "That code didn’t work. Check the code on the Mac, or choose Pair a Phone there again for a new one.": {
+      "comment": "Web remote: the code typed in the browser is wrong.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ያ ኮድ አልሰራም። በMac ላይ ያለውን ኮድ ያረጋግጡ፣ ወይም ለአዲስ ኮድ እዚያ «ስልክ አጣምር»ን እንደገና ይምረጡ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يعمل هذا الرمز. تحقق من الرمز على الـ Mac، أو اختر “إقران هاتف” هناك مرة أخرى للحصول على رمز جديد."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ওই কোডটি কাজ করেনি। Mac-এ কোডটি দেখে নিন, অথবা নতুন কোডের জন্য সেখানে আবার “একটি ফোন পেয়ার করুন” বেছে নিন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tento kód nefungoval. Zkontrolujte kód na Macu, nebo tam znovu zvolte Spárovat telefon a získejte nový."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koden virkede ikke. Kontrollér koden på Mac'en, eller vælg Par en telefon der igen for at få en ny."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Code hat nicht funktioniert. Prüfe den Code auf dem Mac oder wähle dort erneut „Telefon koppeln“, um einen neuen zu erhalten."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτός ο κωδικός δεν λειτούργησε. Ελέγξτε τον κωδικό στο Mac ή επιλέξτε ξανά εκεί «Σύζευξη τηλεφώνου» για νέο κωδικό."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ese código no ha funcionado. Comprueba el código en el Mac o vuelve a elegir Enlazar un teléfono allí para obtener uno nuevo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این کد کار نکرد. کد را روی Mac بررسی کنید، یا برای دریافت کد جدید، آنجا دوباره «جفت کردن گوشی» را انتخاب کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koodi ei toiminut. Tarkista koodi Macista tai valitse siellä uudelleen Parita puhelin saadaksesi uuden."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi gumana ang code na iyon. Tingnan ang code sa Mac, o piliin muli doon ang Mag-pair ng Telepono para sa bagong code."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce code n’a pas fonctionné. Vérifiez le code sur le Mac, ou choisissez à nouveau Jumeler un téléphone sur celui-ci pour en obtenir un nouveau."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તે કોડ કામ ન કર્યો. Mac પર કોડ તપાસો, અથવા નવા કોડ માટે ત્યાં ફરીથી “ફોન પેર કરો” પસંદ કરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan lambar ba ta yi aiki ba. Duba lambar a Mac, ko ku sake zaɓar “Haɗa Waya” a can don samun sabuwar lamba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הקוד הזה לא עבד. בדוק את הקוד ב־Mac, או בחר שם שוב ״צמד טלפון״ כדי לקבל קוד חדש."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यह कोड काम नहीं आया। Mac पर कोड जाँचें, या नए कोड के लिए वहाँ फिर से “फ़ोन पेयर करें” चुनें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez a kód nem működött. Ellenőrizze a kódot a Macen, vagy egy új kódért válassza ott ismét a Telefon párosítása lehetőséget."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kode tersebut tidak berhasil. Periksa kode di Mac, atau pilih Pasangkan Ponsel lagi di Mac untuk mendapatkan kode baru."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quel codice non ha funzionato. Controlla il codice sul Mac oppure scegli di nuovo Abbina un telefono sul Mac per ottenerne uno nuovo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コードが正しくありません。Macに表示されているコードを確認するか、Macでもう一度「スマートフォンをペアリング」を選択して新しいコードを表示してください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಆ ಕೋಡ್ ಕೆಲಸ ಮಾಡಲಿಲ್ಲ. Mac ನಲ್ಲಿರುವ ಕೋಡ್ ಪರಿಶೀಲಿಸಿ, ಅಥವಾ ಹೊಸ ಕೋಡ್‌ಗಾಗಿ ಅಲ್ಲಿ ಮತ್ತೆ “ಫೋನ್ ಜೋಡಿಸಿ” ಆಯ್ಕೆಮಾಡಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "코드가 올바르지 않습니다. Mac에 표시된 코드를 확인하거나, Mac에서 휴대폰 페어링을 다시 선택하여 새 코드를 받으십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ആ കോഡ് പ്രവർത്തിച്ചില്ല. Mac-ലെ കോഡ് പരിശോധിക്കുക, അല്ലെങ്കിൽ പുതിയ കോഡിനായി അവിടെ വീണ്ടും “ഫോൺ ജോടിയാക്കുക” തിരഞ്ഞെടുക്കുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तो कोड चालला नाही. Mac वरील कोड तपासा, किंवा नवीन कोडसाठी तेथे पुन्हा “फोन पेअर करा” निवडा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod itu tidak berfungsi. Semak kod pada Mac, atau pilih Pasangkan Telefon sekali lagi pada Mac untuk mendapatkan kod baharu."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koden fungerte ikke. Sjekk koden på Macen, eller velg Sammenkoble en telefon der på nytt for å få en ny."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die code werkte niet. Controleer de code op de Mac, of kies daar opnieuw ‘Koppel een telefoon’ voor een nieuwe."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਉਸ ਕੋਡ ਨੇ ਕੰਮ ਨਹੀਂ ਕੀਤਾ। Mac ’ਤੇ ਕੋਡ ਜਾਂਚੋ, ਜਾਂ ਨਵੇਂ ਕੋਡ ਲਈ ਉੱਥੇ ਦੁਬਾਰਾ “ਫ਼ੋਨ ਪੇਅਰ ਕਰੋ” ਚੁਣੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ten kod nie zadziałał. Sprawdź kod na Macu lub wybierz tam ponownie Sparuj telefon, aby uzyskać nowy."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esse código não funcionou. Confira o código no Mac ou escolha Emparelhar um Telefone nele novamente para obter um novo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esse código não funcionou. Verifique o código no Mac ou escolha novamente Emparelhar um telefone aí para obter um novo."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codul nu a funcționat. Verificați codul de pe Mac sau alegeți din nou acolo Asociază un telefon pentru un cod nou."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koden fungerade inte. Kontrollera koden på Macen eller välj Parkoppla en telefon där igen för att få en ny."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Msimbo huo haukufanya kazi. Kagua msimbo kwenye Mac, au uchague Oanisha Simu tena kwenye Mac ili upate msimbo mpya."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அந்தக் குறியீடு வேலை செய்யவில்லை. Mac-இல் உள்ள குறியீட்டைச் சரிபார்க்கவும் அல்லது புதிய குறியீட்டுக்கு அங்கே மீண்டும் “ஃபோனை ஜோடியாக்கு” என்பதைத் தேர்வுசெய்யவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఆ కోడ్ పని చేయలేదు. Macలోని కోడ్‌ను తనిఖీ చేయండి, లేదా కొత్త కోడ్ కోసం అక్కడ మళ్లీ “ఫోన్‌ను జత చేయి” ఎంచుకోండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รหัสนั้นใช้ไม่ได้ ตรวจสอบรหัสบน Mac หรือเลือก จับคู่โทรศัพท์ บน Mac อีกครั้งเพื่อรับรหัสใหม่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu kod işe yaramadı. Mac’teki kodu kontrol edin veya yeni bir kod için orada yeniden Telefon Eşle’yi seçin."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей код не спрацював. Перевірте код на Mac або знову виберіть там «Створити пару з телефоном», щоб отримати новий."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ کوڈ کام نہیں آیا۔ Mac پر کوڈ چیک کریں، یا نیا کوڈ لینے کے لیے وہاں دوبارہ “فون پیئر کریں” منتخب کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mã đó không hợp lệ. Hãy kiểm tra mã trên máy Mac hoặc chọn lại Ghép đôi điện thoại trên máy Mac để nhận mã mới."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该代码无效。请检查 Mac 上显示的代码，或在 Mac 上再次选择“配对手机”以获取新代码。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此代碼無效。請檢查 Mac 上顯示的代碼，或在 Mac 上再次選擇「配對手機」以取得新代碼。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此代碼無效。請檢查 Mac 上顯示的代碼，或在 Mac 上再次選擇「配對手機」以取得新代碼。"
+          }
+        }
+      }
+    },
+    "Web browser": {
+      "comment": "Settings › Remote: name of a paired web browser.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የድር አሳሽ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "متصفح ويب"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ওয়েব ব্রাউজার"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webový prohlížeč"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webbrowser"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webbrowser"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Πρόγραμμα περιήγησης"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navegador web"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مرورگر وب"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verkkoselain"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Web browser"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navigateur web"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વેબ બ્રાઉઝર"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Burauzar yanar gizo"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "דפדפן"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वेब ब्राउज़र"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webböngésző"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Browser web"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Browser web"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webブラウザ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ವೆಬ್ ಬ್ರೌಸರ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "웹 브라우저"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "വെബ് ബ്രൗസർ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वेब ब्राउझर"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pelayar web"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nettleser"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webbrowser"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਵੈੱਬ ਬ੍ਰਾਊਜ਼ਰ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przeglądarka"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navegador web"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Navegador web"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Browser web"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webbläsare"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kivinjari cha wavuti"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இணைய உலாவி"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "వెబ్ బ్రౌజర్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เว็บเบราว์เซอร์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Web tarayıcısı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вебпереглядач"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویب براؤزر"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trình duyệt web"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "网页浏览器"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "網頁瀏覽器"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "網頁瀏覽器"
+          }
+        }
+      }
+    },
+    "Also allow web browsers": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የድር አሳሾችንም ፍቀድ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "السماح أيضًا لمتصفحات الويب"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ওয়েব ব্রাউজারকেও অনুমতি দিন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Povolit i webové prohlížeče"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tillad også webbrowsere"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auch Webbrowser erlauben"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Να επιτρέπονται και προγράμματα περιήγησης"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir también navegadores web"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اجازه به مرورگرهای وب نیز"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salli myös verkkoselaimet"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Payagan din ang mga web browser"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autoriser aussi les navigateurs web"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વેબ બ્રાઉઝરને પણ મંજૂરી આપો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba da dama ga burauzan yanar gizo ma"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אפשר גם דפדפנים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वेब ब्राउज़र को भी अनुमति दें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webböngészők engedélyezése is"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Izinkan juga browser web"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consenti anche i browser web"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Webブラウザも許可"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ವೆಬ್ ಬ್ರೌಸರ್‌ಗಳಿಗೂ ಅನುಮತಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "웹 브라우저도 허용"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "വെബ് ബ്രൗസറുകളെയും അനുവദിക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वेब ब्राउझरनाही परवानगी द्या"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Benarkan pelayar web juga"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tillat også nettlesere"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sta ook webbrowsers toe"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਵੈੱਬ ਬ੍ਰਾਊਜ਼ਰਾਂ ਨੂੰ ਵੀ ਇਜਾਜ਼ਤ ਦਿਓ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zezwalaj także przeglądarkom"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir também navegadores web"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir também navegadores web"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permite și browserele web"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tillåt även webbläsare"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruhusu pia vivinjari vya wavuti"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இணைய உலாவிகளையும் அனுமதி"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "వెబ్ బ్రౌజర్‌లను కూడా అనుమతించు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อนุญาตเว็บเบราว์เซอร์ด้วย"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Web tarayıcılarına da izin ver"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Також дозволити вебпереглядачі"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ویب براؤزرز کی بھی اجازت دیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cho phép cả trình duyệt web"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同时允许网页浏览器"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同時允許網頁瀏覽器"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同時允許網頁瀏覽器"
+          }
+        }
+      }
+    },
+    "A browser on any phone, tablet or computer on this network can open this address and pair with the same code as a phone. The web remote isn’t encrypted like the app: use it only on a network you trust.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በዚህ አውታረ መረብ ላይ ያለ የማንኛውም ስልክ፣ ታብሌት ወይም ኮምፒውተር አሳሽ ይህን አድራሻ ከፍቶ እንደ ስልክ በተመሳሳዩ ኮድ ማጣመር ይችላል። የድር ሪሞቱ እንደ መተግበሪያው አልተመሰጠረም፦ በሚያምኑት አውታረ መረብ ላይ ብቻ ይጠቀሙበት።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يمكن لمتصفح على أي هاتف أو جهاز لوحي أو كمبيوتر على هذه الشبكة فتح هذا العنوان والاقتران بالرمز نفسه المستخدم للهاتف. التحكم عن بُعد عبر الويب ليس مشفّرًا مثل التطبيق: استخدمه فقط على شبكة تثق بها."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই নেটওয়ার্কের যেকোনো ফোন, ট্যাবলেট বা কম্পিউটারের ব্রাউজার এই ঠিকানাটি খুলে ফোনের মতোই একই কোড দিয়ে পেয়ার করতে পারে। ওয়েব রিমোট অ্যাপের মতো এনক্রিপ্ট করা নয়: শুধু আপনার বিশ্বস্ত নেটওয়ার্কেই এটি ব্যবহার করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prohlížeč na libovolném telefonu, tabletu nebo počítači v této síti může otevřít tuto adresu a spárovat se stejným kódem jako telefon. Webové dálkové ovládání není šifrované jako aplikace: používejte ho jen v síti, které důvěřujete."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En browser på enhver telefon, tablet eller computer på dette netværk kan åbne denne adresse og parre med den samme kode som en telefon. Webfjernbetjeningen er ikke krypteret som appen: Brug den kun på et netværk, du har tillid til."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Browser auf jedem Telefon, Tablet oder Computer in diesem Netzwerk kann diese Adresse öffnen und sich mit demselben Code wie ein Telefon koppeln. Die Web-Fernbedienung ist nicht wie die App verschlüsselt: Verwende sie nur in einem Netzwerk, dem du vertraust."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ένα πρόγραμμα περιήγησης σε οποιοδήποτε τηλέφωνο, tablet ή υπολογιστή σε αυτό το δίκτυο μπορεί να ανοίξει αυτήν τη διεύθυνση και να κάνει σύζευξη με τον ίδιο κωδικό όπως ένα τηλέφωνο. Ο τηλεχειρισμός μέσω web δεν είναι κρυπτογραφημένος όπως η εφαρμογή: χρησιμοποιήστε τον μόνο σε δίκτυο που εμπιστεύεστε."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un navegador en cualquier teléfono, tablet u ordenador de esta red puede abrir esta dirección y enlazarse con el mismo código que un teléfono. El control remoto web no está cifrado como la app: úsalo solo en una red de confianza."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مرورگر هر گوشی، تبلت یا رایانه‌ای در این شبکه می‌تواند این نشانی را باز کند و با همان کدی که گوشی استفاده می‌کند جفت شود. کنترل از راه دور وب مانند برنامه رمزگذاری نشده است: فقط در شبکه‌ای که به آن اعتماد دارید از آن استفاده کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minkä tahansa tämän verkon puhelimen, tabletin tai tietokoneen selain voi avata tämän osoitteen ja paritua samalla koodilla kuin puhelin. Verkkokaukosäädintä ei ole salattu kuten appia: käytä sitä vain verkossa, johon luotat."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mabubuksan ng browser sa anumang telepono, tablet o computer sa network na ito ang address na ito at makakapag-pair ito gamit ang parehong code gaya ng telepono. Hindi naka-encrypt ang web remote gaya ng app: gamitin lang ito sa network na pinagkakatiwalaan mo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un navigateur sur n’importe quel téléphone, tablette ou ordinateur de ce réseau peut ouvrir cette adresse et se jumeler avec le même code qu’un téléphone. La télécommande web n’est pas chiffrée comme l’app : utilisez-la uniquement sur un réseau de confiance."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ નેટવર્ક પરના કોઈપણ ફોન, ટેબ્લેટ અથવા કમ્પ્યુટરનું બ્રાઉઝર આ સરનામું ખોલીને ફોન જેવા જ કોડથી પેર કરી શકે છે. વેબ રિમોટ ઍપની જેમ એન્ક્રિપ્ટેડ નથી: તેનો ઉપયોગ ફક્ત તમને વિશ્વાસ હોય તેવા નેટવર્ક પર જ કરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Burauza a kowace waya, kwamfutar hannu ko kwamfuta a wannan cibiyar sadarwa zai iya buɗe wannan adireshin ya haɗu da lamba ɗaya da ta waya. Rimot ɗin yanar gizo ba a rufaffe yake kamar manhajar ba: ku yi amfani da shi a cibiyar sadarwar da kuka amince da ita kawai."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "דפדפן בכל טלפון, טאבלט או מחשב ברשת זו יכול לפתוח את הכתובת הזו ולהצטמד עם אותו קוד כמו טלפון. השלט הרחוק בדפדפן אינו מוצפן כמו היישום: השתמש בו רק ברשת שאתה סומך עליה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस नेटवर्क पर किसी भी फ़ोन, टैबलेट या कंप्यूटर का ब्राउज़र यह पता खोलकर फ़ोन वाले ही कोड से पेयर कर सकता है। वेब रिमोट ऐप की तरह एन्क्रिप्टेड नहीं है: इसका उपयोग केवल ऐसे नेटवर्क पर करें जिस पर आप भरोसा करते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A hálózat bármely telefonján, táblagépén vagy számítógépén futó böngésző megnyithatja ezt a címet, és ugyanazzal a kóddal párosítható, mint egy telefon. A webes távirányító nincs úgy titkosítva, mint az app: csak megbízható hálózaton használja."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Browser di ponsel, tablet, atau komputer mana pun di jaringan ini dapat membuka alamat ini dan memasangkan dengan kode yang sama seperti ponsel. Kendali jauh web tidak dienkripsi seperti app: gunakan hanya di jaringan yang Anda percayai."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un browser su qualsiasi telefono, tablet o computer di questa rete può aprire questo indirizzo e abbinarsi con lo stesso codice di un telefono. Il telecomando web non è crittografato come l’app: usalo solo su una rete di cui ti fidi."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このネットワーク上のスマートフォン、タブレット、コンピュータのブラウザでこのアドレスを開くと、スマートフォンと同じコードでペアリングできます。Webリモートはアプリのように暗号化されないため、信頼できるネットワークでのみ使用してください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿರುವ ಯಾವುದೇ ಫೋನ್, ಟ್ಯಾಬ್ಲೆಟ್ ಅಥವಾ ಕಂಪ್ಯೂಟರ್‌ನ ಬ್ರೌಸರ್ ಈ ವಿಳಾಸವನ್ನು ತೆರೆದು, ಫೋನ್‌ನಂತೆಯೇ ಅದೇ ಕೋಡ್‌ನೊಂದಿಗೆ ಜೋಡಿಸಬಹುದು. ವೆಬ್ ರಿಮೋಟ್ ಆ್ಯಪ್‌ನಂತೆ ಎನ್‌ಕ್ರಿಪ್ಟ್ ಆಗಿಲ್ಲ: ನೀವು ನಂಬುವ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ ಮಾತ್ರ ಇದನ್ನು ಬಳಸಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 네트워크에 있는 휴대폰, 태블릿 또는 컴퓨터의 브라우저에서 이 주소를 열고 휴대폰과 같은 코드로 페어링할 수 있습니다. 웹 리모트는 앱처럼 암호화되지 않으므로 신뢰하는 네트워크에서만 사용하십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ നെറ്റ്‌വർക്കിലെ ഏത് ഫോണിലെയും ടാബ്‌ലെറ്റിലെയും കമ്പ്യൂട്ടറിലെയും ബ്രൗസറിന് ഈ വിലാസം തുറന്ന് ഫോണിന്റെ അതേ കോഡ് ഉപയോഗിച്ച് ജോടിയാക്കാം. വെബ് റിമോട്ട് ആപ്പ് പോലെ എൻക്രിപ്റ്റ് ചെയ്തിട്ടില്ല: നിങ്ങൾ വിശ്വസിക്കുന്ന നെറ്റ്‌വർക്കിൽ മാത്രം ഇത് ഉപയോഗിക്കുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या नेटवर्कवरील कोणत्याही फोन, टॅबलेट किंवा कॉम्प्युटरमधील ब्राउझर हा पत्ता उघडून फोनसाठीच्याच कोडने पेअर करू शकतो. वेब रिमोट ॲपप्रमाणे एन्क्रिप्ट केलेला नाही: तो फक्त तुमचा विश्वास असलेल्या नेटवर्कवरच वापरा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pelayar pada mana-mana telefon, tablet atau komputer dalam rangkaian ini boleh membuka alamat ini dan berpasangan menggunakan kod yang sama seperti telefon. Kawalan jauh web tidak disulitkan seperti app: gunakannya hanya pada rangkaian yang anda percayai."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En nettleser på en hvilken som helst telefon, et nettbrett eller en datamaskin på dette nettverket kan åpne denne adressen og sammenkobles med den samme koden som en telefon. Nettfjernkontrollen er ikke kryptert slik appen er: Bruk den bare på et nettverk du stoler på."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een browser op elke telefoon, tablet of computer in dit netwerk kan dit adres openen en koppelen met dezelfde code als een telefoon. De webafstandsbediening is niet versleuteld zoals de app: gebruik deze alleen op een netwerk dat je vertrouwt."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ ਨੈੱਟਵਰਕ ’ਤੇ ਕਿਸੇ ਵੀ ਫ਼ੋਨ, ਟੈਬਲੈੱਟ ਜਾਂ ਕੰਪਿਊਟਰ ਦਾ ਬ੍ਰਾਊਜ਼ਰ ਇਹ ਪਤਾ ਖੋਲ੍ਹ ਕੇ ਫ਼ੋਨ ਵਾਲੇ ਉਸੇ ਕੋਡ ਨਾਲ ਪੇਅਰ ਕਰ ਸਕਦਾ ਹੈ। ਵੈੱਬ ਰਿਮੋਟ ਐਪ ਵਾਂਗ ਇਨਕ੍ਰਿਪਟ ਨਹੀਂ ਹੁੰਦਾ: ਇਸਨੂੰ ਸਿਰਫ਼ ਉਸ ਨੈੱਟਵਰਕ ’ਤੇ ਵਰਤੋ ਜਿਸ ’ਤੇ ਤੁਹਾਨੂੰ ਭਰੋਸਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przeglądarka na dowolnym telefonie, tablecie lub komputerze w tej sieci może otworzyć ten adres i sparować się tym samym kodem co telefon. Pilot w przeglądarce nie jest szyfrowany tak jak aplikacja: używaj go tylko w zaufanej sieci."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um navegador em qualquer telefone, tablet ou computador desta rede pode abrir este endereço e emparelhar com o mesmo código de um telefone. O controle remoto web não tem criptografia como o app: use-o somente em uma rede confiável."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um navegador em qualquer telefone, tablet ou computador desta rede pode abrir este endereço e emparelhar com o mesmo código que um telefone. O controlo remoto web não é encriptado como a app: utilize-o apenas numa rede de confiança."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un browser de pe orice telefon, tabletă sau computer din această rețea poate deschide această adresă și se poate asocia cu același cod ca un telefon. Telecomanda web nu este criptată ca aplicația: utilizați-o doar într-o rețea în care aveți încredere."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En webbläsare på vilken telefon, surfplatta eller dator som helst i det här nätverket kan öppna den här adressen och parkoppla med samma kod som en telefon. Webbfjärrkontrollen är inte krypterad som appen: använd den bara i ett nätverk du litar på."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kivinjari kwenye simu, kompyuta kibao au kompyuta yoyote katika mtandao huu kinaweza kufungua anwani hii na kuoanisha kwa msimbo uleule kama simu. Rimoti ya wavuti haijasimbwa kwa njia fiche kama programu: itumie tu kwenye mtandao unaouamini."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த நெட்வொர்க்கில் உள்ள எந்த ஃபோன், டேப்லெட் அல்லது கணினியின் உலாவியும் இந்த முகவரியைத் திறந்து, ஃபோனுக்கான அதே குறியீட்டைக் கொண்டு ஜோடியாக்கலாம். இணைய ரிமோட் ஆப்ஸைப் போல என்க்ரிப்ட் செய்யப்படவில்லை: நீங்கள் நம்பும் நெட்வொர்க்கில் மட்டுமே இதைப் பயன்படுத்தவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ నెట్‌వర్క్‌లోని ఏదైనా ఫోన్, టాబ్లెట్ లేదా కంప్యూటర్‌లోని బ్రౌజర్ ఈ అడ్రస్‌ను తెరిచి, ఫోన్‌కు ఉపయోగించే అదే కోడ్‌తో జత చేయగలదు. వెబ్ రిమోట్ యాప్‌లాగా ఎన్‌క్రిప్ట్ చేయబడదు: మీరు విశ్వసించే నెట్‌వర్క్‌లో మాత్రమే దీన్ని ఉపయోగించండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เบราว์เซอร์บนโทรศัพท์ แท็บเล็ต หรือคอมพิวเตอร์ใดๆ ในเครือข่ายนี้สามารถเปิดที่อยู่นี้และจับคู่ด้วยรหัสเดียวกับโทรศัพท์ได้ รีโมตผ่านเว็บไม่ได้เข้ารหัสเหมือนแอป ให้ใช้เฉพาะในเครือข่ายที่คุณเชื่อถือเท่านั้น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu ağdaki herhangi bir telefon, tablet veya bilgisayardaki bir tarayıcı bu adresi açabilir ve bir telefonla aynı kodla eşlenebilir. Web uzaktan kumandası uygulama gibi şifreli değildir: Yalnızca güvendiğiniz bir ağda kullanın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Переглядач на будь-якому телефоні, планшеті чи комп’ютері в цій мережі може відкрити цю адресу й створити пару за тим самим кодом, що й телефон. Вебпульт не зашифровано так, як програму: використовуйте його лише в мережі, якій довіряєте."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس نیٹ ورک پر کسی بھی فون، ٹیبلیٹ یا کمپیوٹر کا براؤزر یہ ایڈریس کھول سکتا ہے اور فون والے کوڈ ہی سے پیئر ہو سکتا ہے۔ ویب ریموٹ ایپ کی طرح انکرپٹڈ نہیں ہے: اسے صرف ایسے نیٹ ورک پر استعمال کریں جس پر آپ کو بھروسا ہو۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trình duyệt trên bất kỳ điện thoại, máy tính bảng hoặc máy tính nào trong mạng này đều có thể mở địa chỉ này và ghép đôi bằng cùng mã như điện thoại. Điều khiển từ xa qua web không được mã hóa như ứng dụng: chỉ sử dụng trên mạng mà bạn tin cậy."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此网络中任何手机、平板电脑或电脑上的浏览器都可以打开此地址，并使用与手机相同的代码进行配对。网页遥控不像 App 那样经过加密：请仅在你信任的网络中使用。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此網路上任何手機、平板電腦或電腦的瀏覽器都可以打開此位址，並使用與手機相同的代碼進行配對。網頁遙控不像 App 一樣經過加密：請只在你信任的網路上使用。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此網絡上任何手機、平板電腦或電腦的瀏覽器均可開啟此地址，並使用與手機相同的代碼配對。網頁遙控不像 App 般經過加密：請只在你信任的網絡上使用。"
+          }
+        }
+      }
+    },
+    "Vespertine Remote": {
+      "comment": "Web remote: page title.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine Remote"
+          }
+        }
+      }
+    },
+    "Pair This Browser": {
+      "comment": "Web remote: heading of the pairing screen.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህን አሳሽ አጣምር"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إقران هذا المتصفح"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই ব্রাউজারটি পেয়ার করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spárovat tento prohlížeč"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par denne browser"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesen Browser koppeln"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Σύζευξη αυτού του προγράμματος περιήγησης"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enlazar este navegador"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جفت کردن این مرورگر"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parita tämä selain"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I-pair ang Browser na Ito"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jumeler ce navigateur"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ બ્રાઉઝર પેર કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haɗa Wannan Burauzar"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "צמד את הדפדפן הזה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यह ब्राउज़र पेयर करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Böngésző párosítása"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasangkan Browser Ini"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbina questo browser"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このブラウザをペアリング"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಬ್ರೌಸರ್ ಜೋಡಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 브라우저 페어링"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ ബ്രൗസർ ജോടിയാക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हा ब्राउझर पेअर करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasangkan Pelayar Ini"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sammenkoble denne nettleseren"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koppel deze browser"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਹ ਬ੍ਰਾਊਜ਼ਰ ਪੇਅਰ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sparuj tę przeglądarkę"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emparelhar Este Navegador"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emparelhar este navegador"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asociază acest browser"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parkoppla den här webbläsaren"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oanisha Kivinjari Hiki"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த உலாவியை ஜோடியாக்கு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ బ్రౌజర్‌ను జత చేయి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "จับคู่เบราว์เซอร์นี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Tarayıcıyı Eşle"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Створити пару з цим переглядачем"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ براؤزر پیئر کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghép đôi trình duyệt này"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对此浏览器"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配對此瀏覽器"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配對此瀏覽器"
+          }
+        }
+      }
+    },
+    "On the Mac, open Vespertine › Settings › Remote and choose Pair a Phone. Type the 6-digit code it shows.": {
+      "comment": "Web remote: how to pair a browser.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በMac ላይ Vespertine › ቅንብሮች › ሪሞትን ይክፈቱ እና «ስልክ አጣምር»ን ይምረጡ። የሚያሳየውን ባለ 6 አሃዝ ኮድ ይተይቡ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "على الـ Mac، افتح Vespertine › الإعدادات › التحكم عن بُعد واختر “إقران هاتف”. اكتب الرمز المكوّن من 6 أرقام الذي يظهر."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-এ Vespertine › সেটিংস › রিমোট খুলুন এবং “একটি ফোন পেয়ার করুন” বেছে নিন। সেখানে দেখানো 6 সংখ্যার কোডটি টাইপ করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Na Macu otevřete Vespertine › Nastavení › Dálkové ovládání a zvolte Spárovat telefon. Zadejte zobrazený 6místný kód."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åbn Vespertine › Indstillinger › Fjernbetjening på Mac'en, og vælg Par en telefon. Skriv den 6-cifrede kode, der vises."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne auf dem Mac „Vespertine“ › „Einstellungen“ › „Fernbedienung“ und wähle „Telefon koppeln“. Gib den angezeigten 6-stelligen Code ein."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Στο Mac, ανοίξτε Vespertine › Ρυθμίσεις › Τηλεχειρισμός και επιλέξτε «Σύζευξη τηλεφώνου». Πληκτρολογήστε τον 6ψήφιο κωδικό που εμφανίζεται."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En el Mac, abre Vespertine › Ajustes › Control remoto y elige Enlazar un teléfono. Escribe el código de 6 dígitos que aparece."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روی Mac، برنامهٔ Vespertine › تنظیمات › کنترل از راه دور را باز کنید و «جفت کردن گوشی» را انتخاب کنید. کد ۶ رقمی نمایش‌داده‌شده را وارد کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avaa Macissa Vespertine › Asetukset › Kaukosäädin ja valitse Parita puhelin. Kirjoita näkyviin tuleva 6-numeroinen koodi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sa Mac, buksan ang Vespertine › Settings › Remote at piliin ang Mag-pair ng Telepono. I-type ang 6-digit na code na ipinapakita nito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sur le Mac, ouvrez Vespertine › Réglages › Télécommande et choisissez Jumeler un téléphone. Saisissez le code à 6 chiffres affiché."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac પર Vespertine › સેટિંગ્સ › રિમોટ ખોલો અને “ફોન પેર કરો” પસંદ કરો. ત્યાં દેખાતો 6 અંકનો કોડ ટાઇપ કરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Mac, buɗe Vespertine › Saituna › Rimot sannan ku zaɓi “Haɗa Waya”. Rubuta lambar mai lambobi 6 da ta nuna."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ב־Mac, פתח את Vespertine › ״הגדרות״ › ״שלט רחוק״ ובחר ״צמד טלפון״. הקלד את הקוד בן 6 הספרות שמוצג."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac पर Vespertine › सेटिंग्ज़ › रिमोट खोलें और “फ़ोन पेयर करें” चुनें। वहाँ दिखाया गया 6 अंकों का कोड टाइप करें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Macen nyissa meg a Vespertine › Beállítások › Távirányító panelt, és válassza a Telefon párosítása lehetőséget. Írja be a megjelenő 6 jegyű kódot."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di Mac, buka Vespertine › Pengaturan › Kendali Jauh, lalu pilih Pasangkan Ponsel. Ketik kode 6 digit yang ditampilkan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sul Mac, apri Vespertine › Impostazioni › Telecomando e scegli Abbina un telefono. Inserisci il codice di 6 cifre visualizzato."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macで「Vespertine」›「設定」›「リモート」を開き、「スマートフォンをペアリング」を選択します。表示される6桁のコードを入力してください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ನಲ್ಲಿ Vespertine › ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ರಿಮೋಟ್ ತೆರೆಯಿರಿ ಮತ್ತು “ಫೋನ್ ಜೋಡಿಸಿ” ಆಯ್ಕೆಮಾಡಿ. ಅದು ತೋರಿಸುವ 6 ಅಂಕಿಯ ಕೋಡ್ ಟೈಪ್ ಮಾಡಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac에서 Vespertine › 설정 › 리모트를 열고 휴대폰 페어링을 선택하십시오. 표시되는 6자리 코드를 입력하십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ൽ Vespertine › ക്രമീകരണങ്ങൾ › റിമോട്ട് തുറന്ന് “ഫോൺ ജോടിയാക്കുക” തിരഞ്ഞെടുക്കുക. അത് കാണിക്കുന്ന 6 അക്ക കോഡ് ടൈപ്പ് ചെയ്യുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac वर Vespertine › सेटिंग्ज › रिमोट उघडा आणि “फोन पेअर करा” निवडा. तेथे दाखवलेला 6 अंकी कोड टाइप करा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pada Mac, buka Vespertine › Seting › Kawalan Jauh dan pilih Pasangkan Telefon. Taipkan kod 6 digit yang ditunjukkan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Åpne Vespertine › Innstillinger › Fjernkontroll på Macen, og velg Sammenkoble en telefon. Skriv inn den 6-sifrede koden som vises."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open op de Mac Vespertine › Instellingen › Afstandsbediening en kies ‘Koppel een telefoon’. Typ de 6-cijferige code die daar wordt getoond."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ’ਤੇ Vespertine › ਸੈਟਿੰਗਾਂ › ਰਿਮੋਟ ਖੋਲ੍ਹੋ ਅਤੇ “ਫ਼ੋਨ ਪੇਅਰ ਕਰੋ” ਚੁਣੋ। ਉੱਥੇ ਦਿਖਾਇਆ ਗਿਆ 6 ਅੰਕਾਂ ਦਾ ਕੋਡ ਟਾਈਪ ਕਰੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Na Macu otwórz Vespertine › Ustawienia › Pilot i wybierz Sparuj telefon. Wpisz wyświetlony 6-cyfrowy kod."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Mac, abra Vespertine › Ajustes › Controle Remoto e escolha Emparelhar um Telefone. Digite o código de 6 dígitos exibido."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Mac, abra Vespertine › Definições › Controlo remoto e escolha Emparelhar um telefone. Introduza o código de 6 dígitos apresentado."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pe Mac, deschideți Vespertine › Configurări › Telecomandă și alegeți Asociază un telefon. Introduceți codul din 6 cifre afișat."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öppna Vespertine › Inställningar › Fjärrkontroll på Macen och välj Parkoppla en telefon. Skriv den 6-siffriga koden som visas."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kwenye Mac, fungua Vespertine › Mipangilio › Rimoti na uchague Oanisha Simu. Andika msimbo wa tarakimu 6 unaoonyeshwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-இல் Vespertine › அமைப்புகள் › ரிமோட் என்பதைத் திறந்து, “ஃபோனை ஜோடியாக்கு” என்பதைத் தேர்வுசெய்யவும். அது காட்டும் 6 இலக்கக் குறியீட்டை உள்ளிடவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macలో Vespertine › సెట్టింగ్‌లు › రిమోట్ తెరిచి, “ఫోన్‌ను జత చేయి” ఎంచుకోండి. అది చూపే 6 అంకెల కోడ్‌ను టైప్ చేయండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บน Mac ให้เปิด Vespertine › การตั้งค่า › รีโมต แล้วเลือก จับคู่โทรศัพท์ จากนั้นป้อนรหัส 6 หลักที่แสดง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’te Vespertine › Ayarlar › Uzaktan Kumanda’yı açın ve Telefon Eşle’yi seçin. Gösterilen 6 haneli kodu yazın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На Mac відкрийте «Vespertine» › «Параметри» › «Пульт» і виберіть «Створити пару з телефоном». Введіть 6-значний код, який там показано."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac پر Vespertine › سیٹنگز › ریموٹ کھولیں اور “فون پیئر کریں” منتخب کریں۔ وہاں دکھایا گیا 6 ہندسوں کا کوڈ ٹائپ کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trên máy Mac, hãy mở Vespertine › Cài đặt › Điều khiển từ xa và chọn Ghép đôi điện thoại. Nhập mã gồm 6 chữ số được hiển thị."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Mac 上打开“Vespertine”›“设置”›“遥控”，然后选择“配对手机”。输入其显示的 6 位代码。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Mac 上打開「Vespertine」›「設定」›「遙控」，然後選擇「配對手機」。輸入其顯示的 6 位數代碼。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Mac 上開啟「Vespertine」›「設定」›「遙控」，然後選擇「配對手機」。輸入其顯示的 6 位數代碼。"
+          }
+        }
+      }
+    },
+    "Pair": {
+      "comment": "Web remote: button that pairs the browser with the code typed.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አጣምር"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إقران"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "পেয়ার করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spárovat"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koppeln"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Σύζευξη"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enlazar"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جفت کردن"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parita"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I-pair"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jumeler"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "પેર કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haɗa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "צמד"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पेयर करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Párosítás"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasangkan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbina"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ペアリング"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಜೋಡಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "페어링"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ജോടിയാക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पेअर करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasangkan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sammenkoble"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koppel"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਪੇਅਰ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sparuj"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emparelhar"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emparelhar"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asociază"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parkoppla"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oanisha"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஜோடியாக்கு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "జత చేయి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "จับคู่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşle"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Створити пару"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پیئر کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghép đôi"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配對"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配對"
+          }
+        }
+      }
+    },
+    "Nothing playing": {
+      "comment": "Web remote: nothing is playing.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ምንም እየተጫወተ አይደለም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يوجد تشغيل"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "কিছু চলছে না"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nic nehraje"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspiller ikke"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Wiedergabe"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν παίζει τίποτα"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se está reproduciendo nada"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "چیزی در حال پخش نیست"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ei toistossa"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang nagpe-play"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune lecture en cours"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કંઈ વાગી રહ્યું નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba a kunna komai ba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שום דבר לא מתנגן"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कुछ नहीं चल रहा"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nincs lejátszás"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada yang diputar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna riproduzione"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再生していません"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಏನೂ ಪ್ಲೇ ಆಗುತ್ತಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "재생 중이 아님"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഒന്നും പ്ലേ ചെയ്യുന്നില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "काहीही वाजत नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiada apa-apa dimainkan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiller ikke"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speelt niet af"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕੁਝ ਨਹੀਂ ਚੱਲ ਰਿਹਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nic nie jest odtwarzane"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nada tocando"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sem reprodução"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu se redă nimic"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelar inte"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hakuna kinachocheza"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "எதுவும் இயங்கவில்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఏదీ ప్లే కావడం లేదు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่ได้เล่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiçbir şey çalmıyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Нічого не відтворюється"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کچھ نہیں چل رہا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không có gì đang phát"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未在播放"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未在播放"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未在播放"
+          }
+        }
+      }
+    },
+    "Search songs, artists, albums": {
+      "comment": "Web remote: search field placeholder.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ዘፈኖችን፣ አርቲስቶችን፣ አልበሞችን ፈልግ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ابحث عن الأغاني والفنانين والألبومات"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "গান, শিল্পী, অ্যালবাম খুঁজুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hledat skladby, interprety, alba"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Søg efter sange, kunstnere, album"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Titel, Künstler, Alben suchen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αναζήτηση τραγουδιών, καλλιτεχνών, άλμπουμ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar canciones, artistas, álbumes"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جست‌وجوی آهنگ‌ها، هنرمندان، آلبوم‌ها"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Etsi kappaleita, artisteja, albumeja"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maghanap ng kanta, artist, album"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rechercher des morceaux, artistes, albums"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ગીતો, કલાકારો, આલ્બમ શોધો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nemi waƙoƙi, mawaƙa, kundaye"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חפש שירים, אמנים, אלבומים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गीत, कलाकार, एल्बम खोजें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dalok, előadók, albumok keresése"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cari lagu, artis, album"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerca brani, artisti, album"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "曲、アーティスト、アルバムを検索"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹಾಡುಗಳು, ಕಲಾವಿದರು, ಆಲ್ಬಮ್‌ಗಳನ್ನು ಹುಡುಕಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "노래, 아티스트, 앨범 검색"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പാട്ടുകൾ, ആർട്ടിസ്റ്റുകൾ, ആൽബങ്ങൾ എന്നിവ തിരയുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गाणी, कलाकार, अल्बम शोधा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cari lagu, artis, album"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Søk etter sanger, artister, album"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zoek nummers, artiesten, albums"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਗੀਤ, ਕਲਾਕਾਰ, ਐਲਬਮਾਂ ਖੋਜੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Szukaj utworów, wykonawców, albumów"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar músicas, artistas, álbuns"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pesquisar músicas, artistas, álbuns"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Căutați melodii, artiști, albume"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sök låtar, artister, album"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tafuta nyimbo, wasanii, albamu"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பாடல்கள், கலைஞர்கள், ஆல்பங்களைத் தேடு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "పాటలు, ఆర్టిస్ట్‌లు, ఆల్బమ్‌లను వెతకండి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ค้นหาเพลง ศิลปิน อัลบั้ม"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarkı, sanatçı, albüm arayın"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пошук пісень, виконавців, альбомів"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گانے، فنکار، البمز تلاش کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tìm kiếm bài hát, nghệ sĩ, album"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索歌曲、艺人、专辑"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜尋歌曲、藝人、專輯"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜尋歌曲、藝人、專輯"
+          }
+        }
+      }
+    },
+    "Clear Upcoming": {
+      "comment": "Web remote: clears the songs after the one playing.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ቀጣዮቹን አጽዳ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مسح التالي"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এরপরের গান সাফ করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vymazat nadcházející"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ryd kommende"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kommende leeren"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Καθαρισμός επόμενων"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borrar siguientes"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پاک کردن موارد بعدی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tyhjennä tulevat"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I-clear ang Susunod"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Effacer la suite"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આગળનાં ગીતો સાફ કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share Na Gaba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נקה את הבאים בתור"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आगे आने वाले साफ़ करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Következők törlése"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kosongkan Berikutnya"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancella successivi"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この後の曲を消去"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಮುಂದಿನವನ್ನು ತೆರವುಗೊಳಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다음 재생 지우기"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "അടുത്തതായി വരുന്നവ മായ്ക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पुढील गाणी साफ करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kosongkan Seterusnya"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tøm kommende"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wis volgende"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਅਗਲੇ ਗੀਤ ਸਾਫ਼ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wyczyść następne"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Limpar Próximas"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Limpar seguintes"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Golește următoarele"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rensa kommande"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Futa Zinazofuata"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அடுத்து வருபவற்றை அழி"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "తదుపరి వాటిని క్లియర్ చేయి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ล้างรายการถัดไป"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sıradakileri Temizle"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очистити наступні"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اگلے صاف کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xóa mục tiếp theo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除后续歌曲"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除後續歌曲"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清除後續歌曲"
+          }
+        }
+      }
+    },
+    "Continuing": {
+      "comment": "Web remote: queue section, the rest of the album or playlist.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የሚቀጥሉ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "استكمال"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "চলতে থাকবে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pokračování"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fortsættelse"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fortsetzung"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Συνέχεια"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continuación"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ادامه"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jatkuu"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Magpapatuloy"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suite de la lecture"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ચાલુ રહેશે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ci Gaba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בהמשך"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आगे जारी"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Folytatás"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Berlanjut"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A seguire"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "続けて再生"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಮುಂದುವರಿಯುವವು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계속 재생"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "തുടരുന്നവ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पुढे सुरू"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bersambung"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fortsettelse"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vervolg"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜਾਰੀ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ciąg dalszy"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continuação"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continuação"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Continuare"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fortsättning"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zinazoendelea"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "தொடர்பவை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కొనసాగేవి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่นต่อ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Devamı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Продовження"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جاری"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát tiếp"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "继续播放"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "繼續播放"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "繼續播放"
+          }
+        }
+      }
+    },
+    "The queue is empty.": {
+      "comment": "Web remote: the queue has nothing in it.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ወረፋው ባዶ ነው።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قائمة الانتظار فارغة."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সারি খালি।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fronta je prázdná."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Køen er tom."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Warteschlange ist leer."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η ουρά είναι κενή."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La cola está vacía."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صف پخش خالی است."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jono on tyhjä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang laman ang queue."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La file d’attente est vide."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કતાર ખાલી છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Babu komai a jerin jira."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התור ריק."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कतार ख़ाली है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A lejátszási sor üres."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Antrean kosong."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La coda è vuota."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "キューは空です。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸರದಿ ಖಾಲಿಯಾಗಿದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "대기열이 비어 있습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ക്യൂ ശൂന്യമാണ്."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रांग रिकामी आहे."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Baris gilir kosong."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Køen er tom."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De wachtrij is leeg."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਤਾਰ ਖਾਲੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kolejka jest pusta."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A fila está vazia."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A fila está vazia."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coada este goală."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kön är tom."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foleni haina kitu."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வரிசை காலியாக உள்ளது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "క్యూ ఖాళీగా ఉంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "คิวว่างเปล่า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sıra boş."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Черга порожня."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قطار خالی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hàng đợi trống."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "待播清单为空。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "待播清單是空的。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "待播清單中沒有項目。"
+          }
+        }
+      }
+    },
+    "Fixed volume: set the level on your amplifier or DAC": {
+      "comment": "Web remote: the output's volume can't be changed from Vespertine.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ቋሚ የድምፅ መጠን፦ ደረጃውን በአምፕሊፋየርዎ ወይም በDACዎ ላይ ያዘጋጁ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مستوى صوت ثابت: اضبط المستوى على المضخم أو DAC"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "নির্দিষ্ট ভলিউম: আপনার অ্যামপ্লিফায়ার বা DAC-এ লেভেল ঠিক করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pevná hlasitost: nastavte úroveň na zesilovači nebo DAC"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fast lydstyrke: Indstil niveauet på din forstærker eller DAC"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feste Lautstärke: Stelle den Pegel an deinem Verstärker oder DAC ein"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Σταθερή ένταση: ρυθμίστε τη στάθμη στον ενισχυτή ή στο DAC σας"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volumen fijo: ajusta el nivel en tu amplificador o DAC"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صدای ثابت: سطح صدا را روی تقویت‌کننده یا DAC خود تنظیم کنید"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiinteä äänenvoimakkuus: säädä tasoa vahvistimesta tai DAC:sta"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nakapirming volume: itakda ang level sa amplifier o DAC mo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume fixe : réglez le niveau sur votre amplificateur ou votre DAC"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "નિશ્ચિત વૉલ્યૂમ: તમારા ઍમ્પ્લિફાયર અથવા DAC પર લેવલ સેટ કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙarar tsayayyiya: saita matakin a amplifier ko DAC ɗinku"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עוצמת קול קבועה: כוונן את הרמה במגבר או ב־DAC"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "निश्चित वॉल्यूम: लेवल अपने एम्प्लिफ़ायर या DAC पर सेट करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rögzített hangerő: állítsa be a szintet az erősítőn vagy a DAC-on"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume tetap: atur levelnya di amplifier atau DAC Anda"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume fisso: regola il livello sull’amplificatore o sul DAC"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "固定音量：アンプまたはDACで音量を調整してください"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸ್ಥಿರ ವಾಲ್ಯೂಮ್: ನಿಮ್ಮ ಆಂಪ್ಲಿಫೈಯರ್ ಅಥವಾ DAC ನಲ್ಲಿ ಮಟ್ಟವನ್ನು ಹೊಂದಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "고정 음량: 앰프 또는 DAC에서 음량을 설정하십시오"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്ഥിരമായ വോളിയം: നിങ്ങളുടെ ആംപ്ലിഫയറിലോ DAC-ലോ ലെവൽ സജ്ജമാക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "निश्चित व्हॉल्यूम: तुमच्या ॲम्प्लिफायर किंवा DAC वर लेव्हल सेट करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kelantangan tetap: tetapkan tahapnya pada penguat atau DAC anda"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fast volum: Still inn nivået på forsterkeren eller DAC-en"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vast volume: stel het niveau in op je versterker of DAC"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਥਿਰ ਵੌਲਿਊਮ: ਆਪਣੇ ਐਂਪਲੀਫ਼ਾਇਰ ਜਾਂ DAC ’ਤੇ ਲੈਵਲ ਸੈੱਟ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stała głośność: ustaw poziom na wzmacniaczu lub przetworniku DAC"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume fixo: ajuste o nível no seu amplificador ou DAC"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volume fixo: ajuste o nível no amplificador ou no DAC"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volum fix: setați nivelul de pe amplificator sau DAC"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fast volym: ställ in nivån på din förstärkare eller DAC"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiwango cha sauti kisichobadilika: weka kiwango kwenye amplifaya au DAC yako"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "நிலையான ஒலியளவு: உங்கள் ஆம்ப்ளிஃபையர் அல்லது DAC-இல் அளவை அமைக்கவும்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్థిర వాల్యూమ్: మీ యాంప్లిఫైయర్ లేదా DACలో స్థాయిని సెట్ చేయండి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ระดับเสียงคงที่: ตั้งระดับเสียงที่แอมป์หรือ DAC ของคุณ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sabit ses düzeyi: Düzeyi amfinizden veya DAC’nizden ayarlayın"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Фіксована гучність: установіть рівень на підсилювачі або ЦАП"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقررہ والیوم: لیول اپنے ایمپلیفائر یا DAC پر سیٹ کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Âm lượng cố định: hãy đặt mức âm lượng trên bộ khuếch đại hoặc DAC của bạn"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "固定音量：请在放大器或 DAC 上设置音量"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "固定音量：請在擴大機或 DAC 上設定音量"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "固定音量：請在擴音機或 DAC 上設定音量"
+          }
+        }
+      }
+    },
+    "Can’t reach the Mac. Trying again…": {
+      "comment": "Web remote: the page lost the Mac.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macን ማግኘት አልተቻለም። እንደገና በመሞከር ላይ…"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعذّر الوصول إلى الـ Mac. جارٍ إعادة المحاولة…"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-এর সাথে যোগাযোগ করা যাচ্ছে না। আবার চেষ্টা করা হচ্ছে…"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac není dostupný. Zkouší se to znovu…"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan ikke få forbindelse til Mac'en. Prøver igen…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac nicht erreichbar. Neuer Versuch …"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν είναι δυνατή η επικοινωνία με το Mac. Νέα προσπάθεια…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede conectar con el Mac. Reintentando…"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دسترسی به Mac ممکن نیست. تلاش دوباره…"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macia ei tavoiteta. Yritetään uudelleen…"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi maabot ang Mac. Sinusubukang muli…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de joindre le Mac. Nouvelle tentative…"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac સુધી પહોંચી શકાતું નથી. ફરી પ્રયાસ કરી રહ્યાં છીએ…"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba a iya kaiwa ga Mac ba. Ana sake gwadawa…"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין אפשרות להתחבר ל־Mac. מנסה שוב…"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac तक नहीं पहुँच पा रहे। फिर से कोशिश की जा रही है…"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Mac nem érhető el. Újrapróbálkozás…"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak dapat menjangkau Mac. Mencoba lagi…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile raggiungere il Mac. Nuovo tentativo…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macに接続できません。再試行しています…"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ಅನ್ನು ತಲುಪಲು ಸಾಧ್ಯವಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಲಾಗುತ್ತಿದೆ…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac에 연결할 수 없습니다. 다시 시도하는 중…"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ൽ എത്താനാകുന്നില്ല. വീണ്ടും ശ്രമിക്കുന്നു…"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac पर्यंत पोहोचता येत नाही. पुन्हा प्रयत्न करत आहे…"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak dapat mencapai Mac. Mencuba lagi…"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Får ikke kontakt med Macen. Prøver igjen …"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan de Mac niet bereiken. Opnieuw proberen…"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ਤੱਕ ਨਹੀਂ ਪਹੁੰਚਿਆ ਜਾ ਸਕਦਾ। ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ…"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie można połączyć się z Makiem. Ponawianie próby…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível acessar o Mac. Tentando novamente…"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível contactar o Mac. A tentar novamente…"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ul nu poate fi accesat. Se reîncearcă…"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan inte nå Macen. Försöker igen …"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haiwezi kufikia Mac. Inajaribu tena…"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ஐ அணுக முடியவில்லை. மீண்டும் முயல்கிறது…"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macను చేరుకోలేకపోతోంది. మళ్లీ ప్రయత్నిస్తోంది…"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่สามารถเชื่อมต่อกับ Mac ได้ กำลังลองอีกครั้ง…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’e ulaşılamıyor. Yeniden deneniyor…"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Немає зв’язку з Mac. Повторна спроба…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac تک رسائی نہیں ہو رہی۔ دوبارہ کوشش کی جا رہی ہے…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể kết nối với máy Mac. Đang thử lại…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法连接到 Mac。正在重试…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法連線到 Mac。正在重試…"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法連接 Mac。正在重試…"
+          }
+        }
+      }
+    },
+    "Waiting for %@ to connect": {
+      "comment": "Web remote: playback waits for the chosen output; %@ is its name.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ እስኪገናኝ በመጠበቅ ላይ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "في انتظار اتصال %@"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ সংযুক্ত হওয়ার জন্য অপেক্ষা করা হচ্ছে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Čeká se na připojení zařízení %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Venter på, at %@ opretter forbindelse"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warten auf Verbindung mit %@"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αναμονή για σύνδεση της συσκευής %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando a que %@ se conecte"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "در انتظار اتصال %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odotetaan laitteen %@ yhteyttä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinihintay na kumonekta ang %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En attente de la connexion de %@"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ કનેક્ટ થાય તેની રાહ જોઈ રહ્યાં છીએ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana jiran %@ ya haɗu"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ממתין להתחברות של %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ के कनेक्ट होने की प्रतीक्षा की जा रही है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Várakozás, amíg ez csatlakozik: %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menunggu %@ terhubung"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In attesa della connessione di %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@の接続を待っています"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ಸಂಪರ್ಕಗೊಳ್ಳಲು ಕಾಯಲಾಗುತ್ತಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 기기의 연결을 기다리는 중"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ കണക്റ്റ് ചെയ്യുന്നതിനായി കാത്തിരിക്കുന്നു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ कनेक्ट होण्याची प्रतीक्षा करत आहे"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menunggu %@ bersambung"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Venter på at %@ skal koble til"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wachten tot %@ verbinding maakt"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਦੇ ਕਨੈਕਟ ਹੋਣ ਦੀ ਉਡੀਕ ਕੀਤੀ ਜਾ ਰਹੀ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oczekiwanie na połączenie urządzenia %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aguardando %@ se conectar"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A aguardar que %@ se ligue"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se așteaptă conectarea dispozitivului %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Väntar på att %@ ska ansluta"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inasubiri %@ iunganishwe"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ இணைவதற்காகக் காத்திருக்கிறது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ కనెక్ట్ కావడం కోసం వేచి ఉంది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กำลังรอ %@ เชื่อมต่อ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ aygıtının bağlanması bekleniyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очікування підключення: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ کے منسلک ہونے کا انتظار ہے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang chờ %@ kết nối"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待 %@ 连接"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待 %@ 連線"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待 %@ 連接"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

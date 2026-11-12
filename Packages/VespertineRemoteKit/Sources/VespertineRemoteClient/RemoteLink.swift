@@ -8,18 +8,9 @@ import Foundation
 import Network
 import VespertineRemoteProtocol
 
-public enum RemoteLinkError: Error, Equatable, Sendable {
-    /// The Mac couldn't be reached, or refused the key (a wrong pairing code shows up here too).
-    case couldNotConnect(String)
-    /// No reply in time.
-    case timedOut
-    /// The connection closed before the reply came.
-    case closed
-}
-
 /// A connection to a Mac's remote server. Runs on the main actor; Network calls back on the main queue.
 @MainActor
-final class RemoteLink {
+final class RemoteLink: RemoteChannel {
     private let connection: NWConnection
     private var pending: [Int: CheckedContinuation<RemoteReply, any Error>] = [:]
     private var opening: CheckedContinuation<Void, any Error>?

@@ -75,6 +75,11 @@ struct MacsView: View {
                 if let error = model.pairingError {
                     Section { Text(error).foregroundStyle(.red) }
                 }
+                Section {
+                    Button { model.tryDemo() } label: { Label("Try the Demo", systemImage: "play.rectangle") }
+                } footer: {
+                    Text("No Mac nearby? Try the remote with a made-up library. Nothing plays.")
+                }
                 if let problem = model.discovery.problem, !problem.isEmpty {
                     Section {
                         Text("Vespertine Remote can’t look for Macs. Allow it in Settings › Privacy & Security › Local Network.")

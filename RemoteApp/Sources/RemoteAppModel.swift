@@ -52,6 +52,18 @@ final class RemoteAppModel {
         session.connect()
     }
 
+    /// Tries the remote on a pretend Mac inside the app (no network, no sound). Not saved as a pairing.
+    func tryDemo() {
+        session?.close()
+        let pairing = SavedPairing(serverID: DemoMac.serverID, name: String(localized: "Demo Mac"), device: "demo", key: Data())
+        // One pretend Mac for the whole demo, so the queue survives the app going to the background and back.
+        let mac = DemoMac(name: pairing.name) { key, size in DemoArtwork.png(key: key, size: size) }
+        let session = RemoteSession(pairing: pairing, clientName: deviceName) { mac }
+        self.session = session
+        artwork.session = session
+        session.connect()
+    }
+
     /// Back to the list of Macs.
     func leave() {
         session?.close()

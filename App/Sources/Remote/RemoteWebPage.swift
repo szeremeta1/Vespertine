@@ -36,9 +36,12 @@ enum RemoteWebPage {
             "fixedVolume": String(localized: "Fixed volume: set the level on your amplifier or DAC", comment: "Web remote: the output's volume can't be changed from Vespertine."),
             "volume": String(localized: "Volume", comment: "Web remote: the volume slider."),
             "offline": String(localized: "Can’t reach the Mac. Trying again…", comment: "Web remote: the page lost the Mac."),
-            "waiting": String(localized: "Waiting for %@ to connect", comment: "Web remote: playback waits for the chosen output; %@ is its name."),
+            "waiting": String(localized: "Waiting for \(placeholder) to connect", comment: "Web remote: playback waits for the chosen output; %@ is its name."),
         ]
     }
+
+    /// Left in the words for the page to fill in (with the output's name).
+    private static let placeholder = "%@"
 
     static func html(serverName: String) -> String {
         let json = (try? JSONSerialization.data(withJSONObject: strings.merging(["mac": serverName]) { a, _ in a }, options: [.sortedKeys]))
