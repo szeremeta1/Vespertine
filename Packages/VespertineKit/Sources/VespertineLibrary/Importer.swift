@@ -72,7 +72,8 @@ public enum Importer {
             let name = sacd != nil ? file.deletingPathExtension().lastPathComponent : disc + (number.map { String(format: "%02d ", $0) } ?? "") + title
 
             let folder = root.appendingPathComponent(artist, isDirectory: true).appendingPathComponent(album, isDirectory: true)
-            let wanted = folder.appendingPathComponent(sanitize(name)).appendingPathExtension(file.pathExtension.lowercased())
+            let ext = file.pathExtension.lowercased()
+            let wanted = folder.appendingPathComponent(sanitize(name, maxBytes: maxNameBytes - 1 - ext.utf8.count)).appendingPathExtension(ext)
             albumsPerSourceFolder[file.deletingLastPathComponent(), default: []].insert(folder)
             if let earlier = earlierCopy(of: file, at: wanted) {
                 destinations[file.standardizedFileURL.path] = earlier
@@ -248,9 +249,8 @@ public enum Importer {
             if sourcePrint == nil { sourcePrint = .some(fingerprint(of: source)) }
             return sourcePrint!
         }
-        let base = wanted.deletingPathExtension().lastPathComponent, ext = wanted.pathExtension
         for i in 1...1000 {
-            let candidate = i == 1 ? wanted : wanted.deletingLastPathComponent().appendingPathComponent("\(base) \(i)").appendingPathExtension(ext)
+            let candidate = i == 1 ? wanted : numbered(wanted, i)
             guard FileManager.default.fileExists(atPath: candidate.path) else { return nil }
             var buffer = [UInt8](repeating: 0, count: 256)
             let length = getxattr(candidate.path, stampName, &buffer, buffer.count, 0, 0)
@@ -275,22 +275,39 @@ public enum Importer {
         return t.isEmpty ? nil : t
     }
 
-    static func sanitize(_ s: String) -> String {
+    /// The most UTF-8 bytes a file or folder name gets. The file systems a NAS uses (ext4, Btrfs, ZFS) take 255 bytes
+    /// for one name; APFS, HFS+ and exFAT take 255 UTF-16 units, which is never fewer. It also keeps the whole path
+    /// (artist, album and file under the library folder) inside the 1024 bytes macOS takes for a path.
+    static let maxNameBytes = 255
+
+    /// A name that can be a file or folder: at most 120 characters and `maxBytes` UTF-8 bytes. The characters alone
+    /// don't bound it: a letter is three bytes in Japanese or Chinese, and six or more in Hindi, Tamil or Thai, where
+    /// it carries its vowel signs, so three names of 120 letters can be longer than any path macOS takes.
+    static func sanitize(_ s: String, maxBytes: Int = maxNameBytes) -> String {
         let bad = CharacterSet(charactersIn: "/:\\?%*|\"<>").union(.controlCharacters)
         let cleaned = s.components(separatedBy: bad).joined(separator: "_").trimmingCharacters(in: .whitespaces)
         let trimmed = cleaned.hasPrefix(".") ? "_" + cleaned.dropFirst() : cleaned
-        return String(trimmed.prefix(120)).isEmpty ? "_" : String(trimmed.prefix(120))
+        var name = String(trimmed.prefix(120))
+        while name.utf8.count > maxBytes, !name.isEmpty { name.removeLast() }
+        return name.isEmpty ? "_" : name
     }
 
     static func uniqueURL(_ url: URL) -> URL {
         guard FileManager.default.fileExists(atPath: url.path) else { return url }
-        let base = url.deletingPathExtension().lastPathComponent
-        let ext = url.pathExtension
         for i in 2... {
-            let candidate = url.deletingLastPathComponent().appendingPathComponent("\(base) \(i)").appendingPathExtension(ext)
+            let candidate = numbered(url, i)
             if !FileManager.default.fileExists(atPath: candidate.path) { return candidate }
         }
         return url
+    }
+
+    /// `url` as its `i`th namesake ("Title 2.flac"), the name shortened where the number wouldn't fit after it.
+    static func numbered(_ url: URL, _ i: Int) -> URL {
+        var base = url.deletingPathExtension().lastPathComponent
+        let ext = url.pathExtension
+        let tail = " \(i)".utf8.count + (ext.isEmpty ? 0 : 1 + ext.utf8.count)
+        while base.utf8.count + tail > maxNameBytes, base.count > 1 { base.removeLast() }
+        return url.deletingLastPathComponent().appendingPathComponent("\(base) \(i)").appendingPathExtension(ext)
     }
 }
 

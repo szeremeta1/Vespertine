@@ -145,6 +145,50 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         #expect(Importer.identity(of: twinFile) == Importer.identity(of: src.appendingPathComponent("set.wav")))
         #expect(try Importer.copyAndOrganize([twin], into: dst).map(\.lastPathComponent) == ["set 3.wav"])
     }
+    /// Names and paths are limited in bytes, not letters: a Hindi, Tamil or Thai letter with its vowel signs is six
+    /// bytes or more, a Japanese one three, so a long title, album and artist in those made a path longer than the
+    /// 1024 bytes macOS takes, and Import & Organize stopped there with part of the selection copied.
+    @Test func importTakesLongTitlesInScriptsWithWideLetters() throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        let src = dir.appendingPathComponent("src"), dst = dir.appendingPathComponent("dst")
+        try FileManager.default.createDirectory(at: src, withIntermediateDirectories: true)
+        let hindi = String(repeating: "संगीत की रात ", count: 10)     // about 90 letters, 330 bytes
+        let japanese = String(repeating: "夜の音楽", count: 30)          // 120 letters, 360 bytes
+        for (i, title) in [hindi, japanese].enumerated() {
+            let file = src.appendingPathComponent("\(i).wav"); try audio(file)
+            let tagged = try AudioFile(readingPropertiesAndMetadataFrom: file)
+            tagged.metadata.title = title; tagged.metadata.albumTitle = title; tagged.metadata.artist = title
+            try tagged.writeMetadata()
+        }
+        let written = try Importer.copyAndOrganize([src], into: dst)
+        #expect(written.count == 2)
+        for file in written {
+            #expect(FileManager.default.fileExists(atPath: file.path))
+            for name in [file.lastPathComponent, file.deletingLastPathComponent().lastPathComponent] {
+                #expect(name.utf8.count <= 255, "\(name.utf8.count) bytes")
+            }
+        }
+        // The same files again are found where they were put, not copied a second time.
+        #expect(try Importer.copyAndOrganize([src], into: dst).isEmpty)
+    }
+    /// Names that fit stay exactly as they were (the library finds earlier copies by them); only what the volume
+    /// would refuse is shortened, at a whole letter, and a numbered namesake still fits.
+    @Test func longNamesAreCutToWhatAVolumeTakes() {
+        #expect(Importer.sanitize("Kind of Blue") == "Kind of Blue")
+        let latin = String(repeating: "a", count: 200)
+        #expect(Importer.sanitize(latin) == String(repeating: "a", count: 120))
+        let cyrillic = String(repeating: "я", count: 120)
+        #expect(Importer.sanitize(cyrillic) == cyrillic, "240 bytes fit")
+        let tamil = String(repeating: "கொ", count: 120)                // each letter is two code points, six bytes
+        let cut = Importer.sanitize(tamil, maxBytes: 250)
+        #expect(cut.utf8.count <= 250 && cut.utf8.count > 240)
+        #expect(tamil.hasPrefix(cut) && cut.unicodeScalars.count % 2 == 0, "cut between letters, not inside one")
+        let full = URL(fileURLWithPath: "/tmp/" + String(repeating: "夜", count: 83) + ".flac")   // 249 + 5 bytes
+        let second = Importer.numbered(full, 2)
+        #expect(second.lastPathComponent.utf8.count <= 255)
+        #expect(second.lastPathComponent.hasSuffix(" 2.flac"))
+        #expect(Importer.numbered(URL(fileURLWithPath: "/tmp/set.wav"), 3).lastPathComponent == "set 3.wav")
+    }
     /// A compilation tagged without an Album Artist is one album, not one per artist; the files keep their tags.
     @Test func compilationWithoutAlbumArtistIsOneAlbum() async throws {
         let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
