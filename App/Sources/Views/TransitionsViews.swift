@@ -90,6 +90,15 @@ struct TransitionsExplainerSheet: View {
         }
         .frame(width: 420)
         .background(Palette.panel)
+        // Escape closes the note too. OK holds Return and a button takes one shortcut, so a second, unseen one holds Escape.
+        .background {
+            Button("OK") { dismiss() }
+                .keyboardShortcut(.cancelAction)
+                .opacity(0)
+                .allowsHitTesting(false)
+                .focusable(false)
+                .accessibilityHidden(true)
+        }
     }
 }
 
