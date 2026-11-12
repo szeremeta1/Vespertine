@@ -1,10 +1,14 @@
 //
-// Vespertine: the web remote's page (one file: markup, style and script). Its words come from the String Catalog, so
-// the page speaks the Mac's language like the rest of Vespertine.
+// Vespertine: the web remote's page. Its markup, style and script are the three RemoteWeb files in the app's resources,
+// sent as one page; its words come from the String Catalog, so the page speaks the Mac's language like the rest of
+// Vespertine.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
+import CoreGraphics
 import Foundation
+import ImageIO
+import UniformTypeIdentifiers
 
 enum RemoteWebPage {
     /// The page's words, by key, in this Mac's language.
@@ -34,313 +38,206 @@ enum RemoteWebPage {
             // The same headings as the Mac's Up Next panel: "Up Next" alone, "Continue Playing" under "Playing Next".
             "upNext": String(localized: "Up Next"),
             "continuePlaying": String(localized: "Continue Playing"),
-            "empty": String(localized: "The queue is empty.", comment: "Web remote: the queue has nothing in it."),
+            "empty": String(localized: "The queue is empty."),
             "fixedVolume": String(localized: "Fixed volume: set the level on your amplifier or DAC", comment: "Web remote: the output's volume can't be changed from Vespertine."),
             "volume": String(localized: "Volume", comment: "Web remote: the volume slider."),
             "offline": String(localized: "Can’t reach the Mac. Trying again…", comment: "Web remote: the page lost the Mac."),
             "waiting": String(localized: "Waiting for \(placeholder) to connect", comment: "Web remote: playback waits for the chosen output; %@ is its name."),
+
+            // The rest are the Mac window's own words for the same things, so the remote and the Mac always agree.
+            "artists": String(localized: "Artists"),
+            "songs": String(localized: "Songs"),
+            "playlists": String(localized: "Playlists"),
+            "favorites": String(localized: "Favorites"),
+            "searchTab": String(localized: "Search"),
+            "clearSearch": String(localized: "Clear search"),
+            "noMatches": String(localized: "Nothing matches."),
+            "noFavorites": String(localized: "No favorites yet"),
+            "emptyLibrary": String(localized: "Your library is empty"),
+            "nothingQueued": String(localized: "Nothing queued"),
+            "pause": String(localized: "Pause"),
+            "previous": String(localized: "Previous"),
+            "next": String(localized: "Next"),
+            "mute": String(localized: "Mute"),
+            "unmute": String(localized: "Unmute"),
+            "volumeUp": String(localized: "Volume Up"),
+            "volumeDown": String(localized: "Volume Down"),
+            "position": String(localized: "Position"),
+            "off": String(localized: "Off"),
+            "all": String(localized: "All"),
+            "one": String(localized: "One"),
+            "transitions": String(localized: "Transitions"),
+            "favorite": String(localized: "Add to Favorites"),
+            "unfavorite": String(localized: "Remove from Favorites"),
+            "addToPlaylist": String(localized: "Add to Playlist"),
+            "newPlaylist": String(localized: "New Playlist"),
+            "name": String(localized: "Name"),
+            "create": String(localized: "Create"),
+            "cancel": String(localized: "Cancel"),
+            "close": String(localized: "Close"),
+            "options": String(localized: "Options"),
+            "added": String(localized: "Added"),
+            "goToAlbum": String(localized: "Go to Album"),
+            "removeFromUpNext": String(localized: "Remove from Up Next"),
+            "moveEarlier": String(localized: "Move \(placeholder) earlier"),
+            "moveLater": String(localized: "Move \(placeholder) later"),
+            "smart": String(localized: "SMART"),
+            "smartPlaylist": String(localized: "Smart Playlist"),
+            "hiRes": String(localized: "Hi-Res"),
+            "multichannel": String(localized: "Multichannel"),
+            "signalPath": String(localized: "Signal Path"),
+            "tryAgain": String(localized: "Try again"),
+            "reconnecting": String(localized: "Reconnecting…"),
         ]
     }
 
-    /// Left in the words for the page to fill in (with the output's name).
+    /// Left in the words for the page to fill in (with the output's or the song's name).
     private static let placeholder = "%@"
 
-    static func html(serverName: String) -> String {
-        let json = (try? JSONSerialization.data(withJSONObject: strings.merging(["mac": serverName]) { a, _ in a }, options: [.sortedKeys]))
-            .map { String(decoding: $0, as: UTF8.self) } ?? "{}"
-        // Inside <script>, "<" must not end the element early.
-        let safe = json.replacingOccurrences(of: "<", with: "\\u003c")
-        let language = Locale.current.language.languageCode?.identifier ?? "en"
-        let rtl = Locale.Language(identifier: language).characterDirection == .rightToLeft
-        return template
-            .replacingOccurrences(of: "__STRINGS__", with: safe)
-            .replacingOccurrences(of: "__LANG__", with: language)
-            .replacingOccurrences(of: "__DIR__", with: rtl ? "rtl" : "ltr")
+    /// "3 songs" and "3 albums" for one number of each plural kind a language can have. The page picks the form its own
+    /// plural rules name for a count and puts the count in, so "1 song", "2 utwory" and "5 utworów" all come out right.
+    static let pluralSamples = [0, 1, 2, 3, 5, 11, 20, 100]
+
+    static var plurals: [String: [String: String]] {
+        var songs: [String: String] = [:], albums: [String: String] = [:]
+        for n in pluralSamples {
+            songs[String(n)] = String(localized: "\(n) songs")
+            albums[String(n)] = String(localized: "\(n) albums")
+        }
+        return ["songs": songs, "albums": albums]
     }
 
-    private static let template = #"""
-<!doctype html>
-<html lang="__LANG__" dir="__DIR__">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
-<title>Vespertine</title>
-<style>
-:root { --bg:#141417; --panel:#1e1e23; --line:#2c2c33; --text:#ecebe8; --dim:#9a988f; --accent:#c8a66a; }
-* { box-sizing:border-box; }
-body { margin:0; background:var(--bg); color:var(--text); font:16px/1.4 -apple-system, system-ui, sans-serif; padding-bottom:72px; }
-button { font:inherit; color:inherit; background:none; border:0; cursor:pointer; padding:0; }
-input { font:inherit; color:var(--text); background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 12px; width:100%; }
-.wrap { max-width:720px; margin:0 auto; padding:16px; }
-.hidden { display:none !important; }
-nav { position:fixed; bottom:0; left:0; right:0; display:flex; background:var(--panel); border-top:1px solid var(--line); padding-bottom:env(safe-area-inset-bottom); }
-nav button { flex:1; padding:14px 4px; color:var(--dim); font-size:13px; }
-nav button.on { color:var(--accent); }
-.banner { background:#3a2f1c; color:var(--accent); padding:8px 16px; text-align:center; font-size:14px; }
-.cover { width:100%; max-width:420px; aspect-ratio:1; border-radius:12px; background:var(--panel); display:block; margin:8px auto 16px; object-fit:cover; }
-h1 { font-size:22px; margin:0 0 4px; } .dim { color:var(--dim); } .small { font-size:13px; }
-.row { display:flex; align-items:center; gap:12px; }
-.transport { justify-content:center; gap:36px; margin:16px 0; font-size:30px; }
-.transport .big { font-size:48px; }
-.modes { justify-content:center; gap:24px; color:var(--dim); }
-.modes .on { color:var(--accent); }
-input[type=range] { width:100%; padding:0; border:0; background:none; accent-color:var(--accent); }
-.times { display:flex; justify-content:space-between; font-size:12px; color:var(--dim); font-variant-numeric:tabular-nums; }
-.list > * { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); width:100%; text-align:start; }
-.list img, .thumb { width:44px; height:44px; border-radius:4px; object-fit:cover; background:var(--panel); flex:none; }
-.grow { flex:1; min-width:0; } .ell { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:16px; }
-.grid button { text-align:start; } .grid img { width:100%; aspect-ratio:1; border-radius:6px; object-fit:cover; background:var(--panel); }
-.pill { border:1px solid var(--line); border-radius:999px; padding:8px 16px; }
-.check { color:var(--accent); }
-h2 { font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--dim); margin:20px 0 4px; }
-.code { font:600 32px ui-monospace, monospace; text-align:center; letter-spacing:.2em; }
-.toast { position:fixed; left:16px; right:16px; bottom:84px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px; text-align:center; }
-</style>
-</head>
-<body>
-<div id="banner" class="banner hidden"></div>
-<div id="pairing" class="wrap hidden">
-  <h1 data-t="pairTitle"></h1>
-  <p class="dim" data-t="pairHelp"></p>
-  <input id="code" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="123 456">
-  <p><button id="pairButton" class="pill" data-t="pair"></button></p>
-  <p id="pairError" class="dim"></p>
-</div>
-<main id="app" class="hidden">
-  <section id="tab-now" class="wrap">
-    <img id="cover" class="cover" alt="">
-    <h1 id="title"></h1>
-    <div id="subtitle" class="dim ell"></div>
-    <div id="format" class="dim small"></div>
-    <input id="position" type="range" min="0" max="1" step="0.1" value="0" aria-label="">
-    <div class="times"><span id="elapsed">0:00</span><span id="remaining">0:00</span></div>
-    <div class="row transport">
-      <button id="prev" aria-label="Previous">⏮</button>
-      <button id="playpause" class="big" aria-label="Play">▶</button>
-      <button id="next" aria-label="Next">⏭</button>
-    </div>
-    <div class="row modes">
-      <button id="shuffle" data-t="shuffle"></button>
-      <button id="repeat" data-t="repeat"></button>
-    </div>
-    <div id="volumeRow" class="row" style="margin-top:16px">
-      <button id="mute">🔈</button>
-      <input id="volume" type="range" min="0" max="1" step="0.01">
-      <button id="volDown" class="pill">−</button><button id="volUp" class="pill">+</button>
-    </div>
-    <p id="fixed" class="dim small hidden" data-t="fixedVolume"></p>
-    <p id="waiting" class="dim small"></p>
-    <p id="outputName" class="dim small"></p>
-  </section>
-  <section id="tab-library" class="wrap hidden">
-    <input id="search" type="search">
-    <div id="albumView" class="hidden">
-      <p><button id="backButton" class="pill" data-t="back"></button></p>
-      <h1 id="albumTitle"></h1><div id="albumArtist" class="dim"></div>
-      <p class="row"><button id="albumPlay" class="pill" data-t="play"></button><button id="albumShuffle" class="pill" data-t="shuffle"></button></p>
-      <div id="albumTracks" class="list"></div>
-    </div>
-    <div id="searchResults" class="list hidden"></div>
-    <div id="albumGrid">
-      <h2 data-t="albums"></h2>
-      <div id="albums" class="grid"></div>
-      <p><button id="moreAlbums" class="pill" data-t="more"></button></p>
-    </div>
-  </section>
-  <section id="tab-queue" class="wrap hidden">
-    <p><button id="clearQueue" class="pill" data-t="clear"></button></p>
-    <div id="queue"></div>
-  </section>
-  <section id="tab-output" class="wrap hidden">
-    <div id="outputs" class="list"></div>
-  </section>
-  <nav>
-    <button data-tab="now" class="on" data-t="nowPlaying"></button>
-    <button data-tab="library" data-t="library"></button>
-    <button data-tab="queue" data-t="queue"></button>
-    <button data-tab="output" data-t="output"></button>
-  </nav>
-</main>
-<div id="toast" class="toast hidden"></div>
-<script>
-const L = __STRINGS__;
-const $ = id => document.getElementById(id);
-document.title = L.title + " · " + L.mac;
-document.querySelectorAll("[data-t]").forEach(e => { e.textContent = L[e.dataset.t] || ""; });
-$("search").placeholder = L.search; $("position").setAttribute("aria-label", L.nowPlaying); $("volume").setAttribute("aria-label", L.volume);
-let player = null, queue = null, outputs = null, albums = [], albumTotal = null, openAlbum = null, scrubbing = false;
+    /// The language the page's words are in.
+    static var language: String { Bundle.main.preferredLocalizations.first ?? Locale.current.language.languageCode?.identifier ?? "en" }
 
-function el(tag, attrs, ...kids) { const e = document.createElement(tag); Object.assign(e, attrs || {}); kids.forEach(k => e.append(k)); return e; }
-function art(key, size) { return key ? "/artwork?key=" + encodeURIComponent(key) + "&size=" + size : ""; }
-function time(s) { s = Math.max(0, Math.floor(s || 0)); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = String(s % 60).padStart(2, "0"); return h ? h + ":" + String(m).padStart(2, "0") + ":" + x : m + ":" + x; }
-function toast(text) { if (!text) return; const t = $("toast"); t.textContent = text; t.classList.remove("hidden"); clearTimeout(toast.timer); toast.timer = setTimeout(() => t.classList.add("hidden"), 4000); }
+    /// What the page may load and talk to: itself. Nothing from anywhere else runs or is fetched, and nothing frames it.
+    static let contentSecurityPolicy = "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src 'self' data:; "
+        + "connect-src 'self'; manifest-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
 
-async function send(command) {
-  try {
-    const r = await fetch("/command", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(command) });
-    if (r.status === 401) return start();
-    const reply = await r.json();
-    if (reply.failed) toast(reply.failed.reason);
-    return reply;
-  } catch (e) { toast(L.offline); }
+    static func html(serverName: String) -> String {
+        var words: [String: Any] = strings
+        words["mac"] = serverName
+        words["plurals"] = plurals
+        let language = language
+        let rtl = Locale.Language(identifier: language).characterDirection == .rightToLeft
+        // "unspaced": Arabic, Indic and Thai letters join or stack, so labels get no letter spacing (as in the Mac's own).
+        return template
+            .replacingOccurrences(of: "__STRINGS__", with: scriptJSON(words))
+            .replacingOccurrences(of: "__LANG__", with: language)
+            .replacingOccurrences(of: "__DIR__", with: rtl ? "rtl" : "ltr")
+            .replacingOccurrences(of: "__SPACED__", with: Locale.spacesLetters ? "spaced" : "unspaced")
+    }
+
+    /// JSON that can sit inside a <script> element: "<" must not end the element early.
+    static func scriptJSON(_ value: Any) -> String {
+        let json = (try? JSONSerialization.data(withJSONObject: value, options: [.sortedKeys])).map { String(decoding: $0, as: UTF8.self) } ?? "{}"
+        return json.replacingOccurrences(of: "<", with: "\\u003c")
+    }
+
+    /// The web app manifest: what a phone needs to keep the remote on its home screen and open it without browser bars.
+    static func manifest() -> Data {
+        let manifest: [String: Any] = [
+            "name": strings["title"] ?? "Vespertine Remote",
+            "short_name": "Vespertine",
+            "lang": language,
+            "id": "/",
+            "start_url": "/",
+            "scope": "/",
+            "display": "standalone",
+            "orientation": "any",
+            "background_color": "#09090A",
+            "theme_color": "#09090A",
+            "icons": [
+                ["src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"],
+                ["src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"],
+                ["src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"],
+            ],
+        ]
+        return (try? JSONSerialization.data(withJSONObject: manifest, options: [.sortedKeys])) ?? Data("{}".utf8)
+    }
+
+    /// The page with its style and script in it: one request, as the server answers one per connection.
+    private static let template: String = {
+        func resource(_ name: String, _ type: String) -> String? {
+            let bundles = [Bundle.main, Bundle(for: RemoteWebServer.self)]
+            for bundle in bundles {
+                if let url = bundle.url(forResource: name, withExtension: type), let text = try? String(contentsOf: url, encoding: .utf8) { return text }
+            }
+            return nil
+        }
+        guard let page = resource("RemoteWeb", "html"), let style = resource("RemoteWeb", "css"), let script = resource("RemoteWeb", "js") else {
+            return "<!doctype html><html lang=\"__LANG__\" dir=\"__DIR__\"><meta charset=\"utf-8\"><title>Vespertine</title><p>Vespertine Remote</p></html>"
+        }
+        // The script goes in last and whole: its own text is never searched for the page's placeholders but the words'.
+        return page.replacingOccurrences(of: "/*__STYLE__*/", with: style).replacingOccurrences(of: "/*__SCRIPT__*/", with: script)
+    }()
 }
 
-function position() {
-  if (!player) return 0;
-  let p = player.position;
-  if (player.playback === "playing" && !player.loading) p += Date.now() / 1000 - player.positionAt;
-  return player.duration > 0 ? Math.min(p, player.duration) : p;
-}
+/// The remote's icon for a phone's home screen: the brass crescent on obsidian, drawn here so no image file is needed.
+enum RemoteWebIcon {
+    /// The paths the icons are served at, and each one's size in pixels.
+    static let sizes: [String: Int] = ["/icon-192.png": 192, "/icon-512.png": 512, "/icon-maskable-512.png": 512, "/apple-touch-icon.png": 180]
 
-function renderPlayer() {
-  const p = player, t = p && p.nowPlaying && p.nowPlaying.track;
-  $("title").textContent = t ? t.title : L.nothing;
-  $("subtitle").textContent = t ? t.artist + " — " + t.album : "";
-  $("format").textContent = t ? t.format + (p.signal ? " · " + p.signal.badge : "") : "";
-  const src = t ? art(t.artworkKey, 900) : "";
-  if ($("cover").dataset.src !== src) { $("cover").dataset.src = src; if (src) $("cover").src = src; else $("cover").removeAttribute("src"); }
-  $("playpause").textContent = p && p.playback === "playing" ? "⏸" : "▶";
-  $("shuffle").classList.toggle("on", !!(p && p.shuffle));
-  $("repeat").classList.toggle("on", !!(p && p.repeatMode !== "off"));
-  $("repeat").textContent = L.repeat + (p && p.repeatMode === "one" ? " 1" : "");
-  const v = p && p.volume, fixed = !v || v.route === "fixed";
-  $("volumeRow").classList.toggle("hidden", fixed); $("fixed").classList.toggle("hidden", !fixed);
-  if (v && !fixed) {
-    const hasLevel = v.level !== null && v.level !== undefined;
-    $("volume").classList.toggle("hidden", !hasLevel); $("volDown").classList.toggle("hidden", hasLevel); $("volUp").classList.toggle("hidden", hasLevel);
-    if (hasLevel && document.activeElement !== $("volume")) $("volume").value = v.level;
-    $("mute").textContent = v.muted ? "🔇" : "🔈";
-  }
-  $("waiting").textContent = p && p.waitingFor ? L.waiting.replace("%@", p.waitingFor) : "";
-  $("outputName").textContent = p && p.output ? p.output : "";
-  tick();
-}
+    /// The crescent of docs/brand/mark.svg, in its 512-unit square (y down).
+    private static let crescent: [(CGFloat, CGFloat, CGFloat, CGFloat, CGFloat, CGFloat)] = [
+        (441.48, 409.04, 403.76, 419.84, 363.52, 419.84), (241.93, 419.84, 143.36, 321.27, 143.36, 199.68),
+        (143.36, 111.66, 195.01, 35.71, 269.78, 0.70), (265.28, 0.12, 260.65, 0, 256, 0), (114.62, 0, 0, 114.62, 0, 256),
+        (0, 397.38, 114.62, 512, 256, 512), (348.18, 512, 428.99, 463.28, 473.82, 390.01),
+    ]
+    private static let crescentPath = "M473.82 390.01" + crescent.map { "C\($0.0) \($0.1) \($0.2) \($0.3) \($0.4) \($0.5)" }.joined() + "Z"
 
-function tick() {
-  if (!player || scrubbing) return;
-  $("position").max = Math.max(player.duration, 1); $("position").value = position();
-  $("elapsed").textContent = time(position()); $("remaining").textContent = "-" + time(player.duration - position());
-}
-setInterval(tick, 500);
+    static let svg = """
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1">\
+        <stop offset="0" stop-color="#F0DAAA"/><stop offset="0.55" stop-color="#C8A66A"/><stop offset="1" stop-color="#7C6541"/></linearGradient></defs>\
+        <rect width="512" height="512" rx="112" fill="#09090A"/><g transform="translate(128 128) scale(0.5)"><path fill="url(#b)" d="\(crescentPath)"/></g></svg>
+        """
 
-function trackRow(t, onPlay, extra) {
-  const row = el("button", { onclick: onPlay }, el("img", { src: art(t.artworkKey, 120), alt: "" }),
-    el("div", { className: "grow" }, el("div", { className: "ell", textContent: t.title }), el("div", { className: "dim small ell", textContent: t.artist + " — " + t.album })),
-    el("span", { className: "dim small", textContent: time(t.duration) }));
-  if (extra) row.append(extra);
-  return row;
-}
+    private static var cache: [String: Data] = [:]
 
-function renderQueue() {
-  const box = $("queue"); box.replaceChildren();
-  if (!queue) return;
-  const section = (title, items) => {
-    if (!items.length) return;
-    box.append(el("h2", { textContent: title }));
-    const list = el("div", { className: "list" });
-    items.forEach(i => list.append(trackRow(i.track, () => send({ jump: { entry: i.entry } }),
-      el("span", { className: "dim small", textContent: "✕", title: L.remove, onclick: e => { e.stopPropagation(); send({ removeFromQueue: { entries: [i.entry] } }); } }))));
-    box.append(list);
-  };
-  if (queue.current) section(L.nowPlaying, [queue.current]);
-  section(L.playingNext, queue.playingNext);
-  section(queue.playingNext.length ? L.continuePlaying : L.upNext, queue.continuing);
-  if (!queue.current && !queue.playingNext.length && !queue.continuing.length) box.append(el("p", { className: "dim", textContent: L.empty }));
-}
+    static func png(path: String) -> Data? {
+        if let made = cache[path] { return made }
+        guard let size = sizes[path], let data = png(size: size, maskable: path.contains("maskable") || path.contains("apple")) else { return nil }
+        cache[path] = data
+        return data
+    }
 
-function renderOutputs() {
-  const box = $("outputs"); box.replaceChildren();
-  (outputs ? outputs.outputs : []).forEach(o => box.append(el("button", { onclick: () => send({ selectOutput: o.uid === null || o.uid === undefined ? {} : { uid: o.uid } }) },
-    el("div", { className: "grow" }, el("div", { textContent: o.name }), el("div", { className: "dim small", textContent: o.detail })),
-    el("span", { className: "check", textContent: o.selected ? "✓" : "" }))));
-}
-
-async function loadAlbums() {
-  if (albumTotal !== null && albums.length >= albumTotal) return;
-  const r = await send({ albums: { offset: albums.length, limit: 120 } });
-  if (!r || !r.albums) return;
-  albums = albums.concat(r.albums.items); albumTotal = r.albums.total;
-  r.albums.items.forEach(a => $("albums").append(el("button", { onclick: () => showAlbum(a) },
-    el("img", { src: art(a.artworkKey, 300), alt: "", loading: "lazy" }), el("div", { className: "ell", textContent: a.title }), el("div", { className: "dim small ell", textContent: a.artist }))));
-  $("moreAlbums").classList.toggle("hidden", albums.length >= albumTotal);
-}
-
-async function showAlbum(a) {
-  openAlbum = a; $("albumGrid").classList.add("hidden"); $("albumView").classList.remove("hidden");
-  $("albumTitle").textContent = a.title; $("albumArtist").textContent = a.artist; $("albumTracks").replaceChildren();
-  const r = await send({ albumTracks: { key: a.key } });
-  (r && r.tracks ? r.tracks.items : []).forEach((t, i) => $("albumTracks").append(trackRow(t, () => send({ playAlbum: { key: a.key, startAt: i, shuffled: false } }), queueMenu(t))));
-}
-
-function queueMenu(t) {
-  if (t.id === null || t.id === undefined) return null;
-  return el("span", { className: "row small dim" },
-    el("span", { textContent: "⤴", title: L.playNext, onclick: e => { e.stopPropagation(); send({ playNext: { ids: [t.id] } }); } }),
-    el("span", { textContent: "＋", title: L.addToQueue, onclick: e => { e.stopPropagation(); send({ addToQueue: { ids: [t.id] } }); } }));
-}
-
-let searchTimer;
-$("search").oninput = () => {
-  clearTimeout(searchTimer);
-  const text = $("search").value.trim();
-  $("searchResults").classList.toggle("hidden", !text); $("albumGrid").classList.toggle("hidden", !!text || !!openAlbum);
-  if (!text) return;
-  searchTimer = setTimeout(async () => {
-    const r = await send({ search: { text: text, limit: 200 } });
-    const items = r && r.tracks ? r.tracks.items : [];
-    $("searchResults").replaceChildren(...items.map((t, i) => trackRow(t, () => send({ playTracks: { ids: items.map(x => x.id).filter(x => x !== null && x !== undefined), startAt: i } }), queueMenu(t))));
-  }, 300);
-};
-
-$("backButton").onclick = () => { openAlbum = null; $("albumView").classList.add("hidden"); $("albumGrid").classList.remove("hidden"); };
-$("albumPlay").onclick = () => openAlbum && send({ playAlbum: { key: openAlbum.key, startAt: 0, shuffled: false } });
-$("albumShuffle").onclick = () => openAlbum && send({ playAlbum: { key: openAlbum.key, startAt: 0, shuffled: true } });
-$("moreAlbums").onclick = loadAlbums;
-$("clearQueue").onclick = () => send({ clearUpcoming: {} });
-$("prev").onclick = () => send({ previous: {} });
-$("next").onclick = () => send({ next: {} });
-$("playpause").onclick = () => send({ playPause: {} });
-$("shuffle").onclick = () => send({ setShuffle: { on: !(player && player.shuffle) } });
-$("repeat").onclick = () => { const m = player ? player.repeatMode : "off"; send({ setRepeat: { mode: m === "off" ? "all" : m === "all" ? "one" : "off" } }); };
-$("mute").onclick = () => send({ volume: { action: "mute" } });
-$("volDown").onclick = () => send({ volume: { action: "down" } });
-$("volUp").onclick = () => send({ volume: { action: "up" } });
-$("volume").onchange = () => send({ setVolume: { level: parseFloat($("volume").value) } });
-$("position").oninput = () => { scrubbing = true; $("elapsed").textContent = time($("position").value); };
-$("position").onchange = () => { send({ seek: { seconds: parseFloat($("position").value) } }); setTimeout(() => { scrubbing = false; }, 800); };
-document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
-  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
-  ["now", "library", "queue", "output"].forEach(t => $("tab-" + t).classList.toggle("hidden", t !== b.dataset.tab));
-  if (b.dataset.tab === "library" && !albums.length) loadAlbums();
-});
-
-$("pairButton").onclick = async () => {
-  $("pairError").textContent = "";
-  const r = await fetch("/pair", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: $("code").value, name: navigator.platform || "" }) });
-  if (r.ok) return start();
-  try { $("pairError").textContent = (await r.json()).error; } catch (e) {}
-};
-$("code").onkeydown = e => { if (e.key === "Enter") $("pairButton").click(); };
-
-let events;
-async function start() {
-  if (events) { events.close(); events = null; }
-  let r;
-  try { r = await fetch("/session"); } catch (e) { $("banner").textContent = L.offline; $("banner").classList.remove("hidden"); return setTimeout(start, 3000); }
-  if (r.status === 401) { $("pairing").classList.remove("hidden"); $("app").classList.add("hidden"); $("code").focus(); return; }
-  $("pairing").classList.add("hidden"); $("app").classList.remove("hidden"); $("banner").classList.add("hidden");
-  events = new EventSource("/events");
-  events.addEventListener("player", e => { player = JSON.parse(e.data); renderPlayer(); });
-  events.addEventListener("queue", e => { queue = JSON.parse(e.data); renderQueue(); });
-  events.addEventListener("outputs", e => { outputs = JSON.parse(e.data); renderOutputs(); });
-  events.onopen = () => $("banner").classList.add("hidden");
-  events.onerror = () => { $("banner").textContent = L.offline; $("banner").classList.remove("hidden"); };
-}
-start();
-</script>
-</body>
-</html>
-"""#
+    /// A square PNG: obsidian from edge to edge (a phone cuts its own corners), the crescent in the middle. A maskable
+    /// icon keeps the crescent inside the circle every launcher shows.
+    static func png(size: Int, maskable: Bool) -> Data? {
+        let space = CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB()
+        guard size > 0, size <= 1024,
+              let context = CGContext(data: nil, width: size, height: size, bitsPerComponent: 8, bytesPerRow: 0, space: space,
+                                      bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue) else { return nil }
+        let side = CGFloat(size)
+        context.setFillColor(CGColor(srgbRed: 0x09 / 255.0, green: 0x09 / 255.0, blue: 0x0A / 255.0, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: side, height: side))
+        // A faint lift behind the mark, as on the app's icon.
+        if let glow = CGGradient(colorsSpace: space, colors: [CGColor(srgbRed: 0.11, green: 0.11, blue: 0.13, alpha: 1),
+                                                             CGColor(srgbRed: 0x09 / 255.0, green: 0x09 / 255.0, blue: 0x0A / 255.0, alpha: 1)] as CFArray, locations: [0, 1]) {
+            context.drawRadialGradient(glow, startCenter: CGPoint(x: side / 2, y: side / 2), startRadius: 0,
+                                       endCenter: CGPoint(x: side / 2, y: side / 2), endRadius: side * 0.62, options: [])
+        }
+        let scale = side * (maskable ? 0.46 : 0.54) / 512
+        let inset = (side - 512 * scale) / 2
+        // The mark's coordinates have y down; a bitmap context has y up.
+        context.translateBy(x: inset, y: side - inset)
+        context.scaleBy(x: scale, y: -scale)
+        let path = CGMutablePath()
+        path.move(to: CGPoint(x: 473.82, y: 390.01))
+        for c in crescent { path.addCurve(to: CGPoint(x: c.4, y: c.5), control1: CGPoint(x: c.0, y: c.1), control2: CGPoint(x: c.2, y: c.3)) }
+        path.closeSubpath()
+        context.addPath(path)
+        context.clip()
+        let colors = [CGColor(srgbRed: 0xF0 / 255.0, green: 0xDA / 255.0, blue: 0xAA / 255.0, alpha: 1),
+                      CGColor(srgbRed: 0xC8 / 255.0, green: 0xA6 / 255.0, blue: 0x6A / 255.0, alpha: 1),
+                      CGColor(srgbRed: 0x7C / 255.0, green: 0x65 / 255.0, blue: 0x41 / 255.0, alpha: 1)] as CFArray
+        if let brass = CGGradient(colorsSpace: space, colors: colors, locations: [0, 0.55, 1]) {
+            context.drawLinearGradient(brass, start: CGPoint(x: 0, y: 0), end: CGPoint(x: 512, y: 512), options: [])
+        }
+        guard let image = context.makeImage() else { return nil }
+        let data = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(data, UTType.png.identifier as CFString, 1, nil) else { return nil }
+        CGImageDestinationAddImage(destination, image, nil)
+        return CGImageDestinationFinalize(destination) ? data as Data : nil
+    }
 }

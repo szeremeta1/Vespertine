@@ -270,10 +270,31 @@ public struct PlaylistSummary: Codable, Sendable, Equatable, Identifiable {
     public var id: Int64
     public var name: String
     public var smart: Bool
+    /// How many songs it has; nil from an older Mac, which doesn't say.
+    public var trackCount: Int?
+    /// Up to four covers of its songs, for a tile; nil from an older Mac.
+    public var artworkKeys: [String]?
 
-    public init(id: Int64, name: String, smart: Bool) {
+    public init(id: Int64, name: String, smart: Bool, trackCount: Int? = nil, artworkKeys: [String]? = nil) {
         self.id = id
         self.name = name
         self.smart = smart
+        self.trackCount = trackCount
+        self.artworkKeys = artworkKeys
+    }
+}
+
+/// What a search found, in groups (the answer to `RemoteCommand.find`).
+public struct SearchResults: Codable, Sendable, Equatable {
+    public var tracks: [TrackSummary]
+    public var albums: [AlbumSummary]
+    public var artists: [ArtistSummary]
+    public var playlists: [PlaylistSummary]
+
+    public init(tracks: [TrackSummary], albums: [AlbumSummary], artists: [ArtistSummary], playlists: [PlaylistSummary]) {
+        self.tracks = tracks
+        self.albums = albums
+        self.artists = artists
+        self.playlists = playlists
     }
 }

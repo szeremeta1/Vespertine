@@ -212,7 +212,7 @@ public final class DemoMac: RemoteChannel {
             let theirs = albums.filter { $0.summary.artist == name }.map(\.summary)
             return .albums(items: theirs, total: theirs.count)
         case .playlists:
-            return .playlists(items: playlists.map(\.0))
+            return .playlists(items: playlists.map(summary))
         case .playlistTracks(let id):
             guard let playlist = playlists.first(where: { $0.0.id == id }) else { return notInLibrary }
             return .tracks(items: playlist.1.compactMap { tracks[$0] })
@@ -226,6 +226,38 @@ public final class DemoMac: RemoteChannel {
                 return words.allSatisfy { haystack.contains($0) }
             }
             return .tracks(items: Array(found.prefix(min(max(1, limit), 500))))
+        case .songs(let offset, let limit):
+            let songs = allTracks.sorted { ($0.title, $0.id ?? 0) < ($1.title, $1.id ?? 0) }
+            let start = min(max(0, offset), songs.count)
+            let end = min(songs.count, start + min(max(1, limit), 500))
+            return .songs(items: Array(songs[start..<end]), total: songs.count)
+        case .find(let text, let limit):
+            let words = text.lowercased().split(separator: " ").map(String.init)
+            guard !words.isEmpty else { return .found(SearchResults(tracks: [], albums: [], artists: [], playlists: [])) }
+            let limit = min(max(1, limit), 500)
+            func matches(_ haystack: String) -> Bool { words.allSatisfy { haystack.lowercased().contains($0) } }
+            let artists = Array(Set(albums.map(\.summary.artist))).sorted().filter(matches).map { name in
+                let theirs = albums.filter { $0.summary.artist == name }
+                return ArtistSummary(name: name, albumCount: theirs.count, artworkKey: theirs.first?.summary.artworkKey)
+            }
+            return .found(SearchResults(
+                tracks: Array(allTracks.filter { matches("\($0.title) \($0.artist) \($0.album)") }.prefix(limit)),
+                albums: Array(albums.map(\.summary).filter { matches("\($0.title) \($0.artist)") }.prefix(limit)),
+                artists: Array(artists.prefix(limit)),
+                playlists: Array(playlists.map(summary).filter { matches($0.name) }.prefix(limit))))
+        case .addToPlaylist(let id, let ids):
+            guard let index = playlists.firstIndex(where: { $0.0.id == id }) else { return notInLibrary }
+            guard !playlists[index].0.smart else { return .failed(reason: "A smart playlist chooses its own songs.") }
+            let known = ids.filter { tracks[$0] != nil }
+            guard !known.isEmpty else { return notInLibrary }
+            playlists[index].1.append(contentsOf: known)
+            return .ok
+        case .createPlaylist(let name, let ids):
+            let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty else { return .failed(reason: "A playlist needs a name.") }
+            let id = (playlists.map(\.0.id).max() ?? 0) + 1
+            playlists.append((PlaylistSummary(id: id, name: String(trimmed.prefix(200)), smart: false), ids.filter { tracks[$0] != nil }))
+            return .playlists(items: playlists.map(summary))
         case .artwork(let key, let size):
             guard albums.contains(where: { $0.summary.artworkKey == key }), let data = artwork(key, size) else {
                 return .failed(reason: "")
@@ -377,6 +409,16 @@ public final class DemoMac: RemoteChannel {
     private static func deviceFormat(for format: String) -> String {
         if format.hasPrefix("DSD") { return format.replacingOccurrences(of: " ", with: "") }
         return format.components(separatedBy: " · ").dropFirst().first ?? format
+    }
+
+    /// A playlist as the Mac lists it: with its song count and up to four covers for a tile.
+    private func summary(_ playlist: (PlaylistSummary, [Int64])) -> PlaylistSummary {
+        var summary = playlist.0
+        summary.trackCount = playlist.1.count
+        var covers: [String] = []
+        for key in playlist.1.compactMap({ tracks[$0]?.artworkKey }) where !covers.contains(key) && covers.count < 4 { covers.append(key) }
+        summary.artworkKeys = covers
+        return summary
     }
 
     private var allTracks: [TrackSummary] {
