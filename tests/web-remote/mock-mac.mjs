@@ -29,7 +29,9 @@ export function words(lang = "en") {
   }
   const plural = key => {
     const forms = {};
-    const variants = catalog[key]?.localizations?.[lang]?.variations?.plural || catalog[key]?.localizations?.en?.variations?.plural || {};
+    // A language without plural forms (Japanese) has one string; the others have a variant for each form.
+    const own = catalog[key]?.localizations?.[lang] || catalog[key]?.localizations?.en || {};
+    const variants = own.variations?.plural || { other: own };
     const rules = new Intl.PluralRules(lang);
     for (const n of [0, 1, 2, 3, 5, 11, 20, 100]) {
       const form = (variants[rules.select(n)] || variants.other)?.stringUnit?.value || key;
