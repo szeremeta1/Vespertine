@@ -117,7 +117,8 @@ struct ConnectServerSheet: View {
                 Button("Connect", action: connect)
                     .buttonStyle(BrassButtonStyle())
                     .keyboardShortcut(.defaultAction)
-                    .disabled(share == nil || connecting)
+                    // Enabled for any typed address, so pressing it on one that can't be read says why (see connect()).
+                    .disabled(address.trimmingCharacters(in: .whitespaces).isEmpty || connecting)
             }
             .padding(.horizontal, 22).padding(.vertical, 16)
         }
