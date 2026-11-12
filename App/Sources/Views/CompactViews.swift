@@ -165,16 +165,24 @@ struct DarkWindowAppearance: NSViewRepresentable {
 
 // MARK: - Settings
 
+/// The Settings window's tabs; `AppModel.settingsTab` is the one showing (the setup assistant opens Settings on one).
+enum SettingsTab: Hashable {
+    case playback, library, network, online, remote, updates, about
+}
+
 struct SettingsView: View {
+    @Environment(AppModel.self) private var model
+
     var body: some View {
-        TabView {
-            PlaybackSettings().tabItem { Label("Playback", systemImage: "hifispeaker.2") }
-            LibrarySettings().tabItem { Label("Library", systemImage: "books.vertical") }
-            NetworkSettings().tabItem { Label("Network", systemImage: "server.rack") }
-            OnlineSettings().tabItem { Label("Online", systemImage: "globe") }
-            RemoteSettingsView().tabItem { Label("Remote", systemImage: "iphone") }
-            UpdateSettings().tabItem { Label("Updates", systemImage: "arrow.down.circle") }
-            AboutSettings().tabItem { Label("About", systemImage: "info.circle") }
+        @Bindable var model = model
+        TabView(selection: $model.settingsTab) {
+            PlaybackSettings().tabItem { Label("Playback", systemImage: "hifispeaker.2") }.tag(SettingsTab.playback)
+            LibrarySettings().tabItem { Label("Library", systemImage: "books.vertical") }.tag(SettingsTab.library)
+            NetworkSettings().tabItem { Label("Network", systemImage: "server.rack") }.tag(SettingsTab.network)
+            OnlineSettings().tabItem { Label("Online", systemImage: "globe") }.tag(SettingsTab.online)
+            RemoteSettingsView().tabItem { Label("Remote", systemImage: "iphone") }.tag(SettingsTab.remote)
+            UpdateSettings().tabItem { Label("Updates", systemImage: "arrow.down.circle") }.tag(SettingsTab.updates)
+            AboutSettings().tabItem { Label("About", systemImage: "info.circle") }.tag(SettingsTab.about)
         }
         .frame(width: 560, height: 460)
     }
