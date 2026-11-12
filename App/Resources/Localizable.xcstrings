@@ -148148,270 +148148,270 @@
         }
       }
     },
-    "Copies the selected files into ~/Music/Vespertine as Artist / Album / Track. On the same drive the copies are APFS clones and take no extra space. Your originals are never changed.": {
+    "Copies the selected files into %@ as Artist / Album / Track. On the same drive the copies are APFS clones and take no extra space. Your originals are never changed.": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "የተመረጡትን ፋይሎች ወደ ~/Music/Vespertine እንደ አርቲስት / አልበም / ትራክ ይቀዳል። በአንድ ድራይቭ ላይ ቅጂዎቹ የAPFS ክሎኖች ስለሆኑ ተጨማሪ ቦታ አይይዙም። ኦሪጅናል ፋይሎችዎ በፍጹም አይቀየሩም።"
+            "value": "የተመረጡትን ፋይሎች ወደ %@ እንደ አርቲስት / አልበም / ትራክ ይቀዳል። በአንድ ድራይቭ ላይ ቅጂዎቹ የAPFS ክሎኖች ስለሆኑ ተጨማሪ ቦታ አይይዙም። ኦሪጅናል ፋይሎችዎ በፍጹም አይቀየሩም።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "ينسخ الملفات المحددة إلى ~/Music/Vespertine بترتيب الفنان / الألبوم / المقطوعة. على القرص نفسه تكون النسخ مستنسخات APFS ولا تشغل مساحة إضافية. لا يتم تغيير ملفاتك الأصلية أبدًا."
+            "value": "ينسخ الملفات المحددة إلى %@ بترتيب الفنان / الألبوم / المقطوعة. على القرص نفسه تكون النسخ مستنسخات APFS ولا تشغل مساحة إضافية. لا يتم تغيير ملفاتك الأصلية أبدًا."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "নির্বাচিত ফাইলগুলো ~/Music/Vespertine-এ শিল্পী / অ্যালবাম / ট্র্যাক হিসেবে কপি করে। একই ড্রাইভে কপিগুলো APFS ক্লোন হয় এবং বাড়তি জায়গা নেয় না। আপনার মূল ফাইলগুলো কখনো পরিবর্তন করা হয় না।"
+            "value": "নির্বাচিত ফাইলগুলো %@-এ শিল্পী / অ্যালবাম / ট্র্যাক হিসেবে কপি করে। একই ড্রাইভে কপিগুলো APFS ক্লোন হয় এবং বাড়তি জায়গা নেয় না। আপনার মূল ফাইলগুলো কখনো পরিবর্তন করা হয় না।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zkopíruje vybrané soubory do ~/Music/Vespertine ve struktuře Interpret / Album / Skladba. Na stejném disku jsou kopie klony APFS a nezabírají žádné místo navíc. Originály se nikdy nemění."
+            "value": "Zkopíruje vybrané soubory do %@ ve struktuře Interpret / Album / Skladba. Na stejném disku jsou kopie klony APFS a nezabírají žádné místo navíc. Originály se nikdy nemění."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kopierer de valgte filer til ~/Musik/Vespertine som Kunstner / Album / Nummer. På samme drev er kopierne APFS-kloner og fylder ikke ekstra. Dine originaler ændres aldrig."
+            "value": "Kopierer de valgte filer til %@ som Kunstner / Album / Nummer. På samme drev er kopierne APFS-kloner og fylder ikke ekstra. Dine originaler ændres aldrig."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kopiert die ausgewählten Dateien nach ~/Music/Vespertine als Künstler / Album / Titel. Auf demselben Laufwerk sind die Kopien APFS-Klone und belegen keinen zusätzlichen Platz. Deine Originale werden nie verändert."
+            "value": "Kopiert die ausgewählten Dateien nach %@ als Künstler / Album / Titel. Auf demselben Laufwerk sind die Kopien APFS-Klone und belegen keinen zusätzlichen Platz. Deine Originale werden nie verändert."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Αντιγράφει τα επιλεγμένα αρχεία στο ~/Music/Vespertine ως Καλλιτέχνης / Άλμπουμ / Κομμάτι. Στον ίδιο δίσκο τα αντίγραφα είναι κλώνοι APFS και δεν καταλαμβάνουν επιπλέον χώρο. Τα πρωτότυπά σας δεν αλλάζουν ποτέ."
+            "value": "Αντιγράφει τα επιλεγμένα αρχεία στο %@ ως Καλλιτέχνης / Άλμπουμ / Κομμάτι. Στον ίδιο δίσκο τα αντίγραφα είναι κλώνοι APFS και δεν καταλαμβάνουν επιπλέον χώρο. Τα πρωτότυπά σας δεν αλλάζουν ποτέ."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Copia los archivos seleccionados en ~/Music/Vespertine como Artista / Álbum / Pista. En el mismo disco, las copias son clones APFS y no ocupan espacio adicional. Tus originales nunca se modifican."
+            "value": "Copia los archivos seleccionados en %@ como Artista / Álbum / Pista. En el mismo disco, las copias son clones APFS y no ocupan espacio adicional. Tus originales nunca se modifican."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "فایل‌های انتخاب‌شده را با ساختار هنرمند / آلبوم / قطعه در ~/Music/Vespertine کپی می‌کند. روی همان درایو، کپی‌ها کلون APFS هستند و فضای اضافه‌ای نمی‌گیرند. فایل‌های اصلی شما هرگز تغییر نمی‌کنند."
+            "value": "فایل‌های انتخاب‌شده را با ساختار هنرمند / آلبوم / قطعه در %@ کپی می‌کند. روی همان درایو، کپی‌ها کلون APFS هستند و فضای اضافه‌ای نمی‌گیرند. فایل‌های اصلی شما هرگز تغییر نمی‌کنند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kopioi valitut tiedostot kansioon ~/Musiikki/Vespertine muodossa Artisti / Albumi / Raita. Samalla asemalla kopiot ovat APFS-klooneja eivätkä vie lisätilaa. Alkuperäisiä tiedostojasi ei koskaan muuteta."
+            "value": "Kopioi valitut tiedostot kansioon %@ muodossa Artisti / Albumi / Raita. Samalla asemalla kopiot ovat APFS-klooneja eivätkä vie lisätilaa. Alkuperäisiä tiedostojasi ei koskaan muuteta."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kinokopya ang mga napiling file sa ~/Music/Vespertine bilang Artist / Album / Track. Sa parehong drive, APFS clone ang mga kopya at hindi gumagamit ng dagdag na espasyo. Hindi kailanman binabago ang mga orihinal mo."
+            "value": "Kinokopya ang mga napiling file sa %@ bilang Artist / Album / Track. Sa parehong drive, APFS clone ang mga kopya at hindi gumagamit ng dagdag na espasyo. Hindi kailanman binabago ang mga orihinal mo."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Copie les fichiers sélectionnés dans ~/Music/Vespertine selon Artiste / Album / Morceau. Sur le même disque, les copies sont des clones APFS et n’occupent aucun espace supplémentaire. Vos originaux ne sont jamais modifiés."
+            "value": "Copie les fichiers sélectionnés dans %@ selon Artiste / Album / Morceau. Sur le même disque, les copies sont des clones APFS et n’occupent aucun espace supplémentaire. Vos originaux ne sont jamais modifiés."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "પસંદ કરેલી ફાઇલોને ~/Music/Vespertine માં કલાકાર / આલ્બમ / ટ્રૅક રૂપે કૉપિ કરે છે. એ જ ડ્રાઇવ પર કૉપિ APFS ક્લોન હોય છે અને વધારાની જગ્યા લેતી નથી. તમારી મૂળ ફાઇલો ક્યારેય બદલાતી નથી."
+            "value": "પસંદ કરેલી ફાઇલોને %@ માં કલાકાર / આલ્બમ / ટ્રૅક રૂપે કૉપિ કરે છે. એ જ ડ્રાઇવ પર કૉપિ APFS ક્લોન હોય છે અને વધારાની જગ્યા લેતી નથી. તમારી મૂળ ફાઇલો ક્યારેય બદલાતી નથી."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yana kwafa fayilolin da aka zaɓa zuwa ~/Music/Vespertine a matsayin Mawaƙi / Kundi / Waƙa. A kan faifan ajiya ɗaya, kwafin APFS clones ne kuma ba sa ɗaukar ƙarin wuri. Ba a taɓa canza fayilolinku na asali."
+            "value": "Yana kwafa fayilolin da aka zaɓa zuwa %@ a matsayin Mawaƙi / Kundi / Waƙa. A kan faifan ajiya ɗaya, kwafin APFS clones ne kuma ba sa ɗaukar ƙarin wuri. Ba a taɓa canza fayilolinku na asali."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "מעתיק את הקבצים שנבחרו אל ~/Music/Vespertine במבנה אמן / אלבום / רצועה. באותו כונן, העותקים הם שכפולי APFS ואינם תופסים שטח נוסף. הקבצים המקוריים שלך לעולם אינם משתנים."
+            "value": "מעתיק את הקבצים שנבחרו אל %@ במבנה אמן / אלבום / רצועה. באותו כונן, העותקים הם שכפולי APFS ואינם תופסים שטח נוסף. הקבצים המקוריים שלך לעולם אינם משתנים."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "चुनी गई फ़ाइलों को ~/Music/Vespertine में कलाकार / एल्बम / ट्रैक के क्रम में कॉपी करता है। उसी ड्राइव पर ये कॉपी APFS क्लोन होती हैं और कोई अतिरिक्त जगह नहीं लेतीं। आपकी मूल फ़ाइलें कभी नहीं बदली जातीं।"
+            "value": "चुनी गई फ़ाइलों को %@ में कलाकार / एल्बम / ट्रैक के क्रम में कॉपी करता है। उसी ड्राइव पर ये कॉपी APFS क्लोन होती हैं और कोई अतिरिक्त जगह नहीं लेतीं। आपकी मूल फ़ाइलें कभी नहीं बदली जातीं।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A kijelölt fájlokat a ~/Music/Vespertine mappába másolja Előadó / Album / Szám szerkezetben. Ugyanazon a meghajtón a másolatok APFS-klónok, és nem foglalnak további helyet. Az eredeti fájlok sosem módosulnak."
+            "value": "A kijelölt fájlokat a %@ mappába másolja Előadó / Album / Szám szerkezetben. Ugyanazon a meghajtón a másolatok APFS-klónok, és nem foglalnak további helyet. Az eredeti fájlok sosem módosulnak."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Menyalin file yang dipilih ke ~/Music/Vespertine sebagai Artis / Album / Trek. Di drive yang sama, salinannya adalah klon APFS dan tidak memakan ruang tambahan. File asli Anda tidak pernah diubah."
+            "value": "Menyalin file yang dipilih ke %@ sebagai Artis / Album / Trek. Di drive yang sama, salinannya adalah klon APFS dan tidak memakan ruang tambahan. File asli Anda tidak pernah diubah."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Copia i file selezionati in ~/Music/Vespertine come Artista / Album / Brano. Sullo stesso disco le copie sono cloni APFS e non occupano spazio aggiuntivo. Gli originali non vengono mai modificati."
+            "value": "Copia i file selezionati in %@ come Artista / Album / Brano. Sullo stesso disco le copie sono cloni APFS e non occupano spazio aggiuntivo. Gli originali non vengono mai modificati."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "選択したファイルを~/Music/Vespertineに「アーティスト / アルバム / トラック」の形でコピーします。同じドライブ上ではコピーはAPFSクローンになり、余分な容量を使いません。元のファイルが変更されることはありません。"
+            "value": "選択したファイルを%@に「アーティスト / アルバム / トラック」の形でコピーします。同じドライブ上ではコピーはAPFSクローンになり、余分な容量を使いません。元のファイルが変更されることはありません。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಆಯ್ಕೆಮಾಡಿದ ಫೈಲ್‌ಗಳನ್ನು ~/Music/Vespertine ಗೆ ಕಲಾವಿದ / ಆಲ್ಬಮ್ / ಟ್ರ್ಯಾಕ್ ರೂಪದಲ್ಲಿ ನಕಲಿಸುತ್ತದೆ. ಅದೇ ಡ್ರೈವ್‌ನಲ್ಲಿ ನಕಲುಗಳು APFS ಕ್ಲೋನ್‌ಗಳಾಗಿರುತ್ತವೆ ಮತ್ತು ಹೆಚ್ಚುವರಿ ಸ್ಥಳ ತೆಗೆದುಕೊಳ್ಳುವುದಿಲ್ಲ. ನಿಮ್ಮ ಮೂಲ ಫೈಲ್‌ಗಳನ್ನು ಎಂದಿಗೂ ಬದಲಾಯಿಸಲಾಗುವುದಿಲ್ಲ."
+            "value": "ಆಯ್ಕೆಮಾಡಿದ ಫೈಲ್‌ಗಳನ್ನು %@ ಗೆ ಕಲಾವಿದ / ಆಲ್ಬಮ್ / ಟ್ರ್ಯಾಕ್ ರೂಪದಲ್ಲಿ ನಕಲಿಸುತ್ತದೆ. ಅದೇ ಡ್ರೈವ್‌ನಲ್ಲಿ ನಕಲುಗಳು APFS ಕ್ಲೋನ್‌ಗಳಾಗಿರುತ್ತವೆ ಮತ್ತು ಹೆಚ್ಚುವರಿ ಸ್ಥಳ ತೆಗೆದುಕೊಳ್ಳುವುದಿಲ್ಲ. ನಿಮ್ಮ ಮೂಲ ಫೈಲ್‌ಗಳನ್ನು ಎಂದಿಗೂ ಬದಲಾಯಿಸಲಾಗುವುದಿಲ್ಲ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "선택한 파일을 ~/Music/Vespertine에 아티스트 / 앨범 / 트랙 구조로 복사합니다. 같은 드라이브에서는 복사본이 APFS 복제본이 되어 추가 공간을 사용하지 않습니다. 원본은 절대 변경되지 않습니다."
+            "value": "선택한 파일을 %@에 아티스트 / 앨범 / 트랙 구조로 복사합니다. 같은 드라이브에서는 복사본이 APFS 복제본이 되어 추가 공간을 사용하지 않습니다. 원본은 절대 변경되지 않습니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "തിരഞ്ഞെടുത്ത ഫയലുകൾ ~/Music/Vespertine-ലേക്ക് ആർട്ടിസ്റ്റ് / ആൽബം / ട്രാക്ക് എന്ന ക്രമത്തിൽ പകർത്തുന്നു. ഒരേ ഡ്രൈവിലാണെങ്കിൽ പകർപ്പുകൾ APFS ക്ലോണുകളാണ്, അധിക സ്ഥലം എടുക്കില്ല. നിങ്ങളുടെ ഒറിജിനൽ ഫയലുകൾ ഒരിക്കലും മാറ്റില്ല."
+            "value": "തിരഞ്ഞെടുത്ത ഫയലുകൾ %@-ലേക്ക് ആർട്ടിസ്റ്റ് / ആൽബം / ട്രാക്ക് എന്ന ക്രമത്തിൽ പകർത്തുന്നു. ഒരേ ഡ്രൈവിലാണെങ്കിൽ പകർപ്പുകൾ APFS ക്ലോണുകളാണ്, അധിക സ്ഥലം എടുക്കില്ല. നിങ്ങളുടെ ഒറിജിനൽ ഫയലുകൾ ഒരിക്കലും മാറ്റില്ല."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "निवडलेल्या फाइल्स ~/Music/Vespertine मध्ये कलाकार / अल्बम / ट्रॅक अशा रचनेत कॉपी करते. त्याच ड्राइव्हवर या प्रती APFS क्लोन असतात आणि जास्तीची जागा घेत नाहीत. तुमच्या मूळ फाइल्समध्ये कधीही बदल होत नाही."
+            "value": "निवडलेल्या फाइल्स %@ मध्ये कलाकार / अल्बम / ट्रॅक अशा रचनेत कॉपी करते. त्याच ड्राइव्हवर या प्रती APFS क्लोन असतात आणि जास्तीची जागा घेत नाहीत. तुमच्या मूळ फाइल्समध्ये कधीही बदल होत नाही."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Menyalin fail yang dipilih ke dalam ~/Music/Vespertine sebagai Artis / Album / Trek. Pada pemacu yang sama, salinan ialah klon APFS dan tidak menggunakan ruang tambahan. Fail asal anda tidak pernah diubah."
+            "value": "Menyalin fail yang dipilih ke dalam %@ sebagai Artis / Album / Trek. Pada pemacu yang sama, salinan ialah klon APFS dan tidak menggunakan ruang tambahan. Fail asal anda tidak pernah diubah."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kopierer de valgte filene til ~/Musikk/Vespertine som Artist / Album / Spor. På samme disk er kopiene APFS-kloner og tar ikke ekstra plass. Originalene dine endres aldri."
+            "value": "Kopierer de valgte filene til %@ som Artist / Album / Spor. På samme disk er kopiene APFS-kloner og tar ikke ekstra plass. Originalene dine endres aldri."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kopieert de geselecteerde bestanden naar ~/Music/Vespertine als Artiest / Album / Nummer. Op dezelfde schijf zijn de kopieën APFS-klonen en nemen ze geen extra ruimte in. Je originelen worden nooit gewijzigd."
+            "value": "Kopieert de geselecteerde bestanden naar %@ als Artiest / Album / Nummer. Op dezelfde schijf zijn de kopieën APFS-klonen en nemen ze geen extra ruimte in. Je originelen worden nooit gewijzigd."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਚੁਣੀਆਂ ਫ਼ਾਈਲਾਂ ਨੂੰ ~/Music/Vespertine ਵਿੱਚ ਕਲਾਕਾਰ / ਐਲਬਮ / ਟਰੈਕ ਵਜੋਂ ਕਾਪੀ ਕਰਦਾ ਹੈ। ਉਸੇ ਡਰਾਈਵ ’ਤੇ ਕਾਪੀਆਂ APFS ਕਲੋਨ ਹੁੰਦੀਆਂ ਹਨ ਅਤੇ ਕੋਈ ਵਾਧੂ ਥਾਂ ਨਹੀਂ ਲੈਂਦੀਆਂ। ਤੁਹਾਡੀਆਂ ਅਸਲ ਫ਼ਾਈਲਾਂ ਕਦੇ ਨਹੀਂ ਬਦਲੀਆਂ ਜਾਂਦੀਆਂ।"
+            "value": "ਚੁਣੀਆਂ ਫ਼ਾਈਲਾਂ ਨੂੰ %@ ਵਿੱਚ ਕਲਾਕਾਰ / ਐਲਬਮ / ਟਰੈਕ ਵਜੋਂ ਕਾਪੀ ਕਰਦਾ ਹੈ। ਉਸੇ ਡਰਾਈਵ ’ਤੇ ਕਾਪੀਆਂ APFS ਕਲੋਨ ਹੁੰਦੀਆਂ ਹਨ ਅਤੇ ਕੋਈ ਵਾਧੂ ਥਾਂ ਨਹੀਂ ਲੈਂਦੀਆਂ। ਤੁਹਾਡੀਆਂ ਅਸਲ ਫ਼ਾਈਲਾਂ ਕਦੇ ਨਹੀਂ ਬਦਲੀਆਂ ਜਾਂਦੀਆਂ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kopiuje zaznaczone pliki do ~/Music/Vespertine jako Wykonawca / Album / Utwór. Na tym samym dysku kopie są klonami APFS i nie zajmują dodatkowego miejsca. Oryginały nigdy nie są zmieniane."
+            "value": "Kopiuje zaznaczone pliki do %@ jako Wykonawca / Album / Utwór. Na tym samym dysku kopie są klonami APFS i nie zajmują dodatkowego miejsca. Oryginały nigdy nie są zmieniane."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Copia os arquivos selecionados para ~/Music/Vespertine como Artista / Álbum / Faixa. No mesmo disco, as cópias são clones APFS e não ocupam espaço extra. Seus originais nunca são alterados."
+            "value": "Copia os arquivos selecionados para %@ como Artista / Álbum / Faixa. No mesmo disco, as cópias são clones APFS e não ocupam espaço extra. Seus originais nunca são alterados."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Copia os ficheiros selecionados para ~/Music/Vespertine como Artista / Álbum / Faixa. No mesmo disco, as cópias são clones APFS e não ocupam espaço adicional. Os originais nunca são alterados."
+            "value": "Copia os ficheiros selecionados para %@ como Artista / Álbum / Faixa. No mesmo disco, as cópias são clones APFS e não ocupam espaço adicional. Os originais nunca são alterados."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Copiază fișierele selectate în ~/Music/Vespertine ca Artist / Album / Piesă. Pe același disc, copiile sunt clone APFS și nu ocupă spațiu suplimentar. Originalele nu sunt modificate niciodată."
+            "value": "Copiază fișierele selectate în %@ ca Artist / Album / Piesă. Pe același disc, copiile sunt clone APFS și nu ocupă spațiu suplimentar. Originalele nu sunt modificate niciodată."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kopierar de markerade filerna till ~/Music/Vespertine som Artist/Album/Spår. På samma enhet är kopiorna APFS-kloner som inte tar extra utrymme. Originalen ändras aldrig."
+            "value": "Kopierar de markerade filerna till %@ som Artist/Album/Spår. På samma enhet är kopiorna APFS-kloner som inte tar extra utrymme. Originalen ändras aldrig."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hunakili faili ulizochagua kwenye ~/Music/Vespertine kama Msanii / Albamu / Wimbo. Kwenye diski ileile, nakala ni nakala-pacha za APFS na hazichukui nafasi ya ziada. Faili zako asili hazibadilishwi kamwe."
+            "value": "Hunakili faili ulizochagua kwenye %@ kama Msanii / Albamu / Wimbo. Kwenye diski ileile, nakala ni nakala-pacha za APFS na hazichukui nafasi ya ziada. Faili zako asili hazibadilishwi kamwe."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "தேர்ந்தெடுத்த கோப்புகளை ~/Music/Vespertine-இல் கலைஞர் / ஆல்பம் / டிராக் என நகலெடுக்கும். அதே டிரைவில் நகல்கள் APFS குளோன்களாக இருக்கும், கூடுதல் இடம் எடுக்காது. உங்கள் அசல் கோப்புகள் ஒருபோதும் மாற்றப்படாது."
+            "value": "தேர்ந்தெடுத்த கோப்புகளை %@-இல் கலைஞர் / ஆல்பம் / டிராக் என நகலெடுக்கும். அதே டிரைவில் நகல்கள் APFS குளோன்களாக இருக்கும், கூடுதல் இடம் எடுக்காது. உங்கள் அசல் கோப்புகள் ஒருபோதும் மாற்றப்படாது."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "ఎంచుకున్న ఫైల్‌లను ~/Music/Vespertine లోకి ఆర్టిస్ట్ / ఆల్బమ్ / ట్రాక్ రూపంలో కాపీ చేస్తుంది. అదే డ్రైవ్‌లో అయితే కాపీలు APFS క్లోన్‌లుగా ఉంటాయి, అదనపు స్థలం తీసుకోవు. మీ అసలు ఫైల్‌లు ఎప్పటికీ మార్చబడవు."
+            "value": "ఎంచుకున్న ఫైల్‌లను %@ లోకి ఆర్టిస్ట్ / ఆల్బమ్ / ట్రాక్ రూపంలో కాపీ చేస్తుంది. అదే డ్రైవ్‌లో అయితే కాపీలు APFS క్లోన్‌లుగా ఉంటాయి, అదనపు స్థలం తీసుకోవు. మీ అసలు ఫైల్‌లు ఎప్పటికీ మార్చబడవు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "คัดลอกไฟล์ที่เลือกไปยัง ~/Music/Vespertine ในรูปแบบ ศิลปิน / อัลบั้ม / แทร็ก หากอยู่ในไดรฟ์เดียวกัน สำเนาจะเป็นโคลน APFS และไม่ใช้พื้นที่เพิ่ม ไฟล์ต้นฉบับของคุณจะไม่ถูกเปลี่ยนแปลง"
+            "value": "คัดลอกไฟล์ที่เลือกไปยัง %@ ในรูปแบบ ศิลปิน / อัลบั้ม / แทร็ก หากอยู่ในไดรฟ์เดียวกัน สำเนาจะเป็นโคลน APFS และไม่ใช้พื้นที่เพิ่ม ไฟล์ต้นฉบับของคุณจะไม่ถูกเปลี่ยนแปลง"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Seçilen dosyaları Sanatçı / Albüm / Parça düzeninde ~/Music/Vespertine klasörüne kopyalar. Aynı diskte kopyalar APFS klonlarıdır ve ek yer kaplamaz. Orijinal dosyalarınız asla değiştirilmez."
+            "value": "Seçilen dosyaları Sanatçı / Albüm / Parça düzeninde %@ klasörüne kopyalar. Aynı diskte kopyalar APFS klonlarıdır ve ek yer kaplamaz. Orijinal dosyalarınız asla değiştirilmez."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Копіює вибрані файли в ~/Music/Vespertine у структурі Виконавець / Альбом / Трек. На тому самому диску копії є клонами APFS і не займають додаткового місця. Оригінали ніколи не змінюються."
+            "value": "Копіює вибрані файли в %@ у структурі Виконавець / Альбом / Трек. На тому самому диску копії є клонами APFS і не займають додаткового місця. Оригінали ніколи не змінюються."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "منتخب فائلوں کو ~/Music/Vespertine میں فنکار / البم / ٹریک کی ترتیب سے کاپی کرتا ہے۔ اسی ڈرائیو پر کاپیاں APFS کلونز ہوتی ہیں اور کوئی اضافی جگہ نہیں لیتیں۔ آپ کی اصل فائلیں کبھی تبدیل نہیں ہوتیں۔"
+            "value": "منتخب فائلوں کو %@ میں فنکار / البم / ٹریک کی ترتیب سے کاپی کرتا ہے۔ اسی ڈرائیو پر کاپیاں APFS کلونز ہوتی ہیں اور کوئی اضافی جگہ نہیں لیتیں۔ آپ کی اصل فائلیں کبھی تبدیل نہیں ہوتیں۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sao chép các tệp đã chọn vào ~/Music/Vespertine theo cấu trúc Nghệ sĩ / Album / Bản nhạc. Trên cùng một ổ đĩa, các bản sao là bản sao APFS và không chiếm thêm dung lượng. Tệp gốc của bạn không bao giờ bị thay đổi."
+            "value": "Sao chép các tệp đã chọn vào %@ theo cấu trúc Nghệ sĩ / Album / Bản nhạc. Trên cùng một ổ đĩa, các bản sao là bản sao APFS và không chiếm thêm dung lượng. Tệp gốc của bạn không bao giờ bị thay đổi."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "將所選檔案以「藝人／專輯／曲目」結構複製到 ~/Music/Vespertine。在同一磁碟上，副本是 APFS 複本，不會佔用額外空間。你的原始檔案永遠不會被更改。"
+            "value": "將所選檔案以「藝人／專輯／曲目」結構複製到 %@。在同一磁碟上，副本是 APFS 複本，不會佔用額外空間。你的原始檔案永遠不會被更改。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "将所选文件按“艺人 / 专辑 / 曲目”拷贝到 ~/Music/Vespertine。在同一磁盘上，拷贝为 APFS 克隆，不占用额外空间。原始文件绝不会被更改。"
+            "value": "将所选文件按“艺人 / 专辑 / 曲目”拷贝到 %@。在同一磁盘上，拷贝为 APFS 克隆，不占用额外空间。原始文件绝不会被更改。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "將所選檔案依「藝人／專輯／曲目」拷貝到 ~/Music/Vespertine。在同一個磁碟上，拷貝的檔案為 APFS 複本，不會佔用額外空間。你的原始檔案永遠不會被更改。"
+            "value": "將所選檔案依「藝人／專輯／曲目」拷貝到 %@。在同一個磁碟上，拷貝的檔案為 APFS 複本，不會佔用額外空間。你的原始檔案永遠不會被更改。"
           }
         }
       }

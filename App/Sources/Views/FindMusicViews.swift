@@ -182,6 +182,9 @@ struct FindMusicSheet: View {
         }
     }
 
+    /// The folder Import & Organize copies into, as Settings shows it ("~/Music/Vespertine" unless it was changed).
+    private var managedFolderName: String { (model.settings.managedFolderPath as NSString).abbreviatingWithTildeInPath }
+
     private var footer: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 16) {
@@ -191,7 +194,7 @@ struct FindMusicSheet: View {
                 }
                 .pickerStyle(.segmented).labelsHidden().fixedSize()
                 (mode == .copyAndOrganize
-                     ? Text("Copies the selected files into ~/Music/Vespertine as Artist / Album / Track. On the same drive the copies are APFS clones and take no extra space. Your originals are never changed.")
+                     ? Text("Copies the selected files into \(managedFolderName) as Artist / Album / Track. On the same drive the copies are APFS clones and take no extra space. Your originals are never changed.")
                      : Text("Adds the folders that contain your selection and reads them where they are. Tags you edit later are written to those files."))
                     .font(Typeface.ui(11)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
             }
