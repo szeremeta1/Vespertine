@@ -52,11 +52,14 @@ let package = Package(
                 "CVespertineWavPack",
                 .product(name: "VespertineAnalysisCore", package: "VespertineAnalysis"),
             ],
+            // The known-DoP-DAC list (dop-dacs.json), read by DoPDACList.bundled.
+            resources: [.copy("Resources/dop-dacs.json")],
             linkerSettings: [
                 .linkedFramework("CoreAudio"),
                 .linkedFramework("AudioToolbox"),
                 .linkedFramework("AVFAudio"),
                 .linkedFramework("Accelerate"),
+                .linkedFramework("IOKit"),
             ]
         ),
         .target(

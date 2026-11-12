@@ -182,8 +182,7 @@ struct DoPTestSafetyTests {
         let clip = DoPTestClip.make()
         let frames = try DoP.pack(clip.planes)
         let pcm = frames.map { frame -> Double in
-            var v = Int32(bitPattern: frame[0] << 8) >> 8        // 24-bit two's complement
-            if v > 0x7FFFFF { v -= 0x1000000 }
+            let v = Int32(bitPattern: frame[0] << 8) >> 8        // the 24-bit word, sign-extended
             return Double(v) / 8_388_608
         }
         // Audible band only: a 4th-order Butterworth low-pass at 20 kHz (two biquads), then RMS.
@@ -220,7 +219,7 @@ struct DoPTestSafetyTests {
         let data = DoPTestClip.make().dsfData
         #expect(String(decoding: data.prefix(4), as: UTF8.self) == "DSD ")
         #expect(String(decoding: data[28..<32], as: UTF8.self) == "fmt ")
-        #expect(String(decoding: data[92..<96], as: UTF8.self) == "data")
+        #expect(String(decoding: data[80..<84], as: UTF8.self) == "data")
     }
 }
 
