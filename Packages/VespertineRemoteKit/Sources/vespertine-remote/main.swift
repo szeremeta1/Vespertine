@@ -170,8 +170,11 @@ case "send":
     }
     printJSON(signIn().call(command))
 case "watch":
-    _ = signIn(printingPushes: true)
-    Thread.sleep(forTimeInterval: arguments.count >= 2 ? Double(arguments[1]) ?? 10 : 10)
+    // Keep the link alive while watching: its callbacks hold it weakly.
+    let link = signIn(printingPushes: true)
+    withExtendedLifetime(link) {
+        Thread.sleep(forTimeInterval: arguments.count >= 2 ? Double(arguments[1]) ?? 10 : 10)
+    }
 default:
     fail("Usage: vespertine-remote list | pair <code> [mac name] | send '<command JSON>' | watch [seconds]")
 }

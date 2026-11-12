@@ -72,7 +72,7 @@ struct RemoteTests {
     }
 
     @Test func webRequestsParseOnlyWhenComplete() throws {
-        let head = "POST /command?x=1 HTTP/1.1\r\nHost: mac.local\r\nContent-Type: application/json\r\nCookie: a=1; vespertine-remote=abc\r\nContent-Length: 13\r\n\r\n"
+        let head = "POST /command?x=1 HTTP/1.1\r\nHost: mac.local\r\nContent-Type: application/json\r\nCookie: a=1; vespertine-remote=abc\r\nContent-Length: 11\r\n\r\n"
         #expect(HTTPRequest(Data(head.utf8)) == nil)
         #expect(HTTPRequest(Data((head + "{\"play\":").utf8)) == nil)
         let request = try #require(HTTPRequest(Data((head + "{\"play\":{}}").utf8)))
