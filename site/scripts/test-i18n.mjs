@@ -68,6 +68,9 @@ for (const [langs, want] of cases) {
   const page = await ctx.newPage();
   await page.goto(`${BASE}/press.html`);
   await page.goto(`${BASE}/?utm_source=x#faq`, { referer: 'https://example.com/' });
+  // goto() can return as soon as / has loaded, while its location.replace to /de/ is still loading. Going Back then
+  // races that navigation, and on a busy runner Back is dropped (page.goBack() returns null). Wait for /de/ itself.
+  await page.waitForURL((u) => u.pathname === '/de/', { waitUntil: 'load' });
   check('redirect keeps query and hash', new URL(page.url()).pathname === '/de/' && page.url().endsWith('?utm_source=x#faq'), page.url());
   await page.goBack();
   check('Back after the redirect leaves /, not to it', new URL(page.url()).pathname === '/press.html', path(page));
