@@ -290,271 +290,271 @@
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine እርስዎ ካከሏቸው የሙዚቃ አገልጋዮች እና የአውታረ መረብ ማጋሪያዎች ጋር በአውታረ መረብዎ ላይ ወይም በVPN በኩል ይገናኛል።"
+            "value": "Vespertine እርስዎ ካከሏቸው የሙዚቃ አገልጋዮች እና የአውታረ መረብ ማጋሪያዎች ጋር በአውታረ መረብዎ ላይ ወይም በVPN በኩል ይገናኛል። ሪሞትን ካበሩ፣ ያጣመሯቸው ስልኮች እና አሳሾችም ሊቆጣጠሩት ይችላሉ።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يتصل Vespertine بخوادم الموسيقى ومشاركات الشبكة التي تضيفها، على شبكتك أو عبر VPN."
+            "value": "يتصل Vespertine بخوادم الموسيقى ومشاركات الشبكة التي تضيفها، على شبكتك أو عبر VPN. وإذا شغّلت «التحكم عن بُعد»، يمكن للهواتف والمتصفحات التي تقرنها التحكم فيه أيضًا."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "আপনার যোগ করা মিউজিক সার্ভার ও নেটওয়ার্ক শেয়ারের সাথে Vespertine সংযোগ করে, আপনার নেটওয়ার্কে বা VPN-এর মাধ্যমে।"
+            "value": "আপনার যোগ করা মিউজিক সার্ভার ও নেটওয়ার্ক শেয়ারের সাথে Vespertine সংযোগ করে, আপনার নেটওয়ার্কে বা VPN-এর মাধ্যমে। রিমোট চালু করলে, আপনার পেয়ার করা ফোন ও ব্রাউজার থেকেও এটি নিয়ন্ত্রণ করা যায়।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine se připojuje k hudebním serverům a síťovým sdílením, která přidáte, ve vaší síti nebo přes VPN."
+            "value": "Vespertine se připojuje k hudebním serverům a síťovým sdílením, která přidáte, ve vaší síti nebo přes VPN. Když zapnete Dálkové ovládání, mohou ho ovládat i telefony a prohlížeče, které spárujete."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine opretter forbindelse til de musikservere og netværksdelinger, du tilføjer, på dit netværk eller via VPN."
+            "value": "Vespertine opretter forbindelse til de musikservere og netværksdelinger, du tilføjer, på dit netværk eller via VPN. Hvis du slår Fjernbetjening til, kan de telefoner og browsere, du parrer, også styre det."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine verbindet sich mit den Musikservern und Netzwerkfreigaben, die du hinzufügst – in deinem Netzwerk oder über ein VPN."
+            "value": "Vespertine verbindet sich mit den Musikservern und Netzwerkfreigaben, die du hinzufügst – in deinem Netzwerk oder über ein VPN. Wenn du „Fernbedienung“ einschaltest, können es auch die Telefone und Browser steuern, die du koppelst."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Το Vespertine συνδέεται στους διακομιστές μουσικής και τους κοινόχρηστους φακέλους δικτύου που προσθέτετε, στο δίκτυό σας ή μέσω VPN."
+            "value": "Το Vespertine συνδέεται στους διακομιστές μουσικής και τους κοινόχρηστους φακέλους δικτύου που προσθέτετε, στο δίκτυό σας ή μέσω VPN. Αν ενεργοποιήσετε τον Τηλεχειρισμό, μπορούν να το ελέγχουν και τα τηλέφωνα και τα προγράμματα περιήγησης που αντιστοιχίζετε."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine connects to the music servers and network shares you add, on your network or over a VPN."
+            "value": "Vespertine connects to the music servers and network shares you add, on your network or over a VPN. If you turn on Remote, the phones and browsers you pair can control it too."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine se conecta a los servidores de música y recursos compartidos de red que añadas, en tu red o a través de una VPN."
+            "value": "Vespertine se conecta a los servidores de música y recursos compartidos de red que añadas, en tu red o a través de una VPN. Si activas Control remoto, los teléfonos y navegadores que enlaces también podrán controlarlo."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine به سرورهای موسیقی و اشتراک‌های شبکه‌ای که اضافه می‌کنید وصل می‌شود، در شبکهٔ شما یا از طریق VPN."
+            "value": "Vespertine به سرورهای موسیقی و اشتراک‌های شبکه‌ای که اضافه می‌کنید وصل می‌شود، در شبکهٔ شما یا از طریق VPN. اگر «کنترل از راه دور» را روشن کنید، تلفن‌ها و مرورگرهایی که جفت می‌کنید هم می‌توانند آن را کنترل کنند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine muodostaa yhteyden lisäämiisi musiikkipalvelimiin ja verkkojakoihin omassa verkossasi tai VPN:n kautta."
+            "value": "Vespertine muodostaa yhteyden lisäämiisi musiikkipalvelimiin ja verkkojakoihin omassa verkossasi tai VPN:n kautta. Jos otat Kaukosäätimen käyttöön, myös pariliittämäsi puhelimet ja selaimet voivat ohjata sitä."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kumokonekta ang Vespertine sa mga music server at network share na idinagdag mo, sa network mo o sa pamamagitan ng VPN."
+            "value": "Kumokonekta ang Vespertine sa mga music server at network share na idinagdag mo, sa network mo o sa pamamagitan ng VPN. Kapag binuksan mo ang Remote, makokontrol din ito ng mga phone at browser na ipinares mo."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine se connecte aux serveurs de musique et aux partages réseau que vous ajoutez, sur votre réseau ou via un VPN."
+            "value": "Vespertine se connecte aux serveurs de musique et aux partages réseau que vous ajoutez, sur votre réseau ou via un VPN. Si vous activez Télécommande, les téléphones et navigateurs que vous jumelez peuvent aussi le contrôler."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine તમે ઉમેરેલા મ્યુઝિક સર્વર અને નેટવર્ક શેર સાથે તમારા નેટવર્ક પર અથવા VPN દ્વારા કનેક્ટ થાય છે."
+            "value": "Vespertine તમે ઉમેરેલા મ્યુઝિક સર્વર અને નેટવર્ક શેર સાથે તમારા નેટવર્ક પર અથવા VPN દ્વારા કનેક્ટ થાય છે. જો તમે રિમોટ ચાલુ કરો, તો તમે જોડેલા ફોન અને બ્રાઉઝર પણ તેને નિયંત્રિત કરી શકે છે."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine yana haɗuwa da sabobin kiɗa da foldojin cibiyar sadarwa da kuka ƙara, a kan cibiyar sadarwarku ko ta VPN."
+            "value": "Vespertine yana haɗuwa da sabobin kiɗa da foldojin cibiyar sadarwa da kuka ƙara, a kan cibiyar sadarwarku ko ta VPN. Idan kun kunna Rimot, wayoyi da masu bincike da kuka haɗa su ma za su iya sarrafa shi."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine מתחבר לשרתי המוזיקה ולשיתופי הרשת שהוספת, ברשת שלך או דרך VPN."
+            "value": "Vespertine מתחבר לשרתי המוזיקה ולשיתופי הרשת שהוספת, ברשת שלך או דרך VPN. אם תפעיל את „שלט רחוק”, גם הטלפונים והדפדפנים שתצמיד יוכלו לשלוט בו."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine आपके द्वारा जोड़े गए म्यूज़िक सर्वर और नेटवर्क शेयर से आपके नेटवर्क पर या VPN के ज़रिए कनेक्ट होता है।"
+            "value": "Vespertine आपके द्वारा जोड़े गए म्यूज़िक सर्वर और नेटवर्क शेयर से आपके नेटवर्क पर या VPN के ज़रिए कनेक्ट होता है। अगर आप रिमोट चालू करते हैं, तो आपके पेयर किए गए फ़ोन और ब्राउज़र भी इसे नियंत्रित कर सकते हैं।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A Vespertine csatlakozik az Ön által hozzáadott zeneszerverekhez és hálózati megosztásokhoz, a hálózatán vagy VPN-en keresztül."
+            "value": "A Vespertine csatlakozik az Ön által hozzáadott zeneszerverekhez és hálózati megosztásokhoz, a hálózatán vagy VPN-en keresztül. Ha bekapcsolja a Távirányítót, az Ön által párosított telefonok és böngészők is vezérelhetik."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine terhubung ke server musik dan share jaringan yang Anda tambahkan, di jaringan Anda atau melalui VPN."
+            "value": "Vespertine terhubung ke server musik dan share jaringan yang Anda tambahkan, di jaringan Anda atau melalui VPN. Jika Anda menyalakan Kendali Jauh, ponsel dan browser yang Anda pasangkan juga dapat mengendalikannya."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine si connette ai server musicali e alle condivisioni di rete che aggiungi, sulla tua rete o tramite VPN."
+            "value": "Vespertine si connette ai server musicali e alle condivisioni di rete che aggiungi, sulla tua rete o tramite VPN. Se attivi Telecomando, anche i telefoni e i browser che abbini possono controllarlo."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertineは、追加した音楽サーバやネットワーク共有に、ネットワーク上で、またはVPN経由で接続します。"
+            "value": "Vespertineは、追加した音楽サーバやネットワーク共有に、ネットワーク上で、またはVPN経由で接続します。リモートをオンにすると、ペアリングしたスマートフォンやブラウザからも操作できます。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ನೀವು ಸೇರಿಸುವ ಮ್ಯೂಸಿಕ್ ಸರ್ವರ್‌ಗಳು ಮತ್ತು ನೆಟ್‌ವರ್ಕ್ ಶೇರ್‌ಗಳಿಗೆ Vespertine ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ ಅಥವಾ VPN ಮೂಲಕ ಸಂಪರ್ಕಿಸುತ್ತದೆ."
+            "value": "ನೀವು ಸೇರಿಸುವ ಮ್ಯೂಸಿಕ್ ಸರ್ವರ್‌ಗಳು ಮತ್ತು ನೆಟ್‌ವರ್ಕ್ ಶೇರ್‌ಗಳಿಗೆ Vespertine ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ ಅಥವಾ VPN ಮೂಲಕ ಸಂಪರ್ಕಿಸುತ್ತದೆ. ನೀವು ರಿಮೋಟ್ ಆನ್ ಮಾಡಿದರೆ, ನೀವು ಜೋಡಿಸಿದ ಫೋನ್‌ಗಳು ಮತ್ತು ಬ್ರೌಸರ್‌ಗಳೂ ಇದನ್ನು ನಿಯಂತ್ರಿಸಬಹುದು."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine은 사용자가 추가한 음악 서버 및 네트워크 공유에 사용자의 네트워크 또는 VPN을 통해 연결합니다."
+            "value": "Vespertine은 사용자가 추가한 음악 서버 및 네트워크 공유에 사용자의 네트워크 또는 VPN을 통해 연결합니다. 리모트를 켜면 페어링한 휴대폰과 브라우저에서도 제어할 수 있습니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "നിങ്ങൾ ചേർക്കുന്ന മ്യൂസിക് സെർവറുകളിലേക്കും നെറ്റ്‌വർക്ക് ഷെയറുകളിലേക്കും നിങ്ങളുടെ നെറ്റ്‌വർക്കിലോ VPN വഴിയോ Vespertine കണക്റ്റ് ചെയ്യുന്നു."
+            "value": "നിങ്ങൾ ചേർക്കുന്ന മ്യൂസിക് സെർവറുകളിലേക്കും നെറ്റ്‌വർക്ക് ഷെയറുകളിലേക്കും നിങ്ങളുടെ നെറ്റ്‌വർക്കിലോ VPN വഴിയോ Vespertine കണക്റ്റ് ചെയ്യുന്നു. റിമോട്ട് ഓണാക്കിയാൽ, നിങ്ങൾ ജോടിയാക്കുന്ന ഫോണുകൾക്കും ബ്രൗസറുകൾക്കും ഇതിനെ നിയന്ത്രിക്കാനാകും."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "तुम्ही जोडलेल्या म्युझिक सर्व्हर आणि नेटवर्क शेअरशी Vespertine तुमच्या नेटवर्कवर किंवा VPN द्वारे कनेक्ट होते."
+            "value": "तुम्ही जोडलेल्या म्युझिक सर्व्हर आणि नेटवर्क शेअरशी Vespertine तुमच्या नेटवर्कवर किंवा VPN द्वारे कनेक्ट होते. तुम्ही रिमोट चालू केल्यास, तुम्ही जोडलेले फोन आणि ब्राउझरही ते नियंत्रित करू शकतात."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine menyambung ke pelayan muzik dan perkongsian rangkaian yang anda tambah, pada rangkaian anda atau melalui VPN."
+            "value": "Vespertine menyambung ke pelayan muzik dan perkongsian rangkaian yang anda tambah, pada rangkaian anda atau melalui VPN. Jika anda menghidupkan Kawalan Jauh, telefon dan pelayar yang anda gandingkan juga boleh mengawalnya."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine kobler til musikktjenerne og nettverksdelingene du legger til, på nettverket ditt eller via VPN."
+            "value": "Vespertine kobler til musikktjenerne og nettverksdelingene du legger til, på nettverket ditt eller via VPN. Hvis du slår på Fjernkontroll, kan også telefonene og nettleserne du parer, styre den."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine maakt verbinding met de muziekservers en netwerkshares die je toevoegt, op je netwerk of via een VPN."
+            "value": "Vespertine maakt verbinding met de muziekservers en netwerkshares die je toevoegt, op je netwerk of via een VPN. Als je Afstandsbediening aanzet, kunnen de telefoons en browsers die je koppelt het ook bedienen."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ਤੁਹਾਡੇ ਵੱਲੋਂ ਸ਼ਾਮਲ ਕੀਤੇ ਮਿਊਜ਼ਿਕ ਸਰਵਰਾਂ ਅਤੇ ਨੈੱਟਵਰਕ ਸ਼ੇਅਰਾਂ ਨਾਲ ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ’ਤੇ ਜਾਂ VPN ਰਾਹੀਂ ਕਨੈਕਟ ਕਰਦਾ ਹੈ।"
+            "value": "Vespertine ਤੁਹਾਡੇ ਵੱਲੋਂ ਸ਼ਾਮਲ ਕੀਤੇ ਮਿਊਜ਼ਿਕ ਸਰਵਰਾਂ ਅਤੇ ਨੈੱਟਵਰਕ ਸ਼ੇਅਰਾਂ ਨਾਲ ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ’ਤੇ ਜਾਂ VPN ਰਾਹੀਂ ਕਨੈਕਟ ਕਰਦਾ ਹੈ। ਜੇ ਤੁਸੀਂ ਰਿਮੋਟ ਚਾਲੂ ਕਰਦੇ ਹੋ, ਤਾਂ ਤੁਹਾਡੇ ਪੇਅਰ ਕੀਤੇ ਫ਼ੋਨ ਅਤੇ ਬ੍ਰਾਊਜ਼ਰ ਵੀ ਇਸਨੂੰ ਕੰਟਰੋਲ ਕਰ ਸਕਦੇ ਹਨ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine łączy się z dodanymi przez Ciebie serwerami muzyki i zasobami sieciowymi, w Twojej sieci lub przez VPN."
+            "value": "Vespertine łączy się z dodanymi przez Ciebie serwerami muzyki i zasobami sieciowymi, w Twojej sieci lub przez VPN. Jeśli włączysz Pilota, sparowane przez Ciebie telefony i przeglądarki też będą mogły nim sterować."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine se conecta aos servidores de música e compartilhamentos de rede que você adicionar, na sua rede ou por VPN."
+            "value": "O Vespertine se conecta aos servidores de música e compartilhamentos de rede que você adicionar, na sua rede ou por VPN. Se você ativar o Controle Remoto, os celulares e navegadores que você parear também poderão controlá-lo."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine liga-se aos servidores de música e às partilhas de rede que adicionar, na sua rede ou através de uma VPN."
+            "value": "O Vespertine liga-se aos servidores de música e às partilhas de rede que adicionar, na sua rede ou através de uma VPN. Se ativar o Controlo remoto, os telemóveis e navegadores que emparelhar também o poderão controlar."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine se conectează la serverele de muzică și partajările de rețea pe care le adăugați, în rețeaua dvs. sau prin VPN."
+            "value": "Vespertine se conectează la serverele de muzică și partajările de rețea pe care le adăugați, în rețeaua dvs. sau prin VPN. Dacă activați Telecomandă, telefoanele și browserele pe care le asociați îl pot controla și ele."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ansluter till de musikservrar och nätverksresurser du lägger till, i ditt nätverk eller via VPN."
+            "value": "Vespertine ansluter till de musikservrar och nätverksresurser du lägger till, i ditt nätverk eller via VPN. Om du slår på Fjärrkontroll kan även telefonerna och webbläsarna du parkopplar styra det."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine huunganisha kwenye seva za muziki na folda za mtandao unazoongeza, kwenye mtandao wako au kupitia VPN."
+            "value": "Vespertine huunganisha kwenye seva za muziki na folda za mtandao unazoongeza, kwenye mtandao wako au kupitia VPN. Ukiwasha Rimoti, simu na vivinjari unavyooanisha vinaweza pia kuidhibiti."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "நீங்கள் சேர்க்கும் இசை சர்வர்கள் மற்றும் நெட்வொர்க் பகிர்வுகளுடன் உங்கள் நெட்வொர்க்கில் அல்லது VPN மூலம் Vespertine இணைகிறது."
+            "value": "நீங்கள் சேர்க்கும் இசை சர்வர்கள் மற்றும் நெட்வொர்க் பகிர்வுகளுடன் உங்கள் நெட்வொர்க்கில் அல்லது VPN மூலம் Vespertine இணைகிறது. ரிமோட்டை இயக்கினால், நீங்கள் இணைக்கும் ஃபோன்களும் பிரவுசர்களும் இதைக் கட்டுப்படுத்தலாம்."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "మీరు జోడించే మ్యూజిక్ సర్వర్‌లు, నెట్‌వర్క్ షేర్‌లకు Vespertine మీ నెట్‌వర్క్‌లో లేదా VPN ద్వారా కనెక్ట్ అవుతుంది."
+            "value": "మీరు జోడించే మ్యూజిక్ సర్వర్‌లు, నెట్‌వర్క్ షేర్‌లకు Vespertine మీ నెట్‌వర్క్‌లో లేదా VPN ద్వారా కనెక్ట్ అవుతుంది. మీరు రిమోట్‌ను ఆన్ చేస్తే, మీరు జత చేసిన ఫోన్‌లు, బ్రౌజర్‌లు కూడా దీన్ని నియంత్రించగలవు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine เชื่อมต่อกับเซิร์ฟเวอร์เพลงและแชร์เครือข่ายที่คุณเพิ่ม บนเครือข่ายของคุณหรือผ่าน VPN"
+            "value": "Vespertine เชื่อมต่อกับเซิร์ฟเวอร์เพลงและแชร์เครือข่ายที่คุณเพิ่ม บนเครือข่ายของคุณหรือผ่าน VPN หากคุณเปิดรีโมต โทรศัพท์และเบราว์เซอร์ที่คุณจับคู่ไว้ก็ควบคุมได้เช่นกัน"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine, eklediğiniz müzik sunucularına ve ağ paylaşımlarına ağınızda veya bir VPN üzerinden bağlanır."
+            "value": "Vespertine, eklediğiniz müzik sunucularına ve ağ paylaşımlarına ağınızda veya bir VPN üzerinden bağlanır. Uzaktan Kumanda'yı açarsanız eşlediğiniz telefonlar ve tarayıcılar da onu denetleyebilir."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine під’єднується до доданих вами музичних серверів і мережевих ресурсів у вашій мережі або через VPN."
+            "value": "Vespertine під’єднується до доданих вами музичних серверів і мережевих ресурсів у вашій мережі або через VPN. Якщо ввімкнути «Пульт», ним також зможуть керувати телефони й браузери, які ви під’єднаєте."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine آپ کے شامل کردہ میوزک سرورز اور نیٹ ورک شیئرز سے آپ کے نیٹ ورک پر یا VPN کے ذریعے منسلک ہوتا ہے۔"
+            "value": "Vespertine آپ کے شامل کردہ میوزک سرورز اور نیٹ ورک شیئرز سے آپ کے نیٹ ورک پر یا VPN کے ذریعے منسلک ہوتا ہے۔ اگر آپ ریموٹ آن کریں تو آپ کے جوڑے گئے فون اور براؤزر بھی اسے کنٹرول کر سکتے ہیں۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine kết nối với các máy chủ nhạc và chia sẻ mạng mà bạn thêm vào, trên mạng của bạn hoặc qua VPN."
+            "value": "Vespertine kết nối với các máy chủ nhạc và chia sẻ mạng mà bạn thêm vào, trên mạng của bạn hoặc qua VPN. Nếu bạn bật Điều khiển từ xa, các điện thoại và trình duyệt bạn ghép nối cũng có thể điều khiển ứng dụng."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 會連接至你加入的音樂伺服器和網絡共享，無論是在你的網絡上或透過 VPN。"
+            "value": "Vespertine 會連接至你加入的音樂伺服器和網絡共享，無論是在你的網絡上或透過 VPN。如果你開啟「遙控」，你配對的手機和瀏覽器亦可以控制它。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 会连接到你添加的音乐服务器和网络共享，无论是在你的网络中还是通过 VPN。"
+            "value": "Vespertine 会连接到你添加的音乐服务器和网络共享，无论是在你的网络中还是通过 VPN。如果你打开“遥控”，你配对的手机和浏览器也可以控制它。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 會連線至你加入的音樂伺服器和網路分享，無論是在你的網路上或透過 VPN。"
+            "value": "Vespertine 會連線至你加入的音樂伺服器和網路分享，無論是在你的網路上或透過 VPN。如果你開啟「遙控」，你配對的手機和瀏覽器也可以控制它。"
           }
         }
       }

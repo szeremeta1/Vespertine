@@ -31,7 +31,9 @@ enum RemoteWebPage {
             "remove": String(localized: "Remove", comment: "Web remote: removes a song from the queue."),
             "clear": String(localized: "Clear Upcoming", comment: "Web remote: clears the songs after the one playing."),
             "playingNext": String(localized: "Playing Next", comment: "Web remote: queue section."),
-            "continuing": String(localized: "Continuing", comment: "Web remote: queue section, the rest of the album or playlist."),
+            // The same headings as the Mac's Up Next panel: "Up Next" alone, "Continue Playing" under "Playing Next".
+            "upNext": String(localized: "Up Next"),
+            "continuePlaying": String(localized: "Continue Playing"),
             "empty": String(localized: "The queue is empty.", comment: "Web remote: the queue has nothing in it."),
             "fixedVolume": String(localized: "Fixed volume: set the level on your amplifier or DAC", comment: "Web remote: the output's volume can't be changed from Vespertine."),
             "volume": String(localized: "Volume", comment: "Web remote: the volume slider."),
@@ -244,7 +246,7 @@ function renderQueue() {
   };
   if (queue.current) section(L.nowPlaying, [queue.current]);
   section(L.playingNext, queue.playingNext);
-  section(L.continuing, queue.continuing);
+  section(queue.playingNext.length ? L.continuePlaying : L.upNext, queue.continuing);
   if (!queue.current && !queue.playingNext.length && !queue.continuing.length) box.append(el("p", { className: "dim", textContent: L.empty }));
 }
 

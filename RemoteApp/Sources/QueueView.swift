@@ -31,7 +31,7 @@ struct QueueView: View {
                                 .onDelete { remove(queue.continuing, $0) }
                                 .onMove { move(queue.continuing, from: $0, to: $1) }
                         } header: {
-                            Text("Continuing")
+                            Text(queue.playingNext.isEmpty ? "Up Next" : "Continue Playing")
                         } footer: {
                             if queue.continuingTotal > queue.continuing.count {
                                 Text("And \(queue.continuingTotal - queue.continuing.count) more")

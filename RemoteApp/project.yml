@@ -40,7 +40,7 @@ targets:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
-        NSLocalNetworkUsageDescription: "Vespertine Remote finds and controls Vespertine on the Macs on your network."
+        NSLocalNetworkUsageDescription: "Vespertine Remote looks for Macs running Vespertine on your network, and connects only to the ones you pair with."
         NSBonjourServices: ["_vespertine._tcp"]
         NSCameraUsageDescription: "Vespertine Remote uses the camera only to scan the pairing code that Vespertine shows on your Mac."
         # Scanning the Mac's QR code with the Camera app opens Vespertine Remote and pairs.
