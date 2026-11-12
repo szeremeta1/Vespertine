@@ -16,12 +16,12 @@ SHIPPED_MARKDOWN = {"THIRD-PARTY-NOTICES.md"}
 # Per job, what it doesn't read besides DOCS.
 IRRELEVANT = {
     # VespertineKit and VespertineAnalysis tests, the real-time C (tests/), and the release scripts' parse (scripts/).
-    "packages": ("App/", "project.yml", "verification/"),
+    "packages": ("App/", "project.yml", "verification/", "RemoteApp/"),
     # The app links VespertineKit, so Packages/ counts; scripts/ holds generate-project.sh and check-lockfiles.py.
     "app": ("verification/", "tests/"),
     # The harness builds against Packages/ and reads verification/'s fixtures and requirements, not its Markdown or the
     # studio suite (verification/studio/, tested on Linux).
-    "verification": ("App/", "project.yml", "tests/", "scripts/", "verification/*.md", "verification/hardware/*.md",
+    "verification": ("App/", "project.yml", "tests/", "scripts/", "RemoteApp/", "verification/*.md", "verification/hardware/*.md",
                      "verification/studio/"),
 }
 

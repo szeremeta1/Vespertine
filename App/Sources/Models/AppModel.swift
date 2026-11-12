@@ -192,6 +192,8 @@ final class AppModel {
     let visualizer: VisualizerModel
     /// DoP auto-setup: the hint, the one-tap test and the DAC list's refresh.
     let dopSetup: DoPSetupModel
+    /// The phone remote's server (off until Settings › Remote turns it on).
+    let remote: RemoteServer
 
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = []; searchText = "" } } }
     var path: [DetailRoute] = [] { didSet { carryFilter(from: oldValue) } }
@@ -282,6 +284,7 @@ final class AppModel {
         player = PlayerController(library: library, settings: settings, shares: shares)
         visualizer = VisualizerModel(engine: player.engine)
         dopSetup = DoPSetupModel(settings: settings, player: player)
+        remote = RemoteServer(store: RemoteStore(dataDirectory: settings.dataDirectory))
         analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
         let streaming: @MainActor () -> Bool = { [weak player = self.player, weak shares = self.shares] in
             // Playing from a share, or just asked to (still loading): the network belongs to playback.
@@ -326,6 +329,8 @@ final class AppModel {
         dopSetup.start()
         shares.start()
         analysis.start()
+        remote.model = self
+        remote.apply()
         // Hand the DAC back when Vespertine quits: stop, release exclusive access, then restore or
         // standardize its format as chosen in Settings. Core Audio decides how long that takes (a device that won't
         // switch rate can hold it for many seconds), so it runs off the main thread and quitting waits for it only
