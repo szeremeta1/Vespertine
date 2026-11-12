@@ -10,6 +10,8 @@ What Vespertine has been run on, and what each test did and did not show. A **re
 | MacBook Pro speakers | Built in | Stereo playback | Plays | Tested |
 | **Sony TV (HDMI)** | HDMI, exclusive (hog) mode | **Six-channel 5.1 FLAC, 7.1 FLAC folded to 5.1, and 5.1 DSD64 converted to PCM, and Dolby Atmos rendered by macOS (tentative)** | **Each of the six channels went to its matching speaker position; BIT-PERFECT shown** | **Reported, 2026-10-19** |
 
+DACs known to decode DoP, with the source for each entry, are listed in [`dop-dacs.json`](../Packages/VespertineKit/Sources/VespertineAudio/Resources/dop-dacs.json); [DOP-AUTO-SETUP.md](DOP-AUTO-SETUP.md) explains the list, the one-tap DoP test for DACs that aren't on it, and how to add one.
+
 ## Sony TV over HDMI (first multichannel result)
 
 **Setup.** MacBook Pro (Mac17,8, Apple M5 Pro, macOS 27.0), Vespertine 0.13.0, a 2018 Sony TV ("SONY TV  *00", manufacturer code SNY, product ID 0x7c04) on HDMI through a DisplayPort/HDMI connection. Exclusive (hog) mode on, volume in Vespertine at unity (0.0 dB).
