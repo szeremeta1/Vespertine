@@ -7966,6 +7966,274 @@
         }
       }
     },
+    "%@ is the Mac's output on its own, so the group is not playing.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ የMac ውፅዓት ብቻውን ስለሆነ ቡድኑ እየተጫወተ አይደለም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ هو مخرج الـ Mac بمفرده، لذلك لا تعمل المجموعة."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ একাই Mac-এর আউটপুট, তাই গ্রুপটি চলছে না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ je samostatným výstupem Macu, proto skupina nehraje."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ er Macens output helt alene, så gruppen afspiller ikke."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ist allein die Ausgabe des Mac, daher spielt die Gruppe nicht."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το %@ είναι από μόνο του η έξοδος του Mac, γι’ αυτό η ομάδα δεν παίζει."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ es la salida del Mac por sí sola, así que el grupo no se está reproduciendo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ به‌تنهایی خروجی Mac است، بنابراین گروه پخش نمی‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ on yksin Macin ulostulo, joten ryhmä ei soi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang %@ lang ang output ng Mac, kaya hindi nagpe-play ang group."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ est à lui seul la sortie du Mac, donc le groupe ne joue pas."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ એકલું જ Mac નું આઉટપુટ છે, તેથી ગ્રુપ વાગી રહ્યું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ne kaɗai fitarwar Mac, don haka ƙungiyar ba ta kunnawa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ הוא לבדו הפלט של ה־Mac, ולכן הקבוצה לא מנגנת."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ अकेला ही Mac का आउटपुट है, इसलिए ग्रुप नहीं चल रहा है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) %@ önmagában a Mac kimenete, ezért a csoport nem játszik."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ adalah satu-satunya output Mac, jadi grup tidak diputar."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ è da solo l’uscita del Mac, quindi il gruppo non sta riproducendo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@が単独でMacの出力になっているため、グループは再生されていません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ಮಾತ್ರ Mac ನ ಔಟ್‌ಪುಟ್ ಆಗಿದೆ, ಆದ್ದರಿಂದ ಗುಂಪು ಪ್ಲೇ ಆಗುತ್ತಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@만 Mac의 출력으로 설정되어 있어 그룹이 재생되지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ മാത്രമാണ് Mac-ന്റെ ഔട്ട്‌പുട്ട്, അതിനാൽ ഗ്രൂപ്പ് പ്ലേ ചെയ്യുന്നില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ एकटेच Mac चे आउटपुट आहे, म्हणून ग्रुप प्ले होत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ialah satu-satunya output Mac, jadi kumpulan tidak dimainkan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ er Macens utgang helt alene, så gruppen spiller ikke."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is op zichzelf de uitvoer van de Mac, dus de groep speelt niet."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਇਕੱਲਾ ਹੀ Mac ਦਾ ਆਊਟਪੁੱਟ ਹੈ, ਇਸ ਲਈ ਗਰੁੱਪ ਨਹੀਂ ਚੱਲ ਰਿਹਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ jest samodzielnym wyjściem Maca, więc grupa nie gra."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ é a saída do Mac sozinho, então o grupo não está tocando."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ é a saída do Mac por si só, por isso o grupo não está a tocar."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ este singură ieșirea Mac-ului, așa că grupul nu redă."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ är ensam datorns ljudutgång, så gruppen spelar inte."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ pekee ndicho kifaa cha kutoa sauti cha Mac, kwa hivyo kikundi hakichezi."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ மட்டுமே Mac இன் வெளியீடாக உள்ளது, அதனால் குழு இயங்கவில்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ మాత్రమే Mac యొక్క అవుట్‌పుట్‌గా ఉంది, కాబట్టి గ్రూప్ ప్లే కావడం లేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ เป็นเอาต์พุตของ Mac เพียงตัวเดียว กลุ่มจึงไม่เล่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ tek başına Mac’in çıkışı olduğundan grup çalmıyor."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ є єдиним виходом Mac, тому група не відтворюється."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ تنہا Mac کا آؤٹ پٹ ہے، اس لیے گروپ نہیں چل رہا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ là đầu ra duy nhất của máy Mac, nên nhóm không phát."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 單獨作為 Mac 的輸出，因此群組沒有播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 单独作为 Mac 的输出，因此组没有在播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 單獨作為 Mac 的輸出，因此群組沒有播放。"
+          }
+        }
+      }
+    },
     "%@ is truncated": {
       "comment": "Part of “This DVD-Video is damaged (…).”",
       "extractionState": "manual",
@@ -101065,6 +101333,274 @@
           "stringUnit": {
             "state": "translated",
             "value": "另一個 App 正在獨佔使用 %@。"
+          }
+        }
+      }
+    },
+    "Another app is using %@ exclusively, so the group is not playing.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሌላ መተግበሪያ %@ን በብቸኝነት እየተጠቀመ ስለሆነ ቡድኑ እየተጫወተ አይደለም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هناك تطبيق آخر يستخدم %@ بشكل حصري، لذلك لا تعمل المجموعة."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অন্য একটি অ্যাপ %@ একচেটিয়াভাবে ব্যবহার করছে, তাই গ্রুপটি চলছে না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jiná aplikace používá %@ výhradně, proto skupina nehraje."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En anden app bruger %@ eksklusivt, så gruppen afspiller ikke."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine andere App nutzt %@ exklusiv, daher spielt die Gruppe nicht."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Άλλη εφαρμογή χρησιμοποιεί το %@ αποκλειστικά, γι’ αυτό η ομάδα δεν παίζει."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otra app está usando %@ en exclusiva, así que el grupo no se está reproduciendo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "برنامهٔ دیگری به‌طور انحصاری از %@ استفاده می‌کند، بنابراین گروه پخش نمی‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toinen sovellus käyttää laitetta %@ yksinoikeudella, joten ryhmä ei soi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "May ibang app na eksklusibong gumagamit sa %@, kaya hindi nagpe-play ang group."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une autre app utilise %@ en exclusivité, donc le groupe ne joue pas."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "અન્ય ઍપ %@ નો વિશેષ ઉપયોગ કરી રહી છે, તેથી ગ્રુપ વાગી રહ્યું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wata manhaja tana amfani da %@ ita kaɗai, don haka ƙungiyar ba ta kunnawa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אפליקציה אחרת משתמשת ב־%@ באופן בלעדי, ולכן הקבוצה לא מנגנת."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कोई दूसरा ऐप %@ का विशेष उपयोग कर रहा है, इसलिए ग्रुप नहीं चल रहा है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Egy másik alkalmazás kizárólagosan használja a(z) %@ eszközt, ezért a csoport nem játszik."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App lain sedang menggunakan %@ secara eksklusif, jadi grup tidak diputar."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un’altra app sta usando %@ in modo esclusivo, quindi il gruppo non sta riproducendo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "別のアプリが%@を排他的に使用しているため、グループは再生されていません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇನ್ನೊಂದು ಆ್ಯಪ್ %@ ಅನ್ನು ವಿಶೇಷವಾಗಿ ಬಳಸುತ್ತಿದೆ, ಆದ್ದರಿಂದ ಗುಂಪು ಪ್ಲೇ ಆಗುತ್ತಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 앱이 %@을(를) 독점적으로 사용하고 있어 그룹이 재생되지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മറ്റൊരു ആപ്പ് %@ എക്സ്ക്ലൂസീവായി ഉപയോഗിക്കുന്നു, അതിനാൽ ഗ്രൂപ്പ് പ്ലേ ചെയ്യുന്നില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दुसरे अॅप %@ चा विशेष वापर करत आहे, म्हणून ग्रुप प्ले होत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App lain sedang menggunakan %@ secara eksklusif, jadi kumpulan tidak dimainkan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En annen app bruker %@ eksklusivt, så gruppen spiller ikke."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een andere app gebruikt %@ exclusief, dus de groep speelt niet."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕੋਈ ਹੋਰ ਐਪ %@ ਨੂੰ ਵਿਸ਼ੇਸ਼ ਤੌਰ ਉੱਤੇ ਵਰਤ ਰਹੀ ਹੈ, ਇਸ ਲਈ ਗਰੁੱਪ ਨਹੀਂ ਚੱਲ ਰਿਹਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inna aplikacja używa %@ na wyłączność, więc grupa nie gra."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outro app está usando %@ com exclusividade, então o grupo não está tocando."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outra app está a usar %@ em exclusivo, por isso o grupo não está a tocar."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altă aplicație folosește %@ în exclusivitate, așa că grupul nu redă."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En annan app använder %@ exklusivt, så gruppen spelar inte."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programu nyingine inatumia %@ kwa upekee, kwa hivyo kikundi hakichezi."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வேறொரு செயலி %@ ஐ பிரத்தியேகமாகப் பயன்படுத்துகிறது, அதனால் குழு இயங்கவில்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మరో యాప్ %@ ను ప్రత్యేకంగా ఉపయోగిస్తోంది, కాబట్టి గ్రూప్ ప్లే కావడం లేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แอปอื่นกำลังใช้ %@ แบบเฉพาะ กลุ่มจึงไม่เล่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başka bir uygulama %@ aygıtını özel olarak kullandığından grup çalmıyor."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Інший застосунок використовує %@ ексклюзивно, тому група не відтворюється."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوئی اور ایپ %@ کو خصوصی طور پر استعمال کر رہی ہے، اس لیے گروپ نہیں چل رہا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Một ứng dụng khác đang dùng độc quyền %@, nên nhóm không phát."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一個 App 正在獨佔使用 %@，因此群組沒有播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一个 App 正在独占使用 %@，因此组没有在播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一個 App 正在獨佔使用 %@，因此群組沒有播放。"
           }
         }
       }

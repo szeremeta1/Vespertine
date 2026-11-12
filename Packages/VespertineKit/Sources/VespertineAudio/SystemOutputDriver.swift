@@ -85,4 +85,24 @@ public enum SystemOutputDriver {
 
     /// The device is the Mac's chosen output (what the volume keys and the Sound menu act on).
     public static func isDefaultOutput(_ device: AudioObjectID) -> Bool { DeviceQuery.defaultOutputDeviceID() == device }
+
+    /// The output's volume and mute, as the keys act on them (nil when it has no such control).
+    public static func level(_ device: AudioObjectID) -> SystemOutputLevel? {
+        guard let volume = try? HAL.get(device, .output(kAudioDevicePropertyVolumeScalar), initial: Float32(0)) else { return nil }
+        let muted = (try? HAL.get(device, .output(kAudioDevicePropertyMute), initial: UInt32(0))) ?? 0
+        return SystemOutputLevel(volume: volume, muted: muted != 0)
+    }
+
+    public static func setLevel(_ level: SystemOutputLevel, on device: AudioObjectID) {
+        try? HAL.set(device, .output(kAudioDevicePropertyVolumeScalar), Float32(level.volume))
+        try? HAL.set(device, .output(kAudioDevicePropertyMute), UInt32(level.muted ? 1 : 0))
+    }
+
+    /// The output's channel count now.
+    public static func outputChannels(_ device: AudioObjectID) -> Int { DeviceQuery.outputChannelCount(device) }
+
+    /// The UID of the Mac's chosen output.
+    public static func defaultOutputUID() -> String? {
+        DeviceQuery.defaultOutputDeviceID().flatMap { HAL.getString($0, .global(kAudioDevicePropertyDeviceUID)) }
+    }
 }

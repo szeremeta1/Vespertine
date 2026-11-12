@@ -119,6 +119,9 @@ public final class SystemOutputService: @unchecked Sendable {
     private var returnedAt: [UUID: Date] = [:]
     private var latency: [String: Int] = [:]
     private var lastStatus: SystemOutputStatus?
+    /// Each output's volume across a change of its layout (macOS puts it back to 100% when it rebuilds the output).
+    private var levels = SystemOutputLevelKeeper()
+    private var levelCheckScheduled = false
     private var observers: [NSObjectProtocol] = []
     private var listened: [(AudioObjectID, AudioObjectPropertyAddress)] = []
     private lazy var listener: AudioObjectPropertyListenerBlock = { [weak self] _, _ in self?.poke() }
@@ -213,12 +216,21 @@ public final class SystemOutputService: @unchecked Sendable {
         // An app that took a group and has gone gives it back.
         for (id, pid) in handedOff where pid > 0 && kill(pid, 0) != 0 && errno == ESRCH { handedOff[id] = nil }
 
-        // Publish (refreshes too).
+        // Publish (refreshes too). The levels are read first: a layout that differs from the last one makes macOS rebuild the output,
+        // and the rebuilt output comes back at 100%.
         let driverLoaded = SystemOutputDriver.isLoaded
         if driverLoaded {
+            var layouts: [String: [AudioChannelLabel]] = [:]
+            var read: [String: SystemOutputLevel?] = [:]
+            for entry in entries.prefix(SystemOutput.maxOutputs) {
+                layouts[entry.deviceUID] = Array(entry.labels.prefix(SystemOutput.maxChannels))
+                read[entry.deviceUID] = SystemOutputDriver.device(uid: entry.deviceUID).flatMap { SystemOutputDriver.level($0) }
+            }
+            levels.beforePublish(layouts: layouts, levels: read, now: Date())
             do { try SystemOutputDriver.publish(SystemOutput.driverConfiguration(entries, latency: latency)) } catch {
                 systemOutputLog.error("Mac Sound Output: publishing failed: \(error.localizedDescription, privacy: .public)")
             }
+            restoreLevels(entries)
         }
         listen(entries)
 
@@ -234,6 +246,21 @@ public final class SystemOutputService: @unchecked Sendable {
             status.isDefault = SystemOutputDriver.isDefaultOutput(output)
             if handedOff[id] != nil {
                 status.state = .handedOff
+                groups.append(status)
+                continue
+            }
+            // A member the user chose as the Mac's output, or another app holds exclusively: let it go (stop playing the group, so
+            // the DAC is free) and leave it alone until that changes.
+            let claim = SystemOutputPolicy.memberClaim(group: entry.group, defaultOutputUID: SystemOutputDriver.defaultOutputUID(),
+                                                       hogOwners: Self.hogOwners(entry.group), me: getpid())
+            if claim != .none {
+                if let session = sessions.removeValue(forKey: id) {
+                    session.stop()
+                    systemOutputLog.info("Mac Sound Output: let go of the group's DACs: someone else wants one")
+                }
+                idleSince[id] = nil
+                failures[id] = nil
+                status.message = Self.describe(claim, in: entry.group)
                 groups.append(status)
                 continue
             }
@@ -264,6 +291,46 @@ public final class SystemOutputService: @unchecked Sendable {
             groups.append(status)
         }
         writeStatus(SystemOutputStatus(driverLoaded: driverLoaded, groups: groups, menuBarItem: snapshot.menuBarItem, updated: now))
+    }
+
+    private static func hogOwners(_ group: SpeakerGroup) -> [String: pid_t] {
+        var owners: [String: pid_t] = [:]
+        for member in group.members {
+            if let device = SystemOutputDriver.device(uid: member.deviceUID) { owners[member.deviceUID] = DeviceControl.hogOwner(device) }
+        }
+        return owners
+    }
+
+    private static func describe(_ claim: SystemOutputPolicy.MemberClaim, in group: SpeakerGroup) -> String? {
+        func name(_ uid: String) -> String { group.members.first { $0.deviceUID == uid }?.name ?? uid }
+        switch claim {
+        case .none: return nil
+        case .isDefaultOutput(let uid): return String(localized: "\(name(uid)) is the Mac's output on its own, so the group is not playing.")
+        case .heldByOther(let uid, _): return String(localized: "Another app is using \(name(uid)) exclusively, so the group is not playing.")
+        }
+    }
+
+    /// Puts back the level of an output macOS rebuilt for a new layout, and looks again soon while one is still being watched.
+    private func restoreLevels(_ entries: [SystemOutputEntry]) {
+        var readings: [String: SystemOutputLevelKeeper.Reading] = [:]
+        var devices: [String: AudioObjectID] = [:]
+        for entry in entries.prefix(SystemOutput.maxOutputs) {
+            guard let device = SystemOutputDriver.device(uid: entry.deviceUID) else { continue }
+            devices[entry.deviceUID] = device
+            readings[entry.deviceUID] = .init(level: SystemOutputDriver.level(device), channels: SystemOutputDriver.outputChannels(device))
+        }
+        for (uid, level) in levels.restores(devices: readings, now: Date()) {
+            guard let device = devices[uid] else { continue }
+            SystemOutputDriver.setLevel(level, on: device)
+            systemOutputLog.info("Mac Sound Output: put the group's volume back after its layout changed")
+        }
+        if levels.isWaiting, !levelCheckScheduled {
+            levelCheckScheduled = true
+            queue.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                self?.levelCheckScheduled = false
+                self?.tick()
+            }
+        }
     }
 
     private func start(_ entry: SystemOutputEntry, output: AudioObjectID) {
@@ -322,16 +389,31 @@ public final class SystemOutputService: @unchecked Sendable {
     // MARK: Listening for apps starting to play
 
     private func listen(_ entries: [SystemOutputEntry]) {
-        let wanted = entries.compactMap { SystemOutputDriver.device(uid: $0.deviceUID) }
-        let now = Set(listened.map(\.0))
-        guard Set(wanted) != now else { return }
-        unlisten()
-        for device in wanted {
-            for selector in [kAudioDevicePropertyDeviceIsRunningSomewhere, kAudioDevicePropertyNominalSampleRate] {
-                var address = AudioObjectPropertyAddress.global(selector)
-                if AudioObjectAddPropertyListenerBlock(device, &address, queue, listener) == noErr { listened.append((device, address)) }
+        // The outputs (an app starting to play, a rate change), each member (someone holding it exclusively), and the Mac's chosen
+        // output (the user picking a member on its own).
+        var wanted: [(AudioObjectID, [AudioObjectPropertySelector])] = []
+        for entry in entries {
+            if let output = SystemOutputDriver.device(uid: entry.deviceUID) {
+                wanted.append((output, [kAudioDevicePropertyDeviceIsRunningSomewhere, kAudioDevicePropertyNominalSampleRate]))
+            }
+            for member in entry.group.members {
+                if let device = SystemOutputDriver.device(uid: member.deviceUID) { wanted.append((device, [kAudioDevicePropertyHogMode])) }
             }
         }
+        if !entries.isEmpty { wanted.append((AudioObjectID(kAudioObjectSystemObject), [kAudioHardwarePropertyDefaultOutputDevice])) }
+        let now = Set(listened.map { Listened(device: $0.0, selector: $0.1.mSelector) })
+        let next = Set(wanted.flatMap { device, selectors in selectors.map { Listened(device: device, selector: $0) } })
+        guard next != now else { return }
+        unlisten()
+        for item in next {
+            var address = AudioObjectPropertyAddress.global(item.selector)
+            if AudioObjectAddPropertyListenerBlock(item.device, &address, queue, listener) == noErr { listened.append((item.device, address)) }
+        }
+    }
+
+    private struct Listened: Hashable {
+        var device: AudioObjectID
+        var selector: AudioObjectPropertySelector
     }
 
     private func unlisten() {
