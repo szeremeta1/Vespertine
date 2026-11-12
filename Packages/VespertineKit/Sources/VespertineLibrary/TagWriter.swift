@@ -468,11 +468,23 @@ public actor TagWriter {
         return copies.map { UnsafePointer($0) }.withUnsafeBufferPointer { body($0.baseAddress) }
     }
 
+    /// A backup's file name: a fresh ID, then the file's own name, cut (keeping its extension) to the 255 UTF-16 units
+    /// APFS takes for one name. A name of 219 letters or more is a valid file, but with the ID in front of it it got no
+    /// backup ("File name too long"), so the file couldn't be edited at all.
+    static func backupName(for url: URL, id: String = UUID().uuidString) -> String {
+        let ext = url.pathExtension
+        let suffix = ext.isEmpty ? "" : "." + ext
+        var stem = url.deletingPathExtension().lastPathComponent
+        let room = max(0, 255 - id.utf16.count - 1 - suffix.utf16.count)
+        while stem.utf16.count > room { stem.removeLast() }
+        return "\(id)-\(stem)\(suffix)"
+    }
+
     private func makeBackup(of url: URL) throws -> URL {
         let day = ISO8601DateFormatter.string(from: .now, timeZone: .current, formatOptions: [.withFullDate])
         let dir = backupDirectory.appendingPathComponent(day, isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        let dest = dir.appendingPathComponent("\(UUID().uuidString)-\(url.lastPathComponent)")
+        let dest = dir.appendingPathComponent(Self.backupName(for: url))
         let status = url.withUnsafeFileSystemRepresentation { src in
             dest.withUnsafeFileSystemRepresentation { dst in clonefile(src!, dst!, 0) }
         }

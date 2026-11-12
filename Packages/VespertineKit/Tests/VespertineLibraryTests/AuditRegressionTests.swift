@@ -229,6 +229,29 @@ private func cue(_ title: String = "Second", at url: URL) throws {
         #expect(try await writer.revertLastEdit(trackID: track.id!))
         #expect(try Data(contentsOf: url) == original)
     }
+    @Test("A file whose name is as long as a volume allows can still be edited, and the edit undone")
+    func tagEditOfAFileWithAVeryLongName() async throws {
+        let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
+        // 250 letters and ".wav": 254 of the 255 a volume takes. The backup's ID in front made it 291.
+        let name = String(repeating: "a", count: 250) + ".wav"
+        let url = dir.appendingPathComponent(name); try audio(url)
+        let original = try Data(contentsOf: url)
+        let db = try LibraryDatabase.inMemory()
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false) // fixtures are short clips
+        try await scanner.scan(db.addSource(LibrarySource(path: dir.path, mode: .reference)))
+        let track = try #require(try db.allTracks().first)
+        let writer = TagWriter(database: db, scanner: scanner, backupDirectory: dir.appendingPathComponent(".backups"))
+        let result = try await writer.apply(TagEdit(fields: [.title: "Edited"]), to: [track])
+        #expect(result.written == 1)
+        #expect(result.failures.isEmpty)
+        #expect(try db.allTracks().first?.title == "Edited")
+        #expect(try await writer.revertLastEdit(trackID: track.id!))
+        #expect(try Data(contentsOf: url) == original)
+        let cut = TagWriter.backupName(for: url, id: "ID")
+        #expect(cut.utf16.count == 255 && cut.hasPrefix("ID-aaa") && cut.hasSuffix("a.wav"))
+        #expect(TagWriter.backupName(for: URL(fileURLWithPath: "/tmp/song.flac"), id: "ID") == "ID-song.flac")
+    }
     @Test("A read-only file is edited in the library only: no backup, the file untouched, and a rescan keeps the edit")
     func readOnlyFileEditsStayInLibrary() async throws {
         let dir = try fixture(); defer { try? FileManager.default.removeItem(at: dir) }
