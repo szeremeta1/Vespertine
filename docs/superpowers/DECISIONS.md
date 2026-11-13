@@ -53,3 +53,15 @@ Decisions made while working on my own (the owner said "fly solo, take the best 
 
 400. **TIDAL UX amendments 1–8** are in the library/UI spec ("UX review amendments"). The main ones: one-flow enable, credentials by file import, a single offline banner, the existing search field reused, and download progress shown in the sidebar.
 401. **UPnP UI says "Network Players" everywhere** ("renderer" stays only in code and the technical details). The signal path says "not verified" for what the player does. Clearer empty state.
+
+## "Build everything pending" (owner, 2026-11-13)
+
+500. **Build order:**
+     - now, in parallel: core Track D, the UPnP fix round, and Track E (UI pure parts: master switch, playability, album copies; TidalWriter, ISRC lookup);
+     - after D merges: Track F (TidalModel, playable items, settings and login, sidebar, inspector, sync queue, app routing);
+     - after the UPnP merge: AirPlay phase 1.
+501. **AirPlay phase 1 = RAOP sender, ALAC 16/44.1** (per the study), behind its own switch, off by default: Settings › Playback › "AirPlay Players (beta)".
+     - It reuses the UPnP output façade, the processed-mode PCM tap, and the badges and views.
+     - Badges say what was sent: "BIT-PERFECT · 16/44.1 SENT" only for 16/44.1 sources with no effects, otherwise "CONVERTED · 16/44.1 SENT" with the steps named.
+     - Phase 0 (measuring the macOS route on real hardware) needs the owner's moOde and is left for them.
+     - AirPlay 2 (phase 2) is not started: it's experimental, and Apple receivers are reported broken for third parties since OS 27.
