@@ -403,8 +403,6 @@ struct TrackRows: View {
     let play: (Int) -> RemoteCommand
     var numbered = false
     @State private var feedback = CommandFeedback()
-    /// The row whose copies are showing.
-    @State private var copiesOf: Int?
 
     var body: some View {
         ForEach(Array(tracks.enumerated()), id: \.offset) { index, track in
@@ -428,7 +426,7 @@ struct TrackRows: View {
                 }
                 .buttonStyle(.plain)
                 if let copies = track.copies, copies.count > 1 {
-                    SongCopiesButton(count: copies.count) { copiesOf = index }
+                    SongCopiesButton(session: session, track: track, list: tracks, index: index)
                 }
             }
             .contextMenu {
@@ -442,10 +440,5 @@ struct TrackRows: View {
             }
         }
         .feedback(feedback)
-        .sheet(isPresented: Binding(get: { copiesOf != nil }, set: { if !$0 { copiesOf = nil } })) {
-            if let index = copiesOf, tracks.indices.contains(index) {
-                SongCopiesSheet(session: session, track: tracks[index], list: tracks, index: index)
-            }
-        }
     }
 }

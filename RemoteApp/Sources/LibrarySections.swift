@@ -197,11 +197,17 @@ struct GenreMosaic: View {
 
 /// Beside a song the library has in several copies: "2 COPIES", opening the list of them (as on the Mac).
 struct SongCopiesButton: View {
-    let count: Int
-    let action: () -> Void
+    let session: RemoteSession
+    /// The row's song, and the list and place it is in.
+    let track: TrackSummary
+    let list: [TrackSummary]
+    let index: Int
+    @State private var showing = false
+
+    private var count: Int { track.copies?.count ?? 0 }
 
     var body: some View {
-        Button(action: action) {
+        Button { showing = true } label: {
             HStack(spacing: 3) {
                 Text("\(count) COPIES").font(.signal(.caption2).weight(.semibold))
                 Image(systemName: "chevron.down").font(.system(size: 7, weight: .bold))
@@ -216,6 +222,7 @@ struct SongCopiesButton: View {
         .fixedSize()
         .accessibilityLabel(Text("\(count) COPIES"))
         .accessibilityHint(Text("Shows this song’s copies"))
+        .sheet(isPresented: $showing) { SongCopiesSheet(session: session, track: track, list: list, index: index) }
     }
 }
 
