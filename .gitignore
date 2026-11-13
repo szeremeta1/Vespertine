@@ -46,3 +46,6 @@ verification/oracles/fetched/
 
 # Python bytecode from the verification tools
 verification/**/__pycache__/
+
+# TIDAL client credentials built into local app builds (never committed; see TidalConfig.bundledResourceName)
+App/Resources/TidalClient.json

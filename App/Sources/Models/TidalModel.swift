@@ -72,12 +72,15 @@ final class TidalModel {
         var syncInterval: Duration = .seconds(6 * 3600)
         /// How often the gate's backoff is read while TIDAL is on (no request: it is the gate's own state).
         var backoffPoll: Duration = .seconds(5)
+        /// The client built into the app (used when there is no `tidal-client.json`), so Sign In needs no setup.
+        var bundled: TidalClientCredentials? = nil
 
         static var live: Environment {
             Environment(credentialsURL: TidalConfig.credentialsURL(), tokens: KeychainTokenStore(), transport: URLSessionTransport(),
                         reachability: PathReachability(),
                         register: { TidalPlayback.register(resolver: $0) }, unregister: { TidalPlayback.unregister() },
-                        makeRefresher: { catalog, database, userId in TidalLibrarySync(catalog: catalog, database: database, userId: userId) })
+                        makeRefresher: { catalog, database, userId in TidalLibrarySync(catalog: catalog, database: database, userId: userId) },
+                        bundled: TidalConfig.bundledCredentials())
         }
     }
 
@@ -189,7 +192,7 @@ final class TidalModel {
     private func loadSession() {
         let credentials: TidalClientCredentials?
         do {
-            credentials = try TidalConfig.loadCredentials(at: environment.credentialsURL)
+            credentials = try TidalConfig.loadCredentials(at: environment.credentialsURL) ?? environment.bundled
             credentialsProblem = nil
         } catch {
             credentials = nil

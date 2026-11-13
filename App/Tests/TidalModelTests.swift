@@ -67,13 +67,16 @@ struct TidalModelRig {
                                                          expiresAt: Date().addingTimeInterval(3600), userId: 42, countryCode: "ES") : nil)
     }
 
+    /// The client built into the app (nil: a build without one).
+    var bundled: TidalClientCredentials?
+
     func model() -> TidalModel {
         let refresher = refresher, registered = registered
         return TidalModel(library: library, settings: settings, availability: availability, environment: TidalModel.Environment(
             credentialsURL: credentialsURL, tokens: tokens, transport: transport, reachability: reachability,
             register: { _ in registered.withLock { $0.append("register") } },
             unregister: { registered.withLock { $0.append("unregister") } },
-            makeRefresher: { _, _, _ in refresher }, backoffPoll: .milliseconds(20)))
+            makeRefresher: { _, _, _ in refresher }, backoffPoll: .milliseconds(20), bundled: bundled))
     }
 
     func tidalSourceOnline() throws -> Bool? {
@@ -97,6 +100,19 @@ func eventually(_ timeout: Double = 3, _ condition: () throws -> Bool) async -> 
 
 @Suite("TIDAL model") @MainActor
 struct TidalModelTests {
+    @Test("No credentials file but a client built into the app: signed out, Sign In ready, no request")
+    func builtInClient() async throws {
+        var rig = try TidalModelRig(credentials: false); defer { rig.cleanUp() }
+        rig.bundled = TidalClientCredentials(clientId: "test-a", clientSecret: "test-b", pkceClientId: "test-c", pkceClientSecret: "test-d")
+        let model = rig.model()
+        model.start()
+        #expect(model.state == .signedOut)
+        #expect(rig.transport.requests.withLock { $0.isEmpty })
+        let url = await model.beginLogin()
+        #expect(url?.host == "login.tidal.com")
+        #expect(url.map { URLComponents(url: $0, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "client_id" }?.value } == "test-c")
+    }
+
     @Test("No credentials file: missing credentials, no reader, no request, and local playback untouched")
     func missingCredentials() async throws {
         let rig = try TidalModelRig(credentials: false); defer { rig.cleanUp() }

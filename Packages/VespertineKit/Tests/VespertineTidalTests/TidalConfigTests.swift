@@ -18,6 +18,15 @@ struct TidalConfigTests {
     private let sample = TidalClientCredentials(clientId: "test-client", clientSecret: "test-secret",
                                                 pkceClientId: "test-pkce-client", pkceClientSecret: "test-pkce-secret")
 
+    @Test("a client built into the app is read from its TidalClient.json resource")
+    func bundledClient() throws {
+        let dir = try directory()
+        try JSONEncoder().encode(sample).write(to: dir.appendingPathComponent("TidalClient.json"))
+        let bundle = try #require(Bundle(url: dir))
+        #expect(TidalConfig.bundledCredentials(in: bundle) == sample)
+        #expect(TidalConfig.bundledCredentials(in: try #require(Bundle(url: try directory()))) == nil)
+    }
+
     @Test("a missing file loads as nil")
     func missingFile() throws {
         let url = TidalConfig.credentialsURL(base: try directory())

@@ -32,6 +32,17 @@ public enum TidalConfig {
         base.appendingPathComponent("Vespertine", isDirectory: true).appendingPathComponent("tidal-client.json")
     }
 
+    /// The resource name of the client credentials built into the app (`TidalClient.json` in its Resources). The file is made
+    /// locally and ignored by git, so the repository never holds a client ID or secret; a build without it has none.
+    public static let bundledResourceName = "TidalClient"
+
+    /// The client credentials built into the app, if this build carries them: Sign In then works with no setup.
+    public static func bundledCredentials(in bundle: Bundle = .main) -> TidalClientCredentials? {
+        guard let url = bundle.url(forResource: bundledResourceName, withExtension: "json"),
+              let data = try? Data(contentsOf: url) else { return nil }
+        return try? TidalClientCredentials.parse(data)
+    }
+
     /// The credentials in the file, or nil when there is no file. A file that exists but isn't valid credentials throws.
     public static func loadCredentials(at url: URL) throws -> TidalClientCredentials? {
         guard FileManager.default.fileExists(atPath: url.path) else { return nil }
