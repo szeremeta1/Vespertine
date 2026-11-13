@@ -177,6 +177,12 @@ final class AppSettings {
     /// Network renderers whose volume the listener unlocked (Vespertine's digital volume, so the stream is processed). The
     /// others stay locked at 100%: the original file is sent and the renderer's own volume is left alone.
     var rendererVolumeUnlocked: Set<String> { didSet { defaults.set(rendererVolumeUnlocked.sorted(), forKey: "rendererVolumeUnlocked") } }
+    /// AirPlay receivers are in the app only while this is on (Settings › Playback › AirPlay Players (beta), off by default). Off,
+    /// nothing is browsed on Bonjour, no socket is opened, and nothing about them is shown, read or written.
+    var airPlayPlayersFeature: Bool { didSet { defaults.set(airPlayPlayersFeature, forKey: "airPlayPlayersFeature") } }
+    /// AirPlay receivers whose volume Vespertine sets digitally (the song is converted). The others get their level as the
+    /// receiver's own volume (RAOP metadata), and Vespertine's samples are left as they are.
+    var airPlayDigitalVolume: Set<String> { didSet { defaults.set(airPlayDigitalVolume.sorted(), forKey: "airPlayDigitalVolume") } }
     /// Song transitions (crossfade, Smart Mix, Live Set) and their master switch, off unless turned on. Reach the
     /// engine only while the switch is on (`engineSettings()`).
     var transitions: TransitionSettings { didSet { if transitions != oldValue { transitions.save(to: defaults) } } }
@@ -222,7 +228,7 @@ final class AppSettings {
             "watchFolders": false, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "dopListUpdates": true, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
-            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "bundleCopies": false,
+            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "airPlayPlayersFeature": false, "bundleCopies": false,
         ])
         Self.migrateAutomaticWorkToOff(defaults)
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
@@ -303,6 +309,8 @@ final class AppSettings {
         speakerGroupsFeature = defaults.bool(forKey: "speakerGroupsFeature")
         upnpRenderersFeature = defaults.bool(forKey: "upnpRenderersFeature")
         rendererVolumeUnlocked = Set(defaults.stringArray(forKey: "rendererVolumeUnlocked") ?? [])
+        airPlayPlayersFeature = defaults.bool(forKey: "airPlayPlayersFeature")
+        airPlayDigitalVolume = Set(defaults.stringArray(forKey: "airPlayDigitalVolume") ?? [])
         transitions = TransitionSettings.load(from: defaults)
         self.dataDirectory = resolvedDataDirectory
         // A library that came from the old preferences gets its own file now (`didSet` doesn't run inside `init`).

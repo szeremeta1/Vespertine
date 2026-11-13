@@ -191,8 +191,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
 
     /// The receiver's own volume (sent as RAOP metadata; Vespertine's samples are untouched), −144…0 dB.
     public func setReceiverVolume(decibels: Double) {
-        state.withLock { $0.receiverVolumeDB = decibels }
-        enqueue.yield(.volume(decibels))
+        let changed = state.withLock { s -> Bool in defer { s.receiverVolumeDB = decibels }; return s.receiverVolumeDB != decibels }
+        if changed { enqueue.yield(.volume(decibels)) }
     }
 
     public func shutdown() {

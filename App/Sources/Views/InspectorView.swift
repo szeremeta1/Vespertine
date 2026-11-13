@@ -159,7 +159,7 @@ struct StatusBadges: View {
     }
     private var statusBadge: some View { StatusBadge(text: path.statusLine, kind: path.isUntouched ? .perfect : .converted) }
     // What the status leaves out: "Converted from DSD" beside SPATIAL or a downmix.
-    private var notices: some View { ForEach(path.conversionBadges, id: \.self) { StatusBadge(text: $0, kind: .converted) } }
+    private var notices: some View { ForEach(path.renderer?.transport == .airPlay ? path.renderer?.stepBadges ?? [] : path.conversionBadges, id: \.self) { StatusBadge(text: $0, kind: .converted) } }
     private var status: some View { HStack(spacing: 8) { statusBadge; notices } }
     @ViewBuilder private var details: some View {
         if let renderer = path.renderer {
@@ -189,7 +189,7 @@ struct SignalPathView: View {
     }
 
     var steps: [Step] {
-        if let renderer = path.renderer { return Self.rendererSteps(path, renderer) }
+        if let renderer = path.renderer { return renderer.transport == .airPlay ? Self.airPlaySteps(path, renderer) : Self.rendererSteps(path, renderer) }
         var s: [Step] = []
         let src = path.source
         let srcValue: String = if let dsd = src.dsdName {
