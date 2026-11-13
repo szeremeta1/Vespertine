@@ -397,9 +397,18 @@ struct TidalSyncStorageTests {
         try db.setFavorite(true, trackIDs: [localId])
         try db.writer.write { try $0.execute(sql: "INSERT INTO playHistory (trackId, playedAt) VALUES (?, ?)", arguments: [localId, Date()]) }
 
+        try db.writer.write { db in
+            try db.execute(sql: "INSERT INTO tagHistory (trackId, editedAt, previous) VALUES (?, ?, '{}')", arguments: [localId, Date()])
+            try db.execute(sql: "INSERT INTO cueTagOverride (trackId, metadata) VALUES (?, ?)", arguments: [localId, Data("{}".utf8)])
+            try db.execute(sql: "INSERT INTO preferredCopy (trackId, preferredAt) VALUES (?, ?)", arguments: [localId, Date()])
+        }
+
         let source = try #require(try db.tidalSource(userId: 1).id)
         let ids = try db.upsertTidalTracks([input(77)], sourceId: source)
         let tidalTrack = try #require(ids[77])
+        for table in ["tagHistory", "cueTagOverride", "preferredCopy"] {
+            #expect(try scalar(db, "SELECT count(*) FROM \(table) WHERE trackId = ?", [tidalTrack]) == 1, "\(table) moved")
+        }
         #expect(try scalar(db, "SELECT count(*) FROM track WHERE id = ?", [localId]) == 0, "the plain row is gone")
         #expect(try scalar(db, "SELECT count(*) FROM track") == 1)
         let record = try #require(try db.tidalRecord(trackId: tidalTrack))

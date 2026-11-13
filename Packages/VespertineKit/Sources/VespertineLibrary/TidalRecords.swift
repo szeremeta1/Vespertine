@@ -235,11 +235,33 @@ extension LibraryDatabase {
                              copy.bitDepth, copy.channels, copy.bitrate, copy.playCount, copy.lastPlayedAt, copy.rating, copy.addedAt, trackId])
         try db.execute(sql: "UPDATE track SET lastPlayedAt = NULL WHERE id = ? AND lastPlayedAt = 0", arguments: [trackId])
         try db.execute(sql: "UPDATE tidalTrack SET downloadPath = ?, formatIsProbed = 1 WHERE trackId = ?", arguments: [copy.filePath, trackId])
+        // What belongs to the song moves with it, as for a moved file (`reconcileMovedTracks`). A library-only edit is kept
+        // (TIDAL's descriptions are what the row shows; the edit stays for undo), and so are the file's analysis and transition
+        // profile: the bytes are the same.
         try db.execute(sql: "UPDATE playlistItem SET trackId = ? WHERE trackId = ?", arguments: [trackId, old])
+        try db.execute(sql: "UPDATE tagHistory SET trackId = ? WHERE trackId = ?", arguments: [trackId, old])
         try db.execute(sql: "UPDATE playHistory SET trackId = ? WHERE trackId = ?", arguments: [trackId, old])
         try db.execute(sql: """
             INSERT OR IGNORE INTO favorite (trackId, favoritedAt, borrowed) SELECT ?, favoritedAt, borrowed FROM favorite WHERE trackId = ?
             """, arguments: [trackId, old])
+        try db.execute(sql: """
+            INSERT OR IGNORE INTO preferredCopy (trackId, preferredAt) SELECT ?, preferredAt FROM preferredCopy WHERE trackId = ?
+            """, arguments: [trackId, old])
+        try db.execute(sql: "INSERT OR REPLACE INTO cueTagOverride (trackId, metadata) SELECT ?, metadata FROM cueTagOverride WHERE trackId = ?",
+                       arguments: [trackId, old])
+        if try Bool.fetchOne(db, sql: "SELECT NOT EXISTS (SELECT 1 FROM analysis WHERE trackId = ?)", arguments: [trackId]) == true {
+            try db.execute(sql: "UPDATE analysis SET trackId = ? WHERE trackId = ?", arguments: [trackId, old])
+            try db.execute(sql: """
+                UPDATE track SET
+                  analysisVerdict = (SELECT analysisVerdict FROM track WHERE id = :old),
+                  bandwidthHz = (SELECT bandwidthHz FROM track WHERE id = :old),
+                  effectiveBitDepth = (SELECT effectiveBitDepth FROM track WHERE id = :old)
+                WHERE id = :new AND analysisVerdict IS NULL
+                """, arguments: ["old": old, "new": trackId])
+        }
+        if try Bool.fetchOne(db, sql: "SELECT NOT EXISTS (SELECT 1 FROM transitionProfile WHERE trackId = ?)", arguments: [trackId]) == true {
+            try db.execute(sql: "UPDATE transitionProfile SET trackId = ? WHERE trackId = ?", arguments: [trackId, old])
+        }
         try db.execute(sql: "DELETE FROM track WHERE id = ?", arguments: [old])
     }
 
