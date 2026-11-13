@@ -160,3 +160,10 @@ Made solo on branch `airplay-raop` (spec `docs/superpowers/specs/2026-11-13-airp
 710. **"Add downloads folder to the library" adds the folder when the first download is queued** (or when the setting is turned on), not at launch, so turning TIDAL on doesn't create `~/Music/Vespertine/TIDAL` by itself. Turning the setting off leaves an added folder in the library.
 711. **Remove Download moves the file to the Trash** and the song streams again.
 712. **Switching TIDAL off pauses downloads** (the track being written stops and goes back to the queue, leaving no file) and unregisters the stream reader; switching on resumes.
+
+## Sign-in without setup (owner, 2026-11-14)
+
+800. **TIDAL works with only "Sign In…"** (the owner's requirement), replacing decision 7's "paste credentials first".
+     - Local builds carry a TIDAL client in `App/Resources/TidalClient.json`. Git ignores the file, so the public repo never holds a client ID or secret, but the built app does.
+     - `TidalModel` uses a user-supplied `tidal-client.json` when one exists, otherwise the built-in client.
+     - `scripts/install-local.sh` builds Release, re-signs it for this Mac (as `scripts/release.sh` does for local builds) and installs it in /Applications.
