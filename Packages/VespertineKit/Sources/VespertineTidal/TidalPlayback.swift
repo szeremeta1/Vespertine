@@ -60,10 +60,13 @@ public enum TidalPlayback {
     }
 
     /// `resolver.resolve` from a thread that may block (the cache's open queue, a copy lane, a download's worker).
+    /// Refuses to run on a thread of the cooperative pool (inside a task): waiting there for a task that needs a pool thread
+    /// could leave none to run it.
     static func resolveBlocking(_ resolver: TidalStreamResolver, trackId: Int, priority: TidalPriority) throws -> TidalStream {
+        if withUnsafeCurrentTask(body: { $0 != nil }) { throw BlockingInTask() }
         let done = DispatchSemaphore(value: 0)
         nonisolated(unsafe) var result: Result<TidalStream, Error>?
-        Task {
+        Task.detached(priority: .userInitiated) {
             do { result = .success(try await resolver.resolve(trackId: trackId, priority: priority)) }
             catch { result = .failure(error) }
             done.signal()
@@ -71,4 +74,9 @@ public enum TidalPlayback {
         done.wait()
         return try result!.get()
     }
+}
+
+/// `TidalPlayback.resolveBlocking` was called from inside a task (a programming error: it must run on a thread of its own).
+struct BlockingInTask: LocalizedError {
+    var errorDescription: String? { "A TIDAL stream was resolved from a task thread instead of a thread of its own." }
 }

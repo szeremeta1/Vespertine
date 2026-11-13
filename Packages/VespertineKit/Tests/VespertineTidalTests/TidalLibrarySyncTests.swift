@@ -24,6 +24,9 @@ final class FakeCatalog: TidalCatalogReading, @unchecked Sendable {
     var favorites: [TidalTrack] = []
     var albums: [TidalAlbum] = []
     var albumContents: [Int: [TidalTrack]] = [:]
+    var albumInfo: [Int: TidalAlbum] = [:]
+    /// Thrown, one per call, by the next album or playlist calls.
+    var failures: [TidalError] = []
     var playlists: [TidalPlaylist] = []
     var playlistContents: [String: [TidalTrack]] = [:]
     private(set) var calls: [String] = []
@@ -34,10 +37,18 @@ final class FakeCatalog: TidalCatalogReading, @unchecked Sendable {
 
     func favoriteTracks(userId: Int, priority: TidalPriority) async throws -> [TidalTrack] { record("favoriteTracks"); return lock.withLock { favorites } }
     func favoriteAlbums(userId: Int, priority: TidalPriority) async throws -> [TidalAlbum] { record("favoriteAlbums"); return lock.withLock { albums } }
+    private func nextFailure() -> TidalError? { lock.withLock { failures.isEmpty ? nil : failures.removeFirst() } }
+    func album(_ id: Int, priority: TidalPriority) async throws -> TidalAlbum {
+        record("album \(id)")
+        if let failure = nextFailure() { throw failure }
+        return lock.withLock { albumInfo[id] } ?? TidalAlbum(id: id, title: "Album \(id)", numberOfTracks: 0)
+    }
     func albumTracks(_ id: Int, priority: TidalPriority) async throws -> [TidalTrack] { record("albumTracks \(id)"); return lock.withLock { albumContents[id] ?? [] } }
     func userPlaylists(userId: Int, priority: TidalPriority) async throws -> [TidalPlaylist] { record("userPlaylists"); return lock.withLock { playlists } }
     func playlistTracks(_ uuid: String, priority: TidalPriority) async throws -> [TidalTrack] {
-        record("playlistTracks \(uuid)"); return lock.withLock { playlistContents[uuid] ?? [] }
+        record("playlistTracks \(uuid)")
+        if let failure = nextFailure() { throw failure }
+        return lock.withLock { playlistContents[uuid] ?? [] }
     }
 }
 

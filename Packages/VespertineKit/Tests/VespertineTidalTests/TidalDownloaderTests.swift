@@ -8,6 +8,7 @@ import Foundation
 import GRDB
 import Testing
 @testable import VespertineLibrary
+@testable import VespertineAudio
 @testable import VespertineTidal
 
 /// A CDN with `/audio/<id>.flac` for each track and a TIDAL API that resolves track `<id>` to it.
@@ -21,6 +22,8 @@ private final class DownloadRig: @unchecked Sendable {
     /// How many playback-info requests answer 429 before the rest go through.
     let rateLimited = Locked(0)
     let dash = Locked(false)
+    /// When set, each resolution hands out a new `?token=`, and the CDN's tokens expire after this many bytes.
+    let tokens = Counter()
     let transport: FakeTransport
     let database: LibraryDatabase
 
@@ -34,7 +37,7 @@ private final class DownloadRig: @unchecked Sendable {
         for (index, chunk) in chunks.enumerated() { server.serve("/dash/\(index + 1).m4s", chunk) }
         folder = try DASHFixture.temporaryDirectory("tidal-downloads")
         database = try LibraryDatabase.inMemory()
-        let failing = failing, rateLimited = rateLimited, dash = dash
+        let failing = failing, rateLimited = rateLimited, dash = dash, tokens = tokens
         transport = FakeTransport { request in
             let parts = request.url?.path.split(separator: "/") ?? []
             let id = parts.firstIndex(of: "tracks").flatMap { parts.indices.contains($0 + 1) ? Int(parts[$0 + 1]) : nil } ?? 0
@@ -42,7 +45,7 @@ private final class DownloadRig: @unchecked Sendable {
             if limited { rateLimited.mutate { $0 -= 1 }; return FakeResponse(status: 429, json: "{}", headers: ["Retry-After": "120"]) }
             if failing.value.contains(id) { return FakeResponse(status: 404, json: #"{"status":404,"userMessage":"Not found"}"#) }
             if dash.value { return dashPlaybackInfo(server: server, segments: chunks.count) }
-            return btsPlaybackInfo(url: server.url("/audio/\(id).flac"))
+            return btsPlaybackInfo(url: server.url("/audio/\(id).flac", token: "t\(tokens.next())"))
         }
     }
 
@@ -51,13 +54,16 @@ private final class DownloadRig: @unchecked Sendable {
         try? FileManager.default.removeItem(at: folder)
     }
 
+    /// Nothing plays here: the shared gate's state belongs to the other suites.
+    let playback = ShareIOGate(healthyGrace: 0)
+
     @MainActor
     func downloader(catalog: FakeCatalog = FakeCatalog()) -> TidalDownloader {
         let gate = makeSignedInGate(transport: transport, clock: clock)
         let sleeps = sleeps, clock = clock
         return TidalDownloader(resolver: TidalStreamResolver(gate: gate), catalog: catalog, database: database, folder: folder,
                                sleep: { seconds in sleeps.mutate { $0.append(seconds) }; clock.advance(seconds) },
-                               random: { Double.random(in: $0) }, fetchCover: { _ in nil })
+                               random: { Double.random(in: $0) }, gate: playback, fetchCover: { _ in nil })
     }
 
     func path(_ id: Int, artist: String = "Artist", album: String = "Album", title: String? = nil) -> URL {
@@ -86,7 +92,7 @@ struct TidalDownloaderTests {
         let rig = try DownloadRig(ids: [1, 2, 3])
         let downloader = rig.downloader()
         downloader.enqueue(tracks: [tidalTrack(1), tidalTrack(2), tidalTrack(3)])
-        #expect(downloader.items.map(\.id) == [1, 2, 3])
+        #expect(downloader.items.map(\.trackId) == [1, 2, 3])
         #expect(await finished(downloader))
         for id in 1...3 {
             #expect(downloader.items[id - 1].state == .done(rig.path(id)))
@@ -176,7 +182,7 @@ struct TidalDownloaderTests {
             let state = await MainActor.run { box.value.map { "\($0.items[0].state)" } ?? "-" }
             seen.mutate { $0.append("\(Int(seconds)) \(state)") }
             clock.advance(seconds)
-        }, random: { $0.lowerBound }, fetchCover: { _ in nil })
+        }, random: { $0.lowerBound }, gate: rig.playback, fetchCover: { _ in nil })
         box.mutate { $0 = downloader }
         downloader.enqueue(tracks: [tidalTrack(1)])
         #expect(await finished(downloader))
@@ -190,16 +196,17 @@ struct TidalDownloaderTests {
         let rig = try DownloadRig(ids: [1, 2, 3, 4])
         let catalog = FakeCatalog()
         catalog.albumContents = [9: [tidalTrack(1), tidalTrack(2)]]
+        catalog.albumInfo = [9: TidalAlbum(id: 9, title: "Album", numberOfTracks: 2, artist: TidalArtistRef(id: 50, name: "Artist"))]
         catalog.playlistContents = ["pl": [tidalTrack(3), tidalTrack(4)]]
         let downloader = rig.downloader(catalog: catalog)
         await downloader.enqueue(album: 9)
         await downloader.enqueue(playlist: "pl")
-        #expect(downloader.items.map(\.id) == [1, 2, 3, 4])
+        #expect(downloader.items.map(\.trackId) == [1, 2, 3, 4])
         downloader.cancel(3)
-        #expect(downloader.items.map(\.id) == [1, 2, 4])
+        #expect(downloader.items.map(\.trackId) == [1, 2, 4])
         #expect(await finished(downloader))
         #expect(!FileManager.default.fileExists(atPath: rig.path(3).path))
-        #expect(catalog.log == ["albumTracks 9", "playlistTracks pl"])
+        #expect(catalog.log == ["album 9", "albumTracks 9", "playlistTracks pl"])
     }
 
     @Test("A downloaded track in the library is linked to its file")
@@ -212,5 +219,109 @@ struct TidalDownloaderTests {
         #expect(await finished(downloader))
         let record = try #require(try await rig.database.writer.read { try TidalTrackRecord.filter(Column("tidalId") == 1).fetchOne($0) })
         #expect(record.downloadPath == rig.path(1).path)
+    }
+
+    @Test("While a playing song needs the network the download holds, and carries on once it doesn't")
+    func yieldsToPlayback() async throws {
+        let rig = try DownloadRig(ids: [1])
+        rig.playback.setPlaybackDemand(true, from: "playing song")
+        let downloader = rig.downloader()
+        downloader.enqueue(tracks: [tidalTrack(1)])
+        try await Task.sleep(for: .milliseconds(500))
+        #expect(rig.server.requests.filter { $0.path.hasPrefix("/audio/") }.isEmpty, "not a byte while playback needs the link")
+        #expect(downloader.items[0].state == .downloading(0))
+        rig.playback.setPlaybackDemand(false, from: "playing song", grace: false)
+        #expect(await finished(downloader))
+        #expect(downloader.items[0].state == .done(rig.path(1)))
+    }
+
+    @Test("A renewal mid-download and one mid-playback run at the same time on threads of their own, and both finish")
+    func renewalsOffThePool() async throws {
+        let rig = try DownloadRig(ids: [1, 2])
+        rig.server.expire("/audio/1.flac", afterBytes: 200_000)
+        rig.server.expire("/audio/2.flac", afterBytes: 200_000)
+        // Playback of track 2 through the cache, renewing as it copies, while track 1 downloads and renews.
+        TidalPlayback.register(resolver: TidalStreamResolver(gate: makeSignedInGate(transport: rig.transport, clock: rig.clock)))
+        let directory = try DASHFixture.temporaryDirectory("renewals"); defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = NetworkPlaybackCache(directory: directory, budget: 64 << 20, chunk: 64 << 10)
+        let downloader = rig.downloader()
+        downloader.readSize = 64 << 10
+        downloader.enqueue(tracks: [tidalTrack(1)])
+        let played = Locked<Data?>(nil)
+        Thread {
+            let entry = try? cache.entry(key: "tidal:2", url: TidalPlayback.url(trackId: 2))
+            try? entry?.prepare(full: true, lead: 0, cancelled: { false })
+            let bytes = entry.flatMap { try? Data(contentsOf: $0.url) }
+            played.mutate { $0 = bytes }
+        }.start()
+        #expect(await finished(downloader))
+        #expect(downloader.items[0].state == .done(rig.path(1)))
+        #expect(await eventually { played.value != nil })
+        #expect(played.value == (try DASHFixture.source()))
+        #expect(rig.tokens.next() >= 4, "both renewed at least once")
+        // The blocking resolution refuses to run inside a task: it would hold a pool thread waiting for another task.
+        let resolver = TidalStreamResolver(gate: makeSignedInGate(transport: rig.transport, clock: rig.clock))
+        #expect(throws: BlockingInTask.self) { _ = try TidalPlayback.resolveBlocking(resolver, trackId: 1, priority: .download) }
+    }
+
+    @Test("Stale .partial files of an earlier run are removed when the downloader starts")
+    func removesStalePartials() async throws {
+        let rig = try DownloadRig(ids: [])
+        let stale = rig.folder.appendingPathComponent("A/B/1-01 Old.flac.partial")
+        try FileManager.default.createDirectory(at: stale.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data("half".utf8).write(to: stale)
+        let kept = rig.folder.appendingPathComponent("A/B/1-02 Done.flac")
+        try Data("whole".utf8).write(to: kept)
+        let downloader = rig.downloader()
+        await downloader.startup.value
+        #expect(!FileManager.default.fileExists(atPath: stale.path))
+        #expect(FileManager.default.fileExists(atPath: kept.path))
+    }
+
+    @Test("Downloading a track again replaces its file in one step")
+    func redownload() async throws {
+        let rig = try DownloadRig(ids: [1])
+        try FileManager.default.createDirectory(at: rig.path(1).deletingLastPathComponent(), withIntermediateDirectories: true)
+        try Data("old".utf8).write(to: rig.path(1))
+        let downloader = rig.downloader()
+        downloader.enqueue(tracks: [tidalTrack(1)])
+        #expect(await finished(downloader))
+        #expect(downloader.items[0].state == .done(rig.path(1)))
+        let decoded = try DASHFixture.decode(rig.path(1)), source = try DASHFixture.decode(DASHFixture.directory().appendingPathComponent("source.flac"))
+        #expect(decoded.bytes == source.bytes)
+    }
+
+    @Test("An album or playlist that can't be read stays in the queue as failed, or paused through a backoff and read after it")
+    func collectionFailures() async throws {
+        let rig = try DownloadRig(ids: [1])
+        let catalog = FakeCatalog()
+        catalog.albumInfo = [9: TidalAlbum(id: 9, title: "Album", numberOfTracks: 1, artist: TidalArtistRef(id: 50, name: "Artist"))]
+        catalog.albumContents = [9: [tidalTrack(1)]]
+        catalog.failures = [.http(status: 404, body: "gone"), .backingOff(remaining: 90, reason: "rate limited (HTTP 429)")]
+        let downloader = rig.downloader(catalog: catalog)
+        await downloader.enqueue(playlist: "missing")
+        guard case .failed(let message) = downloader.items.first?.state else { Issue.record("\(downloader.items)"); return }
+        #expect(downloader.items[0].id == "playlist:missing" && !message.isEmpty)
+        await downloader.enqueue(album: 9)
+        #expect(await finished(downloader))
+        #expect(downloader.items.map(\.id) == ["playlist:missing", "track:1"])
+        #expect(downloader.items[1].state == .done(rig.path(1)))
+        #expect(rig.sleeps.value.contains(90), "waited the backoff out: \(rig.sleeps.value)")
+    }
+
+    @Test("A compilation's tracks go in the album artist's folder, whoever plays on each")
+    func compilationFolder() async throws {
+        let rig = try DownloadRig(ids: [1, 2])
+        let catalog = FakeCatalog()
+        catalog.albumInfo = [9: TidalAlbum(id: 9, title: "Hits", numberOfTracks: 2, artist: TidalArtistRef(id: 1, name: "Various Artists"))]
+        catalog.albumContents = [9: [tidalTrack(1, artist: "Singer A", albumTitle: "Hits"), tidalTrack(2, artist: "Singer B", albumTitle: "Hits")]]
+        let downloader = rig.downloader(catalog: catalog)
+        await downloader.enqueue(album: 9)
+        #expect(await finished(downloader))
+        for id in 1...2 {
+            #expect(downloader.items[id - 1].state == .done(rig.path(id, artist: "Various Artists", album: "Hits")))
+        }
+        let tags = try MetadataReader.read(url: rig.path(2, artist: "Various Artists", album: "Hits"), artwork: nil)
+        #expect(tags.albumArtist == "Various Artists" && tags.artist == "Singer B")
     }
 }

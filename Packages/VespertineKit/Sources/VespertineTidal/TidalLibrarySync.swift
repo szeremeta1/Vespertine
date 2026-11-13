@@ -12,6 +12,7 @@ import VespertineLibrary
 public protocol TidalCatalogReading: Sendable {
     func favoriteTracks(userId: Int, priority: TidalPriority) async throws -> [TidalTrack]
     func favoriteAlbums(userId: Int, priority: TidalPriority) async throws -> [TidalAlbum]
+    func album(_ id: Int, priority: TidalPriority) async throws -> TidalAlbum
     func albumTracks(_ id: Int, priority: TidalPriority) async throws -> [TidalTrack]
     func userPlaylists(userId: Int, priority: TidalPriority) async throws -> [TidalPlaylist]
     func playlistTracks(_ uuid: String, priority: TidalPriority) async throws -> [TidalTrack]
