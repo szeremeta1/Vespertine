@@ -297,6 +297,12 @@ public final class RemoteSession {
         }
     }
 
+    /// Reads a range of an open stream (`.streamOpen` opens one). Throws when the Mac refuses or the connection ends.
+    public func readStream(_ stream: Int, offset: Int64, length: Int) async throws -> StreamFrame {
+        guard let link, phase == .connected else { throw RemoteLinkError.closed }
+        return try await link.read(stream: stream, offset: offset, length: length, timeout: .seconds(30))
+    }
+
     // MARK: Pairing
 
     public enum PairingError: Error, Equatable, Sendable {

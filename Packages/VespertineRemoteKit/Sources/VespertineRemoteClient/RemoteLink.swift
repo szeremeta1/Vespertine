@@ -13,6 +13,7 @@ import VespertineRemoteProtocol
 final class RemoteLink: RemoteChannel {
     private let connection: NWConnection
     private var pending: [Int: CheckedContinuation<RemoteReply, any Error>] = [:]
+    private var pendingReads: [Int: CheckedContinuation<StreamFrame, any Error>] = [:]
     private var opening: CheckedContinuation<Void, any Error>?
     private var nextID = 0
     private(set) var isReady = false
@@ -97,6 +98,9 @@ final class RemoteLink: RemoteChannel {
         let waiting = pending
         pending.removeAll()
         for continuation in waiting.values { continuation.resume(throwing: RemoteLinkError.closed) }
+        let reading = pendingReads
+        pendingReads.removeAll()
+        for continuation in reading.values { continuation.resume(throwing: RemoteLinkError.closed) }
         onClose?(lastError)
     }
 
@@ -114,11 +118,42 @@ final class RemoteLink: RemoteChannel {
     }
 
     private func handle(_ data: Data) {
+        // A binary frame answers a stream read; everything else is JSON.
+        if StreamFrame.isFrame(data) {
+            if let frame = StreamFrame(decoding: data) { pendingReads.removeValue(forKey: frame.request)?.resume(returning: frame) }
+            return
+        }
         guard let message = try? RemoteProtocol.decoder().decode(ServerMessage.self, from: data) else { return }
         if case .reply(let id, let result) = message {
+            if let read = pendingReads.removeValue(forKey: id) {
+                // The Mac couldn't serve the range: its reason, instead of a frame.
+                if case .failed(let reason) = result { read.resume(throwing: RemoteLinkError.readFailed(reason)) } else { read.resume(throwing: RemoteLinkError.readFailed("")) }
+                return
+            }
             pending.removeValue(forKey: id)?.resume(returning: result)
         } else {
             onPush?(message)
+        }
+    }
+
+    /// Reads `length` bytes of an open stream from `offset`.
+    func read(stream: Int, offset: Int64, length: Int, timeout: Duration = .seconds(30)) async throws -> StreamFrame {
+        guard isReady, !isClosed else { throw RemoteLinkError.closed }
+        nextID += 1
+        let id = nextID
+        let data = try RemoteProtocol.encoder().encode(ClientMessage(id: id, command: .streamRead(stream: stream, offset: offset, length: length)))
+        let timer = Task { [weak self] in
+            try? await Task.sleep(for: timeout)
+            guard !Task.isCancelled else { return }
+            self?.pendingReads.removeValue(forKey: id)?.resume(throwing: RemoteLinkError.timedOut)
+        }
+        defer { timer.cancel() }
+        return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<StreamFrame, any Error>) in
+            pendingReads[id] = continuation
+            connection.send(content: data, contentContext: RemoteTransport.textContext, isComplete: true, completion: .contentProcessed { [weak self] error in
+                guard error != nil else { return }
+                MainActor.assumeIsolated { self?.pendingReads.removeValue(forKey: id)?.resume(throwing: RemoteLinkError.closed) }
+            })
         }
     }
 
