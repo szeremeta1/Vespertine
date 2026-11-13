@@ -61,3 +61,44 @@ extension URLRequest {
         FormEncoding.decode(String(decoding: httpBody ?? Data(), as: UTF8.self))
     }
 }
+
+/// Holds callers until the test lets them go.
+actor Latch {
+    private var waiting: [CheckedContinuation<Void, Never>] = []
+    private var open = false
+
+    var waitingCount: Int { waiting.count }
+
+    func wait() async {
+        if open { return }
+        await withCheckedContinuation { waiting.append($0) }
+    }
+
+    func releaseOne() {
+        guard !waiting.isEmpty else { return }
+        waiting.removeFirst().resume()
+    }
+
+    func releaseAll() {
+        open = true
+        let all = waiting
+        waiting = []
+        all.forEach { $0.resume() }
+    }
+}
+
+/// Spins (yielding) until `condition` holds or about two seconds pass.
+func eventually(_ condition: @Sendable () async -> Bool) async -> Bool {
+    for _ in 0..<2000 {
+        if await condition() { return true }
+        try? await Task.sleep(for: .milliseconds(1))
+    }
+    return false
+}
+
+final class Counter: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value = 0
+    /// The count before this call.
+    func next() -> Int { lock.withLock { defer { value += 1 }; return value } }
+}
