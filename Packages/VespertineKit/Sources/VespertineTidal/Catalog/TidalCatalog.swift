@@ -66,6 +66,57 @@ public struct TidalCatalog: Sendable {
         try await allPages(path: "users/\(userId)/playlists", priority: priority, as: TidalPlaylist.self)
     }
 
+    // MARK: Browsing
+
+    /// The user's mixes (TIDAL's `users/<id>/mixes`). Throws when TIDAL doesn't offer them to this client; the app hides My Mixes then.
+    public func mixes(userId: Int, priority: TidalPriority = .interactive) async throws -> [TidalMix] {
+        try await allPages(path: "users/\(userId)/mixes", priority: priority, as: TidalMix.self)
+    }
+
+    /// A mix's tracks in order (videos left out).
+    public func mixTracks(_ id: String, priority: TidalPriority = .interactive) async throws -> [TidalTrack] {
+        try await allPages(path: "mixes/\(id)/items", priority: priority, as: PlaylistEntry.self).compactMap(\.track)
+    }
+
+    /// An artist's albums.
+    public func artistAlbums(_ id: Int, priority: TidalPriority = .interactive) async throws -> [TidalAlbum] {
+        try await gate.get("artists/\(id)/albums", query: ["limit": "50", "offset": "0"], priority: priority, as: TidalPage<TidalAlbum>.self).items
+    }
+
+    /// New releases of the user's favorite artists (the first `artists` of them, as TidalSwiftLib's `newReleases` reads them): their
+    /// albums of the last 180 days, newest first. One request per artist, at interactive priority; an artist that fails is skipped.
+    public func newReleases(userId: Int, artists: Int = 20, now: Date = Date()) async throws -> [TidalAlbum] {
+        let favorites = try await favoriteArtists(userId: userId, priority: .interactive).prefix(artists)
+        var albums: [TidalAlbum] = []
+        for artist in favorites {
+            do {
+                albums += try await artistAlbums(artist.id)
+            } catch let error as TidalError {
+                switch error {
+                case .backingOff, .abuse, .notSignedIn: throw error
+                default: continue
+                }
+            }
+        }
+        return Self.newReleases(albums, now: now, limit: 50)
+    }
+
+    /// Albums released in the 180 days up to `now`, newest first, each once.
+    static func newReleases(_ albums: [TidalAlbum], now: Date, limit: Int) -> [TidalAlbum] {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        formatter.dateFormat = "yyyy-MM-dd"
+        let start = now.addingTimeInterval(-180 * 86_400)
+        var seen = Set<Int>()
+        let dated = albums.compactMap { album -> (TidalAlbum, Date)? in
+            guard let text = album.releaseDate, let date = formatter.date(from: String(text.prefix(10))), date >= start, date <= now,
+                  seen.insert(album.id).inserted else { return nil }
+            return (album, date)
+        }
+        return dated.sorted { $0.1 > $1.1 }.prefix(limit).map(\.0)
+    }
+
     // MARK: Search, lyrics, credits
 
     public func search(_ query: String, limit: Int = 50, priority: TidalPriority = .interactive) async throws -> TidalSearchResult {

@@ -49,6 +49,7 @@ extension FilterScope {
         case .favorites: "favorites"
         case .playlist(let id): "playlist:\(id)"
         case .source(let id): "source:\(id)"
+        case .tidalSearch, .tidalMixes, .tidalNewReleases, .tidalDownloads: nil
         }
     }
 

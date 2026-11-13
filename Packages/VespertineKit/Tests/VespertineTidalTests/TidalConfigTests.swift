@@ -65,3 +65,27 @@ struct TidalConfigTests {
         #expect(throws: (any Error).self) { try TidalConfig.loadCredentials(at: url) }
     }
 }
+
+@Suite("TIDAL credentials import")
+struct TidalCredentialsImportTests {
+    @Test("A tidal-client.json pasted or imported gives the four values, trimmed")
+    func parses() throws {
+        let json = #"{"clientId": " a ", "clientSecret": "b", "pkceClientId": "c", "pkceClientSecret": "d"}"#
+        let parsed = try TidalClientCredentials.parse(Data(json.utf8))
+        #expect(parsed == TidalClientCredentials(clientId: "a", clientSecret: "b", pkceClientId: "c", pkceClientSecret: "d"))
+    }
+
+    @Test("A missing or empty value is refused, and the error names the key")
+    func namesTheMissingKey() {
+        let missing = #"{"clientId": "a", "clientSecret": "b", "pkceClientId": "c"}"#
+        #expect(throws: TidalCredentialsError.missing(["pkceClientSecret"])) { try TidalClientCredentials.parse(Data(missing.utf8)) }
+        let empty = #"{"clientId": "", "clientSecret": "b", "pkceClientId": "  ", "pkceClientSecret": "d"}"#
+        #expect(throws: TidalCredentialsError.missing(["clientId", "pkceClientId"])) { try TidalClientCredentials.parse(Data(empty.utf8)) }
+        #expect(TidalCredentialsError.missing(["clientId"]).localizedDescription.contains("clientId"))
+    }
+
+    @Test("Text that isn't a JSON object is refused as such")
+    func notJSON() {
+        #expect(throws: TidalCredentialsError.notJSON) { try TidalClientCredentials.parse(Data("client=abc".utf8)) }
+    }
+}

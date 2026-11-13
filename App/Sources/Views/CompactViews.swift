@@ -167,7 +167,7 @@ struct DarkWindowAppearance: NSViewRepresentable {
 
 /// The Settings window's tabs; `AppModel.settingsTab` is the one showing (the setup assistant opens Settings on one).
 enum SettingsTab: Hashable {
-    case playback, library, network, online, remote, updates, about
+    case playback, library, network, online, tidal, remote, updates, about
 }
 
 struct SettingsView: View {
@@ -180,6 +180,9 @@ struct SettingsView: View {
             LibrarySettings().tabItem { Label("Library", systemImage: "books.vertical") }.tag(SettingsTab.library)
             NetworkSettings().tabItem { Label("Network", systemImage: "server.rack") }.tag(SettingsTab.network)
             OnlineSettings().tabItem { Label("Online", systemImage: "globe") }.tag(SettingsTab.online)
+            if model.settings.tidalEnabled {
+                TidalSettingsView().tabItem { Label("TIDAL", systemImage: "music.note.house") }.tag(SettingsTab.tidal)
+            }
             RemoteSettingsView().tabItem { Label("Remote", systemImage: "iphone") }.tag(SettingsTab.remote)
             UpdateSettings().tabItem { Label("Updates", systemImage: "arrow.down.circle") }.tag(SettingsTab.updates)
             AboutSettings().tabItem { Label("About", systemImage: "info.circle") }.tag(SettingsTab.about)

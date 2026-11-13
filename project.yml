@@ -60,6 +60,8 @@ targets:
         product: VespertineUPnP
       - package: VespertineKit
         product: VespertineAirPlay
+      - package: VespertineKit
+        product: VespertineTidal
       - package: VespertineRemoteKit
         product: VespertineRemoteProtocol
       - package: VespertineRemoteKit

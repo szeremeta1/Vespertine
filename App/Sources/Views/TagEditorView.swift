@@ -49,7 +49,7 @@ struct TagEditorView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         header
-                        musicBrainzRow.padding(.vertical, 14)
+                        if !streamedTidal { musicBrainzRow.padding(.vertical, 14) } else { Spacer().frame(height: 14) }
                         ForEach(Self.mainFields, id: \.self) { field($0) }
                         pairRow("Track", .trackNumber, .trackTotal)
                         pairRow("Disc", .discNumber, .discTotal)
@@ -67,9 +67,13 @@ struct TagEditorView: View {
                         }
                         .font(Typeface.ui(12)).foregroundStyle(Palette.text2)
                         .padding(.vertical, 6)
-                        if tracks.count == 1 { lyrics }
-                        customTags
+                        if tracks.count == 1, !streamedTidal { lyrics }
+                        if !streamedTidal { customTags }
                         technical
+                        // TIDAL's own details for a TIDAL song (only while TIDAL is on): IDs, quality, credits, lyrics.
+                        if tracks.count == 1, let track = tracks.first, track.isTidalTrack, model.library.includesTidal {
+                            TidalDetailsSection(track: track)
+                        }
                     }
                     .padding(20)
                 }
@@ -94,11 +98,13 @@ struct TagEditorView: View {
                     .font(Typeface.mono(11)).foregroundStyle(Palette.text).lineLimit(2)
                 Text(formatLine).font(Typeface.ui(11.5)).foregroundStyle(Palette.text2)
                 if !mixed.isEmpty { Text("Mixed values shown in italics").font(Typeface.ui(11.5)).foregroundStyle(Palette.text3) }
-                HStack(spacing: 6) {
-                    Button("Choose…") { showArtworkPicker = true }.buttonStyle(QuietButtonStyle(compact: true))
-                    Button("Remove") { artwork = .remove }.buttonStyle(QuietButtonStyle(compact: true))
+                if !streamedTidal {
+                    HStack(spacing: 6) {
+                        Button("Choose…") { showArtworkPicker = true }.buttonStyle(QuietButtonStyle(compact: true))
+                        Button("Remove") { artwork = .remove }.buttonStyle(QuietButtonStyle(compact: true))
+                    }
+                    .padding(.top, 4)
                 }
-                .padding(.top, 4)
             }
         }
     }
@@ -171,6 +177,8 @@ struct TagEditorView: View {
             get: { draft[f] ?? "" },
             set: { draft[f] = $0; edited.insert(f) }))
             .textFieldStyle(.plain)
+            // A streamed TIDAL song has no file: its tags are TIDAL's, shown read-only.
+            .disabled(streamedTidal)
             .font(Typeface.ui(12.5))
             .foregroundStyle(Palette.text)
             // Drawn here rather than as the field's placeholder, so a long translation in a narrow field (Track and
@@ -249,7 +257,7 @@ struct TagEditorView: View {
                     row("Channels", "\(t.channels)")
                     row("Duration", t.duration.clock)
                     if let b = t.bitrate { row("Bitrate", String(localized: "\(Int(b)) kbps")) }
-                    row("Size", t.fileSize.byteString)
+                    if !(t.isTidalTrack && t.filePath.isEmpty) { row("Size", t.fileSize.byteString) }
                     if let g = t.rgTrackGain { row("ReplayGain", replayGainLine(track: g, album: t.rgAlbumGain)) }
                     if let area = t.sacdArea {
                         row("SACD", area == .stereo ? String(localized: "Stereo area of a disc image; edits stay in the library")
@@ -261,7 +269,7 @@ struct TagEditorView: View {
                     else if t.cueStartFrame != nil { row("CUE", String(localized: "Virtual track; edits stay in the library")) }
                     row("Plays", t.playCount.formatted())
                 }
-                Text(model.library.displayPath(t.filePath)).font(Typeface.mono(10)).foregroundStyle(Palette.text3).textSelection(.enabled).lineLimit(3)
+                if !t.filePath.isEmpty { Text(model.library.displayPath(t.filePath)).font(Typeface.mono(10)).foregroundStyle(Palette.text3).textSelection(.enabled).lineLimit(3) }
             } else {
                 Text("\(tracks.count) files · \(tracks.reduce(Int64(0)) { $0 + $1.fileSize }.byteString)")
                     .font(Typeface.mono(11)).foregroundStyle(Palette.text2)
@@ -310,9 +318,9 @@ struct TagEditorView: View {
     }
 
     @ViewBuilder private var footerButtons: some View {
-        Button("Revert") { revert() }.buttonStyle(QuietButtonStyle(compact: true)).disabled(saving).fixedSize()
+        Button("Revert") { revert() }.buttonStyle(QuietButtonStyle(compact: true)).disabled(saving || streamedTidal).fixedSize()
             .help(hasChanges ? String(localized: "Discard unsaved changes") : String(localized: "Restore the tags from before the last save"))
-        Button(saving ? String(localized: "Saving…") : String(localized: "Save")) { save() }.buttonStyle(BrassButtonStyle()).disabled(!hasChanges || saving).fixedSize()
+        Button(saving ? String(localized: "Saving…") : String(localized: "Save")) { save() }.buttonStyle(BrassButtonStyle()).disabled(!hasChanges || saving || streamedTidal).fixedSize()
             .keyboardShortcut("s", modifiers: .command)
     }
 
@@ -332,7 +340,13 @@ struct TagEditorView: View {
         return keys.count == 1 ? keys.first! : tracks.first?.artworkKey
     }
 
+    /// The selection holds a TIDAL song that isn't downloaded (TIDAL on): nothing to write to, so the details are read-only.
+    private var streamedTidal: Bool {
+        model.library.includesTidal && tracks.contains { $0.isTidalTrack && $0.filePath.isEmpty }
+    }
+
     private var footerNote: String {
+        if streamedTidal { return String(localized: "TIDAL’s details · read-only until downloaded", comment: "Tag editor footer for a streamed TIDAL song") }
         let files = Set(tracks.filter { $0.cueStartFrame == nil }.map(\.filePath)).count
         if readOnlyFiles { return String(localized: "Read-only location · saved in Vespertine's library; the files aren't changed") }
         // Only CUE or disc-image tracks selected: their tags live in the library alone, so no file is written.

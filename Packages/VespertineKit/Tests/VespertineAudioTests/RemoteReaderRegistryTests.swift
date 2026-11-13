@@ -96,6 +96,44 @@ struct RemoteReaderRegistryTests {
         #expect(throws: (any Error).self) { _ = try cache.entry(key: "x:1", url: URL(string: "unregistered://track/1")!) }
     }
 
+    @Test("An unregistered scheme opens nothing any more (TIDAL switched off)")
+    func unregister() throws {
+        let bytes = try Data(contentsOf: Self.fixture)
+        NetworkPlaybackCache.registerRemoteReader(scheme: "gone") { _ in FakeTidalReader(bytes) }
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20)
+        #expect(NetworkPlaybackCache.hasRemoteReader(scheme: "gone"))
+        _ = try cache.entry(key: "gone:1", url: URL(string: "gone://track/1")!)
+        NetworkPlaybackCache.unregisterRemoteReader(scheme: "GONE")
+        #expect(!NetworkPlaybackCache.hasRemoteReader(scheme: "gone"))
+        #expect(throws: (any Error).self) { _ = try cache.entry(key: "gone:2", url: URL(string: "gone://track/2")!) }
+    }
+
+    @Test("A remote copy that completes is handed over (a link to it) before its lease goes; the link outlives the entry")
+    func completionHandler() throws {
+        let bytes = try Data(contentsOf: Self.fixture)
+        NetworkPlaybackCache.registerRemoteReader(scheme: "staged") { _ in FakeTidalReader(bytes) }
+        let handed = Locked<[(URL, URL)]>([])
+        NetworkPlaybackCache.setCompletionHandler(scheme: "staged") { url, file in handed.withLock { $0.append((url, file)) } }
+        defer { NetworkPlaybackCache.setCompletionHandler(scheme: "staged", nil); NetworkPlaybackCache.unregisterRemoteReader(scheme: "staged") }
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096)
+        var entry: NetworkPlaybackCache.Entry? = try cache.entry(key: "staged:1", url: URL(string: "staged://track/1")!)
+        try entry!.prepare(full: true, lead: 0, cancelled: { false })
+        let end = Date().addingTimeInterval(5)
+        while handed.withLock({ $0.isEmpty }), Date() < end { Thread.sleep(forTimeInterval: 0.01) }
+        let (url, file) = try #require(handed.withLock { $0.first })
+        #expect(handed.withLock { $0.count } == 1)
+        #expect(url.absoluteString == "staged://track/1" && file.pathExtension == "flac")
+        let staged = entry!.url
+        entry = nil
+        let gone = Date().addingTimeInterval(10)
+        while FileManager.default.fileExists(atPath: staged.path), Date() < gone { Thread.sleep(forTimeInterval: 0.01) }
+        #expect(!FileManager.default.fileExists(atPath: staged.path))
+        #expect(try Data(contentsOf: file) == bytes)
+        try FileManager.default.removeItem(at: file)
+    }
+
     @Test("A copy whose reader died opens the track again through the same opener")
     func reopensThroughRegistry() throws {
         let bytes = try Data(contentsOf: Self.fixture)

@@ -161,6 +161,26 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         remoteMessages.withLock { $0[scheme.lowercased()] = notAnsweringMessage }
     }
 
+    /// Forgets `scheme`: its songs no longer open (TIDAL switched off). Copies already open keep their reader.
+    public static func unregisterRemoteReader(scheme: String) {
+        remoteOpeners.withLock { $0[scheme.lowercased()] = nil }
+        remoteMessages.withLock { $0[scheme.lowercased()] = nil }
+    }
+
+    /// Told once each time a copy of a `scheme://…` song is complete, while its lease still holds it: the song's URL and a hard link to
+    /// the staged file (same disk, no copy). The handler owns the link and must delete it; the staged file itself goes with the lease
+    /// as always. For analysis of streamed songs (decision 206). Nil stops it.
+    public static func setCompletionHandler(scheme: String, _ handler: (@Sendable (_ url: URL, _ file: URL) -> Void)?) {
+        completionHandlers.withLock { $0[scheme.lowercased()] = handler }
+    }
+
+    private static let completionHandlers = Locked([String: @Sendable (URL, URL) -> Void]())
+
+    /// Whether songs at `scheme://…` have an opener.
+    public static func hasRemoteReader(scheme: String) -> Bool {
+        remoteOpeners.withLock { $0[scheme.lowercased()] != nil }
+    }
+
     private static func remoteMessage(for url: URL) -> String? {
         guard let scheme = url.scheme?.lowercased() else { return nil }
         return remoteMessages.withLock { $0[scheme] }
@@ -356,6 +376,14 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
                 self.reserved.withLock { $0 -= size }
             }
             reserved.withLock { $0 += size }
+            if remote != nil, let scheme = url.scheme?.lowercased(), let handler = Self.completionHandlers.withLock({ $0[scheme] }) {
+                storage.onComplete = { staged in
+                    let link = staged.deletingLastPathComponent()
+                        .appendingPathComponent("complete-" + UUID().uuidString).appendingPathExtension(staged.pathExtension)
+                    guard (try? FileManager.default.linkItem(at: staged, to: link)) != nil else { return }
+                    handler(url, link)
+                }
+            }
             source = nil   // the copy's from here on
             let entry = Entry(storage)
             entries = entries.filter { $0.value.value != nil }
@@ -707,6 +735,8 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         /// The copy lanes that have not ended (a lane ends when the copy is over, cancelled or failed). Under `condition`.
         var activeLanes: Set<Int> = []
         var progress: (@Sendable (Int64) -> Void)?
+        /// Called once, from the copy lane that writes the last block, with the staged file (`setCompletionHandler`). Under `condition`.
+        var onComplete: (@Sendable (URL) -> Void)?
         /// On `clock`: when the copy started.
         let startedAt: TimeInterval
 
@@ -934,10 +964,14 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
                             done += n
                         }
                     }
-                    condition.withLock {
+                    let completed = condition.withLock { () -> (@Sendable (URL) -> Void)? in
                         inFlight.remove(block)
                         ready.insert(block); condition.broadcast()
+                        guard ready.count == blocks, let done = onComplete else { return nil }
+                        onComplete = nil
+                        return done
                     }
+                    completed?(url)
                     // In order, never backwards, though lanes finish their blocks in any order.
                     reporting.withLock {
                         let (report, copied) = condition.withLock { (progress, min(size, Int64(ready.count) * Int64(chunk))) }

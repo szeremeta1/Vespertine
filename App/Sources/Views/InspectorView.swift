@@ -7,6 +7,7 @@ import AppKit
 import VespertineAudio
 import VespertineLibrary
 import SwiftUI
+import VespertineTidal
 import UniformTypeIdentifiers
 
 struct InspectorView: View {
@@ -81,7 +82,11 @@ struct NowPlayingPanel: View {
                     if let path = player.signalPath {
                         StatusBadges(path: path).padding(.top, 16)
                         Hairline().padding(.top, 18)
-                        SignalPathView(path: path, loopback: model.loopback.result(for: path), callMode: model.bluetoothCallMode).padding(.top, 14)
+                        SignalPathView(path: path, loopback: model.loopback.result(for: path), callMode: model.bluetoothCallMode,
+                                       sourceLabel: SignalPath.remoteSourceLabel(url: model.player.current?.item.url, source: path.source,
+                                                                                 isDASH: model.player.current.flatMap { TidalPlayback.trackId(from: $0.item.url) }
+                                                                                    .flatMap(TidalPlayback.lastStream(trackId:))?.isDASH))
+                            .padding(.top, 14)
                         DoPSetupCard(path: path).padding(.top, 10)
                         DoPOffer(path: path).padding(.top, 10)
                         if path.plan.mode == .bitstream, let bed = player.bedMeters, bed.names.count > 2 {
@@ -178,6 +183,8 @@ struct SignalPathView: View {
     var loopback: LoopbackSavedResult? = nil
     /// The headset is in call mode: says which app holds its microphone (the path alone only knows the rate).
     var callMode: BluetoothCallMode? = nil
+    /// The source line for a streamed song ("TIDAL · FLAC 24/192 (DASH)"), in place of the file's codec line.
+    var sourceLabel: String? = nil
 
     struct Step: Identifiable {
         let id = UUID()
@@ -200,7 +207,7 @@ struct SignalPathView: View {
             "\(SampleRate.format(src.sampleRate)) kHz"
         }
         let kind = src.encoding == .lossy ? String(localized: "lossy") : (src.encoding == .dsd ? String(localized: "1-bit") : String(localized: "lossless"))
-        s.append(Step(title: String(localized: "Source", comment: "First step of the signal path: the file being played"), detail: "\(src.codec) · \(kind) · \(channelName(src.channels))", value: srcValue))
+        s.append(Step(title: String(localized: "Source", comment: "First step of the signal path: the file being played"), detail: sourceLabel.map { "\($0) · \(kind)" } ?? "\(src.codec) · \(kind) · \(channelName(src.channels))", value: srcValue))
         if path.plan.mode != .bitstream {
             s.append(Step(title: String(localized: "Decoder"), detail: path.decoderName,
                           value: src.encoding == .lossy ? String(localized: "decoded") : String(localized: "lossless")))

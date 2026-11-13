@@ -9,6 +9,7 @@ import VespertineAirPlay
 import VespertineAudio
 import VespertineLibrary
 import VespertineUPnP
+import VespertineTidal
 import Observation
 import SwiftUI
 
@@ -16,6 +17,15 @@ enum SidebarItem: Hashable {
     case albums, artists, songs, genres, recentlyAdded, favorites
     case playlist(Int64)
     case source(Int64)
+    /// The TIDAL section (only while TIDAL is switched on): the catalog, the account's mixes and new releases, the downloads.
+    case tidalSearch, tidalMixes, tidalNewReleases, tidalDownloads
+
+    var isTidal: Bool {
+        switch self {
+        case .tidalSearch, .tidalMixes, .tidalNewReleases, .tidalDownloads: true
+        default: false
+        }
+    }
 }
 
 enum DetailRoute: Hashable {
@@ -202,6 +212,8 @@ final class AppModel {
     let dopSetup: DoPSetupModel
     /// The phone remote's server (off until Settings › Remote turns it on).
     let remote: RemoteServer
+    /// The TIDAL account (idle unless Settings › Online › TIDAL integration is on).
+    let tidal: TidalModel
 
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = []; searchText = "" } } }
     var path: [DetailRoute] = [] { didSet { carryFilter(from: oldValue) } }
@@ -297,6 +309,8 @@ final class AppModel {
         dopSetup = DoPSetupModel(settings: settings, player: player)
         remote = RemoteServer(store: RemoteStore(dataDirectory: settings.dataDirectory))
         analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
+        tidal = TidalModel(library: library, settings: settings, availability: tidalAvailability,
+                           environment: Self.tidalEnvironment(settings: settings, arguments: arguments))
         let streaming: @MainActor () -> Bool = { [weak player = self.player, weak shares = self.shares] in
             // Playing from a share, or just asked to (still loading): the network belongs to playback.
             guard let player, let shares, let track = player.current?.track, shares.isNetwork(track) else { return false }
@@ -350,6 +364,9 @@ final class AppModel {
         analysis.start()
         remote.model = self
         remote.apply()
+        tidal.start()   // nothing while TIDAL is switched off
+        tidalAnalysisHook(settings.tidalEnabled)
+        routeTidal(settings.tidalEnabled)
         // Hand the DAC back when Vespertine quits: stop, release exclusive access, then restore or
         // standardize its format as chosen in Settings. Core Audio decides how long that takes (a device that won't
         // switch rate can hold it for many seconds), so it runs off the main thread and quitting waits for it only
@@ -606,7 +623,148 @@ final class AppModel {
             if item != sidebar { sidebar = item }
             if route != path { path = route }
         }
+        tidalAnalysisHook(on)
+        routeTidal(on)
+        if on {
+            tidal.start()
+            // One flow (UX amendment 1): Settings › TIDAL, and the login sheet when there is an account to sign in to.
+            settingsTab = .tidal
+            if tidal.state == .signedOut { tidal.wantsLoginSheet = true }
+        } else {
+            tidal.stop()
+            if settingsTab == .tidal { settingsTab = .online }
+        }
         tidalSwitchChanged?(on)
+    }
+
+    /// Whether the sidebar has its TIDAL section: TIDAL is on, and there is an account (synced, or signed in now).
+    var showsTidalSection: Bool { settings.tidalEnabled && (library.tidalSource != nil || tidal.state.isSignedIn) }
+
+    /// Catalog tracks as the lists show them: the library's row when the library has the track, else a track with no row (it plays
+    /// all the same, and offers Add to Library).
+    func tracks(forCatalog tidalTracks: [TidalTrack]) -> [Track] {
+        for track in tidalTracks { catalogTracks[track.id] = track }
+        let rows = Dictionary(library.tidalRecords.values.map { ($0.tidalId, $0.trackId) }, uniquingKeysWith: { a, _ in a })
+        let known = Dictionary(library.tracks(ids: tidalTracks.compactMap { rows[$0.id] }).compactMap { t in t.id.map { ($0, t) } },
+                               uniquingKeysWith: { a, _ in a })
+        return tidalTracks.map { tidal in rows[tidal.id].flatMap { known[$0] } ?? Track.tidal(TidalTrackInput(tidal), sourceId: nil) }
+    }
+
+    /// The catalog tracks the TIDAL pages listed, by TIDAL id, for the menus of their rows (Add to Library, Download).
+    @ObservationIgnored private(set) var catalogTracks: [Int: TidalTrack] = [:]
+
+    /// The catalog track behind a row with no library id.
+    func catalogTrack(of track: Track) -> TidalTrack? {
+        URL(string: track.location).flatMap(TidalPlayback.trackId(from:)).flatMap { catalogTracks[$0] }
+    }
+
+    /// Downloads catalog tracks (the downloads folder joins the library first, when Settings says so).
+    func download(_ tracks: [TidalTrack]) {
+        guard let downloader = tidal.downloader, !tracks.isEmpty else { return }
+        addTidalDownloadsFolder()
+        downloader.enqueue(tracks: tracks)
+    }
+
+    /// Downloads library TIDAL rows: their tracks are read from TIDAL (one request each, at interactive priority) and queued.
+    func download(libraryTracks tracks: [Track]) {
+        let ids = tracks.filter(\.isTidalTrack).compactMap { URL(string: $0.location).flatMap(TidalPlayback.trackId(from:)) }
+        guard let catalog = tidal.catalog, !ids.isEmpty else { return }
+        Task {
+            var found: [TidalTrack] = []
+            for id in ids {
+                do { found.append(try await catalog.track(id, priority: .interactive)) } catch { tidal.note(error) }
+            }
+            download(found)
+        }
+    }
+
+    func download(album id: Int) {
+        guard let downloader = tidal.downloader else { return }
+        addTidalDownloadsFolder()
+        Task { await downloader.enqueue(album: id) }
+    }
+
+    func download(playlist uuid: String) {
+        guard let downloader = tidal.downloader else { return }
+        addTidalDownloadsFolder()
+        Task { await downloader.enqueue(playlist: uuid) }
+    }
+
+    /// Reads the songs from TIDAL again (interactive priority) and gives their rows TIDAL's current details.
+    func refreshFromTidal(_ tracks: [Track]) {
+        let ids = tracks.filter(\.isTidalTrack).compactMap { URL(string: $0.location).flatMap(TidalPlayback.trackId(from:)) }
+        guard let catalog = tidal.catalog, let userId = tidal.userId, !ids.isEmpty else { return }
+        Task {
+            var inputs: [TidalTrackInput] = []
+            for id in ids {
+                do { inputs.append(TidalTrackInput(try await catalog.track(id, priority: .interactive))) } catch { tidal.note(error) }
+            }
+            guard !inputs.isEmpty, let source = try? library.database.tidalSource(userId: userId).id else { return }
+            try? library.database.upsertTidalTracks(inputs, sourceId: source)
+        }
+    }
+
+    /// Deletes a TIDAL row's downloaded file (to the Trash): the song streams again.
+    func removeDownload(_ tracks: [Track]) {
+        for track in tracks where track.isTidalTrack {
+            guard let id = track.id, let record = library.tidalRecords[id], let path = record.downloadPath else { continue }
+            try? FileManager.default.trashItem(at: URL(fileURLWithPath: path), resultingItemURL: nil)
+            try? library.database.setTidalDownload(tidalId: record.tidalId, path: nil)
+        }
+    }
+
+    /// While TIDAL is on, hearts on TIDAL songs and edits of TIDAL playlists go to TIDAL too (two-way sync); off, everything is local.
+    private func routeTidal(_ on: Bool) {
+        library.tidalRouter = on ? self : nil
+        library.tidalFavoritesChanged = on ? { [weak self] ids, favorite in self?.tidal.favoritesChanged(ids, favorite: favorite) } : nil
+    }
+
+    /// The library playlists that are TIDAL playlists: linked, or being created there.
+    var tidalPlaylistIDs: Set<Int64> {
+        guard settings.tidalEnabled else { return [] }
+        return ((try? library.database.tidalPlaylistIds()) ?? []).union(tidal.pendingCreates)
+    }
+
+    /// Sidebar › Playlists › New TIDAL Playlist…: a playlist here at once, made on TIDAL by the sync queue.
+    func newTidalPlaylist(name: String) -> Playlist? {
+        guard let playlist = library.createPlaylist(name: name), let id = playlist.id else { return nil }
+        tidal.enqueue([.createPlaylist(localId: id, title: name, description: "")])
+        return playlist
+    }
+
+    /// Streamed TIDAL songs are analyzed from their complete staged copy (decision 206), while TIDAL is on.
+    private func tidalAnalysisHook(_ on: Bool) {
+        guard on else { NetworkPlaybackCache.setCompletionHandler(scheme: TidalPlayback.scheme, nil); return }
+        let analysis = self.analysis
+        NetworkPlaybackCache.setCompletionHandler(scheme: TidalPlayback.scheme) { url, file in analysis.analyzeStaged(file: file, url: url) }
+    }
+
+    /// Settings › TIDAL › "Add downloads folder to the library": the folder (made if needed) becomes a library folder, referenced in
+    /// place, so downloaded files are scanned and linked to their TIDAL rows. Turning the setting off leaves a folder already added.
+    func addTidalDownloadsFolder() {
+        guard settings.tidalEnabled, settings.tidalAddDownloadsToLibrary else { return }
+        let url = URL(fileURLWithPath: settings.tidalDownloadsFolder, isDirectory: true)
+        guard !library.sources.contains(where: { $0.path == url.path }) else { return }
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        let library = self.library
+        Task { await library.addFolders([url], mode: .reference, managedRoot: url) }
+    }
+
+    /// The TIDAL model's outside world. A QA run on a test library (`-VespertineDataDirectory`) keeps its credentials file in that
+    /// folder and its session in memory, so it never touches the real account; `-VespertineTidalDemoSession YES` also makes it
+    /// signed in, with every request failing at once (screenshots of the signed-in views without a network).
+    private static func tidalEnvironment(settings: AppSettings, arguments: LaunchArguments) -> TidalModel.Environment {
+        var environment = TidalModel.Environment.live
+        guard arguments.string(forKey: "VespertineDataDirectory") != nil else { return environment }
+        environment.credentialsURL = settings.dataDirectory.appendingPathComponent("tidal-client.json")
+        if arguments.bool(forKey: "VespertineTidalDemoSession") {
+            environment.tokens = MemoryTokenStore(TidalTokens(accessToken: "qa", refreshToken: "qa", expiresAt: .distantFuture,
+                                                              userId: 1, countryCode: "US"))
+            environment.transport = RefusingTransport()
+        } else {
+            environment.tokens = MemoryTokenStore()
+        }
+        return environment
     }
 
     /// Where the window goes when TIDAL is switched off: a source or playlist that is gone sends the sidebar to Albums, and a page
@@ -614,6 +772,7 @@ final class AppModel {
     static func navigation(afterTidalOff sidebar: SidebarItem, path: [DetailRoute], sourceIDs: Set<Int64>, playlistIDs: Set<Int64>,
                            albumExists: (String) -> Bool, artistExists: (String) -> Bool) -> (SidebarItem, [DetailRoute]) {
         switch sidebar {
+        case let item where item.isTidal: return (.albums, [])
         case .source(let id) where !sourceIDs.contains(id): return (.albums, [])
         case .playlist(let id) where !playlistIDs.contains(id): return (.albums, [])
         default: break
@@ -895,5 +1054,61 @@ final class AppModel {
         let mode = pendingImportMode
         let root = URL(fileURLWithPath: settings.managedFolderPath, isDirectory: true)
         Task { await library.addFolders(urls, mode: mode, managedRoot: root) }
+    }
+}
+
+// MARK: - TIDAL playlists
+
+extension AppModel: TidalPlaylistRouter {
+    func isTidalPlaylist(_ id: Int64) -> Bool { tidalPlaylistIDs.contains(id) }
+
+    private func tidalId(_ track: Track) -> Int? {
+        track.isTidalTrack ? URL(string: track.location).flatMap(TidalPlayback.trackId(from:)) : nil
+    }
+
+    func append(_ trackIDs: [Int64], to playlist: Int64) {
+        let byId = Dictionary(library.tracks(ids: trackIDs).compactMap { t in t.id.map { ($0, t) } }, uniquingKeysWith: { a, _ in a })
+        let tracks = trackIDs.compactMap { byId[$0] }
+        let plan = TidalRouting.additions(tracks.compactMap { t in t.id.map { ($0, tidalId(t)) } })
+        let tidalRows = tracks.filter { tidalId($0) != nil }.compactMap(\.id)
+        if !tidalRows.isEmpty {
+            try? library.database.append(trackIDs: tidalRows, to: playlist)
+            tidal.enqueue([.add(playlist: playlist, trackIds: plan.tidal)])
+        }
+        // Local songs: their TIDAL version by ISRC, added in their place; refused when there is none (decision 300).
+        let local = plan.needsLookup.compactMap { byId[$0] }
+        guard !local.isEmpty else { library.bumpRevision(); return }
+        Task {
+            for track in local {
+                guard let found = await tidal.tidalVersion(isrc: track.isrc), let userId = tidal.userId,
+                      let source = try? library.database.tidalSource(userId: userId).id,
+                      let row = (try? library.database.addTidalTracks([TidalTrackInput(found)], sourceId: source))?[found.id] else {
+                    tidal.notice = TidalISRCLookup.refusal
+                    continue
+                }
+                try? library.database.append(trackIDs: [row], to: playlist)
+                tidal.enqueue([.add(playlist: playlist, trackIds: [found.id])])
+                tidal.notice = TidalISRCLookup.addedMessage(title: track.title)
+            }
+            library.bumpRevision()
+        }
+    }
+
+    func reordered(_ playlist: Int64, from old: [Int], to new: [Int]) {
+        let ops: [TidalOp] = TidalRouting.edits(from: old, to: new).map { edit in
+            switch edit {
+            case .remove(let trackId, let index): .remove(playlist: playlist, trackId: trackId, index: index)
+            case .move(let from, let to): .move(playlist: playlist, from: from, to: to)
+            }
+        }
+        if !ops.isEmpty { tidal.enqueue(ops) }
+    }
+
+    func renamed(_ playlist: Int64, to name: String) {
+        tidal.enqueue([.edit(playlist: playlist, title: name, description: "")])
+    }
+
+    func deleted(uuid: String) {
+        tidal.enqueue([.delete(uuid: uuid)])
     }
 }

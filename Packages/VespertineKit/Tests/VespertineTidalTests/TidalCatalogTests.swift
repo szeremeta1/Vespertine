@@ -188,3 +188,38 @@ struct TidalCatalogTests {
                 == "https://resources.tidal.com/images/aaaaaaaa/bbbb/cccc/dddd/eeeeeeeeeeee/1280x1280.jpg")
     }
 }
+
+@Suite("TIDAL browse lists")
+struct TidalBrowseTests {
+    private func album(_ id: Int, _ date: String?) -> TidalAlbum {
+        TidalAlbum(id: id, title: "A\(id)", numberOfTracks: 1, releaseDate: date)
+    }
+
+    @Test("New releases: albums of the last 180 days, newest first, each once, at most the limit")
+    func newReleases() {
+        let now = ISO8601DateFormatter().date(from: "2026-11-13T12:00:00Z")!
+        let albums = [album(1, "2026-11-01"), album(2, "2026-01-01"), album(3, "2026-10-20"), album(1, "2026-11-01"),
+                      album(4, nil), album(5, "2026-11-12"), album(6, "2027-02-01")]
+        #expect(TidalCatalog.newReleases(albums, now: now, limit: 50).map(\.id) == [5, 1, 3])
+        #expect(TidalCatalog.newReleases(albums, now: now, limit: 2).map(\.id) == [5, 1])
+    }
+
+    @Test("Mixes decode, and a mix's items keep only tracks")
+    func mixes() async throws {
+        let transport = FakeTransport { request in
+            let path = String(request.url!.path.dropFirst("/v1/".count))
+            switch path {
+            case "users/42/mixes":
+                return FakeResponse(json: #"{"limit":100,"offset":0,"totalNumberOfItems":1,"items":[{"id":"0abc","title":"My Mix 1","subTitle":"Artist and more"}]}"#)
+            case "mixes/0abc/items":
+                return FakeResponse(json: #"{"limit":100,"offset":0,"totalNumberOfItems":2,"items":[{"type":"video","item":{"id":1}},{"type":"track","item":{"id":9,"title":"T","duration":10,"trackNumber":1,"volumeNumber":1,"explicit":false,"audioQuality":"LOSSLESS","artists":[],"album":{"id":3,"title":"A"}}}]}"#)
+            default:
+                return FakeResponse(status: 404, json: "{}")
+            }
+        }
+        let catalog = TidalCatalog(gate: makeSignedInGate(transport: transport))
+        let mixes = try await catalog.mixes(userId: 42)
+        #expect(mixes.map(\.title) == ["My Mix 1"] && mixes.first?.subTitle == "Artist and more")
+        #expect(try await catalog.mixTracks("0abc").map(\.id) == [9])
+    }
+}

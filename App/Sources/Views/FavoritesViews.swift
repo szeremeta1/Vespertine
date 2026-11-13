@@ -5,6 +5,7 @@
 
 import VespertineLibrary
 import SwiftUI
+import VespertineTidal
 
 /// A quiet heart: an outline in the faintest ink until the song is a favorite, then filled brass.
 struct FavoriteButton: View {
@@ -58,8 +59,17 @@ struct FavoriteCell: View {
 
     var body: some View {
         let visible = hovering || emphasized || prominence == .increased || model.library.isFavorite(track)
+        // A TIDAL song whose heart hasn't reached TIDAL yet shows the "waiting to sync" clock instead, until it has.
+        let waiting = model.library.includesTidal && track.isTidalTrack
+            && URL(string: track.location).flatMap(TidalPlayback.trackId(from:)).map(model.tidal.pendingFavorites.contains) == true
         FavoriteButton(track: track, size: 11, appModel: model)
-            .opacity(visible ? 1 : 0)
+            .opacity(waiting ? 0 : visible ? 1 : 0)
+            .overlay {
+                if waiting {
+                    Image(systemName: "clock").font(.system(size: 10)).foregroundStyle(Palette.text3)
+                        .help("Waiting to sync with TIDAL").allowsHitTesting(false)
+                }
+            }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .contentShape(Rectangle())
             .onHover { hovering = $0 }

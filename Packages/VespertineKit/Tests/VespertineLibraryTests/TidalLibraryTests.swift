@@ -7,6 +7,7 @@
 import AVFAudio
 import Foundation
 import GRDB
+import VespertineAudio
 import Testing
 @testable import VespertineLibrary
 
@@ -42,7 +43,7 @@ struct TidalLibraryTests {
         #expect(try Set(queue.read { try String.fetchAll($0, sql: "SELECT identifier FROM grdb_migrations") }).contains("v23-tidal"))
         let columns = try queue.read { try Row.fetchAll($0, sql: "PRAGMA table_info(tidalTrack)").map { $0["name"] as String } }
         #expect(Set(columns) == ["trackId", "tidalId", "albumId", "artistIds", "listedQuality", "mediaTags", "explicit", "copyright",
-                                 "popularity", "streamable", "unavailableReason", "downloadPath", "formatIsProbed", "lastSyncedAt"])
+                                 "popularity", "streamable", "unavailableReason", "downloadPath", "formatIsProbed", "lastSyncedAt", "origin"])
     }
 
     @Test("The TIDAL source is created once, with its address and name")
@@ -127,6 +128,62 @@ struct TidalLibraryTests {
         // Back in the favorites, it is an ordinary row again.
         try db.upsertTidalTracks([input(2)], sourceId: source)
         #expect(try db.tidalRecord(trackId: ids[2]!)?.unavailableReason == nil)
+    }
+
+    @Test("Rows added from the catalog are marked added; sync's removal keeps them, and a sync doesn't turn them into favorites")
+    func addedRowsStay() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try #require(try db.tidalSource(userId: 1).id)
+        let synced = try db.upsertTidalTracks([input(1, title: "Fav")], sourceId: source)
+        let added = try db.addTidalTracks([input(2, title: "Added"), input(1, title: "Fav")], sourceId: source)
+        #expect(added[2] != nil && added[1] == synced[1])
+        #expect(try db.tidalRecord(trackId: synced[1]!)?.origin == TidalTrackRecord.favoriteOrigin, "already there: stays a favorite")
+        #expect(try db.tidalRecord(trackId: added[2]!)?.origin == TidalTrackRecord.addedOrigin)
+        try db.upsertTidalTracks([input(2, title: "Added")], sourceId: source)
+        #expect(try db.tidalRecord(trackId: added[2]!)?.origin == TidalTrackRecord.addedOrigin)
+        #expect(try db.removeTidalTracks(notIn: [], sourceId: source) == 1)
+        #expect(try db.allTracks().map(\.title) == ["Added"])
+    }
+
+    @Test("A catalog track not in the library is a track with no id, as the library would store it")
+    func transient() {
+        let track = Track.tidal(input(5, title: "Live"), sourceId: nil)
+        #expect(track.id == nil && track.isTidalTrack && track.location == "tidal://track/5" && track.filePath.isEmpty)
+        #expect(track.title == "Live" && track.artist == "Artist" && track.album == "Album" && track.artworkKey == "tidal:ab-cd")
+        #expect(track.codec == "FLAC" && track.sampleRate == 44_100 && track.duration == 200 && track.isrc == "XX00000005")
+    }
+
+    @Test("An analysis saved under tidal://track/<id> belongs to the streamed row")
+    func streamedAnalysis() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try #require(try db.tidalSource(userId: 1).id)
+        let ids = try db.upsertTidalTracks([input(5)], sourceId: source)
+        let track = try #require(try db.allTracks().first)
+        #expect(try db.storedAnalysis(for: track) == nil)
+        try db.saveAnalysis(FileAnalysis(claimedBitDepth: 16, effectiveBitDepth: 16, sampleRate: 44_100, bandwidthHz: 20_000, peakDBFS: -1,
+                                         clippedSamples: 0, verdict: .genuine, summary: "", spectrum: [], version: FileAnalysis.currentVersion), filePath: LibraryDatabase.tidalLocation(5))
+        let row = try #require(try db.allTracks().first { $0.id == ids[5] })
+        let stored = try #require(try db.storedAnalysis(for: row))
+        #expect(stored.isCurrent && stored.analysis.effectiveBitDepth == 16)
+    }
+
+    @Test("TIDAL's favorite tracks are the hearts of their rows: hearted when favorite, un-hearted when not; local songs untouched")
+    func mirroredHearts() throws {
+        let db = try LibraryDatabase.inMemory()
+        let local = try db.addSource(LibrarySource(path: "/Music", mode: .reference))
+        try db.writer.write { d in
+            try d.execute(sql: """
+                INSERT INTO track (sourceId, location, filePath, fileSize, modifiedAt, addedAt, codec, isLossless, isDSD, sampleRate, channels, duration, title)
+                VALUES (?, '/Music/a.flac', '/Music/a.flac', 1, '2020-01-01 00:00:00.000', '2020-01-01 00:00:00.000', 'FLAC', 1, 0, 44100, 2, 1, 'Local')
+                """, arguments: [local.id])
+        }
+        let source = try #require(try db.tidalSource(userId: 1).id)
+        let ids = try db.upsertTidalTracks([input(1), input(2)], sourceId: source)
+        let localId = try #require(try db.allTracks().first { $0.title == "Local" }?.id)
+        try db.setFavorite(true, trackIDs: [localId, ids[2]!])
+        try db.mirrorTidalFavorites([1])
+        let hearts = Set(try db.favoriteTracks().compactMap(\.id))
+        #expect(hearts == [localId, ids[1]!])
     }
 
     @Test("A download is the track's file, and clearing it empties the path again")

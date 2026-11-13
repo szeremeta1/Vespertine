@@ -187,6 +187,17 @@ final class AppSettings {
     /// AirPlay receivers whose volume Vespertine sets digitally (the song is converted). The others get their level as the
     /// receiver's own volume (RAOP metadata), and Vespertine's samples are left as they are.
     var airPlayDigitalVolume: Set<String> { didSet { defaults.set(airPlayDigitalVolume.sorted(), forKey: "airPlayDigitalVolume") } }
+    /// TIDAL's `audioquality` for streams and downloads (Settings › TIDAL › Streaming quality): `HI_RES_LOSSLESS` (the default),
+    /// `LOSSLESS`, `HIGH` or `LOW`. TIDAL falls back to what the track or the subscription allows.
+    var tidalQuality: String { didSet { defaults.set(tidalQuality, forKey: "tidalQuality") } }
+    /// Where TIDAL downloads are written (`~/Music/Vespertine/TIDAL` by default).
+    var tidalDownloadsFolder: String { didSet { defaults.set(tidalDownloadsFolder, forKey: "tidalDownloadsFolder") } }
+    /// The downloads folder is a library folder (referenced in place), so downloaded files are scanned and linked to their TIDAL rows.
+    var tidalAddDownloadsToLibrary: Bool { didSet { defaults.set(tidalAddDownloadsToLibrary, forKey: "tidalAddDownloadsToLibrary") } }
+    /// When the TIDAL account was last pulled into the library (nil: never).
+    var tidalLastSync: Date? { didSet { defaults.set(tidalLastSync, forKey: "tidalLastSync") } }
+    /// The TIDAL account's name as TIDAL gave it at the last sign-in (shown in Settings › TIDAL).
+    var tidalAccountName: String? { didSet { defaults.set(tidalAccountName, forKey: "tidalAccountName") } }
     /// Song transitions (crossfade, Smart Mix, Live Set) and their master switch, off unless turned on. Reach the
     /// engine only while the switch is on (`engineSettings()`).
     var transitions: TransitionSettings { didSet { if transitions != oldValue { transitions.save(to: defaults) } } }
@@ -232,7 +243,7 @@ final class AppSettings {
             "watchFolders": false, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "dopListUpdates": true, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
-            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "tidalEnabled": false, "airPlayPlayersFeature": false, "bundleCopies": false,
+            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "tidalEnabled": false, "airPlayPlayersFeature": false, "tidalQuality": "HI_RES_LOSSLESS", "tidalAddDownloadsToLibrary": true, "bundleCopies": false,
         ])
         Self.migrateAutomaticWorkToOff(defaults)
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
@@ -316,6 +327,13 @@ final class AppSettings {
         tidalEnabled = defaults.bool(forKey: "tidalEnabled")
         airPlayPlayersFeature = defaults.bool(forKey: "airPlayPlayersFeature")
         airPlayDigitalVolume = Set(defaults.stringArray(forKey: "airPlayDigitalVolume") ?? [])
+        tidalQuality = defaults.string(forKey: "tidalQuality") ?? "HI_RES_LOSSLESS"
+        tidalDownloadsFolder = isolatedRun
+            ? resolvedDataDirectory.appendingPathComponent("TIDAL", isDirectory: true).path
+            : defaults.string(forKey: "tidalDownloadsFolder") ?? music.appendingPathComponent("Vespertine/TIDAL", isDirectory: true).path
+        tidalAddDownloadsToLibrary = defaults.bool(forKey: "tidalAddDownloadsToLibrary")
+        tidalLastSync = defaults.object(forKey: "tidalLastSync") as? Date
+        tidalAccountName = defaults.string(forKey: "tidalAccountName")
         transitions = TransitionSettings.load(from: defaults)
         self.dataDirectory = resolvedDataDirectory
         // A library that came from the old preferences gets its own file now (`didSet` doesn't run inside `init`).

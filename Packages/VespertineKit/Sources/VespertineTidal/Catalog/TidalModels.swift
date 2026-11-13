@@ -229,3 +229,14 @@ public struct TidalCredit: Codable, Sendable, Hashable {
     public var type: String
     public var contributors: [TidalContributor]
 }
+
+/// A TIDAL mix (My Mix 1, Daily Discovery…): an id string and its titles.
+public struct TidalMix: Codable, Sendable, Hashable, Identifiable {
+    public var id: String
+    public var title: String
+    public var subTitle: String?
+
+    public init(id: String, title: String, subTitle: String? = nil) {
+        self.id = id; self.title = title; self.subTitle = subTitle
+    }
+}

@@ -7,6 +7,7 @@ import Foundation
 import GRDB
 import VespertineAudio
 import VespertineLibrary
+import VespertineTidal
 import Observation
 
 @Observable
@@ -708,17 +709,44 @@ final class LibraryStore {
 
     func append(_ trackIDs: [Int64], to playlist: Playlist) {
         guard let id = playlist.id, !playlist.isSmart else { return }
+        // A TIDAL playlist takes TIDAL songs only; the router adds them (finding local songs' TIDAL versions) and tells TIDAL.
+        if let router = tidalRouter, router.isTidalPlaylist(id) {
+            router.append(trackIDs, to: id)
+            return
+        }
         try? database.append(trackIDs: trackIDs, to: id)
         revision += 1
     }
 
     func setPlaylistOrder(_ trackIDs: [Int64], playlist: Playlist) {
         guard let id = playlist.id else { return }
+        let router = tidalRouter.flatMap { $0.isTidalPlaylist(id) ? $0 : nil }
+        let before = router == nil ? [] : tidalIds(inPlaylist: id)
         try? database.setPlaylistTracks(trackIDs, playlistID: id)
         revision += 1
+        router?.reordered(id, from: before, to: tidalIds(inPlaylist: id))
     }
 
-    func deletePlaylist(_ playlist: Playlist) { if let id = playlist.id { try? database.deletePlaylist(id) } }
+    /// Lists that show playlists read them again.
+    func bumpRevision() { revision += 1 }
+
+    /// A playlist's TIDAL songs, in order, by TIDAL id.
+    func tidalIds(inPlaylist id: Int64) -> [Int] {
+        guard let playlist = playlists.first(where: { $0.id == id }) else { return [] }
+        return ((try? database.tracks(in: playlist)) ?? []).compactMap { $0.isTidalTrack ? URL(string: $0.location).flatMap(TidalPlayback.trackId(from:)) : nil }
+    }
+
+    func deletePlaylist(_ playlist: Playlist) {
+        guard let id = playlist.id else { return }
+        let uuid = tidalRouter != nil ? (try? database.tidalPlaylistUUID(playlistId: id)) ?? nil : nil
+        try? database.deletePlaylist(id)
+        if let uuid { tidalRouter?.deleted(uuid: uuid) }
+    }
+
+    /// Routes edits of TIDAL playlists to TIDAL (set by the app while TIDAL is on; nil otherwise, and everything stays local).
+    @ObservationIgnored weak var tidalRouter: TidalPlaylistRouter?
+    /// Told when hearts change on TIDAL songs (TIDAL ids), while TIDAL is on.
+    @ObservationIgnored var tidalFavoritesChanged: (([Int], Bool) -> Void)?
     /// A playlist's own transitions; nil follows the app's setting.
     func setTransitions(_ choice: TransitionOverride?, for playlist: Playlist) {
         guard let id = playlist.id else { return }
@@ -739,6 +767,7 @@ final class LibraryStore {
     func renamePlaylist(_ playlist: Playlist, to name: String) {
         guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, let id = playlist.id else { return }
         try? database.renamePlaylist(id, to: name)
+        if let router = tidalRouter, router.isTidalPlaylist(id) { router.renamed(id, to: name) }
     }
     func updateRules(_ playlist: Playlist, _ rules: SmartRules) {
         if let id = playlist.id { try? database.updateSmartRules(id, rules); revision += 1 }
@@ -820,6 +849,11 @@ final class LibraryStore {
     /// Library state only: favorites are never written into the files.
     func setFavorite(_ favorite: Bool, trackIDs: [Int64]) {
         do { try database.setFavorite(favorite, trackIDs: trackIDs) } catch { lastError = error.localizedDescription }
+        // For a TIDAL song the heart is the TIDAL favorite: shown at once, sent to TIDAL by the sync queue.
+        guard includesTidal, let tell = tidalFavoritesChanged else { return }
+        let songs = trackIDs.map { id in (id, (try? database.tidalRecord(trackId: id))??.tidalId) }
+        let tidal = TidalRouting.favoriteTargets(songs, tidalOn: includesTidal)
+        if !tidal.isEmpty { tell(tidal, favorite) }
     }
 
     func markPlayed(_ trackID: Int64) {
