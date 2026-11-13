@@ -115,6 +115,8 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         while true {
             let client = accept(listener, nil, nil)
             guard client >= 0 else { return }
+            var on: Int32 = 1
+            setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &on, socklen_t(MemoryLayout<Int32>.size))
             lock.withLock { clientSockets.append(client) }
             let thread = Thread { [weak self] in self?.serve(client) }
             thread.start()

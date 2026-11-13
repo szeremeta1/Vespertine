@@ -160,8 +160,28 @@ public actor RTSPConnection {
         }
     }
 
+    /// Requests go one at a time: a keep-alive can't slip between another request and its answer (the actor alone would let
+    /// it, at the awaits).
+    private var busy = false
+    private var waiting: [CheckedContinuation<Void, Never>] = []
+
+    private func acquire() async {
+        if !busy { busy = true; return }
+        await withCheckedContinuation { waiting.append($0) }
+    }
+
+    private func release() {
+        if waiting.isEmpty { busy = false } else { waiting.removeFirst().resume() }
+    }
+
     /// Sends `request` and waits for its answer.
     public func send(_ request: RTSPMessage) async throws -> RTSPMessage {
+        await acquire()
+        defer { release() }
+        return try await exchange(request)
+    }
+
+    private func exchange(_ request: RTSPMessage) async throws -> RTSPMessage {
         let connection = self.connection
         try await withTimeout {
             try await withCheckedThrowingContinuation { (c: CheckedContinuation<Void, Error>) in
