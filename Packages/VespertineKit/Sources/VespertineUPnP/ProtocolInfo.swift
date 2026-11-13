@@ -85,11 +85,11 @@ public enum CapabilityWarning: Sendable, Hashable {
     public var message: String {
         switch self {
         case .formatNotAccepted(let name):
-            String(localized: "The renderer doesn't list \(name) among the formats it plays.", comment: "%@ is a format name such as FLAC.")
+            String(localized: "The player doesn't list \(name) among the formats it plays.", comment: "%@ is a format name such as FLAC.")
         case .rateAboveMaximum(let source, let max):
-            String(localized: "This song is \(SampleRate.format(source)) kHz; the renderer states up to \(SampleRate.format(Double(max))) kHz.")
+            String(localized: "This song is \(SampleRate.format(source)) kHz; the player states up to \(SampleRate.format(Double(max))) kHz.")
         case .channelsAboveMaximum(let source, let max):
-            String(localized: "This song has \(source) channels; the renderer states up to \(max).")
+            String(localized: "This song has \(source) channels; the player states up to \(max).")
         }
     }
 }

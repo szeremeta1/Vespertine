@@ -54,7 +54,7 @@ public enum RendererMode {
         if reasons.isEmpty, wholeFile, let mime, accepts(mime) { return .passThrough(mime: mime) }
         if reasons.isEmpty { reasons.append(.format) }
         guard accepts("audio/flac") else {
-            return .unplayable(String(localized: "The renderer doesn't take FLAC, so this song can't be sent to it processed.", comment: "Error for a network renderer."))
+            return .unplayable(String(localized: "The player doesn't take FLAC, so this song can't be sent to it processed.", comment: "Error for a network renderer."))
         }
         return .processed(reasons)
     }
