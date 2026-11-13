@@ -102,7 +102,7 @@ struct MacsView: View {
                 if let problem = model.discovery.problem, !problem.isEmpty {
                     Section {
                         Label {
-                            Text("Vespertine Remote can’t look for Macs. Allow it in Settings › Privacy & Security › Local Network.")
+                            Text("Vespertine can’t look for Macs. Allow it in Settings › Privacy & Security › Local Network.")
                         } icon: {
                             Image(systemName: "exclamationmark.triangle").foregroundStyle(Palette.copper)
                         }

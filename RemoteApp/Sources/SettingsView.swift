@@ -44,7 +44,7 @@ struct SettingsView: View {
                     if let url = URL(string: "https://github.com/szeremeta1/Vespertine") {
                         Link("Source Code", destination: url)
                     }
-                    Text("Vespertine Remote is free software under the GNU General Public License, version 3 or later, with an exception for the App Store. It has no accounts, no ads and no tracking, and connects only to the Macs you pair it with.")
+                    Text("Vespertine is free software under the GNU General Public License, version 3 or later, with an exception for the App Store. It has no accounts, no ads and no tracking, and connects only to the Macs you pair it with.")
                         .font(.footnote).foregroundStyle(Palette.text2)
                 }
             }

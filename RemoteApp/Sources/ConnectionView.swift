@@ -62,7 +62,7 @@ struct MacConnectionView: View {
                     } header: {
                         Text("Ways to reach “\(pairing.name)”")
                     } footer: {
-                        Text("Vespertine Remote tries these together and uses the first that answers. The connection is encrypted with this device’s own key either way.")
+                        Text("Vespertine tries these together and uses the first that answers. The connection is encrypted with this device’s own key either way.")
                     }
 
                     Section {
@@ -81,7 +81,7 @@ struct MacConnectionView: View {
                                   systemImage: "exclamationmark.circle")
                                 .font(.footnote).foregroundStyle(Palette.copper)
                         } else if let address = entry.address, address.port == nil, pairing.lastKnown?.port == nil {
-                            Label("The port isn’t known yet. Connect to this Mac once on its own network and Vespertine Remote fills it in.",
+                            Label("The port isn’t known yet. Connect to this Mac once on its own network and Vespertine fills it in.",
                                   systemImage: "info.circle")
                                 .font(.footnote).foregroundStyle(Palette.text2)
                         }

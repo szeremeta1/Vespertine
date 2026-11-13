@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Vespertine Remote</string>
+	<string>Vespertine</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -40,9 +40,9 @@
 		<string>_vespertine._tcp</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Vespertine Remote uses the camera only to scan the pairing code that Vespertine shows on your Mac.</string>
+	<string>Vespertine uses the camera only to scan the pairing code that the Vespertine app shows on your Mac.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Vespertine Remote looks for Macs running Vespertine on your network, and connects only to the ones you pair with.</string>
+	<string>Vespertine looks for Macs running Vespertine on your network, and connects only to the ones you pair with.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
