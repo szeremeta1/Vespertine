@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Written for the tests in the shape upmpdcli publishes (one device, UPnP AV and OpenHome services). -->
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+  <specVersion><major>1</major><minor>1</minor></specVersion>
+  <device>
+    <deviceType>urn:schemas-upnp-org:device:MediaRenderer:1</deviceType>
+    <friendlyName>moOde UPNP</friendlyName>
+    <manufacturer>JF Light</manufacturer>
+    <manufacturerURL>https://www.lesbonscomptes.com/upmpdcli</manufacturerURL>
+    <modelDescription>UPnP front-end to MPD</modelDescription>
+    <modelName>UpMPD</modelName>
+    <modelNumber>1.8.12</modelNumber>
+    <UDN>uuid:5f8e1c2a-0000-1111-2222-b827eb000001</UDN>
+    <serviceList>
+      <service>
+        <serviceType>urn:schemas-upnp-org:service:RenderingControl:1</serviceType>
+        <serviceId>urn:upnp-org:serviceId:RenderingControl</serviceId>
+        <SCPDURL>/upmpd/RenderingControl.xml</SCPDURL>
+        <controlURL>/ctl/RenderingControl</controlURL>
+        <eventSubURL>/evt/RenderingControl</eventSubURL>
+      </service>
+      <service>
+        <serviceType>urn:schemas-upnp-org:service:AVTransport:1</serviceType>
+        <serviceId>urn:upnp-org:serviceId:AVTransport</serviceId>
+        <SCPDURL>/upmpd/AVTransport.xml</SCPDURL>
+        <controlURL>/ctl/AVTransport</controlURL>
+        <eventSubURL>/evt/AVTransport</eventSubURL>
+      </service>
+      <service>
+        <serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>
+        <serviceId>urn:upnp-org:serviceId:ConnectionManager</serviceId>
+        <SCPDURL>/upmpd/ConnectionManager.xml</SCPDURL>
+        <controlURL>/ctl/ConnectionManager</controlURL>
+        <eventSubURL>/evt/ConnectionManager</eventSubURL>
+      </service>
+      <service>
+        <serviceType>urn:av-openhome-org:service:Product:2</serviceType>
+        <serviceId>urn:av-openhome-org:serviceId:Product</serviceId>
+        <SCPDURL>/upmpd/OHProduct.xml</SCPDURL>
+        <controlURL>/ctl/Product</controlURL>
+        <eventSubURL>/evt/Product</eventSubURL>
+      </service>
+      <service>
+        <serviceType>urn:av-openhome-org:service:Playlist:1</serviceType>
+        <serviceId>urn:av-openhome-org:serviceId:Playlist</serviceId>
+        <SCPDURL>/upmpd/OHPlaylist.xml</SCPDURL>
+        <controlURL>/ctl/Playlist</controlURL>
+        <eventSubURL>/evt/Playlist</eventSubURL>
+      </service>
+      <service>
+        <serviceType>urn:av-openhome-org:service:Time:1</serviceType>
+        <serviceId>urn:av-openhome-org:serviceId:Time</serviceId>
+        <SCPDURL>/upmpd/OHTime.xml</SCPDURL>
+        <controlURL>/ctl/Time</controlURL>
+        <eventSubURL>/evt/Time</eventSubURL>
+      </service>
+      <service>
+        <serviceType>urn:av-openhome-org:service:Info:1</serviceType>
+        <serviceId>urn:av-openhome-org:serviceId:Info</serviceId>
+        <SCPDURL>/upmpd/OHInfo.xml</SCPDURL>
+        <controlURL>/ctl/Info</controlURL>
+        <eventSubURL>/evt/Info</eventSubURL>
+      </service>
+      <service>
+        <serviceType>urn:av-openhome-org:service:Volume:1</serviceType>
+        <serviceId>urn:av-openhome-org:serviceId:Volume</serviceId>
+        <SCPDURL>/upmpd/OHVolume.xml</SCPDURL>
+        <controlURL>/ctl/Volume</controlURL>
+        <eventSubURL>/evt/Volume</eventSubURL>
+      </service>
+    </serviceList>
+  </device>
+</root>
