@@ -48,6 +48,9 @@ extension TidalError: LocalizedError {
             reason
         case .unavailable:
             String(localized: "This track isn't available on TIDAL.")
+        case .missingETag:
+            String(localized: "TIDAL didn't let Vespertine change this playlist. Try again later.",
+                   comment: "A TIDAL playlist write was refused before sending: TIDAL returned no version tag (ETag).")
         }
     }
 
