@@ -239,8 +239,21 @@ public final class RendererPlayback: @unchecked Sendable {
         }
     }
 
+    /// Preparing a song opens its file (a probe, a decoder, an encoder), which can block on a disk or a share: it runs on a
+    /// queue of its own, never on Swift's cooperative pool.
+    public static let preparationQueueLabel = "org.szeremeta.vespertine.upnp.prepare"
+    private static let preparation = DispatchQueue(label: preparationQueueLabel, qos: .userInitiated)
+
+    func entry(for item: PlayableItem, at seconds: TimeInterval) async throws -> Entry {
+        try await withCheckedThrowingContinuation { continuation in
+            Self.preparation.async {
+                continuation.resume(with: Result { try self.prepareEntry(for: item, at: seconds) })
+            }
+        }
+    }
+
     /// Prepares `item` to be sent: its media URL, metadata and signal path.
-    func entry(for item: PlayableItem, at seconds: TimeInterval) throws -> Entry {
+    private func prepareEntry(for item: PlayableItem, at seconds: TimeInterval) throws -> Entry {
         let url = urlResolver?(item) ?? item.url
         let described = try? SourceDescription.describe(item, url: url)
         let settings = state.withLock { $0.settings }
@@ -286,9 +299,9 @@ public final class RendererPlayback: @unchecked Sendable {
                      startOffset: file == nil ? 0 : seconds, duration: info.duration)
     }
 
-    private func nextEntry(after item: PlayableItem) -> Entry? {
+    private func nextEntry(after item: PlayableItem) async -> Entry? {
         guard let next = nextItemProvider?(item) else { return nil }
-        do { return try entry(for: next, at: 0) } catch {
+        do { return try await entry(for: next, at: 0) } catch {
             // Played (and failed) when it's reached, as the engine does with a file that won't open.
             log.error("Next song for \(self.renderer.name, privacy: .public) not prepared: \(String(describing: error), privacy: .public)")
             return nil
@@ -297,9 +310,9 @@ public final class RendererPlayback: @unchecked Sendable {
 
     private func start(_ item: PlayableItem, at seconds: TimeInterval, announce: Bool, generation g: Int) async throws {
         var current: Entry
-        do { current = try entry(for: item, at: seconds) } catch { fail(item, error); return }
+        do { current = try await entry(for: item, at: seconds) } catch { fail(item, error); return }
         current.announces = announce
-        let next = nextEntry(after: item)
+        let next = await nextEntry(after: item)
         guard generation.withLock({ $0 }) == g else { release(current); next.map(release); return }
         try await transport.load(current: current.track, next: next?.track)
         let old = state.withLock { s -> [Entry] in
@@ -339,7 +352,7 @@ public final class RendererPlayback: @unchecked Sendable {
         let wanted = nextItemProvider?(current.item)
         let have = state.withLock { $0.next?.item }
         guard wanted?.id != have?.id else { return }
-        let next = nextEntry(after: current.item)
+        let next = await nextEntry(after: current.item)
         try await transport.replaceNext(next?.track)
         let old = state.withLock { s -> Entry? in defer { s.next = next }; return s.next }
         old.map(release)
@@ -355,7 +368,7 @@ public final class RendererPlayback: @unchecked Sendable {
         if processing != (current.path.renderer?.processing ?? []) || current.processedFile != nil {
             play(current.item, at: snapshot.position, announce: false)
         } else {
-            let next = nextEntry(after: current.item)
+            let next = await nextEntry(after: current.item)
             try await transport.replaceNext(next?.track)
             let old = state.withLock { s -> Entry? in defer { s.next = next }; return s.next }
             old.map(release)
@@ -380,7 +393,7 @@ public final class RendererPlayback: @unchecked Sendable {
         guard var current = state.withLock({ $0.current }) else { return }
         // The renderer moved on to the next song by itself.
         if let uri = status.currentURI, let next = state.withLock({ $0.next }), uri == next.mediaURL {
-            let following = nextEntry(after: next.item)
+            let following = await nextEntry(after: next.item)
             try? await transport.replaceNext(following?.track)
             let old = state.withLock { s -> Entry? in
                 defer { s.current = next; s.next = following; s.snapshot.item = next.item; s.snapshot.signalPath = next.path; s.snapshot.duration = next.duration ?? 0 }
