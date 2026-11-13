@@ -147,19 +147,33 @@ final class OutputSession: @unchecked Sendable {
     /// `group`: `deviceID` is the group's private aggregate, whose members are already configured (and held, if exclusive) by
     /// `group`. The aggregate itself is never held (it has no hog property), integer mode does not apply, and the format is
     /// the members' own, read back from them. On success the session owns `group`; on a throw the caller still does.
-    init(deviceID: AudioObjectID, plan: OutputPlan, exclusive: Bool, group: GroupSessionResources? = nil) throws {
+    /// `leavingFormatAlone`: a Bluetooth link (`OutputDevice.isBluetoothLink`). Its rate and formats are macOS's and the headset's:
+    /// nothing is set on it (a request for another rate is refused while a microphone is open, which is what kept 1.1.1 from ever
+    /// starting), and it is never held. The plan was made for the rate it is at; when it has moved since, this throws and the engine
+    /// plans again for the rate it is at now.
+    init(deviceID: AudioObjectID, plan: OutputPlan, exclusive: Bool, group: GroupSessionResources? = nil,
+         leavingFormatAlone: Bool = false) throws {
         self.deviceID = deviceID
         self.plan = plan
 
-        let hogged = exclusive && group == nil ? DeviceControl.acquireHog(deviceID) : false
-        if exclusive, !hogged, group == nil {
+        let hogged = exclusive && group == nil && !leavingFormatAlone ? DeviceControl.acquireHog(deviceID) : false
+        if exclusive, !hogged, group == nil, !leavingFormatAlone {
             log.notice("Exclusive access unavailable (another process holds the device); continuing shared")
         }
-        do {
-            try DeviceControl.apply(plan: plan, to: deviceID)
-        } catch {
-            if hogged { DeviceControl.releaseHog(deviceID) }
-            throw error
+        if leavingFormatAlone {
+            let current = (try? HAL.get(deviceID, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0
+            guard abs(current - plan.deviceSampleRate) < 0.5 else {
+                throw CoreAudioError(kAudioDeviceUnsupportedFormatError,
+                                     String(localized: "keep the Bluetooth link at \(Int(plan.deviceSampleRate.rounded())) Hz (it moved to \(Int(current.rounded())) Hz)",
+                                            comment: "Followed by “failed: <error code>”."))
+            }
+        } else {
+            do {
+                try DeviceControl.apply(plan: plan, to: deviceID)
+            } catch {
+                if hogged { DeviceControl.releaseHog(deviceID) }
+                throw error
+            }
         }
 
         let rate = (try? HAL.get(deviceID, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? plan.deviceSampleRate

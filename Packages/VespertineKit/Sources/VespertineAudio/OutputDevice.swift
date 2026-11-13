@@ -67,7 +67,9 @@ public struct OutputDevice: Identifiable, Sendable, Hashable {
     /// Built-in outputs (the Mac's speakers and headphone jack) always play shared, whatever the Exclusive access
     /// setting: macOS won't make a device another app holds exclusively the sound output, so the volume keys would
     /// stop reaching them, and they take float formats only, so exclusive access gains nothing (no integer mode).
-    public var alwaysShared: Bool { transport == .builtIn }
+    /// So do Bluetooth links (`isBluetoothLink`): their rate, codec and call mode belong to macOS and the headset, and
+    /// holding one only makes the next change to it fail.
+    public var alwaysShared: Bool { transport == .builtIn || isBluetoothLink }
 
     /// The configured speaker layout ("L", "R", "C", "LFE"…), empty when not set up or unlabeled.
     public var speakerNames: [String] {

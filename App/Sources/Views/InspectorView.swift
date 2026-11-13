@@ -275,6 +275,13 @@ struct SignalPathView: View {
             s.append(Step(title: String(localized: "Match 16-bit sources"), detail: note,
                           value: String(localized: "\(a.physicalBitDepth)-bit"), tone: path.isBitPerfect ? .good : .plain))
         }
+        if let note = path.bluetoothNote {
+            // A Bluetooth link is macOS's and the headset's to set: say what rate it is at and, in call mode, why it sounds like a call.
+            s.append(Step(title: String(localized: "Bluetooth link"), detail: note,
+                          value: path.isBluetoothCallMode ? String(localized: "call mode", comment: "A Bluetooth headset is in its hands-free call mode")
+                                                          : String(localized: "\(SampleRate.format(a.sampleRate)) kHz"),
+                          tone: path.isBluetoothCallMode ? .changed : .plain))
+        }
         var device = [path.deviceProfile.connection,
                       a.exclusive ? String(localized: "exclusive (hog)") : String(localized: "shared", comment: "The output device is shared with other apps"),
                       a.physicalIsInteger ? String(localized: "int \(a.physicalBitDepth)", comment: "Integer samples of this many bits, e.g. int 24")

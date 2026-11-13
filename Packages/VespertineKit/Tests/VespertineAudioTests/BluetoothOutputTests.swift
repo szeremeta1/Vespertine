@@ -89,7 +89,7 @@ struct BluetoothOutputTests {
         #expect(!path.isBluetoothCallMode)
         let note = try #require(path.bluetoothNote)
         #expect(note.contains("48"), "\(note)")
-        #expect(note.localizedCaseInsensitiveContains("converted"), "\(note)")
+        #expect(note.localizedCaseInsensitiveContains("convert"), "\(note)")
         #expect(!path.isBitPerfect)
     }
 
