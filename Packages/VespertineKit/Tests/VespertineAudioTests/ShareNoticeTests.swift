@@ -130,11 +130,11 @@ struct ShareNoticeTests {
         #expect(cache.shareSilence == nil, "the wait ended with the skip, though the open is still stuck")
     }
 
-    @Test("The engine reports the share's silence in its snapshot while a song waits, and not once it is given up on")
+    @Test("The engine reports the share's silence in its snapshot while a song waits, and not once the wait is over")
     func snapshotCarriesIt() async throws {
         let rig = try PlayPauseRig(seconds: 12)
         let cache = NetworkPlaybackCache(directory: rig.directory.appendingPathComponent("notice-cache"), budget: 256 << 20, chunk: 1 << 16,
-                                         noProgressLimit: 3, noticeAfter: 0.4)
+                                         noProgressLimit: 600, noticeAfter: 0.4)
         let size = rig.share.size
         let gated = Locked<[GatedShare]>([])
         cache.readerFactory = { _ in
@@ -148,8 +148,9 @@ struct ShareNoticeTests {
         rig.engine.play(PlayableItem(url: URL(fileURLWithPath: "/share/quiet.wav"), cacheKey: "quiet"))
         let noticed = await rig.wait(timeout: 30) { $0.shareStalledSeconds != nil }
         #expect(noticed, "the snapshot says the share is not answering")
-        let gaveUp = await rig.wait(timeout: 60) { $0.state == .stopped && $0.lastError != nil }
-        #expect(gaveUp)
-        #expect(rig.engine.snapshot.shareStalledSeconds == nil, "the song is given up on: no longer waiting, no notice")
+        rig.engine.stop()   // the wait is over (the cache's own give-up is covered by `QuietShareTests`)
+        // Patience, not a latency bound: the engine thread leaves its wait within a poll or two of the stop.
+        let quiet = await rig.wait(timeout: 30) { $0.shareStalledSeconds == nil }
+        #expect(quiet, "no longer waiting, no notice: \(rig.engine.snapshot.state), buffering \(rig.engine.snapshot.isBuffering)")
     }
 }
