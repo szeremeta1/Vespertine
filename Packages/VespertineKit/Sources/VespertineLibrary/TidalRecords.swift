@@ -259,6 +259,24 @@ extension LibraryDatabase {
         }
     }
 
+    /// A number the TIDAL sync keeps between refreshes (how long each list was), in the library's `meta` table.
+    public func tidalSyncValue(_ key: String) throws -> Int? {
+        try writer.read { db in
+            try Int.fetchOne(db, sql: "SELECT CAST(value AS INTEGER) FROM meta WHERE key = ?", arguments: ["tidal.sync.\(key)"])
+        }
+    }
+
+    /// Stores (or, with nil, forgets) a number of the TIDAL sync.
+    public func setTidalSyncValue(_ key: String, _ value: Int?) throws {
+        try writer.write { db in
+            if let value {
+                try db.execute(sql: "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)", arguments: ["tidal.sync.\(key)", String(value)])
+            } else {
+                try db.execute(sql: "DELETE FROM meta WHERE key = ?", arguments: ["tidal.sync.\(key)"])
+            }
+        }
+    }
+
     // MARK: Playlists
 
     /// Each synced TIDAL playlist's `lastUpdated`, by UUID.

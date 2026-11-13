@@ -74,7 +74,7 @@ struct TidalLibrarySyncTests {
         let db = try LibraryDatabase.inMemory()
         let catalog = account()
         let summary = try await TidalLibrarySync(catalog: catalog, database: db, userId: 4242).refresh()
-        #expect(summary.added == 7 && summary.updated == 0 && summary.removed == 0 && summary.playlists == 2)
+        #expect(summary.added == 7 && summary.updated == 0 && summary.removed == 0 && summary.playlists == 2 && summary.warnings.isEmpty)
         #expect(try count(db, "SELECT count(*) FROM tidalTrack") == 7)
         #expect(try db.tidalTrackIds() == [1, 2, 3, 90, 91, 40, 41])
         let lists = try db.playlists().filter { !$0.isSmart }
@@ -128,7 +128,8 @@ struct TidalLibrarySyncTests {
         catalog.set { $0.favorites = [tidalTrack(1)] }   // 2 stays (in a playlist), 3 is downloaded
         let summary = try await sync.refresh()
         #expect(summary.removed == 0)
-        catalog.set { $0.favorites = []; $0.playlistContents["pl-1"] = []; $0.playlists[0].lastUpdated = "later" }
+        // (One favorite left: an empty list would be held back as a possibly short answer, see emptyListsGuard.)
+        catalog.set { $0.favorites = [tidalTrack(91, album: 9)]; $0.playlistContents["pl-1"] = []; $0.playlists[0].lastUpdated = "later" }
         let next = try await sync.refresh()
         #expect(next.removed == 3, "1, 2 and 40 are gone")
         #expect(try db.tidalTrackIds() == [3, 90, 91, 41])
@@ -147,5 +148,43 @@ struct TidalLibrarySyncTests {
         #expect(summary.playlists == 1)
         #expect(try db.playlists().filter { !$0.isSmart }.map(\.name) == ["Mix"])
         #expect(!(try db.tidalTrackIds()).contains(41))
+    }
+
+    @Test("Empty lists from TIDAL while the library holds their items delete nothing this time, with a warning; the same answer twice is believed")
+    func emptyListsGuard() async throws {
+        let db = try LibraryDatabase.inMemory()
+        let catalog = account()
+        let sync = TidalLibrarySync(catalog: catalog, database: db, userId: 4242)
+        _ = try await sync.refresh()
+        catalog.set { $0.favorites = []; $0.albums = []; $0.playlists = [] }
+        let suspicious = try await sync.refresh()
+        #expect(suspicious.removed == 0)
+        #expect(suspicious.warnings.count == 3, "\(suspicious.warnings)")
+        #expect(try db.tidalTrackIds().count == 7)
+        #expect(Set(try db.playlists().filter { !$0.isSmart }.map(\.name)) == ["Mix", "Other"])
+        // TIDAL says the same again: the account really is empty now.
+        let confirmed = try await sync.refresh()
+        #expect(confirmed.warnings.isEmpty)
+        #expect(confirmed.removed == 7 && confirmed.playlists == 0)
+        #expect(try db.playlists().filter { !$0.isSmart }.isEmpty)
+    }
+
+    @Test("Favorites that shrink by more than half and by more than 20 are not acted on at once; smaller shrinks are")
+    func shrinkGuard() async throws {
+        let db = try LibraryDatabase.inMemory()
+        let catalog = FakeCatalog()
+        catalog.favorites = (1...50).map { tidalTrack($0) }
+        let sync = TidalLibrarySync(catalog: catalog, database: db, userId: 4242)
+        _ = try await sync.refresh()
+        catalog.set { $0.favorites = (1...10).map { tidalTrack($0) } }   // 80 % and 40 tracks fewer
+        let suspicious = try await sync.refresh()
+        #expect(suspicious.removed == 0 && suspicious.warnings.count == 1)
+        #expect(try db.tidalTrackIds().count == 50)
+        catalog.set { $0.favorites = (1...30).map { tidalTrack($0) } }   // 40 % fewer: believed
+        let shrunk = try await sync.refresh()
+        #expect(shrunk.removed == 20 && shrunk.warnings.isEmpty)
+        catalog.set { $0.favorites = (1...10).map { tidalTrack($0) } }   // 67 % fewer, but only 20 tracks
+        let small = try await sync.refresh()
+        #expect(small.removed == 20 && small.warnings.isEmpty)
     }
 }

@@ -29,6 +29,18 @@ public actor TidalLibrarySync {
         public var removed: Int
         /// The user's TIDAL playlists now in the library.
         public var playlists: Int
+        /// Lists TIDAL sent much shorter than last time (see `TidalLibrarySync.looksTruncated`): nothing was deleted for them
+        /// this time. One line per list, for the log or the UI.
+        public var warnings: [String] = []
+    }
+
+    /// A list that comes back empty while the library had items from it, or shrunk by more than half and by more than 20 items,
+    /// may be TIDAL answering short (an empty page from a 200), not the user's doing: deleting on it would take tracks and
+    /// playlists out of the library. Such a refresh deletes nothing; when the next refresh brings the same length, it is believed.
+    static func looksTruncated(fetched: Int, previous: Int?) -> Bool {
+        guard let previous, previous > 0 else { return false }
+        if fetched == 0 { return true }
+        return fetched * 2 < previous && previous - fetched > 20
     }
 
     private let catalog: any TidalCatalogReading
@@ -48,16 +60,34 @@ public actor TidalLibrarySync {
         let source = try database.tidalSource(userId: userId)
         guard let sourceId = source.id else { throw TidalError.unavailable }
         let before = try database.tidalTrackIds()
+        var warnings: [String] = []
+        var confirmed: [(key: String, count: Int)] = []
+        /// Whether `list`, `fetched` long now, may be acted on; records what to remember of it.
+        func trusted(_ list: String, _ fetched: Int) throws -> Bool {
+            let previous = try database.tidalSyncValue(list)
+            let pending = try database.tidalSyncValue(list + ".pending")
+            if Self.looksTruncated(fetched: fetched, previous: previous), pending != fetched {
+                try database.setTidalSyncValue(list + ".pending", fetched)
+                warnings.append("TIDAL sent \(fetched) \(list) where there were \(previous ?? 0): nothing removed for it until a refresh confirms it")
+                return false
+            }
+            confirmed.append((list, fetched))
+            return true
+        }
 
         var inputs: [TidalTrackInput] = []
         var present = Set<Int>()
-        for track in try await catalog.favoriteTracks(userId: userId, priority: .sync) {
+        let favorites = try await catalog.favoriteTracks(userId: userId, priority: .sync)
+        var trustAll = try trusted("favorite tracks", favorites.count)
+        for track in favorites {
             inputs.append(TidalTrackInput(track))
             present.insert(track.id)
         }
 
         let byAlbum = try database.tidalTrackIdsByAlbum()
-        for album in try await catalog.favoriteAlbums(userId: userId, priority: .sync) {
+        let albums = try await catalog.favoriteAlbums(userId: userId, priority: .sync)
+        trustAll = try trusted("favorite albums", albums.count) && trustAll
+        for album in albums {
             let known = byAlbum[album.id] ?? []
             if album.numberOfTracks > 0, known.count >= album.numberOfTracks {
                 present.formUnion(known)
@@ -70,6 +100,8 @@ public actor TidalLibrarySync {
         }
 
         let playlists = try await catalog.userPlaylists(userId: userId, priority: .sync)
+        let trustPlaylists = try trusted("playlists", playlists.count)
+        trustAll = trustPlaylists && trustAll
         let states = try database.tidalPlaylistStates()
         var changed: [(TidalPlaylist, [Int])] = []
         for playlist in playlists {
@@ -88,12 +120,18 @@ public actor TidalLibrarySync {
         for (playlist, ids) in changed {
             try database.setTidalPlaylist(uuid: playlist.uuid, name: playlist.title, lastUpdated: playlist.lastUpdated, tidalIds: ids)
         }
-        try database.removeTidalPlaylists(notIn: Set(playlists.map(\.uuid)))
-        let removed = try database.removeTidalTracks(notIn: present, sourceId: sourceId)
+        if trustPlaylists { try database.removeTidalPlaylists(notIn: Set(playlists.map(\.uuid))) }
+        // A track may be in any list, so one list in doubt keeps every track this time.
+        let removed = trustAll ? try database.removeTidalTracks(notIn: present, sourceId: sourceId) : 0
+        for (list, count) in confirmed {
+            try database.setTidalSyncValue(list, count)
+            try database.setTidalSyncValue(list + ".pending", nil)
+        }
 
         let upserted = Set(inputs.map(\.tidalId))
         return Summary(added: upserted.subtracting(before).count, updated: upserted.intersection(before).count,
-                       removed: removed, playlists: playlists.count)
+                       removed: removed, playlists: trustPlaylists ? playlists.count : (try database.tidalPlaylistStates().count),
+                       warnings: warnings)
     }
 }
 
