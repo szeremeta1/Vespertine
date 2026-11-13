@@ -471,6 +471,12 @@ struct OnlineSettings: View {
                 }
                 .font(.caption).foregroundStyle(.secondary)
             }
+            Section {
+                Toggle("TIDAL integration", isOn: Binding(get: { model.settings.tidalEnabled }, set: { model.setTidalEnabled($0) }))
+            } footer: {
+                Text("Stream, sync and download from your TIDAL account. Off: Vespertine shows only your own music.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
         .task { token = await ListenBrainzClient.shared.savedToken() }

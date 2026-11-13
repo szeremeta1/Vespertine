@@ -177,6 +177,10 @@ final class AppSettings {
     /// Network renderers whose volume the listener unlocked (Vespertine's digital volume, so the stream is processed). The
     /// others stay locked at 100%: the original file is sent and the renderer's own volume is left alone.
     var rendererVolumeUnlocked: Set<String> { didSet { defaults.set(rendererVolumeUnlocked.sorted(), forKey: "rendererVolumeUnlocked") } }
+    /// The TIDAL integration exists in the app only while this is on (Settings › Online › TIDAL integration), off by default. Off,
+    /// there is no TIDAL settings tab, sidebar section, Source column or inspector group, no TIDAL reader, sync or network traffic,
+    /// and the TIDAL rows in the library are left out of every list, count, album and smart playlist. Switching it off deletes nothing.
+    var tidalEnabled: Bool { didSet { defaults.set(tidalEnabled, forKey: "tidalEnabled") } }
     /// Song transitions (crossfade, Smart Mix, Live Set) and their master switch, off unless turned on. Reach the
     /// engine only while the switch is on (`engineSettings()`).
     var transitions: TransitionSettings { didSet { if transitions != oldValue { transitions.save(to: defaults) } } }
@@ -222,7 +226,7 @@ final class AppSettings {
             "watchFolders": false, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "dopListUpdates": true, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
-            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "bundleCopies": false,
+            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "tidalEnabled": false, "bundleCopies": false,
         ])
         Self.migrateAutomaticWorkToOff(defaults)
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
@@ -303,6 +307,7 @@ final class AppSettings {
         speakerGroupsFeature = defaults.bool(forKey: "speakerGroupsFeature")
         upnpRenderersFeature = defaults.bool(forKey: "upnpRenderersFeature")
         rendererVolumeUnlocked = Set(defaults.stringArray(forKey: "rendererVolumeUnlocked") ?? [])
+        tidalEnabled = defaults.bool(forKey: "tidalEnabled")
         transitions = TransitionSettings.load(from: defaults)
         self.dataDirectory = resolvedDataDirectory
         // A library that came from the old preferences gets its own file now (`didSet` doesn't run inside `init`).

@@ -210,6 +210,8 @@ struct QueueRow: View {
 
     var body: some View {
         let track = entry.track
+        // A queued TIDAL song that can't play now (TIDAL went offline) is grayed as in the songs table.
+        let unavailable = model.playability(of: track).reason
         HStack(spacing: 10) {
             ArtworkView(key: model.artworkKey(track), size: 160, cornerRadius: 4).frame(width: 34, height: 34)
                 .overlay(alignment: .topLeading) {
@@ -241,6 +243,8 @@ struct QueueRow: View {
             }
         }
         .padding(.vertical, 2)
+        .opacity(unavailable == nil ? 1 : 0.45)
+        .help(ifAny: unavailable)
         .contentShape(Rectangle())
         .onHover { hovering = $0 }
         // One VoiceOver stop per song: title, artist, length, format.

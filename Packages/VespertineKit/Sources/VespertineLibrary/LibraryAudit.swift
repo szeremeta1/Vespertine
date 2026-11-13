@@ -142,6 +142,6 @@ extension LibraryDatabase {
 
     /// Every present track, for an audit.
     public func auditTracks() throws -> [Track] {
-        try writer.read { db in try Track.filter(Column("isMissing") == false).fetchAll(db) }
+        try writer.read { db in try Track.filter(Column("isMissing") == false).filter(sql: try visibleTracksClause(db)).fetchAll(db) }
     }
 }

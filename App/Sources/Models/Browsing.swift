@@ -328,12 +328,12 @@ extension AppModel {
             guard copies.copies.count > 1 else { return passing }
             let isLocal: (AlbumCopy) -> Bool = { [shares] in !$0.tracks.contains(where: shares.isNetwork) }
             let pass = Set(passing.map(\.location))
-            if let chosen = copies.selected(library.copyChoice(albumKey: key), multichannel: wanted, isLocal: isLocal),
+            if let chosen = copies.selected(library.copyChoice(albumKey: key), multichannel: wanted, isLocal: isLocal, isPlayable: copyCanPlay),
                chosen.tracks.contains(where: { pass.contains($0.location) }) {
                 return chosen.tracks.filter { pass.contains($0.location) }
             }
             let candidates = AlbumCopies(copies: copies.copies.filter { $0.tracks.contains { pass.contains($0.location) } }, songs: copies.songs)
-            return candidates.bestCopy(multichannel: wanted, isLocal: isLocal)?.tracks.filter { pass.contains($0.location) } ?? passing
+            return candidates.bestCopy(multichannel: wanted, isLocal: isLocal, isPlayable: copyCanPlay)?.tracks.filter { pass.contains($0.location) } ?? passing
         }
     }
 
@@ -402,7 +402,7 @@ extension AppModel {
         switch facet {
         case .genre: Dictionary(library.genres.map { ($0.key, $0.name) }, uniquingKeysWith: { a, _ in a })
         case .artist: Dictionary(library.artists.map { ($0.name.lowercased(), $0.name) }, uniquingKeysWith: { a, _ in a })
-        case .source: Dictionary(library.sources.compactMap { s in s.id.map { (String($0), s.displayName) } }, uniquingKeysWith: { a, _ in a })
+        case .source: Dictionary((library.sources + [library.tidalSource].compactMap { $0 }).compactMap { s in s.id.map { (String($0), s.displayName) } }, uniquingKeysWith: { a, _ in a })
         default: [:]
         }
     }

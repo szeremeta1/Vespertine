@@ -441,10 +441,10 @@ public actor TagWriter {
         url.withUnsafeFileSystemRepresentation { $0.map { access($0, W_OK) == 0 } ?? false }
     }
 
-    /// Network shares added read-only. Their files are never rewritten, however the share is mounted: Vespertine
+    /// Network shares added read-only (the TIDAL account is no share: its downloads are local files). Their files are never rewritten, however the share is mounted: Vespertine
     /// reuses a mount that's already there (Finder's, or one shared with a writable source), which may be read-write.
     public static func readOnlyShares(_ sources: [LibrarySource]) -> Set<Int64> {
-        Set(sources.filter { $0.isNetwork && !$0.isWritable }.compactMap(\.id))
+        Set(sources.filter { $0.isNetwork && !$0.isTidal && !$0.isWritable }.compactMap(\.id))
     }
 
     /// After SFBAudioEngine's save: puts back the values of multi-valued fields it cut to one (fields the edit set

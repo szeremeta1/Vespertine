@@ -79,6 +79,11 @@ public actor TidalGate {
         }
     }
 
+    /// A GET whose answer's headers matter too (the `ETag` of a playlist).
+    public func getResponse(_ path: String, query: [String: String] = [:], priority: TidalPriority) async throws -> (Data, HTTPURLResponse) {
+        try await perform(method: "GET", path: path, query: query, form: nil, priority: priority, ifMatch: nil)
+    }
+
     /// POST/PUT/DELETE with a form body. `ifMatch` is the playlist ETag; TIDAL reads it from `If-None-Match`.
     public func send(method: String, path: String, form: [String: String], priority: TidalPriority,
                      ifMatch: String? = nil) async throws -> (Data, HTTPURLResponse) {

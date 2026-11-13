@@ -169,17 +169,23 @@ final class PlayerController {
     /// e.g. the chosen output is reconnecting). Set by the app model.
     var wantsMultichannel: () -> Bool? = { nil }
 
+    /// Whether a song can play now (the app's playability rule: a TIDAL song while TIDAL is out of reach can't). Songs that can't are
+    /// left out of what is queued, so a click on an album doesn't queue what would only fail.
+    var isPlayable: (Track) -> Bool = { _ in true }
+
     /// Queue entries for `tracks`, each playing the version of its song that suits the output.
     /// A song whose versions all arrive together (a whole SACD album) is queued once. With `allowing`, only
     /// versions it accepts are considered (a filtered page asked for multichannel: stereo versions stay out).
     /// `exactly`: tracks (by location) asked for as they are, a copy picked by hand, even on an album whose copies are bundled.
     private func entries(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, transitions: TransitionOverride? = nil,
                          exactly: Set<String> = []) -> [QueueEntry] {
+        let tracks = tracks.filter(isPlayable)
         // Only an album whose copies are bundled lets the output pick; any other copy plays as itself.
         let versions = library.playbackVersions(of: tracks).enumerated().map { i, versions in
             if exactly.contains(tracks[i].location) { return [tracks[i]] }
-            guard let allowing, versions.count > 1 else { return versions }
-            return versions.filter { $0.location == tracks[i].location || allowing($0) }
+            let playable = versions.filter { $0.location == tracks[i].location || isPlayable($0) }
+            guard let allowing, playable.count > 1 else { return playable }
+            return playable.filter { $0.location == tracks[i].location || allowing($0) }
         }
         let wanted = wantsMultichannel()
         var queued = Set<String>()
@@ -266,6 +272,26 @@ final class PlayerController {
     }
 
     func removeFromQueue(_ id: UUID) { removeFromQueue([id]) }
+
+    /// TIDAL was switched off: its songs leave the queue, those already played and those to come, and a TIDAL song that is playing
+    /// stops (playback does not move on by itself). Other songs, and a local song that is playing, are not touched.
+    func dropTidalTracks() {
+        func isTidal(_ entry: QueueEntry) -> Bool { entry.track.isTidalTrack }
+        func withoutTidalVersions(_ entry: QueueEntry) -> QueueEntry {
+            guard entry.versions.contains(where: \.isTidalTrack) else { return entry }
+            var copy = entry
+            copy.versions = entry.versions.filter { !$0.isTidalTrack }
+            if copy.versions.count < 2 { copy.versions = [] }
+            return copy
+        }
+        guard queue.contains(where: { isTidal($0) || $0.versions.contains(where: \.isTidalTrack) }) else { return }
+        let keptCurrent = current.flatMap { isTidal($0) ? nil : $0.id }
+        if current != nil, keptCurrent == nil { stop() }
+        queue = queue.filter { !isTidal($0) }.map(withoutTidalVersions)
+        originalOrder = originalOrder.filter { !isTidal($0) }.map(withoutTidalVersions)
+        currentIndex = keptCurrent.flatMap { id in queue.firstIndex { $0.id == id } }
+        syncMirror()
+    }
 
     /// Removes songs from the queue by entry, never the one playing. Entries no longer queued are ignored, so a
     /// request made from a list drawn a moment ago (the song ended meanwhile) can't remove the wrong song.
