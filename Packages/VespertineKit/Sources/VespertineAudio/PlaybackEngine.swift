@@ -31,6 +31,9 @@ public struct EngineSnapshot: Sendable {
     /// While the song is copied from a share before it plays: how much of it is local (0…1). nil when not copying, or when
     /// the copy is progressive (a large DSD file starts after its first reserve).
     public var bufferingFraction: Double?
+    /// The song is buffering and its share has sent nothing for this many seconds (10 or more; `NetworkPlaybackCache.shareSilence`):
+    /// the share is not answering, as opposed to answering slowly. nil when it is fine, or when the song is not waiting on a share.
+    public var shareStalledSeconds: Int?
     /// Playback is waiting for the chosen output (by name) to come back; it starts by itself when it does.
     public var waitingForDevice: String?
     /// The chosen output (by name) isn't connected and `outputDevice` plays in its place (see `OutputFallback`).
@@ -678,7 +681,13 @@ public final class PlaybackEngine: @unchecked Sendable {
         if changed { post(.settingsChanged(settings, outputSwitched: newOutput)) }
     }
 
-    public var snapshot: EngineSnapshot { shared.withLock { $0.snapshot } }
+    public var snapshot: EngineSnapshot {
+        var snapshot = shared.withLock { $0.snapshot }
+        // Asked of the cache outside the engine's lock: a copy's lock is taken first wherever both are (see `readsCancelled`). Only
+        // while the song is buffering, which also keeps a player that never touches a share from setting the cache up.
+        if snapshot.isBuffering { snapshot.shareStalledSeconds = playbackCache.shareSilence }
+        return snapshot
+    }
 
     /// Peak levels (linear) since the previous call.
     public func takePeaks() -> (left: Float, right: Float) {
