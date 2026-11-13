@@ -185,3 +185,36 @@ struct ProcessedHousekeepingTests {
         #expect(playback.snapshot.signalPath?.volume == .digital(dB: -13))
     }
 }
+
+/// Records the dispatch queue it is asked on, then makes nothing.
+final class QueueRecordingMaker: ProcessedStreamMaking, @unchecked Sendable {
+    private let lock = NSLock()
+    private var labels: [String] = []
+    var recorded: [String] { lock.withLock { labels } }
+    func makeStream(item: PlayableItem, url: URL, settings: RendererSettings, startSeconds: TimeInterval) throws -> (GrowingFile, SourceFormat) {
+        let label = String(cString: __dispatch_queue_get_label(nil))
+        lock.withLock { labels.append(label) }
+        throw RendererPlaybackError.unplayable("test")
+    }
+}
+
+@Suite("Renderer preparation queue")
+struct PreparationQueueTests {
+    @Test("Opening files and starting encoders happens on a queue of its own, not on Swift's cooperative pool")
+    func offThePool() async throws {
+        let fake = try await FakeRenderer(kind: .openHome)
+        let media = MediaServer()
+        try await media.start()
+        defer { media.stop(); fake.stop() }
+        let device = try await RendererDevice.load(location: fake.location)
+        let maker = QueueRecordingMaker()
+        let playback = RendererPlayback(renderer: device, transport: try device.makeTransport(), media: media, processed: maker, pollInterval: 0.05)
+        defer { playback.shutdown() }
+        playback.update(settings: RendererSettings(digitalVolumeDB: -6))
+        let events = EventLog()
+        playback.eventHandler = { events.add($0) }
+        playback.play(PlayableItem(url: try makeWAV(seconds: 0.2)))
+        #expect(await events.wait(for: "failed"))
+        #expect(maker.recorded == [RendererPlayback.preparationQueueLabel])
+    }
+}
