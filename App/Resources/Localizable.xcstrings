@@ -568572,6 +568572,1889 @@
           }
         }
       }
+    },
+    "System Settings": {
+      "comment": "The macOS app, named as the one using a headset's microphone",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የስርዓት ቅንብሮች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إعدادات النظام"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সিস্টেম সেটিংস"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nastavení systému"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systemindstillinger"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systemeinstellungen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ρυθμίσεις συστήματος"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes del Sistema"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تنظیمات سیستم"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Järjestelmäasetukset"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System Settings"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages Système"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સિસ્ટમ સેટિંગ્સ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saitunan Tsarin"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הגדרות המערכת"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सिस्टम सेटिंग्ज़"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rendszerbeállítások"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pengaturan Sistem"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impostazioni di Sistema"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システム設定"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಿಸ್ಟಂ ಸೆಟ್ಟಿಂಗ್‌ಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시스템 설정"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സിസ്റ്റം ക്രമീകരണങ്ങൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सिस्टम सेटिंग्ज"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seting Sistem"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systeminnstillinger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systeeminstellingen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਿਸਟਮ ਸੈਟਿੰਗਾਂ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ustawienia systemowe"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes do Sistema"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Definições do Sistema"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Configurări sistem"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systeminställningar"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mipangilio ya Mfumo"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "சிஸ்டம் அமைப்புகள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "సిస్టమ్ సెట్టింగ్‌లు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การตั้งค่าระบบ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem Ayarları"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Системні параметри"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سسٹم سیٹنگز"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cài đặt hệ thống"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系統設定"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系统设置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系統設定"
+          }
+        }
+      }
+    },
+    "Siri": {
+      "comment": "Siri's listening (\"Hey Siri\"), named as what is using a headset's microphone",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siri"
+          }
+        }
+      }
+    },
+    "an app": {
+      "comment": "An app Vespertine can't name, using a headset's microphone; its process ID follows in parentheses",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አንድ መተግበሪያ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تطبيق ما"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "একটি অ্যাপ"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nějaká aplikace"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "en app"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "eine App"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "μια εφαρμογή"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "una app"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یک برنامه"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "jokin appi"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "isang app"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "une app"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કોઈ ઍપ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "wata manhaja"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יישום כלשהו"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कोई ऐप"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "egy app"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sebuah app"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "un’app"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "いずれかのアプリ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಯಾವುದೋ ಆ್ಯಪ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "어떤 앱"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഏതോ ഒരു ആപ്പ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "एखादे अ‍ॅप"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sebuah app"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "en app"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "een app"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕੋਈ ਐਪ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "jakaś aplikacja"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "um app"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "uma app"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "o aplicație"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "en app"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "programu fulani"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஏதோ ஒரு ஆப்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఏదో ఒక యాప్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แอปหนึ่ง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bir uygulama"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "якась програма"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوئی ایپ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "một ứng dụng"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "某個 App"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "某个 App"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "某個 App"
+          }
+        }
+      }
+    },
+    "%@ is in call mode because %@ is using its microphone: macOS plays everything on it at %@ kHz, like a phone call, without Spatial Audio. Close it or pick another input in System Settings › Sound; full quality returns by itself.": {
+      "comment": "A Bluetooth headset is in its hands-free call mode because an app has its microphone open. The first %@ is the headset, the second the app (e.g. System Settings), the third the rate in kHz.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ በጥሪ ሁነታ ላይ ነው፤ ምክንያቱም %2$@ ማይክሮፎኑን እየተጠቀመ ነው፦ macOS በላዩ ላይ ሁሉንም ነገር እንደ ስልክ ጥሪ በ%3$@ kHz ያለ Spatial Audio ያጫውታል። ይዝጉት ወይም በየስርዓት ቅንብሮች › ድምፅ ሌላ ግብዓት ይምረጡ፤ ሙሉ ጥራት በራሱ ይመለሳል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ في وضع المكالمات لأن %2$@ يستخدم الميكروفون الخاص به: يشغّل macOS كل شيء عليه بتردد %3$@ kHz، كأنه مكالمة هاتفية، ومن دون الصوت المكاني. أغلقه أو اختر مدخلًا آخر في إعدادات النظام › الصوت؛ وستعود الجودة الكاملة تلقائيًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ কল মোডে আছে কারণ %2$@ এর মাইক্রোফোন ব্যবহার করছে: macOS এতে সবকিছু %3$@ kHz-এ ফোন কলের মতো, স্পেশিয়াল অডিও ছাড়া বাজায়। এটি বন্ধ করুন বা সিস্টেম সেটিংস › সাউন্ড-এ অন্য ইনপুট বেছে নিন; পূর্ণ মান নিজে থেকেই ফিরে আসবে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ je v režimu hovoru, protože jeho mikrofon používá %2$@: macOS na něm přehrává vše při %3$@ kHz jako telefonní hovor, bez prostorového zvuku. Zavřete ji nebo vyberte jiný vstup v Nastavení systému › Zvuk; plná kvalita se vrátí sama."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ er i opkaldstilstand, fordi %2$@ bruger dens mikrofon: macOS afspiller alt på den ved %3$@ kHz som et telefonopkald, uden rumlig lyd. Luk den, eller vælg et andet input i Systemindstillinger › Lyd; fuld kvalitet vender selv tilbage."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ist im Anrufmodus, weil %2$@ das Mikrofon verwendet: macOS spielt darauf alles mit %3$@ kHz wie bei einem Telefonat ab, ohne 3D-Audio. Schließe es oder wähle in Systemeinstellungen › Ton einen anderen Eingang; die volle Qualität kehrt von selbst zurück."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το %1$@ βρίσκεται σε λειτουργία κλήσης επειδή το %2$@ χρησιμοποιεί το μικρόφωνό του: το macOS παίζει τα πάντα σε αυτό στα %3$@ kHz, σαν τηλεφωνική κλήση, χωρίς χωρικό ήχο. Κλείστε το ή επιλέξτε άλλη είσοδο στις Ρυθμίσεις συστήματος › Ήχος· η πλήρης ποιότητα επιστρέφει από μόνη της."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ está en modo llamada porque %2$@ está usando su micrófono: macOS reproduce todo en él a %3$@ kHz, como una llamada, sin audio espacial. Ciérralo o elige otra entrada en Ajustes del Sistema › Sonido; la calidad completa vuelve sola."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ در حالت تماس است، چون %2$@ از میکروفون آن استفاده می‌کند: macOS همه‌چیز را روی آن با %3$@ kHz، مثل یک تماس تلفنی و بدون صدای فضایی پخش می‌کند. آن را ببندید یا در System Settings › Sound ورودی دیگری انتخاب کنید؛ کیفیت کامل خودبه‌خود برمی‌گردد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ on puhelutilassa, koska %2$@ käyttää sen mikrofonia: macOS toistaa siinä kaiken %3$@ kHz:n taajuudella kuin puhelun, ilman tilaääntä. Sulje se tai valitse toinen sisääntulo kohdassa Järjestelmäasetukset › Ääni; täysi laatu palaa itsestään."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naka-call mode ang %1$@ dahil ginagamit ng %2$@ ang mikropono nito: pinapatugtog ng macOS ang lahat dito sa %3$@ kHz, parang tawag sa telepono, nang walang Spatial Audio. Isara ito o pumili ng ibang input sa System Settings › Sound; kusang babalik ang buong kalidad."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ est en mode appel car %2$@ utilise son micro : macOS y joue tout à %3$@ kHz, comme un appel téléphonique, sans audio spatial. Fermez-le ou choisissez une autre entrée dans Réglages Système › Son ; la qualité complète revient d’elle-même."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ કૉલ મોડમાં છે કારણ કે %2$@ તેના માઇક્રોફોનનો ઉપયોગ કરે છે: macOS તેના પર બધું %3$@ kHz પર, ફોન કૉલની જેમ, સ્પેશિયલ ઑડિયો વિના વગાડે છે. તેને બંધ કરો અથવા સિસ્ટમ સેટિંગ્સ › સાઉન્ડમાં બીજું ઇનપુટ પસંદ કરો; પૂર્ણ ગુણવત્તા આપમેળે પાછી આવશે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ yana cikin yanayin kira saboda %2$@ yana amfani da makirufonsa: macOS yana kunna komai a kansa a %3$@ kHz, kamar kiran waya, ba tare da Spatial Audio ba. Rufe shi ko zaɓi wata shigarwa a Saitunan Tsarin › Sauti; cikakken inganci zai dawo da kansa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ במצב שיחה כי %2$@ משתמש במיקרופון שלו: macOS מנגן בו הכול ב־%3$@ kHz, כמו בשיחת טלפון, ללא שמע מרחבי. סגרו אותו או בחרו קלט אחר ב״הגדרות המערכת״ › ״צליל״; האיכות המלאה תחזור מעצמה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ कॉल मोड में है क्योंकि %2$@ उसका माइक्रोफ़ोन इस्तेमाल कर रहा है: macOS उस पर सब कुछ %3$@ kHz पर, फ़ोन कॉल की तरह, स्पेशियल ऑडियो के बिना चलाता है। इसे बंद करें या सिस्टम सेटिंग्ज़ › ध्वनि में कोई दूसरा इनपुट चुनें; पूरी गुणवत्ता अपने आप लौट आएगी।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ hívásmódban van, mert %2$@ használja a mikrofonját: a macOS mindent %3$@ kHz-en játszik le rajta, mint egy telefonhívást, térhatású hang nélkül. Zárja be, vagy válasszon másik bemenetet a Rendszerbeállítások › Hang alatt; a teljes minőség magától visszatér."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ dalam mode panggilan karena %2$@ sedang menggunakan mikrofonnya: macOS memutar semuanya di sana pada %3$@ kHz, seperti panggilan telepon, tanpa Audio Spasial. Tutup app itu atau pilih input lain di Pengaturan Sistem › Suara; kualitas penuh kembali dengan sendirinya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ è in modalità chiamata perché %2$@ sta usando il suo microfono: macOS vi riproduce tutto a %3$@ kHz, come una telefonata, senza audio spaziale. Chiudilo o scegli un altro ingresso in Impostazioni di Sistema › Suono; la qualità piena torna da sola."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@がマイクを使用しているため、%1$@は通話モードです。macOSはこのデバイスですべてを電話のように%3$@ kHzで、空間オーディオなしで再生します。それを閉じるか、「システム設定」›「サウンド」で別の入力を選んでください。フル音質は自動的に戻ります。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ ಅದರ ಮೈಕ್ರೊಫೋನ್ ಬಳಸುತ್ತಿರುವುದರಿಂದ %1$@ ಕರೆ ಮೋಡ್‌ನಲ್ಲಿದೆ: macOS ಅದರಲ್ಲಿ ಎಲ್ಲವನ್ನೂ %3$@ kHz ನಲ್ಲಿ, ಫೋನ್ ಕರೆಯಂತೆ, ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋ ಇಲ್ಲದೆ ಪ್ಲೇ ಮಾಡುತ್ತದೆ. ಅದನ್ನು ಮುಚ್ಚಿ ಅಥವಾ ಸಿಸ್ಟಂ ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ಧ್ವನಿಯಲ್ಲಿ ಬೇರೆ ಇನ್‌ಪುಟ್ ಆರಿಸಿ; ಪೂರ್ಣ ಗುಣಮಟ್ಟ ತಾನಾಗಿಯೇ ಮರಳುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@에서 마이크를 사용하고 있어 %1$@이(가) 통화 모드입니다. macOS는 이 기기에서 모든 소리를 전화 통화처럼 %3$@ kHz로, 공간 음향 없이 재생합니다. 그 앱을 닫거나 시스템 설정 › 사운드에서 다른 입력을 선택하십시오. 전체 음질은 자동으로 돌아옵니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ അതിന്റെ മൈക്രോഫോൺ ഉപയോഗിക്കുന്നതിനാൽ %1$@ കോൾ മോഡിലാണ്: macOS അതിൽ എല്ലാം %3$@ kHz-ൽ, ഫോൺ കോൾ പോലെ, സ്പേഷ്യൽ ഓഡിയോ ഇല്ലാതെ പ്ലേ ചെയ്യുന്നു. അത് അടയ്ക്കുക അല്ലെങ്കിൽ സിസ്റ്റം ക്രമീകരണങ്ങൾ › ശബ്ദം എന്നതിൽ മറ്റൊരു ഇൻപുട്ട് തിരഞ്ഞെടുക്കുക; പൂർണ്ണ നിലവാരം സ്വയം തിരിച്ചെത്തും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ त्याचा मायक्रोफोन वापरत असल्यामुळे %1$@ कॉल मोडमध्ये आहे: macOS त्यावर सर्व काही %3$@ kHz वर, फोन कॉलसारखे, स्पेशियल ऑडिओशिवाय वाजवते. ते बंद करा किंवा सिस्टम सेटिंग्ज › ध्वनी मध्ये दुसरे इनपुट निवडा; पूर्ण गुणवत्ता आपोआप परत येईल."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ dalam mod panggilan kerana %2$@ sedang menggunakan mikrofonnya: macOS memainkan semuanya padanya pada %3$@ kHz, seperti panggilan telefon, tanpa Audio Ruang. Tutup app itu atau pilih input lain dalam Seting Sistem › Bunyi; kualiti penuh kembali dengan sendirinya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ er i samtalemodus fordi %2$@ bruker mikrofonen: macOS spiller alt på den med %3$@ kHz, som en telefonsamtale, uten romlig lyd. Lukk den, eller velg en annen inngang i Systeminnstillinger › Lyd; full kvalitet kommer tilbake av seg selv."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ staat in gespreksmodus omdat %2$@ de microfoon gebruikt: macOS speelt er alles op af met %3$@ kHz, als een telefoongesprek, zonder ruimtelijke audio. Sluit het of kies een andere invoer in Systeeminstellingen › Geluid; de volledige kwaliteit komt vanzelf terug."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ਕਾਲ ਮੋਡ ਵਿੱਚ ਹੈ ਕਿਉਂਕਿ %2$@ ਇਸਦਾ ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਵਰਤ ਰਿਹਾ ਹੈ: macOS ਇਸ ਉੱਤੇ ਸਭ ਕੁਝ %3$@ kHz 'ਤੇ, ਫ਼ੋਨ ਕਾਲ ਵਾਂਗ, ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ ਤੋਂ ਬਿਨਾਂ ਚਲਾਉਂਦਾ ਹੈ। ਇਸਨੂੰ ਬੰਦ ਕਰੋ ਜਾਂ ਸਿਸਟਮ ਸੈਟਿੰਗਾਂ › ਧੁਨੀ ਵਿੱਚ ਕੋਈ ਹੋਰ ਇਨਪੁਟ ਚੁਣੋ; ਪੂਰੀ ਗੁਣਵੱਤਾ ਆਪਣੇ ਆਪ ਵਾਪਸ ਆ ਜਾਵੇਗੀ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ jest w trybie rozmowy, ponieważ %2$@ używa jego mikrofonu: macOS odtwarza na nim wszystko z częstotliwością %3$@ kHz, jak rozmowę telefoniczną, bez dźwięku przestrzennego. Zamknij ją lub wybierz inne wejście w Ustawieniach systemowych › Dźwięk; pełna jakość wróci sama."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ está no modo de chamada porque %2$@ está usando o microfone dele: o macOS reproduz tudo nele a %3$@ kHz, como uma ligação, sem Áudio Espacial. Feche-o ou escolha outra entrada em Ajustes do Sistema › Som; a qualidade total volta sozinha."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ está no modo de chamada porque %2$@ está a usar o respetivo microfone: o macOS reproduz tudo nele a %3$@ kHz, como uma chamada telefónica, sem áudio espacial. Feche-a ou escolha outra entrada em Definições do Sistema › Som; a qualidade total volta sozinha."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ este în modul apel deoarece %2$@ îi folosește microfonul: macOS redă totul pe el la %3$@ kHz, ca într-un apel telefonic, fără audio spațial. Închide-o sau alege altă intrare în Configurări sistem › Sunet; calitatea completă revine de la sine."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ är i samtalsläge eftersom %2$@ använder dess mikrofon: macOS spelar upp allt på den med %3$@ kHz, som ett telefonsamtal, utan rumsligt ljud. Stäng den eller välj en annan ingång i Systeminställningar › Ljud; full kvalitet kommer tillbaka av sig själv."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ iko katika hali ya simu kwa sababu %2$@ inatumia maikrofoni yake: macOS inacheza kila kitu juu yake kwa %3$@ kHz, kama simu, bila Spatial Audio. Ifunge au chagua ingizo jingine katika System Settings › Sound; ubora kamili utarudi wenyewe."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ அதன் மைக்ரோஃபோனைப் பயன்படுத்துவதால் %1$@ அழைப்புப் பயன்முறையில் உள்ளது: macOS அதில் எல்லாவற்றையும் %3$@ kHz இல், தொலைபேசி அழைப்பு போல, ஸ்பேஷியல் ஆடியோ இல்லாமல் இயக்குகிறது. அதை மூடுங்கள் அல்லது சிஸ்டம் அமைப்புகள் › ஒலி என்பதில் வேறு உள்ளீட்டைத் தேர்ந்தெடுங்கள்; முழுத் தரம் தானாகவே திரும்பும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ దాని మైక్రోఫోన్‌ను ఉపయోగిస్తున్నందున %1$@ కాల్ మోడ్‌లో ఉంది: macOS దానిపై అన్నింటినీ %3$@ kHz వద్ద, ఫోన్ కాల్ లాగా, స్పేషియల్ ఆడియో లేకుండా ప్లే చేస్తుంది. దాన్ని మూసివేయండి లేదా సిస్టమ్ సెట్టింగ్‌లు › సౌండ్‌లో వేరే ఇన్‌పుట్‌ను ఎంచుకోండి; పూర్తి నాణ్యత దానంతట అదే తిరిగి వస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ อยู่ในโหมดการโทรเพราะ %2$@ กำลังใช้ไมโครโฟนของอุปกรณ์นี้ macOS จึงเล่นทุกอย่างบนอุปกรณ์นี้ที่ %3$@ kHz เหมือนการโทรศัพท์ โดยไม่มีเสียงตามตำแหน่ง ปิดแอปนั้นหรือเลือกอินพุตอื่นใน การตั้งค่าระบบ › เสียง แล้วคุณภาพเต็มจะกลับมาเอง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%2$@ mikrofonunu kullandığı için %1$@ arama modunda: macOS bu aygıtta her şeyi %3$@ kHz’de, telefon görüşmesi gibi, Uzamsal Ses olmadan çalıyor. Onu kapatın ya da Sistem Ayarları › Ses’te başka bir giriş seçin; tam kalite kendiliğinden geri gelir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ у режимі дзвінка, бо %2$@ використовує його мікрофон: macOS відтворює на ньому все з частотою %3$@ кГц, як телефонну розмову, без просторового аудіо. Закрийте її або виберіть інший вхід у «Системні параметри» › «Звук»; повна якість повернеться сама."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ کال موڈ میں ہے کیونکہ %2$@ اس کا مائیکروفون استعمال کر رہا ہے: macOS اس پر سب کچھ %3$@ kHz پر، فون کال کی طرح، اسپیشل آڈیو کے بغیر چلاتا ہے۔ اسے بند کریں یا System Settings › Sound میں کوئی دوسرا ان پٹ منتخب کریں؛ پورا معیار خود بخود واپس آ جائے گا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ đang ở chế độ cuộc gọi vì %2$@ đang dùng micrô của nó: macOS phát mọi thứ trên đó ở %3$@ kHz, như một cuộc gọi điện thoại, không có Âm thanh không gian. Hãy đóng nó hoặc chọn đầu vào khác trong Cài đặt hệ thống › Âm thanh; chất lượng đầy đủ sẽ tự trở lại."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@處於通話模式，因為%2$@正在使用它的咪高峰：macOS 在它上面以 %3$@ kHz 播放所有聲音，就像打電話一樣，沒有空間音訊。請關閉它，或在「系統設定」›「聲音」中選擇其他輸入；完整音質會自動恢復。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@处于通话模式，因为%2$@正在使用它的麦克风：macOS 在它上面以 %3$@ kHz 播放所有声音，就像打电话一样，没有空间音频。请关闭它，或在“系统设置” › “声音”中选择其他输入；完整音质会自动恢复。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@處於通話模式，因為%2$@正在使用它的麥克風：macOS 在它上面以 %3$@ kHz 播放所有聲音，就像打電話一樣，沒有空間音訊。請關閉它，或在「系統設定」›「聲音」中選擇其他輸入；完整音質會自動恢復。"
+          }
+        }
+      }
+    },
+    "%@ is in call mode because an app is using its microphone: macOS plays everything on it at %@ kHz, like a phone call, without Spatial Audio. Close that app or pick another input in System Settings › Sound; full quality returns by itself.": {
+      "comment": "A Bluetooth headset is in its hands-free call mode and Vespertine can't tell which app has its microphone. The first %@ is the headset, the second the rate in kHz.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ በጥሪ ሁነታ ላይ ነው፤ ምክንያቱም አንድ መተግበሪያ ማይክሮፎኑን እየተጠቀመ ነው፦ macOS በላዩ ላይ ሁሉንም ነገር እንደ ስልክ ጥሪ በ%2$@ kHz ያለ Spatial Audio ያጫውታል። ያንን መተግበሪያ ይዝጉ ወይም በየስርዓት ቅንብሮች › ድምፅ ሌላ ግብዓት ይምረጡ፤ ሙሉ ጥራት በራሱ ይመለሳል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ في وضع المكالمات لأن تطبيقًا ما يستخدم الميكروفون الخاص به: يشغّل macOS كل شيء عليه بتردد %2$@ kHz، كأنه مكالمة هاتفية، ومن دون الصوت المكاني. أغلق ذلك التطبيق أو اختر مدخلًا آخر في إعدادات النظام › الصوت؛ وستعود الجودة الكاملة تلقائيًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ কল মোডে আছে কারণ একটি অ্যাপ এর মাইক্রোফোন ব্যবহার করছে: macOS এতে সবকিছু %2$@ kHz-এ ফোন কলের মতো, স্পেশিয়াল অডিও ছাড়া বাজায়। সেই অ্যাপটি বন্ধ করুন বা সিস্টেম সেটিংস › সাউন্ড-এ অন্য ইনপুট বেছে নিন; পূর্ণ মান নিজে থেকেই ফিরে আসবে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ je v režimu hovoru, protože jeho mikrofon používá nějaká aplikace: macOS na něm přehrává vše při %2$@ kHz jako telefonní hovor, bez prostorového zvuku. Zavřete tu aplikaci nebo vyberte jiný vstup v Nastavení systému › Zvuk; plná kvalita se vrátí sama."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ er i opkaldstilstand, fordi en app bruger dens mikrofon: macOS afspiller alt på den ved %2$@ kHz som et telefonopkald, uden rumlig lyd. Luk den app, eller vælg et andet input i Systemindstillinger › Lyd; fuld kvalitet vender selv tilbage."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ist im Anrufmodus, weil eine App das Mikrofon verwendet: macOS spielt darauf alles mit %2$@ kHz wie bei einem Telefonat ab, ohne 3D-Audio. Schließe diese App oder wähle in Systemeinstellungen › Ton einen anderen Eingang; die volle Qualität kehrt von selbst zurück."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το %1$@ βρίσκεται σε λειτουργία κλήσης επειδή μια εφαρμογή χρησιμοποιεί το μικρόφωνό του: το macOS παίζει τα πάντα σε αυτό στα %2$@ kHz, σαν τηλεφωνική κλήση, χωρίς χωρικό ήχο. Κλείστε αυτή την εφαρμογή ή επιλέξτε άλλη είσοδο στις Ρυθμίσεις συστήματος › Ήχος· η πλήρης ποιότητα επιστρέφει από μόνη της."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ está en modo llamada porque una app está usando su micrófono: macOS reproduce todo en él a %2$@ kHz, como una llamada, sin audio espacial. Cierra esa app o elige otra entrada en Ajustes del Sistema › Sonido; la calidad completa vuelve sola."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ در حالت تماس است، چون یک برنامه از میکروفون آن استفاده می‌کند: macOS همه‌چیز را روی آن با %2$@ kHz، مثل یک تماس تلفنی و بدون صدای فضایی پخش می‌کند. آن برنامه را ببندید یا در System Settings › Sound ورودی دیگری انتخاب کنید؛ کیفیت کامل خودبه‌خود برمی‌گردد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ on puhelutilassa, koska jokin appi käyttää sen mikrofonia: macOS toistaa siinä kaiken %2$@ kHz:n taajuudella kuin puhelun, ilman tilaääntä. Sulje se appi tai valitse toinen sisääntulo kohdassa Järjestelmäasetukset › Ääni; täysi laatu palaa itsestään."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naka-call mode ang %1$@ dahil may app na gumagamit ng mikropono nito: pinapatugtog ng macOS ang lahat dito sa %2$@ kHz, parang tawag sa telepono, nang walang Spatial Audio. Isara ang app na iyon o pumili ng ibang input sa System Settings › Sound; kusang babalik ang buong kalidad."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ est en mode appel car une app utilise son micro : macOS y joue tout à %2$@ kHz, comme un appel téléphonique, sans audio spatial. Fermez cette app ou choisissez une autre entrée dans Réglages Système › Son ; la qualité complète revient d’elle-même."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ કૉલ મોડમાં છે કારણ કે કોઈ ઍપ તેના માઇક્રોફોનનો ઉપયોગ કરે છે: macOS તેના પર બધું %2$@ kHz પર, ફોન કૉલની જેમ, સ્પેશિયલ ઑડિયો વિના વગાડે છે. તે ઍપ બંધ કરો અથવા સિસ્ટમ સેટિંગ્સ › સાઉન્ડમાં બીજું ઇનપુટ પસંદ કરો; પૂર્ણ ગુણવત્તા આપમેળે પાછી આવશે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ yana cikin yanayin kira saboda wata manhaja tana amfani da makirufonsa: macOS yana kunna komai a kansa a %2$@ kHz, kamar kiran waya, ba tare da Spatial Audio ba. Rufe waccan manhajar ko zaɓi wata shigarwa a Saitunan Tsarin › Sauti; cikakken inganci zai dawo da kansa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ במצב שיחה כי יישום כלשהו משתמש במיקרופון שלו: macOS מנגן בו הכול ב־%2$@ kHz, כמו בשיחת טלפון, ללא שמע מרחבי. סגרו את היישום הזה או בחרו קלט אחר ב״הגדרות המערכת״ › ״צליל״; האיכות המלאה תחזור מעצמה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ कॉल मोड में है क्योंकि कोई ऐप उसका माइक्रोफ़ोन इस्तेमाल कर रहा है: macOS उस पर सब कुछ %2$@ kHz पर, फ़ोन कॉल की तरह, स्पेशियल ऑडियो के बिना चलाता है। उस ऐप को बंद करें या सिस्टम सेटिंग्ज़ › ध्वनि में कोई दूसरा इनपुट चुनें; पूरी गुणवत्ता अपने आप लौट आएगी।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ hívásmódban van, mert egy app használja a mikrofonját: a macOS mindent %2$@ kHz-en játszik le rajta, mint egy telefonhívást, térhatású hang nélkül. Zárja be azt az appot, vagy válasszon másik bemenetet a Rendszerbeállítások › Hang alatt; a teljes minőség magától visszatér."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ dalam mode panggilan karena sebuah app sedang menggunakan mikrofonnya: macOS memutar semuanya di sana pada %2$@ kHz, seperti panggilan telepon, tanpa Audio Spasial. Tutup app tersebut atau pilih input lain di Pengaturan Sistem › Suara; kualitas penuh kembali dengan sendirinya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ è in modalità chiamata perché un’app sta usando il suo microfono: macOS vi riproduce tutto a %2$@ kHz, come una telefonata, senza audio spaziale. Chiudi quell’app o scegli un altro ingresso in Impostazioni di Sistema › Suono; la qualità piena torna da sola."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "いずれかのアプリがマイクを使用しているため、%1$@は通話モードです。macOSはこのデバイスですべてを電話のように%2$@ kHzで、空間オーディオなしで再生します。そのアプリを閉じるか、「システム設定」›「サウンド」で別の入力を選んでください。フル音質は自動的に戻ります。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಯಾವುದೋ ಆ್ಯಪ್ ಅದರ ಮೈಕ್ರೊಫೋನ್ ಬಳಸುತ್ತಿರುವುದರಿಂದ %1$@ ಕರೆ ಮೋಡ್‌ನಲ್ಲಿದೆ: macOS ಅದರಲ್ಲಿ ಎಲ್ಲವನ್ನೂ %2$@ kHz ನಲ್ಲಿ, ಫೋನ್ ಕರೆಯಂತೆ, ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋ ಇಲ್ಲದೆ ಪ್ಲೇ ಮಾಡುತ್ತದೆ. ಆ ಆ್ಯಪ್ ಅನ್ನು ಮುಚ್ಚಿ ಅಥವಾ ಸಿಸ್ಟಂ ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ಧ್ವನಿಯಲ್ಲಿ ಬೇರೆ ಇನ್‌ಪುಟ್ ಆರಿಸಿ; ಪೂರ್ಣ ಗುಣಮಟ್ಟ ತಾನಾಗಿಯೇ ಮರಳುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "어떤 앱이 마이크를 사용하고 있어 %1$@이(가) 통화 모드입니다. macOS는 이 기기에서 모든 소리를 전화 통화처럼 %2$@ kHz로, 공간 음향 없이 재생합니다. 그 앱을 닫거나 시스템 설정 › 사운드에서 다른 입력을 선택하십시오. 전체 음질은 자동으로 돌아옵니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഏതോ ഒരു ആപ്പ് അതിന്റെ മൈക്രോഫോൺ ഉപയോഗിക്കുന്നതിനാൽ %1$@ കോൾ മോഡിലാണ്: macOS അതിൽ എല്ലാം %2$@ kHz-ൽ, ഫോൺ കോൾ പോലെ, സ്പേഷ്യൽ ഓഡിയോ ഇല്ലാതെ പ്ലേ ചെയ്യുന്നു. ആ ആപ്പ് അടയ്ക്കുക അല്ലെങ്കിൽ സിസ്റ്റം ക്രമീകരണങ്ങൾ › ശബ്ദം എന്നതിൽ മറ്റൊരു ഇൻപുട്ട് തിരഞ്ഞെടുക്കുക; പൂർണ്ണ നിലവാരം സ്വയം തിരിച്ചെത്തും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "एखादे अ‍ॅप त्याचा मायक्रोफोन वापरत असल्यामुळे %1$@ कॉल मोडमध्ये आहे: macOS त्यावर सर्व काही %2$@ kHz वर, फोन कॉलसारखे, स्पेशियल ऑडिओशिवाय वाजवते. ते अ‍ॅप बंद करा किंवा सिस्टम सेटिंग्ज › ध्वनी मध्ये दुसरे इनपुट निवडा; पूर्ण गुणवत्ता आपोआप परत येईल."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ dalam mod panggilan kerana sebuah app sedang menggunakan mikrofonnya: macOS memainkan semuanya padanya pada %2$@ kHz, seperti panggilan telefon, tanpa Audio Ruang. Tutup app tersebut atau pilih input lain dalam Seting Sistem › Bunyi; kualiti penuh kembali dengan sendirinya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ er i samtalemodus fordi en app bruker mikrofonen: macOS spiller alt på den med %2$@ kHz, som en telefonsamtale, uten romlig lyd. Lukk den appen, eller velg en annen inngang i Systeminnstillinger › Lyd; full kvalitet kommer tilbake av seg selv."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ staat in gespreksmodus omdat een app de microfoon gebruikt: macOS speelt er alles op af met %2$@ kHz, als een telefoongesprek, zonder ruimtelijke audio. Sluit die app of kies een andere invoer in Systeeminstellingen › Geluid; de volledige kwaliteit komt vanzelf terug."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ ਕਾਲ ਮੋਡ ਵਿੱਚ ਹੈ ਕਿਉਂਕਿ ਕੋਈ ਐਪ ਇਸਦਾ ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਵਰਤ ਰਿਹਾ ਹੈ: macOS ਇਸ ਉੱਤੇ ਸਭ ਕੁਝ %2$@ kHz 'ਤੇ, ਫ਼ੋਨ ਕਾਲ ਵਾਂਗ, ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ ਤੋਂ ਬਿਨਾਂ ਚਲਾਉਂਦਾ ਹੈ। ਉਸ ਐਪ ਨੂੰ ਬੰਦ ਕਰੋ ਜਾਂ ਸਿਸਟਮ ਸੈਟਿੰਗਾਂ › ਧੁਨੀ ਵਿੱਚ ਕੋਈ ਹੋਰ ਇਨਪੁਟ ਚੁਣੋ; ਪੂਰੀ ਗੁਣਵੱਤਾ ਆਪਣੇ ਆਪ ਵਾਪਸ ਆ ਜਾਵੇਗੀ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ jest w trybie rozmowy, ponieważ jakaś aplikacja używa jego mikrofonu: macOS odtwarza na nim wszystko z częstotliwością %2$@ kHz, jak rozmowę telefoniczną, bez dźwięku przestrzennego. Zamknij tę aplikację lub wybierz inne wejście w Ustawieniach systemowych › Dźwięk; pełna jakość wróci sama."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ está no modo de chamada porque um app está usando o microfone dele: o macOS reproduz tudo nele a %2$@ kHz, como uma ligação, sem Áudio Espacial. Feche esse app ou escolha outra entrada em Ajustes do Sistema › Som; a qualidade total volta sozinha."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ está no modo de chamada porque uma app está a usar o respetivo microfone: o macOS reproduz tudo nele a %2$@ kHz, como uma chamada telefónica, sem áudio espacial. Feche essa app ou escolha outra entrada em Definições do Sistema › Som; a qualidade total volta sozinha."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ este în modul apel deoarece o aplicație îi folosește microfonul: macOS redă totul pe el la %2$@ kHz, ca într-un apel telefonic, fără audio spațial. Închide acea aplicație sau alege altă intrare în Configurări sistem › Sunet; calitatea completă revine de la sine."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ är i samtalsläge eftersom en app använder dess mikrofon: macOS spelar upp allt på den med %2$@ kHz, som ett telefonsamtal, utan rumsligt ljud. Stäng den appen eller välj en annan ingång i Systeminställningar › Ljud; full kvalitet kommer tillbaka av sig själv."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ iko katika hali ya simu kwa sababu programu fulani inatumia maikrofoni yake: macOS inacheza kila kitu juu yake kwa %2$@ kHz, kama simu, bila Spatial Audio. Funga programu hiyo au chagua ingizo jingine katika System Settings › Sound; ubora kamili utarudi wenyewe."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஏதோ ஒரு ஆப் அதன் மைக்ரோஃபோனைப் பயன்படுத்துவதால் %1$@ அழைப்புப் பயன்முறையில் உள்ளது: macOS அதில் எல்லாவற்றையும் %2$@ kHz இல், தொலைபேசி அழைப்பு போல, ஸ்பேஷியல் ஆடியோ இல்லாமல் இயக்குகிறது. அந்த ஆப்பை மூடுங்கள் அல்லது சிஸ்டம் அமைப்புகள் › ஒலி என்பதில் வேறு உள்ளீட்டைத் தேர்ந்தெடுங்கள்; முழுத் தரம் தானாகவே திரும்பும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఏదో ఒక యాప్ దాని మైక్రోఫోన్‌ను ఉపయోగిస్తున్నందున %1$@ కాల్ మోడ్‌లో ఉంది: macOS దానిపై అన్నింటినీ %2$@ kHz వద్ద, ఫోన్ కాల్ లాగా, స్పేషియల్ ఆడియో లేకుండా ప్లే చేస్తుంది. ఆ యాప్‌ను మూసివేయండి లేదా సిస్టమ్ సెట్టింగ్‌లు › సౌండ్‌లో వేరే ఇన్‌పుట్‌ను ఎంచుకోండి; పూర్తి నాణ్యత దానంతట అదే తిరిగి వస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ อยู่ในโหมดการโทรเพราะมีแอปหนึ่งกำลังใช้ไมโครโฟนของอุปกรณ์นี้ macOS จึงเล่นทุกอย่างบนอุปกรณ์นี้ที่ %2$@ kHz เหมือนการโทรศัพท์ โดยไม่มีเสียงตามตำแหน่ง ปิดแอปนั้นหรือเลือกอินพุตอื่นใน การตั้งค่าระบบ › เสียง แล้วคุณภาพเต็มจะกลับมาเอง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir uygulama mikrofonunu kullandığı için %1$@ arama modunda: macOS bu aygıtta her şeyi %2$@ kHz’de, telefon görüşmesi gibi, Uzamsal Ses olmadan çalıyor. O uygulamayı kapatın ya da Sistem Ayarları › Ses’te başka bir giriş seçin; tam kalite kendiliğinden geri gelir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ у режимі дзвінка, бо якась програма використовує його мікрофон: macOS відтворює на ньому все з частотою %2$@ кГц, як телефонну розмову, без просторового аудіо. Закрийте цю програму або виберіть інший вхід у «Системні параметри» › «Звук»; повна якість повернеться сама."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ کال موڈ میں ہے کیونکہ کوئی ایپ اس کا مائیکروفون استعمال کر رہی ہے: macOS اس پر سب کچھ %2$@ kHz پر، فون کال کی طرح، اسپیشل آڈیو کے بغیر چلاتا ہے۔ اس ایپ کو بند کریں یا System Settings › Sound میں کوئی دوسرا ان پٹ منتخب کریں؛ پورا معیار خود بخود واپس آ جائے گا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ đang ở chế độ cuộc gọi vì một ứng dụng đang dùng micrô của nó: macOS phát mọi thứ trên đó ở %2$@ kHz, như một cuộc gọi điện thoại, không có Âm thanh không gian. Hãy đóng ứng dụng đó hoặc chọn đầu vào khác trong Cài đặt hệ thống › Âm thanh; chất lượng đầy đủ sẽ tự trở lại."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@處於通話模式，因為某個 App 正在使用它的咪高峰：macOS 在它上面以 %2$@ kHz 播放所有聲音，就像打電話一樣，沒有空間音訊。請關閉該 App，或在「系統設定」›「聲音」中選擇其他輸入；完整音質會自動恢復。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@处于通话模式，因为某个 App 正在使用它的麦克风：macOS 在它上面以 %2$@ kHz 播放所有声音，就像打电话一样，没有空间音频。请关闭该 App，或在“系统设置” › “声音”中选择其他输入；完整音质会自动恢复。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@處於通話模式，因為某個 App 正在使用它的麥克風：macOS 在它上面以 %2$@ kHz 播放所有聲音，就像打電話一樣，沒有空間音訊。請關閉該 App，或在「系統設定」›「聲音」中選擇其他輸入；完整音質會自動恢復。"
+          }
+        }
+      }
+    },
+    "%@ kHz · CALL MODE": {
+      "comment": "Device chip: the Bluetooth headset's rate, then CALL MODE (short, uppercase): an app has its microphone open, so macOS plays at phone quality",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · የጥሪ ሁነታ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · وضع المكالمات"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · কল মোড"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · REŽIM HOVORU"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · OPKALDSTILSTAND"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ANRUFMODUS"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ΛΕΙΤΟΥΡΓΙΑ ΚΛΗΣΗΣ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MODO LLAMADA"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · حالت تماس"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · PUHELUTILA"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · CALL MODE"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MODE APPEL"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · કૉલ મોડ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · YANAYIN KIRA"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · מצב שיחה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · कॉल मोड"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · HÍVÁSMÓD"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MODE PANGGILAN"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MODALITÀ CHIAMATA"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · 通話モード"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ಕರೆ ಮೋಡ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · 통화 모드"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · കോൾ മോഡ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · कॉल मोड"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MOD PANGGILAN"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · SAMTALEMODUS"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · GESPREKSMODUS"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ਕਾਲ ਮੋਡ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · TRYB ROZMOWY"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MODO DE CHAMADA"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MODO DE CHAMADA"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MOD APEL"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · SAMTALSLÄGE"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · HALI YA SIMU"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · அழைப்புப் பயன்முறை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · కాల్ మోడ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · โหมดการโทร"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · ARAMA MODU"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · РЕЖИМ ДЗВІНКА"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · کال موڈ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · CHẾ ĐỘ CUỘC GỌI"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · 通話模式"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · 通话模式"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · 通話模式"
+          }
+        }
+      }
+    },
+    "%@ kHz · MACOS": {
+      "comment": "Device chip: the device's rate, then MACOS (short, uppercase): macOS's own renderer is playing (Dolby Atmos)",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz · MACOS"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

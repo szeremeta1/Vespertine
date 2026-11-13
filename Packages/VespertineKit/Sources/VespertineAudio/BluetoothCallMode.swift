@@ -67,7 +67,7 @@ public enum MicrophoneUsers {
             return String(localized: "Siri", comment: "Siri's listening (\"Hey Siri\"), named as what is using a headset's microphone")
         }
         if let name = process.name, !name.isEmpty { return name }
-        return String(localized: "an app (pid \(process.pid))", comment: "An app Vespertine can't name, using a headset's microphone. %lld is its process ID.")
+        return String(localized: "an app", comment: "An app Vespertine can't name, using a headset's microphone; its process ID follows in parentheses") + " (pid \(process.pid))"
     }
 
     /// The live list, read from Core Audio (macOS 14.2 and later): every process running input, with its input devices.
@@ -125,12 +125,12 @@ public struct BluetoothCallMode: Sendable, Equatable {
     public var explanation: String {
         let rate = SampleRate.format(sampleRate)
         guard !microphoneUsers.isEmpty else {
-            return String(localized: "\(deviceName) is in call mode: an app has its microphone open, so macOS plays everything on it at \(rate) kHz like a phone call, without Spatial Audio. Close the app using the microphone, or choose another input in System Settings › Sound; full quality comes back by itself.",
-                          comment: "A Bluetooth headset is in its hands-free call mode and Vespertine can't tell which app has its microphone. %1$@ is the headset, %2$@ the rate in kHz.")
+            return String(localized: "\(deviceName) is in call mode because an app is using its microphone: macOS plays everything on it at \(rate) kHz, like a phone call, without Spatial Audio. Close that app or pick another input in System Settings › Sound; full quality returns by itself.",
+                          comment: "A Bluetooth headset is in its hands-free call mode and Vespertine can't tell which app has its microphone. The first %@ is the headset, the second the rate in kHz.")
         }
         let users = ListFormatter.localizedString(byJoining: microphoneUsers)
-        return String(localized: "\(deviceName) is in call mode: \(users) has its microphone open, so macOS plays everything on it at \(rate) kHz like a phone call, without Spatial Audio. Close \(users), or choose another input in System Settings › Sound; full quality comes back by itself.",
-                      comment: "A Bluetooth headset is in its hands-free call mode because an app has its microphone open. %1$@ is the headset, %2$@ the app(s), e.g. System Settings, %3$@ the rate in kHz, %4$@ the app(s) again.")
+        return String(localized: "\(deviceName) is in call mode because \(users) is using its microphone: macOS plays everything on it at \(rate) kHz, like a phone call, without Spatial Audio. Close it or pick another input in System Settings › Sound; full quality returns by itself.",
+                      comment: "A Bluetooth headset is in its hands-free call mode because an app has its microphone open. The first %@ is the headset, the second the app (e.g. System Settings), the third the rate in kHz.")
     }
 }
 

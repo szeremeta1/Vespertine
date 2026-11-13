@@ -81,7 +81,7 @@ struct NowPlayingPanel: View {
                     if let path = player.signalPath {
                         StatusBadges(path: path).padding(.top, 16)
                         Hairline().padding(.top, 18)
-                        SignalPathView(path: path, loopback: model.loopback.result(for: path)).padding(.top, 14)
+                        SignalPathView(path: path, loopback: model.loopback.result(for: path), callMode: model.bluetoothCallMode).padding(.top, 14)
                         DoPSetupCard(path: path).padding(.top, 10)
                         DoPOffer(path: path).padding(.top, 10)
                         if path.plan.mode == .bitstream, let bed = player.bedMeters, bed.names.count > 2 {
@@ -90,7 +90,7 @@ struct NowPlayingPanel: View {
                             ChannelMetersView(path: path, levels: model.player.channelLevels).padding(.top, 14)
                         }
                     } else if let system = player.systemRendering {
-                        SystemRenderingView(rendering: system, device: player.outputDevice?.name,
+                        SystemRenderingView(rendering: system, device: player.outputDevice?.name, callMode: model.bluetoothCallMode,
                                             bypassedEqualizer: player.outputDevice.flatMap { model.settings.eqPreset(for: $0) }.flatMap { $0.isFlat ? nil : $0.name }).padding(.top, 16)
                         if let bed = player.bedMeters, bed.names.count > 2 {
                             ChannelMetersView(bed: bed, bitstream: false, levels: model.player.channelLevels).padding(.top, 14)
@@ -169,6 +169,8 @@ struct SignalPathView: View {
     /// The loopback test's saved result for this format, on this macOS and Vespertine version. Informational only:
     /// it's a software check, so the BIT-PERFECT badge never depends on it.
     var loopback: LoopbackSavedResult? = nil
+    /// The headset is in call mode: says which app holds its microphone (the path alone only knows the rate).
+    var callMode: BluetoothCallMode? = nil
 
     struct Step: Identifiable {
         let id = UUID()
@@ -277,7 +279,7 @@ struct SignalPathView: View {
         }
         if let note = path.bluetoothNote {
             // A Bluetooth link is macOS's and the headset's to set: say what rate it is at and, in call mode, why it sounds like a call.
-            s.append(Step(title: String(localized: "Bluetooth link"), detail: note,
+            s.append(Step(title: String(localized: "Bluetooth link"), detail: path.isBluetoothCallMode ? (callMode?.explanation ?? note) : note,
                           value: path.isBluetoothCallMode ? String(localized: "call mode", comment: "A Bluetooth headset is in its hands-free call mode")
                                                           : String(localized: "\(SampleRate.format(a.sampleRate)) kHz"),
                           tone: path.isBluetoothCallMode ? .changed : .plain))
@@ -427,17 +429,29 @@ extension SignalSteps {
 struct SystemRenderingView: View {
     let rendering: SystemRendering
     let device: String?
+    /// The output is a Bluetooth headset in call mode: macOS renders to it at phone quality, without Spatial Audio, whatever
+    /// the setting says, so that is what the path shows (on 2026-11-13 it said "Spatial Audio on" through eight minutes of it).
+    var callMode: BluetoothCallMode? = nil
     /// The equalizer chosen for this output, which macOS's renderer doesn't pass through.
     var bypassedEqualizer: String?
+
+    private var spatial: Bool { rendering.spatial && callMode == nil }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 8) {
-                    StatusBadge(text: String(localized: "OBJECTS RENDERED BY MACOS"), kind: .perfect)
-                    if rendering.spatial { StatusBadge(text: String(localized: "SPATIAL", comment: "Badge: Spatial Audio is on")) }
+                    StatusBadge(text: String(localized: "OBJECTS RENDERED BY MACOS"), kind: callMode == nil ? .perfect : .converted)
+                    if callMode != nil {
+                        StatusBadge(text: String(localized: "BLUETOOTH · CALL MODE"), kind: .converted)
+                    } else if spatial {
+                        StatusBadge(text: String(localized: "SPATIAL", comment: "Badge: Spatial Audio is on"))
+                    }
                 }
-                StatusBadge(text: String(localized: "OBJECTS RENDERED BY MACOS"), kind: .perfect)
+                VStack(alignment: .leading, spacing: 8) {
+                    StatusBadge(text: String(localized: "OBJECTS RENDERED BY MACOS"), kind: callMode == nil ? .perfect : .converted)
+                    if callMode != nil { StatusBadge(text: String(localized: "BLUETOOTH · CALL MODE"), kind: .converted) }
+                }
             }
             Hairline().padding(.top, 18)
             SignalSteps(steps: [
@@ -446,12 +460,15 @@ struct SystemRenderingView: View {
                           ?? String(localized: "objects", comment: "Dolby Atmos audio objects")),
                 .init(title: String(localized: "Dolby Atmos renderer"), detail: String(localized: "macOS renders the objects for this output (the same renderer Apple Music uses)"),
                       value: String(localized: "objects → speakers"), tone: .good),
-                .init(title: rendering.spatial ? String(localized: "Spatial Audio") : String(localized: "Output"),
-                      detail: rendering.spatial ? String(localized: "Head tracking and personalized profile as set in Control Center")
+                callMode.map { mode in
+                    SignalPathView.Step(title: String(localized: "Bluetooth link"), detail: mode.explanation,
+                          value: String(localized: "call mode", comment: "A Bluetooth headset is in its hands-free call mode"), tone: .changed)
+                } ?? SignalPathView.Step(title: spatial ? String(localized: "Spatial Audio") : String(localized: "Output"),
+                      detail: spatial ? String(localized: "Head tracking and personalized profile as set in Control Center")
                           : String(localized: "The output's own speaker layout"),
-                      value: rendering.spatial ? String(localized: "on", comment: "A signal path step (equalizer, Spatial Audio) is switched on")
+                      value: spatial ? String(localized: "on", comment: "A signal path step (equalizer, Spatial Audio) is switched on")
                           : String(localized: "channels", comment: "Audio goes out as the output's channels"),
-                      tone: rendering.spatial ? .changed : .plain),
+                      tone: spatial ? .changed : .plain),
                 .init(title: device ?? String(localized: "Output"), detail: String(localized: "Frames go to macOS untouched; the meters and the Visualizer read a separate decode of the bed"),
                       value: String(localized: "system", comment: "The macOS system renderer handles this step")),
             ] + (bypassedEqualizer.map { [.init(title: String(localized: "Equalizer"), detail: "\($0) · \(EqualizerStatus.Bypass.systemRendered.explanation)",
