@@ -272,6 +272,26 @@ final class PlayerController {
 
     func removeFromQueue(_ id: UUID) { removeFromQueue([id]) }
 
+    /// TIDAL was switched off: its songs leave the queue, those already played and those to come, and a TIDAL song that is playing
+    /// stops (playback does not move on by itself). Other songs, and a local song that is playing, are not touched.
+    func dropTidalTracks() {
+        func isTidal(_ entry: QueueEntry) -> Bool { entry.track.isTidalTrack }
+        func withoutTidalVersions(_ entry: QueueEntry) -> QueueEntry {
+            guard entry.versions.contains(where: \.isTidalTrack) else { return entry }
+            var copy = entry
+            copy.versions = entry.versions.filter { !$0.isTidalTrack }
+            if copy.versions.count < 2 { copy.versions = [] }
+            return copy
+        }
+        guard queue.contains(where: { isTidal($0) || $0.versions.contains(where: \.isTidalTrack) }) else { return }
+        let keptCurrent = current.flatMap { isTidal($0) ? nil : $0.id }
+        if current != nil, keptCurrent == nil { stop() }
+        queue = queue.filter { !isTidal($0) }.map(withoutTidalVersions)
+        originalOrder = originalOrder.filter { !isTidal($0) }.map(withoutTidalVersions)
+        currentIndex = keptCurrent.flatMap { id in queue.firstIndex { $0.id == id } }
+        syncMirror()
+    }
+
     /// Removes songs from the queue by entry, never the one playing. Entries no longer queued are ignored, so a
     /// request made from a list drawn a moment ago (the song ended meanwhile) can't remove the wrong song.
     func removeFromQueue(_ ids: some Collection<UUID>) {

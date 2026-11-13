@@ -486,8 +486,14 @@ public enum AlbumCopyChoice: Hashable, Sendable {
 extension AlbumCopies {
     /// The copy to play when none is chosen: one that has most of the album (80 % of the songs of the most complete),
     /// in the layout the output wants, then lossless, then the highest rate and depth, then on this Mac (`isLocal`).
-    public func bestCopy(multichannel wantsMultichannel: Bool, isLocal: (AlbumCopy) -> Bool = { _ in true }) -> AlbumCopy? {
+    ///
+    /// `isPlayable`: copies it refuses (a streamed TIDAL copy while TIDAL can't be reached) are passed over for one that can play;
+    /// if it refuses every copy, they are all considered, as before.
+    public func bestCopy(multichannel wantsMultichannel: Bool, isLocal: (AlbumCopy) -> Bool = { _ in true },
+                         isPlayable: (AlbumCopy) -> Bool = { _ in true }) -> AlbumCopy? {
         guard copies.count > 1 else { return copies.first }
+        let playable = copies.filter(isPlayable)
+        let copies = playable.isEmpty ? copies : playable
         let most = copies.map(\.songCount).max() ?? 0
         // Copies equal in all of these: the first, which has the most songs.
         // A copy streamed from TIDAL ranks below files at equal layout and losslessness: the format TIDAL lists for it is unconfirmed
@@ -507,11 +513,12 @@ extension AlbumCopies {
     public var sharesNoSongs: Bool { copies.count > 1 && songs.allSatisfy { $0.tracks.count == 1 } }
 
     /// The copy `choice` names, if the album still has it, else the best one for the output; nil when bundled.
-    public func selected(_ choice: AlbumCopyChoice, multichannel: Bool, isLocal: (AlbumCopy) -> Bool = { _ in true }) -> AlbumCopy? {
+    public func selected(_ choice: AlbumCopyChoice, multichannel: Bool, isLocal: (AlbumCopy) -> Bool = { _ in true },
+                         isPlayable: (AlbumCopy) -> Bool = { _ in true }) -> AlbumCopy? {
         switch choice {
         case .bundled: return copies.count > 1 ? nil : copies.first
-        case .copy(let id): return copy(id: id) ?? bestCopy(multichannel: multichannel, isLocal: isLocal)
-        case .automatic: return bestCopy(multichannel: multichannel, isLocal: isLocal)
+        case .copy(let id): return copy(id: id) ?? bestCopy(multichannel: multichannel, isLocal: isLocal, isPlayable: isPlayable)
+        case .automatic: return bestCopy(multichannel: multichannel, isLocal: isLocal, isPlayable: isPlayable)
         }
     }
 }

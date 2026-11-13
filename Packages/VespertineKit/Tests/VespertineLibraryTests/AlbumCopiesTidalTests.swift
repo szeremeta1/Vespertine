@@ -115,4 +115,22 @@ struct AlbumCopiesTidalTests {
         #expect(TrackVersions.choose(song, multichannel: false)?.isTidalTrack == false)
         #expect(TrackVersions.choose([local(1), tidal(1, downloaded: "/Music/TIDAL/1.flac")], multichannel: false)?.isTidalTrack == true)
     }
+
+    @Test("With TIDAL out of reach, a streamed TIDAL copy never outranks a local copy that can play as the album's default")
+    func defaultCopyFollowsAvailability() throws {
+        // Three of the five songs are local, so the complete TIDAL copy leads while TIDAL can be reached.
+        let partial = Array(titles.indices.prefix(3).map { local($0) })
+        let copies = album(local: partial, tidal: titles.indices.map { tidal($0) })
+        #expect(copies.bestCopy(multichannel: false)?.isTidal == true)
+        // Offline, nothing streamed can play: the local copy is the default, and the listener's own choice still stands.
+        #expect(copies.bestCopy(multichannel: false, isPlayable: { !$0.isStreamed })?.isTidal == false)
+        #expect(copies.selected(.automatic, multichannel: false, isPlayable: { !$0.isStreamed })?.isTidal == false)
+        let id = try #require(copies.copies.first { $0.isTidal }).id
+        #expect(copies.selected(.copy(id), multichannel: false, isPlayable: { !$0.isStreamed })?.isTidal == true)
+        // A copy whose songs are all downloaded plays offline and keeps its place.
+        let downloaded = album(local: partial, tidal: titles.indices.map { tidal($0, downloaded: "/Music/TIDAL/\($0).flac") })
+        #expect(downloaded.bestCopy(multichannel: false, isPlayable: { !$0.isStreamed })?.isTidal == true)
+        // When nothing can play, the usual choice stands.
+        #expect(copies.bestCopy(multichannel: false, isPlayable: { _ in false })?.isTidal == true)
+    }
 }

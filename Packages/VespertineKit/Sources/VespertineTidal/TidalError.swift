@@ -22,4 +22,6 @@ public enum TidalError: Error, Equatable {
     /// TIDAL says the track can't be streamed (not ready, region, subscription).
     case notStreamable(String)
     case unavailable
+    /// TIDAL answered a playlist's GET without the `ETag` a write needs; nothing was written.
+    case missingETag(playlist: String)
 }

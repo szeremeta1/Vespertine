@@ -534,7 +534,37 @@ final class AppModel {
         guard settings.tidalEnabled != on else { return }
         settings.tidalEnabled = on
         library.setIncludeTidal(on)
+        if !on {
+            // What is playing or queued from TIDAL goes, and no page is left showing TIDAL content.
+            player.dropTidalTracks()
+            let sources = Set(library.sources.compactMap(\.id))
+            let playlists = Set(((try? library.database.playlists()) ?? []).compactMap(\.id))
+            let (item, route) = Self.navigation(afterTidalOff: sidebar, path: path, sourceIDs: sources, playlistIDs: playlists,
+                                                albumExists: { !library.tracks(albumKey: $0).isEmpty },
+                                                artistExists: { !library.albums(artist: $0).isEmpty })
+            if item != sidebar { sidebar = item }
+            if route != path { path = route }
+        }
         tidalSwitchChanged?(on)
+    }
+
+    /// Where the window goes when TIDAL is switched off: a source or playlist that is gone sends the sidebar to Albums, and a page
+    /// about an album or artist that is gone (TIDAL's) clears the pages above the list.
+    static func navigation(afterTidalOff sidebar: SidebarItem, path: [DetailRoute], sourceIDs: Set<Int64>, playlistIDs: Set<Int64>,
+                           albumExists: (String) -> Bool, artistExists: (String) -> Bool) -> (SidebarItem, [DetailRoute]) {
+        switch sidebar {
+        case .source(let id) where !sourceIDs.contains(id): return (.albums, [])
+        case .playlist(let id) where !playlistIDs.contains(id): return (.albums, [])
+        default: break
+        }
+        let gone = path.contains { route in
+            switch route {
+            case .album(let key), .albumFamily(let key): !albumExists(key)
+            case .artist(let name): !artistExists(name)
+            case .genre: false
+            }
+        }
+        return (sidebar, gone ? [] : path)
     }
 
     /// Told after `setTidalEnabled`, for what the switch starts and stops (the TIDAL model's reader, sync and downloads).
@@ -553,9 +583,28 @@ final class AppModel {
     /// and errors, which the rule can't see), and only while TIDAL is on: with it off every song is as it always was.
     func playability(of track: Track) -> Playability {
         guard library.includesTidal, track.isTidalTrack else { return .playable }
-        return Playability.playability(track: track, source: library.tidalSource, tidal: track.id.flatMap { library.tidalRecords[$0] },
-                                       signedIn: tidalAvailability.signedIn, reachable: tidalAvailability.reachable,
-                                       backingOff: tidalAvailability.backingOff, fileExists: { FileManager.default.fileExists(atPath: $0) })
+        // A row asks several times (each of its cells does). What the answer depends on is read first, so views that ask are redrawn
+        // when it changes; the answer itself is kept for a few seconds (it looks at the file system for a downloaded song).
+        let stamp = PlayabilityStamp(records: library.tidalRecordsVersion, signedIn: tidalAvailability.signedIn,
+                                     reachable: tidalAvailability.reachable, backingOff: tidalAvailability.backingOff)
+        if let id = track.id, let hit = playabilityCache[id], hit.stamp == stamp, Date().timeIntervalSince(hit.at) < 5 { return hit.answer }
+        let answer = Playability.playability(track: track, source: library.tidalSource, tidal: track.id.flatMap { library.tidalRecords[$0] },
+                                             signedIn: stamp.signedIn, reachable: stamp.reachable, backingOff: stamp.backingOff,
+                                             fileExists: { FileManager.default.fileExists(atPath: $0) })
+        if let id = track.id {
+            if playabilityCache.count > 20_000 { playabilityCache.removeAll() }
+            playabilityCache[id] = (stamp, Date(), answer)
+        }
+        return answer
+    }
+
+    private struct PlayabilityStamp: Equatable { var records: Int; var signedIn: Bool; var reachable: Bool; var backingOff: Bool }
+    @ObservationIgnored private var playabilityCache: [Int64: (stamp: PlayabilityStamp, at: Date, answer: Playability)] = [:]
+
+    /// Whether every song of an album copy can play now: the album's default copy is never one that can't (a streamed TIDAL copy while
+    /// TIDAL is out of reach) when another can. Only TIDAL songs can fail, so without TIDAL every copy passes.
+    var copyCanPlay: (AlbumCopy) -> Bool {
+        { [self] copy in !library.includesTidal || copy.tracks.allSatisfy { playability(of: $0).isPlayable } }
     }
 
     /// The transitions master switch (Controls › Transitions, ⌥⌘X, the transport bar, Up Next). It applies from the next
@@ -633,7 +682,8 @@ final class AppModel {
         let copies = library.albumCopies(albumKey: albumKey)
         guard copies.copies.count > 1 else { return copies.copies.first?.tracks ?? library.tracks(albumKey: albumKey) }
         let wanted = outputWantsMultichannel() ?? true
-        if let copy = copies.selected(library.copyChoice(albumKey: albumKey), multichannel: wanted, isLocal: { [shares] in !$0.tracks.contains(where: shares.isNetwork) }) {
+        if let copy = copies.selected(library.copyChoice(albumKey: albumKey), multichannel: wanted, isLocal: { [shares] in !$0.tracks.contains(where: shares.isNetwork) },
+                           isPlayable: copyCanPlay) {
             return copy.tracks
         }
         return copies.songs.map { song in

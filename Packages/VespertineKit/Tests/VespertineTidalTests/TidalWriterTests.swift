@@ -127,7 +127,7 @@ struct TidalWriterTests {
             request.httpMethod == "GET" ? FakeResponse(json: "{}") : FakeResponse(json: "{}")   // no ETag header
         }
         let writer = TidalWriter(gate: makeSignedInGate(transport: transport), userId: 4242)
-        await #expect(throws: TidalError.self) { try await writer.delete(Self.uuid) }
+        await #expect(throws: TidalError.missingETag(playlist: Self.uuid)) { try await writer.delete(Self.uuid) }
         #expect(transport.requests.count == 1)
     }
 

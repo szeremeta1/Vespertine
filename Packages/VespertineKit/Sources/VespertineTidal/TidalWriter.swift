@@ -74,7 +74,7 @@ public struct TidalWriter: Sendable {
     private func write(method: String, path: String, form: [String: String], uuid: String) async throws {
         let (_, head) = try await gate.getResponse("playlists/\(uuid)", priority: .interactive)
         guard let etag = head.value(forHTTPHeaderField: "ETag"), !etag.isEmpty else {
-            throw TidalError.http(status: head.statusCode, body: "TIDAL sent no ETag for playlist \(uuid)")
+            throw TidalError.missingETag(playlist: uuid)
         }
         _ = try await gate.send(method: method, path: path, form: form, priority: .interactive, ifMatch: etag)
     }

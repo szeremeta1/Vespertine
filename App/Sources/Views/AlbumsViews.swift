@@ -452,7 +452,7 @@ struct AlbumDetailView: View {
         let wanted = model.outputWantsMultichannel() ?? true
         let shares = model.shares
         let choice = model.library.copyChoice(albumKey: albumKey)
-        let selected = copies.copies.isEmpty ? nil : copies.selected(choice, multichannel: wanted, isLocal: { !$0.tracks.contains(where: shares.isNetwork) })
+        let selected = copies.copies.isEmpty ? nil : copies.selected(choice, multichannel: wanted, isLocal: { !$0.tracks.contains(where: shares.isNetwork) }, isPlayable: model.copyCanPlay)
         let shown: [Track] = copies.copies.isEmpty ? tracks : selected?.tracks ?? copies.songs.map {
             TrackVersions.choose($0.tracks, multichannel: wanted, isLocal: { !shares.isNetwork($0) }, isPreferred: model.library.isPreferredCopy) ?? $0.lead
         }

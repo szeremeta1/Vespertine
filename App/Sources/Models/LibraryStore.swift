@@ -51,7 +51,9 @@ final class LibraryStore {
     private(set) var includesTidal = false
     /// What the library keeps of each TIDAL song (by track ID) beyond its row: the quality TIDAL lists, whether it streams here, and its
     /// download. Empty while TIDAL is off.
-    private(set) var tidalRecords: [Int64: TidalTrackRecord] = [:]
+    private(set) var tidalRecords: [Int64: TidalTrackRecord] = [:] { didSet { tidalRecordsVersion += 1 } }
+    /// Counts the changes of `tidalRecords` (cheap to compare, unlike the records).
+    private(set) var tidalRecordsVersion = 0
     /// Albums whose songs are all streamed (none downloaded): they can't play without TIDAL. Empty while TIDAL is off.
     private(set) var streamOnlyAlbumKeys: Set<String> = []
 
@@ -306,7 +308,7 @@ final class LibraryStore {
                 }
                 do {
                     for try await (records, streamOnly) in obs.values(in: writer) {
-                        guard let self, self.includesTidal else { continue }
+                        guard !Task.isCancelled, let self, self.includesTidal else { continue }
                         let byTrack = Dictionary(records.map { ($0.trackId, $0) }, uniquingKeysWith: { a, _ in a })
                         if self.tidalRecords != byTrack { self.tidalRecords = byTrack }
                         if self.streamOnlyAlbumKeys != streamOnly { self.streamOnlyAlbumKeys = streamOnly }
