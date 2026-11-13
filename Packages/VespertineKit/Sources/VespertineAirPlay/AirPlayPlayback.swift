@@ -52,7 +52,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     final class Segment: @unchecked Sendable {
         let item: PlayableItem
         let frames: AirPlayFrames
-        let path: SignalPath
+        var path: SignalPath
         /// Where in the song the stream starts (a seek, a resume).
         let offset: TimeInterval
         let duration: TimeInterval
@@ -77,16 +77,33 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         var settings = RendererSettings()
         var receiverVolumeDB: Double = 0
         var segments: [Segment] = []
-        /// The next song, opened ahead while the one before plays.
+        /// The next song, opened ahead while the one before plays (segment nil: it couldn't be opened).
         var prepared: (item: PlayableItem, segment: Segment?)?
+        /// The next song being opened now (its id), so it isn't opened twice.
+        var preparing: UUID?
+        /// The receiver volume last sent, and whether a send is queued (volume changes are coalesced: the latest wins).
+        var sentVolumeDB: Double?
+        var volumeQueued = false
         var queueDone = false
         var endAnnounced = false
         var wantsPlaying = false
         var shutDown = false
     }
     private let state = Locked(State())
-    private var session: RAOPSession?
+    /// The session: set by the worker, read by the pacer and by `snapshot` on any thread, so behind a lock.
+    private let sessionBox = Locked<RAOPSession?>(nil)
+    private var session: RAOPSession? {
+        get { sessionBox.withLock { $0 } }
+        set { sessionBox.withLock { $0 = newValue } }
+    }
+    /// Only the worker touches it.
     private var pacer: Pacer?
+    /// Tests: called on every song opened, with whether it was on the pacer's thread (it never should be).
+    var onOpen: (@Sendable (_ onPacer: Bool) -> Void)?
+    /// Tests: how long opening the next song ahead takes at least.
+    var preparationDelay: TimeInterval = 0
+    /// Tests: the next song opened ahead, if any.
+    var preparedNext: (item: PlayableItem, segment: AnyObject?)? { state.withLock { $0.prepared.map { ($0.item, $0.segment) } } }
 
     private let commands: AsyncStream<Command>
     private let enqueue: AsyncStream<Command>.Continuation
@@ -96,7 +113,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
 
     enum Command {
         case play(PlayableItem, at: TimeInterval, announce: Bool, generation: Int)
-        case pause, stop, queueChanged, settings(RendererSettings), volume(Double), heard(Segment), lost, ended
+        case pause, stop, queueChanged, settings(RendererSettings), volume, heard(Segment), lost, ended
     }
 
     public init(device: AirPlayDevice, endpoint: NWEndpoint, encryption: RAOPEncryption, rsaKey: SecKey? = nil, lead: TimeInterval = 0.25) {
@@ -191,8 +208,26 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
 
     /// The receiver's own volume (sent as RAOP metadata; Vespertine's samples are untouched), −144…0 dB.
     public func setReceiverVolume(decibels: Double) {
-        let changed = state.withLock { s -> Bool in defer { s.receiverVolumeDB = decibels }; return s.receiverVolumeDB != decibels }
-        if changed { enqueue.yield(.volume(decibels)) }
+        let queue = state.withLock { s -> Bool in
+            guard s.receiverVolumeDB != decibels else { return false }
+            s.receiverVolumeDB = decibels
+            // The signal path's note about the receiver's own volume follows at once, for the songs already open too.
+            let warnings = Self.receiverWarnings(decibels)
+            s.snapshot.signalPath?.renderer?.warnings = warnings
+            for segment in s.segments { segment.path.renderer?.warnings = warnings }
+            s.prepared?.segment?.path.renderer?.warnings = warnings
+            guard !s.volumeQueued else { return false }
+            s.volumeQueued = true
+            return true
+        }
+        if queue { enqueue.yield(.volume) }
+    }
+
+    static func receiverWarnings(_ db: Double) -> [String] {
+        guard db < 0 else { return [] }
+        let value = db <= -144 ? "−∞" : db.formatted(.number.precision(.fractionLength(1)))
+        return [String(localized: "The receiver lowers the volume itself (\(value) dB), which changes the samples after they arrive.",
+                       comment: "Signal path: an AirPlay receiver applies its own volume; %@ is in dB.")]
     }
 
     public func shutdown() {
@@ -246,20 +281,38 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                 s.snapshot = EngineSnapshot()
             }
         case .queueChanged:
-            let wanted = state.withLock { $0.segments.last }.flatMap { nextItemProvider?($0.item) }
-            state.withLock { s in
-                if let prepared = s.prepared, prepared.item.id != wanted?.id { s.prepared = nil }
+            // Only a different next song drops the one opened ahead.
+            guard let last = state.withLock({ $0.segments.last }) else { return }
+            let wanted = nextItemProvider?(last.item)
+            let dropped = state.withLock { s -> Bool in
+                guard let prepared = s.prepared, prepared.item.id != wanted?.id else { return false }
+                s.prepared = nil
+                return true
             }
+            if dropped { prepareNext(after: last.item) }
         case .settings(let settings):
             let before = state.withLock { s -> RendererSettings in defer { s.settings = settings }; return s.settings }
-            guard before != settings, let heard = state.withLock({ $0.segments.first }), state.withLock({ $0.snapshot.state == .playing }) else {
+            // The same settings again (every syncEngine sends them) change nothing: the next song stays as it was opened.
+            guard before != settings else { return }
+            if let heard = state.withLock({ $0.segments.first }), state.withLock({ $0.snapshot.state == .playing }) {
+                let item = state.withLock { $0.snapshot.item } ?? heard.item
+                start(item, at: snapshot.position, announce: false)
+            } else if let last = state.withLock({ $0.segments.last }) {
                 state.withLock { $0.prepared = nil }
-                return
+                prepareNext(after: last.item)
             }
-            let item = state.withLock { $0.snapshot.item } ?? heard.item
-            start(item, at: snapshot.position, announce: false)
-        case .volume(let db):
-            try? await session?.setVolume(db)
+        case .volume:
+            // At most one send in flight; the latest level wins.
+            while true {
+                let db = state.withLock { s -> Double? in
+                    guard s.sentVolumeDB != s.receiverVolumeDB else { s.volumeQueued = false; return nil }
+                    s.sentVolumeDB = s.receiverVolumeDB
+                    return s.receiverVolumeDB
+                }
+                guard let db else { break }
+                guard let session, session.isConnected else { state.withLock { $0.sentVolumeDB = nil; $0.volumeQueued = false }; break }
+                try? await session.setVolume(db)
+            }
         case .heard(let segment):
             await announce(segment)
         case .lost:
@@ -299,7 +352,10 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     private func begin(_ item: PlayableItem, at seconds: TimeInterval, announce: Bool, generation g: Int) async {
         await halt()
         let segment: Segment
-        do { segment = try await prepare(item, at: seconds, announces: announce) } catch { fail(item, error); return }
+        do { segment = try await prepare(item, at: seconds, announces: announce) } catch {
+            if generation.withLock({ $0 }) == g { fail(item, error) }
+            return
+        }
         guard generation.withLock({ $0 }) == g else { return }
         do {
             if let session, session.isConnected {
@@ -307,18 +363,22 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             } else {
                 let made = RAOPSession(name: device.name, endpoint: endpoint, encryption: encryption, rsaKey: rsaKey)
                 made.onLost = { [weak self] in self?.enqueue.yield(.lost) }
-                try await made.connect(volumeDB: state.withLock { $0.receiverVolumeDB })
+                let volume = state.withLock { $0.receiverVolumeDB }
+                try await made.connect(volumeDB: volume)
+                state.withLock { $0.sentVolumeDB = volume }
                 session = made
             }
         } catch {
             session = nil
-            fail(item, error)
+            // Overtaken by a later play or stop: that one decides what is said.
+            if generation.withLock({ $0 }) == g { fail(item, error) }
             return
         }
         guard generation.withLock({ $0 }) == g, let session else { return }
         state.withLock { s in
             s.segments = [segment]
             s.prepared = nil
+            s.preparing = nil
             s.queueDone = false
             s.endAnnounced = false
             s.snapshot.item = item
@@ -328,7 +388,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             s.snapshot.lastError = nil
             s.snapshot.state = .playing
         }
-        let pacer = Pacer(lead: lead, session: session, source: { [weak self] count in self?.frames(count) ?? ([], true) },
+        let pacer = Pacer(lead: lead, session: session, source: { [weak self] count in self?.frames(count) ?? ([], true, false) },
                           tick: { [weak self] in self?.tick() })
         self.pacer = pacer
         pacer.start()
@@ -347,15 +407,12 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     private static let preparation = DispatchQueue(label: "org.szeremeta.vespertine.airplay.prepare", qos: .userInitiated)
 
     private func makeSegment(_ item: PlayableItem, at seconds: TimeInterval, announces: Bool) throws -> Segment {
+        onOpen?(Thread.current.name == Pacer.threadName)
         let url = urlResolver?(item) ?? item.url
         let (settings, receiverDB) = state.withLock { ($0.settings, $0.receiverVolumeDB) }
         let frames = try AirPlayFrames(item: item, url: url, settings: settings, startSeconds: seconds)
         let info = metadataProvider?(item)
-        var warnings: [String] = []
-        if receiverDB < 0 {
-            warnings.append(String(localized: "The receiver lowers the volume itself (\(receiverDB <= -144 ? "−∞" : receiverDB.formatted(.number.precision(.fractionLength(1)))) dB), which changes the samples after they arrive.",
-                                   comment: "Signal path: an AirPlay receiver applies its own volume; %@ is in dB."))
-        }
+        let warnings = Self.receiverWarnings(receiverDB)
         let stage = SignalPath.RendererStage(name: device.name, protocolName: "AirPlay", processing: frames.steps, sentCodec: "ALAC",
                                              sentSampleRate: 44_100, sentBitDepth: 16, sentChannels: 2, gapless: true, warnings: warnings,
                                              transport: .airPlay)
@@ -372,43 +429,65 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     private func prepareNext(after item: PlayableItem) {
         guard let next = nextItemProvider?(item) else { return }
         let g = generation.withLock { $0 }
+        let go = state.withLock { s -> Bool in
+            guard s.prepared == nil, s.preparing != next.id else { return false }
+            s.preparing = next.id
+            return true
+        }
+        guard go else { return }
+        let delay = preparationDelay
         Self.preparation.async { [weak self] in
             guard let self else { return }
+            if delay > 0 { Thread.sleep(forTimeInterval: delay) }
             let segment: Segment?
             do { segment = try self.makeSegment(next, at: 0, announces: true) } catch {
                 self.log.error("Next song for \(self.device.name, privacy: .public) not opened: \(String(describing: error), privacy: .public)")
                 segment = nil
             }
-            guard self.generation.withLock({ $0 }) == g else { return }
-            self.state.withLock { s in if s.prepared == nil, s.segments.last?.item.id == item.id { s.prepared = (next, segment) } }
+            self.state.withLock { s in
+                if s.preparing == next.id { s.preparing = nil }
+                guard self.generation.withLock({ $0 }) == g, s.prepared == nil, s.segments.last?.item.id == item.id else { return }
+                s.prepared = (next, segment)
+            }
         }
     }
 
     // MARK: Pacer side (its own thread)
 
-    /// The next `count` stereo frames of the timeline, crossing into the next song; `done` once the queue has none left.
-    private func frames(_ count: Int) -> ([Int16], Bool) {
+    /// The next `count` stereo frames of the timeline, crossing into the next song; `done` once the queue has none left;
+    /// `waiting` while the next song is still being opened (never here: this is the pacer's real-time thread).
+    private func frames(_ count: Int) -> ([Int16], Bool, Bool) {
         var out: [Int16] = []
         out.reserveCapacity(count * 2)
         while out.count < count * 2 {
             guard let segment = state.withLock({ $0.segments.last }), !state.withLock({ $0.queueDone }) else { break }
-            let head = (session?.nextTimestamp ?? 0) &+ UInt32(out.count / 2)
+            // The pacer may hold part of this packet already (it waited for this song): those frames come first.
+            let held = max(0, RAOPTiming.framesPerPacket - count)
+            let head = (session?.nextTimestamp ?? 0) &+ UInt32(held + out.count / 2)
             state.withLock { _ in if segment.start == nil { segment.start = head } }
             let chunk = segment.frames.next(maxFrames: count - out.count / 2)
             if !chunk.isEmpty { out += chunk; continue }
             state.withLock { _ in segment.end = head }
-            // On to the next song: prepared ahead, or opened now.
-            var next = state.withLock { s -> Segment?? in
-                guard let p = s.prepared else { return .none }
+            // On to the next song, opened ahead. Not ready yet: wait for it (the pacer holds the packet; the receiver's two
+            // seconds cover the wait), opening it off this thread if nobody has started to.
+            let wanted = nextItemProvider?(segment.item)
+            let next = state.withLock { s -> Segment?? in
+                guard let p = s.prepared, p.item.id == wanted?.id else { return .none }
                 s.prepared = nil
                 return .some(p.segment)
             }
-            if next == nil, let item = nextItemProvider?(segment.item) {
-                next = .some(try? makeSegment(item, at: 0, announces: true))
+            guard let found = next else {
+                if wanted == nil {
+                    state.withLock { $0.queueDone = true }
+                    break
+                }
+                state.withLock { s in if s.prepared != nil { s.prepared = nil } }
+                prepareNext(after: segment.item)
+                return (out, false, true)
             }
-            guard let found = next, let following = found else {
-                if case .some(.none) = next, let item = nextItemProvider?(segment.item) {
-                    emit(.failed(item, String(localized: "\(device.name) couldn't play the song (it couldn't be opened).", comment: "%@ is an AirPlay receiver's name.")))
+            guard let following = found else {
+                if let wanted {
+                    emit(.failed(wanted, String(localized: "\(device.name) couldn't play the song (it couldn't be opened).", comment: "%@ is an AirPlay receiver's name.")))
                 }
                 state.withLock { $0.queueDone = true }
                 break
@@ -417,7 +496,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             prepareNext(after: following.item)
         }
         let done = state.withLock { $0.queueDone }
-        return (out, done)
+        return (out, done, false)
     }
 
     /// After each packet: songs that became audible, the end of the queue heard.
@@ -469,13 +548,14 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
 final class Pacer: @unchecked Sendable {
     private let lead: TimeInterval
     private let session: RAOPSession
-    private let source: @Sendable (Int) -> ([Int16], Bool)
+    static let threadName = "Vespertine AirPlay pacer"
+    private let source: @Sendable (Int) -> ([Int16], Bool, Bool)
     private let tick: @Sendable () -> Void
     private let stopped = Locked(false)
     private let finished = DispatchSemaphore(value: 0)
     private var thread: Thread?
 
-    init(lead: TimeInterval, session: RAOPSession, source: @escaping @Sendable (Int) -> ([Int16], Bool), tick: @escaping @Sendable () -> Void) {
+    init(lead: TimeInterval, session: RAOPSession, source: @escaping @Sendable (Int) -> ([Int16], Bool, Bool), tick: @escaping @Sendable () -> Void) {
         self.lead = lead
         self.session = session
         self.source = source
@@ -484,7 +564,7 @@ final class Pacer: @unchecked Sendable {
 
     func start() {
         let thread = Thread { [self] in run() }
-        thread.name = "Vespertine AirPlay pacer"
+        thread.name = Self.threadName
         thread.qualityOfService = .userInteractive
         self.thread = thread
         thread.start()
@@ -504,6 +584,8 @@ final class Pacer: @unchecked Sendable {
         let anchor = NTPClock.nanosecondsNow() + UInt64(lead * 1e9)
         var index: UInt64 = 0
         var draining = false
+        /// Frames of the packet being filled, held while the next song is being opened.
+        var pending: [Int16] = []
         while !stopped.withLock({ $0 }) {
             let due = anchor + UInt64(Double(index) * nanosPerPacket)
             let sendAt = due >= UInt64(lead * 1e9) ? due - UInt64(lead * 1e9) : 0
@@ -513,10 +595,18 @@ final class Pacer: @unchecked Sendable {
                 continue
             }
             if !draining {
-                var (samples, done) = source(packet)
-                if !samples.isEmpty {
-                    if samples.count < packet * 2 { samples += [Int16](repeating: 0, count: packet * 2 - samples.count) }
-                    session.send(samples, startNanos: anchor)
+                let (samples, done, waiting) = source(packet - pending.count / 2)
+                pending += samples
+                if waiting {
+                    // Held: nothing is sent and the timeline doesn't move on; once the song is open, the packets due go at once.
+                    tick()
+                    usleep(2000)
+                    continue
+                }
+                if !pending.isEmpty {
+                    if pending.count < packet * 2 { pending += [Int16](repeating: 0, count: packet * 2 - pending.count) }
+                    session.send(pending, startNanos: anchor)
+                    pending = []
                     if index % 125 == 124 { session.sendSync() }
                 }
                 if done { draining = true }
