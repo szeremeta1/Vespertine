@@ -171,6 +171,12 @@ final class AppSettings {
     /// Groups (beta), off by default; `defaults write org.szeremeta.Vespertine speakerGroupsFeature -bool YES` sets it too). Off,
     /// there is no setting, menu item or string for them, and nothing about them is read or written.
     var speakerGroupsFeature: Bool { didSet { defaults.set(speakerGroupsFeature, forKey: "speakerGroupsFeature") } }
+    /// Network renderers (UPnP AV / OpenHome) are in the app only while this is on (Settings › Playback › UPnP Renderers (beta),
+    /// off by default). Off, nothing is searched for, no port is opened, and nothing about them is shown, read or written.
+    var upnpRenderersFeature: Bool { didSet { defaults.set(upnpRenderersFeature, forKey: "upnpRenderersFeature") } }
+    /// Network renderers whose volume the listener unlocked (Vespertine's digital volume, so the stream is processed). The
+    /// others stay locked at 100%: the original file is sent and the renderer's own volume is left alone.
+    var rendererVolumeUnlocked: Set<String> { didSet { defaults.set(rendererVolumeUnlocked.sorted(), forKey: "rendererVolumeUnlocked") } }
     /// Song transitions (crossfade, Smart Mix, Live Set) and their master switch, off unless turned on. Reach the
     /// engine only while the switch is on (`engineSettings()`).
     var transitions: TransitionSettings { didSet { if transitions != oldValue { transitions.save(to: defaults) } } }
@@ -216,7 +222,7 @@ final class AppSettings {
             "watchFolders": false, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "dopListUpdates": true, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
-            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "bundleCopies": false,
+            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "bundleCopies": false,
         ])
         Self.migrateAutomaticWorkToOff(defaults)
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
@@ -295,6 +301,8 @@ final class AppSettings {
         visualizerWindow = VisualizerWindowState.load(from: defaults)
         transitionsFeature = defaults.bool(forKey: "transitionsFeature")
         speakerGroupsFeature = defaults.bool(forKey: "speakerGroupsFeature")
+        upnpRenderersFeature = defaults.bool(forKey: "upnpRenderersFeature")
+        rendererVolumeUnlocked = Set(defaults.stringArray(forKey: "rendererVolumeUnlocked") ?? [])
         transitions = TransitionSettings.load(from: defaults)
         self.dataDirectory = resolvedDataDirectory
         // A library that came from the old preferences gets its own file now (`didSet` doesn't run inside `init`).

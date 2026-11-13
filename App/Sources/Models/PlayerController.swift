@@ -7,6 +7,7 @@ import AppKit
 import MediaPlayer
 import VespertineAudio
 import VespertineLibrary
+import VespertineUPnP
 import Observation
 
 struct QueueEntry: Identifiable, Hashable {
@@ -417,7 +418,50 @@ final class PlayerController {
 
     private func syncMirror(reloadCurrent: Bool = false) {
         mirror.update(queue.map(\.item), repeatMode: repeatMode)
-        engine.queueChanged(reloadCurrent: reloadCurrent)
+        if let rendererInfo {
+            let entries = queue
+            rendererInfo.withLock { map in for entry in entries where map[entry.id] == nil { map[entry.id] = Self.rendererInfo(entry.track) } }
+        }
+        if let renderer { renderer.queueChanged() } else { engine.queueChanged(reloadCurrent: reloadCurrent) }
+    }
+
+    // MARK: Network renderer (UPnP renderers, beta)
+
+    /// The network renderer playing in place of the engine, while one is the chosen output; nil: the engine plays, as always.
+    @ObservationIgnored private(set) var renderer: RendererPlayback?
+
+    /// Hands playback to `playback` (a network renderer) or back to the engine (nil). A song that was playing carries on, at
+    /// its position, on the new one.
+    func useRenderer(_ playback: RendererPlayback?) {
+        guard playback !== renderer else { return }
+        let carried = state == .playing ? current : nil
+        let at = position
+        if let old = renderer { old.shutdown() } else if playback != nil { engine.stop() }
+        renderer = playback
+        if let playback {
+            let mirror = self.mirror
+            let cache = shares.cache
+            playback.nextItemProvider = { finished in mirror.item(after: finished.id) }
+            playback.urlResolver = { @Sendable item in item.cacheKey.flatMap { cache.localURL(forKey: $0) } ?? item.url }
+            let info = Locked([UUID: RendererTrackInfo]())
+            info.withLock { map in for entry in queue { map[entry.id] = Self.rendererInfo(entry.track) } }
+            rendererInfo = info
+            playback.metadataProvider = { item in info.withLock { $0[item.id] } }
+            playback.eventHandler = { [weak self] event in self?.handle(event) }
+        }
+        signalPath = nil
+        if let carried {
+            start(carried)
+            if at > 1 { seek(to: at) }
+        }
+    }
+
+    /// Titles for the renderer's display, by queue entry (kept current as the queue changes).
+    @ObservationIgnored private var rendererInfo: Locked<[UUID: RendererTrackInfo]>?
+
+    nonisolated static func rendererInfo(_ track: Track) -> RendererTrackInfo {
+        RendererTrackInfo(title: track.title, artist: track.displayArtist.libraryDisplayName, album: track.displayAlbum.libraryDisplayName,
+                          duration: track.duration > 0 ? track.duration : nil)
     }
 
     /// Files in the queue were moved or renamed (found by a rescan): point their entries at the new
@@ -524,7 +568,8 @@ final class PlayerController {
         bedMeters = nil
         channelLevels = []
         shares.skipped(to: entry.track, upcoming: upcoming.map(\.track))
-        engine.play(entry.item)
+        rendererInfo?.withLock { $0[entry.id] = Self.rendererInfo(entry.track) }
+        if let renderer { renderer.play(entry.item) } else { engine.play(entry.item) }
         updateNowPlayingInfo()
     }
 
@@ -534,7 +579,7 @@ final class PlayerController {
         if waitingForDevice != nil { engine.pause(); return }
         switch state {
         case .playing: pause()
-        case .paused: request(.playing); engine.resume()
+        case .paused: request(.playing); if let renderer { renderer.resume() } else { engine.resume() }
         case .stopped:
             // After the queue played to its end, Play starts it from the first song, as Apple Music does.
             if playedToEnd, currentIndex == queue.count - 1, let first = queue.first { currentIndex = 0; start(first) }
@@ -547,7 +592,7 @@ final class PlayerController {
         if waitingForDevice != nil { engine.pause(); return }
         guard state == .playing else { return }
         request(.paused)
-        engine.pause()
+        if let renderer { renderer.pause() } else { engine.pause() }
     }
 
     private func request(_ target: PlaybackState) {
@@ -571,12 +616,12 @@ final class PlayerController {
 
     func seek(to seconds: TimeInterval) {
         if let id = current?.id { seekRestart = id }
-        engine.seek(to: seconds)
+        if let renderer { renderer.seek(to: seconds) } else { engine.seek(to: seconds) }
         position = seconds
         requestedPosition = (seconds, .now)
     }
 
-    func stop() { requested = nil; requestedPosition = nil; seekRestart = nil; requestedState = nil; engine.stop() }
+    func stop() { requested = nil; requestedPosition = nil; seekRestart = nil; requestedState = nil; if let renderer { renderer.stop() } else { engine.stop() } }
 
     func clearError() { lastError = nil }
 
@@ -732,7 +777,7 @@ final class PlayerController {
     }
 
     func poll(_ snapshot: EngineSnapshot? = nil) {
-        let snap = snapshot ?? engine.snapshot
+        let snap = snapshot ?? renderer?.snapshot ?? engine.snapshot
         if let requestedState, snap.state != requestedState.from
             || requestedState.state == .playing && Date().timeIntervalSince(requestedState.at) > 30 {
             self.requestedState = nil
