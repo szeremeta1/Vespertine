@@ -103,3 +103,16 @@ Catalog items that aren't in the library play directly (transient `PlayableItem`
 - Album-copy matching by ISRC and by title/duration.
 - The analysis hook: when a staged entry is complete, analysis runs and stores under the tidal location; the file is deleted after release.
 - UI: build the app (`xcodebuild … build`), plus SwiftUI previews or snapshot images of the Settings tab, a songs table with mixed sources (one grayed), and the inspector TIDAL group, compared visually with neighbouring views. No pixel tests.
+
+## UX review amendments (2026-11-13)
+
+These override the sections above where they conflict.
+
+1. **Turning on is one flow.** Switching on "TIDAL integration" opens Settings › TIDAL and, if signed out, the login sheet. Turning it off asks nothing, because all data stays.
+2. **Credentials: one step, not four fields.** "Import Client File…" reads a `tidal-client.json`. Alternatively, one multi-line field takes the pasted JSON. The four separate fields appear only under "Show Details". Values are validated as non-empty, and the errors name the missing key.
+3. **One banner instead of a thousand tooltips.** When the TIDAL source is offline (no network, signed out or backing off), lists containing TIDAL rows show one slim banner at the top: "TIDAL is offline. Downloaded tracks still play." It ends with the reason and an action ("Sign In…", "Retry"). Per-row tooltips stay for the per-track reasons (region, removed).
+4. **Search uses the existing search field.** On TIDAL › Search, the main window's search field searches TIDAL (placeholder "Search TIDAL"). The detail header gets no second field.
+5. **Hide, don't disable, the heart on TIDAL rows** until two-way sync (sub-project 3) ships. The two are built together here, so this only applies if they ship separately.
+6. **Download progress is visible from anywhere.** The sidebar's Downloads row shows a progress ring and the remaining count while the queue runs. A paused queue (backoff) shows a clock and its reason in the tooltip.
+7. **Quality picker labels:** "Hi-Res Lossless (up to 24/192)", "Lossless (16/44.1)", "High (AAC 320)", "Low (AAC 96)". There is no "Max".
+8. **Wording:** "TIDAL" in caps everywhere, and "Download" / "Remove Download" (not "Keep Offline", which already means something else for shares).

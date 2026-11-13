@@ -48,3 +48,8 @@ Decisions made while working on my own (the owner said "fly solo, take the best 
 
      Turning it off deletes nothing: the rows, tokens and downloaded files stay. Turning it back on restores everything. The database migration still runs, but adds only empty tables.
 210. **UPnP output gets the same treatment**, with its own switch: Settings › Playback › "UPnP renderers (beta)", off by default, following the Speaker Groups beta pattern. With it off, no SSDP traffic and nothing new in the output picker.
+
+## UX pass (2026-11-13, owner asked for a quick overall UX review)
+
+400. **TIDAL UX amendments 1–8** are in the library/UI spec ("UX review amendments"). The main ones: one-flow enable, credentials by file import, a single offline banner, the existing search field reused, and download progress shown in the sidebar.
+401. **UPnP UI says "Network Players" everywhere** ("renderer" stays only in code and the technical details). The signal path says "not verified" for what the player does. Clearer empty state.
