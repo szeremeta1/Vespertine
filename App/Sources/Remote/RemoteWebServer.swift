@@ -118,7 +118,19 @@ final class RemoteWebServer {
         let device = authenticatedDevice(request)
         switch (request.method, request.path) {
         case ("GET", "/"):
-            respond(connection, status: 200, type: "text/html; charset=utf-8", body: Data(RemoteWebPage.html(serverName: RemoteServer.computerName).utf8))
+            respond(connection, status: 200, type: "text/html; charset=utf-8", body: Data(RemoteWebPage.html(serverName: RemoteServer.computerName).utf8),
+                    headers: ["Content-Security-Policy": RemoteWebPage.contentSecurityPolicy])
+        // What a phone needs to put the remote on its home screen: nothing here says anything about this Mac or its music.
+        case ("GET", "/manifest.webmanifest"):
+            respond(connection, status: 200, type: "application/manifest+json", body: RemoteWebPage.manifest(), headers: ["Cache-Control": "no-cache"])
+        case ("GET", let path) where RemoteWebIcon.sizes[path] != nil:
+            if let icon = RemoteWebIcon.png(path: path) {
+                respond(connection, status: 200, type: "image/png", body: icon, headers: ["Cache-Control": "public, max-age=86400"])
+            } else {
+                respond(connection, status: 404)
+            }
+        case ("GET", "/icon.svg"):
+            respond(connection, status: 200, type: "image/svg+xml", body: Data(RemoteWebIcon.svg.utf8), headers: ["Cache-Control": "public, max-age=86400"])
         case ("GET", "/session"):
             if device != nil {
                 respondJSON(connection, server.serverInfo)
@@ -209,15 +221,21 @@ final class RemoteWebServer {
 
     private func respond(_ connection: NWConnection, status: Int, type: String = "text/plain; charset=utf-8", body: Data = Data(),
                          headers: [String: String] = [:]) {
-        var head = "HTTP/1.1 \(status) \(Self.reason(status))\r\nContent-Type: \(type)\r\nContent-Length: \(body.count)\r\n"
-        head += "Connection: close\r\nCache-Control: no-store\r\nX-Content-Type-Options: nosniff\r\nX-Frame-Options: DENY\r\n"
-        head += "Referrer-Policy: no-referrer\r\n"
-        for (name, value) in headers where name != "Cache-Control" { head += "\(name): \(value)\r\n" }
-        head += "\r\n"
+        let head = Self.head(status: status, type: type, length: body.count, headers: headers)
         connection.send(content: Data(head.utf8) + body, isComplete: true, completion: .contentProcessed { _ in connection.cancel() })
     }
 
-    static func reason(_ status: Int) -> String {
+    /// A response's status line and headers. Nothing is cached unless the caller says how (covers and icons do: a cover
+    /// asked for again on every screen made the lists flicker and the Mac read the same file over and over).
+    nonisolated static func head(status: Int, type: String, length: Int, headers: [String: String] = [:]) -> String {
+        var head = "HTTP/1.1 \(status) \(reason(status))\r\nContent-Type: \(type)\r\nContent-Length: \(length)\r\n"
+        head += "Connection: close\r\nCache-Control: \(headers["Cache-Control"] ?? "no-store")\r\n"
+        head += "X-Content-Type-Options: nosniff\r\nX-Frame-Options: DENY\r\nReferrer-Policy: no-referrer\r\n"
+        for (name, value) in headers.sorted(by: { $0.key < $1.key }) where name != "Cache-Control" { head += "\(name): \(value)\r\n" }
+        return head + "\r\n"
+    }
+
+    nonisolated static func reason(_ status: Int) -> String {
         switch status {
         case 200: "OK"
         case 400: "Bad Request"

@@ -1,4 +1,5 @@
 import Foundation
+import ImageIO
 import Testing
 import VespertineLibrary
 import VespertineRemoteProtocol
@@ -99,6 +100,82 @@ struct RemoteTests {
         #expect(!page.contains("__STRINGS__"))
     }
 
+    @Test func theWebPageIsOneWholePage() {
+        // The markup, the style and the script travel in the app's resources and go out as one page.
+        let page = RemoteWebPage.html(serverName: "Studio")
+        #expect(page.hasPrefix("<!doctype html>"))
+        #expect(page.contains("id=\"view-now\"") && page.contains("id=\"view-queue\"") && page.contains("id=\"pairing\""))
+        #expect(page.contains("--brass: #C8A66A"))
+        #expect(page.contains("function renderPlayer()"))
+        for placeholder in ["__STYLE__", "__SCRIPT__", "__LANG__", "__DIR__", "__SPACED__"] { #expect(!page.contains(placeholder)) }
+        #expect(page.contains("<link rel=\"manifest\" href=\"/manifest.webmanifest\">"))
+        // Nothing is fetched from anywhere but this Mac.
+        #expect(!page.contains("https://") && !page.contains("//cdn"))
+    }
+
+    @Test func everyWordThePageUsesIsThere() throws {
+        // The script reads its words as L.name: each one must be among those the Mac sends.
+        let page = RemoteWebPage.html(serverName: "Studio")
+        let known = Set(RemoteWebPage.strings.keys).union(["mac", "plurals"])
+        var used = Set<String>()
+        for match in page.matches(of: /\bL\.([A-Za-z]+)\b/) { used.insert(String(match.1)) }
+        for match in page.matches(of: /data-t="([A-Za-z]+)"/) { used.insert(String(match.1)) }
+        #expect(used.count > 40)
+        #expect(used.subtracting(known).isEmpty, "missing: \(used.subtracting(known).sorted())")
+        #expect(RemoteWebPage.strings.values.allSatisfy { !$0.isEmpty })
+    }
+
+    @Test func countsComeInEveryPluralForm() {
+        let plurals = RemoteWebPage.plurals
+        for kind in ["songs", "albums"] {
+            let forms = plurals[kind] ?? [:]
+            #expect(Set(forms.keys) == Set(RemoteWebPage.pluralSamples.map(String.init)))
+            #expect(forms.values.allSatisfy { !$0.isEmpty && !$0.contains("%") })
+        }
+    }
+
+    @Test func theManifestMakesItAHomeScreenApp() throws {
+        let manifest = try #require(try JSONSerialization.jsonObject(with: RemoteWebPage.manifest()) as? [String: Any])
+        #expect(manifest["display"] as? String == "standalone")
+        #expect(manifest["start_url"] as? String == "/")
+        #expect(manifest["short_name"] as? String == "Vespertine")
+        let icons = try #require(manifest["icons"] as? [[String: String]])
+        #expect(icons.contains { $0["sizes"] == "192x192" } && icons.contains { $0["sizes"] == "512x512" } && icons.contains { $0["purpose"] == "maskable" })
+        // Every icon the manifest and the page name is one the server draws.
+        for icon in icons { #expect(RemoteWebIcon.sizes[icon["src"] ?? ""] != nil) }
+        #expect(RemoteWebIcon.sizes["/apple-touch-icon.png"] == 180)
+    }
+
+    @Test func iconsAreDrawnAtTheirSizes() throws {
+        for (path, size) in RemoteWebIcon.sizes {
+            let data = try #require(RemoteWebIcon.png(path: path))
+            #expect(RemoteBridge.mimeType(of: data) == "image/png")
+            let source = try #require(CGImageSourceCreateWithData(data as CFData, nil))
+            let image = try #require(CGImageSourceCreateImageAtIndex(source, 0, nil))
+            #expect(image.width == size && image.height == size)
+        }
+        #expect(RemoteWebIcon.png(path: "/icon-9999.png") == nil)
+        #expect(RemoteWebIcon.png(path: "/../etc/passwd") == nil)
+        #expect(RemoteWebIcon.png(size: 0, maskable: false) == nil)
+        #expect(RemoteWebIcon.svg.hasPrefix("<svg") && !RemoteWebIcon.svg.contains("<script"))
+    }
+
+    @Test func nothingIsCachedUnlessItSaysSo() {
+        let plain = RemoteWebServer.head(status: 200, type: "application/json", length: 2)
+        #expect(plain.hasPrefix("HTTP/1.1 200 OK\r\n"))
+        #expect(plain.contains("Cache-Control: no-store\r\n"))
+        #expect(plain.contains("X-Content-Type-Options: nosniff\r\n") && plain.contains("X-Frame-Options: DENY\r\n") && plain.contains("Referrer-Policy: no-referrer\r\n"))
+        #expect(plain.hasSuffix("\r\n\r\n"))
+        // A cover keeps for a day in the browser that asked (it sat behind the cookie); it used to be fetched every time.
+        let cover = RemoteWebServer.head(status: 200, type: "image/jpeg", length: 9, headers: ["Cache-Control": "private, max-age=86400"])
+        #expect(cover.contains("Cache-Control: private, max-age=86400\r\n") && !cover.contains("no-store"))
+        #expect(cover.components(separatedBy: "Cache-Control").count == 2)
+        let page = RemoteWebServer.head(status: 200, type: "text/html; charset=utf-8", length: 1, headers: ["Content-Security-Policy": RemoteWebPage.contentSecurityPolicy])
+        #expect(page.contains("Content-Security-Policy: default-src 'none';"))
+        #expect(page.contains("frame-ancestors 'none'") && page.contains("connect-src 'self'"))
+        #expect(RemoteWebServer.head(status: 401, type: "text/plain", length: 0).hasPrefix("HTTP/1.1 401 Unauthorized\r\n"))
+    }
+
     // MARK: Polish: names and labels on the web remote
 
     @Test func aPairedBrowserIsNamedFromItsUserAgent() {
@@ -121,11 +198,11 @@ struct RemoteTests {
     @Test func theWebPageNamesPauseAndPositionForScreenReaders() {
         let page = RemoteWebPage.html(serverName: "Mac")
         // Play/Pause says what a press does; the slider is a position, not "Now Playing".
-        #expect(page.contains("$(\"playpause\").setAttribute(\"aria-label\""))
+        #expect(page.contains("playing ? L.pause : L.play"))
         #expect(page.contains("$(\"position\").setAttribute(\"aria-label\", L.position)"))
         #expect(!page.contains("$(\"position\").setAttribute(\"aria-label\", L.nowPlaying)"))
-        #expect(page.contains("\"pause\":"))
-        // The browser's name comes from its user agent on the Mac, not from navigator.platform ("MacIntel").
-        #expect(!page.contains("navigator.platform"))
+        #expect(page.contains("$(\"prev\").setAttribute(\"aria-label\", L.previous)"))
+        #expect(page.contains("$(\"volDown\").setAttribute(\"aria-label\", L.volumeDown)"))
+        #expect(RemoteWebPage.strings["pause"] != nil)
     }
 }

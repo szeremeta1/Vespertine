@@ -92,6 +92,26 @@ The opt-in loopback tests (`VESPERTINE_GROUP_LOOPBACK=1 swift test --filter Grou
 
 `scripts/qa-run.sh` and `App/Sources/App/DeveloperHooks.swift` hold the launch arguments used for visual QA. They can open albums, artists and genres, start playback or a shuffle, set any page's filters, select inspector tabs and render windows to PNG, which works even while the screen is locked.
 
+## The web remote
+
+The page a paired browser gets (Settings › Remote › web browsers) is three files in `App/Resources/Remote`: `RemoteWeb.html`, `RemoteWeb.css` and `RemoteWeb.js`. `RemoteWebPage.swift` puts the style and the script into the markup and sends them as one page, with its words taken from the String Catalog in the Mac's language (the page has no words of its own: add a key to `RemoteWebPage.strings` and use it as `L.key`). `RemoteWebServer.swift` serves it, the manifest and the home-screen icons, and answers `/session`, `/pair`, `/events`, `/command` and `/artwork`. Commands are the remote protocol's own (`Packages/VespertineRemoteKit`), so anything the page can ask, the iPhone app can too.
+
+To work on the page without the app, `tests/web-remote/mock-mac.mjs` is a pretend Mac with a small made-up library. It builds the page from the same three files and listens on this computer only:
+
+```bash
+node tests/web-remote/mock-mac.mjs --port 47821            # add --lang de, or --unpaired to see the pairing screen (code 123456)
+```
+
+Two more scripts drive it in a headless browser with Playwright (the website's copy is used: `cd site && npm ci && npx playwright-core install chromium webkit`, or set `PLAYWRIGHT_CORE` to another copy's folder):
+
+```bash
+node tests/web-remote/check.mjs                            # pairing, transport, sliders, queue, library, playlists, search, in Chromium and WebKit
+```
+
+```bash
+node tests/web-remote/shoot.mjs shots                      # screenshots at phone sizes, dark and light, and in German, Arabic and Japanese
+```
+
 ## Website
 
 The website (vespertineapp.com) is an Astro site in `site/`: `cd site && npm ci && npm run dev`. Its version, download link and "What's new" come from the GitHub releases at build time, and publishing a release rebuilds it, so a release needs no website edit. Feature, format and FAQ wording lives in `site/src/data/content.ts`; keep it in step with this folder's docs. [site/README.md](../site/README.md) has the rest.

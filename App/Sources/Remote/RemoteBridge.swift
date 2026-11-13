@@ -108,13 +108,99 @@ struct RemoteBridge {
                      hiRes: album.isHiRes, dsd: album.isDSD, multichannel: album.isMultichannel)
     }
 
+    // MARK: The library's own commands
+    // These need only the library, so they are tested against a real one (App/Tests/RemoteLibraryTests.swift).
+
+    /// A playlist as a remote lists it: its name, how many songs it has, and up to four of their covers for a tile.
+    static func playlistSummary(_ playlist: Playlist, in library: LibraryStore, artworkKey: (Track) -> String?) -> PlaylistSummary? {
+        guard let id = playlist.id else { return nil }
+        let tracks = library.tracks(in: playlist)
+        var covers: [String] = []
+        for track in tracks {
+            guard covers.count < 4 else { break }
+            if let key = artworkKey(track), !covers.contains(key) { covers.append(key) }
+        }
+        return PlaylistSummary(id: id, name: playlist.name.libraryDisplayName, smart: playlist.isSmart, trackCount: tracks.count, artworkKeys: covers)
+    }
+
+    /// A search answered in groups: songs as the search field finds them; albums, artists and playlists by name (every
+    /// word, anywhere, whatever its case or accents). Up to `limit` of each.
+    static func find(_ text: String, limit: Int, in library: LibraryStore, track: (Track) -> TrackSummary, album: (Album) -> AlbumSummary,
+                     artworkKey: (Track) -> String?) -> SearchResults {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return SearchResults(tracks: [], albums: [], artists: [], playlists: []) }
+        let limit = min(max(1, limit), 500)
+        let words = trimmed.split(whereSeparator: \.isWhitespace).map(String.init)
+        func matches(_ names: String...) -> Bool {
+            words.allSatisfy { word in names.contains { $0.range(of: word, options: [.caseInsensitive, .diacriticInsensitive]) != nil } }
+        }
+        let albums = Array(library.albums.lazy.filter { matches($0.title.libraryDisplayName, $0.artist.libraryDisplayName) }.prefix(limit))
+        let artists = Array(library.artists.lazy.filter { matches($0.name.libraryDisplayName) }.prefix(limit))
+        let playlists = Array(library.playlists.lazy.filter { matches($0.name.libraryDisplayName) }.prefix(limit))
+        return SearchResults(
+            tracks: library.search(trimmed).prefix(limit).map(track),
+            albums: albums.map(album),
+            artists: artists.map { ArtistSummary(name: $0.name.libraryDisplayName, albumCount: $0.albumCount, artworkKey: $0.artworkKey) },
+            playlists: playlists.compactMap { playlistSummary($0, in: library, artworkKey: artworkKey) })
+    }
+
+    /// Adds songs at the end of a playlist. A smart playlist's rules choose its songs: a remote doesn't offer one.
+    static func addToPlaylist(_ id: Int64, ids: [Int64], in library: LibraryStore) -> RemoteReply {
+        guard let playlist = (try? library.database.playlists())?.first(where: { $0.id == id }) else { return notInLibrary }
+        guard !playlist.isSmart else { return unavailable }
+        let found = library.tracks(ids: ids).compactMap(\.id)
+        guard !found.isEmpty else { return notInLibrary }
+        library.append(Array(found.prefix(playlistBatch)), to: playlist)
+        return .ok
+    }
+
+    /// Makes a playlist of these songs (a remote asks for the name first) and answers with every playlist, the new one included.
+    static func createPlaylist(named name: String, ids: [Int64], in library: LibraryStore, artworkKey: (Track) -> String?) -> RemoteReply {
+        let trimmed = String(name.trimmingCharacters(in: .whitespacesAndNewlines).prefix(200))
+        guard !trimmed.isEmpty else { return unavailable }
+        let found = Array(library.tracks(ids: ids).compactMap(\.id).prefix(playlistBatch))
+        guard library.createPlaylist(name: trimmed, trackIDs: found) != nil else {
+            return .failed(reason: String(localized: "Couldn't save the playlist: \(trimmed)"))
+        }
+        // Read from the database: the library's own list hears of the new playlist a moment later.
+        let all = (try? library.database.playlists()) ?? library.playlists
+        return .playlists(items: all.compactMap { playlistSummary($0, in: library, artworkKey: artworkKey) })
+    }
+
+    /// The most songs one command adds to a playlist.
+    static let playlistBatch = 5_000
+
+    /// Every song by title, kept until the library changes: a remote asks for it a page at a time.
+    private static var songList: (library: ObjectIdentifier, revision: Int, count: Int, tracks: [Track])?
+
+    static func songs(of library: LibraryStore) -> [Track] {
+        let id = ObjectIdentifier(library)
+        if let songList, songList.library == id, songList.revision == library.revision, songList.count == library.stats.tracks {
+            return songList.tracks
+        }
+        let tracks = byTitle(library.allTracks())
+        songList = (id, library.revision, library.stats.tracks, tracks)
+        return tracks
+    }
+
+    /// Songs in the order a list of titles reads: by title as the Finder would sort it, then artist and album.
+    nonisolated static func byTitle(_ tracks: [Track]) -> [Track] {
+        tracks.sorted { a, b in
+            let order = a.title.localizedStandardCompare(b.title)
+            if order != .orderedSame { return order == .orderedAscending }
+            let artist = a.displayArtist.localizedStandardCompare(b.displayArtist)
+            if artist != .orderedSame { return artist == .orderedAscending }
+            return (a.albumKey, a.discNumber ?? 0, a.trackNumber ?? 0, a.id ?? 0) < (b.albumKey, b.discNumber ?? 0, b.trackNumber ?? 0, b.id ?? 0)
+        }
+    }
+
     // MARK: Commands
 
     /// Carries out a command (everything but the session ones and artwork, which the connection handles).
     func perform(_ command: RemoteCommand) -> RemoteReply {
         switch command {
         case .hello, .pair, .artwork:
-            return .failed(reason: String(localized: "This command isn’t available here.", comment: "Remote control: a phone sent a command at the wrong time."))
+            return Self.unavailable
 
         case .playPause: player.togglePlayPause()
         case .play: if player.state != .playing { player.togglePlayPause() }
@@ -178,7 +264,7 @@ struct RemoteBridge {
             let albums = library.albums(artist: name)
             return .albums(items: albums.map(albumSummary), total: albums.count)
         case .playlists:
-            return .playlists(items: library.playlists.compactMap { p in p.id.map { PlaylistSummary(id: $0, name: p.name.libraryDisplayName, smart: p.isSmart) } })
+            return .playlists(items: library.playlists.compactMap { Self.playlistSummary($0, in: library, artworkKey: { model.artworkKey($0) }) })
         case .playlistTracks(let id):
             guard let playlist = library.playlists.first(where: { $0.id == id }) else { return notInLibrary }
             return .tracks(items: library.tracks(in: playlist).map(trackSummary))
@@ -188,6 +274,19 @@ struct RemoteBridge {
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else { return .tracks(items: []) }
             return .tracks(items: library.search(trimmed).prefix(min(max(1, limit), 500)).map(trackSummary))
+
+        case .songs(let offset, let limit):
+            let songs = Self.songs(of: library)
+            let start = min(max(0, offset), songs.count)
+            let end = min(start + min(max(1, limit), 500), songs.count)
+            return .songs(items: songs[start..<end].map(trackSummary), total: songs.count)
+        case .find(let text, let limit):
+            return .found(Self.find(text, limit: limit, in: library, track: trackSummary, album: albumSummary, artworkKey: { model.artworkKey($0) }))
+
+        case .addToPlaylist(let id, let ids):
+            return Self.addToPlaylist(id, ids: ids, in: library)
+        case .createPlaylist(let name, let ids):
+            return Self.createPlaylist(named: name, ids: ids, in: library, artworkKey: { model.artworkKey($0) })
 
         case .selectOutput(let uid):
             if let uid, !outputsState().outputs.contains(where: { $0.uid == uid }) {
@@ -216,11 +315,17 @@ struct RemoteBridge {
         return .ok
     }
 
+    private static var unavailable: RemoteReply {
+        .failed(reason: String(localized: "This command isn’t available here.", comment: "Remote control: a phone sent a command at the wrong time."))
+    }
+
     private var notInQueue: RemoteReply {
         .failed(reason: String(localized: "That song is no longer in the queue.", comment: "Remote control: the phone acted on a queue entry that has gone."))
     }
 
-    private var notInLibrary: RemoteReply {
+    private var notInLibrary: RemoteReply { Self.notInLibrary }
+
+    private static var notInLibrary: RemoteReply {
         .failed(reason: String(localized: "Those songs aren’t in the library anymore.", comment: "Remote control: the phone asked for songs, an album or a playlist the Mac no longer has."))
     }
 
