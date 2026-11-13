@@ -146,6 +146,21 @@ struct TidalReadersTests {
         }
     }
 
+    @Test("HTTP reader: 502, 503 and 504 are retried after growing waits; other errors fail at once")
+    func httpServerErrors() throws {
+        let server = try FakeHTTPServer(); defer { server.stop() }
+        let file = noise(100_000, seed: 9)
+        server.serve("/track.flac", file)
+        let waits = Locked<[TimeInterval]>([])
+        let reader = try TidalHTTPReader(stream: fileStream(server.url("/track.flac")), renew: noRenew, session: TidalCDN.session,
+                                         retryDelay: { attempt in waits.mutate { $0.append(TidalCDN.retryDelay(attempt)) }; return 0.01 })
+        server.fail("/track.flac", with: [502, 503, 504])
+        #expect(try reader.read(at: 5, count: 50) == file.subdata(in: 5..<55))
+        #expect(waits.value == [2, 4, 6])
+        server.fail("/track.flac", with: [500])
+        #expect(throws: TidalError.http(status: 500, body: "busy")) { _ = try reader.read(at: 0, count: 10) }
+    }
+
     // MARK: DASH
 
     @Test("DASH reader: the size is header + payloads, a full read decodes to source.flac, a read across a segment boundary matches")

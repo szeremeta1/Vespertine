@@ -31,6 +31,8 @@ final class FakeHTTPServer: @unchecked Sendable {
     private var served: [String: Int] = [:]
     /// Path → how many coming requests get their connection closed without an answer.
     private var drops: [String: Int] = [:]
+    /// Path → statuses the coming requests get instead of the file, in order.
+    private var failures: [String: [Int]] = [:]
     private var log: [Request] = []
     private var active = 0
     private var mostActive = 0
@@ -83,6 +85,9 @@ final class FakeHTTPServer: @unchecked Sendable {
 
     /// The next `count` requests for `path` have their connection closed without an answer.
     func drop(_ path: String, count: Int) { condition.withLock { drops[path] = count } }
+
+    /// The next requests for `path` are answered with `statuses`, one each, before the file is served again.
+    func fail(_ path: String, with statuses: [Int]) { condition.withLock { failures[path] = statuses } }
 
     var requests: [Request] { condition.withLock { log } }
     /// The most requests that were being answered at once.
@@ -137,6 +142,8 @@ final class FakeHTTPServer: @unchecked Sendable {
         let file = files[path]
         let dropping = (drops[path] ?? 0) > 0
         if dropping { drops[path]! -= 1 }
+        let failure = failures[path]?.first
+        if failure != nil { failures[path]!.removeFirst() }
         let limit = expiring[path]
         let used = served[path + "?" + token] ?? 0
         let rate = bytesPerSecond
@@ -154,6 +161,7 @@ final class FakeHTTPServer: @unchecked Sendable {
             connection.cancel()
             return
         }
+        if let failure { return respond(connection, status: failure, headers: [:], body: Data("busy".utf8), rate: nil, finish: finish) }
         guard let file else { return respond(connection, status: 404, headers: [:], body: Data("not found".utf8), rate: nil, finish: finish) }
         if let limit, used >= limit { return respond(connection, status: 403, headers: [:], body: Data("expired".utf8), rate: nil, finish: finish) }
 

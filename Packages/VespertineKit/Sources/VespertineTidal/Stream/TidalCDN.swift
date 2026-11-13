@@ -1,7 +1,7 @@
 //
 // Vespertine: blocking, cancellable range requests to TIDAL's CDN for the stream readers (they run on the playback cache's copy
 // threads), with the retry policy of the design: an expired URL is resolved again, a lost connection is retried after growing
-// waits (2 s, 4 s, 6 s…), and any other answer fails the read.
+// waits (2 s, 4 s, 6 s…), as are a CDN's 502, 503 and 504, and any other answer fails the read.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -101,7 +101,7 @@ final class CDNClient: @unchecked Sendable {
     }
 
     /// `range` of the resource at the stream's URL (`url` picks it), or all of it. 403/410 renew the stream and retry the same
-    /// range, once per renewal this read asks for; transport failures retry after growing waits, until `deadline` if there is one
+    /// range, once per renewal this read asks for; transport failures and 502/503/504 retry after growing waits, until `deadline` if there is one
     /// (otherwise for as long as the reader isn't cancelled: the cache's no-progress limit decides when a song gives up). Any other
     /// status is `TidalError.http`.
     func fetch(_ source: RenewableStream, url: (TidalStream) throws -> URL, range: ClosedRange<Int64>?, deadline: Date? = nil) throws -> Answer {
@@ -124,6 +124,11 @@ final class CDNClient: @unchecked Sendable {
             switch response.statusCode {
             case 200, 206:
                 return Answer(data: data, status: response.statusCode, total: Self.total(of: response))
+            case 502, 503, 504:
+                // A CDN edge that is overloaded or between deployments: like a lost connection, it may answer a moment later.
+                failures += 1
+                if let deadline, Date() >= deadline { throw TidalError.http(status: response.statusCode, body: Self.text(data)) }
+                try pause(retryDelay(failures))
             case 403, 410:
                 // An expired URL. A second refusal of the URL this read itself renewed to is not expiry.
                 if renewedTo == generation { throw TidalError.http(status: response.statusCode, body: Self.text(data)) }
