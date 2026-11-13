@@ -34,6 +34,11 @@ public final class RemoteSession {
     public private(set) var queue: QueueState?
     public private(set) var outputs: OutputsState?
 
+    /// The volume as a slider moves it: sent while it's dragged, and shown where the finger put it.
+    @ObservationIgnored public private(set) lazy var volume = LiveLevel { [weak self] level in
+        await self?.send(.setVolume(level: level))
+    }
+
     /// How the Mac was reached, while connected (nil for the demo).
     public private(set) var route: RemoteRoute.Kind?
     /// When the phase last changed (for "trying again since…").
@@ -94,6 +99,7 @@ public final class RemoteSession {
         guard phase != new else { return }
         phase = new
         phaseSince = Date()
+        if new != .connected { volume.reset() }
         if new != .connected { route = nil }
     }
 
@@ -254,7 +260,11 @@ public final class RemoteSession {
 
     private func received(_ message: ServerMessage) {
         switch message {
-        case .player(let state): player = state
+        case .player(let state):
+            // Another output has its own level: nothing held from the one before applies to it.
+            if let old = player, old.output != state.output || old.volume.route != state.volume.route { volume.reset() }
+            player = state
+            volume.reported(state.volume.level)
         case .queue(let state): queue = state
         case .outputs(let state): outputs = state
         case .goodbye(let reason):
