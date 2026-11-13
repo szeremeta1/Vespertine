@@ -80,8 +80,12 @@ public actor TidalAuth {
             throw TidalError.http(status: response.statusCode, body: String(decoding: data, as: UTF8.self))
         }
         let new = try Self.parse(data, previous: nil, now: clock())
-        self.pending = nil
+        // Clear only the login that was just used: loginURL() may have started a newer one while the request was in flight.
+        if self.pending?.verifier == pending.verifier { self.pending = nil }
+        // A refresh of the previous session that is still in flight must not outlive it.
         generation += 1
+        refreshTask?.cancel()
+        refreshTask = nil
         try store.save(new)
         tokens = new
     }
@@ -129,8 +133,16 @@ public actor TidalAuth {
             "client_secret": credentials.pkceClientSecret,
             "scope": Self.scope,
         ]
-        let (data, response) = try await post(fields)
-        guard generation == started else { throw TidalError.notSignedIn }
+        let data: Data
+        let response: HTTPURLResponse
+        do {
+            (data, response) = try await post(fields)
+        } catch {
+            // Signing out (or in again) cancels the request; that is not the waiters' error.
+            if generation != started { return try supersededResult() }
+            throw error
+        }
+        guard generation == started else { return try supersededResult() }
         guard response.statusCode == 200 else {
             if response.statusCode == 400 || response.statusCode == 401 {
                 // The refresh token is dead (revoked, or rotated by another install): only a new login helps.
@@ -143,6 +155,12 @@ public actor TidalAuth {
         try store.save(new)
         tokens = new
         return new
+    }
+
+    /// What a refresh that sign-out or a new login overtook hands its waiters: the new session, or notSignedIn.
+    private func supersededResult() throws -> TidalTokens {
+        guard let tokens else { throw TidalError.notSignedIn }
+        return tokens
     }
 
     private func post(_ fields: [String: String]) async throws -> (Data, HTTPURLResponse) {

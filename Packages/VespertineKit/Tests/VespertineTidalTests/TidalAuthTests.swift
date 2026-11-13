@@ -250,4 +250,83 @@ struct TidalAuthTests {
         let second = TidalAuth(credentials: credentials, transport: FakeTransport(always: FakeResponse(json: "{}")), store: store, clock: clock.callable)
         #expect(try await second.validAccessToken() == "access-1")
     }
+
+    // MARK: Fix round 1
+
+    private func loginJSON() -> String { tokenJSON(access: "access-login", refresh: "refresh-login", expiresIn: 3600) }
+
+    @Test("a refresh in flight when a new login completes doesn't wedge later refreshes")
+    func loginDuringRefresh() async throws {
+        let clock = TestClock()
+        let latch = Latch()
+        let refreshes = Counter()
+        let transport = FakeTransport { request in
+            if request.formFields["grant_type"] == "refresh_token" {
+                // The first refresh is the stale one, held until after the login; later ones answer at once.
+                if refreshes.next() == 0 {
+                    await latch.wait()
+                    return FakeResponse(json: self.tokenJSON(access: "access-stale", refresh: "refresh-stale"))
+                }
+                return FakeResponse(json: self.tokenJSON(access: "access-3", refresh: "refresh-3"))
+            }
+            return FakeResponse(json: self.loginJSON())
+        }
+        let (auth, _) = signedIn(expiresAt: clock.now.addingTimeInterval(10), clock: clock, transport: transport)
+        let stale = Task { try await auth.validAccessToken() }
+        #expect(await eventually { await latch.waitingCount == 1 })
+        _ = await auth.loginURL()
+        try await auth.finishLogin(redirect: redirect)
+        await latch.releaseAll()
+        // The caller that was waiting on the superseded refresh gets the new login's token, not an error.
+        #expect(try await stale.value == "access-login")
+        #expect(try await auth.session?.accessToken == "access-login")
+
+        // The new token nears expiry: a real refresh runs and succeeds.
+        clock.advance(3550)
+        #expect(try await auth.validAccessToken() == "access-3")
+        #expect(transport.requests.filter { $0.formFields["grant_type"] == "refresh_token" }.count == 2)
+    }
+
+    @Test("signOut while a refresh is in flight: every waiter gets notSignedIn, not a CancellationError")
+    func signOutDuringRefresh() async throws {
+        let clock = TestClock()
+        let transport = FakeTransport { _ in
+            try await Task.sleep(for: .seconds(30))
+            return FakeResponse(json: self.tokenJSON())
+        }
+        let (auth, store) = signedIn(expiresAt: clock.now.addingTimeInterval(5), clock: clock, transport: transport)
+        let first = Task { try await auth.validAccessToken() }
+        let second = Task { try await auth.validAccessToken() }
+        #expect(await eventually { transport.requests.count == 1 })
+        try await Task.sleep(for: .milliseconds(20))
+        await auth.signOut()
+        for waiter in [first, second] {
+            await #expect(throws: TidalError.notSignedIn) { try await waiter.value }
+        }
+        #expect(store.load() == nil)
+        #expect(await auth.isSignedIn == false)
+    }
+
+    @Test("finishLogin doesn't clear a newer loginURL's verifier")
+    func newerLoginSurvives() async throws {
+        let latch = Latch()
+        let transport = FakeTransport { _ in
+            await latch.wait()
+            return FakeResponse(json: self.loginJSON())
+        }
+        let auth = TidalAuth(credentials: credentials, transport: transport, store: MemoryTokenStore())
+        _ = await auth.loginURL()
+        let first = Task { try await auth.finishLogin(redirect: redirect) }
+        #expect(await eventually { await latch.waitingCount == 1 })
+        let newer = await auth.loginURL()   // started while the first is still waiting on the network
+        await latch.releaseAll()
+        try await first.value
+
+        try await auth.finishLogin(redirect: redirect)   // the newer login must still be pending
+        let verifiers = transport.requests.map { $0.formFields["code_verifier"] ?? "" }
+        #expect(verifiers.count == 2 && verifiers[0] != verifiers[1])
+        let components = try #require(URLComponents(url: newer, resolvingAgainstBaseURL: false))
+        let challenge = components.queryItems?.first { $0.name == "code_challenge" }?.value
+        #expect(challenge == base64URL(Data(SHA256.hash(data: Data(verifiers[1].utf8)))))
+    }
 }
