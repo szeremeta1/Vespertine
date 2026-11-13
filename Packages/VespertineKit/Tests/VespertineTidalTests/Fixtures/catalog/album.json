@@ -1,0 +1,6 @@
+{"id":300001,"title":"Fabricated Album","duration":2400,"streamReady":true,"allowStreaming":true,"numberOfTracks":10,"numberOfVideos":0,
+ "numberOfVolumes":2,"releaseDate":"2019-05-17","copyright":"(c) Test Records","type":"ALBUM","version":"Deluxe",
+ "url":"http://www.tidal.com/album/300001","cover":"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee","explicit":false,"upc":"000000000001",
+ "popularity":40,"audioQuality":"HI_RES_LOSSLESS","audioModes":["STEREO"],"mediaMetadata":{"tags":["LOSSLESS","HIRES_LOSSLESS"]},
+ "artist":{"id":200001,"name":"Test Artist","type":"MAIN"},
+ "artists":[{"id":200001,"name":"Test Artist","type":"MAIN"}]}
