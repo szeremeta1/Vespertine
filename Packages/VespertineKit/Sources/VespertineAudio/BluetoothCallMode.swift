@@ -35,19 +35,39 @@ public enum MicrophoneUsers {
     /// The apps (display names, without duplicates, in Core Audio's order) recording from the microphone of the headset whose
     /// output has `outputUID`, leaving out `excludingPID` (Vespertine itself).
     public static func holders(ofOutputUID outputUID: String, among processes: [AudioInputProcess], excludingPID: Int32) -> [String] {
-        []
+        var names: [String] = []
+        for process in processes where process.pid != excludingPID && process.inputDeviceUIDs.contains(where: { sameHeadset($0, outputUID) }) {
+            let name = displayName(process)
+            if !names.contains(name) { names.append(name) }
+        }
+        return names
     }
 
     /// The headset's microphone as Core Audio names it: AirPods' output "70-F9-4A-BF-8C-C7:output" and input
     /// "70-F9-4A-BF-8C-C7:input" share the Bluetooth address before the colon.
     static func sameHeadset(_ inputUID: String, _ outputUID: String) -> Bool {
-        false
+        guard !inputUID.isEmpty, !outputUID.isEmpty else { return false }
+        func address(_ uid: String) -> Substring? {
+            guard let colon = uid.lastIndex(of: ":") else { return nil }
+            let head = uid[..<colon]
+            return head.isEmpty ? nil : head
+        }
+        if let a = address(inputUID), let b = address(outputUID) { return a == b }
+        return inputUID == outputUID
     }
 
     /// What to call a process in a sentence: System Settings' panes run as their own processes ("Sound"), the speech daemon
     /// behind "Hey Siri" as corespeechd.
     public static func displayName(_ process: AudioInputProcess) -> String {
-        process.name ?? "pid \(process.pid)"
+        let bundle = process.bundleID?.lowercased() ?? ""
+        if bundle == "com.apple.systempreferences" || (bundle.hasPrefix("com.apple.") && bundle.contains("settings.extension")) {
+            return String(localized: "System Settings", comment: "The macOS app, named as the one using a headset's microphone")
+        }
+        if process.name == "corespeechd" || bundle == "com.apple.corespeech.corespeechd" {
+            return String(localized: "Siri", comment: "Siri's listening (\"Hey Siri\"), named as what is using a headset's microphone")
+        }
+        if let name = process.name, !name.isEmpty { return name }
+        return String(localized: "an app (pid \(process.pid))", comment: "An app Vespertine can't name, using a headset's microphone. %lld is its process ID.")
     }
 
     /// The live list, read from Core Audio (macOS 14.2 and later): every process running input, with its input devices.
@@ -90,7 +110,9 @@ public struct BluetoothCallMode: Sendable, Equatable {
 
     /// The call mode of `device` (nil: not a Bluetooth output, or not in call mode), with the apps holding its microphone.
     public static func of(_ device: OutputDevice, processes: [AudioInputProcess], excludingPID: Int32) -> BluetoothCallMode? {
-        nil
+        guard device.isInCallMode else { return nil }
+        return BluetoothCallMode(deviceName: device.name, sampleRate: device.nominalSampleRate,
+                                 microphoneUsers: MicrophoneUsers.holders(ofOutputUID: device.uid, among: processes, excludingPID: excludingPID))
     }
 
     /// The same, read live from Core Audio.
@@ -100,13 +122,24 @@ public struct BluetoothCallMode: Sendable, Equatable {
     }
 
     /// What happened and what to do about it, in a sentence or two.
-    public var explanation: String { "" }
+    public var explanation: String {
+        let rate = SampleRate.format(sampleRate)
+        guard !microphoneUsers.isEmpty else {
+            return String(localized: "\(deviceName) is in call mode: an app has its microphone open, so macOS plays everything on it at \(rate) kHz like a phone call, without Spatial Audio. Close the app using the microphone, or choose another input in System Settings › Sound; full quality comes back by itself.",
+                          comment: "A Bluetooth headset is in its hands-free call mode and Vespertine can't tell which app has its microphone. %1$@ is the headset, %2$@ the rate in kHz.")
+        }
+        let users = ListFormatter.localizedString(byJoining: microphoneUsers)
+        return String(localized: "\(deviceName) is in call mode: \(users) has its microphone open, so macOS plays everything on it at \(rate) kHz like a phone call, without Spatial Audio. Close \(users), or choose another input in System Settings › Sound; full quality comes back by itself.",
+                      comment: "A Bluetooth headset is in its hands-free call mode because an app has its microphone open. %1$@ is the headset, %2$@ the app(s), e.g. System Settings, %3$@ the rate in kHz, %4$@ the app(s) again.")
+    }
 }
 
 extension OutputDevice {
     /// A Bluetooth output macOS has put in its hands-free call mode (below 32 kHz; A2DP music runs at 44.1 or 48 kHz). Judged by
     /// the transport, not the profile: AirPods Max on the cable go back to Bluetooth for the call.
-    public var isInCallMode: Bool { false }
+    public var isInCallMode: Bool {
+        (transport == .bluetooth || transport == .bluetoothLE) && nominalSampleRate > 0 && nominalSampleRate < 32_000
+    }
 }
 
 /// What the output chip says next to the rate when Vespertine's own signal path isn't playing.
@@ -119,6 +152,8 @@ public enum DeviceChipState: Sendable, Equatable {
     case callMode
 
     public static func of(_ device: OutputDevice, systemRendering: Bool, standingIn: Bool) -> DeviceChipState {
-        .idle
+        if device.isInCallMode { return .callMode }
+        if standingIn { return .standingIn }
+        return systemRendering ? .systemRenders : .idle
     }
 }
