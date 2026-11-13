@@ -157,7 +157,8 @@ struct DeviceChip: View {
                     .foregroundStyle(Palette.brassHi)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(device?.name ?? model.missingChosenOutput ?? String(localized: "No Output")).font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1)
-                    Text(chipDetail(device, path)).font(Typeface.mono(9.5)).foregroundStyle(path.map { $0.isBitPerfect ? Palette.brassHi : Palette.copper } ?? Palette.text3)
+                    Text(chipDetail(device, path)).font(Typeface.mono(9.5))
+                        .foregroundStyle(device?.isInCallMode == true ? Palette.copper : path.map { $0.isBitPerfect ? Palette.brassHi : Palette.copper } ?? Palette.text3)
                         .lineLimit(1)
                 }
                 .frame(maxWidth: 150, alignment: .leading)
@@ -176,7 +177,7 @@ struct DeviceChip: View {
             .fixedSize()
         }
         .buttonStyle(.plain)
-        .help(standIn.map { String(localized: "Output device: \(device?.name ?? "") plays while \($0) isn’t connected", comment: "Both are audio output device names.") }
+        .help(model.bluetoothCallMode?.explanation ?? standIn.map { String(localized: "Output device: \(device?.name ?? "") plays while \($0) isn’t connected", comment: "Both are audio output device names.") }
               ?? String(localized: "Output device"))
         // Bit-perfect or converted is said in words too, not only by the colour and the dot.
         .accessibilityLabel(device.map { String(localized: "Output device, \($0.name)") } ?? String(localized: "Output device, none"))
@@ -202,9 +203,17 @@ struct DeviceChip: View {
                 : String(localized: "\(path.deviceFormatShort) · SHARED", comment: "Device chip: format, then SHARED = shared with other apps (short, uppercase)")
         }
         guard let device else { return model.missingChosenOutput == nil ? "—" : String(localized: "NOT CONNECTED", comment: "Device chip: the chosen output isn't connected (short, uppercase)") }
-        return standIn == nil
-            ? String(localized: "\(SampleRate.format(device.nominalSampleRate)) kHz · IDLE", comment: "Device chip: the device's sample rate, then IDLE (short, uppercase)")
-            : String(localized: "\(SampleRate.format(device.nominalSampleRate)) kHz · STANDING IN", comment: "Device chip: the device's sample rate, then STANDING IN (short, uppercase): it plays in place of the chosen output, which isn't connected")
+        let rate = SampleRate.format(device.nominalSampleRate)
+        switch DeviceChipState.of(device, systemRendering: model.player.systemRendering != nil, standingIn: standIn != nil) {
+        case .callMode:
+            return String(localized: "\(rate) kHz · CALL MODE", comment: "Device chip: the Bluetooth headset's rate, then CALL MODE (short, uppercase): an app has its microphone open, so macOS plays at phone quality")
+        case .systemRenders:
+            return String(localized: "\(rate) kHz · MACOS", comment: "Device chip: the device's rate, then MACOS (short, uppercase): macOS's own renderer is playing (Dolby Atmos)")
+        case .standingIn:
+            return String(localized: "\(rate) kHz · STANDING IN", comment: "Device chip: the device's sample rate, then STANDING IN (short, uppercase): it plays in place of the chosen output, which isn't connected")
+        case .idle:
+            return String(localized: "\(rate) kHz · IDLE", comment: "Device chip: the device's sample rate, then IDLE (short, uppercase)")
+        }
     }
 }
 
