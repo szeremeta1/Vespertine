@@ -360,6 +360,7 @@ final class AppModel {
         remote.apply()
         tidal.start()   // nothing while TIDAL is switched off
         tidalAnalysisHook(settings.tidalEnabled)
+        routeTidal(settings.tidalEnabled)
         // Hand the DAC back when Vespertine quits: stop, release exclusive access, then restore or
         // standardize its format as chosen in Settings. Core Audio decides how long that takes (a device that won't
         // switch rate can hold it for many seconds), so it runs off the main thread and quitting waits for it only
@@ -591,6 +592,7 @@ final class AppModel {
             if route != path { path = route }
         }
         tidalAnalysisHook(on)
+        routeTidal(on)
         if on {
             tidal.start()
             // One flow (UX amendment 1): Settings › TIDAL, and the login sheet when there is an account to sign in to.
@@ -677,6 +679,25 @@ final class AppModel {
             try? FileManager.default.trashItem(at: URL(fileURLWithPath: path), resultingItemURL: nil)
             try? library.database.setTidalDownload(tidalId: record.tidalId, path: nil)
         }
+    }
+
+    /// While TIDAL is on, hearts on TIDAL songs and edits of TIDAL playlists go to TIDAL too (two-way sync); off, everything is local.
+    private func routeTidal(_ on: Bool) {
+        library.tidalRouter = on ? self : nil
+        library.tidalFavoritesChanged = on ? { [weak self] ids, favorite in self?.tidal.favoritesChanged(ids, favorite: favorite) } : nil
+    }
+
+    /// The library playlists that are TIDAL playlists: linked, or being created there.
+    var tidalPlaylistIDs: Set<Int64> {
+        guard settings.tidalEnabled else { return [] }
+        return ((try? library.database.tidalPlaylistIds()) ?? []).union(tidal.pendingCreates)
+    }
+
+    /// Sidebar › Playlists › New TIDAL Playlist…: a playlist here at once, made on TIDAL by the sync queue.
+    func newTidalPlaylist(name: String) -> Playlist? {
+        guard let playlist = library.createPlaylist(name: name), let id = playlist.id else { return nil }
+        tidal.enqueue([.createPlaylist(localId: id, title: name, description: "")])
+        return playlist
     }
 
     /// Streamed TIDAL songs are analyzed from their complete staged copy (decision 206), while TIDAL is on.
@@ -988,5 +1009,61 @@ final class AppModel {
         let mode = pendingImportMode
         let root = URL(fileURLWithPath: settings.managedFolderPath, isDirectory: true)
         Task { await library.addFolders(urls, mode: mode, managedRoot: root) }
+    }
+}
+
+// MARK: - TIDAL playlists
+
+extension AppModel: TidalPlaylistRouter {
+    func isTidalPlaylist(_ id: Int64) -> Bool { tidalPlaylistIDs.contains(id) }
+
+    private func tidalId(_ track: Track) -> Int? {
+        track.isTidalTrack ? URL(string: track.location).flatMap(TidalPlayback.trackId(from:)) : nil
+    }
+
+    func append(_ trackIDs: [Int64], to playlist: Int64) {
+        let byId = Dictionary(library.tracks(ids: trackIDs).compactMap { t in t.id.map { ($0, t) } }, uniquingKeysWith: { a, _ in a })
+        let tracks = trackIDs.compactMap { byId[$0] }
+        let plan = TidalRouting.additions(tracks.compactMap { t in t.id.map { ($0, tidalId(t)) } })
+        let tidalRows = tracks.filter { tidalId($0) != nil }.compactMap(\.id)
+        if !tidalRows.isEmpty {
+            try? library.database.append(trackIDs: tidalRows, to: playlist)
+            tidal.enqueue([.add(playlist: playlist, trackIds: plan.tidal)])
+        }
+        // Local songs: their TIDAL version by ISRC, added in their place; refused when there is none (decision 300).
+        let local = plan.needsLookup.compactMap { byId[$0] }
+        guard !local.isEmpty else { library.bumpRevision(); return }
+        Task {
+            for track in local {
+                guard let found = await tidal.tidalVersion(isrc: track.isrc), let userId = tidal.userId,
+                      let source = try? library.database.tidalSource(userId: userId).id,
+                      let row = (try? library.database.addTidalTracks([TidalTrackInput(found)], sourceId: source))?[found.id] else {
+                    tidal.notice = TidalISRCLookup.refusal
+                    continue
+                }
+                try? library.database.append(trackIDs: [row], to: playlist)
+                tidal.enqueue([.add(playlist: playlist, trackIds: [found.id])])
+                tidal.notice = TidalISRCLookup.addedMessage(title: track.title)
+            }
+            library.bumpRevision()
+        }
+    }
+
+    func reordered(_ playlist: Int64, from old: [Int], to new: [Int]) {
+        let ops: [TidalOp] = TidalRouting.edits(from: old, to: new).map { edit in
+            switch edit {
+            case .remove(let trackId, let index): .remove(playlist: playlist, trackId: trackId, index: index)
+            case .move(let from, let to): .move(playlist: playlist, from: from, to: to)
+            }
+        }
+        if !ops.isEmpty { tidal.enqueue(ops) }
+    }
+
+    func renamed(_ playlist: Int64, to name: String) {
+        tidal.enqueue([.edit(playlist: playlist, title: name, description: "")])
+    }
+
+    func deleted(uuid: String) {
+        tidal.enqueue([.delete(uuid: uuid)])
     }
 }

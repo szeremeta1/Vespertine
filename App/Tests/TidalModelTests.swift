@@ -24,7 +24,9 @@ final class FakeReachability: TidalReachability {
 }
 
 /// Counts refreshes and answers what the test says.
-final class FakeRefresher: TidalRefreshing, @unchecked Sendable {
+final class FakeRefresher: TidalSyncing, @unchecked Sendable {
+    func playlistTrackIds(_ uuid: String) async throws -> [Int] { [] }
+    func pullPlaylist(_ uuid: String) async throws {}
     let calls = Locked(0)
     let error = Locked<Error?>(nil)
     let warnings = Locked<[String]>([])

@@ -43,12 +43,6 @@ struct RefusingTransport: HTTPTransport {
     func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) { throw URLError(.notConnectedToInternet) }
 }
 
-/// One pull of the account into the library (`TidalLibrarySync`; a fake in tests).
-protocol TidalRefreshing: Sendable {
-    func refresh() async throws -> TidalLibrarySync.Summary
-}
-
-extension TidalLibrarySync: TidalRefreshing {}
 
 @MainActor @Observable
 final class TidalModel {
@@ -73,7 +67,7 @@ final class TidalModel {
         var register: (TidalStreamResolver) -> Void
         var unregister: () -> Void
         /// The library sync for the signed-in user.
-        var makeRefresher: (TidalCatalog, LibraryDatabase, Int) -> TidalRefreshing
+        var makeRefresher: (TidalCatalog, LibraryDatabase, Int) -> TidalSyncing
         /// Sync at launch, then this often while the app runs (decision 208).
         var syncInterval: Duration = .seconds(6 * 3600)
         /// How often the gate's backoff is read while TIDAL is on (no request: it is the gate's own state).
@@ -113,7 +107,17 @@ final class TidalModel {
     private(set) var catalog: TidalCatalog?
     private(set) var resolver: TidalStreamResolver?
     @ObservationIgnored private var auth: TidalAuth?
-    @ObservationIgnored private var refresher: TidalRefreshing?
+    @ObservationIgnored private var refresher: TidalSyncing?
+    /// The writes waiting for TIDAL, sent before every pull (sub-project 3).
+    @ObservationIgnored private var queue: TidalSyncQueue?
+    @ObservationIgnored private var drainSoon: Task<Void, Never>?
+    /// TIDAL tracks whose heart waits to reach TIDAL, and library playlists with changes waiting (the rows' "waiting to sync" clock).
+    private(set) var pendingFavorites: Set<Int> = []
+    private(set) var pendingPlaylists: Set<Int64> = []
+    /// Playlists made with New TIDAL Playlist… whose creation hasn't reached TIDAL yet (they are TIDAL playlists already).
+    private(set) var pendingCreates: Set<Int64> = []
+    /// A short message for the main window ("Added the TIDAL version of …", "Not on TIDAL").
+    var notice: String?
     /// The app's one downloader (made with the first credentials, kept across sign-outs and credential changes).
     private(set) var downloader: TidalDownloader?
 
@@ -155,6 +159,7 @@ final class TidalModel {
         isStarted = true
         ArtworkCache.shared.fetchesTidalCovers = true
         loadSession()
+        loadPending()
         environment.reachability.start { [weak self] up in self?.reachabilityChanged(up) }
         downloader?.isPaused = false
         poll = Task { [weak self, interval = environment.backoffPoll] in
@@ -242,7 +247,10 @@ final class TidalModel {
     /// Signed in (at launch or just now): the user's sync, its timer, and a first refresh.
     private func sessionBegan() {
         guard let catalog, let tokens = environment.tokens.load() else { return }
-        refresher = environment.makeRefresher(catalog, library.database, tokens.userId)
+        let refresher = environment.makeRefresher(catalog, library.database, tokens.userId)
+        self.refresher = refresher
+        if let gate { queue = TidalSyncQueue(writer: TidalWriter(gate: gate, userId: tokens.userId), database: library.database, sync: refresher) }
+        loadPending()
         timer?.cancel()
         timer = Task { [weak self, interval = environment.syncInterval] in
             while !Task.isCancelled {
@@ -328,6 +336,7 @@ final class TidalModel {
         timer?.cancel(); timer = nil
         refreshTask?.cancel(); refreshTask = nil
         refresher = nil
+        queue = nil
         environment.tokens.clear()
         if let auth { Task { await auth.signOut() } }
         settings.tidalAccountName = nil
@@ -365,18 +374,22 @@ final class TidalModel {
 
     /// Pulls the account into the library now (Settings › Refresh Now, the timer, sign-in).
     func refresh() async {
-        guard isStarted, state.isSignedIn, let refresher, !isRefreshing else { return }
+        guard isStarted, state.isSignedIn, let queue, !isRefreshing else { return }
         isRefreshing = true
         defer { isRefreshing = false }
-        do {
-            let summary = try await refresher.refresh()
+        // What waits is sent first; the pull runs only once nothing does (so it never undoes a write not sent yet).
+        let report = await queue.drain()
+        skippedOps = Array((skippedOps + report.skipped).suffix(20))
+        if let summary = report.summary {
             settings.tidalLastSync = Date()
             syncWarnings = summary.warnings
             lastError = nil
-        } catch is CancellationError {
-        } catch {
-            note(error)
+        } else if let failure = report.failure {
+            note(failure)
+        } else if let error = report.error {
+            lastError = error
         }
+        loadPending()
         await readBackoff()
         publish()
     }
@@ -395,13 +408,61 @@ final class TidalModel {
         }
     }
 
+    // MARK: Writes to TIDAL (two-way sync)
+
+    /// Hearts changed on TIDAL songs (`tidalIds`): queued for TIDAL, sent soon (the library's hearts changed already).
+    func favoritesChanged(_ tidalIds: [Int], favorite: Bool) {
+        for id in tidalIds { try? TidalSyncQueue.enqueue(.favorite(kind: .track, id: id, on: favorite), in: library.database) }
+        changed()
+    }
+
+    /// Queues playlist ops and sends them soon.
+    func enqueue(_ ops: [TidalOp]) {
+        for op in ops { try? TidalSyncQueue.enqueue(op, in: library.database) }
+        changed()
+    }
+
+    /// Something was queued: the clocks show it, and the queue is sent a moment later (a burst of clicks goes out together).
+    private func changed() {
+        loadPending()
+        guard isStarted, isOnline else { return }
+        drainSoon?.cancel()
+        drainSoon = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(2))
+            guard !Task.isCancelled else { return }
+            await self?.refresh()
+        }
+    }
+
+    /// The waiting writes, as the rows' clocks show them.
+    private func loadPending() {
+        var favorites = Set<Int>(), playlists = Set<Int64>(), creates = Set<Int64>()
+        for op in TidalSyncQueue.pending(in: library.database) {
+            switch op {
+            case .favorite(.track, let id, _): favorites.insert(id)
+            case .createPlaylist(let local, _, _): creates.insert(local); playlists.insert(local)
+            default: if let local = op.playlist { playlists.insert(local) }
+            }
+        }
+        if favorites != pendingFavorites { pendingFavorites = favorites }
+        if playlists != pendingPlaylists { pendingPlaylists = playlists }
+        if creates != pendingCreates { pendingCreates = creates }
+    }
+
+    /// Finds the TIDAL version of a local song by ISRC (nil: not on TIDAL, or no ISRC to ask by).
+    func tidalVersion(isrc: String?) async -> TidalTrack? {
+        guard let gate, isOnline else { return nil }
+        do { return try await TidalISRCLookup(gate: gate).track(forISRC: isrc) } catch { note(error); return nil }
+    }
+
     // MARK: Online state
 
     private func reachabilityChanged(_ up: Bool) {
         guard up != isReachable else { return }
         isReachable = up
         publish()
-        if up, state.isSignedIn, lastError != nil { startRefresh() }
+        // Back online: what waits is sent (and the pull follows).
+        if up, state.isSignedIn, lastError != nil || !pendingFavorites.isEmpty || !pendingPlaylists.isEmpty { startRefresh() }
     }
 
     /// The gate's backoff (it refuses requests until it ends).
@@ -416,8 +477,11 @@ final class TidalModel {
     }
 
     private func setBackoff(_ value: (until: Date, reason: String)?) {
+        let ended = backoff != nil && value == nil
         backoff = value
         publish()
+        // TIDAL stopped asking to wait: what waits is sent.
+        if ended, state.isSignedIn, !pendingFavorites.isEmpty || !pendingPlaylists.isEmpty { startRefresh() }
     }
 
     /// Hands the state to the playability rule, and to the TIDAL source's online flag (signed in, reachable, not backing off).

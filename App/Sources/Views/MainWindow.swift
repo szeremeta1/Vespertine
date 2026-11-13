@@ -226,9 +226,13 @@ struct ErrorBanner: View {
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
 
     var body: some View {
-        if let message = model.player.lastError ?? model.library.lastError {
+        if let message = model.player.lastError ?? model.library.lastError ?? model.tidal.notice {
             HStack(spacing: 10) {
-                Image(systemName: "exclamationmark.triangle").foregroundStyle(Palette.copper)
+                if model.player.lastError == nil, model.library.lastError == nil {
+                    TidalGlyph().foregroundStyle(Palette.text2)   // a TIDAL note, not an error
+                } else {
+                    Image(systemName: "exclamationmark.triangle").foregroundStyle(Palette.copper)
+                }
                 Text(message).font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(2)
                 Button("Dismiss") { dismiss() }.buttonStyle(QuietButtonStyle(compact: true))
             }
@@ -249,7 +253,7 @@ struct ErrorBanner: View {
     }
 
     private func dismiss() {
-        withAnimation { model.player.clearError(); model.library.clearError() }
+        withAnimation { model.player.clearError(); model.library.clearError(); model.tidal.notice = nil }
     }
 }
 

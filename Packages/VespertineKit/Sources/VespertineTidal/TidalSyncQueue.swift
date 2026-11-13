@@ -58,6 +58,8 @@ public actor TidalSyncQueue {
         public var summary: TidalLibrarySync.Summary?
         /// Why that pull (or the draining) failed.
         public var error: String?
+        /// The same, when it was TIDAL's (a backoff, a lost session), so the app can act on it.
+        public var failure: TidalError?
         public init() {}
     }
 
@@ -72,9 +74,17 @@ public actor TidalSyncQueue {
         self.sync = sync
     }
 
-    public func enqueue(_ op: TidalOp) throws {
+    public func enqueue(_ op: TidalOp) throws { try Self.enqueue(op, in: database) }
+
+    /// Puts `op` in the library's queue (also with no session: it waits for the next sign-in).
+    public static func enqueue(_ op: TidalOp, in database: LibraryDatabase) throws {
         let payload = String(decoding: try JSONEncoder().encode(op), as: UTF8.self)
         try database.enqueueTidalOp(kind: op.kind, payload: payload)
+    }
+
+    /// The ops waiting in `database`, oldest first.
+    public static func pending(in database: LibraryDatabase) -> [TidalOp] {
+        ((try? database.tidalPendingOps()) ?? []).compactMap { try? JSONDecoder().decode(TidalOp.self, from: Data($0.payload.utf8)) }
     }
 
     public var pendingCount: Int { (try? database.tidalPendingOps().count) ?? 0 }
@@ -117,6 +127,7 @@ public actor TidalSyncQueue {
                     try? database.bumpTidalOpAttempts(row.id)
                     report.stopped = true
                     report.error = error.localizedDescription
+                    report.failure = error
                     return report
                 }
             } catch {
@@ -131,6 +142,7 @@ public actor TidalSyncQueue {
             report.summary = try await sync.refresh()
         } catch {
             report.error = error.localizedDescription
+            report.failure = error as? TidalError
         }
         return report
     }
