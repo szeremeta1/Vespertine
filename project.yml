@@ -58,6 +58,8 @@ targets:
         product: VespertineVisualizer
       - package: VespertineRemoteKit
         product: VespertineRemoteProtocol
+      - package: VespertineRemoteKit
+        product: VespertineStreamServer
       - package: Sparkle
       # Mac Sound Output (beta): the audio driver travels inside the app (Contents/Library/Audio) and is copied to
       # /Library/Audio/Plug-Ins/HAL only when the user turns the feature on.

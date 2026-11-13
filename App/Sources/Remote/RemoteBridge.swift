@@ -259,7 +259,7 @@ struct RemoteBridge {
     /// Carries out a command (everything but the session ones and artwork, which the connection handles).
     func perform(_ command: RemoteCommand) -> RemoteReply {
         switch command {
-        case .hello, .pair, .artwork:
+        case .hello, .pair, .artwork, .streamInfo, .streamOpen, .streamRead, .streamClose:
             return Self.unavailable
 
         case .playPause: player.togglePlayPause()
