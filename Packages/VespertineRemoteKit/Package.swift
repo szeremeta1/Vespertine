@@ -26,6 +26,6 @@ let package = Package(
         .target(name: "VespertineStreamServer", dependencies: ["VespertineRemoteProtocol"]),
         .executableTarget(name: "vespertine-remote", dependencies: ["VespertineRemoteProtocol"]),
         .testTarget(name: "VespertineRemoteProtocolTests", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient"]),
-        .testTarget(name: "VespertineStreamServerTests", dependencies: ["VespertineStreamServer", "VespertineRemoteProtocol"]),
+        .testTarget(name: "VespertineStreamServerTests", dependencies: ["VespertineStreamServer", "VespertineRemoteProtocol", "VespertineRemoteClient"]),
     ]
 )
