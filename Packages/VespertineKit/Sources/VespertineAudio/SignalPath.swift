@@ -54,8 +54,15 @@ public struct SignalPath: Sendable, Hashable {
     public struct RendererStage: Sendable, Hashable {
         /// What changed the samples before they were encoded (none: the original file's bytes were sent).
         public enum Processing: String, Sendable, Hashable, CaseIterable {
-            // In the order the badge names them.
-            case roomCorrection, equalizer, volume, replayGain, format
+            // In the order the badge names them. The last four are what a fixed-format output (AirPlay's ALAC 16/44.1) does
+            // to a song that isn't already in its format.
+            case roomCorrection, equalizer, volume, replayGain, format, resampled, dithered, downmix, dsdToPCM
+        }
+
+        /// How the music gets there: a renderer pulls a file from Vespertine's server, or Vespertine pushes the frames
+        /// (AirPlay, always ALAC 16-bit / 44.1 kHz stereo, on this Mac's clock).
+        public enum Transport: String, Sendable, Hashable {
+            case pull, airPlay
         }
 
         public var name: String
@@ -71,9 +78,11 @@ public struct SignalPath: Sendable, Hashable {
         public var gapless: Bool
         /// What the renderer said it can play and this song goes beyond.
         public var warnings: [String]
+        public var transport: Transport = .pull
 
         public init(name: String, protocolName: String, processing: [Processing], sentCodec: String, sentSampleRate: Double,
-                    sentBitDepth: Int?, sentChannels: Int, gapless: Bool, warnings: [String] = []) {
+                    sentBitDepth: Int?, sentChannels: Int, gapless: Bool, warnings: [String] = [], transport: Transport = .pull) {
+            self.transport = transport
             self.name = name
             self.protocolName = protocolName
             self.processing = processing
@@ -87,15 +96,45 @@ public struct SignalPath: Sendable, Hashable {
 
         public var passesThrough: Bool { processing.isEmpty }
 
+        /// The format sent, short: "16/44.1".
+        public var sentFormatShort: String {
+            sentBitDepth.map { "\($0)/\(SampleRate.format(sentSampleRate))" } ?? SampleRate.format(sentSampleRate)
+        }
+
+        /// What changed the samples, as small badges (an AirPlay song's conversion steps).
+        public var stepBadges: [String] {
+            Processing.allCases.filter(processing.contains).map { step in
+                switch step {
+                case .roomCorrection: String(localized: "ROOM CORRECTION", comment: "Small badge (short, uppercase): a step that changed the samples sent.")
+                case .equalizer: String(localized: "EQ", comment: "Small badge (short, uppercase): a step that changed the samples sent.")
+                case .volume: String(localized: "VOLUME", comment: "Small badge (short, uppercase): Vespertine's digital volume changed the samples sent.")
+                case .replayGain: String(localized: "REPLAYGAIN", comment: "Small badge (short, uppercase): a step that changed the samples sent.")
+                case .format: String(localized: "DECODED", comment: "Small badge (short, uppercase): the file was decoded to be sent.")
+                case .resampled: String(localized: "RESAMPLED", comment: "Small badge (short, uppercase): the song was resampled to the rate sent.")
+                case .dithered: String(localized: "DITHERED", comment: "Small badge (short, uppercase): the samples were reduced to 16 bits with TPDF dither.")
+                case .downmix: String(localized: "DOWNMIX", comment: "Small badge (short, uppercase): more channels were mixed down to stereo.")
+                case .dsdToPCM: String(localized: "DSD→PCM", comment: "Small badge (short, uppercase): DSD was converted to PCM.")
+                }
+            }
+        }
+
         /// The badge: what was sent, never a claim about the renderer's DAC.
         public func badge(source: SourceFormat) -> String {
+            if transport == .airPlay {
+                if source.encoding == .lossy {
+                    return String(localized: "LOSSY SOURCE · \(sentFormatShort) SENT", comment: "Status badge (short, uppercase): a lossy file decoded and sent to an AirPlay receiver; %@ is e.g. 16/44.1.")
+                }
+                return processing.isEmpty
+                    ? String(localized: "BIT-PERFECT · \(sentFormatShort) SENT", comment: "Status badge (short, uppercase): the file's own samples were sent to a network player unchanged; %@ is e.g. 16/44.1. It says what was sent, not what the player's DAC received.")
+                    : String(localized: "CONVERTED · \(sentFormatShort) SENT", comment: "Status badge (short, uppercase): the song was converted (resampled, dithered, processed) to the format an AirPlay receiver takes; %@ is e.g. 16/44.1.")
+            }
             if let first = Processing.allCases.first(where: processing.contains) {
                 return switch first {
                 case .roomCorrection: String(localized: "PROCESSED · ROOM CORRECTION", comment: "Status badge (short, uppercase): a network renderer gets Vespertine's room-corrected stream.")
                 case .equalizer: String(localized: "PROCESSED · EQ", comment: "Status badge (short, uppercase): a network renderer gets Vespertine's equalized stream.")
                 case .volume: String(localized: "PROCESSED · VOLUME", comment: "Status badge (short, uppercase): a network renderer gets a stream with Vespertine's digital volume.")
                 case .replayGain: String(localized: "PROCESSED · REPLAYGAIN", comment: "Status badge (short, uppercase): a network renderer gets a stream with ReplayGain applied.")
-                case .format: String(localized: "PROCESSED · FLAC", comment: "Status badge (short, uppercase): the file was decoded and sent to a network renderer as FLAC (it doesn't take the file's own format).")
+                case .format, .resampled, .dithered, .downmix, .dsdToPCM: String(localized: "PROCESSED · FLAC", comment: "Status badge (short, uppercase): the file was decoded and sent to a network renderer as FLAC (it doesn't take the file's own format).")
                 }
             }
             switch source.encoding {

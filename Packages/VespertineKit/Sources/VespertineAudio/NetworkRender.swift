@@ -11,8 +11,24 @@ import CVespertineRT
 import Foundation
 
 public final class NetworkRender: @unchecked Sendable {
-    /// What comes out: PCM at the plan's rate (the source's own for PCM), 24-bit, the source's channels.
+    /// What the stream is planned for.
+    public enum Target: Sendable, Hashable {
+        /// A renderer's processed FLAC: the source's rate (DSD as PCM), 24 bits, the source's channels.
+        case sourceRate24
+        /// AirPlay: 44.1 kHz, 16 bits, at most two channels (resampled, downmixed and DSD→PCM by the engine's own converter).
+        case airPlay
+    }
+
+    /// What comes out: PCM at the plan's rate (the source's own for PCM, 44.1 kHz for AirPlay), at the target's word length,
+    /// the source's channels (at most two for AirPlay).
     public let format: SourceFormat
+    /// The plan the engine's planner made for the target (resampling, DSD→PCM, channels).
+    public let plan: OutputPlan
+    /// The source as probed.
+    public var source: SourceFormat { probed.format }
+    public var decoderName: String { probed.decoderName }
+    /// The chain itself adds TPDF dither at the target's word length (gain, equalizer or room correction change the samples).
+    public let chainDithers: Bool
     private let probed: ProbedSource
     private let decoding: Decoding
     private let ring: OpaquePointer
@@ -28,13 +44,16 @@ public final class NetworkRender: @unchecked Sendable {
     static let rates: [Double] = [44_100, 48_000, 88_200, 96_000, 176_400, 192_000, 352_800, 384_000]
 
     public init(item: PlayableItem, url: URL, equalizer: EQPreset?, roomCorrection: RoomCorrectionPlayback?, digitalVolumeDB: Double?,
-                startSeconds: TimeInterval = 0) throws {
+                startSeconds: TimeInterval = 0, target: Target = .sourceRate24) throws {
         let probed = try SourceOpener.probe(url, area: item.sacdArea, dvd: item.dvd, audioStream: item.audioStream)
         let source = probed.format
-        let channels = max(1, source.channels)
-        let device = DeviceCapabilities(sampleRates: Self.rates,
-                                        physicalFormats: [PhysicalFormat(minRate: 44_100, maxRate: 384_000, bitDepth: 24, isInteger: true, isMixable: true, channels: channels)],
-                                        outputChannels: channels, supportsDoP: false)
+        let bits = target == .airPlay ? 16 : 24
+        let channels = target == .airPlay ? min(2, max(1, source.channels)) : max(1, source.channels)
+        let rates = target == .airPlay ? [44_100.0] : Self.rates
+        let device = DeviceCapabilities(sampleRates: rates,
+                                        physicalFormats: [PhysicalFormat(minRate: rates.min()!, maxRate: rates.max()!, bitDepth: bits, isInteger: true, isMixable: true,
+                                                                         channels: target == .airPlay ? 2 : channels)],
+                                        outputChannels: target == .airPlay ? 2 : channels, supportsDoP: false)
         var plan = FormatPlanner.plan(source: source, device: device, policy: .matchSource)
         plan.integerSamples = false
         guard plan.mode == .pcm, let ring = nrt_ring_create(OutputSession.ringFrames(rate: plan.deviceSampleRate, channels: plan.channels, seconds: 4), UInt32(plan.channels)) else {
@@ -48,15 +67,16 @@ public final class NetworkRender: @unchecked Sendable {
         self.context = context
         self.probed = probed
         self.channels = plan.channels
+        self.plan = plan
         let rate = plan.deviceSampleRate
-        format = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: rate, bitDepth: 24, channels: plan.channels)
+        format = SourceFormat(encoding: .pcm, codec: target == .airPlay ? "ALAC" : "FLAC", sampleRate: rate, bitDepth: bits, channels: plan.channels)
         do {
             let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: item)
             if startSeconds > 0 {
                 let frame = AVAudioFramePosition(startSeconds * plan.decodedSampleRate)
                 if frame < decoder.length { try decoder.seek(to: frame) }
             }
-            let applied = AppliedFormat(sampleRate: rate, physicalBitDepth: 24, physicalIsInteger: true, virtualChannels: plan.channels,
+            let applied = AppliedFormat(sampleRate: rate, physicalBitDepth: bits, physicalIsInteger: true, virtualChannels: plan.channels,
                                         exclusive: false, bufferFrames: 512)
             let path = SignalPath(source: source, decoderName: probed.decoderName, plan: plan, applied: applied, deviceName: "", deviceUID: "",
                                   deviceProfile: .networkRenderer(protocolName: ""), volume: .fixed, replayGainDB: item.replayGainDB)
@@ -67,15 +87,16 @@ public final class NetworkRender: @unchecked Sendable {
             nrt_ring_destroy(ring)
             throw error
         }
-        // PlaybackEngine.applyGain, with the stream's 24 bits as the word length.
+        // PlaybackEngine.applyGain, with the stream's word length (24 bits, 16 for AirPlay).
         let db = digitalVolumeDB ?? 0
-        nrt_context_set_gain(context, db == 0 ? 1.0 : pow(10, db / 20), 24)
+        nrt_context_set_gain(context, db == 0 ? 1.0 : pow(10, db / 20), UInt32(bits))
         let eq = equalizer.flatMap { $0.isFlat ? nil : $0 }
         let sections = eq?.sections(sampleRate: rate) ?? []
         sections.withUnsafeBufferPointer { nrt_context_set_eq(context, $0.baseAddress, UInt32($0.count), eq?.preampGain ?? 1) }
         let room = roomCorrection.flatMap { $0.isFlat || !$0.applies(channels: plan.channels) ? nil : $0 }
         RoomCorrectionPlayback.install(room, on: context, sampleRate: rate, channelCount: plan.channels)
         RoomCorrectionPlayback.installFilters(room?.impulseTaps(sampleRate: rate, channelCount: plan.channels), on: context)
+        chainDithers = db != 0 || !sections.isEmpty || room != nil
     }
 
     deinit {
@@ -85,6 +106,18 @@ public final class NetworkRender: @unchecked Sendable {
 
     /// Up to `maxFrames` interleaved frames, each sample a 24-bit value (−8388608…8388607) in an Int32; empty at the end.
     public func next(maxFrames: Int = 4096) -> [Int32] {
+        let rendered = nextFloats(maxFrames: maxFrames)
+        var out = [Int32](repeating: 0, count: rendered.count)
+        for i in rendered.indices {
+            let v = (Double(rendered[i]) * 8_388_608).rounded()
+            out[i] = Int32(min(max(v, -8_388_608), 8_388_607))
+        }
+        return out
+    }
+
+    /// Up to `maxFrames` interleaved frames as the chain renders them (Float, full scale ±1); empty at the end. The caller
+    /// quantises them to the target's word length.
+    public func nextFloats(maxFrames: Int = 4096) -> [Float] {
         while Int(nrt_ring_readable(ring)) < maxFrames, !decoding.finished {
             guard Int(nrt_ring_writable(ring)) >= Int(Self.chunkFrames) else { break }
             let chunk = decoding.convertChunk()
@@ -98,11 +131,6 @@ public final class NetworkRender: @unchecked Sendable {
         guard n > 0 else { finished = true; return [] }
         if scratch.count < n * channels { scratch = [Float](repeating: 0, count: n * channels) }
         scratch.withUnsafeMutableBufferPointer { nrt_context_render_interleaved(context, $0.baseAddress!, UInt32(n), UInt32(channels)) }
-        var out = [Int32](repeating: 0, count: n * channels)
-        for i in 0..<(n * channels) {
-            let v = (Double(scratch[i]) * 8_388_608).rounded()
-            out[i] = Int32(min(max(v, -8_388_608), 8_388_607))
-        }
-        return out
+        return Array(scratch.prefix(n * channels))
     }
 }
