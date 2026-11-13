@@ -33,6 +33,8 @@ public struct ScanProgress: Sendable {
 public struct ScanSummary: Sendable {
     public var added = 0
     public var updated = 0
+    /// Files that carry the `TIDAL_TRACK_ID` of a TIDAL track the library has: each became that track's download, and none was added.
+    public var linked = 0
     public var missing = 0
     /// Missing files found again under a new name or folder (folded into the new entry): old ID → new ID.
     public var movedTracks: [Int64: Int64] = [:]
@@ -214,6 +216,24 @@ public actor LibraryScanner {
             return map
         }
 
+        // Downloaded TIDAL files in this source's folder, by path: the library already has them as the download of a TIDAL track (not as
+        // tracks of their own), so a file whose size and date are as they were is left alone, and one that is gone unlinks its track.
+        let linked: [String: Known] = try await database.writer.read { db in
+            var map: [String: Known] = [:]
+            // (A library from before v23-tidal, as a test of the migrations holds it half way, has none.)
+            guard try db.tableExists("tidalTrack") else { return map }
+            let prefix = root.path.hasSuffix("/") ? root.path : root.path + "/"
+            for row in try Row.fetchAll(db, sql: """
+                SELECT d.downloadPath, t.id, t.codec, t.fileSize, t.modifiedAt FROM tidalTrack d JOIN track t ON t.id = d.trackId
+                WHERE d.downloadPath IS NOT NULL
+                """) {
+                let path: String = row["downloadPath"]
+                guard path.hasPrefix(prefix) else { continue }
+                map[path] = Known(id: row["id"], codec: row["codec"], size: row["fileSize"], modified: row["modifiedAt"], isMissing: false, hasArt: true)
+            }
+            return map
+        }
+
         // Files that list several tracks of their own, by file: a disc image's (SACD "<image>#2ch-1" … "<image>#mch-6",
         // DVD-Video "<image or VIDEO_TS.IFO>#dvd-…"), a Matroska file's audio streams ("<file>#audio-1"), and the tracks of
         // a CUE sheet inside the file ("<file>#2"), told from an external sheet's by there having been none.
@@ -260,7 +280,7 @@ public actor LibraryScanner {
                 toRead.append(url)
             } else {
                 seen.insert(url.path)
-                if let k = known[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 0.001, !k.isMissing, !coverAppeared(k, url),
+                if let k = known[url.path] ?? linked[url.path], k.size == size, abs(k.modified.timeIntervalSince(modified)) < 0.001, !k.isMissing, !coverAppeared(k, url),
                    !Self.isFallbackLabel(k.codec) { continue }
                 toRead.append(url)
             }
@@ -365,6 +385,7 @@ public actor LibraryScanner {
             !seen.contains(k.key) && !k.value.isMissing && !unlisted.contains { k.key.hasPrefix($0) }
         }.map(\.value.id)
         summary.missing = missing.count
+        let vanished = linked.filter { entry in !seen.contains(entry.key) && !unlisted.contains { entry.key.hasPrefix($0) } }
         summary.failed.append(contentsOf: listing.unreadable.sorted())
         let failedPaths = Set(summary.failed)
         let moved = try await database.writer.write { db -> [Int64: Int64] in
@@ -373,6 +394,8 @@ public actor LibraryScanner {
                                arguments: [sourceID, path, cue.signature])
             }
             for id in missing { try db.execute(sql: "UPDATE track SET isMissing = 1 WHERE id = ?", arguments: [id]) }
+            // A downloaded TIDAL file that is gone: the track is still there to stream, without a download.
+            for (path, file) in vanished where !failedPaths.contains(path) { try LibraryDatabase.clearTidalDownload(db, trackId: file.id) }
             // Moved or renamed files: the new copy takes over the old entry's playlists, plays and analysis.
             let moved = try LibraryDatabase.reconcileMovedTracks(db, sourceID: sourceID)
             try db.execute(sql: "UPDATE source SET lastScannedAt = ? WHERE id = ?", arguments: [Date(), sourceID])
@@ -391,9 +414,10 @@ public actor LibraryScanner {
         let pending = batch
         batch.removeAll()
         lastFlush = Date()
-        let (a, u) = try await upsert(pending, sourceID: sourceID, database: database)
+        let (a, u, l) = try await upsert(pending, sourceID: sourceID, database: database)
         summary.added += a
         summary.updated += u
+        summary.linked += l
     }
 
     /// One file read: its tracks (nil when it can't be read), or `answered: false` when the source didn't answer in time.
@@ -665,11 +689,13 @@ public actor LibraryScanner {
     }
 
     /// Inserts new tracks; updates changed ones while keeping library state (play counts, ratings, date added).
-    static func upsert(_ tracks: [Track], sourceID: Int64, database: LibraryDatabase, preserveAnalysis: Bool = false) async throws -> (added: Int, updated: Int) {
-        guard !tracks.isEmpty else { return (0, 0) }
+    static func upsert(_ tracks: [Track], sourceID: Int64, database: LibraryDatabase, preserveAnalysis: Bool = false) async throws -> (added: Int, updated: Int, linked: Int) {
+        guard !tracks.isEmpty else { return (0, 0, 0) }
         return try await database.writer.write { db in
-            var added = 0, updated = 0
+            var added = 0, updated = 0, linked = 0
             for var track in tracks {
+                // A downloaded TIDAL file is the download of the TIDAL track it names, not a song of its own.
+                if try LibraryDatabase.linkTidalDownload(db, scanned: track) { linked += 1; continue }
                 track.sourceId = sourceID
                 if let existing = try Track.filter(Column("location") == track.location).fetchOne(db) {
                     track.id = existing.id
@@ -705,7 +731,7 @@ public actor LibraryScanner {
                     added += 1
                 }
             }
-            return (added, updated)
+            return (added, updated, linked)
         }
     }
 

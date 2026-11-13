@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
+import AVFAudio
 import Foundation
 import GRDB
 import Testing
@@ -189,5 +190,174 @@ struct TidalLibraryTests {
         #expect(summary.added == 0 && summary.missing == 0 && !summary.interrupted)
         #expect(try db.sources().first?.isOnline == true)
         #expect(try db.allTracks().first?.isMissing == false)
+    }
+}
+
+// MARK: - The scanner links downloaded files
+
+/// A FLAC (made by Core Audio) whose Vorbis comments are `comments`, written into the file's metadata blocks.
+private func makeTaggedFLAC(_ url: URL, comments: [String: String], seconds: Double = 0.5) throws {
+    let settings: [String: Any] = [AVFormatIDKey: kAudioFormatFLAC, AVSampleRateKey: 44_100.0, AVNumberOfChannelsKey: 2, AVEncoderBitDepthHintKey: 16]
+    do {
+        let file = try AVAudioFile(forWriting: url, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
+        let frames = AVAudioFrameCount(44_100 * seconds)
+        let buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: frames)!
+        buffer.frameLength = frames
+        for c in 0..<2 { for i in 0..<Int(frames) { buffer.floatChannelData![c][i] = Float(sin(Double(i) * 0.03)) * 0.3 } }
+        try file.write(from: buffer)
+    }
+    let data = try Data(contentsOf: url)
+    precondition(data.prefix(4) == Data("fLaC".utf8))
+    var blocks: [(type: UInt8, body: Data)] = []
+    var offset = 4
+    while true {
+        let header = data[offset]
+        let length = Int(data[offset + 1]) << 16 | Int(data[offset + 2]) << 8 | Int(data[offset + 3])
+        if header & 0x7F != 4 { blocks.append((header & 0x7F, data.subdata(in: offset + 4..<offset + 4 + length))) }
+        offset += 4 + length
+        if header & 0x80 != 0 { break }
+    }
+    func le32(_ n: Int) -> Data { Data([UInt8(n & 0xFF), UInt8(n >> 8 & 0xFF), UInt8(n >> 16 & 0xFF), UInt8(n >> 24 & 0xFF)]) }
+    var vorbis = le32(4) + Data("test".utf8) + le32(comments.count)
+    for (key, value) in comments.sorted(by: { $0.key < $1.key }) {
+        let entry = Data("\(key)=\(value)".utf8)
+        vorbis += le32(entry.count) + entry
+    }
+    blocks.append((4, vorbis))
+    var out = Data("fLaC".utf8)
+    for (i, block) in blocks.enumerated() {
+        let n = block.body.count
+        out.append(block.type | (i == blocks.count - 1 ? 0x80 : 0))
+        out.append(contentsOf: [UInt8(n >> 16 & 0xFF), UInt8(n >> 8 & 0xFF), UInt8(n & 0xFF)])
+        out += block.body
+    }
+    out += data.subdata(in: offset..<data.count)
+    try out.write(to: url)
+}
+
+@Suite("Downloaded TIDAL files in a scanned folder")
+struct TidalDownloadScanTests {
+    private struct Rig {
+        var dir: URL
+        var db: LibraryDatabase
+        var scanner: LibraryScanner
+        var source: LibrarySource
+        var tidal: Int64
+    }
+
+    /// A library with TIDAL tracks 777 and 778, and a folder (the library's only folder source) to scan.
+    private func rig() async throws -> Rig {
+        let dir = try tempDir()
+        let db = try LibraryDatabase.inMemory()
+        let tidal = try #require(try db.tidalSource(userId: 1).id)
+        try db.upsertTidalTracks([input(777, title: "Streamed One", album: "Album", artist: "Artist"),
+                                  input(778, title: "Streamed Two", album: "Album", artist: "Artist")], sourceId: tidal)
+        let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
+        await scanner.setSkipsNonMusic(false)
+        let source = try db.addSource(LibrarySource(path: dir.path, mode: .reference))
+        return Rig(dir: dir, db: db, scanner: scanner, source: source, tidal: tidal)
+    }
+
+    private func download(_ rig: Rig, tidalId: Int) throws -> TidalTrackRecord {
+        let id = try #require(try rig.db.writer.read { try Int64.fetchOne($0, sql: "SELECT trackId FROM tidalTrack WHERE tidalId = ?", arguments: [tidalId]) })
+        return try #require(try rig.db.tidalRecord(trackId: id))
+    }
+
+    @Test("A tagged file for a TIDAL track in the library adds no track and becomes its download")
+    func linksInsteadOfAdding() async throws {
+        let rig = try await rig()
+        defer { try? FileManager.default.removeItem(at: rig.dir) }
+        let file = rig.dir.appendingPathComponent("Artist/Album/1-01 Streamed One.flac")
+        try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+        try makeTaggedFLAC(file, comments: ["TITLE": "Streamed One", "ARTIST": "Artist", "ALBUM": "Album", "TIDAL_TRACK_ID": "777"])
+        let summary = try await rig.scanner.scan(rig.source)
+        #expect(summary.added == 0 && summary.linked == 1 && summary.failed.isEmpty)
+        #expect(try rig.db.allTracks().count == 2, "the two TIDAL tracks, and no third for the file")
+        let record = try download(rig, tidalId: 777)
+        let path = try #require(record.downloadPath)
+        #expect(URL(fileURLWithPath: path).resolvingSymlinksInPath() == file.resolvingSymlinksInPath())
+        let track = try #require(try rig.db.tracks(ids: [record.trackId]).first)
+        #expect(track.filePath == path && track.location == "tidal://track/777" && track.fileSize > 0)
+        #expect(record.formatIsProbed && track.codec == "FLAC" && track.sampleRate == 44_100)
+        #expect(try download(rig, tidalId: 778).downloadPath == nil)
+    }
+
+    @Test("Scanning again changes nothing")
+    func rescanIsIdempotent() async throws {
+        let rig = try await rig()
+        defer { try? FileManager.default.removeItem(at: rig.dir) }
+        try makeTaggedFLAC(rig.dir.appendingPathComponent("a.flac"), comments: ["TITLE": "A", "TIDAL_TRACK_ID": "777"])
+        try await rig.scanner.scan(rig.source)
+        let before = try rig.db.allTracks()
+        let path = try download(rig, tidalId: 777).downloadPath
+        for _ in 0..<2 {
+            let summary = try await rig.scanner.scan(rig.source)
+            #expect(summary.added == 0 && summary.updated == 0 && summary.linked == 0 && summary.missing == 0, "the file is found as it was")
+        }
+        #expect(try rig.db.allTracks() == before)
+        #expect(try download(rig, tidalId: 777).downloadPath == path)
+        // Even when the file is read again (its date moved) it links to the same track instead of adding one.
+        try FileManager.default.setAttributes([.modificationDate: Date().addingTimeInterval(100)], ofItemAtPath: rig.dir.appendingPathComponent("a.flac").path)
+        let touched = try await rig.scanner.scan(rig.source)
+        #expect(touched.added == 0 && touched.linked == 1)
+        #expect(try rig.db.allTracks().count == 2)
+    }
+
+    @Test("A file the downloader linked is not read as a new track either")
+    func downloaderLinkFirst() async throws {
+        let rig = try await rig()
+        defer { try? FileManager.default.removeItem(at: rig.dir) }
+        let file = rig.dir.appendingPathComponent("b.flac")
+        try makeTaggedFLAC(file, comments: ["TITLE": "B", "TIDAL_TRACK_ID": "778"])
+        try rig.db.setTidalDownload(tidalId: 778, path: file.path)
+        let summary = try await rig.scanner.scan(rig.source)
+        #expect(summary.added == 0 && summary.missing == 0)
+        #expect(try rig.db.allTracks().count == 2)
+        #expect(try download(rig, tidalId: 778).downloadPath != nil)
+    }
+
+    @Test("When the file is deleted, a rescan clears the download and keeps the track")
+    func deletedFileUnlinks() async throws {
+        let rig = try await rig()
+        defer { try? FileManager.default.removeItem(at: rig.dir) }
+        let file = rig.dir.appendingPathComponent("a.flac")
+        try makeTaggedFLAC(file, comments: ["TITLE": "A", "TIDAL_TRACK_ID": "777"])
+        try await rig.scanner.scan(rig.source)
+        let record = try download(rig, tidalId: 777)
+        #expect(record.downloadPath != nil)
+        try FileManager.default.removeItem(at: file)
+        let summary = try await rig.scanner.scan(rig.source)
+        #expect(summary.added == 0 && summary.missing == 0)
+        #expect(try download(rig, tidalId: 777).downloadPath == nil)
+        let track = try #require(try rig.db.tracks(ids: [record.trackId]).first)
+        #expect(track.filePath == "" && !track.isMissing && track.location == "tidal://track/777")
+        #expect(try rig.db.allTracks().count == 2)
+        // And the file coming back links again.
+        try makeTaggedFLAC(file, comments: ["TITLE": "A", "TIDAL_TRACK_ID": "777"])
+        try await rig.scanner.scan(rig.source)
+        #expect(try download(rig, tidalId: 777).downloadPath != nil)
+    }
+
+    @Test("A tag that names no TIDAL track in the library gives an ordinary track")
+    func unmatchedTagIsInserted() async throws {
+        let rig = try await rig()
+        defer { try? FileManager.default.removeItem(at: rig.dir) }
+        try makeTaggedFLAC(rig.dir.appendingPathComponent("c.flac"), comments: ["TITLE": "Stranger", "ARTIST": "Someone", "TIDAL_TRACK_ID": "9999"])
+        try makeTaggedFLAC(rig.dir.appendingPathComponent("d.flac"), comments: ["TITLE": "Untagged", "ARTIST": "Someone"])
+        let summary = try await rig.scanner.scan(rig.source)
+        #expect(summary.added == 2 && summary.linked == 0)
+        let local = try rig.db.allTracks().filter { $0.sourceId == rig.source.id }
+        #expect(Set(local.map(\.title)) == ["Stranger", "Untagged"])
+        #expect(local.first { $0.title == "Stranger" }?.extraTags["TIDAL_TRACK_ID"] == "9999")
+    }
+
+    @Test("A download outside the scanned folder is not touched by its scan")
+    func outsideFolderUntouched() async throws {
+        let rig = try await rig()
+        defer { try? FileManager.default.removeItem(at: rig.dir) }
+        try rig.db.setTidalDownload(tidalId: 777, path: "/Elsewhere/TIDAL/gone.flac")
+        let summary = try await rig.scanner.scan(rig.source)
+        #expect(summary.missing == 0)
+        #expect(try download(rig, tidalId: 777).downloadPath == "/Elsewhere/TIDAL/gone.flac")
     }
 }
