@@ -114,6 +114,43 @@ struct TidalStreamResolverTests {
         await #expect(throws: TidalError.http(status: 500, body: "boom")) { try await resolver.resolve(trackId: 1) }
     }
 
+    private static func isMalformed(_ error: any Error) -> Bool {
+        if case TidalError.malformedStream = error { return true }
+        return false
+    }
+
+    private func dashResponse(initialization: String = "https://h/0.mp4", media: String) -> FakeResponse {
+        let mpd = """
+        <?xml version='1.0' encoding='UTF-8'?><MPD><Period><AdaptationSet><Representation id="7" codecs="flac" audioSamplingRate="44100">
+        <SegmentTemplate initialization="\(initialization)" media="\(media)" startNumber="9"><SegmentTimeline><S d="1" r="2"/></SegmentTimeline></SegmentTemplate>
+        </Representation></AdaptationSet></Period></MPD>
+        """
+        return manifestResponse(mime: "application/dash+xml", manifest: mpd)
+    }
+
+    @Test("$Number%05d$ is zero-padded; $Number$ and $$ work")
+    func numberTemplates() async throws {
+        let (padded, _) = resolver(dashResponse(media: "https://h/s$Number%05d$.mp4"))
+        guard case let .dash(_, segments) = try await padded.resolve(trackId: 1).kind else { Issue.record("expected dash"); return }
+        #expect(segments.map(\.lastPathComponent) == ["s00009.mp4", "s00010.mp4", "s00011.mp4"])
+        let (plain, _) = resolver(dashResponse(media: "https://h/a$$b/$Number$.mp4"))
+        guard case let .dash(_, plainSegments) = try await plain.resolve(trackId: 1).kind else { Issue.record("expected dash"); return }
+        #expect(plainSegments.first?.absoluteString == "https://h/a$b/9.mp4")
+    }
+
+    @Test("a template with any other identifier or format is malformed, never formatted")
+    func unsupportedTemplates() async throws {
+        for media in ["https://h/$Number%s$.mp4", "https://h/$Number%n$.mp4", "https://h/$Number%5d$.mp4", "https://h/$Number%0d$.mp4",
+                      "https://h/$Time$.mp4", "https://h/$RepresentationID$-$Number$.mp4", "https://h/$Number.mp4", "https://h/$Number%099d$.mp4"] {
+            let (resolver, _) = resolver(dashResponse(media: media))
+            await #expect(performing: { try await resolver.resolve(trackId: 1) }, throws: Self.isMalformed)
+        }
+        let (initial, _) = resolver(dashResponse(initialization: "https://h/init-$RepresentationID$.mp4", media: "https://h/$Number$.mp4"))
+        await #expect(performing: { try await initial.resolve(trackId: 1) }, throws: Self.isMalformed)
+        let (numbered, _) = resolver(dashResponse(initialization: "https://h/init-$Number$.mp4", media: "https://h/$Number$.mp4"))
+        await #expect(performing: { try await numbered.resolve(trackId: 1) }, throws: Self.isMalformed)
+    }
+
     @Test("a manifest that isn't BTS or DASH, or isn't base64, is malformed")
     func malformed() async throws {
         let (a, _) = resolver(manifestResponse(mime: "application/x-unknown", manifest: "x"))

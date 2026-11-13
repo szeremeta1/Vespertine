@@ -72,11 +72,11 @@ public struct TidalStreamResolver: Sendable {
     private static func fromDASH(_ manifest: Data, _ info: PlaybackInfo) throws -> TidalStream {
         let mpd = try MPDParser.parse(String(decoding: manifest, as: UTF8.self))
         if mpd.hasContentProtection { throw TidalError.encrypted }
-        guard let initialization = httpsURL(mpd.initialization) else { throw TidalError.malformedStream("the initialization URL is not valid") }
+        guard let initialization = httpsURL(try expand(mpd.initialization, number: nil)) else { throw TidalError.malformedStream("the initialization URL is not valid") }
         var segments: [URL] = []
         segments.reserveCapacity(mpd.segmentCount)
         for number in mpd.startNumber..<(mpd.startNumber + mpd.segmentCount) {
-            guard let url = httpsURL(substituteNumber(in: mpd.media, with: number)) else {
+            guard let url = httpsURL(try expand(mpd.media, number: number)) else {
                 throw TidalError.malformedStream("the media URL is not valid")
             }
             segments.append(url)
@@ -86,16 +86,34 @@ public struct TidalStreamResolver: Sendable {
                            audioQuality: info.audioQuality, audioMode: info.audioMode, fileExtension: fileExtension(for: mpd.codecs))
     }
 
-    /// `$Number$`, or `$Number%05d$` with a printf width.
-    private static func substituteNumber(in template: String, with number: Int) -> String {
-        var result = template
-        while let open = result.range(of: "$Number") {
-            guard let close = result.range(of: "$", range: open.upperBound..<result.endIndex) else { break }
-            let format = String(result[open.upperBound..<close.lowerBound])
-            let text = format.isEmpty ? String(number) : String(format: format, number)
-            result.replaceSubrange(open.lowerBound..<close.upperBound, with: text)
+    /// Expands a DASH URL template. Only `$Number$`, `$Number%0Nd$` (zero-padded to N digits, N 1...20) and the `$$` escape are
+    /// understood, and `$Number…$` only when `number` is given. Anything else (`$Time$`, `$RepresentationID$`, other formats) is
+    /// refused: the template is server text, so it is parsed here and never used as a format string.
+    static func expand(_ template: String, number: Int?) throws -> String {
+        var result = ""
+        var rest = Substring(template)
+        while let dollar = rest.firstIndex(of: "$") {
+            result += rest[rest.startIndex..<dollar]
+            let afterOpen = rest.index(after: dollar)
+            guard let close = rest[afterOpen...].firstIndex(of: "$") else {
+                throw TidalError.malformedStream("an unterminated $ in the URL template \(template)")
+            }
+            let identifier = rest[afterOpen..<close]
+            if identifier.isEmpty {
+                result += "$"
+            } else if identifier == "Number", let number {
+                result += String(number)
+            } else if identifier.hasPrefix("Number%0"), identifier.hasSuffix("d"), let number,
+                      let width = Int(identifier.dropFirst("Number%0".count).dropLast()),
+                      identifier.dropFirst("Number%0".count).dropLast().allSatisfy { $0.isASCII && $0.isNumber }, (1...20).contains(width) {
+                let digits = String(number)
+                result += String(repeating: "0", count: max(0, width - digits.count)) + digits
+            } else {
+                throw TidalError.malformedStream("unsupported identifier $\(identifier)$ in the URL template")
+            }
+            rest = rest[rest.index(after: close)...]
         }
-        return result
+        return result + rest
     }
 
     private static func httpsURL(_ string: String) -> URL? {
