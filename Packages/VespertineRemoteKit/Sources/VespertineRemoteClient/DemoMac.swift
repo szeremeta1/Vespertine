@@ -114,10 +114,13 @@ public final class DemoMac: RemoteChannel {
 
     private func perform(_ command: RemoteCommand) -> RemoteReply {
         switch command {
-        case .hello(_, _, let version):
-            return version == RemoteProtocol.version ? .welcome(info) : .failed(reason: "")
+        case .hello(_, _, let version, let highest):
+            return RemoteProtocol.negotiate(baseline: version, highest: highest) != nil ? .welcome(info) : .failed(reason: "")
         case .pair:
             return .failed(reason: "")
+        case .streamInfo, .streamOpen, .streamRead, .streamClose:
+            // The demo library has no audio files; its sound comes with the phone player's bundled clips.
+            return .failed(reason: "The demo library has nothing to stream.")
 
         case .playPause: setPlayback(playback == .playing ? .paused : .playing)
         case .play: setPlayback(.playing)

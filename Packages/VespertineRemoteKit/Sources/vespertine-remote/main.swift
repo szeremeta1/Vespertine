@@ -142,7 +142,7 @@ func signIn(printingPushes: Bool = false) -> Link {
     let link = Link(endpoint: mac.endpoint, key: .init(identity: saved.device, key: saved.key))
     link.printPushes = printingPushes
     link.open()
-    let welcome = link.call(.hello(device: saved.device, name: "vespertine-remote on \(ProcessInfo.processInfo.hostName)", protocolVersion: RemoteProtocol.version))
+    let welcome = link.call(.hello(device: saved.device, name: "vespertine-remote on \(ProcessInfo.processInfo.hostName)", protocolVersion: RemoteProtocol.minimumVersion, highestProtocolVersion: RemoteProtocol.version))
     guard case .welcome = welcome else { printJSON(welcome); fail("The Mac didn't let this remote in.") }
     return link
 }
@@ -159,7 +159,7 @@ case "pair":
     let key = RemoteTransport.PresharedKey(identity: RemoteProtocol.pairingCodeIdentity, key: PairingKey.derive(secret: code, serverID: mac.serverID))
     let link = Link(endpoint: mac.endpoint, key: key)
     link.open()
-    let reply = link.call(.pair(name: "vespertine-remote on \(ProcessInfo.processInfo.hostName)", protocolVersion: RemoteProtocol.version))
+    let reply = link.call(.pair(name: "vespertine-remote on \(ProcessInfo.processInfo.hostName)", protocolVersion: RemoteProtocol.minimumVersion, highestProtocolVersion: RemoteProtocol.version))
     guard case .paired(let device, let deviceKey, let server) = reply else { printJSON(reply); fail("Pairing didn't work.") }
     let saved = SavedPairing(serverID: server.serverID, name: server.name, device: device, key: deviceKey)
     try JSONEncoder().encode(saved).write(to: configURL, options: [.atomic])
