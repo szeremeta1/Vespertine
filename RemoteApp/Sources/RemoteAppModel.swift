@@ -112,6 +112,17 @@ final class RemoteAppModel {
         return discovery.macs.filter { !isPaired($0) }
     }
 
+    /// The "Demo: a made-up library" bar. Hidden in App Store captures (-VTScreenshot YES), which still use the demo library.
+    nonisolated static func showsDemoNotice(isDemo: Bool, screenshotRun: Bool) -> Bool { isDemo && !screenshotRun }
+
+    var showsDemoNotice: Bool {
+        #if DEBUG
+        return Self.showsDemoNotice(isDemo: true, screenshotRun: LaunchOptions.screenshot)
+        #else
+        return true
+        #endif
+    }
+
     // MARK: Reaching a Mac
 
     func pairing(serverID: String) -> SavedPairing? {

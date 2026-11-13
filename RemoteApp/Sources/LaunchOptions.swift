@@ -6,6 +6,7 @@
 //   -VTTilt "x,y"                a fixed tilt for Cover Flow (-1…1 each), since the Simulator has no gyroscope
 //   -VTSamplePairing YES         a made-up paired Mac with a Tailscale address (never saved)
 //   -VTPlay YES                  start the demo playing
+//   -VTScreenshot YES            an App Store capture: the demo notice bar is hidden (the demo library itself stays)
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
@@ -18,6 +19,7 @@ enum LaunchOptions {
     static var demo: Bool { defaults.bool(forKey: "VTDemo") }
     static var screen: String? { defaults.string(forKey: "VTScreen") }
     static var samplePairing: Bool { defaults.bool(forKey: "VTSamplePairing") }
+    static var screenshot: Bool { defaults.bool(forKey: "VTScreenshot") }
     static var play: Bool { defaults.bool(forKey: "VTPlay") }
     static var vinyl: Bool? { defaults.object(forKey: "VTVinyl") == nil ? nil : defaults.bool(forKey: "VTVinyl") }
 

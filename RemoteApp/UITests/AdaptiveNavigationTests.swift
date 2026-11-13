@@ -60,6 +60,18 @@ final class AdaptiveNavigationTests: XCTestCase {
         XCTAssertEqual(pairSection.count, 0)
     }
 
+    /// The demo notice bar shows in a normal demo, and is gone from App Store captures (-VTScreenshot YES), which keep the demo library.
+    func testDemoNoticeIsHiddenOnlyForScreenshots() {
+        launch()
+        XCTAssertTrue(app.staticTexts["Demo: a made-up library. Nothing plays."].waitForExistence(timeout: 10))
+        app.terminate()
+        app.launchArguments = ["-VTDemo", "YES", "-VTPlay", "YES", "-VTVinyl", "NO", "-VTScreenshot", "YES"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
+        XCTAssertFalse(app.staticTexts["Demo: a made-up library. Nothing plays."].exists)
+        XCTAssertFalse(app.buttons["Leave Demo"].exists)
+    }
+
     func testNarrowWindowUsesTabsNotSidebar() throws {
         try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .pad, "iPad window-width harness")
         // Exercises real views constrained to 440 pt; this is not an OS Split View test, and the system still reports a

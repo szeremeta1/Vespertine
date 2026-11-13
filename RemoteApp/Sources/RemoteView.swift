@@ -225,6 +225,8 @@ struct ConnectionBanner: View {
     var body: some View {
         Group {
             switch session.phase {
+            case .connected where session.isDemo && !model.showsDemoNotice:
+                EmptyView()
             case .connected where session.isDemo:
                 HStack(spacing: 10) {
                     Text("Demo: a made-up library. Nothing plays.").font(.footnote)

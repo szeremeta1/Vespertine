@@ -99,3 +99,11 @@ import VespertineRemoteProtocol
         #expect(formatTime(.infinity) == "0:00")
     }
 }
+
+@Suite struct DemoNotice {
+    @Test func theDemoBarIsHiddenOnlyInScreenshotRuns() {
+        #expect(RemoteAppModel.showsDemoNotice(isDemo: true, screenshotRun: false))
+        #expect(!RemoteAppModel.showsDemoNotice(isDemo: true, screenshotRun: true))
+        #expect(!RemoteAppModel.showsDemoNotice(isDemo: false, screenshotRun: false))
+    }
+}
