@@ -7,6 +7,7 @@ import Network
 import Observation
 import SwiftUI
 import UIKit
+import VespertinePhonePlayer
 import VespertineRemoteClient
 import VespertineRemoteProtocol
 
@@ -15,6 +16,17 @@ final class RemoteAppModel {
     let discovery = RemoteDiscovery()
     private(set) var pairings: [SavedPairing]
     private(set) var session: RemoteSession?
+    /// "Play on this phone" (M3, behind `PhonePlayerFlag`: off unless turned on, so the app stays a remote): made for the
+    /// current session when the flag is on and the Mac speaks protocol 2. Nothing in the screens uses it yet.
+    @ObservationIgnored private var phone: (session: ObjectIdentifier, playback: PhonePlayback)?
+    @MainActor var phonePlayback: PhonePlayback? {
+        guard PhonePlayerFlag.isEnabled(), let session, session.canStream else { return nil }
+        if let phone, phone.session == ObjectIdentifier(session) { return phone.playback }
+        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first ?? FileManager.default.temporaryDirectory
+        let playback = PhonePlayback(session: session, player: PhonePlayer(), cacheDirectory: caches.appendingPathComponent("Streams", isDirectory: true))
+        phone = (ObjectIdentifier(session), playback)
+        return playback
+    }
     /// A pairing link opened from the Camera app or scanned, waiting for its Mac to show up on Bonjour.
     var pendingLink: PairingLink?
     /// What went wrong with the last pairing attempt, for the pairing screen.

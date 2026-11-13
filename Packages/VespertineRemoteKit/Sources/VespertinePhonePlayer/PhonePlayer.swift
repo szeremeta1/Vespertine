@@ -83,6 +83,9 @@ public final class PhonePlayer {
     public func play() throws {
         guard file != nil else { return }
         heldFrame = nil
+        #if os(iOS)
+        do { try PhoneAudioSession.activate() } catch { throw Failure.engine(error.localizedDescription) }
+        #endif
         if !engine.isRunning {
             engine.prepare()
             do { try engine.start() } catch { throw Failure.engine(error.localizedDescription) }

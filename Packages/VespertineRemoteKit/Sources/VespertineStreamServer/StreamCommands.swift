@@ -20,15 +20,19 @@ extension StreamPreparer {
         }
     }
 
+    /// What a phone is told while Stream to Phones is off (the server answers with it without making a preparer).
+    public static let refusalWhenOff = "Streaming to phones is off on this Mac. Turn on Stream to Phones in Vespertine › Settings › Remote."
+    public static let refusalForOlderPhones = "This Mac’s connection with the phone is the older kind, which can’t stream. Update Vespertine on the phone."
+
     /// nil when `command` isn't a stream command. `protocolVersion` is what the connection negotiated; `allowed` is the Mac's
     /// "Stream to phones" switch (and this phone's own permission).
     public func handle(_ command: RemoteCommand, id: Int, client: String, protocolVersion: Int, allowed: Bool) async -> StreamAnswer? {
         guard Self.isStreamCommand(command) else { return nil }
         guard protocolVersion >= RemoteProtocol.streamVersion else {
-            return .reply(.failed(reason: "This Mac’s connection with the phone is the older kind, which can’t stream. Update Vespertine on the phone."))
+            return .reply(.failed(reason: Self.refusalForOlderPhones))
         }
         guard allowed else {
-            return .reply(.failed(reason: "Streaming to phones is off on this Mac. Turn on Stream to Phones in Vespertine › Settings › Remote."))
+            return .reply(.failed(reason: Self.refusalWhenOff))
         }
         switch command {
         case .streamInfo(let ids, let maxSampleRate):

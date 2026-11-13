@@ -27,6 +27,8 @@ targets:
         product: VespertineRemoteProtocol
       - package: VespertineRemoteKit
         product: VespertineRemoteClient
+      - package: VespertineRemoteKit
+        product: VespertinePhonePlayer
     info:
       path: Info.plist
       properties:

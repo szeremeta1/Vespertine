@@ -95,6 +95,8 @@ final class RemoteServer {
 
     /// The stream channel's Mac side, made the first time a phone asks to stream.
     @ObservationIgnored private var streams: StreamPreparer?
+    /// The preparer if one was made (closing a connection must not make one).
+    var activeStreamPreparer: StreamPreparer? { streams }
     var streamPreparer: StreamPreparer? {
         if streams == nil, let model { streams = RemoteStreaming.makePreparer(model: model) }
         return streams
@@ -487,7 +489,7 @@ final class RemoteClient {
         closed = true
         helloTimeout?.cancel()
         connection.cancel()
-        if device != nil, let preparer = server?.streamPreparer { let id = streamClient; Task { await preparer.closeAll(client: id) } }
+        if device != nil, let preparer = server?.activeStreamPreparer { let id = streamClient; Task { await preparer.closeAll(client: id) } }
         // A connection that never got through TLS used a wrong key: while pairing, that's a wrong code.
         server?.ended(self, handshakeFailed: !becameReady)
     }
@@ -565,7 +567,10 @@ final class RemoteClient {
 
     /// Stream commands are answered off the main actor (reads touch the disk); the answer is a JSON reply or a binary frame.
     private func handleStream(_ message: ClientMessage) {
-        guard let server, let preparer = server.streamPreparer else {
+        guard let server else { return }
+        // Off (the default): answer in words, without making the preparer or its cache folder. A phone on protocol 1 never gets here.
+        guard server.store.streamEnabled else { return reply(message.id, .failed(reason: StreamPreparer.refusalWhenOff)) }
+        guard let preparer = server.streamPreparer else {
             return reply(message.id, .failed(reason: "This Mac can’t stream right now."))
         }
         let isRead: Bool
@@ -574,7 +579,7 @@ final class RemoteClient {
             guard readsInFlight < Self.maximumReadsInFlight else { return reply(message.id, .failed(reason: "Too many reads at once; wait for one to finish.")) }
             readsInFlight += 1
         }
-        let allowed = server.store.streamEnabled
+        let allowed = true
         let version = protocolVersion
         let client = streamClient
         Task { [weak self] in
