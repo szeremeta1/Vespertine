@@ -61,10 +61,13 @@ struct PhoneTranscoder: StreamTranscoding {
         await gate.enter()
         defer { Task { await gate.leave() } }
         do {
-            let result = try await Task.detached(priority: .utility) {
-                try FLACStreamTranscoder.transcode(playable, sampleRate: request.sampleRate, bitDepth: request.bitDepth, to: destination,
-                                                   progress: progress, isCancelled: { Task.isCancelled })
-            }.value
+            // `progress` is only used while this call runs, so it may be lent to the detached task.
+            let result = try await withoutActuallyEscaping(progress) { relay in
+                try await Task.detached(priority: .utility) {
+                    try FLACStreamTranscoder.transcode(playable, sampleRate: request.sampleRate, bitDepth: request.bitDepth, to: destination,
+                                                       progress: relay, isCancelled: { Task.isCancelled })
+                }.value
+            }
             return TranscodeResult(format: StreamFormat(codec: "FLAC", container: "flac", sampleRate: result.sampleRate, bitDepth: result.bitDepth,
                                                         channels: result.channels, channelLabels: result.labels, lossless: true),
                                    frames: result.frames)
