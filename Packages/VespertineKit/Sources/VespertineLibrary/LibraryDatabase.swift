@@ -384,6 +384,27 @@ public final class LibraryDatabase: Sendable {
                   AND (lower(filePath) LIKE '%.mka' OR (json_valid(extraTags) AND json_extract(extraTags, '$.CUESHEET') IS NOT NULL))
                 """)
         }
+        m.registerMigration("v23-tidal") { db in
+            // What the library keeps of a TIDAL track beyond its `track` row (location "tidal://track/<id>", filePath the download or
+            // empty): its TIDAL identity, the quality TIDAL lists, whether it can be streamed, and the downloaded copy.
+            try db.create(table: "tidalTrack") { t in
+                t.primaryKey("trackId", .integer).references("track", onDelete: .cascade)
+                t.column("tidalId", .integer).notNull().unique()
+                t.column("albumId", .integer)
+                t.column("artistIds", .jsonText).notNull().defaults(to: "[]")
+                t.column("listedQuality", .text)
+                t.column("mediaTags", .jsonText).notNull().defaults(to: "[]")
+                t.column("explicit", .boolean).notNull().defaults(to: false)
+                t.column("copyright", .text)
+                t.column("popularity", .integer)
+                t.column("streamable", .boolean).notNull().defaults(to: true)
+                t.column("unavailableReason", .text)
+                t.column("downloadPath", .text)
+                t.column("formatIsProbed", .boolean).notNull().defaults(to: false)
+                t.column("lastSyncedAt", .datetime)
+            }
+            try db.create(index: "tidalTrack_downloadPath", on: "tidalTrack", columns: ["downloadPath"])
+        }
         return m
     }
 }
@@ -915,7 +936,7 @@ public extension LibraryDatabase {
             let canonical = source.url.resolvingSymlinksInPath().path
             let sources = try LibrarySource.fetchAll(db)
             var inside: [LibrarySource] = []
-            for existing in sources {
+            for existing in sources where !existing.isTidal {
                 let path = existing.url.resolvingSymlinksInPath().path
                 if canonical == path || canonical.hasPrefix(path == "/" ? "/" : path + "/") { return existing }
                 if path.hasPrefix(canonical == "/" ? "/" : canonical + "/") {

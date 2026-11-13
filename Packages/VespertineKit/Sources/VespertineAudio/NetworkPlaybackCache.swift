@@ -6,7 +6,7 @@ import Foundation
 import os
 import SFBAudioEngine
 
-protocol PlaybackCacheReader: AnyObject, Sendable {
+public protocol PlaybackCacheReader: AnyObject, Sendable {
     var size: Int64 { get }
     func read(at offset: Int64, count: Int) throws -> Data
     /// The file was rewritten on the server since it was opened (its size or modification date moved): what was copied
@@ -15,7 +15,15 @@ protocol PlaybackCacheReader: AnyObject, Sendable {
 }
 
 extension PlaybackCacheReader {
-    var changedSinceOpen: Bool { false }
+    public var changedSinceOpen: Bool { false }
+}
+
+/// A source that is not a file on a mounted share (a streaming service's track, say): opened by a URL of its own scheme (see
+/// `NetworkPlaybackCache.registerRemoteReader`) and copied into the cache like a share's file.
+public protocol RemoteCacheReader: PlaybackCacheReader {
+    /// The extension of the cache file the bytes are copied to (`flac`): decoders and `NetworkStart` choose by it, since the
+    /// URL (`tidal://track/1`) has none.
+    var fileExtension: String { get }
 }
 
 private final class ShareFileReader: PlaybackCacheReader, @unchecked Sendable {
@@ -125,9 +133,22 @@ struct ShareReadFailure: LocalizedError, CustomNSError {
 /// The playback cache is transient: leases keep current/next files alive; dropping a lease cancels its copy
 /// and deletes it once an outstanding share read returns. Reservations include in-flight and cancelled reads.
 /// A sparse file is NEVER handed unguarded to a decoder until every byte is present.
-final class NetworkPlaybackCache: @unchecked Sendable {
+public final class NetworkPlaybackCache: @unchecked Sendable {
     static let shared = NetworkPlaybackCache(directory: FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
         .appendingPathComponent((Bundle.main.bundleIdentifier ?? "org.szeremeta.Vespertine") + "/Playback", isDirectory: true))
+    /// Opens the files of URLs with a scheme of their own (see `RemoteCacheReader`). Consulted before the test factory and the share.
+    private static let remoteOpeners = Locked([String: @Sendable (URL) throws -> any RemoteCacheReader]())
+
+    /// Songs at `scheme://…` are staged through `open` instead of read from a share. Registering a scheme again replaces its opener.
+    public static func registerRemoteReader(scheme: String, _ open: @escaping @Sendable (URL) throws -> any RemoteCacheReader) {
+        remoteOpeners.withLock { $0[scheme.lowercased()] = open }
+    }
+
+    private static func remoteOpener(for url: URL) -> (@Sendable (URL) throws -> any RemoteCacheReader)? {
+        guard let scheme = url.scheme?.lowercased() else { return nil }
+        return remoteOpeners.withLock { $0[scheme] }
+    }
+
     enum Failure: LocalizedError {
         case budgetExceeded, unexpectedEOF, cancelled
         /// Nothing arrived from the share for `noProgressLimit`, even with the file opened again.
@@ -279,10 +300,15 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             if foreground { existing.promote() }
             return existing
         }
-        var source: (any PlaybackCacheReader)? = try reader ?? readerFactory?(url) ?? openShare(key: key, url: url, foreground: foreground, cancelled: cancelled)
+        let remote = Self.remoteOpener(for: url)
+        var source: (any PlaybackCacheReader)?
+        if let reader { source = reader }
+        else if let remote { source = try openReader(key: key, url: url, foreground: foreground, cancelled: cancelled) { try remote($0) } }
+        else if let made = readerFactory?(url) { source = made }
+        else { source = try openReader(key: key, url: url, foreground: foreground, cancelled: cancelled) { try ShareFileReader($0) } }
         // A handle can die under the copy (the share was mounted again after the link dropped): the file is opened again by
         // its path, the way it was opened first. A reader handed in by the caller has no path to open again.
-        let reopen: Reopen? = reader != nil ? nil : Self.reopener(url: url, factory: readerFactory)
+        let reopen: Reopen? = reader != nil ? nil : Self.reopener(url: url, remote: remote, factory: readerFactory)
         // Opened here and not used after all (another caller made the entry first, or it does not fit): closed on the closing queue.
         defer { Self.letGo(&source) }
         return try lock.withLock {
@@ -297,7 +323,8 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             let unwritten = entries.values.compactMap(\.value).reduce(Int64(0)) { $0 + max(0, $1.size - $1.copiedBytes) }
             if let free = freeSpace?() ?? Self.freeBytes(at: directory),
                size + unwritten > max(0, free - (64 << 20)) { throw CocoaError(.fileWriteOutOfSpace) }
-            let path = directory.appendingPathComponent(UUID().uuidString).appendingPathExtension(url.pathExtension)
+            let fileExtension = (opened as? any RemoteCacheReader)?.fileExtension ?? url.pathExtension
+            let path = directory.appendingPathComponent(UUID().uuidString).appendingPathExtension(fileExtension)
             let storage = try Storage(url: path, reader: opened, chunk: chunk, lanes: lanes, session: session, gate: gate, foreground: foreground,
                                       reopen: reopen, noProgressLimit: noProgressLimit, clock: clock) { [weak self] in
                 guard let self else { return }
@@ -318,8 +345,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     }
 
     typealias Reopen = @Sendable () throws -> any PlaybackCacheReader
-    private static func reopener(url: URL, factory: (@Sendable (URL) -> (any PlaybackCacheReader)?)?) -> Reopen {
+    private static func reopener(url: URL, remote: (@Sendable (URL) throws -> any RemoteCacheReader)?,
+                                 factory: (@Sendable (URL) -> (any PlaybackCacheReader)?)?) -> Reopen {
         { () throws -> any PlaybackCacheReader in
+            if let remote { return try remote(url) }
             if let fresh = factory?(url) { return fresh }
             let opened: any PlaybackCacheReader = try ShareFileReader(url)
             return opened
@@ -329,10 +358,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     /// One open of a share file, shared by everyone who wants it (the press-time warm-up and the engine thread).
     private final class Opening: @unchecked Sendable {
         private let done = NSCondition()
-        private var result: Result<ShareFileReader, Error>?
-        func finish(_ value: Result<ShareFileReader, Error>) { done.withLock { result = value; done.broadcast() } }
+        private var result: Result<any PlaybackCacheReader, Error>?
+        func finish(_ value: Result<any PlaybackCacheReader, Error>) { done.withLock { result = value; done.broadcast() } }
         /// `silent`: the share has taken longer over this open than a song waits for it (`noProgressLimit`).
-        func wait(cancelled: () -> Bool, silent: () -> Bool) throws -> ShareFileReader {
+        func wait(cancelled: () -> Bool, silent: () -> Bool) throws -> any PlaybackCacheReader {
             try done.withLock {
                 while true {
                     if let result { return try result.get() }
@@ -349,7 +378,9 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     /// When (on `clock`) each caller that is waiting for the listener's song to open began to wait.
     private let openWaits = Locked([UUID: TimeInterval]())
 
-    private func openShare(key: String, url: URL, foreground: Bool, cancelled: () -> Bool) throws -> ShareFileReader {
+    /// `makeReader` opens the file (a share's, or a remote reader's): the same wait applies to both.
+    private func openReader(key: String, url: URL, foreground: Bool, cancelled: () -> Bool,
+                            _ makeReader: @escaping @Sendable (URL) throws -> any PlaybackCacheReader) throws -> any PlaybackCacheReader {
         let (job, starts) = openings.withLock { table -> (Opening, Bool) in
             if let running = table[key] { return (running, false) }
             let job = Opening(); table[key] = job
@@ -357,7 +388,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         }
         if starts {
             Self.openQueue.async { [openings] in
-                let result = Result { try ShareFileReader(url) }
+                let result = Result { try makeReader(url) }
                 openings.withLock { if $0[key] === job { $0[key] = nil } }
                 job.finish(result)
             }

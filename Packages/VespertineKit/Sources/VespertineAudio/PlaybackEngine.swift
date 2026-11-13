@@ -251,7 +251,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         // Keep current, and let the prefetched next lease survive until it is taken by entry().
         staged = [key: entry]
         // A FLAC, WAV, DSF or DSDIFF on a share starts on a prefix (see `NetworkStart`); the rest keeps copying ahead of the playhead.
-        let early = NetworkStart.startsEarly(fileExtension: resolved.pathExtension, size: entry.size,
+        let early = NetworkStart.startsEarly(fileExtension: entry.url.pathExtension, size: entry.size,
                                              isRegion: item.regionStartFrame != nil || item.regionFrameLength != nil)
         // An SACD image's area is not at the front of the file: a large one still starts on a lead from where it plays.
         let progressiveDSD = !early && item.sacdArea != nil && item.dvd == nil && entry.size > 512 << 20
