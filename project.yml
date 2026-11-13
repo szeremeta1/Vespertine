@@ -58,6 +58,8 @@ targets:
         product: VespertineVisualizer
       - package: VespertineKit
         product: VespertineUPnP
+      - package: VespertineKit
+        product: VespertineTidal
       - package: VespertineRemoteKit
         product: VespertineRemoteProtocol
       - package: VespertineRemoteKit

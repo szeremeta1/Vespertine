@@ -59,8 +59,8 @@ public final class TidalDownloader {
     public private(set) var items: [Item] = []
     public var folder: URL
 
-    @ObservationIgnored private let resolver: TidalStreamResolver
-    @ObservationIgnored private let catalog: any TidalCatalogReading
+    @ObservationIgnored private var resolver: TidalStreamResolver
+    @ObservationIgnored private var catalog: any TidalCatalogReading
     @ObservationIgnored private let database: LibraryDatabase?
     @ObservationIgnored private let sleep: @Sendable (TimeInterval) async throws -> Void
     @ObservationIgnored private let random: @Sendable (ClosedRange<Double>) -> Double
@@ -102,6 +102,21 @@ public final class TidalDownloader {
             return data
         }
         startup = Task.detached(priority: .utility) { Self.removeStalePartials(in: folder) }
+    }
+
+    /// While set nothing downloads (TIDAL switched off): the track being written stops, leaves no file and goes back to the queue,
+    /// and the queue waits. Cleared, the queue goes on where it was.
+    public var isPaused = false {
+        didSet {
+            guard isPaused != oldValue else { return }
+            if isPaused { running?.stop.stop() } else { startWorker() }
+        }
+    }
+
+    /// The session's resolver and catalog after a change of account, credentials or quality (the app keeps one downloader).
+    public func use(resolver: TidalStreamResolver, catalog: any TidalCatalogReading) {
+        self.resolver = resolver
+        self.catalog = catalog
     }
 
     // MARK: Queue
@@ -172,7 +187,8 @@ public final class TidalDownloader {
     /// What the worker may take now: a queued track, or a collection a backoff paused that nobody is reading. A collection still
     /// being read (by `enqueue`) is not: the worker would have nothing to wait on.
     private func isRunnable(_ item: Item) -> Bool {
-        switch (item.kind, item.state) {
+        if isPaused { return false }
+        return switch (item.kind, item.state) {
         case (.track, .queued): true
         case (.album, .paused), (.playlist, .paused): !expanding.contains(item.id)
         default: false
@@ -257,7 +273,7 @@ public final class TidalDownloader {
     private func download(_ item: Item) async {
         guard let track = item.track else { return }
         let id = item.id, trackId = track.id
-        while items.contains(where: { $0.id == id }) {
+        while !isPaused, items.contains(where: { $0.id == id }) {
             setState(id, .downloading(0))
             let stop = Stop()
             running = (id, stop)
@@ -292,6 +308,7 @@ public final class TidalDownloader {
                 setState(id, .done(url))
                 return
             } catch let error as TidalError {
+                if stop.stopped { setState(id, .queued); return }   // paused (a cancelled item is gone already)
                 switch error {
                 case .backingOff(let remaining, _), .abuse(let remaining):
                     setState(id, .paused(error.localizedDescription))
@@ -302,11 +319,13 @@ public final class TidalDownloader {
                     return
                 }
             } catch {
-                if stop.stopped { return }   // cancelled: the item is gone already
+                if stop.stopped { setState(id, .queued); return }   // paused, or cancelled (the item is gone already)
                 setState(id, .failed(error.localizedDescription))
                 return
             }
         }
+        // Paused while it waited out a backoff: it waits in the queue again.
+        if isPaused { setState(id, .queued) }
     }
 
     /// Deletes the `.partial` files under `folder` that an earlier run left: those not written to for `age` (an hour), except

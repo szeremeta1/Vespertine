@@ -111,6 +111,38 @@ struct TidalDownloaderTests {
         #expect(try rig.database.tidalTrackIds().isEmpty)
     }
 
+    @Test("Paused (TIDAL switched off), nothing downloads and the queue stays; resumed, it downloads")
+    func pauseAndResume() async throws {
+        let rig = try DownloadRig(ids: [1])
+        let downloader = rig.downloader()
+        downloader.isPaused = true
+        downloader.enqueue(tracks: [tidalTrack(1)])
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(downloader.items.map(\.state) == [.queued])
+        #expect(rig.server.requests.isEmpty)
+        downloader.isPaused = false
+        #expect(await finished(downloader))
+        #expect(downloader.items.first?.state == .done(rig.path(1)))
+    }
+
+    @Test("Pausing stops the track being written and puts it back in the queue, with no file left")
+    func pauseStopsRunning() async throws {
+        let rig = try DownloadRig(ids: [7])
+        rig.server.throttle(200_000)
+        let downloader = rig.downloader()
+        downloader.enqueue(tracks: [tidalTrack(7)])
+        let end = Date().addingTimeInterval(10)
+        while Date() < end, !rig.server.requests.contains(where: { $0.path.hasPrefix("/audio/") }) { try await Task.sleep(for: .milliseconds(10)) }
+        downloader.isPaused = true
+        let settled = Date().addingTimeInterval(10)
+        while Date() < settled, downloader.items.first?.state != .queued { try await Task.sleep(for: .milliseconds(10)) }
+        #expect(downloader.items.first?.state == .queued)
+        #expect(!FileManager.default.fileExists(atPath: rig.path(7).path))
+        downloader.isPaused = false
+        #expect(await finished(downloader))
+        #expect(downloader.items.first?.state == .done(rig.path(7)))
+    }
+
     @Test("While a track downloads it is a .partial file; once done there is none, and the tags read back include TIDAL_TRACK_ID")
     func partialAndTags() async throws {
         let rig = try DownloadRig(ids: [7])

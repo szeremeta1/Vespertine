@@ -63,3 +63,34 @@ public enum TidalConfig {
         }
     }
 }
+
+/// Why a pasted or imported `tidal-client.json` can't be used.
+public enum TidalCredentialsError: Error, Equatable, LocalizedError {
+    case notJSON
+    /// The keys that are absent or empty, in the file's order of fields.
+    case missing([String])
+
+    public var errorDescription: String? {
+        switch self {
+        case .notJSON:
+            String(localized: "This isn't a TIDAL client file (a JSON object with clientId, clientSecret, pkceClientId and pkceClientSecret).",
+                   comment: "Settings › TIDAL: the imported or pasted client credentials aren't JSON.")
+        case .missing(let keys):
+            String(localized: "The client file has no value for \(keys.joined(separator: ", ")).",
+                   comment: "Settings › TIDAL: the imported or pasted client credentials lack these keys (key names, not translated).")
+        }
+    }
+}
+
+extension TidalClientCredentials {
+    static let keys = ["clientId", "clientSecret", "pkceClientId", "pkceClientSecret"]
+
+    /// The credentials of a `tidal-client.json` (imported or pasted): every value present and not blank, trimmed.
+    public static func parse(_ data: Data) throws -> TidalClientCredentials {
+        guard let object = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { throw TidalCredentialsError.notJSON }
+        let values = keys.map { ((object[$0] as? String) ?? "").trimmingCharacters(in: .whitespacesAndNewlines) }
+        let missing = zip(keys, values).filter { $0.1.isEmpty }.map(\.0)
+        guard missing.isEmpty else { throw TidalCredentialsError.missing(missing) }
+        return TidalClientCredentials(clientId: values[0], clientSecret: values[1], pkceClientId: values[2], pkceClientSecret: values[3])
+    }
+}

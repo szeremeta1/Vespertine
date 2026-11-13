@@ -13,6 +13,8 @@ public struct TidalStream: Sendable, Equatable {
     }
 
     public var kind: Kind
+    /// Whether the stream comes as DASH segments (remuxed to FLAC here) rather than one file.
+    public var isDASH: Bool { if case .dash = kind { true } else { false } }
     /// As the manifest names it: `flac`, `mp4a.40.2`, `eac3`, …
     public var codec: String
     public var sampleRate: Int?

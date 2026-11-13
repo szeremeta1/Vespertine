@@ -8,6 +8,7 @@ import CoreAudio
 import VespertineAudio
 import VespertineLibrary
 import VespertineUPnP
+import VespertineTidal
 import Observation
 import SwiftUI
 
@@ -199,6 +200,8 @@ final class AppModel {
     let dopSetup: DoPSetupModel
     /// The phone remote's server (off until Settings › Remote turns it on).
     let remote: RemoteServer
+    /// The TIDAL account (idle unless Settings › Online › TIDAL integration is on).
+    let tidal: TidalModel
 
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = []; searchText = "" } } }
     var path: [DetailRoute] = [] { didSet { carryFilter(from: oldValue) } }
@@ -294,6 +297,8 @@ final class AppModel {
         dopSetup = DoPSetupModel(settings: settings, player: player)
         remote = RemoteServer(store: RemoteStore(dataDirectory: settings.dataDirectory))
         analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
+        tidal = TidalModel(library: library, settings: settings, availability: tidalAvailability,
+                           environment: Self.tidalEnvironment(settings: settings, arguments: arguments))
         let streaming: @MainActor () -> Bool = { [weak player = self.player, weak shares = self.shares] in
             // Playing from a share, or just asked to (still loading): the network belongs to playback.
             guard let player, let shares, let track = player.current?.track, shares.isNetwork(track) else { return false }
@@ -344,6 +349,7 @@ final class AppModel {
         analysis.start()
         remote.model = self
         remote.apply()
+        tidal.start()   // nothing while TIDAL is switched off
         // Hand the DAC back when Vespertine quits: stop, release exclusive access, then restore or
         // standardize its format as chosen in Settings. Core Audio decides how long that takes (a device that won't
         // switch rate can hold it for many seconds), so it runs off the main thread and quitting waits for it only
@@ -574,7 +580,25 @@ final class AppModel {
             if item != sidebar { sidebar = item }
             if route != path { path = route }
         }
+        if on { tidal.start() } else { tidal.stop() }
         tidalSwitchChanged?(on)
+    }
+
+    /// The TIDAL model's outside world. A QA run on a test library (`-VespertineDataDirectory`) keeps its credentials file in that
+    /// folder and its session in memory, so it never touches the real account; `-VespertineTidalDemoSession YES` also makes it
+    /// signed in, with every request failing at once (screenshots of the signed-in views without a network).
+    private static func tidalEnvironment(settings: AppSettings, arguments: LaunchArguments) -> TidalModel.Environment {
+        var environment = TidalModel.Environment.live
+        guard arguments.string(forKey: "VespertineDataDirectory") != nil else { return environment }
+        environment.credentialsURL = settings.dataDirectory.appendingPathComponent("tidal-client.json")
+        if arguments.bool(forKey: "VespertineTidalDemoSession") {
+            environment.tokens = MemoryTokenStore(TidalTokens(accessToken: "qa", refreshToken: "qa", expiresAt: .distantFuture,
+                                                              userId: 1, countryCode: "US"))
+            environment.transport = RefusingTransport()
+        } else {
+            environment.tokens = MemoryTokenStore()
+        }
+        return environment
     }
 
     /// Where the window goes when TIDAL is switched off: a source or playlist that is gone sends the sidebar to Albums, and a page

@@ -29,10 +29,26 @@ public enum TidalPlayback {
     public static func register(resolver: TidalStreamResolver, session: URLSession = TidalCDN.session) {
         NetworkPlaybackCache.registerRemoteReader(scheme: scheme, notAnsweringMessage: TidalError.notAnsweringMessage) { url in
             guard let id = trackId(from: url) else { throw TidalError.malformedStream("\(url.absoluteString) is not a TIDAL track") }
-            let renew: @Sendable () throws -> TidalStream = { try resolveBlocking(resolver, trackId: id, priority: .playback) }
+            let renew: @Sendable () throws -> TidalStream = {
+                let stream = try resolveBlocking(resolver, trackId: id, priority: .playback)
+                resolved.withLock { $0[id] = stream }
+                return stream
+            }
             return try reader(for: try renew(), renew: renew, session: session)
         }
     }
+
+    /// Forgets the reader (TIDAL switched off): `tidal://` songs no longer open.
+    public static func unregister() {
+        NetworkPlaybackCache.unregisterRemoteReader(scheme: scheme)
+        resolved.withLock { $0.removeAll() }
+    }
+
+    /// The stream track `trackId` last resolved to for playback (its kind, codec and listed format), for the signal path; nil
+    /// before it has been played in this run.
+    public static func lastStream(trackId: Int) -> TidalStream? { resolved.withLock { $0[trackId] } }
+
+    private static let resolved = Locked([Int: TidalStream]())
 
     /// The reader for a resolved stream: FLAC over DASH is remuxed; one file (FLAC, AAC, or Dolby Atmos as E-AC-3) is read as it
     /// is. Atmos is staged as `.m4a`, so the probe hands it to the system renderer as it does a local Atmos file.

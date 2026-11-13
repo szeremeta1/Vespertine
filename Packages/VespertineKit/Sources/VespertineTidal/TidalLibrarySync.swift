@@ -32,6 +32,10 @@ public actor TidalLibrarySync {
         /// Lists TIDAL sent much shorter than the library holds (see `TidalLibrarySync.looksTruncated`): nothing was deleted
         /// for them this time. One line per list, for the log or the UI.
         public var warnings: [String] = []
+
+        public init(added: Int, updated: Int, removed: Int, playlists: Int, warnings: [String] = []) {
+            self.added = added; self.updated = updated; self.removed = removed; self.playlists = playlists; self.warnings = warnings
+        }
     }
 
     /// A list that comes back empty while the library holds items of it, or shorter by more than half and by more than 20

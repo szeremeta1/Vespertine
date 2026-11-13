@@ -74,6 +74,22 @@ struct TidalPlaybackTests {
         #expect(transport.requests[0].url?.path.hasSuffix("tracks/7/playbackinfopostpaywall") == true)
     }
 
+    @Test("The stream a track resolved to is remembered for the signal path (DASH or one file); unregistering forgets the reader")
+    func remembersStreamAndUnregisters() throws {
+        let server = try FakeHTTPServer(); defer { server.stop() }
+        server.serve("/audio/8.flac", try DASHFixture.source())
+        let transport = FakeTransport { _ in btsPlaybackInfo(url: server.url("/audio/8.flac")) }
+        TidalPlayback.register(resolver: TidalStreamResolver(gate: makeSignedInGate(transport: transport)))
+        let (cache, directory) = try cache(); defer { try? FileManager.default.removeItem(at: directory) }
+        let entry = try cache.entry(key: TidalPlayback.cacheKey(trackId: 8), url: TidalPlayback.url(trackId: 8))
+        try entry.prepare(full: true, lead: 0, cancelled: { false })
+        #expect(TidalPlayback.lastStream(trackId: 8)?.isDASH == false)
+        #expect(TidalPlayback.lastStream(trackId: 9) == nil)
+        TidalPlayback.unregister()
+        #expect(!NetworkPlaybackCache.hasRemoteReader(scheme: "tidal"))
+        #expect(throws: (any Error).self) { _ = try cache.entry(key: "tidal:10", url: TidalPlayback.url(trackId: 10)) }
+    }
+
     @Test("A DASH track: the cache entry holds the remuxed FLAC")
     func dashEntry() throws {
         let server = try FakeHTTPServer(); defer { server.stop() }

@@ -96,6 +96,19 @@ struct RemoteReaderRegistryTests {
         #expect(throws: (any Error).self) { _ = try cache.entry(key: "x:1", url: URL(string: "unregistered://track/1")!) }
     }
 
+    @Test("An unregistered scheme opens nothing any more (TIDAL switched off)")
+    func unregister() throws {
+        let bytes = try Data(contentsOf: Self.fixture)
+        NetworkPlaybackCache.registerRemoteReader(scheme: "gone") { _ in FakeTidalReader(bytes) }
+        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
+        let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20)
+        #expect(NetworkPlaybackCache.hasRemoteReader(scheme: "gone"))
+        _ = try cache.entry(key: "gone:1", url: URL(string: "gone://track/1")!)
+        NetworkPlaybackCache.unregisterRemoteReader(scheme: "GONE")
+        #expect(!NetworkPlaybackCache.hasRemoteReader(scheme: "gone"))
+        #expect(throws: (any Error).self) { _ = try cache.entry(key: "gone:2", url: URL(string: "gone://track/2")!) }
+    }
+
     @Test("A copy whose reader died opens the track again through the same opener")
     func reopensThroughRegistry() throws {
         let bytes = try Data(contentsOf: Self.fixture)

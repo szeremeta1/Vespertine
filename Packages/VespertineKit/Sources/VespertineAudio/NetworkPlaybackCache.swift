@@ -161,6 +161,17 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         remoteMessages.withLock { $0[scheme.lowercased()] = notAnsweringMessage }
     }
 
+    /// Forgets `scheme`: its songs no longer open (TIDAL switched off). Copies already open keep their reader.
+    public static func unregisterRemoteReader(scheme: String) {
+        remoteOpeners.withLock { $0[scheme.lowercased()] = nil }
+        remoteMessages.withLock { $0[scheme.lowercased()] = nil }
+    }
+
+    /// Whether songs at `scheme://…` have an opener.
+    public static func hasRemoteReader(scheme: String) -> Bool {
+        remoteOpeners.withLock { $0[scheme.lowercased()] != nil }
+    }
+
     private static func remoteMessage(for url: URL) -> String? {
         guard let scheme = url.scheme?.lowercased() else { return nil }
         return remoteMessages.withLock { $0[scheme] }
