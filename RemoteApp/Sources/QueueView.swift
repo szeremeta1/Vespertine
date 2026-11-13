@@ -46,7 +46,7 @@ struct QueueView: View {
                 }
             }
             .obsidianList()
-            .navigationTitle("Queue")
+            .navigationTitle("Queue").screenTitleStyle()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { EditButton() }
                 ToolbarItem(placement: .topBarTrailing) {

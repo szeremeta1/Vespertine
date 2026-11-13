@@ -58,6 +58,10 @@ extension View {
             .background(Palette.base)
     }
 
+    /// Large titles on iPhone; a centred inline title in a regular-width window, where the title would otherwise sit
+    /// at the pane's edge while the readable content is centred.
+    func screenTitleStyle() -> some View { modifier(ScreenTitleStyle()) }
+
     /// The app's background behind a screen's content.
     func obsidianBackground() -> some View {
         background(Palette.base.ignoresSafeArea())
@@ -129,4 +133,11 @@ func formatTime(_ seconds: Double) -> String {
     let total = Int(seconds.rounded(.down))
     let h = total / 3600, m = (total % 3600) / 60, s = total % 60
     return h > 0 ? String(format: "%d:%02d:%02d", h, m, s) : String(format: "%d:%02d", m, s)
+}
+
+private struct ScreenTitleStyle: ViewModifier {
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    func body(content: Content) -> some View {
+        content.navigationBarTitleDisplayMode(sizeClass == .regular ? .inline : .automatic)
+    }
 }

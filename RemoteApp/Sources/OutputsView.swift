@@ -60,7 +60,7 @@ struct OutputsView: View {
                 }
             }
             .obsidianList()
-            .navigationTitle("Output")
+            .navigationTitle("Output").screenTitleStyle()
             .feedback(feedback)
             .sheet(isPresented: $editingConnection) { MacConnectionView(serverID: session.pairing.serverID) }
             .sheet(isPresented: $showingSettings) { SettingsView() }

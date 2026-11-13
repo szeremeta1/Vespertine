@@ -260,7 +260,7 @@ struct ArtistsList: View {
         }
         .obsidianList()
         .searchable(text: $filter)
-        .navigationTitle("Artists")
+        .navigationTitle("Artists").screenTitleStyle()
         .task(id: session.isConnected) { if case .artists(let items) = await session.send(.artists) { artists = items } }
     }
 }
@@ -279,7 +279,7 @@ struct PlaylistsList: View {
             }
         }
         .obsidianList()
-        .navigationTitle("Playlists")
+        .navigationTitle("Playlists").screenTitleStyle()
         .task(id: session.isConnected) { if case .playlists(let items) = await session.send(.playlists) { playlists = items } }
     }
 }
@@ -298,7 +298,7 @@ struct TrackListView: View {
             TrackRows(session: session, tracks: tracks, play: play ?? { index in .playTracks(ids: tracks.compactMap(\.id), startAt: index, shuffled: nil) })
         }
         .obsidianList()
-        .navigationTitle(title)
+        .navigationTitle(title).screenTitleStyle()
         .task(id: session.isConnected) { if case .tracks(let items) = await session.send(load) { tracks = items } }
     }
 }
