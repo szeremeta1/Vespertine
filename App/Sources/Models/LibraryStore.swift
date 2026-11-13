@@ -41,7 +41,14 @@ final class LibraryStore {
     private(set) var favoriteCount = 0
     /// Albums with at least one favorite song (present), for the Favorites filter on album pages.
     private(set) var favoriteAlbumKeys: Set<String> = []
+    /// The folders, drives and shares the library indexes. Never the TIDAL account: it is no folder or share, and the code that
+    /// scans, watches, mounts or lists sources must not meet it (`tidalSource`).
     private(set) var sources: [LibrarySource] = []
+    /// The TIDAL account's source, while TIDAL is switched on and the library has one.
+    private(set) var tidalSource: LibrarySource?
+    /// Whether the TIDAL account's songs are in every list, count and album (Settings › Online › TIDAL integration; off by default,
+    /// and then the library reads exactly as one that never had a TIDAL account).
+    private(set) var includesTidal = false
 
     // MARK: Copies
 
@@ -197,9 +204,12 @@ final class LibraryStore {
     /// How long the scan at launch waits (the window and the shares come first); tests shorten it.
     @ObservationIgnored var launchScanDelay: Duration = .seconds(3)
 
-    init(dataDirectory: URL, automaticScanning: @escaping () -> Bool = { false }) throws {
+    init(dataDirectory: URL, automaticScanning: @escaping () -> Bool = { false }, includeTidal: Bool = false) throws {
         self.automaticScanning = automaticScanning
         database = try LibraryDatabase(url: dataDirectory.appendingPathComponent("Library.sqlite"))
+        // Before anything reads: the TIDAL rows are hidden unless the switch is on.
+        database.includeTidal = includeTidal
+        includesTidal = includeTidal
         artwork = ArtworkStore(directory: dataDirectory.appendingPathComponent("Artwork", isDirectory: true))
         scanner = LibraryScanner(database: database, artwork: artwork)
         tagWriter = TagWriter(database: database, scanner: scanner,
@@ -245,41 +255,42 @@ final class LibraryStore {
     /// row, and the observations' first values change nothing. Three small queries; a failure leaves them to the
     /// observations.
     private func loadSidebarState() {
+        let database = database
         guard let state = try? database.writer.read({ db in
-            (try Self.fetchSources(db), try Self.fetchPlaylists(db), try Self.fetchStats(db))
+            (try database.sources(db), try database.playlists(db), try database.stats(db))
         }) else { return }
-        sources = state.0
+        setSources(state.0)
         playlists = state.1
         if let stats = state.2 { self.stats = stats }
         loadPlaylistTransitions()
     }
 
-    private nonisolated static func fetchSources(_ db: Database) throws -> [LibrarySource] {
-        try LibrarySource.order(Column("path")).fetchAll(db)
+    /// Keeps the TIDAL account's source out of `sources`, whatever the switch says.
+    private func setSources(_ all: [LibrarySource]) {
+        sources = all.filter { !$0.isTidal }
+        tidalSource = includesTidal ? all.first { $0.isTidal } : nil
     }
 
-    private nonisolated static func fetchPlaylists(_ db: Database) throws -> [Playlist] {
-        try Playlist.order(Column("sortIndex"), Column("name")).fetchAll(db)
-    }
-
-    private nonisolated static func fetchStats(_ db: Database) throws -> LibraryDatabase.Stats? {
-        try Row.fetchOne(db, sql: """
-            SELECT count(DISTINCT albumKey) AS a, count(*) AS t, count(DISTINCT lower(coalesce(albumArtist, artist))) AS ar,
-                   coalesce((SELECT sum(size) FROM (SELECT max(fileSize) AS size FROM track WHERE isMissing = 0 GROUP BY filePath)), 0) AS b, coalesce(sum(duration), 0) AS d FROM track WHERE isMissing = 0
-            """).map { LibraryDatabase.Stats(albums: $0["a"], tracks: $0["t"], artists: $0["ar"], bytes: $0["b"], duration: $0["d"]) }
+    /// Settings › Online › TIDAL integration was switched. Every list, count, album and playlist is read again as the library
+    /// is with that account in it, or as it is without. Nothing is deleted either way.
+    func setIncludeTidal(_ on: Bool) {
+        guard on != includesTidal else { return }
+        includesTidal = on
+        database.includeTidal = on
+        for task in tasks { task.cancel() }
+        tasks = []
+        loadSidebarState()
+        observe()
+        revision += 1
+        favoriteVersions()
     }
 
     private func observe() {
         observeAlbums()
         let writer = database.writer
+        let database = database
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking { db in
-                try Row.fetchAll(db, sql: """
-                    SELECT coalesce(albumArtist, artist, 'Unknown Artist') AS name, count(DISTINCT albumKey) AS albums,
-                           count(*) AS tracks, max(artworkKey) AS art
-                    FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY vesperSort(min(albumArtistSortKey))
-                    """).map { LibraryDatabase.ArtistSummary(name: $0["name"], albumCount: $0["albums"], trackCount: $0["tracks"], artworkKey: $0["art"]) }
-            }
+            let obs = ValueObservation.tracking { db in try database.artists(db) }
             // The count covers the whole track table, so every track write (an analysis saved, a play counted) wakes
             // this; only a real change reloads the views. Writes that change tracks without changing this bump
             // `revision` themselves (scans, tag edits, plays, a share relinked).
@@ -292,7 +303,7 @@ final class LibraryStore {
             } catch {}
         })
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking(Self.fetchPlaylists)
+            let obs = ValueObservation.tracking { db in try database.playlists(db) }
             do {
                 for try await value in obs.values(in: writer) where self?.playlists != value {
                     self?.playlists = value
@@ -302,7 +313,7 @@ final class LibraryStore {
         })
         tasks.append(Task { [weak self] in
             let obs = ValueObservation.tracking { db in
-                try Row.fetchAll(db, sql: "SELECT favorite.trackId AS id, track.isMissing AS missing, track.albumKey AS album FROM favorite JOIN track ON track.id = favorite.trackId")
+                try Row.fetchAll(db, sql: "SELECT favorite.trackId AS id, track.isMissing AS missing, track.albumKey AS album FROM favorite JOIN track ON track.id = favorite.trackId WHERE \(try database.visibleTracksClause(db))")
                     .map { (id: $0["id"] as Int64, missing: $0["missing"] as Bool, album: $0["album"] as String?) }
             }
             do {
@@ -326,21 +337,23 @@ final class LibraryStore {
             } catch {}
         })
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking(Self.fetchSources)
+            let obs = ValueObservation.tracking { db in try database.sources(db) }
             do {
-                for try await value in obs.values(in: writer) {
+                for try await all in obs.values(in: writer) {
                     // A share relinked to a new mount point rewrites its tracks' paths.
+                    let value = all.filter { !$0.isTidal }
                     if let self, self.sources != value {
                         if !self.sources.isEmpty { self.revision += 1 }
                         self.sources = value
                     }
+                    if let self { self.tidalSource = self.includesTidal ? all.first { $0.isTidal } : nil }
                     self?.updateWatcher()
                     self?.rescanLocalAtLaunch()
                 }
             } catch {}
         })
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking(Self.fetchStats)
+            let obs = ValueObservation.tracking { db in try database.stats(db) }
             do { for try await value in obs.values(in: writer) { if let value, self?.stats != value { self?.stats = value } } } catch {}
         })
     }
@@ -348,9 +361,10 @@ final class LibraryStore {
     private func observeAlbums() {
         albumTask?.cancel()
         let writer = database.writer
-        let sql = LibraryDatabase.albumsSQL(sort: albumSort)
+        let database = database
+        let sort = albumSort
         albumTask = Task { [weak self] in
-            let obs = ValueObservation.tracking { db in try Row.fetchAll(db, sql: sql).map(LibraryDatabase.album(from:)) }
+            let obs = ValueObservation.tracking { db in try database.albums(db, sort: sort) }
             do { for try await value in obs.values(in: writer) { self?.albums = value } } catch {}
         }
     }

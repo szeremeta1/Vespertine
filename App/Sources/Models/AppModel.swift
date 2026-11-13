@@ -277,7 +277,8 @@ final class AppModel {
         filtersURL = isolated ? nil : FilterStore.url(in: settings.dataDirectory)
         systemOutput = SystemOutputModel(isolated: arguments.string(forKey: "VespertineDataDirectory") != nil)
         if let filtersURL { filters = FilterStore.load(from: filtersURL) }
-        library = try LibraryStore(dataDirectory: settings.dataDirectory, automaticScanning: { [weak settings] in settings?.watchFolders ?? false })
+        library = try LibraryStore(dataDirectory: settings.dataDirectory, automaticScanning: { [weak settings] in settings?.watchFolders ?? false },
+                                   includeTidal: settings.tidalEnabled)
         showSetup = Self.needsSetup(settings: settings, library: library, arguments: arguments)
         devices = DeviceStore()
         loopback = LoopbackTest(dataDirectory: settings.dataDirectory)
@@ -524,6 +525,19 @@ final class AppModel {
         if on { speakerGroups?.followUSBPorts(amongUIDs: devices.devices.map(\.uid)) }
         syncEngine()
     }
+
+    /// The Settings switch that brings TIDAL into the app (Settings › Online › TIDAL integration, off by default), without a restart.
+    /// Every list, count, album and playlist is read again with the account's songs in it, or without; nothing is deleted. The TIDAL
+    /// model (when there is one) starts and stops with it: it does nothing while this is off.
+    func setTidalEnabled(_ on: Bool) {
+        guard settings.tidalEnabled != on else { return }
+        settings.tidalEnabled = on
+        library.setIncludeTidal(on)
+        tidalSwitchChanged?(on)
+    }
+
+    /// Told after `setTidalEnabled`, for what the switch starts and stops (the TIDAL model's reader, sync and downloads).
+    @ObservationIgnored var tidalSwitchChanged: ((Bool) -> Void)?
 
     /// The transitions master switch (Controls › Transitions, ⌥⌘X, the transport bar, Up Next). It applies from the next
     /// boundary (one already mixed is taken back while it can be). The first time it's turned on, a note says what it changes.

@@ -81,7 +81,8 @@ final class NetworkShareManager {
     /// Read from the database, not the store's observed copy, which may not have loaded yet at launch.
     var sources: [LibrarySource] {
         let observed = library.sources // observed, so views refresh when shares are added or removed
-        return (observed.isEmpty ? (try? library.database.sources()) ?? [] : observed).filter(\.isNetwork)
+        // The TIDAL account has a network-shaped address and is no share.
+        return (observed.isEmpty ? (try? library.database.sources()) ?? [] : observed).filter { $0.isNetwork && !$0.isTidal }
     }
 
     func isNetwork(_ track: Track) -> Bool {
