@@ -325,6 +325,7 @@ final class AppModel {
         // Which groups are published decides how long a pause keeps one from the other apps.
         systemOutput.onPublishedChanged = { [weak self] in self?.syncEngine() }
         library.bundlesCopiesByDefault = settings.bundleCopies
+        player.isPlayable = { [weak self] track in self?.playability(of: track).isPlayable ?? true }
         if settings.speakerGroupsFeature {
             speakerGroups = SpeakerGroupsSwitch.apply(true, to: settings, current: nil, onChange: groupsChanged)
             speakerGroups?.followUSBPorts(amongUIDs: devices.devices.map(\.uid))
@@ -538,6 +539,24 @@ final class AppModel {
 
     /// Told after `setTidalEnabled`, for what the switch starts and stops (the TIDAL model's reader, sync and downloads).
     @ObservationIgnored var tidalSwitchChanged: ((Bool) -> Void)?
+
+    /// Whether TIDAL can stream now (signed in, reachable, not asked to wait), for `playability(of:)`.
+    let tidalAvailability = TidalAvailability()
+
+    /// Where a song comes from, for the Source column.
+    func trackSource(of track: Track) -> TrackSource {
+        let source = track.isTidalTrack ? library.tidalSource : library.sources.first { $0.id == track.sourceId }
+        return TrackSource.of(track: track, source: source, tidal: track.id.flatMap { library.tidalRecords[$0] })
+    }
+
+    /// Whether `track` can play right now, and if not, why. Only TIDAL songs can be unavailable here (a share has its own offline copies
+    /// and errors, which the rule can't see), and only while TIDAL is on: with it off every song is as it always was.
+    func playability(of track: Track) -> Playability {
+        guard library.includesTidal, track.isTidalTrack else { return .playable }
+        return Playability.playability(track: track, source: library.tidalSource, tidal: track.id.flatMap { library.tidalRecords[$0] },
+                                       signedIn: tidalAvailability.signedIn, reachable: tidalAvailability.reachable,
+                                       backingOff: tidalAvailability.backingOff, fileExists: { FileManager.default.fileExists(atPath: $0) })
+    }
 
     /// The transitions master switch (Controls › Transitions, ⌥⌘X, the transport bar, Up Next). It applies from the next
     /// boundary (one already mixed is taken back while it can be). The first time it's turned on, a note says what it changes.

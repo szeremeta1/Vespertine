@@ -49,6 +49,11 @@ final class LibraryStore {
     /// Whether the TIDAL account's songs are in every list, count and album (Settings › Online › TIDAL integration; off by default,
     /// and then the library reads exactly as one that never had a TIDAL account).
     private(set) var includesTidal = false
+    /// What the library keeps of each TIDAL song (by track ID) beyond its row: the quality TIDAL lists, whether it streams here, and its
+    /// download. Empty while TIDAL is off.
+    private(set) var tidalRecords: [Int64: TidalTrackRecord] = [:]
+    /// Albums whose songs are all streamed (none downloaded): they can't play without TIDAL. Empty while TIDAL is off.
+    private(set) var streamOnlyAlbumKeys: Set<String> = []
 
     // MARK: Copies
 
@@ -277,6 +282,7 @@ final class LibraryStore {
         guard on != includesTidal else { return }
         includesTidal = on
         database.includeTidal = on
+        if !on { tidalRecords = [:]; streamOnlyAlbumKeys = [] }
         for task in tasks { task.cancel() }
         tasks = []
         loadSidebarState()
@@ -289,6 +295,25 @@ final class LibraryStore {
         observeAlbums()
         let writer = database.writer
         let database = database
+        if includesTidal {
+            tasks.append(Task { [weak self] in
+                let obs = ValueObservation.tracking { db in
+                    (try TidalTrackRecord.fetchAll(db),
+                     Set(try String.fetchAll(db, sql: """
+                        SELECT DISTINCT albumKey FROM track WHERE sourceId IN (SELECT id FROM source WHERE path = ?)
+                        EXCEPT SELECT albumKey FROM track WHERE sourceId IS NULL OR sourceId NOT IN (SELECT id FROM source WHERE path = ?) OR filePath != ''
+                        """, arguments: [LibrarySource.tidalPath, LibrarySource.tidalPath])))
+                }
+                do {
+                    for try await (records, streamOnly) in obs.values(in: writer) {
+                        guard let self, self.includesTidal else { continue }
+                        let byTrack = Dictionary(records.map { ($0.trackId, $0) }, uniquingKeysWith: { a, _ in a })
+                        if self.tidalRecords != byTrack { self.tidalRecords = byTrack }
+                        if self.streamOnlyAlbumKeys != streamOnly { self.streamOnlyAlbumKeys = streamOnly }
+                    }
+                } catch {}
+            })
+        }
         tasks.append(Task { [weak self] in
             let obs = ValueObservation.tracking { db in try database.artists(db) }
             // The count covers the whole track table, so every track write (an analysis saved, a play counted) wakes

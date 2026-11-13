@@ -168,17 +168,23 @@ final class PlayerController {
     /// e.g. the chosen output is reconnecting). Set by the app model.
     var wantsMultichannel: () -> Bool? = { nil }
 
+    /// Whether a song can play now (the app's playability rule: a TIDAL song while TIDAL is out of reach can't). Songs that can't are
+    /// left out of what is queued, so a click on an album doesn't queue what would only fail.
+    var isPlayable: (Track) -> Bool = { _ in true }
+
     /// Queue entries for `tracks`, each playing the version of its song that suits the output.
     /// A song whose versions all arrive together (a whole SACD album) is queued once. With `allowing`, only
     /// versions it accepts are considered (a filtered page asked for multichannel: stereo versions stay out).
     /// `exactly`: tracks (by location) asked for as they are, a copy picked by hand, even on an album whose copies are bundled.
     private func entries(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, transitions: TransitionOverride? = nil,
                          exactly: Set<String> = []) -> [QueueEntry] {
+        let tracks = tracks.filter(isPlayable)
         // Only an album whose copies are bundled lets the output pick; any other copy plays as itself.
         let versions = library.playbackVersions(of: tracks).enumerated().map { i, versions in
             if exactly.contains(tracks[i].location) { return [tracks[i]] }
-            guard let allowing, versions.count > 1 else { return versions }
-            return versions.filter { $0.location == tracks[i].location || allowing($0) }
+            let playable = versions.filter { $0.location == tracks[i].location || isPlayable($0) }
+            guard let allowing, playable.count > 1 else { return playable }
+            return playable.filter { $0.location == tracks[i].location || allowing($0) }
         }
         let wanted = wantsMultichannel()
         var queued = Set<String>()

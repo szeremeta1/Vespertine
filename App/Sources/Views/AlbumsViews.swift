@@ -121,6 +121,9 @@ struct AlbumCard: View {
 
     var isPlaying: Bool { model.player.current?.track.albumKey == album.key && model.player.state != .stopped }
 
+    /// Why none of the album can play now: all its songs are streamed from TIDAL and TIDAL is out of reach (same rule as its song rows).
+    var unavailableReason: String? { model.library.streamOnlyAlbumKeys.contains(album.key) ? model.tidalAvailability.accountReason : nil }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ZStack(alignment: .bottomTrailing) {
@@ -138,7 +141,7 @@ struct AlbumCard: View {
                 if isPlaying {
                     PlayingBars(active: model.player.isPlaying)
                         .padding(8)
-                } else if hovering {
+                } else if hovering, unavailableReason == nil {
                     Button {
                         model.player.play(model.playableTracks(albumKey: album.key), shuffled: false)
                     } label: {
@@ -167,6 +170,8 @@ struct AlbumCard: View {
             FormatLabel(summary: album.formatSummary, highlight: album.isHiRes)
                 .padding(.top, 5)
         }
+        .opacity(unavailableReason == nil ? 1 : 0.45)
+        .help(ifAny: unavailableReason)
         .contentShape(Rectangle())
         .onHover { h in withAnimation(.easeOut(duration: 0.15)) { hovering = h } }
         .onTapGesture { model.openAlbum(album.key) }

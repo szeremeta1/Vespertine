@@ -402,7 +402,7 @@ extension AppModel {
         switch facet {
         case .genre: Dictionary(library.genres.map { ($0.key, $0.name) }, uniquingKeysWith: { a, _ in a })
         case .artist: Dictionary(library.artists.map { ($0.name.lowercased(), $0.name) }, uniquingKeysWith: { a, _ in a })
-        case .source: Dictionary(library.sources.compactMap { s in s.id.map { (String($0), s.displayName) } }, uniquingKeysWith: { a, _ in a })
+        case .source: Dictionary((library.sources + [library.tidalSource].compactMap { $0 }).compactMap { s in s.id.map { (String($0), s.displayName) } }, uniquingKeysWith: { a, _ in a })
         default: [:]
         }
     }
