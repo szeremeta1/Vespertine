@@ -32,9 +32,9 @@ public struct RendererDevice: Sendable, Hashable, Identifiable {
 
     /// Reads the description at `location`, AVTransport's actions (for gapless) and ConnectionManager's sink formats.
     public static func load(location: URL, client: SOAPClient = SOAPClient()) async throws -> RendererDevice {
-        let description = try DeviceDescription.parse(try await client.get(location), location: location)
+        let description = try DeviceDescription.parse(try await client.get(location, limit: 1 << 20), location: location).confined()
         var avActions: Set<String>?
-        if let av = description.service(.avTransport) { avActions = try? SCPD.actions(try await client.get(av.scpdURL)) }
+        if let av = description.service(.avTransport) { avActions = try? SCPD.actions(try await client.get(av.scpdURL, limit: 1 << 20)) }
         guard let kind = RendererKind.of(description, avActions: avActions) else { throw LoadError.notARenderer }
         var capabilities = RendererCapabilities()
         if let cm = description.service(.connectionManager), let sink = try? await client.call(cm, "GetProtocolInfo")["Sink"] {
@@ -138,7 +138,11 @@ public final class RendererDiscovery: @unchecked Sendable {
         guard go else { return }
         let replies = await searcher.search(targets: SSDP.rendererTargets, mx: 2, wait: 3)
         var locations: [String: URL] = [:]
-        for reply in replies where locations[reply.udn] == nil { locations[reply.udn] = reply.location }
+        // A reply naming a description on another host than its own isn't followed (it could point Vespertine anywhere).
+        for reply in replies where locations[reply.udn] == nil {
+            if let responder = reply.responder, reply.location.host != responder { continue }
+            locations[reply.udn] = reply.location
+        }
         var loaded: [String: RendererDevice] = [:]
         for (udn, location) in locations {
             let known = lock.withLock { found[udn]?.device }

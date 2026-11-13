@@ -121,6 +121,7 @@ struct ProcessedStreamTests {
         playback.update(settings: RendererSettings(equalizer: eq))
         playback.play(PlayableItem(url: wav))
         #expect(await events.wait(for: "started"))
+        for _ in 0..<50 where fake.currentURI == nil { try await Task.sleep(for: .milliseconds(20)) }
         let uri = try #require(fake.currentURI)
         #expect(uri.hasSuffix(".flac"))
         let bytes = try #require(await fake.fetched(uri))

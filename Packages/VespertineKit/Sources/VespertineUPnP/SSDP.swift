@@ -38,6 +38,18 @@ public struct SSDPResponse: Sendable, Hashable {
     public var udn: String
     public var server: String?
     public var maxAge: Int?
+    /// The address the reply came from (set by the searcher); its description must be on that host.
+    public var responder: String?
+
+    public init(location: URL, st: String, usn: String, udn: String, server: String? = nil, maxAge: Int? = nil, responder: String? = nil) {
+        self.location = location
+        self.st = st
+        self.usn = usn
+        self.udn = udn
+        self.server = server
+        self.maxAge = maxAge
+        self.responder = responder
+    }
 
     public static func parse(_ data: Data) -> SSDPResponse? {
         guard let text = String(data: data, encoding: .utf8) else { return nil }
@@ -110,8 +122,16 @@ public final class SSDPSearcher: Sendable {
             if left <= 0 { break }
             var pfd = pollfd(fd: fd, events: Int16(POLLIN), revents: 0)
             guard poll(&pfd, 1, Int32(max(1, left * 1000))) > 0 else { continue }
-            let n = recv(fd, &buffer, buffer.count, 0)
-            guard n > 0, let reply = SSDPResponse.parse(Data(buffer[0..<n])) else { continue }
+            var from = sockaddr_in()
+            var fromLength = socklen_t(MemoryLayout<sockaddr_in>.size)
+            let n = withUnsafeMutablePointer(to: &from) { p in
+                p.withMemoryRebound(to: sockaddr.self, capacity: 1) { recvfrom(fd, &buffer, buffer.count, 0, $0, &fromLength) }
+            }
+            guard n > 0, var reply = SSDPResponse.parse(Data(buffer[0..<n])) else { continue }
+            var text = [CChar](repeating: 0, count: Int(INET_ADDRSTRLEN))
+            if inet_ntop(AF_INET, &from.sin_addr, &text, socklen_t(text.count)) != nil {
+                reply.responder = String(decoding: text.prefix { $0 != 0 }.map { UInt8(bitPattern: $0) }, as: UTF8.self)
+            }
             if seen.insert(reply.usn).inserted { replies.append(reply) }
         }
         return replies

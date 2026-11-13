@@ -76,6 +76,15 @@ public struct DeviceDescription: Sendable, Hashable {
 
     public func service(_ kind: ServiceKind) -> UPnPService? { services.first { kind.matches($0.type) } }
 
+    /// Only the services whose control and description URLs are on the description's own host: a description can't send
+    /// Vespertine's requests anywhere else on the network.
+    public func confined() -> DeviceDescription {
+        var copy = self
+        let host = location.host?.lowercased()
+        copy.services = services.filter { $0.controlURL.host?.lowercased() == host && $0.scpdURL.host?.lowercased() == host }
+        return copy
+    }
+
     public enum ParseError: Error { case notADescription }
 
     /// The renderer in `data`: the first device (the root or an embedded one) that is a MediaRenderer or has an
