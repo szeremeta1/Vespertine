@@ -5,6 +5,7 @@
 
 import AppKit
 import CoreAudio
+import VespertineAirPlay
 import VespertineAudio
 import VespertineLibrary
 import VespertineUPnP
@@ -186,6 +187,8 @@ final class AppModel {
     private(set) var speakerGroups: SpeakerGroupsModel?
     /// Network renderers; nil unless the Settings switch (Network Players (UPnP, beta)) is on.
     private(set) var renderers: RendererOutputModel?
+    /// AirPlay receivers; nil unless the Settings switch (AirPlay Players (beta)) is on.
+    private(set) var airPlay: AirPlayOutputModel?
     /// Mac Sound Output (beta): speaker groups published as outputs of the Mac.
     let systemOutput: SystemOutputModel
     let library: LibraryStore
@@ -324,7 +327,7 @@ final class AppModel {
         }
         followChosenOutput()
         player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
-        player.rendererGrace = { [weak self] in self?.renderers?.searching == true }
+        player.rendererGrace = { [weak self] in self?.renderers?.searching == true || self?.airPlay?.searching == true }
         // Which groups are published decides how long a pause keeps one from the other apps.
         systemOutput.onPublishedChanged = { [weak self] in self?.syncEngine() }
         library.bundlesCopiesByDefault = settings.bundleCopies
@@ -334,6 +337,9 @@ final class AppModel {
         }
         if settings.upnpRenderersFeature {
             renderers = RendererSwitch.apply(true, to: settings, current: nil, onChange: { [weak self] in self?.syncEngine() })
+        }
+        if settings.airPlayPlayersFeature {
+            airPlay = AirPlaySwitch.apply(true, to: settings, current: nil, onChange: { [weak self] in self?.syncEngine() })
         }
         syncEngine()
         dopSetup.onChoicesChanged = { [weak self] in self?.syncEngine() }
@@ -438,8 +444,8 @@ final class AppModel {
     /// Where the next song would play: the chosen output, or while it isn't connected, the one that stands in for it
     /// (Settings → Playback; nil when set to wait for it, and while playback waits for one that dropped out mid-song).
     var plannedDevice: OutputDevice? {
-        // A network renderer chosen: no Core Audio device plays.
-        if rendererChosen { return nil }
+        // A network renderer or AirPlay receiver chosen: no Core Audio device plays.
+        if networkOutputChosen { return nil }
         guard let uid = settings.selectedDeviceUID else {
             // Following the Mac's sound output while it is a group published with Mac Sound Output: that group plays.
             if !devices.devices.contains(where: \.isDefault), let groups = speakerGroups?.groups,
@@ -455,8 +461,8 @@ final class AppModel {
 
     /// The chosen output's name while it isn't connected.
     var missingChosenOutput: String? {
-        if rendererChosen {
-            return chosenRenderer == nil ? (settings.selectedDevice?.name ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")) : nil
+        if networkOutputChosen {
+            return chosenRenderer == nil && chosenAirPlay == nil ? (settings.selectedDevice?.name ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")) : nil
         }
         if let group = chosenGroup { return groupOutput(group) == nil ? group.name : nil }
         guard let uid = settings.selectedDeviceUID, !devices.devices.contains(where: { $0.uid == uid }) else { return nil }
@@ -468,6 +474,25 @@ final class AppModel {
 
     /// The chosen network renderer, while it is on the network.
     var chosenRenderer: RendererDevice? { rendererChosen ? renderers?.renderer(uid: settings.selectedDeviceUID) : nil }
+
+    /// An AirPlay receiver is the chosen output (the feature is on), found on the network or not.
+    var airPlayChosen: Bool { airPlay != nil && AirPlayDevice.isAirPlayUID(settings.selectedDeviceUID) }
+
+    /// The chosen AirPlay receiver, while it is on the network (and one Vespertine can send to).
+    var chosenAirPlay: AirPlayDevice? { airPlayChosen ? airPlay?.device(uid: settings.selectedDeviceUID) : nil }
+
+    /// A network output (a UPnP player or an AirPlay receiver) is the chosen output: nothing else plays in its place.
+    var networkOutputChosen: Bool { rendererChosen || airPlayChosen }
+
+    /// The AirPlay Players (beta) switch. Turning it off while a receiver is the chosen output lets go of it first.
+    func setAirPlayFeature(_ on: Bool) {
+        if !AirPlaySwitch.keepsOutput(settings.selectedDeviceUID, turningOnTo: on) {
+            settings.selectedDeviceUID = nil
+            settings.selectedDevice = nil
+        }
+        airPlay = AirPlaySwitch.apply(on, to: settings, current: airPlay, onChange: { [weak self] in self?.syncEngine() })
+        syncEngine()
+    }
 
     /// The Network Players (UPnP, beta) switch. Turning it off while a renderer is the chosen output lets go of it first (the Mac's sound
     /// output plays).
@@ -599,6 +624,12 @@ final class AppModel {
 
     /// Controls › Volume Up, Volume Down, Mute. Only the output Vespertine plays to: never the Mac's sound output.
     func adjustVolume(_ action: VolumeControls.Action) {
+        if let receiver = chosenAirPlay {
+            // An AirPlay receiver: the level is its own volume, or Vespertine's digital volume when chosen so.
+            settings.applyVolume(action, for: receiver.uid)
+            syncEngine()
+            return
+        }
         if let renderer = chosenRenderer {
             // A renderer's volume moves only once unlocked (Vespertine's digital volume); locked, the note says why.
             if settings.rendererVolumeUnlocked.contains(renderer.uid) {
@@ -633,8 +664,13 @@ final class AppModel {
         // A network renderer plays in place of the engine while one is chosen and on the network.
         // Chosen and not on the network: nothing plays anywhere else in its place (decision 119).
         let renderer = chosenRenderer
-        let playback = renderers?.playback(for: renderer, settings: renderer.map { settings.rendererSettings(uid: $0.uid) } ?? RendererSettings())
-        player.useRenderer(playback, missing: rendererChosen && playback == nil ? missingChosenOutput : nil)
+        let rendererPlayback = renderers?.playback(for: renderer, settings: renderer.map { settings.rendererSettings(uid: $0.uid) } ?? RendererSettings())
+        // An AirPlay receiver likewise (decision 614): chosen and gone, nothing plays anywhere else.
+        let receiver = chosenAirPlay
+        let airPlayPlayback = airPlay?.playback(for: receiver, settings: receiver.map { settings.airPlaySettings(uid: $0.uid) } ?? RendererSettings(),
+                                                receiverVolumeDB: receiver.map { settings.airPlayReceiverVolumeDB(uid: $0.uid) } ?? 0)
+        let playback: (any NetworkPlayback)? = rendererPlayback ?? airPlayPlayback
+        player.useRenderer(playback, missing: networkOutputChosen && playback == nil ? missingChosenOutput : nil)
         player.resolveVersions()
     }
 
@@ -686,6 +722,7 @@ final class AppModel {
         settings.selectedDeviceUID = uid
         settings.selectedDevice = uid.flatMap { uid in devices.devices.first { $0.uid == uid } }.map { OutputIdentity($0) }
             ?? renderers?.renderer(uid: uid).map { OutputIdentity(uid: $0.uid, name: $0.name, manufacturer: $0.description.manufacturer) }
+            ?? airPlay?.device(uid: uid).map { OutputIdentity(uid: $0.uid, name: $0.name, manufacturer: $0.model ?? "") }
             ?? (uid == settings.selectedDevice?.uid ? settings.selectedDevice : nil)
         syncEngine()
     }

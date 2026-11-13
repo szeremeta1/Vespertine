@@ -243,6 +243,7 @@ struct PlaybackSettings: View {
             TransitionsSettingsSection()
             SpeakerGroupsSettingsSection()
             RendererSettingsSection()
+            AirPlaySettingsSection()
             SystemOutputSettingsSection()
             Section("Surround formats") {
                 Picker("Dolby Atmos", selection: $s.atmosBySystem) {
@@ -550,9 +551,10 @@ extension MiniPlayerView {
     /// (what Vespertine sent), never a claim about the renderer's DAC.
     static func verdictText(_ path: SignalPath) -> String {
         if let renderer = path.renderer {
-            return renderer.passesThrough && path.source.encoding != .lossy
-                ? String(localized: "Sent bit-perfect to \(renderer.name): the original file", comment: "%@ is a network player's name.")
-                : path.statusLine
+            guard renderer.passesThrough && path.source.encoding != .lossy else { return path.statusLine }
+            return renderer.transport == .airPlay
+                ? String(localized: "Sent bit-perfect to \(renderer.name): the file's own samples", comment: "%@ is an AirPlay receiver's name.")
+                : String(localized: "Sent bit-perfect to \(renderer.name): the original file", comment: "%@ is a network player's name.")
         }
         return path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted on the way to the device")
     }
