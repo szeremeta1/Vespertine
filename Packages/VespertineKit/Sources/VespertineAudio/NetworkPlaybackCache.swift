@@ -133,7 +133,7 @@ struct ShareReadFailure: LocalizedError, CustomNSError {
 /// The playback cache is transient: leases keep current/next files alive; dropping a lease cancels its copy
 /// and deletes it once an outstanding share read returns. Reservations include in-flight and cancelled reads.
 /// A sparse file is NEVER handed unguarded to a decoder until every byte is present.
-final class NetworkPlaybackCache: @unchecked Sendable {
+public final class NetworkPlaybackCache: @unchecked Sendable {
     static let shared = NetworkPlaybackCache(directory: FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
         .appendingPathComponent((Bundle.main.bundleIdentifier ?? "org.szeremeta.Vespertine") + "/Playback", isDirectory: true))
     /// Opens the files of URLs with a scheme of their own (see `RemoteCacheReader`). Consulted before the test factory and the share.
