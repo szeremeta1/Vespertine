@@ -39,7 +39,18 @@ final class RemoteServer {
     let store: RemoteStore
     @ObservationIgnored weak var model: AppModel?
     @ObservationIgnored private var listener: NWListener?
-    @ObservationIgnored private var listenerPort: NWEndpoint.Port?
+    /// Which port the next listener binds: set when the server starts, and walked on when a port is taken.
+    private enum PortPlan {
+        /// This port is ours now: a restart (new keys) binds it again, a few times over if the last listener hasn't let go.
+        case held(UInt16, retries: Int)
+        /// Ports still to try, the first next.
+        case trying([UInt16])
+        /// Every candidate was taken: let the system choose.
+        case system
+    }
+    @ObservationIgnored private var portPlan: PortPlan?
+    @ObservationIgnored private var restart: Task<Void, Never>?
+    @ObservationIgnored private let preferredPort: UInt16
     @ObservationIgnored private var clients: [ObjectIdentifier: RemoteClient] = [:]
     @ObservationIgnored private var pushTask: Task<Void, Never>?
     @ObservationIgnored private var pairingTimeout: Task<Void, Never>?
@@ -58,8 +69,13 @@ final class RemoteServer {
     /// Failed handshakes while pairing (wrong codes) after which the window closes, so a code can't be guessed.
     static let pairingAttempts = 10
 
-    init(store: RemoteStore) {
+    /// How often a restart on the port we hold tries again before the port counts as taken, and how long it waits between.
+    static let restartTries = 8
+    static let restartDelay: Duration = .milliseconds(250)
+
+    init(store: RemoteStore, preferredPort: UInt16 = RemotePort.preferred) {
         self.store = store
+        self.preferredPort = preferredPort
         web.server = self
         web.onPortChange = { [weak self] port in self?.webPort = port }
     }
@@ -98,8 +114,11 @@ final class RemoteServer {
         for client in clients.values { client.close(saying: .serverStopped) }
         clients.removeAll()
         connected.removeAll()
+        restart?.cancel()
+        restart = nil
         listener?.cancel()
         listener = nil
+        portPlan = nil
         web.stop()
         pushTask?.cancel()
         pushTask = nil
@@ -116,9 +135,11 @@ final class RemoteServer {
         return keys
     }
 
-    /// (Re)starts the listener with the current keys. Connections already open stay open; the port stays the same when
-    /// it can, and Bonjour says where it is either way.
+    /// (Re)starts the listener with the current keys. Connections already open stay open; the port stays the same
+    /// (it is the one the phones know), and Bonjour says where it is either way.
     private func startListener() {
+        restart?.cancel()
+        restart = nil
         listener?.cancel()
         listener = nil
         let keys = acceptedKeys
@@ -130,26 +151,40 @@ final class RemoteServer {
         startListener(keys: keys)
     }
 
+    /// The text record Bonjour carries for this Mac, with the port it listens on (nil before the system has chosen one).
+    static func txtRecord(info: ServerInfo, port: UInt16?) -> NWTXTRecord {
+        var record = NWTXTRecord([
+            RemoteProtocol.TXTKey.serverID: info.serverID,
+            RemoteProtocol.TXTKey.protocolVersion: String(RemoteProtocol.version),
+            RemoteProtocol.TXTKey.appVersion: info.appVersion,
+        ])
+        if let port { record[RemoteProtocol.TXTKey.port] = String(port) }
+        return record
+    }
+
     private func startListener(keys: [RemoteTransport.PresharedKey]) {
+        let plan = portPlan ?? .trying(RemotePort.candidates(saved: store.port, preferred: preferredPort))
+        portPlan = plan
+        let wanted: UInt16?
+        switch plan {
+        case .held(let port, _): wanted = port
+        case .trying(let ports): wanted = ports.first
+        case .system: wanted = nil
+        }
         let parameters = RemoteTransport.parameters(keys: keys)
         parameters.allowLocalEndpointReuse = true
         let listener: NWListener
         do {
-            if let port = listenerPort {
+            if let wanted, let port = NWEndpoint.Port(rawValue: wanted) {
                 listener = try NWListener(using: parameters, on: port)
             } else {
                 listener = try NWListener(using: parameters)
             }
         } catch {
-            status = .failed(error.localizedDescription)
-            return
+            return portUnavailable(error)
         }
         let info = serverInfo
-        listener.service = NWListener.Service(type: RemoteProtocol.serviceType, txtRecord: NWTXTRecord([
-            RemoteProtocol.TXTKey.serverID: info.serverID,
-            RemoteProtocol.TXTKey.protocolVersion: String(RemoteProtocol.version),
-            RemoteProtocol.TXTKey.appVersion: info.appVersion,
-        ]))
+        listener.service = NWListener.Service(type: RemoteProtocol.serviceType, txtRecord: Self.txtRecord(info: info, port: wanted))
         listener.stateUpdateHandler = { [weak self] state in
             MainActor.assumeIsolated { self?.listenerChanged(state, listener) }
         }
@@ -157,7 +192,7 @@ final class RemoteServer {
             MainActor.assumeIsolated { self?.accept(connection) }
         }
         self.listener = listener
-        if status == .off || listenerPort == nil { status = .starting }
+        if case .held = plan {} else { status = .starting }
         listener.start(queue: .main)
         if pushTask == nil {
             pushTask = Task { [weak self] in
@@ -173,22 +208,51 @@ final class RemoteServer {
         guard listener === self.listener else { return }
         switch state {
         case .ready:
-            listenerPort = listener.port
-            status = .running(port: listener.port?.rawValue ?? 0)
+            let port = listener.port?.rawValue ?? 0
+            portPlan = .held(port, retries: 0)
+            if port != 0 { store.setPort(port) }
+            status = .running(port: port)
         case .failed(let error):
             self.listener = nil
             listener.cancel()
-            if listenerPort != nil {
-                // The old port was taken in the meantime: any port will do (Bonjour says which).
-                listenerPort = nil
-                startListener()
+            portUnavailable(error)
+        case .waiting(let error):
+            // A port another program holds can show up as waiting rather than failed: either way, try the next.
+            if case .posix(.EADDRINUSE) = error {
+                self.listener = nil
+                listener.cancel()
+                portUnavailable(error)
             } else {
                 status = .failed(error.localizedDescription)
             }
-        case .waiting(let error):
-            status = .failed(error.localizedDescription)
         default:
             break
+        }
+    }
+
+    /// The port the listener tried couldn't be bound. A port we held a moment ago is tried again shortly (the last
+    /// listener may not have let go yet); a candidate that's taken gives way to the next; after the last, the system chooses.
+    private func portUnavailable(_ error: any Error) {
+        switch portPlan {
+        case .held(let port, let retries):
+            if retries < Self.restartTries {
+                portPlan = .held(port, retries: retries + 1)
+                restart = Task { [weak self] in
+                    try? await Task.sleep(for: Self.restartDelay)
+                    guard !Task.isCancelled, let self, self.store.enabled, self.listener == nil else { return }
+                    self.startListener()
+                }
+            } else {
+                // Taken since: the rest of the candidates, without this one.
+                portPlan = .trying(RemotePort.candidates(saved: nil, preferred: preferredPort).filter { $0 != port })
+                startListener()
+            }
+        case .trying(let ports):
+            let rest = Array(ports.dropFirst())
+            portPlan = rest.isEmpty ? .system : .trying(rest)
+            startListener()
+        case .system, nil:
+            status = .failed(error.localizedDescription)
         }
     }
 
