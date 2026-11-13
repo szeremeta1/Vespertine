@@ -11,6 +11,8 @@ struct OutputsView: View {
     @Environment(RemoteAppModel.self) private var model
     let session: RemoteSession
     @State private var feedback = CommandFeedback()
+    @State private var editingConnection = false
+    @State private var showingSettings = false
 
     var body: some View {
         NavigationStack {
@@ -40,11 +42,40 @@ struct OutputsView: View {
                     if let version = session.server?.appVersion, !version.isEmpty {
                         LabeledContent("Vespertine", value: version)
                     }
+                    if !session.isDemo {
+                        Button { editingConnection = true } label: {
+                            LabeledContent("Connection") {
+                                HStack(spacing: 6) {
+                                    Circle().fill(session.isConnected ? Palette.brass : Palette.text3).frame(width: 7, height: 7)
+                                    Text(reach)
+                                }
+                            }
+                        }
+                        .foregroundStyle(Palette.text)
+                    }
                     Button("Choose Another Mac") { model.leave() }
                 }
+                Section {
+                    Button { showingSettings = true } label: { Label("Settings", systemImage: "gearshape") }
+                }
             }
-            .navigationTitle("Output")
+            .obsidianList()
+            .navigationTitle("Output").screenTitleStyle()
             .feedback(feedback)
+            .sheet(isPresented: $editingConnection) { MacConnectionView(serverID: session.pairing.serverID) }
+            .sheet(isPresented: $showingSettings) { SettingsView() }
+        }
+    }
+
+    /// How the Mac is reached now.
+    private var reach: String {
+        guard session.isConnected else { return String(localized: "Not connected") }
+        switch session.route {
+        case .nearby, nil: return String(localized: "On this network")
+        case .lastKnown: return String(localized: "By its last address")
+        case .address:
+            let tailscale = model.pairing(serverID: session.pairing.serverID)?.address?.kind == .tailscale
+            return tailscale ? String(localized: "Over Tailscale") : String(localized: "By address")
         }
     }
 

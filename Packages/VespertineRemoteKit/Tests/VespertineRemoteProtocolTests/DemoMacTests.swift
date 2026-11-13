@@ -48,7 +48,7 @@ struct DemoMacTests {
     @Test func browsesAndSearchesTheLibrary() async throws {
         let (mac, _) = try await opened()
         guard case .albums(let page, let total) = try await ask(mac, .albums(offset: 0, limit: 3)) else { Issue.record("no albums"); return }
-        #expect(page.count == 3 && total == 8)
+        #expect(page.count == 3 && total == 18)
         guard case .tracks(let songs) = try await ask(mac, .albumTracks(key: page[0].key)) else { Issue.record("no tracks"); return }
         #expect(songs.first?.trackNumber == 1)
         guard case .tracks(let found) = try await ask(mac, .search(text: "nocturne", limit: 50)) else { Issue.record("no search"); return }

@@ -34,8 +34,10 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSRequiresIPhoneOS: true
+        UIRequiresFullScreen: false
         ITSAppUsesNonExemptEncryption: false
-        UILaunchScreen: {}
+        UILaunchScreen:
+          UIColorName: LaunchBackground
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
@@ -60,3 +62,51 @@ targets:
         SWIFT_APPROACHABLE_CONCURRENCY: YES
         SWIFT_STRICT_CONCURRENCY: complete
         SWIFT_EMIT_LOC_STRINGS: YES
+  VespertineRemoteTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: VespertineRemote
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.VespertineRemoteTests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/VespertineRemote.app/VespertineRemote
+        BUNDLE_LOADER: $(TEST_HOST)
+        DEVELOPMENT_TEAM: 7WMQ9ZV6V8
+        SWIFT_STRICT_CONCURRENCY: complete
+  VespertineRemoteUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: UITests
+    dependencies:
+      - target: VespertineRemote
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.VespertineRemoteUITests
+        GENERATE_INFOPLIST_FILE: YES
+        DEVELOPMENT_TEAM: 7WMQ9ZV6V8
+        TEST_TARGET_NAME: VespertineRemote
+        SWIFT_STRICT_CONCURRENCY: complete
+schemes:
+  VespertineRemote:
+    build:
+      targets:
+        VespertineRemote: all
+        VespertineRemoteTests: [test]
+        VespertineRemoteUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - VespertineRemoteTests
+        - VespertineRemoteUITests
+      parallelizable: false
+      environmentVariables:
+        VT_CAPTURE_ORIENTATION: "$(VT_CAPTURE_ORIENTATION)"
+    archive:
+      config: Release

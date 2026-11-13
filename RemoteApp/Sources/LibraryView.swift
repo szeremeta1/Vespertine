@@ -8,16 +8,21 @@ import VespertineRemoteClient
 import VespertineRemoteProtocol
 
 struct LibraryView: View {
+    @Environment(RemoteAppModel.self) private var model
     let session: RemoteSession
+    var section: RemoteDestination? = nil
     @State private var search = ""
+    @State private var path: [String] = []
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Group {
-                if search.trimmingCharacters(in: .whitespaces).isEmpty {
+                if let section {
+                    sectionContent(section)
+                } else if search.trimmingCharacters(in: .whitespaces).isEmpty {
                     List {
-                        NavigationLink { AlbumsGrid(session: session) } label: { Label("Albums", systemImage: "square.stack") }
-                        NavigationLink { ArtistsList(session: session) } label: { Label("Artists", systemImage: "music.mic") }
+                        NavigationLink(value: "albums") { Label("Albums", systemImage: "square.stack") }
+                        NavigationLink(value: "artists") { Label("Artists", systemImage: "music.mic") }
                         NavigationLink { PlaylistsList(session: session) } label: { Label("Playlists", systemImage: "music.note.list") }
                         NavigationLink {
                             TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil)
@@ -27,8 +32,43 @@ struct LibraryView: View {
                     SearchResults(session: session, text: search)
                 }
             }
-            .navigationTitle("Library")
+            .obsidianList()
+            .navigationTitle(section?.title ?? String(localized: "Library"))
             .searchable(text: $search, prompt: Text("Songs, artists, albums"))
+            .navigationDestination(for: String.self) { place in
+                switch place {
+                case "artists": ArtistsList(session: session)
+                case "playlists": PlaylistsList(session: session)
+                case "favorites": TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil)
+                default: AlbumsGrid(session: session)
+                }
+            }
+            .onAppear {
+                #if DEBUG
+                if model.startScreen == "search" { search = "Harbor"; model.startScreen = nil }
+                #endif
+                guard section == nil else { return }
+                switch model.startScreen {
+                case "albums", "coverFlow", "album": path = ["albums"]; if model.startScreen != "album" { model.startScreen = nil }
+                case "artists", "playlists", "favorites":
+                    if let screen = model.startScreen { path = [screen] }
+                    model.startScreen = nil
+                default: break
+                }
+            }
+        }
+    }
+
+    @ViewBuilder private func sectionContent(_ place: RemoteDestination) -> some View {
+        if !search.trimmingCharacters(in: .whitespaces).isEmpty {
+            SearchResults(session: session, text: search)
+        } else {
+            switch place {
+            case .artists: ArtistsList(session: session).readablePane()
+            case .playlists: PlaylistsList(session: session).readablePane()
+            case .favorites: TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil).readablePane()
+            default: AlbumsGrid(session: session)
+            }
         }
     }
 }
@@ -42,6 +82,7 @@ private struct SearchResults: View {
         List {
             TrackRows(session: session, tracks: tracks, play: { index in .playTracks(ids: tracks.compactMap(\.id), startAt: index, shuffled: nil) })
         }
+        .obsidianList()
         .task(id: text) {
                 try? await Task.sleep(for: .milliseconds(300))
                 guard !Task.isCancelled else { return }
@@ -51,32 +92,76 @@ private struct SearchResults: View {
 }
 
 struct AlbumsGrid: View {
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(RemoteAppModel.self) private var model
     let session: RemoteSession
     @State private var albums: [AlbumSummary] = []
     @State private var total: Int?
     @State private var loading = false
+    @State private var sample: AlbumSummary?
     var artist: String?
 
+    private var coverFlow: Bool { model.settings.albumsLayout == .coverFlow }
+
     var body: some View {
-        ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 20) {
-                ForEach(albums) { album in
-                    NavigationLink { AlbumView(session: session, album: album) } label: {
-                        VStack(alignment: .leading, spacing: 4) {
-                            ArtworkView(key: album.artworkKey)
-                            Text(album.title).font(.subheadline).lineLimit(1)
-                            Text(album.artist).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+        Group {
+            if coverFlow {
+                CoverFlowView(session: session, albums: albums) { Task { await loadMore() } }
+            } else {
+                grid
+            }
+        }
+        .obsidianBackground()
+        .navigationTitle(artist.map { Text($0) } ?? Text("Albums"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    withAnimation(.easeInOut(duration: 0.25)) { model.settings.albumsLayout = coverFlow ? .grid : .coverFlow }
+                } label: {
+                    Image(systemName: coverFlow ? "square.grid.2x2" : "rectangle.stack")
+                }
+                .accessibilityLabel(coverFlow ? Text("Show as a Grid") : Text("Show as Cover Flow"))
+            }
+        }
+        .navigationDestination(isPresented: Binding(get: { sample != nil }, set: { if !$0 { sample = nil } })) {
+            if let sample { AlbumView(session: session, album: sample) }
+        }
+        .task(id: session.isConnected) {
+            if albums.isEmpty { await loadMore() }
+            if model.startScreen == "album", let first = albums.first { model.startScreen = nil; sample = first }
+        }
+    }
+
+    private var grid: some View {
+        GeometryReader { geometry in
+            ScrollView {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: RemoteLayout.albumColumns(width: min(geometry.size.width, 1200), accessibilityText: typeSize.isAccessibilitySize)), spacing: 20) {
+                    ForEach(albums) { album in
+                        NavigationLink { AlbumView(session: session, album: album) } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                ArtworkView(key: album.artworkKey)
+                                    .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
+                                Text(album.title).font(.serif(.subheadline, weight: .medium)).foregroundStyle(Palette.text).lineLimit(1)
+                                Text(album.artist).font(.caption).foregroundStyle(Palette.text2).lineLimit(1)
+                            }
+                            .accessibilityElement(children: .combine)
                         }
+                        .buttonStyle(.plain)
+                        .hoverEffect(.lift)
+                        .onAppear { if album.key == albums.last?.key { Task { await loadMore() } } }
                     }
-                    .buttonStyle(.plain)
-                    .onAppear { if album.key == albums.last?.key { Task { await loadMore() } } }
+                }
+                .padding()
+                .frame(maxWidth: 1200)
+                .frame(maxWidth: .infinity)
+                if loading { ProgressView().padding() }
+                if !loading, albums.isEmpty, total != nil {
+                    Text("No albums yet").font(.serif(.title3)).foregroundStyle(Palette.text2).padding(.top, 60)
                 }
             }
-            .padding()
-            if loading { ProgressView().padding() }
+            .accessibilityIdentifier("albums-grid")
         }
-        .navigationTitle(artist.map { Text($0) } ?? Text("Albums"))
-        .task { if albums.isEmpty { await loadMore() } }
     }
 
     private func loadMore() async {
@@ -103,34 +188,56 @@ struct AlbumView: View {
     let album: AlbumSummary
     @State private var tracks: [TrackSummary] = []
     @State private var feedback = CommandFeedback()
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         List {
             Section {
-                VStack(spacing: 10) {
-                    ArtworkView(key: album.artworkKey, size: 600, cornerRadius: 10).frame(maxWidth: 280)
-                    Text(album.title).font(.title3.bold()).multilineTextAlignment(.center)
-                    Text(album.artist).foregroundStyle(.secondary)
-                    Text([album.year.map(String.init), album.format].compactMap { $0 }.joined(separator: " · "))
-                        .font(.caption).foregroundStyle(.secondary)
-                    HStack {
-                        Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: false)) } label: {
-                            Label("Play", systemImage: "play.fill").frame(maxWidth: .infinity)
-                        }
-                        Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: true)) } label: {
-                            Label("Shuffle", systemImage: "shuffle").frame(maxWidth: .infinity)
+                ViewThatFits(in: .horizontal) {
+                    if sizeClass == .regular && !typeSize.isAccessibilitySize {
+                        HStack(alignment: .bottom, spacing: 28) {
+                            ArtworkView(key: album.artworkKey, size: 800, cornerRadius: 10).frame(width: 240, height: 240)
+                            albumInfo(leading: true).frame(minWidth: 260, maxWidth: 420)
+                            Spacer(minLength: 0)
                         }
                     }
-                    .buttonStyle(.bordered)
+                    VStack(spacing: 16) {
+                        ArtworkView(key: album.artworkKey, size: 800, cornerRadius: 10).frame(maxWidth: 280)
+                        albumInfo(leading: false)
+                    }
                 }
                 .frame(maxWidth: .infinity)
                 .listRowBackground(Color.clear)
             }
             TrackRows(session: session, tracks: tracks, play: { .playAlbum(key: album.key, startAt: $0, shuffled: false) }, numbered: true)
         }
+        .obsidianList()
         .navigationBarTitleDisplayMode(.inline)
         .feedback(feedback)
-        .task { if case .tracks(let items) = await session.send(.albumTracks(key: album.key)) { tracks = items } }
+        .task(id: session.isConnected) { if tracks.isEmpty, case .tracks(let items) = await session.send(.albumTracks(key: album.key)) { tracks = items } }
+    }
+
+    private func albumInfo(leading: Bool) -> some View {
+        VStack(alignment: leading ? .leading : .center, spacing: 10) {
+            Text(album.title).font(.serif(leading ? .title2 : .title3, weight: .semibold)).multilineTextAlignment(leading ? .leading : .center)
+            Text(album.artist).foregroundStyle(Palette.text2)
+            HStack(spacing: 6) {
+                Chip(text: album.format, highlighted: album.hiRes || album.dsd)
+                if let year = album.year { Chip(text: String(year)) }
+            }
+            HStack {
+                Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: false)) } label: {
+                    Label("Play", systemImage: "play.fill").frame(maxWidth: .infinity)
+                }
+                Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: true)) } label: {
+                    Label("Shuffle", systemImage: "shuffle").frame(maxWidth: .infinity)
+                }
+            }
+            .buttonStyle(.bordered)
+            .disabled(!session.isConnected)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -151,9 +258,10 @@ struct ArtistsList: View {
                 }
             }
         }
+        .obsidianList()
         .searchable(text: $filter)
-        .navigationTitle("Artists")
-        .task { if case .artists(let items) = await session.send(.artists) { artists = items } }
+        .navigationTitle("Artists").screenTitleStyle()
+        .task(id: session.isConnected) { if case .artists(let items) = await session.send(.artists) { artists = items } }
     }
 }
 
@@ -170,8 +278,9 @@ struct PlaylistsList: View {
                 Label(playlist.name, systemImage: playlist.smart ? "gearshape" : "music.note.list")
             }
         }
-        .navigationTitle("Playlists")
-        .task { if case .playlists(let items) = await session.send(.playlists) { playlists = items } }
+        .obsidianList()
+        .navigationTitle("Playlists").screenTitleStyle()
+        .task(id: session.isConnected) { if case .playlists(let items) = await session.send(.playlists) { playlists = items } }
     }
 }
 
@@ -188,8 +297,9 @@ struct TrackListView: View {
         List {
             TrackRows(session: session, tracks: tracks, play: play ?? { index in .playTracks(ids: tracks.compactMap(\.id), startAt: index, shuffled: nil) })
         }
-        .navigationTitle(title)
-        .task { if case .tracks(let items) = await session.send(load) { tracks = items } }
+        .obsidianList()
+        .navigationTitle(title).screenTitleStyle()
+        .task(id: session.isConnected) { if case .tracks(let items) = await session.send(load) { tracks = items } }
     }
 }
 

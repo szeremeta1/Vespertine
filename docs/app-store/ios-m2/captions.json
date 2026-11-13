@@ -1,0 +1,8 @@
+[
+  {"id":"01-now-playing", "screen":"03-now-playing", "headline":"Your music. Your Mac.", "caption":"NOW PLAYING", "alternative":"See what's playing."},
+  {"id":"02-library", "screen":"08-albums", "headline":"Keep your library close.", "caption":"ALBUMS, ARTISTS, PLAYLISTS", "alternative":"Browse the collection."},
+  {"id":"03-queue", "screen":"10-queue", "headline":"Choose what comes next.", "caption":"THE MAC'S QUEUE", "alternative":"Keep the queue in reach."},
+  {"id":"04-output", "screen":"11-output", "headline":"Choose where it plays.", "caption":"OUTPUT ON YOUR MAC", "alternative":"Your Mac. Your speakers."},
+  {"id":"05-connection", "screen":"02-connection", "headline":"A familiar connection.", "caption":"PAIR ONCE WITH YOUR MAC", "alternative":"Connect to your Mac."},
+  {"id":"06-cover-flow", "screen":"05-cover-flow", "headline":"Browse by the covers.", "caption":"GRID OR COVER FLOW", "alternative":"A different view of the collection."}
+]

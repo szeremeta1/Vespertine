@@ -45,7 +45,8 @@ struct QueueView: View {
                     ProgressView()
                 }
             }
-            .navigationTitle("Queue")
+            .obsidianList()
+            .navigationTitle("Queue").screenTitleStyle()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { EditButton() }
                 ToolbarItem(placement: .topBarTrailing) {

@@ -1,0 +1,17 @@
+{
+  "status": "draft for Alex; nothing uploaded",
+  "locale": "en-US",
+  "name": "Vespertine Remote",
+  "subtitle": "Remote for Vespertine on Mac",
+  "subtitleAlternative": "Your Mac library, within reach",
+  "promotionalText": "Browse your Vespertine library, pick what plays next and choose the output, from your iPhone or iPad. Requires Vespertine on your Mac.",
+  "description": "Control Vespertine on your Mac from your iPhone or iPad. Browse your library, choose what plays next and pick the output from anywhere in the room.\n\nNOW PLAYING\nThe cover or a turning record, with play, pause, skip, seek, shuffle, repeat and volume. Format, sample rate and the output in use, as Vespertine on the Mac reports them.\n\nLIBRARY\nAlbums, artists, playlists and favorites. Search songs, artists and albums. Browse albums in a grid or in Cover Flow, and play or shuffle a whole record.\n\nQUEUE\nSee what is playing and what comes next. Reorder it, remove songs or clear it.\n\nOUTPUT\nChoose where the Mac plays: its speakers, a USB DAC, a receiver or a speaker group.\n\nBUILT FOR IPAD\nA sidebar keeps Now Playing, the library, the queue and the output one tap away. Layouts adapt to portrait, landscape and the size of the window. Keyboard shortcuts switch sections and control playback.\n\nPAIRING\nPair once with a code shown by Vespertine on your Mac. The connection is encrypted. At home the remote finds the Mac on your network. Away from it, a saved address reaches a paired Mac through your own VPN, including Tailscale, when the Mac is awake.\n\nTRY IT WITHOUT A MAC\nThe built-in demo opens a made-up library with every screen of the remote. The demo does not play audio.\n\nLight and dark appearances follow your device. Motion follows your accessibility settings.\n\nVespertine Remote controls playback on the Mac. It does not play music on this device. Requires Vespertine for Mac, free from vespertineapp.com.\n\nFree and open source. No accounts. No ads. No tracking.",
+  "keywords": "music,mac,controller,library,albums,queue,player,hi-res,lossless,flac,dac,surround,ipad,cover flow",
+  "whatsNew": "A sidebar on iPad, layouts that adapt as you resize the window, keyboard shortcuts, light and dark appearances, and a new app icon.",
+  "reviewNotes": "This is a remote for the open-source Vespertine Mac app. No account is required. Without a Mac, open the app and tap Try the Demo on the Macs screen. The demo shows a generated library and every main remote screen. It does not play audio. Music playback happens on the paired Mac. Local Network access discovers Macs; camera access is used only to scan a pairing code. Nothing in this kit has been submitted.",
+  "screenshots": {
+    "appearance": "dark only",
+    "iphone69": "screenshots/iphone69 (6 images, 1320x2868)",
+    "ipad13": "screenshots/ipad13 (6 images, 2752x2064)"
+  }
+}

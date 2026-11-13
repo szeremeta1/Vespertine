@@ -18,6 +18,14 @@ public struct DiscoveredMac: Identifiable, Hashable, Sendable {
     public var protocolVersion: Int?
     public var appVersion: String?
     public var endpoint: NWEndpoint
+
+    public init(name: String, serverID: String, protocolVersion: Int? = nil, appVersion: String? = nil, endpoint: NWEndpoint) {
+        self.name = name
+        self.serverID = serverID
+        self.protocolVersion = protocolVersion
+        self.appVersion = appVersion
+        self.endpoint = endpoint
+    }
 }
 
 /// Browses for Macs while started. Everything happens on the main actor.

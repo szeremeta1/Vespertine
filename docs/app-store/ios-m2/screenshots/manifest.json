@@ -1,0 +1,122 @@
+[
+  {
+    "file": "iphone69/01-now-playing.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "source": "01-now-playing.png",
+    "appearance": "dark",
+    "headline": "Your music. Your Mac."
+  },
+  {
+    "file": "iphone69/02-library.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "source": "10-library.png",
+    "appearance": "dark",
+    "headline": "Keep your library close."
+  },
+  {
+    "file": "iphone69/03-queue.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "source": "03-queue.png",
+    "appearance": "dark",
+    "headline": "Choose what comes next."
+  },
+  {
+    "file": "iphone69/04-output.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "source": "04-output.png",
+    "appearance": "dark",
+    "headline": "Choose where it plays."
+  },
+  {
+    "file": "iphone69/05-connection.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "source": "07-macs.png",
+    "appearance": "dark",
+    "headline": "A familiar connection."
+  },
+  {
+    "file": "iphone69/06-cover-flow.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "source": "06-cover-flow.png",
+    "appearance": "dark",
+    "headline": "Browse by the covers."
+  },
+  {
+    "file": "ipad13/01-now-playing.png",
+    "size": [
+      2752,
+      2064
+    ],
+    "source": "01-now-playing.png",
+    "appearance": "dark",
+    "headline": "Your music. Your Mac."
+  },
+  {
+    "file": "ipad13/02-library.png",
+    "size": [
+      2752,
+      2064
+    ],
+    "source": "02-library.png",
+    "appearance": "dark",
+    "headline": "Keep your library close."
+  },
+  {
+    "file": "ipad13/03-queue.png",
+    "size": [
+      2752,
+      2064
+    ],
+    "source": "03-queue.png",
+    "appearance": "dark",
+    "headline": "Choose what comes next."
+  },
+  {
+    "file": "ipad13/04-output.png",
+    "size": [
+      2752,
+      2064
+    ],
+    "source": "04-output.png",
+    "appearance": "dark",
+    "headline": "Choose where it plays."
+  },
+  {
+    "file": "ipad13/05-connection.png",
+    "size": [
+      2752,
+      2064
+    ],
+    "source": "07-macs.png",
+    "appearance": "dark",
+    "headline": "A familiar connection."
+  },
+  {
+    "file": "ipad13/06-cover-flow.png",
+    "size": [
+      2752,
+      2064
+    ],
+    "source": "06-cover-flow.png",
+    "appearance": "dark",
+    "headline": "Browse by the covers."
+  }
+]
