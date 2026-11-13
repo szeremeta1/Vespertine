@@ -428,6 +428,16 @@ public final class LibraryDatabase: Sendable {
             // How each TIDAL row arrived: the account's sync ("favorite") or Add to Library from the catalog ("added", never removed by sync).
             try db.alter(table: "tidalTrack") { t in t.add(column: "origin", .text).notNull().defaults(to: "favorite") }
         }
+        m.registerMigration("v27-tidal-pending-ops") { db in
+            // TIDAL writes made in Vespertine and not sent yet (offline, signed out, backing off), in the order they were made.
+            try db.create(table: "tidalPendingOp") { t in
+                t.autoIncrementedPrimaryKey("id")
+                t.column("kind", .text).notNull()
+                t.column("payload", .text).notNull()
+                t.column("createdAt", .datetime).notNull()
+                t.column("attempts", .integer).notNull().defaults(to: 0)
+            }
+        }
         return m
     }
 }

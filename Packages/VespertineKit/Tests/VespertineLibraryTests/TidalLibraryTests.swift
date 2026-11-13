@@ -167,6 +167,25 @@ struct TidalLibraryTests {
         #expect(stored.isCurrent && stored.analysis.effectiveBitDepth == 16)
     }
 
+    @Test("TIDAL's favorite tracks are the hearts of their rows: hearted when favorite, un-hearted when not; local songs untouched")
+    func mirroredHearts() throws {
+        let db = try LibraryDatabase.inMemory()
+        let local = try db.addSource(LibrarySource(path: "/Music", mode: .reference))
+        try db.writer.write { d in
+            try d.execute(sql: """
+                INSERT INTO track (sourceId, location, filePath, fileSize, modifiedAt, addedAt, codec, isLossless, isDSD, sampleRate, channels, duration, title)
+                VALUES (?, '/Music/a.flac', '/Music/a.flac', 1, '2020-01-01 00:00:00.000', '2020-01-01 00:00:00.000', 'FLAC', 1, 0, 44100, 2, 1, 'Local')
+                """, arguments: [local.id])
+        }
+        let source = try #require(try db.tidalSource(userId: 1).id)
+        let ids = try db.upsertTidalTracks([input(1), input(2)], sourceId: source)
+        let localId = try #require(try db.allTracks().first { $0.title == "Local" }?.id)
+        try db.setFavorite(true, trackIDs: [localId, ids[2]!])
+        try db.mirrorTidalFavorites([1])
+        let hearts = Set(try db.favoriteTracks().compactMap(\.id))
+        #expect(hearts == [localId, ids[1]!])
+    }
+
     @Test("A download is the track's file, and clearing it empties the path again")
     func downloadPath() throws {
         let db = try LibraryDatabase.inMemory()

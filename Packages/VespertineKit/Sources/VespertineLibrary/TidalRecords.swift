@@ -510,3 +510,97 @@ extension LibraryDatabase {
         return true
     }
 }
+
+// MARK: - Pending TIDAL writes
+
+/// A TIDAL write waiting in the library (`tidalPendingOp`).
+public struct TidalPendingOpRow: Sendable, Equatable {
+    public var id: Int64
+    public var kind: String
+    public var payload: String
+    public var createdAt: Date
+    public var attempts: Int
+}
+
+extension LibraryDatabase {
+    @discardableResult
+    public func enqueueTidalOp(kind: String, payload: String, at date: Date = Date()) throws -> Int64 {
+        try writer.write { db in
+            try db.execute(sql: "INSERT INTO tidalPendingOp (kind, payload, createdAt, attempts) VALUES (?, ?, ?, 0)",
+                           arguments: [kind, payload, date])
+            return db.lastInsertedRowID
+        }
+    }
+
+    /// Every waiting write, oldest first.
+    public func tidalPendingOps() throws -> [TidalPendingOpRow] {
+        try writer.read { db in
+            try Row.fetchAll(db, sql: "SELECT * FROM tidalPendingOp ORDER BY id").map {
+                TidalPendingOpRow(id: $0["id"], kind: $0["kind"], payload: $0["payload"], createdAt: $0["createdAt"], attempts: $0["attempts"])
+            }
+        }
+    }
+
+    public func deleteTidalOp(_ id: Int64) throws {
+        try writer.write { db in try db.execute(sql: "DELETE FROM tidalPendingOp WHERE id = ?", arguments: [id]) }
+    }
+
+    public func bumpTidalOpAttempts(_ id: Int64) throws {
+        try writer.write { db in try db.execute(sql: "UPDATE tidalPendingOp SET attempts = attempts + 1 WHERE id = ?", arguments: [id]) }
+    }
+
+    /// The TIDAL playlist a library playlist stands for, nil for a plain one.
+    public func tidalPlaylistUUID(playlistId: Int64) throws -> String? {
+        try writer.read { db in try String.fetchOne(db, sql: "SELECT uuid FROM tidalPlaylist WHERE playlistId = ?", arguments: [playlistId]) }
+    }
+
+    /// The library playlists linked to TIDAL playlists (for the sidebar's glyph and the routing of edits).
+    public func tidalPlaylistIds() throws -> Set<Int64> {
+        try writer.read { db in Set(try Int64.fetchAll(db, sql: "SELECT playlistId FROM tidalPlaylist")) }
+    }
+
+    /// A playlist made in Vespertine was created on TIDAL as `uuid`.
+    public func linkTidalPlaylist(uuid: String, playlistId: Int64) throws {
+        try writer.write { db in
+            try db.execute(sql: "INSERT OR REPLACE INTO tidalPlaylist (uuid, playlistId, lastUpdated) VALUES (?, ?, NULL)", arguments: [uuid, playlistId])
+        }
+    }
+
+    /// The TIDAL playlist is gone: the library's playlist stays, as a plain one.
+    public func unlinkTidalPlaylist(uuid: String) throws {
+        try writer.write { db in try db.execute(sql: "DELETE FROM tidalPlaylist WHERE uuid = ?", arguments: [uuid]) }
+    }
+
+    /// The ids the library's record of TIDAL list `list` holds.
+    public func tidalFavoriteIds(_ list: String) throws -> Set<Int> {
+        try writer.read { db in Set(try Int.fetchAll(db, sql: "SELECT itemId FROM tidalFavorite WHERE list = ?", arguments: [list])) }
+    }
+
+    /// The hearts of TIDAL rows follow TIDAL's favorite tracks (`ids`): for a TIDAL song the heart is the TIDAL favorite. Local songs'
+    /// hearts are left as they are.
+    public func mirrorTidalFavorites(_ ids: Set<Int>) throws {
+        try writer.write { db in
+            let rows = try Row.fetchAll(db, sql: "SELECT trackId, tidalId FROM tidalTrack")
+            let now = Date()
+            for row in rows {
+                let trackId: Int64 = row["trackId"], tidalId: Int = row["tidalId"]
+                if ids.contains(tidalId) {
+                    try db.execute(sql: "INSERT OR IGNORE INTO favorite (trackId, favoritedAt) VALUES (?, ?)", arguments: [trackId, now])
+                } else {
+                    try db.execute(sql: "DELETE FROM favorite WHERE trackId = ?", arguments: [trackId])
+                }
+            }
+        }
+    }
+
+    /// One favorite sent to TIDAL: the record of its list follows, so the next pull doesn't take the change for a short answer.
+    public func setTidalFavorite(_ list: String, id: Int, present: Bool) throws {
+        try writer.write { db in
+            if present {
+                try db.execute(sql: "INSERT OR IGNORE INTO tidalFavorite (list, itemId) VALUES (?, ?)", arguments: [list, id])
+            } else {
+                try db.execute(sql: "DELETE FROM tidalFavorite WHERE list = ? AND itemId = ?", arguments: [list, id])
+            }
+        }
+    }
+}

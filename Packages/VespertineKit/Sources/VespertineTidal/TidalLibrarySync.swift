@@ -16,6 +16,12 @@ public protocol TidalCatalogReading: Sendable {
     func albumTracks(_ id: Int, priority: TidalPriority) async throws -> [TidalTrack]
     func userPlaylists(userId: Int, priority: TidalPriority) async throws -> [TidalPlaylist]
     func playlistTracks(_ uuid: String, priority: TidalPriority) async throws -> [TidalTrack]
+    func playlist(_ uuid: String, priority: TidalPriority) async throws -> TidalPlaylist
+}
+
+extension TidalCatalogReading {
+    /// For readers that never pull a single playlist (test fakes of the sync and the downloader).
+    public func playlist(_ uuid: String, priority: TidalPriority) async throws -> TidalPlaylist { throw TidalError.unavailable }
 }
 
 extension TidalCatalog: TidalCatalogReading {}
@@ -52,9 +58,9 @@ public actor TidalLibrarySync {
     static let believedSpan: TimeInterval = 24 * 3600
 
     private let clock: @Sendable () -> Date
-    private let catalog: any TidalCatalogReading
-    private let database: LibraryDatabase
-    private let userId: Int
+    let catalog: any TidalCatalogReading
+    let database: LibraryDatabase
+    let userId: Int
 
     public init(catalog: any TidalCatalogReading, database: LibraryDatabase, userId: Int, clock: @escaping @Sendable () -> Date = Date.init) {
         self.clock = clock
@@ -158,6 +164,7 @@ public actor TidalLibrarySync {
         let removed = trustAll ? try database.removeTidalTracks(notIn: present, sourceId: sourceId) : 0
         for (list, ids) in accepted {
             if let ids { try database.setTidalFavorites(list, ids: ids) }   // playlists: their own table is the record
+            if list == "favorite tracks", let ids { try database.mirrorTidalFavorites(ids) }   // the heart is the TIDAL favorite
         }
 
         let upserted = Set(inputs.map(\.tidalId))
