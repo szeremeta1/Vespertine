@@ -20,3 +20,21 @@ Decisions made while working on my own (the owner said "fly solo, take the best 
 11. **Default stream quality `HI_RES_LOSSLESS`.** TIDAL falls back to what the track or subscription allows, and the probed format is what the app shows.
 12. **Only the PKCE login is implemented** (in-app web sheet that catches the redirect). The device-code login is skipped because its client can't get hi-res.
 13. **Work order and parallel tracks:** see the plan. Track A (pure TIDAL module), Track B (cache registry + library migration) and Track C (UPnP) run in parallel in separate worktrees and are merged into `tidal-integration`.
+
+## Library and UI (sub-project 2)
+
+200. **Settings › TIDAL is its own tab**, between Online and Remote. It holds the account, credentials, quality, downloads folder and sync status.
+201. **Login runs in a WKWebView sheet** with a non-persistent data store, so TIDAL's real login page is used and no web cookies are kept.
+202. **Source column** after Format, shown only when a TIDAL source exists. TIDAL is shown with a "T" glyph in a rounded square, with a check added once downloaded.
+203. **One playability rule** for every view, so the grayed rows match everywhere. It reuses the dimming offline share sources already get.
+204. **The Format column shows TIDAL's listed quality with "≈"** until the stream has been probed, so the app never claims a format it hasn't seen.
+205. **Albums in both libraries appear as copies** through the existing AlbumCopies grouping. Tracks match by ISRC, then by title and duration within 2 s.
+206. **Streamed tracks are analyzed from the transient cache file once it's complete**, before deletion. Only the analysis result is stored, so fake hi-res detection works without keeping audio.
+207. **Catalog items play without a database row.** "Add to Library" adds them as `origin = added`, and sync never removes those.
+208. **Sync runs at launch, every 6 h, and on demand.**
+
+## Two-way sync (sub-project 3)
+
+300. **A TIDAL-linked playlist accepts only TIDAL tracks.** A dropped local track is matched by ISRC; if there's no match, the drop is refused. Plain playlists mix sources freely.
+301. **Conflicts:** TIDAL wins on etag mismatch (412). Pending adds and removes are re-applied, moves are skipped, and skipped ops are reported.
+302. **Writes queue persistently** when offline, signed out or backing off. The UI updates optimistically, with a "waiting to sync" clock on affected rows.
