@@ -166,6 +166,9 @@ public final class RendererPlayback: @unchecked Sendable {
         poller?.cancel()
     }
 
+    /// Vespertine means the player to be playing (not paused or stopped by the listener).
+    var wantsPlaying: Bool { state.withLock { $0.wantsPlaying } }
+
     /// The state, with the position moved on since the last poll while playing.
     public var snapshot: EngineSnapshot {
         state.withLock { s in
@@ -191,9 +194,9 @@ public final class RendererPlayback: @unchecked Sendable {
             case .play(let item, let at, let announce, let g):
                 guard generation.withLock({ $0 }) == g else { return }   // overtaken by a later skip or stop
                 try await start(item, at: at, announce: announce, generation: g)
-            case .pause: await retrying(String(localized: "pause")) { try await self.transport.pause() }
-            case .resume: await retrying(String(localized: "play")) { try await self.transport.play() }
-            case .seek(let seconds): await retrying(String(localized: "seek")) { try await self.seek(seconds) }
+            case .pause: await retrying(String(localized: "pause"), resync: true) { try await self.transport.pause() }
+            case .resume: await retrying(String(localized: "play"), resync: true) { try await self.transport.play() }
+            case .seek(let seconds): await retrying(String(localized: "seek"), resync: false) { try await self.seek(seconds) }
             case .stop:
                 try? await transport.stop()
                 let old = state.withLock { s -> [Entry] in
@@ -214,10 +217,21 @@ public final class RendererPlayback: @unchecked Sendable {
 
     /// Pause, play and seek: a renderer busy changing state refuses them now and then (UPnP 701, "transition not available").
     /// Tried again once after a moment; refused again, the listener is told and the song plays on as it was.
-    private func retrying(_ what: String, _ body: @escaping () async throws -> Void) async {
+    /// `resync`: pause and play were shown at once (optimistically); refused, the snapshot and what Vespertine wants go back to what
+    /// the player is really doing, so the interface doesn't say paused while it plays.
+    private func retrying(_ what: String, resync: Bool, _ body: @escaping () async throws -> Void) async {
         do { try await body(); return } catch {}
         try? await Task.sleep(for: .milliseconds(300))
         do { try await body() } catch {
+            if resync, let status = try? await transport.status() {
+                state.withLock { s in
+                    switch status.state {
+                    case .playing, .transitioning: s.wantsPlaying = true; s.snapshot.state = .playing
+                    case .paused: s.wantsPlaying = false; s.snapshot.state = .paused; s.anchor = nil
+                    case .stopped, .noMedia: s.wantsPlaying = false; s.snapshot.state = .stopped; s.anchor = nil
+                    }
+                }
+            }
             let reason = (error as? UPnPError)?.message ?? error.localizedDescription
             emit(.notice(String(localized: "\(renderer.name) didn't \(what) (\(reason)).", comment: "%1$@ is a network player's name, %2$@ an action (pause, play, seek), %3$@ the reason.")))
         }

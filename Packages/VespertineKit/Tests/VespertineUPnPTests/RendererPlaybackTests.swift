@@ -275,4 +275,36 @@ struct RendererTransientTests {
         #expect(h.fake.currentURI == uri)
         #expect(h.playback.snapshot.state == .playing)
     }
+
+    @Test("A pause refused twice leaves the snapshot as the player really is: playing, and still meant to play")
+    func pauseRefusedTwice() async throws {
+        let h = try await Harness.make(kind: .openHome)
+        defer { h.close() }
+        h.playback.play(h.queue[0])
+        #expect(await h.events.wait(for: "started"))
+        h.fake.fail("Pause", code: 701, times: 2)
+        h.playback.pause()
+        #expect(await h.events.wait(for: "notice"))
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(h.fake.transportState == "Playing")
+        #expect(h.playback.snapshot.state == .playing)
+        #expect(h.playback.wantsPlaying)
+    }
+
+    @Test("A resume refused twice leaves it paused, and not meant to play")
+    func resumeRefusedTwice() async throws {
+        let h = try await Harness.make(kind: .openHome)
+        defer { h.close() }
+        h.playback.play(h.queue[0])
+        #expect(await h.events.wait(for: "started"))
+        h.playback.pause()
+        try await Task.sleep(for: .milliseconds(300))
+        h.fake.fail("Play", code: 701, times: 2)
+        h.playback.resume()
+        #expect(await h.events.wait(for: "notice"))
+        try await Task.sleep(for: .milliseconds(300))
+        #expect(h.fake.transportState == "Paused")
+        #expect(h.playback.snapshot.state == .paused)
+        #expect(!h.playback.wantsPlaying)
+    }
 }

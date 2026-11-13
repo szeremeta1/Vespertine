@@ -123,7 +123,7 @@ public struct SOAPClient: Sendable {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.httpMaximumConnectionsPerHost = 2
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        return URLSession(configuration: configuration)
+        return URLSession(configuration: configuration, delegate: SameHostRedirects(), delegateQueue: nil)
     }()
 
     public func call(_ service: UPnPService, _ action: String, _ arguments: [(String, String)] = []) async throws -> [String: String] {
@@ -167,6 +167,17 @@ public struct SOAPClient: Sendable {
         } catch {
             throw UPnPError.unreachable(error.localizedDescription)
         }
+    }
+}
+
+/// Redirects are followed only on the host first asked (the responder discovery pinned): a description or control URL can't
+/// send Vespertine's requests anywhere else on the network by redirecting.
+final class SameHostRedirects: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+        let from = task.originalRequest?.url?.host?.lowercased()
+        let to = request.url?.host?.lowercased()
+        completionHandler(from != nil && from == to ? request : nil)
     }
 }
 

@@ -122,14 +122,15 @@ struct ProcessedStreamTests {
         playback.play(PlayableItem(url: wav))
         #expect(await events.wait(for: "started"))
         for _ in 0..<50 where fake.currentURI == nil { try await Task.sleep(for: .milliseconds(20)) }
-        let uri = try #require(fake.currentURI)
+        let uri = try #require(fake.currentURI, "calls: \(fake.actions) events: \(events.all) state: \(fake.transportState)")
         #expect(uri.hasSuffix(".flac"))
         let bytes = try #require(await fake.fetched(uri))
         #expect(bytes.prefix(4) == Data("fLaC".utf8))
         #expect(playback.snapshot.signalPath?.statusLine == "PROCESSED · EQ")
         #expect(playback.snapshot.signalPath?.renderer?.sentBitDepth == 24)
         playback.update(settings: RendererSettings())
-        for _ in 0..<200 where fake.currentURI == uri { try await Task.sleep(for: .milliseconds(20)) }
+        // The restart empties the playlist for a moment (DeleteAll, then Insert): wait for the new entry, not just for the old to go.
+        for _ in 0..<200 where fake.currentURI == uri || fake.currentURI == nil { try await Task.sleep(for: .milliseconds(20)) }
         let original = try #require(fake.currentURI)
         #expect(original != uri)
         #expect(original.hasSuffix(".wav"))

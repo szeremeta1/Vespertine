@@ -6,6 +6,7 @@
 
 import Foundation
 import Testing
+import VespertineAudio
 @testable import VespertineUPnP
 
 @Suite("Discovery trust", .serialized)
@@ -65,5 +66,36 @@ struct DiscoveryTrustTests {
         let parsed = try DeviceDescription.parse(Data(description.utf8), location: URL(string: "http://127.0.0.1:\(port)/odd.xml")!)
         #expect(parsed.confined().service(.avTransport) == nil)
         #expect(parsed.confined().service(.connectionManager) != nil)
+    }
+}
+
+@Suite("Redirects", .serialized)
+struct RedirectTests {
+    @Test("A description that redirects to another host isn't followed; one on the same host is")
+    func pinned() async throws {
+        let description = """
+        <?xml version="1.0"?><root xmlns="urn:schemas-upnp-org:device-1-0"><device>
+        <deviceType>urn:schemas-upnp-org:device:MediaRenderer:1</deviceType><friendlyName>R</friendlyName><UDN>uuid:r</UDN><serviceList>
+        <service><serviceType>urn:schemas-upnp-org:service:AVTransport:1</serviceType><serviceId>a</serviceId><SCPDURL>/scpd.xml</SCPDURL><controlURL>/avt</controlURL></service>
+        <service><serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType><serviceId>c</serviceId><SCPDURL>/scpd.xml</SCPDURL><controlURL>/cm</controlURL></service>
+        </serviceList></device></root>
+        """
+        let portBox = Locked<UInt16>(0)
+        let server = HTTPServer { request in
+            let port = portBox.withLock { $0 }
+            switch request.path {
+            // "localhost" is this same machine under another host name: the redirect must be refused all the same.
+            case "/away.xml": return HTTPResponse(status: 302, headers: [("Location", "http://localhost:\(port)/d.xml"), ("Content-Length", "0")])
+            case "/here.xml": return HTTPResponse(status: 302, headers: [("Location", "/d.xml"), ("Content-Length", "0")])
+            case "/d.xml": return HTTPResponse(status: 200, headers: [("Content-Length", "\(description.utf8.count)")], body: .data(Data(description.utf8)))
+            default: return .status(404)
+            }
+        }
+        let port = try await server.start()
+        portBox.withLock { $0 = port }
+        defer { server.stop() }
+        await #expect(throws: (any Error).self) { try await SOAPClient().get(URL(string: "http://127.0.0.1:\(port)/away.xml")!) }
+        let same = try await SOAPClient().get(URL(string: "http://127.0.0.1:\(port)/here.xml")!)
+        #expect(String(decoding: same, as: UTF8.self).contains("uuid:r"))
     }
 }
