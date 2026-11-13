@@ -1,0 +1,3 @@
+{"created":"2024-01-01T00:00:00.000+0000","item":{"id":100001,"title":"Fav","duration":100,"trackNumber":1,"volumeNumber":1,"explicit":false,
+ "audioQuality":"LOSSLESS","artists":[{"id":200001,"name":"Test Artist","type":"MAIN"}],
+ "album":{"id":300001,"title":"Fabricated Album","cover":"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"}}}
