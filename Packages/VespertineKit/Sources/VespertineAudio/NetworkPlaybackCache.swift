@@ -12,10 +12,15 @@ public protocol PlaybackCacheReader: AnyObject, Sendable {
     /// The file was rewritten on the server since it was opened (its size or modification date moved): what was copied
     /// so far may not belong with what follows.
     var changedSinceOpen: Bool { get }
+    /// The copy is over (cancelled, failed, or given up on as silent): a read still waiting on the network may give up now, with
+    /// any error, and later reads may fail at once. Called on any thread, possibly with the copy's lock held, so it must not
+    /// block or call back into the cache. A share's file has nothing to stop (its reads are the kernel's).
+    func cancel()
 }
 
 extension PlaybackCacheReader {
     public var changedSinceOpen: Bool { false }
+    public func cancel() {}
 }
 
 /// A source that is not a file on a mounted share (a streaming service's track, say): opened by a URL of its own scheme (see
@@ -708,7 +713,11 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
             NetworkPlaybackCache.letGo(&held)
             try? file.close(); try? FileManager.default.removeItem(at: url); release()
         }
-        func cancel() { condition.withLock { cancelled = true; condition.broadcast() }; publishDemand() }
+        func cancel() {
+            let current = condition.withLock { () -> (any PlaybackCacheReader)? in cancelled = true; condition.broadcast(); return held }
+            current?.cancel()
+            publishDemand()
+        }
         func promote() { condition.withLock { foreground = true }; publishDemand() }
 
         /// Library scans of the share wait while this song's bytes are the ones being waited for: its copy is
@@ -743,6 +752,8 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
             guard error == nil, clock() - lastProgress >= noProgressLimit else { return false }
             error = Failure.notAnswering
             condition.broadcast()
+            // A remote reader may be retrying for as long as it is let: the copy is over, so its lanes should come back.
+            held?.cancel()
             return true
         }
 
@@ -910,7 +921,7 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
                     }
                     publishDemand()
                 } catch {
-                    condition.withLock {
+                    let current = condition.withLock { () -> (any PlaybackCacheReader)? in
                         inFlight.remove(block)
                         activeLanes.remove(lane)
                         if self.error == nil {
@@ -918,7 +929,10 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
                             log.error("The song's copy stopped at block \(block, privacy: .public) of \(self.blocks, privacy: .public): \(ShareReadFailure.describe(error), privacy: .public)")
                         }
                         condition.broadcast()
+                        return held
                     }
+                    // The other lanes' reads of a failed copy are of no use: a remote reader stops retrying them.
+                    current?.cancel()
                     publishDemand()
                     return
                 }

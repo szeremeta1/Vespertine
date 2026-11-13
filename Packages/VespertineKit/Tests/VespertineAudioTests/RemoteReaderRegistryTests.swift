@@ -114,6 +114,83 @@ struct RemoteReaderRegistryTests {
     }
 }
 
+/// A share's file handed to the cache as a remote track: what a streaming reader of a big FLAC looks like to it.
+private final class RemoteShare: RemoteCacheReader, @unchecked Sendable {
+    let share: ControlledShare
+    var fileExtension: String { "flac" }
+    var size: Int64 { share.size }
+    init(_ share: ControlledShare) { self.share = share }
+    func read(at offset: Int64, count: Int) throws -> Data { try share.read(at: offset, count: count) }
+}
+
+@Suite("A big remote FLAC starts on a prefix")
+struct RemoteEarlyStartTests {
+    @Test("A remote FLAC over 12 MiB plays while everything past its first 8 MiB is still to come (NetworkStart's early start)")
+    func startsOnPrefix() async throws {
+        let rig = try PlayPauseRig(seconds: 26, fileExtension: "flac", cacheClock: PlayPauseRig.slowCacheClock())
+        try #require(rig.share.size > NetworkStart.smallestEarlyFile, "the fixture must be big enough to start early: \(rig.share.size)")
+        // Its own scheme: the `tidal` one belongs to the suite above, and suites run side by side.
+        NetworkPlaybackCache.registerRemoteReader(scheme: "remote-early") { [share = rig.share] _ in RemoteShare(share) }
+        rig.share.goQuiet(from: 8 << 20)
+        defer { rig.share.goQuiet(from: nil) }
+        rig.engine.play(PlayableItem(url: URL(string: "remote-early://track/1")!, cacheKey: "remote-early:1"))
+        let playing = await rig.wait(timeout: 30) { $0.state == .playing && $0.position > 0.2 }
+        #expect(playing, "plays on its prefix: \(rig.engine.snapshot.state), \(rig.engine.snapshot.lastError ?? "-")")
+        #expect(rig.audibleFrames > 0)
+        let entry = try rig.cache.entry(key: "remote-early:1", url: URL(string: "remote-early://track/1")!)
+        #expect(!entry.isComplete && entry.url.pathExtension == "flac", "the rest is still to come")
+        rig.engine.stop()
+    }
+}
+
+/// A remote reader whose reads past the first chunk wait until it is cancelled (a CDN retrying a dead link for ever).
+private final class WaitingReader: RemoteCacheReader, @unchecked Sendable {
+    let bytes: Data
+    let condition = NSCondition()
+    var cancelled = false
+    var fileExtension: String { "flac" }
+    var size: Int64 { Int64(bytes.count) }
+    init(_ bytes: Data) { self.bytes = bytes }
+    func read(at offset: Int64, count: Int) throws -> Data {
+        if offset >= 4096 {
+            try condition.withLock {
+                while !cancelled { condition.wait() }
+                throw CancellationError()
+            }
+        }
+        return bytes.subdata(in: Int(offset)..<min(Int(offset) + count, bytes.count))
+    }
+    func cancel() { condition.withLock { cancelled = true; condition.broadcast() } }
+    var wasCancelled: Bool { condition.withLock { cancelled } }
+}
+
+@Suite("Remote readers are told when their copy is over")
+struct RemoteReaderCancelTests {
+    @Test("Releasing the lease, and giving up on a silent copy, both cancel the remote reader so its waiting reads return")
+    func cancelsReader() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("remote-cancel-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096)
+        let released = WaitingReader(Data(repeating: 1, count: 64 << 10))
+        var entry: NetworkPlaybackCache.Entry? = try cache.entry(key: "a", url: URL(string: "x-remote://a")!, reader: released)
+        try entry!.prepare(full: false, lead: 4096, cancelled: { false })
+        entry = nil
+        let end = Date().addingTimeInterval(5)
+        while !released.wasCancelled, Date() < end { Thread.sleep(forTimeInterval: 0.01) }
+        #expect(released.wasCancelled)
+
+        // A copy whose reads never come back fails with "not answering" after the no-progress limit, and lets its reader go.
+        let clock = Locked(0.0)
+        let quiet = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096, noProgressLimit: 5, clock: { clock.withLock { $0 } })
+        let silent = WaitingReader(Data(repeating: 2, count: 64 << 10))
+        let stuck = try quiet.entry(key: "b", url: URL(string: "x-remote://b")!, reader: silent)
+        Thread { Thread.sleep(forTimeInterval: 0.2); clock.withLock { $0 = 10 } }.start()
+        #expect(throws: (any Error).self) { try stuck.prepare(full: true, lead: 0, cancelled: { false }) }
+        #expect(silent.wasCancelled)
+    }
+}
+
 /// A reader that fails every read with EIO from its second chunk on, for ever: only a fresh one reads.
 private final class FailingFirstReader: RemoteCacheReader, @unchecked Sendable {
     let bytes: Data

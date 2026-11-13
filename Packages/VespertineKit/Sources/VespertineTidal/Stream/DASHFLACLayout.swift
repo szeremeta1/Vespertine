@@ -117,8 +117,11 @@ public struct DASHFLACLayout: Sendable {
                 if let expected = fragment.firstDataOffset, expected != payloadOffset {
                     throw TidalError.malformedStream("a track run's data offset doesn't point at the media data")
                 }
-                payloads.append(payloadOffset..<(payloadOffset + payloadLength))
-                endOffset = payloadOffset + payloadLength
+                // A size-0 mdat takes its length from the runs, which a crafted segment can make as large as Int.max.
+                let (payloadEnd, overflow) = payloadOffset.addingReportingOverflow(payloadLength)
+                guard !overflow, payloadLength >= 0 else { throw TidalError.malformedStream("the media data is too large") }
+                payloads.append(payloadOffset..<payloadEnd)
+                endOffset = payloadEnd
                 if let running = total, let known = fragment.sampleTotal {
                     let (sum, overflow) = running.addingReportingOverflow(known)
                     total = overflow ? nil : sum
