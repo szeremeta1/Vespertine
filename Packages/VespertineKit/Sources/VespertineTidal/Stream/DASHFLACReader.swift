@@ -19,6 +19,7 @@ public final class DASHFLACReader: RemoteCacheReader, @unchecked Sendable {
 
     public let size: Int64
     public let fileExtension: String
+    public var notAnsweringMessage: String? { TidalError.notAnsweringMessage }
     let header: Data
     /// In output order, contiguous, after the header.
     let pieces: [Piece]

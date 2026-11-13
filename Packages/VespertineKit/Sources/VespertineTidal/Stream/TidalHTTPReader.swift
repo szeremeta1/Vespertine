@@ -10,6 +10,7 @@ import VespertineAudio
 public final class TidalHTTPReader: RemoteCacheReader, @unchecked Sendable {
     public let size: Int64
     public let fileExtension: String
+    public var notAnsweringMessage: String? { TidalError.notAnsweringMessage }
     private let source: RenewableStream
     private let client: CDNClient
 

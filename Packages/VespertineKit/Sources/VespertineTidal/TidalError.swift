@@ -49,6 +49,11 @@ extension TidalError: LocalizedError {
         }
     }
 
+    /// What a TIDAL song says when the CDN (or the stream's resolution) sends nothing for the playback cache's silence limit.
+    public static var notAnsweringMessage: String {
+        String(localized: "TIDAL isn't answering", comment: "A TIDAL track's stream sent nothing for two minutes.")
+    }
+
     /// "TIDAL asked us to wait N min", N rounded up, at least 1.
     private static func waitMessage(_ seconds: TimeInterval) -> String {
         let minutes = max(1, Int((seconds / 60).rounded(.up)))

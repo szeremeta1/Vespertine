@@ -153,6 +153,24 @@ struct TidalPlaybackTests {
         #expect(TidalError.backingOff(remaining: 300, reason: "x").localizedDescription == "TIDAL asked us to wait 5 min")
     }
 
+    @Test("A track whose resolution never answers fails with \"TIDAL isn't answering\"")
+    func notAnswering() throws {
+        let latch = Latch()
+        let transport = FakeTransport { _ in await latch.wait(); return FakeResponse(status: 500, json: "{}") }
+        TidalPlayback.register(resolver: TidalStreamResolver(gate: makeSignedInGate(transport: transport)))
+        let directory = try DASHFixture.temporaryDirectory("tidal-silent"); defer { try? FileManager.default.removeItem(at: directory) }
+        let clock = Locked(0.0)
+        let cache = NetworkPlaybackCache(directory: directory, budget: 64 << 20, noProgressLimit: 5, clock: { clock.value })
+        Thread { Thread.sleep(forTimeInterval: 0.2); clock.mutate { $0 = 10 } }.start()
+        do {
+            _ = try cache.entry(key: "tidal:20", url: TidalPlayback.url(trackId: 20))
+            Issue.record("opened")
+        } catch {
+            #expect(error.localizedDescription == "TIDAL isn't answering")
+        }
+        Task { await latch.releaseAll() }
+    }
+
     @Test("A URL that isn't a track throws instead of resolving anything")
     func notATrack() throws {
         let transport = FakeTransport { _ in FakeResponse(status: 500, json: "{}") }

@@ -52,6 +52,7 @@ struct TidalReadersTests {
         let reader = try TidalHTTPReader(stream: fileStream(server.url("/track.flac")), renew: noRenew)
         #expect(reader.size == Int64(file.count))
         #expect(reader.fileExtension == "flac")
+        #expect(reader.notAnsweringMessage == "TIDAL isn't answering", "the spec's wording when the CDN goes silent")
         var generator = SystemRandomNumberGenerator()
         for _ in 0..<20 {
             let offset = Int.random(in: 0..<file.count, using: &generator)
@@ -155,6 +156,7 @@ struct TidalReadersTests {
         let expected = try DASHFixture.remuxed()
         #expect(reader.size == Int64(expected.count))
         #expect(reader.fileExtension == "flac")
+        #expect(reader.notAnsweringMessage == "TIDAL isn't answering")
         // Indexing read only the first bytes of each segment.
         let probes = server.requests.filter { $0.path.hasSuffix(".m4s") }
         #expect(probes.count == count && probes.allSatisfy { $0.range == "bytes=0-4095" })

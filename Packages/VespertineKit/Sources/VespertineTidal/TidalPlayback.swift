@@ -27,7 +27,7 @@ public enum TidalPlayback {
     /// it (blocking the cache's open thread, never the main actor), and an expired URL is resolved again the same way. Failures
     /// are thrown, so the engine reports them as it does any song that can't be opened (`TidalError.localizedDescription`).
     public static func register(resolver: TidalStreamResolver, session: URLSession = TidalCDN.session) {
-        NetworkPlaybackCache.registerRemoteReader(scheme: scheme) { url in
+        NetworkPlaybackCache.registerRemoteReader(scheme: scheme, notAnsweringMessage: TidalError.notAnsweringMessage) { url in
             guard let id = trackId(from: url) else { throw TidalError.malformedStream("\(url.absoluteString) is not a TIDAL track") }
             let renew: @Sendable () throws -> TidalStream = { try resolveBlocking(resolver, trackId: id, priority: .playback) }
             return try reader(for: try renew(), renew: renew, session: session)

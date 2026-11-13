@@ -148,9 +148,10 @@ private final class WaitingReader: RemoteCacheReader, @unchecked Sendable {
     let bytes: Data
     let condition = NSCondition()
     var cancelled = false
+    let notAnsweringMessage: String?
     var fileExtension: String { "flac" }
     var size: Int64 { Int64(bytes.count) }
-    init(_ bytes: Data) { self.bytes = bytes }
+    init(_ bytes: Data, message: String? = nil) { self.bytes = bytes; notAnsweringMessage = message }
     func read(at offset: Int64, count: Int) throws -> Data {
         if offset >= 4096 {
             try condition.withLock {
@@ -189,14 +190,58 @@ struct RemoteReaderCancelTests {
         #expect(throws: (any Error).self) { try stuck.prepare(full: true, lead: 0, cancelled: { false }) }
         #expect(silent.wasCancelled)
     }
+
+    @Test("A silent remote copy fails with the reader's own message; one without a message keeps the share's")
+    func notAnsweringMessage() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("remote-message-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        for message in ["Service X isn't answering", nil] as [String?] {
+            let clock = Locked(0.0)
+            let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096, noProgressLimit: 5, clock: { clock.withLock { $0 } })
+            let entry = try cache.entry(key: "m", url: URL(string: "x-remote://m")!, reader: WaitingReader(Data(repeating: 3, count: 64 << 10), message: message))
+            Thread { Thread.sleep(forTimeInterval: 0.2); clock.withLock { $0 = 10 } }.start()
+            do {
+                try entry.prepare(full: true, lead: 0, cancelled: { false })
+                Issue.record("a silent copy completed")
+            } catch {
+                guard case NetworkPlaybackCache.Failure.notAnswering = error else { Issue.record("failed with \(error)"); continue }
+                #expect(error.localizedDescription == (message ?? NetworkPlaybackCache.Failure.notAnswering().localizedDescription))
+                #expect(message != nil || error.localizedDescription.contains("share"))
+            }
+        }
+    }
+
+    @Test("A registered scheme's open that never returns fails with the scheme's message")
+    func silentOpenMessage() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("remote-open-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let release = DispatchSemaphore(value: 0)
+        NetworkPlaybackCache.registerRemoteReader(scheme: "x-silent-open", notAnsweringMessage: "Service Y isn't answering") { _ in
+            release.wait()
+            throw CancellationError()
+        }
+        defer { release.signal() }
+        let clock = Locked(0.0)
+        let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, noProgressLimit: 5, clock: { clock.withLock { $0 } })
+        Thread { Thread.sleep(forTimeInterval: 0.2); clock.withLock { $0 = 10 } }.start()
+        do {
+            _ = try cache.entry(key: "o", url: URL(string: "x-silent-open://o")!)
+            Issue.record("opened")
+        } catch {
+            #expect(error.localizedDescription == "Service Y isn't answering")
+        }
+    }
 }
 
 /// A reader that fails every read with EIO from its second chunk on, for ever: only a fresh one reads.
 private final class FailingFirstReader: RemoteCacheReader, @unchecked Sendable {
     let bytes: Data
+    let notAnsweringMessage: String?
     var fileExtension: String { "flac" }
     var size: Int64 { Int64(bytes.count) }
-    init(_ bytes: Data) { self.bytes = bytes }
+    init(_ bytes: Data, message: String? = nil) { self.bytes = bytes; notAnsweringMessage = message }
     func read(at offset: Int64, count: Int) throws -> Data {
         if offset >= 4096 { throw POSIXError(.EIO) }
         return bytes.subdata(in: Int(offset)..<min(Int(offset) + count, bytes.count))
