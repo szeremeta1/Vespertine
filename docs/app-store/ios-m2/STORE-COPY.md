@@ -1,4 +1,4 @@
-# Vespertine Remote: App Store copy (draft)
+# Vespertine for iPhone and iPad: App Store copy (draft)
 
 Draft for Alex. Nothing has been entered in App Store Connect. No em dashes.
 
@@ -8,8 +8,10 @@ Draft for Alex. Nothing has been entered in App Store Connect. No em dashes.
 
 **Claims still to confirm before submission:** the VPN/Tailscale sentence (needs a real connection test and the Mac port caveat from milestone 1); keyboard control and window resizing were not tried with a hardware keyboard or a real Split View window (see RESULT2.md).
 
-## Name (17/30)
-Vespertine Remote
+## Name (10/30)
+Vespertine
+
+Renamed from "Vespertine Remote" (Alex, 2026-11-13; the App Store name is already changed in App Store Connect). The Mac app has the same name; the subtitle says this one is the remote. The home-screen name is "Vespertine" too.
 
 ## Subtitle (28/30)
 Remote for Vespertine on Mac
@@ -45,14 +47,14 @@ The built-in demo opens a made-up library with every screen of the remote. The d
 
 Light and dark appearances follow your device. Motion follows your accessibility settings.
 
-Vespertine Remote controls playback on the Mac. It does not play music on this device. Requires Vespertine for Mac, free from vespertineapp.com.
+Vespertine for iPhone and iPad controls playback on the Mac. It does not play music on this device. Requires Vespertine for Mac, free from vespertineapp.com.
 
 Free and open source. No accounts. No ads. No tracking.
 
 ## Keywords (98/100)
 music,mac,controller,library,albums,queue,player,hi-res,lossless,flac,dac,surround,ipad,cover flow
 
-("remote" and "vespertine" are left out because the name is already indexed.)
+("vespertine" is left out because the name is already indexed, and "remote" and "mac" because the subtitle is.)
 
 ## What's New (131/4000)
 A sidebar on iPad, layouts that adapt as you resize the window, keyboard shortcuts, light and dark appearances, and a new app icon.

@@ -14,7 +14,7 @@ settings:
   base:
     SWIFT_VERSION: "6.0"
     MARKETING_VERSION: "1.0"
-    CURRENT_PROJECT_VERSION: "2"
+    CURRENT_PROJECT_VERSION: "3"
 targets:
   VespertineRemote:
     type: application
@@ -30,7 +30,7 @@ targets:
     info:
       path: Info.plist
       properties:
-        CFBundleDisplayName: Vespertine Remote
+        CFBundleDisplayName: Vespertine
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         LSRequiresIPhoneOS: true
@@ -42,10 +42,10 @@ targets:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         UISupportedInterfaceOrientations~ipad: [UIInterfaceOrientationPortrait, UIInterfaceOrientationPortraitUpsideDown, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
-        NSLocalNetworkUsageDescription: "Vespertine Remote looks for Macs running Vespertine on your network, and connects only to the ones you pair with."
+        NSLocalNetworkUsageDescription: "Vespertine looks for Macs running Vespertine on your network, and connects only to the ones you pair with."
         NSBonjourServices: ["_vespertine._tcp"]
-        NSCameraUsageDescription: "Vespertine Remote uses the camera only to scan the pairing code that Vespertine shows on your Mac."
-        # Scanning the Mac's QR code with the Camera app opens Vespertine Remote and pairs.
+        NSCameraUsageDescription: "Vespertine uses the camera only to scan the pairing code that the Vespertine app shows on your Mac."
+        # Scanning the Mac's QR code with the Camera app opens Vespertine on this device and pairs.
         CFBundleURLTypes:
           - CFBundleURLName: org.szeremeta.VespertineRemote.pair
             CFBundleURLSchemes: [vespertine-remote]

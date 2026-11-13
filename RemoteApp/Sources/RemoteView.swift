@@ -249,7 +249,7 @@ struct ConnectionBanner: View {
                 }
                 .font(.callout).padding().frame(maxWidth: .infinity).background(Palette.surface)
             case .incompatible:
-                banner(Text("This version of Vespertine Remote doesn’t match Vespertine on the Mac. Update both to the latest version."), busy: false)
+                banner(Text("This version of Vespertine on this device doesn’t match Vespertine on the Mac. Update both to the latest version."), busy: false)
             }
         }
         .sheet(isPresented: $editing) { MacConnectionView(serverID: session.pairing.serverID) }
@@ -263,7 +263,7 @@ struct ConnectionBanner: View {
                 ProgressView()
                 Group {
                     if !model.isOnline {
-                        Text("This device is offline. Vespertine Remote connects again when the network is back.")
+                        Text("This device is offline. Vespertine connects again when the network is back.")
                     } else if hasAddress {
                         Text("Can’t reach “\(name)”. Trying again… Check that the Mac is awake with Vespertine open, and that Tailscale or your VPN is connected on both.")
                     } else {
