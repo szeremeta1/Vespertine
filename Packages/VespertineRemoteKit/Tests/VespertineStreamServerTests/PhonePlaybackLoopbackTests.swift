@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
-#if canImport(Network)
+#if canImport(Network) && canImport(AVFAudio)
 import AVFAudio
 import Foundation
 import Testing
