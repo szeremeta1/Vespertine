@@ -264,18 +264,65 @@ struct TidalDownloaderTests {
         #expect(throws: BlockingInTask.self) { _ = try TidalPlayback.resolveBlocking(resolver, trackId: 1, priority: .download) }
     }
 
-    @Test("Stale .partial files of an earlier run are removed when the downloader starts")
+    @Test("Stale .partial files (over an hour old) of an earlier run are removed when the downloader starts; fresh ones stay")
     func removesStalePartials() async throws {
         let rig = try DownloadRig(ids: [])
         let stale = rig.folder.appendingPathComponent("A/B/1-01 Old.flac.partial")
         try FileManager.default.createDirectory(at: stale.deletingLastPathComponent(), withIntermediateDirectories: true)
         try Data("half".utf8).write(to: stale)
+        try FileManager.default.setAttributes([.modificationDate: Date().addingTimeInterval(-7200)], ofItemAtPath: stale.path)
+        let fresh = rig.folder.appendingPathComponent("A/B/1-03 Writing.flac.partial")
+        try Data("busy".utf8).write(to: fresh)
         let kept = rig.folder.appendingPathComponent("A/B/1-02 Done.flac")
         try Data("whole".utf8).write(to: kept)
+        try FileManager.default.setAttributes([.modificationDate: Date().addingTimeInterval(-7200)], ofItemAtPath: kept.path)
         let downloader = rig.downloader()
         await downloader.startup.value
         #expect(!FileManager.default.fileExists(atPath: stale.path))
+        #expect(FileManager.default.fileExists(atPath: fresh.path), "may be another writer's, or one that has only just stopped")
         #expect(FileManager.default.fileExists(atPath: kept.path))
+        // The download being written is never touched, however old its partial looks.
+        let active = rig.folder.appendingPathComponent("A/B/1-04 Active.flac.partial")
+        try Data("now".utf8).write(to: active)
+        try FileManager.default.setAttributes([.modificationDate: Date().addingTimeInterval(-7200)], ofItemAtPath: active.path)
+        TidalDownloader.removeStalePartials(in: rig.folder, except: [active.path])
+        #expect(FileManager.default.fileExists(atPath: active.path))
+    }
+
+    @Test("An album still being read while the worker runs doesn't stall the queue, and its tracks download once read")
+    func slowAlbumWhileRunning() async throws {
+        let rig = try DownloadRig(ids: [1, 2, 3])
+        let catalog = FakeCatalog()
+        let latch = Latch()
+        catalog.albumGate = latch
+        catalog.albumInfo = [9: TidalAlbum(id: 9, title: "Album", numberOfTracks: 2, artist: TidalArtistRef(id: 50, name: "Artist"))]
+        catalog.albumContents = [9: [tidalTrack(2), tidalTrack(3)]]
+        let downloader = rig.downloader(catalog: catalog)
+        downloader.enqueue(tracks: [tidalTrack(1)])
+        let reading = Task { await downloader.enqueue(album: 9) }
+        // Track 1 downloads while the album waits to be read: the main actor stays free (this test would hang otherwise).
+        let end = Date().addingTimeInterval(20)
+        while Date() < end, downloader.items.first?.state != .done(rig.path(1)) { try await Task.sleep(for: .milliseconds(10)) }
+        #expect(downloader.items.first?.state == .done(rig.path(1)))
+        #expect(downloader.items.map(\.id) == ["track:1", "album:9"])
+        await latch.releaseAll()
+        await reading.value
+        #expect(await finished(downloader))
+        #expect(downloader.items.map(\.trackId) == [1, 2, 3])
+        #expect(downloader.items.allSatisfy { if case .done = $0.state { true } else { false } })
+    }
+
+    @Test("An album whose details can't be read still downloads its tracks, in the track artist's folder")
+    func albumDetailsMissing() async throws {
+        let rig = try DownloadRig(ids: [1])
+        let catalog = FakeCatalog()
+        catalog.albumInfoError = .http(status: 500, body: "oops")
+        catalog.albumContents = [9: [tidalTrack(1)]]
+        let downloader = rig.downloader(catalog: catalog)
+        await downloader.enqueue(album: 9)
+        #expect(await finished(downloader))
+        #expect(downloader.items.map(\.id) == ["track:1"])
+        #expect(downloader.items[0].state == .done(rig.path(1)))
     }
 
     @Test("Downloading a track again replaces its file in one step")

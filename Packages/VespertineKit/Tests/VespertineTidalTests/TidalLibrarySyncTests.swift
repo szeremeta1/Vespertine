@@ -30,6 +30,10 @@ final class FakeCatalog: TidalCatalogReading, @unchecked Sendable {
     var playlists: [TidalPlaylist] = []
     var playlistContents: [String: [TidalTrack]] = [:]
     private(set) var calls: [String] = []
+    /// When set, `album(_:)` waits for it to open.
+    var albumGate: Latch?
+    /// Thrown by `album(_:)` only (its tracks still answer).
+    var albumInfoError: TidalError?
 
     func set(_ change: (FakeCatalog) -> Void) { lock.withLock { change(self) } }
     var log: [String] { lock.withLock { calls } }
@@ -40,7 +44,9 @@ final class FakeCatalog: TidalCatalogReading, @unchecked Sendable {
     private func nextFailure() -> TidalError? { lock.withLock { failures.isEmpty ? nil : failures.removeFirst() } }
     func album(_ id: Int, priority: TidalPriority) async throws -> TidalAlbum {
         record("album \(id)")
+        if let gate = lock.withLock({ albumGate }) { await gate.wait() }
         if let failure = nextFailure() { throw failure }
+        if let error = lock.withLock({ albumInfoError }) { throw error }
         return lock.withLock { albumInfo[id] } ?? TidalAlbum(id: id, title: "Album \(id)", numberOfTracks: 0)
     }
     func albumTracks(_ id: Int, priority: TidalPriority) async throws -> [TidalTrack] { record("albumTracks \(id)"); return lock.withLock { albumContents[id] ?? [] } }

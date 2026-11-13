@@ -10,6 +10,7 @@ import Observation
 import VespertineAudio
 import VespertineLibrary
 
+/// One downloader per downloads folder (the app has one): at start it removes the `.partial` files an earlier run left there.
 @MainActor
 @Observable
 public final class TidalDownloader {
@@ -73,6 +74,8 @@ public final class TidalDownloader {
     @ObservationIgnored let startup: Task<Void, Never>
     /// How long a collection paused by a backoff waits before it is read again.
     @ObservationIgnored private var collectionWaits: [Item.ID: TimeInterval] = [:]
+    /// Collections whose track list is being read now.
+    @ObservationIgnored private var expanding: Set<Item.ID> = []
     /// Bytes asked of the stream per read (smaller in tests, so a file of a few hundred KiB takes several).
     @ObservationIgnored var readSize = 1 << 20
 
@@ -160,15 +163,18 @@ public final class TidalDownloader {
         startWorker()
     }
 
+    /// Starts the worker if something can run now. `enqueue` and every change that makes an item runnable call this, so a worker
+    /// that found nothing to do may simply end.
     private func startWorker() {
-        if worker == nil, items.contains(where: Self.isWaiting) { worker = Task { await self.run() } }
+        if worker == nil, items.contains(where: isRunnable) { worker = Task { await self.run() } }
     }
 
-    /// Queued, or a collection paused by a backoff (read again once the backoff ends).
-    private static func isWaiting(_ item: Item) -> Bool {
+    /// What the worker may take now: a queued track, or a collection a backoff paused that nobody is reading. A collection still
+    /// being read (by `enqueue`) is not: the worker would have nothing to wait on.
+    private func isRunnable(_ item: Item) -> Bool {
         switch (item.kind, item.state) {
-        case (_, .queued): true
-        case (.album, .paused), (.playlist, .paused): true
+        case (.track, .queued): true
+        case (.album, .paused), (.playlist, .paused): !expanding.contains(item.id)
         default: false
         }
     }
@@ -182,11 +188,24 @@ public final class TidalDownloader {
     /// marking the item paused; other failures mark it failed.
     @discardableResult
     private func expand(_ id: Item.ID) async -> TimeInterval? {
-        guard let item = items.first(where: { $0.id == id }) else { return nil }
+        guard let item = items.first(where: { $0.id == id }), !expanding.contains(id) else { return nil }
+        expanding.insert(id)
+        defer { expanding.remove(id); startWorker() }
         do {
             switch item.kind {
             case .album(let albumId):
-                let album = try await catalog.album(albumId, priority: .download)
+                // The album's own details give the album artist; without them its tracks still download, by track artist.
+                let album: TidalAlbum?
+                do {
+                    album = try await catalog.album(albumId, priority: .download)
+                } catch let error as TidalError {
+                    switch error {
+                    case .backingOff, .abuse: throw error
+                    default: album = nil
+                    }
+                } catch {
+                    album = nil
+                }
                 let tracks = try await catalog.albumTracks(albumId, priority: .download)
                 insert(tracks.map { Item(kind: .track($0), album: album, state: .queued) }, replacing: id)
             case .playlist(let uuid):
@@ -216,15 +235,15 @@ public final class TidalDownloader {
     private func run() async {
         await startup.value
         var first = true
-        while let next = items.first(where: Self.isWaiting) {
+        // Every turn of this loop awaits (a download, a pause, a read of a collection), and only items that can run are taken,
+        // so it never spins on the main actor.
+        while let next = items.first(where: isRunnable) {
             switch next.kind {
             case .album, .playlist:
                 // A collection the backoff held up: wait it out, then read it.
-                if case .paused = next.state {
-                    try? await sleep(collectionWaits.removeValue(forKey: next.id) ?? 1)
-                    await expand(next.id)
-                }
-                continue
+                // A collection a backoff held up: wait it out, then read it.
+                try? await sleep(collectionWaits.removeValue(forKey: next.id) ?? 1)
+                await expand(next.id)
             case .track:
                 if !first { try? await sleep(random(1...3)) }
                 first = false
@@ -290,11 +309,16 @@ public final class TidalDownloader {
         }
     }
 
-    /// Deletes every `.partial` file under `folder`: what an earlier run was writing when it stopped.
-    nonisolated static func removeStalePartials(in folder: URL) {
-        guard let files = FileManager.default.enumerator(at: folder, includingPropertiesForKeys: nil) else { return }
-        for case let file as URL in files where file.pathExtension == "partial" {
-            try? FileManager.default.removeItem(at: file)
+    /// Deletes the `.partial` files under `folder` that an earlier run left: those not written to for `age` (an hour), except
+    /// the paths in `except` (a download being written). One downloader per folder: another instance's partial file is only
+    /// spared while it is fresh.
+    nonisolated static func removeStalePartials(in folder: URL, olderThan age: TimeInterval = 3600, now: Date = Date(),
+                                                except active: Set<String> = []) {
+        guard let files = FileManager.default.enumerator(at: folder, includingPropertiesForKeys: [.contentModificationDateKey]) else { return }
+        let spared = Set(active.map { URL(fileURLWithPath: $0).resolvingSymlinksInPath().path })
+        for case let file as URL in files where file.pathExtension == "partial" && !spared.contains(file.resolvingSymlinksInPath().path) {
+            let modified = (try? file.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate ?? .distantPast
+            if now.timeIntervalSince(modified) >= age { try? FileManager.default.removeItem(at: file) }
         }
     }
 
