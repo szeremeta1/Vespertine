@@ -361,3 +361,77 @@ struct TidalDownloadScanTests {
         #expect(try download(rig, tidalId: 777).downloadPath == "/Elsewhere/TIDAL/gone.flac")
     }
 }
+
+@Suite("TIDAL sync storage: duplicates, merges and playlists")
+struct TidalSyncStorageTests {
+    private func scalar(_ db: LibraryDatabase, _ sql: String, _ arguments: StatementArguments = []) throws -> Int? {
+        try db.writer.read { try Int.fetchOne($0, sql: sql, arguments: arguments) }
+    }
+
+    @Test("An input listing a track twice stores it once, as its last description")
+    func duplicateInputs() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try #require(try db.tidalSource(userId: 1).id)
+        let ids = try db.upsertTidalTracks([input(5, title: "First"), input(6), input(5, title: "Last")], sourceId: source)
+        #expect(ids.count == 2)
+        #expect(try scalar(db, "SELECT count(*) FROM tidalTrack") == 2)
+        #expect(try db.allTracks().contains { $0.title == "Last" })
+        #expect(try !db.allTracks().contains { $0.title == "First" })
+        #expect(try db.tidalTrackIds() == [5, 6])
+    }
+
+    @Test("A local file tagged with a TIDAL id becomes that TIDAL row's download, bringing its playlists, favorite and plays")
+    func mergesTaggedLocalTrack() throws {
+        let db = try LibraryDatabase.inMemory()
+        let folder = try db.addSource(LibrarySource(path: "/Music", mode: .reference))
+        var local = Track.stub(path: "/Music/TIDAL/A/1-01 Song.flac")
+        local.sourceId = folder.id
+        local.extraTags = ["TIDAL_TRACK_ID": "77"]
+        local.playCount = 3
+        local.fileSize = 1234
+        local.sampleRate = 192_000
+        try db.writer.write { try local.insert($0) }
+        let localId = try #require(local.id)
+        let playlist = try db.createPlaylist(name: "Mine")
+        try db.append(trackIDs: [localId], to: try #require(playlist.id))
+        try db.setFavorite(true, trackIDs: [localId])
+        try db.writer.write { try $0.execute(sql: "INSERT INTO playHistory (trackId, playedAt) VALUES (?, ?)", arguments: [localId, Date()]) }
+
+        let source = try #require(try db.tidalSource(userId: 1).id)
+        let ids = try db.upsertTidalTracks([input(77)], sourceId: source)
+        let tidalTrack = try #require(ids[77])
+        #expect(try scalar(db, "SELECT count(*) FROM track WHERE id = ?", [localId]) == 0, "the plain row is gone")
+        #expect(try scalar(db, "SELECT count(*) FROM track") == 1)
+        let record = try #require(try db.tidalRecord(trackId: tidalTrack))
+        #expect(record.downloadPath == "/Music/TIDAL/A/1-01 Song.flac" && record.formatIsProbed)
+        let merged = try #require(try db.allTracks().first)
+        #expect(merged.filePath == "/Music/TIDAL/A/1-01 Song.flac" && merged.sampleRate == 192_000 && merged.playCount == 3)
+        #expect(try db.tracks(in: playlist).map(\.id) == [tidalTrack])
+        #expect(try db.favoriteTracks().map(\.id) == [tidalTrack])
+        #expect(try scalar(db, "SELECT count(*) FROM playHistory WHERE trackId = ?", [tidalTrack]) == 1)
+        // A second sync changes nothing.
+        _ = try db.upsertTidalTracks([input(77)], sourceId: source)
+        #expect(try scalar(db, "SELECT count(*) FROM track") == 1)
+    }
+
+    @Test("A TIDAL playlist maps to one library playlist, in TIDAL's order, renamed and refilled in place; gone playlists go")
+    func playlists() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try #require(try db.tidalSource(userId: 1).id)
+        try db.upsertTidalTracks([input(1), input(2), input(3)], sourceId: source)
+        let id = try db.setTidalPlaylist(uuid: "uuid-a", name: "Road", lastUpdated: "2026-01-01", tidalIds: [3, 1, 2, 99])
+        #expect(try db.tidalPlaylistStates() == ["uuid-a": "2026-01-01"])
+        let playlist = try #require(try db.playlists().first { $0.id == id })
+        #expect(playlist.name == "Road")
+        #expect(try db.tracks(in: playlist).map(\.trackNumber) == [3, 1, 2], "unknown ids are skipped")
+        #expect(try db.tidalIds(inPlaylist: "uuid-a") == [3, 1, 2])
+        let again = try db.setTidalPlaylist(uuid: "uuid-a", name: "Road trip", lastUpdated: "2026-02-01", tidalIds: [2])
+        #expect(again == id)
+        let renamed = try db.playlists().filter { !$0.isSmart }
+        #expect(renamed.map(\.name) == ["Road trip"])
+        #expect(try db.tidalIds(inPlaylist: "uuid-a") == [2])
+        try db.removeTidalPlaylists(notIn: [])
+        let left = try db.playlists().filter { !$0.isSmart }, states = try db.tidalPlaylistStates()
+        #expect(left.isEmpty && states.isEmpty)
+    }
+}

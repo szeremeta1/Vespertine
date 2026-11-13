@@ -405,6 +405,14 @@ public final class LibraryDatabase: Sendable {
             }
             try db.create(index: "tidalTrack_downloadPath", on: "tidalTrack", columns: ["downloadPath"])
         }
+        m.registerMigration("v24-tidal-playlists") { db in
+            // Which library playlist stands for which TIDAL playlist, and the `lastUpdated` its items were last fetched at.
+            try db.create(table: "tidalPlaylist") { t in
+                t.primaryKey("uuid", .text)
+                t.column("playlistId", .integer).notNull().unique().references("playlist", onDelete: .cascade)
+                t.column("lastUpdated", .text)
+            }
+        }
         return m
     }
 }

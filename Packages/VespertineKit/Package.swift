@@ -108,7 +108,7 @@ let package = Package(
                     resources: [.copy("Fixtures")]),
         .testTarget(name: "VespertineGroupProbeTests", dependencies: ["VespertineGroupProbe", "VespertineAudio"], resources: [.copy("Fixtures")]),
         .testTarget(name: "VespertineTidalTests",
-                    dependencies: ["VespertineTidal", "VespertineAudio", .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
+                    dependencies: ["VespertineTidal", "VespertineAudio", "VespertineLibrary", .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
                     resources: [.copy("Fixtures")]),
         .testTarget(name: "VespertineVisualizerTests", dependencies: ["VespertineVisualizer"]),
         .testTarget(name: "VespertineLibraryTests", dependencies: ["VespertineLibrary", "CVespertineTags", "VespertineTestSupport"]),
