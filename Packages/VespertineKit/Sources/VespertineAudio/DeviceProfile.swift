@@ -71,6 +71,13 @@ public struct DeviceProfile: Sendable, Hashable {
 
     /// A network renderer. Never `canBeBitPerfect`: what its DAC receives can't be read back, so the badge says what was sent.
     public static func networkRenderer(protocolName: String) -> DeviceProfile {
+        if protocolName == "AirPlay" {
+            var profile = DeviceProfile(kind: .networkRenderer, tag: "AIRPLAY",
+                                        note: String(localized: "An AirPlay receiver. Vespertine sends it ALAC 16-bit / 44.1 kHz; the receiver keeps in step with this Mac's clock by adding or dropping samples, and may apply its own volume and resampling. What reaches its DAC can't be seen from here."),
+                                        canBeBitPerfect: false, symbol: "airplay.audio")
+            profile.connection = protocolName
+            return profile
+        }
         var profile = DeviceProfile(kind: .networkRenderer, tag: protocolName == "OpenHome" ? "OPENHOME" : "UPNP",
                                     note: String(localized: "A network player. Vespertine sends it the music; what the player does with it (resampling, volume, ReplayGain) can't be seen from here."),
                                     canBeBitPerfect: false, symbol: "hifireceiver")
