@@ -7430,6 +7430,275 @@
         }
       }
     },
+    "%@ is in call mode (macOS does this while an app has its microphone open), so it plays at %@ kHz, mono, like a phone call. Vespertine doesn't change a Bluetooth link; music returns to full quality when the microphone is released.": {
+      "comment": "Signal path: a Bluetooth headset is in its hands-free call mode. %1$@ is the headset's name, %2$@ the rate in kHz.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ በጥሪ ሁነታ ላይ ነው (አንድ መተግበሪያ ማይክሮፎኑን ክፍት አድርጎ ሲይዝ macOS ይህን ያደርጋል)፤ ስለዚህ እንደ የስልክ ጥሪ በ%@ kHz፣ ሞኖ ይጫወታል። Vespertine የBluetooth ግንኙነትን አይለውጥም፤ ማይክሮፎኑ ሲለቀቅ ሙዚቃ ወደ ሙሉ ጥራት ይመለሳል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ في وضع المكالمات (يفعل macOS ذلك أثناء فتح أحد التطبيقات للميكروفون)، لذا يُشغَّل بمعدل %@ kHz وبصوت أحادي، كما في المكالمة الهاتفية. لا يغيّر Vespertine رابط Bluetooth؛ وتعود الموسيقى إلى الجودة الكاملة عند تحرير الميكروفون."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ কল মোডে আছে (কোনো অ্যাপ মাইক্রোফোন খুলে রাখলে macOS এটি করে), তাই এটি ফোন কলের মতো %@ kHz-এ, মনো হিসেবে চলে। Vespertine Bluetooth লিংক বদলায় না; মাইক্রোফোন ছেড়ে দিলে সংগীত আবার পূর্ণ মানে ফিরে আসে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ je v režimu hovoru (macOS to dělá, když má některá aplikace otevřený mikrofon), takže hraje v %@ kHz, mono, jako při telefonním hovoru. Vespertine spojení Bluetooth nemění; hudba se vrátí k plné kvalitě, jakmile se mikrofon uvolní."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ er i opkaldstilstand (det gør macOS, mens en app har mikrofonen åben), så den afspiller ved %@ kHz, mono, som et telefonopkald. Vespertine ændrer ikke en Bluetooth-forbindelse; musikken vender tilbage til fuld kvalitet, når mikrofonen frigives."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ befindet sich im Anrufmodus (macOS schaltet so um, solange eine App das Mikrofon geöffnet hat) und spielt daher wie bei einem Telefonat mit %@ kHz in Mono ab. Vespertine ändert eine Bluetooth-Verbindung nicht; die Musik kehrt zur vollen Qualität zurück, sobald das Mikrofon freigegeben wird."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το %@ βρίσκεται σε λειτουργία κλήσης (το macOS το κάνει όσο μια εφαρμογή έχει ανοιχτό το μικρόφωνο), οπότε παίζει στα %@ kHz, μονοφωνικά, όπως μια τηλεφωνική κλήση. Το Vespertine δεν αλλάζει μια σύνδεση Bluetooth· η μουσική επιστρέφει σε πλήρη ποιότητα όταν αποδεσμευτεί το μικρόφωνο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ está en modo llamada (macOS lo hace mientras una app tiene el micrófono abierto), así que reproduce a %@ kHz, en mono, como una llamada telefónica. Vespertine no cambia un enlace Bluetooth; la música recupera la calidad completa cuando se libera el micrófono."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ در حالت تماس است (macOS وقتی برنامه‌ای میکروفون را باز نگه دارد این کار را می‌کند)، بنابراین مثل یک تماس تلفنی با %@ kHz و تک‌کاناله پخش می‌کند. Vespertine پیوند بلوتوث را تغییر نمی‌دهد؛ وقتی میکروفون آزاد شود، موسیقی به کیفیت کامل برمی‌گردد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ on puhelutilassa (macOS tekee näin, kun jokin appi pitää mikrofonia auki), joten se toistaa taajuudella %@ kHz monona kuin puhelussa. Vespertine ei muuta Bluetooth-yhteyttä; musiikki palaa täyteen laatuun, kun mikrofoni vapautetaan."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nasa call mode ang %@ (ginagawa ito ng macOS habang bukas ng isang app ang mikropono), kaya nagpe-play ito sa %@ kHz, mono, parang tawag sa telepono. Hindi binabago ng Vespertine ang Bluetooth link; babalik sa buong kalidad ang musika kapag nabitawan na ang mikropono."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ est en mode appel (macOS fait cela tant qu’une app a son micro ouvert), donc il lit à %@ kHz, en mono, comme lors d’un appel téléphonique. Vespertine ne modifie pas un lien Bluetooth ; la musique retrouve sa pleine qualité quand le micro est libéré."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ કૉલ મોડમાં છે (જ્યારે કોઈ ઍપે માઇક્રોફોન ખુલ્લો રાખ્યો હોય ત્યારે macOS આમ કરે છે), તેથી તે ફોન કૉલની જેમ %@ kHz પર, મોનો ચાલે છે. Vespertine Bluetooth લિંકમાં ફેરફાર કરતું નથી; માઇક્રોફોન છૂટો થતાં જ સંગીત પૂર્ણ ગુણવત્તામાં પાછું આવે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ yana cikin yanayin kira (macOS yana yin haka yayin da wata manhaja ke da makirufo a buɗe), don haka yana kunna a %@ kHz, mono, kamar kiran waya. Vespertine ba ya canza haɗin Bluetooth; kiɗa na komawa ga cikakken inganci idan aka saki makirufo."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ במצב שיחה (macOS עושה זאת כל עוד אפליקציה מחזיקה את המיקרופון פתוח), ולכן ההשמעה בו היא ב־%@ kHz, במונו, כמו בשיחת טלפון. Vespertine אינו משנה חיבור Bluetooth; המוזיקה חוזרת לאיכות מלאה כשהמיקרופון משתחרר."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ कॉल मोड में है (जब कोई ऐप माइक्रोफ़ोन खुला रखता है, तब macOS ऐसा करता है), इसलिए यह फ़ोन कॉल की तरह %@ kHz पर, मोनो में चलता है। Vespertine Bluetooth लिंक नहीं बदलता; माइक्रोफ़ोन छोड़े जाने पर संगीत पूरी गुणवत्ता में लौट आता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) %@ hívásmódban van (a macOS ezt teszi, amíg egy alkalmazás megnyitva tartja a mikrofont), ezért %@ kHz-en, monóban szól, mint egy telefonhívás. A Vespertine nem módosítja a Bluetooth-kapcsolatot; a zene teljes minőségben tér vissza, amint a mikrofon felszabadul."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ berada dalam mode panggilan (macOS melakukannya selama ada aplikasi yang membuka mikrofon), sehingga diputar pada %@ kHz, mono, seperti panggilan telepon. Vespertine tidak mengubah tautan Bluetooth; musik kembali ke kualitas penuh saat mikrofon dilepas."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ è in modalità chiamata (macOS lo fa mentre un’app tiene aperto il microfono), quindi riproduce a %@ kHz, in mono, come in una telefonata. Vespertine non modifica un collegamento Bluetooth; la musica torna alla qualità piena quando il microfono viene rilasciato."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@は通話モードです（アプリがマイクを開いている間、macOSがこの状態にします）。そのため、電話の通話のように%@ kHzのモノラルで再生されます。VespertineはBluetooth接続を変更しません。マイクが解放されると、音楽は通常の音質に戻ります。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ಕರೆ ಮೋಡ್‌ನಲ್ಲಿದೆ (ಒಂದು ಆ್ಯಪ್ ಮೈಕ್ರೊಫೋನ್ ತೆರೆದಿಟ್ಟುಕೊಂಡಿರುವಾಗ macOS ಹೀಗೆ ಮಾಡುತ್ತದೆ), ಆದ್ದರಿಂದ ಇದು ಫೋನ್ ಕರೆಯಂತೆ %@ kHz ನಲ್ಲಿ, ಮೊನೊದಲ್ಲಿ ಪ್ಲೇ ಆಗುತ್ತದೆ. Vespertine Bluetooth ಲಿಂಕ್ ಅನ್ನು ಬದಲಾಯಿಸುವುದಿಲ್ಲ; ಮೈಕ್ರೊಫೋನ್ ಬಿಡುಗಡೆಯಾದಾಗ ಸಂಗೀತ ಪೂರ್ಣ ಗುಣಮಟ್ಟಕ್ಕೆ ಮರಳುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@은(는) 통화 모드입니다(앱이 마이크를 열어 둔 동안 macOS가 이렇게 전환합니다). 그래서 전화 통화처럼 %@ kHz 모노로 재생됩니다. Vespertine은 Bluetooth 연결을 변경하지 않으며, 마이크가 해제되면 음악은 다시 원래 음질로 돌아옵니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ കോൾ മോഡിലാണ് (ഒരു ആപ്പ് മൈക്രോഫോൺ തുറന്നിരിക്കുമ്പോൾ macOS ഇങ്ങനെ ചെയ്യുന്നു), അതിനാൽ ഫോൺ കോൾ പോലെ %@ kHz-ൽ, മോണോയായി പ്ലേ ചെയ്യുന്നു. Vespertine Bluetooth ലിങ്ക് മാറ്റുന്നില്ല; മൈക്രോഫോൺ വിട്ടുകഴിഞ്ഞാൽ സംഗീതം പൂർണ്ണ ഗുണനിലവാരത്തിലേക്ക് മടങ്ങും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ कॉल मोडमध्ये आहे (एखाद्या ॲपने मायक्रोफोन उघडा ठेवलेला असताना macOS असे करते), त्यामुळे ते फोन कॉलप्रमाणे %@ kHz वर, मोनोमध्ये प्ले होते. Vespertine Bluetooth लिंक बदलत नाही; मायक्रोफोन सोडला की संगीत पूर्ण गुणवत्तेवर परत येते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ berada dalam mod panggilan (macOS berbuat demikian semasa sesebuah apl membuka mikrofon), jadi ia dimainkan pada %@ kHz, mono, seperti panggilan telefon. Vespertine tidak mengubah pautan Bluetooth; muzik kembali kepada kualiti penuh apabila mikrofon dilepaskan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ er i samtalemodus (macOS gjør dette mens en app har mikrofonen åpen), så den spiller med %@ kHz, mono, som en telefonsamtale. Vespertine endrer ikke en Bluetooth-forbindelse; musikken går tilbake til full kvalitet når mikrofonen frigis."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ staat in gespreksmodus (macOS doet dit zolang een app de microfoon open heeft), dus speelt het af op %@ kHz, mono, zoals een telefoongesprek. Vespertine verandert een Bluetooth-verbinding niet; de muziek keert terug naar volledige kwaliteit zodra de microfoon wordt vrijgegeven."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਕਾਲ ਮੋਡ ਵਿੱਚ ਹੈ (ਜਦੋਂ ਕੋਈ ਐਪ ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਖੁੱਲ੍ਹਾ ਰੱਖਦੀ ਹੈ ਤਾਂ macOS ਅਜਿਹਾ ਕਰਦਾ ਹੈ), ਇਸ ਲਈ ਇਹ ਫ਼ੋਨ ਕਾਲ ਵਾਂਗ %@ kHz ’ਤੇ, ਮੋਨੋ ਵਿੱਚ ਚੱਲਦਾ ਹੈ। Vespertine Bluetooth ਲਿੰਕ ਨੂੰ ਨਹੀਂ ਬਦਲਦਾ; ਮਾਈਕ੍ਰੋਫ਼ੋਨ ਛੱਡੇ ਜਾਣ ’ਤੇ ਸੰਗੀਤ ਪੂਰੀ ਗੁਣਵੱਤਾ ’ਤੇ ਵਾਪਸ ਆ ਜਾਂਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ jest w trybie rozmowy (macOS robi tak, gdy aplikacja ma otwarty mikrofon), więc odtwarza dźwięk w %@ kHz, mono, jak podczas rozmowy telefonicznej. Vespertine nie zmienia łącza Bluetooth; muzyka wraca do pełnej jakości, gdy mikrofon zostanie zwolniony."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ está em modo de chamada (o macOS faz isso enquanto um app está com o microfone aberto), então reproduz a %@ kHz, em mono, como uma ligação telefônica. O Vespertine não altera um link Bluetooth; a música volta à qualidade total quando o microfone é liberado."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ está em modo de chamada (o macOS faz isto enquanto uma app tem o microfone aberto), por isso reproduz a %@ kHz, em mono, como uma chamada telefónica. O Vespertine não altera uma ligação Bluetooth; a música volta à qualidade total quando o microfone é libertado."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ este în mod apel (macOS face asta cât timp o aplicație ține microfonul deschis), așa că redă la %@ kHz, mono, ca într-un apel telefonic. Vespertine nu modifică o legătură Bluetooth; muzica revine la calitatea completă când microfonul este eliberat."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ är i samtalsläge (macOS gör det medan en app har mikrofonen öppen), så den spelar vid %@ kHz, i mono, som ett telefonsamtal. Vespertine ändrar inte en Bluetooth-länk; musiken återgår till full kvalitet när mikrofonen släpps."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ iko katika hali ya simu (macOS hufanya hivi wakati programu inapokuwa na maikrofoni wazi), kwa hivyo hucheza kwa %@ kHz, mono, kama mazungumzo ya simu. Vespertine hakibadilishi kiungo cha Bluetooth; muziki hurudi katika ubora kamili maikrofoni inapoachiliwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ அழைப்புப் பயன்முறையில் உள்ளது (ஒரு ஆப்ஸ் மைக்ரோஃபோனைத் திறந்து வைத்திருக்கும்போது macOS இவ்வாறு செய்கிறது), எனவே தொலைபேசி அழைப்பைப் போல %@ kHz-இல், மோனோவில் ஒலிக்கிறது. Vespertine Bluetooth இணைப்பை மாற்றுவதில்லை; மைக்ரோஃபோன் விடுவிக்கப்பட்டதும் இசை முழுத் தரத்துக்குத் திரும்பும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ కాల్ మోడ్‌లో ఉంది (ఒక యాప్ మైక్రోఫోన్‌ను తెరిచి ఉంచినప్పుడు macOS ఇలా చేస్తుంది), కాబట్టి ఇది ఫోన్ కాల్ లాగా %@ kHz వద్ద, మోనోలో ప్లే అవుతుంది. Vespertine Bluetooth లింక్‌ను మార్చదు; మైక్రోఫోన్ విడుదలైనప్పుడు సంగీతం పూర్తి నాణ్యతకు తిరిగి వస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ อยู่ในโหมดการโทร (macOS ทำเช่นนี้ขณะที่แอปเปิดไมโครโฟนอยู่) จึงเล่นที่ %@ kHz แบบโมโน เหมือนการโทรศัพท์ Vespertine ไม่เปลี่ยนลิงก์ Bluetooth เพลงจะกลับมามีคุณภาพเต็มเมื่อปล่อยไมโครโฟน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ arama modunda (macOS, bir uygulama mikrofonu açık tuttuğu sürece bunu yapar); bu yüzden telefon görüşmesi gibi %@ kHz’de, mono çalar. Vespertine bir Bluetooth bağlantısını değiştirmez; mikrofon serbest bırakılınca müzik tam kalitesine döner."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ перебуває в режимі дзвінка (macOS робить це, поки застосунок тримає мікрофон відкритим), тому відтворює звук на %@ kHz, моно, як під час телефонної розмови. Vespertine не змінює канал Bluetooth; музика повертається до повної якості, коли мікрофон звільняється."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ کال موڈ میں ہے (جب کوئی ایپ مائیکروفون کھلا رکھتی ہے تو macOS ایسا کرتا ہے)، اس لیے یہ فون کال کی طرح %@ kHz پر، مونو میں چلتا ہے۔ Vespertine بلوٹوتھ لنک کو نہیں بدلتا؛ مائیکروفون چھوڑ دیے جانے پر موسیقی مکمل معیار پر لوٹ آتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ đang ở chế độ cuộc gọi (macOS làm vậy khi một ứng dụng đang mở micro), nên phát ở %@ kHz, đơn âm, như một cuộc gọi điện thoại. Vespertine không thay đổi liên kết Bluetooth; nhạc trở lại chất lượng đầy đủ khi micro được giải phóng."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 處於通話模式（當有 App 開啟咪高峰時，macOS 會這樣做），因此以 %@ kHz 單聲道播放，就像電話通話一樣。Vespertine 不會更改藍牙連線；咪高峰釋放後，音樂會恢復完整音質。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 处于通话模式（当有 App 打开麦克风时，macOS 会这样做），因此以 %@ kHz 单声道播放，就像电话通话一样。Vespertine 不会更改蓝牙连接；麦克风释放后，音乐会恢复完整音质。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 處於通話模式（當有 App 開啟麥克風時，macOS 會這樣做），因此以 %@ kHz 單聲道播放，就像電話通話一樣。Vespertine 不會變更藍牙連線；麥克風釋放後，音樂會恢復完整音質。"
+          }
+        }
+      }
+    },
     "%@ is not connected.": {
       "localizations": {
         "am": {
@@ -118234,6 +118503,274 @@
         }
       }
     },
+    "Bluetooth link": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የBluetooth ግንኙነት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رابط Bluetooth"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth লিংক"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spojení Bluetooth"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth-forbindelse"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth-Verbindung"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Σύνδεση Bluetooth"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enlace Bluetooth"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پیوند بلوتوث"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth-yhteys"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth link"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lien Bluetooth"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth લિંક"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haɗin Bluetooth"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "חיבור Bluetooth"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth लिंक"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth-kapcsolat"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tautan Bluetooth"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collegamento Bluetooth"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth接続"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ಲಿಂಕ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth 연결"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ലിങ്ക്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth लिंक"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pautan Bluetooth"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth-forbindelse"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth-verbinding"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ਲਿੰਕ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Łącze Bluetooth"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Link Bluetooth"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ligação Bluetooth"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legătură Bluetooth"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth-länk"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiungo cha Bluetooth"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth இணைப்பு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth లింక్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ลิงก์ Bluetooth"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth bağlantısı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Канал Bluetooth"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلوٹوتھ لنک"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liên kết Bluetooth"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "藍牙連線"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "蓝牙连接"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "藍牙連線"
+          }
+        }
+      }
+    },
     "Bluetooth re-encodes audio with a lossy codec, so the output can't be bit-perfect.": {
       "extractionState": "manual",
       "localizations": {
@@ -118505,6 +119042,544 @@
           "stringUnit": {
             "state": "translated",
             "value": "藍牙會使用有損編解碼器重新編碼音訊，因此輸出無法達到位元完美。"
+          }
+        }
+      }
+    },
+    "Bluetooth sets this link to %@ kHz; Vespertine leaves it alone and converts the music to it.": {
+      "comment": "Signal path: a Bluetooth link's rate was kept and the music converted to it. %@ is the rate in kHz.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ይህን ግንኙነት ወደ %@ kHz ያዘጋጃል፤ Vespertine እንዳለ ይተወዋል እና ሙዚቃውን ወደዚያ ይቀይረዋል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يضبط Bluetooth هذا الرابط على %@ kHz؛ ويتركه Vespertine كما هو ويحوّل الموسيقى إليه."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth এই লিংক %@ kHz-এ সেট করে; Vespertine এটি যেমন আছে তেমনই রাখে এবং সংগীতকে সেই রেটে রূপান্তর করে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth nastavuje toto spojení na %@ kHz; Vespertine je nechává být a hudbu na tuto frekvenci převádí."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth indstiller denne forbindelse til %@ kHz; Vespertine lader den være og konverterer musikken til den."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth legt für diese Verbindung %@ kHz fest; Vespertine lässt sie unangetastet und konvertiert die Musik auf diese Rate."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Bluetooth ορίζει αυτή τη σύνδεση στα %@ kHz· το Vespertine την αφήνει ως έχει και μετατρέπει τη μουσική σε αυτήν."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth fija este enlace en %@ kHz; Vespertine lo deja como está y convierte la música a esa frecuencia."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلوتوث این پیوند را روی %@ kHz تنظیم می‌کند؛ Vespertine آن را دست‌نخورده می‌گذارد و موسیقی را به همان نرخ تبدیل می‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth asettaa tämän yhteyden taajuudelle %@ kHz; Vespertine jättää sen ennalleen ja muuntaa musiikin siihen."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Itinatakda ng Bluetooth ang link na ito sa %@ kHz; hindi ito ginagalaw ng Vespertine at kino-convert nito ang musika para tumugma rito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Bluetooth règle ce lien sur %@ kHz ; Vespertine n’y touche pas et convertit la musique à cette fréquence."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth આ લિંકને %@ kHz પર સેટ કરે છે; Vespertine તેને જેમ છે તેમ રાખે છે અને સંગીતને તેમાં કન્વર્ટ કરે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth yana saita wannan haɗin zuwa %@ kHz; Vespertine ba ya taɓa shi kuma yana sauya kiɗan zuwa gare shi."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth מגדיר את החיבור הזה ל־%@ kHz; Vespertine משאיר אותו כמות שהוא וממיר את המוזיקה אליו."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth इस लिंक को %@ kHz पर सेट करता है; Vespertine उसे जैसी है वैसी रखता है और संगीत को उसी दर में बदल देता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Bluetooth erre a kapcsolatra %@ kHz-et állít be; a Vespertine békén hagyja, és erre alakítja át a zenét."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth menetapkan tautan ini ke %@ kHz; Vespertine membiarkannya dan mengonversi musik ke laju tersebut."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il Bluetooth imposta questo collegamento a %@ kHz; Vespertine lo lascia com’è e converte la musica a quella frequenza."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetoothがこの接続を%@ kHzに設定します。Vespertineはそのままにして、音楽をそのレートに変換します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ಈ ಲಿಂಕ್ ಅನ್ನು %@ kHz ಗೆ ಹೊಂದಿಸುತ್ತದೆ; Vespertine ಅದನ್ನು ಹಾಗೆಯೇ ಬಿಡುತ್ತದೆ ಮತ್ತು ಸಂಗೀತವನ್ನು ಅದಕ್ಕೆ ಪರಿವರ್ತಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth가 이 연결을 %@ kHz로 설정합니다. Vespertine은 이를 그대로 두고 음악을 해당 레이트로 변환합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ഈ ലിങ്ക് %@ kHz-ലേക്ക് സജ്ജമാക്കുന്നു; Vespertine അതിനെ അതുപോലെ വിടുകയും സംഗീതത്തെ അതിലേക്ക് പരിവർത്തനം ചെയ്യുകയും ചെയ്യുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ही लिंक %@ kHz वर सेट करते; Vespertine ती जशी आहे तशी ठेवते आणि संगीत त्यात रूपांतरित करते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth menetapkan pautan ini kepada %@ kHz; Vespertine membiarkannya dan menukar muzik kepada kadar itu."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth setter denne forbindelsen til %@ kHz; Vespertine lar den være og konverterer musikken til den."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth stelt deze verbinding in op %@ kHz; Vespertine laat die ongemoeid en zet de muziek daarnaar om."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ਇਸ ਲਿੰਕ ਨੂੰ %@ kHz ’ਤੇ ਸੈੱਟ ਕਰਦਾ ਹੈ; Vespertine ਇਸ ਨੂੰ ਜਿਉਂ ਦੀ ਤਿਉਂ ਰੱਖਦਾ ਹੈ ਅਤੇ ਸੰਗੀਤ ਨੂੰ ਉਸ ਵਿੱਚ ਬਦਲਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ustawia to łącze na %@ kHz; Vespertine go nie zmienia i konwertuje muzykę do tej częstotliwości."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Bluetooth define este link em %@ kHz; o Vespertine o mantém como está e converte a música para essa taxa."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Bluetooth define esta ligação para %@ kHz; o Vespertine deixa-a como está e converte a música para essa taxa."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth setează această legătură la %@ kHz; Vespertine o lasă neschimbată și convertește muzica la această frecvență."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ställer in den här länken på %@ kHz; Vespertine låter den vara och konverterar musiken till den."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth huweka kiungo hiki kuwa %@ kHz; Vespertine hukiacha kilivyo na hubadilisha muziki kuwa kiwango hicho."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth இந்த இணைப்பை %@ kHz-ஆக அமைக்கிறது; Vespertine அதை அப்படியே விட்டு, இசையை அதற்கு மாற்றுகிறது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ఈ లింక్‌ను %@ kHzకి సెట్ చేస్తుంది; Vespertine దాన్ని అలాగే వదిలి, సంగీతాన్ని దానికి మారుస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ตั้งลิงก์นี้เป็น %@ kHz Vespertine จะไม่แตะต้อง และแปลงเพลงให้เป็นอัตรานั้น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth bu bağlantıyı %@ kHz’e ayarlar; Vespertine ona dokunmaz ve müziği bu hıza dönüştürür."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth задає цьому каналу %@ kHz; Vespertine не чіпає його й перетворює музику на цю частоту."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلوٹوتھ اس لنک کو %@ kHz پر سیٹ کرتا ہے؛ Vespertine اسے جوں کا توں رکھتا ہے اور موسیقی کو اسی ریٹ پر تبدیل کرتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth đặt liên kết này ở %@ kHz; Vespertine giữ nguyên và chuyển đổi nhạc sang tần số đó."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "藍牙會將此連線設為 %@ kHz；Vespertine 不會改動它，而是把音樂轉換至該取樣率。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "蓝牙将此连接设为 %@ kHz；Vespertine 不会改动它，而是把音乐转换到该采样率。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "藍牙會將此連線設為 %@ kHz；Vespertine 不會改動它，而是把音樂轉換為該取樣率。"
+          }
+        }
+      }
+    },
+    "Bluetooth sets this link to %@ kHz; Vespertine leaves it alone.": {
+      "comment": "Signal path: a Bluetooth link's rate was kept. %@ is the rate in kHz.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ይህን ግንኙነት ወደ %@ kHz ያዘጋጃል፤ Vespertine እንዳለ ይተወዋል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يضبط Bluetooth هذا الرابط على %@ kHz؛ ويتركه Vespertine كما هو."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth এই লিংক %@ kHz-এ সেট করে; Vespertine এটি যেমন আছে তেমনই রাখে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth nastavuje toto spojení na %@ kHz; Vespertine je nechává být."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth indstiller denne forbindelse til %@ kHz; Vespertine lader den være."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth legt für diese Verbindung %@ kHz fest; Vespertine lässt sie unangetastet."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Bluetooth ορίζει αυτή τη σύνδεση στα %@ kHz· το Vespertine την αφήνει ως έχει."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth fija este enlace en %@ kHz; Vespertine lo deja como está."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلوتوث این پیوند را روی %@ kHz تنظیم می‌کند؛ Vespertine آن را دست‌نخورده می‌گذارد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth asettaa tämän yhteyden taajuudelle %@ kHz; Vespertine jättää sen ennalleen."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Itinatakda ng Bluetooth ang link na ito sa %@ kHz; hindi ito ginagalaw ng Vespertine."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Bluetooth règle ce lien sur %@ kHz ; Vespertine n’y touche pas."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth આ લિંકને %@ kHz પર સેટ કરે છે; Vespertine તેને જેમ છે તેમ રાખે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth yana saita wannan haɗin zuwa %@ kHz; Vespertine ba ya taɓa shi."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth מגדיר את החיבור הזה ל־%@ kHz; Vespertine משאיר אותו כמות שהוא."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth इस लिंक को %@ kHz पर सेट करता है; Vespertine उसे जैसी है वैसी रखता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Bluetooth erre a kapcsolatra %@ kHz-et állít be; a Vespertine békén hagyja."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth menetapkan tautan ini ke %@ kHz; Vespertine membiarkannya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il Bluetooth imposta questo collegamento a %@ kHz; Vespertine lo lascia com’è."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetoothがこの接続を%@ kHzに設定します。Vespertineはそのままにします。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ಈ ಲಿಂಕ್ ಅನ್ನು %@ kHz ಗೆ ಹೊಂದಿಸುತ್ತದೆ; Vespertine ಅದನ್ನು ಹಾಗೆಯೇ ಬಿಡುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth가 이 연결을 %@ kHz로 설정합니다. Vespertine은 이를 그대로 둡니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ഈ ലിങ്ക് %@ kHz-ലേക്ക് സജ്ജമാക്കുന്നു; Vespertine അതിനെ അതുപോലെ വിടുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ही लिंक %@ kHz वर सेट करते; Vespertine ती जशी आहे तशी ठेवते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth menetapkan pautan ini kepada %@ kHz; Vespertine membiarkannya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth setter denne forbindelsen til %@ kHz; Vespertine lar den være."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth stelt deze verbinding in op %@ kHz; Vespertine laat die ongemoeid."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ਇਸ ਲਿੰਕ ਨੂੰ %@ kHz ’ਤੇ ਸੈੱਟ ਕਰਦਾ ਹੈ; Vespertine ਇਸ ਨੂੰ ਜਿਉਂ ਦੀ ਤਿਉਂ ਰੱਖਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ustawia to łącze na %@ kHz; Vespertine go nie zmienia."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Bluetooth define este link em %@ kHz; o Vespertine o mantém como está."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Bluetooth define esta ligação para %@ kHz; o Vespertine deixa-a como está."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth setează această legătură la %@ kHz; Vespertine o lasă neschimbată."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ställer in den här länken på %@ kHz; Vespertine låter den vara."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth huweka kiungo hiki kuwa %@ kHz; Vespertine hukiacha kilivyo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth இந்த இணைப்பை %@ kHz-ஆக அமைக்கிறது; Vespertine அதை அப்படியே விடுகிறது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ఈ లింక్‌ను %@ kHzకి సెట్ చేస్తుంది; Vespertine దాన్ని అలాగే వదిలేస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ตั้งลิงก์นี้เป็น %@ kHz Vespertine จะไม่แตะต้อง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth bu bağlantıyı %@ kHz’e ayarlar; Vespertine ona dokunmaz."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth задає цьому каналу %@ kHz; Vespertine не чіпає його."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلوٹوتھ اس لنک کو %@ kHz پر سیٹ کرتا ہے؛ Vespertine اسے جوں کا توں رکھتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth đặt liên kết này ở %@ kHz; Vespertine giữ nguyên."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "藍牙會將此連線設為 %@ kHz；Vespertine 不會改動它。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "蓝牙将此连接设为 %@ kHz；Vespertine 不会改动它。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "藍牙會將此連線設為 %@ kHz；Vespertine 不會改動它。"
           }
         }
       }
@@ -118781,6 +119856,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "藍牙 · AAC"
+          }
+        }
+      }
+    },
+    "BLUETOOTH · CALL MODE": {
+      "comment": "Status badge (short, uppercase): a Bluetooth headset is in its hands-free call mode, so music plays at phone quality.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · የጥሪ ሁነታ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth · وضع المكالمات"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · কল মোড"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · REŽIM HOVORU"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · OPKALDSTILSTAND"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · ANRUFMODUS"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · ΛΕΙΤΟΥΡΓΙΑ ΚΛΗΣΗΣ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · MODO LLAMADA"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلوتوث · حالت تماس"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · PUHELUTILA"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · CALL MODE"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · MODE APPEL"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · કૉલ મોડ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · YANAYIN KIRA"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · מצב שיחה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · कॉल मोड"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · HÍVÁSMÓD"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · MODE PANGGILAN"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · MODALITÀ CHIAMATA"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · 通話モード"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · ಕರೆ ಮೋಡ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · 통화 모드"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · കോൾ മോഡ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · कॉल मोड"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · MOD PANGGILAN"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · SAMTALEMODUS"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · GESPREKSMODUS"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · ਕਾਲ ਮੋਡ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · TRYB ROZMOWY"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · MODO DE CHAMADA"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · MODO DE CHAMADA"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · MOD APEL"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · SAMTALSLÄGE"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · HALI YA SIMU"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · அழைப்புப் பயன்முறை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · కాల్ మోడ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · โหมดการโทร"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · ARAMA MODU"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · РЕЖИМ ДЗВІНКА"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلوٹوتھ · کال موڈ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BLUETOOTH · CHẾ ĐỘ CUỘC GỌI"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "藍牙 · 通話模式"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "蓝牙 · 通话模式"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "藍牙 · 通話模式"
           }
         }
       }
@@ -123270,6 +124614,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "校正檔案"
+          }
+        }
+      }
+    },
+    "call mode": {
+      "comment": "A Bluetooth headset is in its hands-free call mode",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የጥሪ ሁነታ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وضع المكالمات"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "কল মোড"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "režim hovoru"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "opkaldstilstand"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anrufmodus"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "λειτουργία κλήσης"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "modo llamada"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حالت تماس"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "puhelutila"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "call mode"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mode appel"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કૉલ મોડ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yanayin kira"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מצב שיחה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कॉल मोड"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hívásmód"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mode panggilan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "modalità chiamata"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通話モード"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಕರೆ ಮೋಡ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "통화 모드"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കോൾ മോഡ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कॉल मोड"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mod panggilan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "samtalemodus"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "gespreksmodus"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਾਲ ਮੋਡ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tryb rozmowy"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "modo de chamada"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "modo de chamada"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mod apel"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "samtalsläge"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hali ya simu"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அழைப்புப் பயன்முறை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కాల్ మోడ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "โหมดการโทร"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "arama modu"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "режим дзвінка"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کال موڈ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "chế độ cuộc gọi"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通話模式"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通话模式"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通話模式"
           }
         }
       }
@@ -239554,6 +241167,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "保留離線拷貝"
+          }
+        }
+      }
+    },
+    "keep the Bluetooth link at %lld Hz (it moved to %lld Hz)": {
+      "comment": "Followed by “failed: <error code>”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የBluetooth ግንኙነትን በ%lld Hz ማቆየት (ወደ %lld Hz ተሸጋግሯል)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إبقاء رابط Bluetooth على %lld Hz (انتقل إلى %lld Hz)"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth লিংক %lld Hz-এ ধরে রাখা (এটি %lld Hz-এ সরে গেছে)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "udržet spojení Bluetooth na %lld Hz (změnilo se na %lld Hz)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "beholde Bluetooth-forbindelsen ved %lld Hz (den skiftede til %lld Hz)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth-Verbindung bei %lld Hz halten (sie ist auf %lld Hz gewechselt)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "διατήρηση της σύνδεσης Bluetooth στα %lld Hz (μετακινήθηκε στα %lld Hz)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mantener el enlace Bluetooth a %lld Hz (cambió a %lld Hz)"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نگه داشتن پیوند بلوتوث روی %lld Hz (به %lld Hz رفت)"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth-yhteyden pitäminen taajuudella %lld Hz (se siirtyi taajuudelle %lld Hz)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "panatilihin ang Bluetooth link sa %lld Hz (lumipat ito sa %lld Hz)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "maintenir le lien Bluetooth à %lld Hz (il est passé à %lld Hz)"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth લિંકને %lld Hz પર રાખવી (તે %lld Hz પર ખસી ગઈ)"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "riƙe haɗin Bluetooth a %lld Hz (ya koma %lld Hz)"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שמירת חיבור ה־Bluetooth על %lld Hz (הוא עבר ל־%lld Hz)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth लिंक को %lld Hz पर बनाए रखना (वह %lld Hz पर चली गई)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "a Bluetooth-kapcsolat %lld Hz-en tartása (átváltott %lld Hz-re)"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mempertahankan tautan Bluetooth pada %lld Hz (berpindah ke %lld Hz)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mantenere il collegamento Bluetooth a %lld Hz (è passato a %lld Hz)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth接続の%lld Hzでの維持（%lld Hzに変わりました）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ಲಿಂಕ್ ಅನ್ನು %lld Hz ನಲ್ಲಿ ಇರಿಸುವುದು (ಅದು %lld Hz ಗೆ ಬದಲಾಯಿತು)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth 연결을 %lld Hz로 유지(%lld Hz로 변경됨)"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ലിങ്ക് %lld Hz-ൽ നിലനിർത്തൽ (അത് %lld Hz-ലേക്ക് മാറി)"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth लिंक %lld Hz वर ठेवणे (ती %lld Hz वर गेली)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mengekalkan pautan Bluetooth pada %lld Hz (ia beralih ke %lld Hz)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "beholde Bluetooth-forbindelsen på %lld Hz (den gikk over til %lld Hz)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth-verbinding op %lld Hz houden (die is overgegaan naar %lld Hz)"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth ਲਿੰਕ ਨੂੰ %lld Hz ’ਤੇ ਰੱਖਣਾ (ਇਹ %lld Hz ’ਤੇ ਚਲੀ ਗਈ)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "utrzymanie łącza Bluetooth na %lld Hz (zmieniło się na %lld Hz)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "manter o link Bluetooth em %lld Hz (ele mudou para %lld Hz)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "manter a ligação Bluetooth a %lld Hz (passou para %lld Hz)"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "menținerea legăturii Bluetooth la %lld Hz (a trecut la %lld Hz)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "behålla Bluetooth-länken vid %lld Hz (den ändrades till %lld Hz)"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kudumisha kiungo cha Bluetooth kwa %lld Hz (kilihamia %lld Hz)"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth இணைப்பை %lld Hz-இல் வைத்திருத்தல் (அது %lld Hz-க்கு மாறியது)"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth లింక్‌ను %lld Hz వద్ద ఉంచడం (అది %lld Hzకి మారింది)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "คงลิงก์ Bluetooth ไว้ที่ %lld Hz (เปลี่ยนไปเป็น %lld Hz)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bluetooth bağlantısını %lld Hz’de tutma (%lld Hz’e geçti)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "утримати канал Bluetooth на %lld Hz (він перейшов на %lld Hz)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلوٹوتھ لنک کو %lld Hz پر رکھنا (یہ %lld Hz پر چلا گیا)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "giữ liên kết Bluetooth ở %lld Hz (đã chuyển sang %lld Hz)"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將藍牙連線維持在 %lld Hz（已變為 %lld Hz）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将蓝牙连接保持在 %lld Hz（它已变为 %lld Hz）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將藍牙連線維持在 %lld Hz（已變為 %lld Hz）"
           }
         }
       }
