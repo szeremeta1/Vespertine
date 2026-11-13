@@ -17,14 +17,27 @@ public struct DiscoveredMac: Identifiable, Hashable, Sendable {
     public var serverID: String
     public var protocolVersion: Int?
     public var appVersion: String?
+    /// The port the Mac says it listens on (nil from a Mac that doesn't say).
+    public var port: UInt16?
     public var endpoint: NWEndpoint
 
-    public init(name: String, serverID: String, protocolVersion: Int? = nil, appVersion: String? = nil, endpoint: NWEndpoint) {
+    public init(name: String, serverID: String, protocolVersion: Int? = nil, appVersion: String? = nil, port: UInt16? = nil, endpoint: NWEndpoint) {
         self.name = name
         self.serverID = serverID
         self.protocolVersion = protocolVersion
         self.appVersion = appVersion
+        self.port = port
         self.endpoint = endpoint
+    }
+
+    /// A Mac as its Bonjour service record describes it.
+    public init(name: String, txt: NWTXTRecord, endpoint: NWEndpoint) {
+        self.init(name: name,
+                  serverID: txt[RemoteProtocol.TXTKey.serverID] ?? "",
+                  protocolVersion: txt[RemoteProtocol.TXTKey.protocolVersion].flatMap { Int($0) },
+                  appVersion: txt[RemoteProtocol.TXTKey.appVersion],
+                  port: RemotePort.advertised(txt: txt[RemoteProtocol.TXTKey.port].map { [RemoteProtocol.TXTKey.port: $0] } ?? [:]),
+                  endpoint: endpoint)
     }
 }
 
@@ -36,6 +49,8 @@ public final class RemoteDiscovery {
     /// Why browsing doesn't work (most often: Local Network access was turned off for the app).
     public private(set) var problem: String?
 
+    /// Called when the list of Macs changed (the app keeps the ports the Macs announce).
+    @ObservationIgnored public var onChange: (@MainActor ([DiscoveredMac]) -> Void)?
     @ObservationIgnored private var browser: NWBrowser?
 
     public init() {}
@@ -49,7 +64,10 @@ public final class RemoteDiscovery {
         let browser = NWBrowser(for: .bonjourWithTXTRecord(type: RemoteProtocol.serviceType, domain: nil), using: parameters)
         browser.browseResultsChangedHandler = { [weak self] results, _ in
             let found = results.compactMap(Self.mac(from:)).sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-            MainActor.assumeIsolated { self?.macs = found }
+            MainActor.assumeIsolated {
+                self?.macs = found
+                self?.onChange?(found)
+            }
         }
         browser.stateUpdateHandler = { [weak self] state in
             let problem: String?
@@ -75,13 +93,10 @@ public final class RemoteDiscovery {
 
     nonisolated static func mac(from result: NWBrowser.Result) -> DiscoveredMac? {
         guard case .service(let name, _, _, _) = result.endpoint else { return nil }
-        var serverID = "", version: Int?, app: String?
         if case .bonjour(let txt) = result.metadata {
-            serverID = txt[RemoteProtocol.TXTKey.serverID] ?? ""
-            version = txt[RemoteProtocol.TXTKey.protocolVersion].flatMap { Int($0) }
-            app = txt[RemoteProtocol.TXTKey.appVersion]
+            return DiscoveredMac(name: name, txt: txt, endpoint: result.endpoint)
         }
-        return DiscoveredMac(name: name, serverID: serverID, protocolVersion: version, appVersion: app, endpoint: result.endpoint)
+        return DiscoveredMac(name: name, serverID: "", endpoint: result.endpoint)
     }
 }
 #endif

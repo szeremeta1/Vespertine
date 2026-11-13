@@ -25,6 +25,8 @@ public enum RemoteProtocol {
         public static let protocolVersion = "v"
         /// Vespertine's version on the Mac ("1.1.0").
         public static let appVersion = "app"
+        /// The port the Mac listens on (the same one Bonjour resolves to, for a phone to keep against its typed address).
+        public static let port = "port"
     }
 
     /// The TLS pre-shared key identity a phone uses while pairing with the code from the QR link, and with the typed code.

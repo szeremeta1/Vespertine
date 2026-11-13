@@ -154,20 +154,62 @@ private func waitUntil(_ condition: () -> Bool, seconds: Double = 5) async -> Bo
         #expect(again == changed)
     }
 
-    @Test func savedAddressesComeInOrderAndNeedAPort() {
+    @Test func savedAddressesComeInOrderAndFallBackToTheDefaultPort() {
         let lan = RemoteAddress(host: "192.168.1.20", port: 51000)
-        // A typed name without a port borrows the last known one, and goes first.
+        let standard = RemotePort.preferred
+        // A typed name without a port borrows the last known one and goes first; then the last known address; then
+        // each host at the Mac's fixed port, in case the Mac restarted on its usual port.
         #expect(Self.saved(address: RemoteAddress(host: "mac.ts.net"), lastKnown: lan).savedAddresses
-                == [RemoteAddress(host: "mac.ts.net", port: 51000), lan])
-        // No port anywhere: nothing to try yet.
-        #expect(Self.saved(address: RemoteAddress(host: "mac.ts.net")).savedAddresses.isEmpty)
-        // The same address typed and remembered is tried once.
-        #expect(Self.saved(address: lan, lastKnown: lan).savedAddresses == [lan])
+                == [RemoteAddress(host: "mac.ts.net", port: 51000), lan,
+                    RemoteAddress(host: "mac.ts.net", port: standard), RemoteAddress(host: "192.168.1.20", port: standard)])
+        // No port anywhere: the typed name at the fixed port is still worth a try (an old pairing, away from home).
+        #expect(Self.saved(address: RemoteAddress(host: "mac.ts.net")).savedAddresses
+                == [RemoteAddress(host: "mac.ts.net", port: standard)])
+        // Nothing typed and nothing remembered: nothing to try but Bonjour.
+        #expect(Self.saved().savedAddresses.isEmpty)
+        // The same address typed and remembered is tried once, and a Mac already on the fixed port isn't tried twice.
+        #expect(Self.saved(address: lan, lastKnown: lan).savedAddresses == [lan, RemoteAddress(host: "192.168.1.20", port: standard)])
+        let fixed = RemoteAddress(host: "mac.ts.net", port: standard)
+        #expect(Self.saved(address: fixed, lastKnown: fixed).savedAddresses == [fixed])
 
         let bonjour = NWEndpoint.service(name: "Test Mac", type: RemoteProtocol.serviceType, domain: "local.", interface: nil)
         let routes = Self.saved(address: RemoteAddress(host: "mac.ts.net"), lastKnown: lan).routes(nearby: bonjour)
-        #expect(routes.map(\.kind) == [.nearby, .address, .lastKnown])
-        #expect(Self.saved(lastKnown: lan).routes(nearby: nil).map(\.kind) == [.lastKnown])
+        #expect(routes.map(\.kind) == [.nearby, .address, .lastKnown, .address, .lastKnown])
+        #expect(Self.saved(lastKnown: lan).routes(nearby: nil).map(\.kind) == [.lastKnown, .lastKnown])
+    }
+
+    @Test func theMacsAdvertisedPortReplacesAStaleRememberedOne() {
+        // The Mac moved (its usual port was busy): Bonjour's TXT says so, and the phone keeps it for when it's away.
+        let stale = Self.saved(address: RemoteAddress(host: "mac.ts.net"), lastKnown: RemoteAddress(host: "192.168.1.20", port: 51000))
+        let moved = stale.noting(advertisedPort: 47_823)
+        #expect(moved.lastKnown == RemoteAddress(host: "192.168.1.20", port: 47_823))
+        #expect(moved.address == RemoteAddress(host: "mac.ts.net"))
+        #expect(moved.savedAddresses.first == RemoteAddress(host: "mac.ts.net", port: 47_823))
+        // Nothing changes when it's the same, or when there's no host to attach the port to yet.
+        #expect(moved.noting(advertisedPort: 47_823) == moved)
+        let unknown = Self.saved()
+        #expect(unknown.noting(advertisedPort: 47_823) == unknown)
+        // A typed address with its own port is the user's choice: left alone.
+        let typed = Self.saved(address: RemoteAddress(host: "mac.ts.net", port: 9000), lastKnown: RemoteAddress(host: "192.168.1.20", port: 51000))
+        #expect(typed.noting(advertisedPort: 47_823).address == RemoteAddress(host: "mac.ts.net", port: 9000))
+        // Only a typed host with no remembered address: the port is remembered against it.
+        let onlyTyped = Self.saved(address: RemoteAddress(host: "mac.ts.net"))
+        #expect(onlyTyped.noting(advertisedPort: 47_823).lastKnown == RemoteAddress(host: "mac.ts.net", port: 47_823))
+    }
+
+    @Test func aMacsServiceRecordCarriesItsPort() {
+        var txt = NWTXTRecord()
+        txt[RemoteProtocol.TXTKey.serverID] = "S-TEST"
+        txt[RemoteProtocol.TXTKey.protocolVersion] = "1"
+        txt[RemoteProtocol.TXTKey.appVersion] = "1.1.2"
+        txt[RemoteProtocol.TXTKey.port] = "47822"
+        let endpoint = NWEndpoint.service(name: "Test Mac", type: RemoteProtocol.serviceType, domain: "local.", interface: nil)
+        let mac = DiscoveredMac(name: "Test Mac", txt: txt, endpoint: endpoint)
+        #expect(mac.serverID == "S-TEST")
+        #expect(mac.port == 47_822)
+        // An older Mac says no port: Bonjour's own endpoint is all there is.
+        txt[RemoteProtocol.TXTKey.port] = nil
+        #expect(DiscoveredMac(name: "Test Mac", txt: txt, endpoint: endpoint).port == nil)
     }
 
     @Test func connectsByAddressWhenTheFirstRouteIsDead() async throws {

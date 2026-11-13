@@ -39,6 +39,9 @@ final class RemoteStore {
 
     private(set) var devices: [PairedRemote] = []
     let serverID: String
+    /// The port the server listened on last. It tries this one first the next time, so a phone that knows the Mac's
+    /// address keeps reaching it across restarts (a file beside `server-id`, so each library has its own).
+    private(set) var port: UInt16?
 
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let folder: URL
@@ -62,6 +65,26 @@ final class RemoteStore {
         folder = dataDirectory.appendingPathComponent("Remote", isDirectory: true)
         serverID = Self.loadServerID(in: folder)
         devices = Self.loadDevices(in: folder)
+        port = Self.loadPort(in: folder)
+    }
+
+    /// Remembers the port the server is listening on.
+    func setPort(_ new: UInt16) {
+        guard new != port else { return }
+        port = new
+        do {
+            try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+            try Data(String(new).utf8).write(to: portURL, options: [.atomic])
+        } catch {
+            NSLog("Vespertine remote: couldn't save the port: \(error.localizedDescription)")
+        }
+    }
+
+    private var portURL: URL { folder.appendingPathComponent("port") }
+
+    private static func loadPort(in folder: URL) -> UInt16? {
+        guard let text = try? String(contentsOf: folder.appendingPathComponent("port"), encoding: .utf8) else { return nil }
+        return UInt16(text.trimmingCharacters(in: .whitespacesAndNewlines))
     }
 
     private var devicesURL: URL { folder.appendingPathComponent("paired-remotes.json") }

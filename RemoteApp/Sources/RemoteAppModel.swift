@@ -32,11 +32,14 @@ final class RemoteAppModel {
     /// Pairings that are never saved (a made-up one for screenshots).
     @ObservationIgnored private var transientPairings: Set<String> = []
     @ObservationIgnored private var linkWatch: Task<Void, Never>?
+    /// The paired Macs Bonjour listed last time, to notice one that just showed up.
+    @ObservationIgnored private var listedPaired: Set<String> = []
     @ObservationIgnored private let pathMonitor = NWPathMonitor()
     private static let lastMacKey = "lastMac"
 
     init() {
         pairings = keychain.load().sorted { $0.pairedAt < $1.pairedAt }
+        discovery.onChange = { [weak self] macs in self?.discovered(macs) }
         discovery.start()
         pathMonitor.pathUpdateHandler = { [weak self] path in
             let online = path.status == .satisfied
@@ -140,6 +143,28 @@ final class RemoteAppModel {
         pairings[index].address = address
         save(pairings[index])
         if session?.pairing.serverID == serverID { session?.networkChanged() }
+    }
+
+    /// Bonjour's list changed. A paired Mac that announces a port (it moved when its usual one was busy) has that port
+    /// kept against its saved addresses, so it also works from away; and a paired Mac that just appeared, or moved, is
+    /// tried now if the session with it isn't connected, rather than at the next retry.
+    private func discovered(_ macs: [DiscoveredMac]) {
+        var moved = false
+        for mac in macs {
+            guard let port = mac.port, let index = pairings.firstIndex(where: { $0.serverID == mac.serverID }) else { continue }
+            let updated = pairings[index].noting(advertisedPort: port)
+            if updated != pairings[index] {
+                pairings[index] = updated
+                save(updated)
+                if session?.pairing.serverID == mac.serverID { moved = true }
+            }
+        }
+        let listed = Set(macs.map(\.serverID)).intersection(pairings.map(\.serverID))
+        let appeared = !listed.subtracting(listedPaired).isEmpty
+        listedPaired = listed
+        if let session, !session.isConnected, moved || (appeared && listed.contains(session.pairing.serverID)) {
+            session.networkChanged()
+        }
     }
 
     /// Keeps where a Mac answered, for the next time Bonjour can't say.
