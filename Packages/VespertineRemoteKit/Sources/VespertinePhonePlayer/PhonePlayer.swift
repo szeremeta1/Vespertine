@@ -8,6 +8,7 @@
 // screen and the 5.1 / Spatial Audio path (docs/plans/ios-spatial-multichannel.md) are the rest of M3.
 //
 
+#if canImport(AVFAudio)
 import AVFAudio
 import Foundation
 import Observation
@@ -151,3 +152,4 @@ public final class PhonePlayer {
         }
     }
 }
+#endif

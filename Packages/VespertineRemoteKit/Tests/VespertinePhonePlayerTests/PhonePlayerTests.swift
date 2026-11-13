@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
+#if canImport(AVFAudio)
 import AVFAudio
 import Foundation
 import Testing
@@ -160,3 +161,4 @@ private func makeFile(seconds: Double, rate: Double = 44_100, channels: Int = 2)
         #expect(!PhonePlayerFlag.isEnabled(defaults: defaults, arguments: ["app", "-VespertinePhonePlayer", "NO"]))
     }
 }
+#endif

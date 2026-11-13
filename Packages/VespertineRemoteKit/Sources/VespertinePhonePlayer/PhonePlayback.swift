@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
+#if canImport(Network) && canImport(AVFAudio)
 import Foundation
 import VespertineRemoteClient
 import VespertineRemoteProtocol
@@ -69,3 +70,4 @@ public final class PhonePlayback {
         }
     }
 }
+#endif
