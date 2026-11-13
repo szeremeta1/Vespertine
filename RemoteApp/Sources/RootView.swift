@@ -75,7 +75,7 @@ struct MacsView: View {
                     }
                 }
                 Section {
-                    let unpaired = model.discovery.macs.filter { !model.isPaired($0) }
+                    let unpaired = model.unpairedMacs
                     if unpaired.isEmpty {
                         HStack(spacing: 12) {
                             ProgressView()

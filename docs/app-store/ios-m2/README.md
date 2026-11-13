@@ -22,6 +22,6 @@ The requested 6.9-inch set uses 1320 x 2868; iPad 13-inch uses 2064 x 2752. Both
 
 ## Current state
 
-Sandbox denies CoreSimulator XPC, so no milestone 2 simulator screenshots exist. `draft-reference/` uses genuine, unchanged milestone 1 phone captures solely to make the caption treatment reviewable. Every such image is visibly labelled as a milestone 1 reference. The iPad set contains labelled capture slots, not fabricated iPad UI. Neither is an upload-ready screenshot set.
+2026-11-13: real simulator captures exist. `screenshots/raw/` holds iPhone 18 Pro Max (6.9-inch, portrait) and iPad Pro 13-inch M5 (landscape) captures in dark and light from the built-in demo; `screenshots/iphone69/` and `screenshots/ipad13/` are the composed Store set (dark), built by `scripts/make-ios-store-screenshots.py`, with `screenshots/contact-sheet.png`. Store copy: `STORE-COPY.md` (mirrored in `metadata.json`). `draft-reference/` is the older milestone 1 placeholder and can be deleted. Nothing is uploaded; headlines and copy still need Alex's approval. Real OS Split View / Slide Over was not exercised (simctl cannot drive it); see RESULT2.md in the task folder.
 
-`metadata.json` contains all requested text fields, a second subtitle option and review notes. `captions.json` contains a headline alternative for each screen. These require Alex's wording approval, and the VPN wording needs a real connection check and resolution of milestone 1's changing-port caveat before submission.
+Capture tip: `simctl status_bar override` resets the iPad's weekday when called again, so set battery/bars first and `--time 2026-11-12T14:41:00.000Z` last, after launching the app.

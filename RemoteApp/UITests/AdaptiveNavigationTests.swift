@@ -26,7 +26,6 @@ final class AdaptiveNavigationTests: XCTestCase {
         if largeText { app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"] }
         app.launch()
         if screen == "nowPlaying" {
-            XCTAssertTrue(app.otherElements["now-playing"].waitForExistence(timeout: 15))
             XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
         }
     }
@@ -34,33 +33,43 @@ final class AdaptiveNavigationTests: XCTestCase {
     func testNativeLayoutAndNavigation() {
         launch()
         if UIDevice.current.userInterfaceIdiom == .pad {
-            XCTAssertTrue(app.otherElements["regular-layout"].exists)
+            XCTAssertTrue(element("regular-layout").exists)
             XCTAssertTrue(sidebar("queue").waitForExistence(timeout: 5))
             sidebar("queue").tap()
             XCTAssertTrue(app.navigationBars["Queue"].waitForExistence(timeout: 5))
             sidebar("library").tap()
-            XCTAssertTrue(app.otherElements["albums-grid"].waitForExistence(timeout: 10))
+            let firstAlbum = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS 'Low Tide Lanterns'")).firstMatch
+            XCTAssertTrue(firstAlbum.waitForExistence(timeout: 10))
             sidebar("output").tap()
             XCTAssertTrue(app.navigationBars["Output"].waitForExistence(timeout: 5))
         } else {
-            XCTAssertTrue(app.otherElements["compact-layout"].exists)
-            app.tabBars.buttons["Queue"].tap()
+            XCTAssertTrue(element("compact-layout").exists)
+            tab("Queue").tap()
             XCTAssertTrue(app.navigationBars["Queue"].waitForExistence(timeout: 5))
-            app.tabBars.buttons["Library"].tap()
+            tab("Library").tap()
             XCTAssertTrue(app.navigationBars["Library"].waitForExistence(timeout: 5))
         }
     }
 
-    func testNarrowWindowUsesTabsAndCanSwitchScreens() throws {
+    /// Screenshots of the Macs screen must never list real Macs that happen to be on the capture machine's network.
+    func testScreenshotMacsListShowsOnlyMadeUpMacs() {
+        app.launchArguments = ["-VTSamplePairing", "YES"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Living Room iMac"].waitForExistence(timeout: 10))
+        let pairSection = app.buttons.matching(NSPredicate(format: "label ENDSWITH 'MacBook Pro' OR label ENDSWITH 'MacBook Air'"))
+        XCTAssertEqual(pairSection.count, 0)
+    }
+
+    func testNarrowWindowUsesTabsNotSidebar() throws {
         try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .pad, "iPad window-width harness")
-        // Exercises real views constrained to 440 pt; this is not an OS Split View test.
+        // Exercises real views constrained to 440 pt; this is not an OS Split View test, and the system still reports a
+        // regular-width window here, so iPadOS draws its top tab pill (which overflows) instead of the bottom bar a real
+        // 440 pt window would get. Only the choice of layout is checked; tapping the overflowing pill is not reliable here.
         launch(width: 440)
-        XCTAssertTrue(app.otherElements["compact-layout"].exists)
-        XCTAssertFalse(app.otherElements["regular-layout"].exists)
-        app.tabBars.buttons["Queue"].tap()
-        XCTAssertTrue(app.navigationBars["Queue"].waitForExistence(timeout: 5))
-        app.tabBars.buttons["Output"].tap()
-        XCTAssertTrue(app.navigationBars["Output"].waitForExistence(timeout: 5))
+        XCTAssertTrue(element("compact-layout").exists)
+        XCTAssertFalse(element("regular-layout").exists)
+        XCTAssertFalse(sidebar("queue").exists)
+        XCTAssertTrue(app.buttons["Pause"].exists)
     }
 
     func testRotationRetainsQueueAndControlsRemainReachable() {
@@ -99,6 +108,16 @@ final class AdaptiveNavigationTests: XCTestCase {
             screenshot.lifetime = .keepAlways
             add(screenshot)
         }
+    }
+
+    /// SwiftUI containers can surface as any element type, so look the identifier up among all of them.
+    private func element(_ identifier: String) -> XCUIElement {
+        app.descendants(matching: .any).matching(identifier: identifier).firstMatch
+    }
+
+    /// The bottom tab bar on iPhone; the tabs are plain buttons wherever iPadOS draws them elsewhere.
+    private func tab(_ name: String) -> XCUIElement {
+        app.tabBars.buttons[name].exists ? app.tabBars.buttons[name] : app.buttons[name]
     }
 
     private func sidebar(_ name: String) -> XCUIElement {

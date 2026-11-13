@@ -101,6 +101,17 @@ final class RemoteAppModel {
         pairings.contains { $0.serverID == mac.serverID }
     }
 
+    /// Macs on this network that aren't paired yet. Screenshot runs show a made-up one instead, so a real Mac near the
+    /// capture machine (and its owner's name) never ends up in a picture.
+    var unpairedMacs: [DiscoveredMac] {
+        #if DEBUG
+        if LaunchOptions.samplePairing {
+            return [DiscoveredMac(name: "Living Room iMac", serverID: "sample-nearby", endpoint: .hostPort(host: "192.168.1.31", port: 52718))]
+        }
+        #endif
+        return discovery.macs.filter { !isPaired($0) }
+    }
+
     // MARK: Reaching a Mac
 
     func pairing(serverID: String) -> SavedPairing? {
