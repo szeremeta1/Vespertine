@@ -64,17 +64,17 @@ The module has no UI. It depends on Foundation, `VespertineLibrary` (for `TagWri
 
 ### `TidalPlaybackSource` (cache integration)
 
-Dependency direction: `VespertineAudio` gains a small hook. A `RemoteSourceProvider` protocol, registered per URL scheme at app start, returns either a `PlaybackCacheReader` or a size-known-at-end writer for a `tidal://` URL. `VespertineTidal` implements it. `VespertineAudio` never imports `VespertineTidal`.
+Dependency direction: `NetworkPlaybackCache` gains a registry of remote readers by URL scheme (`NetworkPlaybackCache.registerRemoteReader(scheme:_:)`). It is consulted before `openShare`. `VespertineTidal` registers `tidal` at app start. `VespertineAudio` never imports `VespertineTidal`.
 
-- **BTS:** `TidalHTTPReader: PlaybackCacheReader`. Its `size` comes from `Content-Length`, and `read(at:count:)` uses HTTP Range requests. It plugs into `NetworkPlaybackCache.entry(key:url:reader:)` unchanged, so progressive start (`NetworkStart`), guarded reads, seeking, next-track prefetch and lease deletion all keep their current behavior.
-- **DASH:** a new cache entry mode, **size known at end**:
-  - Segments are fetched in order and remuxed into the entry's file.
-  - Guarded reads wait for bytes as today. A read past the bytes written so far waits; it is not treated as end of file until the last segment has been written and the size is final.
-  - Start uses the existing lead calculation on the measured rate.
-  - A seek ahead of the download waits, with the existing buffering ring.
-- **Expired URL** (HTTP 403/410 from the CDN): resolve again through the gate and resume at the same byte (BTS) or segment index (DASH).
-- **CDN retry:** retries with a growing wait (2 s, 4 s, 6 s…), as in TidalSwiftLib's `HLSDownloader`. The existing 2-minute no-progress limit (`defaultNoProgressLimit`) fails the track with "TIDAL isn't answering". The queue then continues as for shares: if the next track also needs the network, playback stops; downloaded and local tracks play.
-- **Library rows:** `tidal://track/<id>` is the cache key. `Track.fileURL` and the probe path recognize the scheme, so nothing on the main thread treats it as a file path.
+- **Items:** a TIDAL `PlayableItem` has `url = tidal://track/<id>` and `cacheKey = "tidal:<id>"`. The engine's existing rule ("an item with a cache key is staged") sends it through the cache with no engine change. The reader reports the file extension of the resolved stream (`flac` or `m4a`), so the cache file and `NetworkStart`'s FLAC prefix start see the right type.
+- **BTS:** `TidalHTTPReader: PlaybackCacheReader`. Its `size` comes from `Content-Length`, and `read(at:count:)` makes synchronous HTTP Range requests. Progressive start, guarded reads, seeking, next-track prefetch and lease deletion all keep their current behavior.
+- **DASH:** `DASHFLACReader: PlaybackCacheReader`, which gives **random access over the remuxed FLAC without changing the cache**.
+  - At open, it fetches the init segment, then the first 4 KiB of every media segment, 8 at a time, to read each `moof` + `mdat` header. Those give the layout: header (`fLaC` + metadata from `dfLa`), then each segment's mdat payload range.
+  - The total size is therefore exact before playback starts.
+  - `read(at:count:)` maps the output offset to the header bytes or to (segment, offset in its mdat payload) and fetches with Range.
+  - The cache's lanes and demand reads then give progressive start and instant seeking, as for a share. (Decision 2026-11-13; it replaces the "size known at end" mode in the approved conversation design.)
+- **Expired URL** (HTTP 403/410 from the CDN): resolve again through the gate and retry the same range.
+- **CDN retry:** retries with a growing wait (2 s, 4 s, 6 s…), as in TidalSwiftLib's `HLSDownloader`. The existing 2-minute no-progress limit fails the track with "TIDAL isn't answering". The queue then continues as for shares.
 - **Atmos:** when the stream is unencrypted E-AC-3, it goes to `SystemRendererSession`, as local Atmos files do.
 
 ### `TidalDownloader`
