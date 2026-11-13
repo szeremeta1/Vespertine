@@ -36,12 +36,12 @@ struct MiniPlayerView: View {
                         if let path = player.signalPath {
                             // A filled disc or a ring beside the format, so bit-perfect or converted isn't colour alone.
                             HStack(spacing: 5) {
-                                VerdictMark(untouched: path.isBitPerfect)
+                                VerdictMark(untouched: path.isUntouched)
                                 Text(path.isResampling
                                      ? String(localized: "\(SampleRate.format(path.plan.decodedSampleRate)) → \(SampleRate.format(path.plan.deviceSampleRate)) kHz")
                                      : path.deviceFormatShort)
                                     .font(Typeface.mono(10))
-                                    .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
+                                    .foregroundStyle(path.isUntouched ? Palette.brassHi : Palette.copper)
                             }
                             .help(path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted on the way to the device"))
                             .accessibilityElement(children: .ignore)
@@ -115,9 +115,9 @@ struct MenuBarView: View {
                         .font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     if let path = player.signalPath {
                         HStack(alignment: .firstTextBaseline, spacing: 5) {
-                            VerdictMark(untouched: path.isBitPerfect)
+                            VerdictMark(untouched: path.isUntouched)
                             (player.buffering ? Text("BUFFERING…") : Text(verbatim: ([path.statusLine] + path.conversionBadges + [path.deviceFormatShort]).joined(separator: " · "))).font(Typeface.mono(9.5)).lineLimit(2)
-                                .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
+                                .foregroundStyle(path.isUntouched ? Palette.brassHi : Palette.copper)
                         }
                     }
                 }
@@ -242,6 +242,7 @@ struct PlaybackSettings: View {
             }
             TransitionsSettingsSection()
             SpeakerGroupsSettingsSection()
+            RendererSettingsSection()
             SystemOutputSettingsSection()
             Section("Surround formats") {
                 Picker("Dolby Atmos", selection: $s.atmosBySystem) {

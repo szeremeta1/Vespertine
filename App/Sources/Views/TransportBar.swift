@@ -5,6 +5,7 @@
 
 import VespertineAudio
 import VespertineLibrary
+import VespertineUPnP
 import SwiftUI
 
 struct TransportBar: View {
@@ -149,21 +150,22 @@ struct DeviceChip: View {
 
     var body: some View {
         let device = model.activeDevice
+        let renderer = model.chosenRenderer
         let path = model.player.signalPath
         Button { showDevices.toggle() } label: {
             HStack(spacing: 9) {
-                Image(systemName: device?.profile.symbol ?? (model.missingChosenOutput == nil ? "hifispeaker" : "cable.connector.slash"))
+                Image(systemName: chipSymbol(device, renderer))
                     .font(.system(size: 14))
                     .foregroundStyle(Palette.brassHi)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(device?.name ?? model.missingChosenOutput ?? String(localized: "No Output")).font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1)
+                    Text(chipName(device, renderer)).font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1)
                     Text(chipDetail(device, path)).font(Typeface.mono(9.5))
-                        .foregroundStyle(device?.isInCallMode == true ? Palette.copper : path.map { $0.isBitPerfect ? Palette.brassHi : Palette.copper } ?? Palette.text3)
+                        .foregroundStyle(renderer == nil && device?.isInCallMode == true ? Palette.copper : chipTint(path))
                         .lineLimit(1)
                 }
                 .frame(maxWidth: 150, alignment: .leading)
                 if let path {
-                    if path.isBitPerfect {
+                    if path.isUntouched {
                         Circle().fill(Palette.brassHi).frame(width: 6, height: 6).shadow(color: Palette.brass, radius: 4)
                     } else {
                         Circle().strokeBorder(Palette.copper, lineWidth: 1.5).frame(width: 7, height: 7)
@@ -180,9 +182,10 @@ struct DeviceChip: View {
         .help(model.bluetoothCallMode?.explanation ?? standIn.map { String(localized: "Output device: \(device?.name ?? "") plays while \($0) isn’t connected", comment: "Both are audio output device names.") }
               ?? String(localized: "Output device"))
         // Bit-perfect or converted is said in words too, not only by the colour and the dot.
-        .accessibilityLabel(device.map { String(localized: "Output device, \($0.name)") } ?? String(localized: "Output device, none"))
+        .accessibilityLabel((renderer?.name ?? device?.name).map { String(localized: "Output device, \($0)") } ?? String(localized: "Output device, none"))
         .accessibilityValue(path.map {
-            $0.isBitPerfect ? String(localized: "Bit-perfect, \(chipDetail(device, $0))") : String(localized: "Converted, \(chipDetail(device, $0))")
+            $0.renderer != nil ? "\($0.statusLine), \(chipDetail(device, $0))"
+                : $0.isBitPerfect ? String(localized: "Bit-perfect, \(chipDetail(device, $0))") : String(localized: "Converted, \(chipDetail(device, $0))")
         } ?? "")
         .popover(isPresented: $showDevices, arrowEdge: .top) {
             ScrollView {
@@ -196,7 +199,29 @@ struct DeviceChip: View {
     /// The chosen output that isn't connected, while another one plays (or would play) in its place.
     private var standIn: String? { model.activeDevice == nil ? nil : model.missingChosenOutput }
 
+    private func chipSymbol(_ device: OutputDevice?, _ renderer: RendererDevice?) -> String {
+        if renderer != nil { return "hifireceiver" }
+        return device?.profile.symbol ?? (model.missingChosenOutput == nil ? "hifispeaker" : "cable.connector.slash")
+    }
+
+    private func chipName(_ device: OutputDevice?, _ renderer: RendererDevice?) -> String {
+        renderer?.name ?? device?.name ?? model.missingChosenOutput ?? String(localized: "No Output")
+    }
+
+    private func chipTint(_ path: SignalPath?) -> Color {
+        guard let path else { return Palette.text3 }
+        return path.isUntouched ? Palette.brassHi : Palette.copper
+    }
+
     private func chipDetail(_ device: OutputDevice?, _ path: SignalPath?) -> String {
+        if let path, let renderer = path.renderer {
+            return renderer.passesThrough
+                ? String(localized: "\(path.deviceFormatShort) · SENT", comment: "Device chip: the format sent to a network player as the original file (short, uppercase)")
+                : String(localized: "\(path.deviceFormatShort) · PROCESSED", comment: "Device chip: the format sent to a network player after Vespertine's processing (short, uppercase)")
+        }
+        if let renderer = model.chosenRenderer {
+            return String(localized: "\(renderer.kind.protocolName.localizedUppercase) · IDLE", comment: "Device chip: a network player chosen, nothing playing (short, uppercase)")
+        }
         if let path {
             return path.applied.exclusive
                 ? String(localized: "\(path.deviceFormatShort) · EXCL", comment: "Device chip: format, then EXCL = exclusive access (short, uppercase)")
@@ -242,12 +267,28 @@ struct DevicePicker: View {
                         .opacity(row.isReady ? 1 : 0.6)
                 }
             }
-            if let device = model.activeDevice {
+            // Network players (UPnP Renderers (beta), behind their Settings switch).
+            if let renderers = model.renderers {
+                Hairline().padding(.vertical, 8)
+                SectionLabel(text: String(localized: "Network players", comment: "Header of the network renderers in the output list")).padding(.horizontal, 8).padding(.bottom, 4)
+                if renderers.renderers.isEmpty {
+                    Text(renderers.searching ? String(localized: "SEARCHING…") : String(localized: "NONE FOUND ON THIS NETWORK"))
+                        .font(Typeface.mono(9.5)).foregroundStyle(Palette.text3).padding(.horizontal, 8)
+                }
+                ForEach(renderers.renderers) { r in
+                    deviceRow(r.uid, name: r.name, detail: RendererText.detail(r), symbol: "hifireceiver", selected: model.settings.selectedDeviceUID == r.uid)
+                }
+            }
+            if let renderer = model.chosenRenderer {
+                Hairline().padding(.vertical, 8)
+                RendererDetails(renderer: renderer)
+            } else if let device = model.activeDevice {
                 Hairline().padding(.vertical, 8)
                 DeviceSettings(device: device)
             }
         }
         .padding(12)
+        .onAppear { model.renderers?.refresh() }
     }
 
     private func deviceRow(_ uid: String?, name: String, detail: String, symbol: String, selected: Bool) -> some View {
@@ -396,7 +437,9 @@ struct VolumeControl: View {
         let settings = model.settings
         HStack(spacing: 8) {
             Image(systemName: "speaker.wave.2").font(.system(size: 12)).foregroundStyle(Palette.text2)
-            if device?.hasHardwareVolume == true, let v = model.devices.hardwareVolume {
+            if let renderer = model.chosenRenderer {
+                RendererVolumeControl(renderer: renderer)
+            } else if device?.hasHardwareVolume == true, let v = model.devices.hardwareVolume {
                 BrassSlider(value: Binding(get: { Double(v) }, set: { model.devices.setHardwareVolume(Float($0)) }),
                             tint: Palette.text2, showsThumb: false, accessibilityName: String(localized: "Hardware volume"))
                     .frame(width: 72)
