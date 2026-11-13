@@ -14,7 +14,26 @@ import Foundation
 
 public enum RemoteProtocol {
     /// Bumped when a message changes in a way an older remote or Mac would misread. Both sides say theirs in the handshake.
-    public static let version = 1
+    /// Version 2 adds the stream channel (`RemoteCommand.streamOpen` and friends, answered with `StreamFrame`s); everything
+    /// else is as version 1, so a version 1 phone is still served as a remote (see `negotiate`).
+    public static let version = 2
+    /// The oldest version a Mac still serves.
+    public static let minimumVersion = 1
+    /// The first version with the stream channel.
+    public static let streamVersion = 2
+
+    /// The version a connection speaks, from what its `hello` or `pair` said: `baseline` is the version field every
+    /// version reads (a phone that can do more sends 1 there, so an old Mac accepts it), `highest` the newest the phone
+    /// speaks (absent from a version 1 phone). nil: the phone needs a newer Mac than this one.
+    public static func negotiate(baseline: Int, highest: Int?) -> Int? {
+        guard baseline >= minimumVersion, baseline <= version else { return nil }
+        return min(max(highest ?? baseline, baseline), version)
+    }
+
+    /// The most bytes one `StreamFrame` carries.
+    public static let maximumChunk = 1024 * 1024
+    /// What a phone asks for in one read unless it knows better.
+    public static let defaultChunkSize = 256 * 1024
     /// The Bonjour service a Mac running the remote server advertises.
     public static let serviceType = "_vespertine._tcp"
     /// TXT record keys of that service.
@@ -67,9 +86,11 @@ public struct ClientMessage: Codable, Sendable, Equatable {
 public enum RemoteCommand: Codable, Sendable, Equatable {
     // Session
     /// First message on a connection made with a device key. `device` is the ID the Mac gave at pairing.
-    case hello(device: String, name: String, protocolVersion: Int)
+    /// `protocolVersion` is the baseline every Mac reads (1); `highestProtocolVersion` the newest the phone speaks (nil from a
+    /// version 1 phone), which an old Mac ignores and a new one answers in `ServerInfo.protocolVersion`.
+    case hello(device: String, name: String, protocolVersion: Int, highestProtocolVersion: Int? = nil)
     /// First message on a connection made with a pairing key: asks to be paired under `name` ("Alex's iPhone").
-    case pair(name: String, protocolVersion: Int)
+    case pair(name: String, protocolVersion: Int, highestProtocolVersion: Int? = nil)
 
     // Transport
     case playPause
@@ -141,6 +162,18 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     /// 0…1, on whatever `VolumeState.route` says moves.
     case setVolume(level: Double)
     case setTransitions(on: Bool)
+
+    // Streaming to the phone (protocol 2): the phone plays the song itself from the Mac's bytes.
+    /// What the Mac would send for these songs (answered with `.streamInfo`): the original file or a lossless FLAC it makes,
+    /// the format that arrives, and why a song can't be streamed. `maxSampleRate`: the most the phone's output can use (48000
+    /// for AirPods), which a conversion on the Mac is kept to.
+    case streamInfo(ids: [Int64], maxSampleRate: Double?)
+    /// Opens a song for reading (answered with `.streamOpened`, or `.streamPreparing` while the Mac converts it: ask again).
+    case streamOpen(id: Int64, maxSampleRate: Double?)
+    /// Reads up to `length` bytes (at most `RemoteProtocol.maximumChunk`) from `offset` of an open stream. Answered with a
+    /// `StreamFrame` (binary) carrying this command's `id`, or `.failed`.
+    case streamRead(stream: Int, offset: Int64, length: Int)
+    case streamClose(stream: Int)
 }
 
 public enum RepeatModeValue: String, Codable, Sendable, Equatable {
@@ -186,6 +219,11 @@ public enum RemoteReply: Codable, Sendable, Equatable {
     case found(SearchResults)
     case library(LibraryOverview)
     case genres(items: [GenreSummary])
+    // Protocol 2
+    case streamInfo(items: [StreamInfo])
+    case streamOpened(StreamDescriptor)
+    /// The Mac is converting this song to FLAC; ask again with `streamOpen` (`progress` 0…1 when it knows).
+    case streamPreparing(progress: Double?)
 }
 
 public struct ServerInfo: Codable, Sendable, Equatable {

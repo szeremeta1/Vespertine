@@ -146,9 +146,10 @@ private let copied: TrackSummary = {
         #expect(try json(new) == #"{"artworkKeys":["a"],"id":7,"name":"Late","smart":false,"trackCount":3}"#)
     }
 
-    @Test func theProtocolVersionStays() {
-        // Everything added is new commands and optional fields: nothing a 1.1.0 remote or Mac would misread.
-        #expect(RemoteProtocol.version == 1)
+    @Test func theProtocolVersionIsTwoAndOneIsStillServed() {
+        // Version 2 is the stream channel. Everything added since 1.1.0 is new commands and optional fields: nothing a
+        // version 1 remote or Mac would misread, so a version 1 phone is still let in (see RemoteStreamTests).
+        #expect(RemoteProtocol.version == 2 && RemoteProtocol.minimumVersion == 1)
     }
 }
 
