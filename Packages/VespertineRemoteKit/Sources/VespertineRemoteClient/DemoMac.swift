@@ -22,7 +22,15 @@ public final class DemoMac: RemoteChannel {
     private struct Album {
         var summary: AlbumSummary
         var tracks: [Int64]
+        var genre: String
+        var source: Int64
+        /// Its place among the albums by when it was added (0: the newest).
+        var added: Int
     }
+
+    /// A second copy of one song (a Dolby Atmos mix beside the stereo file): song ID → the other copy's ID.
+    private var otherCopies: [Int64: Int64] = [:]
+    private let sourceNames: [(Int64, String, SourceKind)] = [(1, "Music", .folder), (2, "Studio NAS", .network), (3, "Archive Drive", .external)]
 
     private var albums: [Album] = []
     private var tracks: [Int64: TrackSummary] = [:]
@@ -194,6 +202,14 @@ public final class DemoMac: RemoteChannel {
         case .setFavorite(let ids, let on):
             for id in ids { tracks[id]?.favorite = on }
             refreshFavorites()
+        case .playAlbums(let keys, let shuffled):
+            let ids = keys.flatMap { key in albums.first { $0.summary.key == key }?.tracks ?? [] }
+            guard !ids.isEmpty else { return notInLibrary }
+            play(ids, startAt: 0, shuffled: shuffled)
+        case .playCopy(let ids, let startAt):
+            let known = ids.filter { tracks[$0] != nil }
+            guard !known.isEmpty else { return notInLibrary }
+            play(known, startAt: startAt, shuffled: nil)
 
         case .albums(let offset, let limit):
             let start = min(max(0, offset), albums.count)
@@ -217,7 +233,28 @@ public final class DemoMac: RemoteChannel {
             guard let playlist = playlists.first(where: { $0.0.id == id }) else { return notInLibrary }
             return .tracks(items: playlist.1.compactMap { tracks[$0] })
         case .favorites:
-            return .tracks(items: allTracks.filter(\.favorite))
+            // A song in two copies is listed once, with its copies beside it.
+            let hidden = Set(otherCopies.values)
+            return .tracks(items: allTracks.filter { $0.favorite && !hidden.contains($0.id ?? 0) }.map(withCopies))
+        case .library:
+            let favorites = allTracks.filter { $0.favorite && !otherCopies.values.contains($0.id ?? 0) }.count
+            return .library(LibraryOverview(albums: albums.count, artists: Set(albums.map(\.summary.artist)).count, songs: allTracks.count,
+                                            genres: Set(albums.map(\.genre)).count, favorites: favorites, playlists: playlists.count, sources: sources))
+        case .genres:
+            return .genres(items: Set(albums.map(\.genre)).sorted().map { genre in
+                let theirs = albums.filter { $0.genre == genre }
+                return GenreSummary(key: genre.lowercased(), name: genre, albumCount: theirs.count, artworkKeys: Array(theirs.compactMap(\.summary.artworkKey).prefix(4)))
+            })
+        case .genreAlbums(let key):
+            let theirs = albums.filter { $0.genre.lowercased() == key }.map(\.summary)
+            return .albums(items: theirs, total: theirs.count)
+        case .recentlyAdded(let limit):
+            let newest = albums.sorted { $0.added < $1.added }.prefix(min(max(1, limit), 150)).map(\.summary)
+            return .albums(items: newest, total: newest.count)
+        case .sourceAlbums(let id):
+            guard sourceNames.contains(where: { $0.0 == id }) else { return notInLibrary }
+            let theirs = albums.filter { $0.source == id }.map(\.summary)
+            return .albums(items: theirs, total: theirs.count)
         case .search(let text, let limit):
             let words = text.lowercased().split(separator: " ").map(String.init)
             guard !words.isEmpty else { return .tracks(items: []) }
@@ -425,6 +462,24 @@ public final class DemoMac: RemoteChannel {
         albums.flatMap(\.tracks).compactMap { tracks[$0] }
     }
 
+    private var sources: [SourceSummary] {
+        sourceNames.map { id, name, kind in
+            SourceSummary(id: id, name: name, kind: kind, online: kind != .external, scanning: false, albumCount: albums.filter { $0.source == id }.count,
+                          detail: kind == .external ? "REFERENCED IN PLACE · OFFLINE · SCANNED LAST WEEK" : "REFERENCED IN PLACE · ONLINE · SCANNED 2 HOURS AGO")
+        }
+    }
+
+    /// A song with its other copy beside it, as Favorites lists a song the library has twice.
+    private func withCopies(_ track: TrackSummary) -> TrackSummary {
+        guard let id = track.id, let otherID = otherCopies[id], let other = tracks[otherID] else { return track }
+        var listed = track
+        listed.copies = [(track, "Music › \(track.artist)/\(track.album)"), (other, "Studio NAS › Spatial/\(track.artist)/\(track.album)")].compactMap { copy, place in
+            copy.id.map { TrackCopy(id: $0, format: copy.format, hiRes: !copy.format.hasPrefix("Dolby"), edition: nil, location: place,
+                                    duration: copy.duration, favorite: copy.favorite, preferred: false) }
+        }
+        return listed
+    }
+
     // MARK: The made-up library
 
     private func makeLibrary() {
@@ -467,6 +522,7 @@ public final class DemoMac: RemoteChannel {
             ("After the Storm", "Wren and Ash", 2024, "FLAC · 24/96", true, false, false,
              ["Still Air", "Puddles", "After the Storm", "Rooftops", "Clear Sky", "Sunset Drive"]),
         ]
+        let genres = ["Folk", "Indie Rock", "Classical", "Electronic", "Jazz", "Classical", "Rock", "Ambient", "Electronic", "Jazz", "Jazz", "Classical", "Folk", "Blues", "Electronic", "Folk", "Ambient", "Indie Rock"]
         var id: Int64 = 1000
         for (index, entry) in catalog.enumerated() {
             let (title, artist, year, format, hiRes, dsd, multichannel, titles) = entry
@@ -485,7 +541,19 @@ public final class DemoMac: RemoteChannel {
             albums.append(Album(summary: AlbumSummary(key: key, title: title, artist: artist, year: year, trackCount: ids.count,
                                                       duration: total, format: format, artworkKey: key, hiRes: hiRes, dsd: dsd,
                                                       multichannel: multichannel),
-                                tracks: ids))
+                                tracks: ids, genre: genres[index % genres.count], source: Int64(index % 3 == 2 ? 2 : index % 7 == 6 ? 3 : 1),
+                                added: (index * 7) % catalog.count))
+        }
+        // One song the library has twice: the stereo file and a Dolby Atmos mix of it. Both are favorites, as on a
+        // Mac where the album's copies are bundled; Favorites lists the song once.
+        if let first = albums.first?.tracks.first, var atmos = tracks[first] {
+            id += 1
+            atmos.id = id
+            atmos.format = "Dolby Atmos · 768k · 5.1"
+            atmos.favorite = true
+            tracks[first]?.favorite = true
+            tracks[id] = atmos
+            otherCopies[first] = id
         }
         let late = albums.flatMap(\.tracks).enumerated().filter { $0.offset % 3 == 1 }.map(\.element)
         let hiRes = albums.filter { $0.summary.hiRes }.flatMap(\.tracks)

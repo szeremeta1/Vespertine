@@ -200,9 +200,12 @@ public struct TrackSummary: Codable, Sendable, Equatable, Identifiable {
     public var format: String
     public var artworkKey: String?
     public var favorite: Bool
+    /// Every copy of the song in the library, this one among them, on lists that show a song once however many copies
+    /// it has (Favorites); nil for a song in one copy, on lists of files, and from an older Mac.
+    public var copies: [TrackCopy]?
 
     public init(id: Int64?, title: String, artist: String, album: String, albumKey: String, duration: Double,
-                trackNumber: Int?, discNumber: Int?, format: String, artworkKey: String?, favorite: Bool) {
+                trackNumber: Int?, discNumber: Int?, format: String, artworkKey: String?, favorite: Bool, copies: [TrackCopy]? = nil) {
         self.id = id
         self.title = title
         self.artist = artist
@@ -214,6 +217,34 @@ public struct TrackSummary: Codable, Sendable, Equatable, Identifiable {
         self.format = format
         self.artworkKey = artworkKey
         self.favorite = favorite
+        self.copies = copies
+    }
+}
+
+/// One copy of a song the library has more than once (a 24/192 download and a Dolby Atmos mix), as the Mac lists them.
+public struct TrackCopy: Codable, Sendable, Equatable, Identifiable {
+    public var id: Int64
+    /// "ALAC · 24/96", "Dolby Atmos · 768k · 5.1"
+    public var format: String
+    public var hiRes: Bool
+    /// What its folder calls it ("Vinyl Transfer 24-96"), when it says.
+    public var edition: String?
+    /// Where it is, as the Mac shows it ("Music Share › Artist/Album").
+    public var location: String
+    public var duration: Double
+    public var favorite: Bool
+    /// The copy the listener starred on the Mac: it plays wherever the album's copies are bundled.
+    public var preferred: Bool
+
+    public init(id: Int64, format: String, hiRes: Bool, edition: String?, location: String, duration: Double, favorite: Bool, preferred: Bool) {
+        self.id = id
+        self.format = format
+        self.hiRes = hiRes
+        self.edition = edition
+        self.location = location
+        self.duration = duration
+        self.favorite = favorite
+        self.preferred = preferred
     }
 }
 
@@ -296,5 +327,81 @@ public struct SearchResults: Codable, Sendable, Equatable {
         self.albums = albums
         self.artists = artists
         self.playlists = playlists
+    }
+}
+
+public struct GenreSummary: Codable, Sendable, Equatable, Identifiable {
+    public var id: String { key }
+    /// What `genreAlbums` takes.
+    public var key: String
+    public var name: String
+    public var albumCount: Int
+    /// Up to four covers of its albums, for a tile.
+    public var artworkKeys: [String]
+
+    public init(key: String, name: String, albumCount: Int, artworkKeys: [String]) {
+        self.key = key
+        self.name = name
+        self.albumCount = albumCount
+        self.artworkKeys = artworkKeys
+    }
+
+    private enum CodingKeys: String, CodingKey { case key, name, albumCount, artworkKeys }
+}
+
+public enum SourceKind: String, Codable, Sendable, Equatable {
+    /// A folder on the Mac, played where it is.
+    case folder
+    /// The folder Vespertine imports into.
+    case managed
+    /// A drive plugged into the Mac.
+    case external
+    /// A share on a server or NAS.
+    case network
+}
+
+/// A folder, drive or share the Mac's library reads, as its sidebar lists it.
+public struct SourceSummary: Codable, Sendable, Hashable, Identifiable {
+    /// What `sourceAlbums` takes.
+    public var id: Int64
+    public var name: String
+    public var kind: SourceKind
+    /// Connected (a drive that's plugged in, a share that's mounted).
+    public var online: Bool
+    /// Being scanned now.
+    public var scanning: Bool
+    public var albumCount: Int
+    /// "REFERENCED IN PLACE · ONLINE · SCANNED 2 HOURS AGO", as the Mac's page of the source says.
+    public var detail: String
+
+    public init(id: Int64, name: String, kind: SourceKind, online: Bool, scanning: Bool, albumCount: Int, detail: String) {
+        self.id = id
+        self.name = name
+        self.kind = kind
+        self.online = online
+        self.scanning = scanning
+        self.albumCount = albumCount
+        self.detail = detail
+    }
+}
+
+/// The library at a glance: the counts beside the Mac's sidebar rows, and its sources.
+public struct LibraryOverview: Codable, Sendable, Equatable {
+    public var albums: Int
+    public var artists: Int
+    public var songs: Int
+    public var genres: Int
+    public var favorites: Int
+    public var playlists: Int
+    public var sources: [SourceSummary]
+
+    public init(albums: Int, artists: Int, songs: Int, genres: Int, favorites: Int, playlists: Int, sources: [SourceSummary]) {
+        self.albums = albums
+        self.artists = artists
+        self.songs = songs
+        self.genres = genres
+        self.favorites = favorites
+        self.playlists = playlists
+        self.sources = sources
     }
 }

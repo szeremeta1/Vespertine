@@ -137,6 +137,21 @@ final class LibraryStore {
         return tracks.map { songByLocation[$0.location] ?? [$0] }
     }
 
+    /// `tracks` as songs, in the order the songs first appear: each once, with the copies of it among `tracks`
+    /// (`listed`: a favorite is the copy hearted; where an album's copies are bundled, all of them are) and every copy
+    /// of it in the library (`all`). What Favorites lists, in the window and on a remote.
+    func songs(listing tracks: [Track]) -> [(listed: [Track], all: [Track])] {
+        var seen = Set<String>()
+        var songs: [(listed: [Track], all: [Track])] = []
+        let given = Set(tracks.map(\.location))
+        for song in versions(of: tracks) {
+            let key = song.map(\.location).sorted().joined(separator: "\u{1F}")
+            guard seen.insert(key).inserted else { continue }
+            songs.append((song.filter { given.contains($0.location) }, song))
+        }
+        return songs
+    }
+
     /// Where an album lives, broadly: its source and the folder under it ("Music Share › Pink Floyd").
     /// A grouping folder like "_Spatial Extras" brings the next one along ("… › _Spatial Extras › Eagles").
     func albumLocation(_ path: String) -> String {
@@ -215,6 +230,10 @@ final class LibraryStore {
     }
 
     func albums(genre key: String) -> [Album] { albums.filter { $0.facts.genres.contains(key) } }
+    /// The albums with songs in a source, as its page lists them.
+    func albums(inSource id: Int64) -> [Album] { albums.filter { $0.facts.sources.contains(id) } }
+    /// The newest albums, newest first (the Recently Added page).
+    func recentlyAddedAlbums(limit: Int) -> [Album] { Array(albums.sorted { $0.addedAt > $1.addedAt }.prefix(max(0, limit))) }
 
     // MARK: Observation
 

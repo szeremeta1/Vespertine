@@ -14,7 +14,6 @@ struct NowPlayingView: View {
     let session: RemoteSession
     @State private var feedback = CommandFeedback()
     @State private var scrubbing: Double?
-    @State private var volumeDrag: Double?
 
     private var player: PlayerState? { session.player }
 
@@ -280,12 +279,9 @@ struct NowPlayingView: View {
                     }
                     .accessibilityLabel(volume.muted ? Text("Unmute") : Text("Mute"))
                     if let level = volume.level {
-                        Slider(value: Binding(get: { volumeDrag ?? level }, set: { volumeDrag = $0 }), in: 0...1, onEditingChanged: { editing in
-                            if !editing, let target = volumeDrag {
-                                feedback.run(session, .setVolume(level: target))
-                                Task { try? await Task.sleep(for: .seconds(1)); volumeDrag = nil }
-                            }
-                        })
+                        // Sent while it moves (the newest level only), and shown where the finger put it until the Mac agrees.
+                        Slider(value: Binding(get: { session.volume.shown(reported: level) }, set: { session.volume.drag(to: $0) }), in: 0...1,
+                               onEditingChanged: { editing in if !editing { session.volume.end() } })
                         .tint(Palette.text2)
                         .accessibilityLabel(Text("Volume"))
                         Image(systemName: "speaker.wave.3.fill").foregroundStyle(Palette.text3).accessibilityHidden(true)

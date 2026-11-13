@@ -98,6 +98,11 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     case playNext(ids: [Int64])
     case addToQueue(ids: [Int64])
     case setFavorite(ids: [Int64], on: Bool)
+    /// Plays these albums one after another (a genre's, a source's, the newest ones), in the order given.
+    case playAlbums(keys: [String], shuffled: Bool?)
+    /// Plays these songs from the `startAt`th, and that one as the very copy it is (one picked from `TrackSummary.copies`),
+    /// whatever copy the output would have chosen.
+    case playCopy(ids: [Int64], startAt: Int)
 
     // Playlists
     /// Adds these songs at the end of a playlist (not a smart one: its rules choose its songs).
@@ -118,6 +123,14 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     case songs(offset: Int, limit: Int)
     /// A search answered in groups (`.found`): songs, albums, artists and playlists, up to `limit` of each.
     case find(text: String, limit: Int)
+    /// The library at a glance (answered with `.library`): how much it holds, and its sources.
+    case library
+    case genres
+    case genreAlbums(key: String)
+    /// The albums added last, newest first, up to `limit` (the Mac's own page shows 150).
+    case recentlyAdded(limit: Int)
+    /// The albums with songs in a source (`SourceSummary.id`).
+    case sourceAlbums(id: Int64)
     /// A cover by `artworkKey`, about `size` pixels on its long side (160 or 600 are stored; others pick the nearest).
     case artwork(key: String, size: Int)
 
@@ -171,6 +184,8 @@ public enum RemoteReply: Codable, Sendable, Equatable {
     /// A page of the library's songs and how many there are in all.
     case songs(items: [TrackSummary], total: Int)
     case found(SearchResults)
+    case library(LibraryOverview)
+    case genres(items: [GenreSummary])
 }
 
 public struct ServerInfo: Codable, Sendable, Equatable {

@@ -51,6 +51,39 @@ final class AdaptiveNavigationTests: XCTestCase {
         }
     }
 
+    /// The library lists what the Mac's sidebar lists: Genres, Recently Added and Songs beside the rest, and the sources.
+    func testLibraryListsTheMacsSectionsAndSources() {
+        launch(screen: "library")
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            XCTAssertTrue(sidebar("genres").waitForExistence(timeout: 15))
+            XCTAssertTrue(sidebar("recentlyAdded").exists)
+            XCTAssertTrue(sidebar("songs").exists)
+            XCTAssertTrue(sidebar("source").waitForExistence(timeout: 10))
+            sidebar("genres").tap()
+        } else {
+            XCTAssertTrue(element("library-genres").waitForExistence(timeout: 15))
+            XCTAssertTrue(element("library-recentlyAdded").exists)
+            XCTAssertTrue(element("library-songs").exists)
+            XCTAssertTrue(app.staticTexts["Studio NAS"].waitForExistence(timeout: 10))
+            element("library-genres").tap()
+        }
+        XCTAssertTrue(element("genres-grid").waitForExistence(timeout: 10))
+        let jazz = app.descendants(matching: .any).matching(NSPredicate(format: "label BEGINSWITH 'Jazz'")).firstMatch
+        XCTAssertTrue(jazz.waitForExistence(timeout: 10))
+    }
+
+    /// A favorite the library has twice (a stereo file and a Dolby Atmos mix) is one row, with its copies a tap away.
+    func testAFavoriteInTwoCopiesIsOneRowWithItsCopies() {
+        launch(screen: "favorites")
+        let copies = app.buttons["2 COPIES"]
+        XCTAssertTrue(copies.waitForExistence(timeout: 15))
+        // One row of the list (the mini player names the song too).
+        XCTAssertEqual(app.cells.containing(NSPredicate(format: "label CONTAINS 'Harbor Lights'")).count, 1)
+        copies.tap()
+        XCTAssertTrue(app.navigationBars["Copies"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Dolby Atmos'")).firstMatch.waitForExistence(timeout: 5))
+    }
+
     /// Screenshots of the Macs screen must never list real Macs that happen to be on the capture machine's network.
     func testScreenshotMacsListShowsOnlyMadeUpMacs() {
         app.launchArguments = ["-VTSamplePairing", "YES"]
