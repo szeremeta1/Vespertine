@@ -156,26 +156,76 @@ struct TidalLibrarySyncTests {
         #expect(!(try db.tidalTrackIds()).contains(41))
     }
 
-    @Test("Empty lists from TIDAL while the library holds their items delete nothing this time, with a warning; the same answer twice is believed")
+    @Test("Empty lists from TIDAL while the library holds their items delete nothing, with a warning, until believed")
     func emptyListsGuard() async throws {
         let db = try LibraryDatabase.inMemory()
         let catalog = account()
-        let sync = TidalLibrarySync(catalog: catalog, database: db, userId: 4242)
+        let clock = TestClock()
+        let sync = TidalLibrarySync(catalog: catalog, database: db, userId: 4242, clock: clock.callable)
         _ = try await sync.refresh()
         catalog.set { $0.favorites = []; $0.albums = []; $0.playlists = [] }
-        let suspicious = try await sync.refresh()
-        #expect(suspicious.removed == 0)
-        #expect(suspicious.warnings.count == 3, "\(suspicious.warnings)")
+        // Three answers the same, but within an hour: not yet.
+        for _ in 0..<3 {
+            clock.advance(600)
+            let suspicious = try await sync.refresh()
+            #expect(suspicious.removed == 0)
+            #expect(suspicious.warnings.count == 3, "\(suspicious.warnings)")
+        }
         #expect(try db.tidalTrackIds().count == 7)
         #expect(Set(try db.playlists().filter { !$0.isSmart }.map(\.name)) == ["Mix", "Other"])
-        // TIDAL says the same again: the account really is empty now.
-        let confirmed = try await sync.refresh()
-        #expect(confirmed.warnings.isEmpty)
-        #expect(confirmed.removed == 7 && confirmed.playlists == 0)
+    }
+
+    @Test("Two suspicious answers within an hour delete nothing; three over more than 24 hours are believed")
+    func believedAfterADay() async throws {
+        let db = try LibraryDatabase.inMemory()
+        let catalog = account()
+        let clock = TestClock()
+        let sync = TidalLibrarySync(catalog: catalog, database: db, userId: 4242, clock: clock.callable)
+        _ = try await sync.refresh()
+        catalog.set { $0.favorites = []; $0.albums = []; $0.playlists = [] }
+        let first = try await sync.refresh()
+        clock.advance(1800)
+        let second = try await sync.refresh()
+        #expect(first.removed == 0 && second.removed == 0 && !second.warnings.isEmpty)
+        #expect(try db.tidalTrackIds().count == 7)
+        clock.advance(23 * 3600)   // 23.5 h after the first: three answers, not yet a day
+        let third = try await sync.refresh()
+        #expect(third.removed == 0 && !third.warnings.isEmpty)
+        clock.advance(3600)        // 24.5 h, the fourth answer: believed
+        let fourth = try await sync.refresh()
+        #expect(fourth.warnings.isEmpty, "\(fourth.warnings)")
+        #expect(fourth.removed == 7 && fourth.playlists == 0)
         #expect(try db.playlists().filter { !$0.isSmart }.isEmpty)
     }
 
-    @Test("Favorites that shrink by more than half and by more than 20 are not acted on at once; smaller shrinks are")
+    @Test("Three suspicious answers spanning a day are believed on the third")
+    func believedOnThird() async throws {
+        let db = try LibraryDatabase.inMemory()
+        let catalog = account()
+        let clock = TestClock()
+        let sync = TidalLibrarySync(catalog: catalog, database: db, userId: 4242, clock: clock.callable)
+        _ = try await sync.refresh()
+        catalog.set { $0.favorites = []; $0.albums = []; $0.playlists = [] }
+        _ = try await sync.refresh()
+        clock.advance(12 * 3600)
+        _ = try await sync.refresh()
+        clock.advance(13 * 3600)
+        let third = try await sync.refresh()
+        #expect(third.warnings.isEmpty && third.removed == 7)
+    }
+
+    @Test("The first refresh of a library that already has TIDAL tracks (an upgrade) is guarded too")
+    func firstRefreshGuarded() async throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try #require(try db.tidalSource(userId: 4242).id)
+        try db.upsertTidalTracks((1...30).map { TidalTrackInput(tidalTrack($0)) }, sourceId: source)
+        let catalog = FakeCatalog()   // everything empty
+        let summary = try await TidalLibrarySync(catalog: catalog, database: db, userId: 4242).refresh()
+        #expect(summary.removed == 0 && !summary.warnings.isEmpty)
+        #expect(try db.tidalTrackIds().count == 30)
+    }
+
+    @Test("Favorites that shrink by more than half and by more than 20 are held back; smaller shrinks are acted on")
     func shrinkGuard() async throws {
         let db = try LibraryDatabase.inMemory()
         let catalog = FakeCatalog()
@@ -186,7 +236,7 @@ struct TidalLibrarySyncTests {
         let suspicious = try await sync.refresh()
         #expect(suspicious.removed == 0 && suspicious.warnings.count == 1)
         #expect(try db.tidalTrackIds().count == 50)
-        catalog.set { $0.favorites = (1...30).map { tidalTrack($0) } }   // 40 % fewer: believed
+        catalog.set { $0.favorites = (1...30).map { tidalTrack($0) } }   // 40 % fewer: acted on
         let shrunk = try await sync.refresh()
         #expect(shrunk.removed == 20 && shrunk.warnings.isEmpty)
         catalog.set { $0.favorites = (1...10).map { tidalTrack($0) } }   // 67 % fewer, but only 20 tracks

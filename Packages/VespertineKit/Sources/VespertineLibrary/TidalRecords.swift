@@ -299,6 +299,23 @@ extension LibraryDatabase {
         }
     }
 
+    /// How many items TIDAL list `list` held at the last sync that recorded it; nil when none has (a library from before).
+    public func tidalFavoriteCount(_ list: String) throws -> Int? {
+        try writer.read { db in
+            guard try Int.fetchOne(db, sql: "SELECT 1 FROM meta WHERE key = ?", arguments: ["tidal.sync.\(list).recorded"]) != nil else { return nil }
+            return try Int.fetchOne(db, sql: "SELECT count(*) FROM tidalFavorite WHERE list = ?", arguments: [list]) ?? 0
+        }
+    }
+
+    /// Records what TIDAL list `list` holds now.
+    public func setTidalFavorites(_ list: String, ids: Set<Int>) throws {
+        try writer.write { db in
+            try db.execute(sql: "DELETE FROM tidalFavorite WHERE list = ?", arguments: [list])
+            for id in ids { try db.execute(sql: "INSERT INTO tidalFavorite (list, itemId) VALUES (?, ?)", arguments: [list, id]) }
+            try db.execute(sql: "INSERT OR REPLACE INTO meta (key, value) VALUES (?, '1')", arguments: ["tidal.sync.\(list).recorded"])
+        }
+    }
+
     // MARK: Playlists
 
     /// Each synced TIDAL playlist's `lastUpdated`, by UUID.
