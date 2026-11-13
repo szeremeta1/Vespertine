@@ -153,7 +153,8 @@ public actor LibraryScanner {
     @discardableResult
     public func scan(_ source: LibrarySource, restart: Bool = false,
                      progress: (@Sendable (ScanProgress) -> Void)? = nil) async throws -> ScanSummary {
-        guard let sourceID = source.id else { return ScanSummary() }
+        // The TIDAL account is no folder: there is nothing to list, and it must never be found "offline" or its tracks "missing".
+        guard let sourceID = source.id, !source.isTidal else { return ScanSummary() }
         if let running = activeScans[sourceID] {
             guard restart else { return try await running.task.value }
             if running.activity.quiet < stallLimit {
