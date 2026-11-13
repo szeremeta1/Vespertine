@@ -101,6 +101,10 @@ final class TidalModel {
     private(set) var credentialsProblem: String?
     private(set) var isStarted = false
     private(set) var countryCode: String?
+    /// Writes the sync queue skipped or dropped (conflicts, playlists deleted on TIDAL), for Settings › TIDAL › Status.
+    private(set) var skippedOps: [String] = []
+    /// Settings › TIDAL opens the login sheet when it sees this (the switch was just turned on, signed out: one flow).
+    var wantsLoginSheet = false
 
     /// The session's services; nil without credentials.
     private(set) var gate: TidalGate?

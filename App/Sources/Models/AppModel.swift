@@ -580,8 +580,27 @@ final class AppModel {
             if item != sidebar { sidebar = item }
             if route != path { path = route }
         }
-        if on { tidal.start() } else { tidal.stop() }
+        if on {
+            tidal.start()
+            // One flow (UX amendment 1): Settings › TIDAL, and the login sheet when there is an account to sign in to.
+            settingsTab = .tidal
+            if tidal.state == .signedOut { tidal.wantsLoginSheet = true }
+        } else {
+            tidal.stop()
+            if settingsTab == .tidal { settingsTab = .online }
+        }
         tidalSwitchChanged?(on)
+    }
+
+    /// Settings › TIDAL › "Add downloads folder to the library": the folder (made if needed) becomes a library folder, referenced in
+    /// place, so downloaded files are scanned and linked to their TIDAL rows. Turning the setting off leaves a folder already added.
+    func addTidalDownloadsFolder() {
+        guard settings.tidalEnabled, settings.tidalAddDownloadsToLibrary else { return }
+        let url = URL(fileURLWithPath: settings.tidalDownloadsFolder, isDirectory: true)
+        guard !library.sources.contains(where: { $0.path == url.path }) else { return }
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        let library = self.library
+        Task { await library.addFolders([url], mode: .reference, managedRoot: url) }
     }
 
     /// The TIDAL model's outside world. A QA run on a test library (`-VespertineDataDirectory`) keeps its credentials file in that

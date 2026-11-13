@@ -152,6 +152,12 @@ enum DeveloperHooks {
                 NSApp.terminate(nil)
             }
         }
+        // `-VespertineSettingsTab online|tidal|…` (with `-VespertineOpenSettings YES`): the tab Settings opens on.
+        if let tab = d.string(forKey: "VespertineSettingsTab") {
+            let tabs: [String: SettingsTab] = ["playback": .playback, "library": .library, "network": .network, "online": .online,
+                                               "tidal": .tidal, "remote": .remote, "updates": .updates, "about": .about]
+            if let chosen = tabs[tab] { model.settingsTab = chosen }
+        }
         if let path = d.string(forKey: "VespertineSnapshot") {
             Task { await snapshotLoop(to: path, delay: d.double(forKey: "VespertineSnapshotDelay"), repeats: max(1, d.integer(forKey: "VespertineSnapshotCount"))) }
         }
