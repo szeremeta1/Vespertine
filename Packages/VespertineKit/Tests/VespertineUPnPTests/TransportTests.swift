@@ -142,7 +142,7 @@ struct TransportTests {
         let transport = try AVTransportControl(description: device.description, gapless: true)
         fake.fail("SetAVTransportURI", code: 714)
         await #expect(throws: UPnPError.fault(code: 714, description: "Fake failure")) {
-            try await transport.load(current: track("a"), next: nil)
+            try await transport.load(current: track("a"), next: track("b"))
         }
     }
 

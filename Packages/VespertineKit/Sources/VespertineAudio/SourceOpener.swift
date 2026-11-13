@@ -610,3 +610,11 @@ extension Optional {
         return self
     }
 }
+
+/// What a file is, for outputs that don't decode it themselves (a network renderer passed the file).
+public enum SourceDescription {
+    public static func describe(_ item: PlayableItem, url: URL) throws -> (format: SourceFormat, decoderName: String) {
+        let probed = try SourceOpener.probe(url, area: item.sacdArea, dvd: item.dvd, audioStream: item.audioStream)
+        return (probed.format, probed.decoderName)
+    }
+}
