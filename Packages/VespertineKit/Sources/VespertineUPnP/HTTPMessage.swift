@@ -15,28 +15,50 @@ public struct HTTPRequest: Sendable, Hashable {
     public var body: Data
 
     public static let maximumHeader = 64 * 1024
+    /// The longest body accepted (SOAP calls in the tests' fake renderer; the media server takes none).
+    public static let maximumBody = 1 << 20
 
-    /// The request in `data`, nil until its headers and its whole body (by Content-Length) have arrived.
+    public enum ParseResult: Sendable, Equatable {
+        /// More bytes are needed.
+        case incomplete
+        /// Not a request this server takes: answer 400 and close.
+        case invalid
+        case request(HTTPRequest)
+    }
+
+    /// The request in `data`, nil until its headers and its whole body (by Content-Length) have arrived, or when it is invalid.
     public static func parse(_ data: Data) -> HTTPRequest? {
-        guard let end = data.range(of: Data("\r\n\r\n".utf8)) else { return nil }
-        guard let head = String(data: data[data.startIndex..<end.lowerBound], encoding: .utf8) else { return nil }
+        if case .request(let request) = read(data) { return request }
+        return nil
+    }
+
+    /// Reads a request from what has arrived so far. A Content-Length that isn't a plain number in 0…`maximumBody`, headers
+    /// past `maximumHeader`, or a request line without a target are invalid.
+    public static func read(_ data: Data) -> ParseResult {
+        guard let end = data.range(of: Data("\r\n\r\n".utf8)) else { return data.count > maximumHeader ? .invalid : .incomplete }
+        guard end.lowerBound - data.startIndex <= maximumHeader,
+              let head = String(data: data[data.startIndex..<end.lowerBound], encoding: .utf8) else { return .invalid }
         let lines = head.components(separatedBy: "\r\n")
         let parts = lines[0].split(separator: " ")
-        guard parts.count >= 2 else { return nil }
+        guard parts.count >= 2 else { return .invalid }
         var headers: [String: String] = [:]
         for line in lines.dropFirst() {
             guard let colon = line.firstIndex(of: ":") else { continue }
             headers[line[..<colon].trimmingCharacters(in: .whitespaces).lowercased()] = line[line.index(after: colon)...].trimmingCharacters(in: .whitespaces)
         }
-        let length = Int(headers["content-length"] ?? "") ?? 0
+        var length = 0
+        if let text = headers["content-length"] {
+            guard !text.isEmpty, text.allSatisfy({ $0.isASCII && $0.isNumber }), let value = Int(text), value <= maximumBody else { return .invalid }
+            length = value
+        }
         let bodyStart = end.upperBound
-        guard data.endIndex - bodyStart >= length else { return nil }
+        guard data.endIndex - bodyStart >= length else { return .incomplete }
         let target = String(parts[1])
         let components = URLComponents(string: target)
         var query: [String: String] = [:]
         for item in components?.queryItems ?? [] { query[item.name] = item.value ?? "" }
-        return HTTPRequest(method: String(parts[0]).uppercased(), path: components?.percentEncodedPath.removingPercentEncoding ?? target,
-                           query: query, headers: headers, body: Data(data[bodyStart..<bodyStart + length]))
+        return .request(HTTPRequest(method: String(parts[0]).uppercased(), path: components?.percentEncodedPath.removingPercentEncoding ?? target,
+                                    query: query, headers: headers, body: Data(data[bodyStart..<bodyStart + length])))
     }
 }
 

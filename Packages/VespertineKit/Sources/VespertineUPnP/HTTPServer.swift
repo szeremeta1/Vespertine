@@ -16,8 +16,16 @@ public final class HTTPServer: @unchecked Sendable {
     private var listener: NWListener?
     private var connections: [ObjectIdentifier: NWConnection] = [:]
     static let chunk = 256 * 1024
+    /// A client has this long to send its whole request, then it is cut off (a slow client can't hold a connection open).
+    let headerTimeout: TimeInterval
+    /// Connections open at once; more are closed as they arrive.
+    let maximumConnections: Int
 
-    public init(handler: @escaping Handler) { self.handler = handler }
+    public init(headerTimeout: TimeInterval = 10, maximumConnections: Int = 32, handler: @escaping Handler) {
+        self.headerTimeout = headerTimeout
+        self.maximumConnections = maximumConnections
+        self.handler = handler
+    }
 
     /// Listens on every interface, on `port` (0: any free one), and returns the port once ready.
     public func start(port: UInt16 = 0) async throws -> UInt16 {
@@ -52,7 +60,17 @@ public final class HTTPServer: @unchecked Sendable {
 
     private func accept(_ connection: NWConnection) {
         let id = ObjectIdentifier(connection)
-        state.withLock { connections[id] = connection }
+        let admitted = state.withLock { () -> Bool in
+            guard connections.count < maximumConnections else { return false }
+            connections[id] = connection
+            return true
+        }
+        guard admitted else {
+            // Over the cap: closed at once, before anything is read.
+            connection.start(queue: queue)
+            connection.forceCancel()
+            return
+        }
         connection.stateUpdateHandler = { [weak self] state in
             switch state {
             case .failed, .cancelled: self?.state.withLock { _ = self?.connections.removeValue(forKey: id) }
@@ -60,16 +78,20 @@ public final class HTTPServer: @unchecked Sendable {
             }
         }
         connection.start(queue: queue)
-        receive(connection, buffer: Data())
+        let deadline = DispatchWorkItem { connection.forceCancel() }
+        queue.asyncAfter(deadline: .now() + headerTimeout, execute: deadline)
+        receive(connection, buffer: Data(), deadline: deadline)
     }
 
-    private func receive(_ connection: NWConnection, buffer: Data) {
+    private func receive(_ connection: NWConnection, buffer: Data, deadline: DispatchWorkItem) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 64 * 1024) { [weak self] content, _, complete, error in
             guard let self else { connection.cancel(); return }
             var buffer = buffer
             if let content { buffer.append(content) }
-            if error != nil || buffer.count > HTTPRequest.maximumHeader + 1_048_576 { connection.cancel(); return }
-            if let request = HTTPRequest.parse(buffer) {
+            if error != nil { deadline.cancel(); connection.cancel(); return }
+            switch HTTPRequest.read(buffer) {
+            case .request(let request):
+                deadline.cancel()
                 let handler = self.handler
                 Task {
                     var response = await handler(request)
@@ -77,10 +99,14 @@ public final class HTTPServer: @unchecked Sendable {
                     await Self.send(response, on: connection)
                     connection.cancel()
                 }
-            } else if complete {
-                connection.cancel()
-            } else {
-                self.receive(connection, buffer: buffer)
+            case .invalid:
+                deadline.cancel()
+                Task {
+                    await Self.send(.status(400), on: connection)
+                    connection.cancel()
+                }
+            case .incomplete:
+                if complete { deadline.cancel(); connection.cancel() } else { self.receive(connection, buffer: buffer, deadline: deadline) }
             }
         }
     }
@@ -95,7 +121,7 @@ public final class HTTPServer: @unchecked Sendable {
 
     private static func send(_ response: HTTPResponse, on connection: NWConnection) async {
         guard await write(response.head, on: connection) else { return }
-        if response.headOnly { _ = await write(Data(), on: connection, final: true); return }
+        if response.headOnly { return }
         switch response.body {
         case .empty:
             break
@@ -126,7 +152,6 @@ public final class HTTPServer: @unchecked Sendable {
             }
             guard await write(Data("0\r\n\r\n".utf8), on: connection) else { return }
         }
-        _ = await write(Data(), on: connection, final: true)
     }
 }
 
