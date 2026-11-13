@@ -59,9 +59,13 @@ final class AdaptiveLayoutTests: XCTestCase {
         XCTAssertEqual(RemoteLayout.albumColumns(width: 820, accessibilityText: true), 3)
     }
     func testLibraryDestinationsMapToOneCompactTab() {
-        for place in RemoteDestination.allCases {
+        for place in RemoteDestination.fixed + [.source(3)] {
             XCTAssertEqual(place.compactTab, place.isLibrary ? .library : place)
         }
+        // Every page of the library, a source's among them, is under the Library tab in a narrow window.
+        for place: RemoteDestination in [.songs, .genres, .recentlyAdded, .source(3)] { XCTAssertEqual(place.compactTab, .library) }
+        XCTAssertEqual(RemoteDestination.starting(at: "genres"), .genres)
+        XCTAssertEqual(RemoteDestination.starting(at: "recentlyAdded"), .recentlyAdded)
         XCTAssertEqual(RemoteDestination.starting(at: "album"), .library)
         XCTAssertEqual(RemoteDestination.starting(at: "coverFlow"), .library)
         XCTAssertEqual(RemoteDestination.starting(at: "artists"), .artists)

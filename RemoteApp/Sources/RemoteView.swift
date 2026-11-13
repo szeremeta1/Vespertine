@@ -15,6 +15,8 @@ struct RemoteView: View {
     @State private var visibility: NavigationSplitViewVisibility = .all
     @State private var showingSettings = false
     @State private var feedback = CommandFeedback()
+    /// The library's counts and sources, for the sidebar.
+    @State private var overview: LibraryOverview?
 
     var body: some View {
         GeometryReader { geometry in
@@ -32,6 +34,10 @@ struct RemoteView: View {
         .sheet(isPresented: $showingSettings) { SettingsView() }
         .feedback(feedback)
         .onAppear { destination = .starting(at: model.startScreen) }
+        // Again whenever a page is chosen: a heart or a scan since then shows in the counts.
+        .task(id: "\(session.isConnected)#\(destination.id)") {
+            if case .library(let loaded) = await session.send(.library) { overview = loaded }
+        }
     }
 
     private var splitView: some View {
@@ -43,11 +49,24 @@ struct RemoteView: View {
                     sidebarLink(.nowPlaying)
                     sidebarLink(.queue)
                 }
+                // The Mac's sidebar: its Library pages in its order, then the playlists and the sources.
                 Section("Library") {
-                    sidebarLink(.library)
-                    sidebarLink(.artists)
-                    sidebarLink(.playlists)
-                    sidebarLink(.favorites)
+                    sidebarLink(.library, count: overview?.albums)
+                    sidebarLink(.artists, count: overview?.artists)
+                    sidebarLink(.songs, count: overview?.songs)
+                    sidebarLink(.genres, count: overview?.genres)
+                    sidebarLink(.recentlyAdded)
+                    sidebarLink(.favorites, count: overview?.favorites)
+                    sidebarLink(.playlists, count: overview?.playlists)
+                }
+                if let sources = overview?.sources, !sources.isEmpty {
+                    Section("Sources") {
+                        ForEach(sources) { source in
+                            NavigationLink(value: RemoteDestination.source(source.id)) { SourceLabel(source: source) }
+                                .accessibilityIdentifier("sidebar-source")
+                                .hoverEffect(.highlight)
+                        }
+                    }
                 }
                 Section("Mac") { sidebarLink(.output) }
             }
@@ -78,9 +97,9 @@ struct RemoteView: View {
         .navigationSplitViewStyle(.balanced)
     }
 
-    private func sidebarLink(_ place: RemoteDestination) -> some View {
-        NavigationLink(value: place) { Label(place.title, systemImage: place.symbol) }
-            .accessibilityIdentifier("sidebar-" + place.rawValue)
+    private func sidebarLink(_ place: RemoteDestination, count: Int? = nil) -> some View {
+        NavigationLink(value: place) { CountedLabel(title: place.title, symbol: place.symbol, count: count) }
+            .accessibilityIdentifier("sidebar-" + place.id)
             .hoverEffect(.highlight)
     }
 
@@ -97,7 +116,7 @@ struct RemoteView: View {
         case .output:
             OutputsView(session: session).readablePane()
                 .miniPlayer(session: session) { destination = .nowPlaying }
-        case .library, .artists, .playlists, .favorites:
+        case .library, .artists, .songs, .genres, .recentlyAdded, .favorites, .playlists, .source:
             LibraryView(session: session, section: destination)
                 .id(destination)
                 .miniPlayer(session: session) { destination = .nowPlaying }

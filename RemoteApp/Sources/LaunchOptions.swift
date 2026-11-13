@@ -1,7 +1,7 @@
 //
 // Vespertine Remote: launch arguments for taking screenshots and trying screens in the Simulator (debug builds only):
 //   -VTDemo YES                  open the demo Mac
-//   -VTScreen <name>             nowPlaying | library | albums | coverFlow | album | artists | playlists | favorites | search | queue | output | settings | connection | macs
+//   -VTScreen <name>             nowPlaying | library | albums | coverFlow | album | artists | songs | genres | recentlyAdded | playlists | favorites | search | queue | output | settings | connection | macs
 //   -VTVinyl YES|NO              Now Playing's record on or off
 //   -VTTilt "x,y"                a fixed tilt for Cover Flow (-1…1 each), since the Simulator has no gyroscope
 //   -VTSamplePairing YES         a made-up paired Mac with a Tailscale address (never saved)

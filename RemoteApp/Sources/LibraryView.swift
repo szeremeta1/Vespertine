@@ -1,5 +1,6 @@
 //
-// Vespertine Remote: the Mac's library: albums, artists, playlists, favorites and search.
+// Vespertine Remote: the Mac's library as its sidebar lists it: albums, artists, songs, genres, recently added,
+// favorites, playlists and sources, and search.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
@@ -13,6 +14,8 @@ struct LibraryView: View {
     var section: RemoteDestination? = nil
     @State private var search = ""
     @State private var path: [String] = []
+    /// The library's counts and sources (nil until the Mac answers, and from a Mac too old to say).
+    @State private var overview: LibraryOverview?
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -20,14 +23,7 @@ struct LibraryView: View {
                 if let section {
                     sectionContent(section)
                 } else if search.trimmingCharacters(in: .whitespaces).isEmpty {
-                    List {
-                        NavigationLink(value: "albums") { Label("Albums", systemImage: "square.stack") }
-                        NavigationLink(value: "artists") { Label("Artists", systemImage: "music.mic") }
-                        NavigationLink { PlaylistsList(session: session) } label: { Label("Playlists", systemImage: "music.note.list") }
-                        NavigationLink {
-                            TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil)
-                        } label: { Label("Favorites", systemImage: "heart") }
-                    }
+                    root
                 } else {
                     SearchResults(session: session, text: search)
                 }
@@ -38,10 +34,17 @@ struct LibraryView: View {
             .navigationDestination(for: String.self) { place in
                 switch place {
                 case "artists": ArtistsList(session: session)
+                case "songs": SongsList(session: session)
+                case "genres": GenresGrid(session: session)
+                case "recentlyAdded": AlbumsGrid(session: session, listing: .recentlyAdded)
                 case "playlists": PlaylistsList(session: session)
                 case "favorites": TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil)
                 default: AlbumsGrid(session: session)
                 }
+            }
+            .navigationDestination(for: SourceSummary.self) { SourcePage(session: session, source: $0) }
+            .task(id: session.isConnected) {
+                if case .library(let loaded) = await session.send(.library) { overview = loaded }
             }
             .onAppear {
                 #if DEBUG
@@ -50,7 +53,7 @@ struct LibraryView: View {
                 guard section == nil else { return }
                 switch model.startScreen {
                 case "albums", "coverFlow", "album": path = ["albums"]; if model.startScreen != "album" { model.startScreen = nil }
-                case "artists", "playlists", "favorites":
+                case "artists", "songs", "genres", "recentlyAdded", "playlists", "favorites":
                     if let screen = model.startScreen { path = [screen] }
                     model.startScreen = nil
                 default: break
@@ -59,14 +62,51 @@ struct LibraryView: View {
         }
     }
 
+    /// The Mac's sidebar as a list: its Library pages in its order, with its counts, then the playlists and the sources.
+    private var root: some View {
+        List {
+            Section {
+                rootLink("albums", .library, count: overview?.albums)
+                rootLink("artists", .artists, count: overview?.artists)
+                rootLink("songs", .songs, count: overview?.songs)
+                rootLink("genres", .genres, count: overview?.genres)
+                rootLink("recentlyAdded", .recentlyAdded)
+                rootLink("favorites", .favorites, count: overview?.favorites)
+                rootLink("playlists", .playlists, count: overview?.playlists)
+            }
+            if let sources = overview?.sources, !sources.isEmpty {
+                Section("Sources") {
+                    ForEach(sources) { source in
+                        NavigationLink(value: source) { SourceLabel(source: source) }
+                    }
+                }
+            }
+        }
+        .accessibilityIdentifier("library-root")
+    }
+
+    private func rootLink(_ place: String, _ destination: RemoteDestination, count: Int? = nil) -> some View {
+        NavigationLink(value: place) { CountedLabel(title: destination.title, symbol: destination.symbol, count: count) }
+            .accessibilityIdentifier("library-" + destination.id)
+    }
+
     @ViewBuilder private func sectionContent(_ place: RemoteDestination) -> some View {
         if !search.trimmingCharacters(in: .whitespaces).isEmpty {
             SearchResults(session: session, text: search)
         } else {
             switch place {
             case .artists: ArtistsList(session: session).readablePane()
+            case .songs: SongsList(session: session).readablePane()
+            case .genres: GenresGrid(session: session)
+            case .recentlyAdded: AlbumsGrid(session: session, listing: .recentlyAdded)
             case .playlists: PlaylistsList(session: session).readablePane()
             case .favorites: TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil).readablePane()
+            case .source(let id):
+                if let source = overview?.sources.first(where: { $0.id == id }) {
+                    SourcePage(session: session, source: source)
+                } else {
+                    ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
             default: AlbumsGrid(session: session)
             }
         }
@@ -92,6 +132,36 @@ private struct SearchResults: View {
 }
 
 struct AlbumsGrid: View {
+    /// What the grid lists.
+    enum Listing: Hashable {
+        /// Every album, a page at a time.
+        case all
+        case artist(String)
+        case genre(key: String, name: String)
+        /// The newest albums first, as many as the Mac's own page shows.
+        case recentlyAdded
+        case source(id: Int64, name: String)
+
+        var title: Text {
+            switch self {
+            case .all: Text("Albums")
+            case .artist(let name), .genre(_, let name), .source(_, let name): Text(name)
+            case .recentlyAdded: Text("Recently Added")
+            }
+        }
+
+        /// The command that lists it whole (nil for the paged list of every album).
+        var command: RemoteCommand? {
+            switch self {
+            case .all: nil
+            case .artist(let name): .artistAlbums(name: name)
+            case .genre(let key, _): .genreAlbums(key: key)
+            case .recentlyAdded: .recentlyAdded(limit: 150)
+            case .source(let id, _): .sourceAlbums(id: id)
+            }
+        }
+    }
+
     @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(RemoteAppModel.self) private var model
     let session: RemoteSession
@@ -99,7 +169,10 @@ struct AlbumsGrid: View {
     @State private var total: Int?
     @State private var loading = false
     @State private var sample: AlbumSummary?
-    var artist: String?
+    /// Why the list couldn't be loaded, in the Mac's words (an older Mac doesn't know the newer pages).
+    @State private var problem: String?
+    @State private var feedback = CommandFeedback()
+    var listing: Listing = .all
 
     private var coverFlow: Bool { model.settings.albumsLayout == .coverFlow }
 
@@ -112,10 +185,21 @@ struct AlbumsGrid: View {
             }
         }
         .obsidianBackground()
-        .navigationTitle(artist.map { Text($0) } ?? Text("Albums"))
+        .navigationTitle(listing.title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                // A page of chosen albums plays as the Mac's Play and Shuffle buttons on that page do.
+                if listing != .all {
+                    Menu {
+                        Button { feedback.run(session, .playAlbums(keys: albums.map(\.key), shuffled: false)) } label: { Label("Play", systemImage: "play.fill") }
+                        Button { feedback.run(session, .playAlbums(keys: albums.map(\.key), shuffled: true)) } label: { Label("Shuffle", systemImage: "shuffle") }
+                    } label: {
+                        Image(systemName: "play.circle")
+                    }
+                    .accessibilityLabel(Text("Play These Albums"))
+                    .disabled(albums.isEmpty || !session.isConnected)
+                }
                 Button {
                     withAnimation(.easeInOut(duration: 0.25)) { model.settings.albumsLayout = coverFlow ? .grid : .coverFlow }
                 } label: {
@@ -127,6 +211,7 @@ struct AlbumsGrid: View {
         .navigationDestination(isPresented: Binding(get: { sample != nil }, set: { if !$0 { sample = nil } })) {
             if let sample { AlbumView(session: session, album: sample) }
         }
+        .feedback(feedback)
         .task(id: session.isConnected) {
             if albums.isEmpty { await loadMore() }
             if model.startScreen == "album", let first = albums.first { model.startScreen = nil; sample = first }
@@ -159,6 +244,9 @@ struct AlbumsGrid: View {
                 if !loading, albums.isEmpty, total != nil {
                     Text("No albums yet").font(.serif(.title3)).foregroundStyle(Palette.text2).padding(.top, 60)
                 }
+                if !loading, albums.isEmpty, let problem {
+                    Text(problem).font(.callout).foregroundStyle(Palette.text2).multilineTextAlignment(.center).padding(.top, 60).padding(.horizontal, 32)
+                }
             }
             .accessibilityIdentifier("albums-grid")
         }
@@ -166,11 +254,15 @@ struct AlbumsGrid: View {
 
     private func loadMore() async {
         guard !loading else { return }
-        if let artist {
+        if let command = listing.command {
             guard albums.isEmpty else { return }
             loading = true
             defer { loading = false }
-            if case .albums(let items, _) = await session.send(.artistAlbums(name: artist)) { albums = items; total = items.count }
+            switch await session.send(command) {
+            case .albums(let items, _): albums = items; total = items.count; problem = nil
+            case .failed(let reason): problem = reason.isEmpty ? nil : reason
+            default: break
+            }
             return
         }
         if let total, albums.count >= total { return }
@@ -248,7 +340,7 @@ struct ArtistsList: View {
 
     var body: some View {
         List(artists.filter { filter.isEmpty || $0.name.localizedCaseInsensitiveContains(filter) }) { artist in
-            NavigationLink { AlbumsGrid(session: session, artist: artist.name) } label: {
+            NavigationLink { AlbumsGrid(session: session, listing: .artist(artist.name)) } label: {
                 HStack {
                     ArtworkView(key: artist.artworkKey, size: 120, cornerRadius: 22).frame(width: 44)
                     VStack(alignment: .leading) {
@@ -303,34 +395,42 @@ struct TrackListView: View {
     }
 }
 
-/// Song rows: tap plays from that song; the menu adds to the queue or favorites.
+/// Song rows: tap plays from that song; the menu adds to the queue or favorites. A song the library has in several
+/// copies says how many, as on the Mac, and opens the list of them.
 struct TrackRows: View {
     let session: RemoteSession
     let tracks: [TrackSummary]
     let play: (Int) -> RemoteCommand
     var numbered = false
     @State private var feedback = CommandFeedback()
+    /// The row whose copies are showing.
+    @State private var copiesOf: Int?
 
     var body: some View {
         ForEach(Array(tracks.enumerated()), id: \.offset) { index, track in
-            Button { feedback.run(session, play(index)) } label: {
-                HStack(spacing: 12) {
-                    if numbered {
-                        Text(track.trackNumber.map(String.init) ?? "").font(.callout.monospacedDigit()).foregroundStyle(.secondary).frame(width: 28, alignment: .trailing)
-                    } else {
-                        ArtworkView(key: track.artworkKey, size: 120, cornerRadius: 4).frame(width: 44)
+            HStack(spacing: 10) {
+                Button { feedback.run(session, play(index)) } label: {
+                    HStack(spacing: 12) {
+                        if numbered {
+                            Text(track.trackNumber.map(String.init) ?? "").font(.callout.monospacedDigit()).foregroundStyle(.secondary).frame(width: 28, alignment: .trailing)
+                        } else {
+                            ArtworkView(key: track.artworkKey, size: 120, cornerRadius: 4).frame(width: 44)
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(track.title).lineLimit(1)
+                            Text(numbered ? track.format : "\(track.artist) — \(track.album)").font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                        }
+                        Spacer()
+                        if track.favorite { Image(systemName: "heart.fill").font(.caption).foregroundStyle(.secondary) }
+                        Text(formatTime(track.duration)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                     }
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(track.title).lineLimit(1)
-                        Text(numbered ? track.format : "\(track.artist) — \(track.album)").font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                    }
-                    Spacer()
-                    if track.favorite { Image(systemName: "heart.fill").font(.caption).foregroundStyle(.secondary) }
-                    Text(formatTime(track.duration)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                    .contentShape(Rectangle())
                 }
-                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+                if let copies = track.copies, copies.count > 1 {
+                    SongCopiesButton(count: copies.count) { copiesOf = index }
+                }
             }
-            .buttonStyle(.plain)
             .contextMenu {
                 if let id = track.id {
                     Button { feedback.run(session, .playNext(ids: [id])) } label: { Label("Play Next", systemImage: "text.insert") }
@@ -342,5 +442,10 @@ struct TrackRows: View {
             }
         }
         .feedback(feedback)
+        .sheet(isPresented: Binding(get: { copiesOf != nil }, set: { if !$0 { copiesOf = nil } })) {
+            if let index = copiesOf, tracks.indices.contains(index) {
+                SongCopiesSheet(session: session, track: tracks[index], list: tracks, index: index)
+            }
+        }
     }
 }
