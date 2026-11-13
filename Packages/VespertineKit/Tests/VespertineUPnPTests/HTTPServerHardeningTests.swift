@@ -91,9 +91,11 @@ struct HTTPServerHardeningTests {
             idle.append(fd)
         }
         try await Task.sleep(for: .milliseconds(200))
-        let refused = try #require(rawExchange(port: port, send: Data("GET / HTTP/1.1\r\n\r\n".utf8), timeout: 1.5))
-        #expect(refused.closed)
-        #expect(!refused.response.hasPrefix("HTTP/1.1 404"))
+        // Over the cap: closed on arrival (or, if the close beats the connect, refused outright). Never served.
+        if let refused = rawExchange(port: port, send: Data("GET / HTTP/1.1\r\n\r\n".utf8), timeout: 1.5) {
+            #expect(refused.closed)
+            #expect(!refused.response.hasPrefix("HTTP/1.1 404"))
+        }
         idle.forEach { close($0) }
         try await Task.sleep(for: .milliseconds(300))
         let served = try #require(rawExchange(port: port, send: Data("GET / HTTP/1.1\r\n\r\n".utf8)))
