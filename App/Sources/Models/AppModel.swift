@@ -184,7 +184,7 @@ final class AppModel {
     let settings: AppSettings
     /// The saved speaker groups; nil unless the Settings switch (Speaker Groups (beta)) is on.
     private(set) var speakerGroups: SpeakerGroupsModel?
-    /// Network renderers; nil unless the Settings switch (UPnP Renderers (beta)) is on.
+    /// Network renderers; nil unless the Settings switch (Network Players (UPnP, beta)) is on.
     private(set) var renderers: RendererOutputModel?
     /// Mac Sound Output (beta): speaker groups published as outputs of the Mac.
     let systemOutput: SystemOutputModel
@@ -469,7 +469,7 @@ final class AppModel {
     /// The chosen network renderer, while it is on the network.
     var chosenRenderer: RendererDevice? { rendererChosen ? renderers?.renderer(uid: settings.selectedDeviceUID) : nil }
 
-    /// The UPnP Renderers (beta) switch. Turning it off while a renderer is the chosen output lets go of it first (the Mac's sound
+    /// The Network Players (UPnP, beta) switch. Turning it off while a renderer is the chosen output lets go of it first (the Mac's sound
     /// output plays).
     func setRenderersFeature(_ on: Bool) {
         if !RendererSwitch.keepsOutput(settings.selectedDeviceUID, turningOnTo: on) {

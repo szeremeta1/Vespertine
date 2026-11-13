@@ -171,7 +171,7 @@ final class AppSettings {
     /// Groups (beta), off by default; `defaults write org.szeremeta.Vespertine speakerGroupsFeature -bool YES` sets it too). Off,
     /// there is no setting, menu item or string for them, and nothing about them is read or written.
     var speakerGroupsFeature: Bool { didSet { defaults.set(speakerGroupsFeature, forKey: "speakerGroupsFeature") } }
-    /// Network renderers (UPnP AV / OpenHome) are in the app only while this is on (Settings › Playback › UPnP Renderers (beta),
+    /// Network renderers (UPnP AV / OpenHome) are in the app only while this is on (Settings › Playback › Network Players (UPnP, beta),
     /// off by default). Off, nothing is searched for, no port is opened, and nothing about them is shown, read or written.
     var upnpRenderersFeature: Bool { didSet { defaults.set(upnpRenderersFeature, forKey: "upnpRenderersFeature") } }
     /// Network renderers whose volume the listener unlocked (Vespertine's digital volume, so the stream is processed). The

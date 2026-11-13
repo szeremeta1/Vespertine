@@ -32,7 +32,8 @@ struct RendererSwitchTests {
 
     @Test("The switch says beta, and its line says what off means")
     func switchExists() {
-        #expect(RendererSwitch.title == "UPnP Renderers (beta)")
+        #expect(RendererSwitch.title == "Network Players (UPnP, beta)")
+        #expect(!RendererSwitch.explanation.localizedCaseInsensitiveContains("renderer"))
         #expect(!RendererSwitch.explanation.contains("\n"))
         #expect(RendererSwitch.explanation.localizedCaseInsensitiveContains("off"))
     }

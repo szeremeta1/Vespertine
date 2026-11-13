@@ -1,5 +1,5 @@
 //
-// Vespertine: network renderers (UPnP Renderers (beta)): the Settings switch, the renderer's details under the output list,
+// Vespertine: network players (Network Players (UPnP, beta)): the Settings switch, the player's details under the output list,
 // its volume lock, and its signal path. None of it shows while the switch is off. Renderer names are shown as they are.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -20,7 +20,7 @@ struct RendererSettingsSection: View {
                     if renderers.searching {
                         Text("Looking for network players…")
                     } else if renderers.renderers.isEmpty {
-                        Text("No network players found. They appear in the output list when they are on and on the same network.")
+                        Text("No network players found. Check it's on and on the same network as this Mac.")
                     } else {
                         Text("Network players found: \(ListFormatter.localizedString(byJoining: renderers.renderers.map(\.name))). Choose one in the output list.",
                              comment: "%@ is a list of network player names.")
@@ -45,6 +45,15 @@ enum RendererText {
             : String(localized: "\(renderer.kind.protocolName.localizedUppercase) · GAPLESS NOT GUARANTEED", comment: "Output list: a network player's protocol, then that it may leave gaps between songs (short, uppercase)")
     }
 
+    /// The player advertises a volume of its own (UPnP RenderingControl or OpenHome Volume).
+    static func hasOwnVolume(_ renderer: RendererDevice) -> Bool {
+        renderer.description.service(.renderingControl) != nil || renderer.description.service(.ohVolume) != nil
+    }
+
+    static var gaplessNotGuaranteedOnPlayer: String {
+        String(localized: "gapless not guaranteed on this player", comment: "Signal path: a network player may leave a gap between songs.")
+    }
+
     static var gaplessNotGuaranteed: String {
         String(localized: "Gapless: not guaranteed on this renderer", comment: "A network player without SetNextAVTransportURI: it may leave a gap between songs.")
     }
@@ -52,10 +61,10 @@ enum RendererText {
     /// Advice for any renderer, MPD-based ones named only as an example.
     static var advice: [String] {
         [
-            String(localized: "Turn off resampling on the renderer, so it plays each song at its own rate."),
-            String(localized: "Use its hardware volume, or none: software volume on the renderer changes the samples Vespertine sent (on MPD-based players such as moOde or Volumio, set the mixer to “hardware” or “none”)."),
-            String(localized: "Turn off ReplayGain on the renderer; Vespertine applies its own when you ask it to."),
-            String(localized: "Vespertine says what it sent. What the renderer then does can't be read back from here."),
+            String(localized: "Turn off resampling on the player, so it plays each song at its own rate."),
+            String(localized: "Use its hardware volume, or none: software volume on the player changes the samples Vespertine sent (on MPD-based players such as moOde or Volumio, set the mixer to “hardware” or “none”)."),
+            String(localized: "Turn off ReplayGain on the player; Vespertine applies its own when you ask it to."),
+            String(localized: "Vespertine says what it sent. What the player then does can't be read back from here."),
         ]
     }
 }
@@ -175,10 +184,19 @@ struct RendererVolumeControl: View {
         }
         .buttonStyle(.plain)
         .help(unlocked ? String(localized: "Digital volume in Vespertine: the song is sent processed (24-bit FLAC). Click to lock it at 100% again.")
-                       : String(localized: "Volume locked at 100%: the original file is sent and the renderer's volume is left alone. Click to unlock."))
+                       : String(localized: "Volume locked at 100%: the original file is sent and the player's own volume is left alone. Click to unlock."))
         .accessibilityLabel(unlocked ? String(localized: "Volume control in Vespertine") : String(localized: "Volume locked at 100%"))
         .popover(isPresented: $showOptions, arrowEdge: .top) { options(unlocked: unlocked) }
         .onChange(of: model.volumeNoteRequests) { showOptions = true }
+    }
+
+    /// The locked note; for a player with a volume of its own (RenderingControl or OpenHome Volume), one sentence more.
+    private var lockedText: String {
+        var text = String(localized: "Locked at 100%: Vespertine sends the original files and never touches the player's own volume. Set the level on your amplifier or the player. Unlocking lets Vespertine set it, which means decoding and re-encoding each song (lossless 24-bit FLAC), so it is no longer the original file.")
+        if RendererText.hasOwnVolume(renderer) {
+            text += " " + String(localized: "This player also has its own volume; Vespertine leaves it as it is.")
+        }
+        return text
     }
 
     private func options(unlocked: Bool) -> some View {
@@ -186,7 +204,7 @@ struct RendererVolumeControl: View {
             SectionLabel(text: renderer.name)
             Text(unlocked
                  ? "Vespertine sets the volume: each song is decoded, its level changed in 64-bit with dither, and sent as 24-bit FLAC. Lock it to send the original files again."
-                 : "Locked at 100%: Vespertine sends the original files and never touches the renderer's own volume. Set the level on your amplifier or the renderer. Unlocking lets Vespertine set it, which means decoding and re-encoding each song (lossless 24-bit FLAC), so it is no longer the original file.")
+                 : lockedText)
                 .font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
             Button(unlocked ? String(localized: "Lock at 100%") : String(localized: "Unlock Volume")) {
                 model.settings.setRendererVolumeUnlocked(!unlocked, for: renderer.uid)
@@ -234,10 +252,10 @@ extension SignalPathView {
             s.append(Step(title: String(localized: "Sent as"), detail: String(localized: "24-bit FLAC at the source rate, lossless after processing"),
                           value: "FLAC \(sent)", tone: .changed))
         }
-        s.append(Step(title: r.name, detail: "\(r.protocolName) · " + (r.gapless ? String(localized: "gapless") : RendererText.gaplessNotGuaranteed),
-                      value: String(localized: "not read back", comment: "Signal path: what a network player does with the stream can't be read back")))
+        s.append(Step(title: r.name, detail: "\(r.protocolName) · " + (r.gapless ? String(localized: "gapless") : RendererText.gaplessNotGuaranteedOnPlayer),
+                      value: String(localized: "not verified", comment: "Signal path: what a network player does with the stream isn't verified (it can't be read back)")))
         for warning in r.warnings {
-            s.append(Step(title: String(localized: "Renderer limit"), detail: warning, value: "", tone: .changed))
+            s.append(Step(title: String(localized: "Player limit", comment: "Signal path: a limit the network player states, which this song goes beyond"), detail: warning, value: "", tone: .changed))
         }
         return s
     }

@@ -274,13 +274,20 @@ struct DevicePicker: View {
                         .opacity(row.isReady ? 1 : 0.6)
                 }
             }
-            // Network players (UPnP Renderers (beta), behind their Settings switch).
+            // Network players (Network Players (UPnP, beta), behind their Settings switch).
             if let renderers = model.renderers {
                 Hairline().padding(.vertical, 8)
                 SectionLabel(text: String(localized: "Network players", comment: "Header of the network renderers in the output list")).padding(.horizontal, 8).padding(.bottom, 4)
                 if renderers.renderers.isEmpty {
-                    Text(renderers.searching ? String(localized: "SEARCHING…") : String(localized: "NONE FOUND ON THIS NETWORK"))
-                        .font(Typeface.mono(9.5)).foregroundStyle(Palette.text3).padding(.horizontal, 8)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(renderers.searching ? String(localized: "SEARCHING…") : String(localized: "NONE FOUND ON THIS NETWORK"))
+                            .font(Typeface.mono(9.5)).foregroundStyle(Palette.text3)
+                        if !renderers.searching {
+                            Text("Check it's on and on the same network as this Mac.").font(Typeface.ui(11)).foregroundStyle(Palette.text3)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .padding(.horizontal, 8)
                 }
                 ForEach(renderers.renderers) { r in
                     deviceRow(r.uid, name: r.name, detail: RendererText.detail(r), symbol: "hifireceiver", selected: model.settings.selectedDeviceUID == r.uid)

@@ -1,5 +1,5 @@
 //
-// Vespertine: network renderers (UPnP AV / OpenHome) as outputs, behind Settings › Playback › UPnP Renderers (beta), off by
+// Vespertine: network players (UPnP AV / OpenHome renderers) as outputs, behind Settings › Playback › Network Players (UPnP, beta), off by
 // default. The model exists only while the switch is on; until then nothing is searched for and no port is open.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -86,11 +86,11 @@ final class RendererOutputModel {
 @MainActor
 enum RendererSwitch {
     static var title: String {
-        String(localized: "UPnP Renderers (beta)", comment: "Settings › Playback: the switch that brings network players (UPnP AV and OpenHome renderers, such as moOde or a streamer) into the app as outputs. “beta” stays as it is in your language.")
+        String(localized: "Network Players (UPnP, beta)", comment: "Settings › Playback: the switch that brings network players (UPnP AV and OpenHome, such as moOde or a streamer) into the app as outputs. “UPnP” and “beta” stay as they are in your language.")
     }
 
     static var explanation: String {
-        String(localized: "Plays to network players on your network (UPnP and OpenHome renderers). Off, Vespertine doesn't look for them, opens no port for them, and plays as before.", comment: "Settings › Playback: the caption under the UPnP Renderers (beta) switch.")
+        String(localized: "Plays to network players on your network (UPnP and OpenHome). Off, Vespertine doesn't look for them, opens no port for them, and plays as before.", comment: "Settings › Playback: the caption under the Network Players (UPnP, beta) switch.")
     }
 
     /// Turns the feature on or off and answers the model that should exist now: `current` or a new, started one while on; nil off.
