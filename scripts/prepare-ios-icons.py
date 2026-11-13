@@ -2,7 +2,7 @@
 """Install Alex's approved A2 masters. Requires Pillow; never redraws the approved artwork."""
 import json
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / 'docs/design/ios-icon-proposals'
@@ -31,6 +31,17 @@ def main():
     (DEST / 'Contents.json').write_text(json.dumps({'images': images, 'info': {'author': 'xcode', 'version': 1}}, indent=2) + '\n')
     # Remove the superseded M1 catalog image only, not either proposal master.
     (DEST / 'AppIcon-1024.png').unlink(missing_ok=True)
+    sheet = Image.new('RGB', (1260, 600), '#16161A')
+    draw = ImageDraw.Draw(sheet)
+    face = ImageFont.truetype(str(ROOT / 'docs/design/fonts/Inter[opsz,wght].ttf'), 24)
+    for index, appearance in enumerate(['light', 'dark', 'tinted']):
+        with Image.open(EXPORT / f'{appearance}-1024.png') as master:
+            sheet.paste(master.resize((320, 320), Image.Resampling.LANCZOS), (index * 420 + 50, 40))
+        for side, offset in [(120, 50), (60, 210)]:
+            with Image.open(EXPORT / f'{appearance}-{side}.png') as sample:
+                sheet.paste(sample, (index * 420 + offset, 410))
+        draw.text((index * 420 + 50, 560), appearance, font=face, fill='#ECE6DA')
+    sheet.save(EXPORT.parent / 'contact-sheet.png')
     print(f'Installed 3 opaque universal masters; exported {len(sizes) * 3} device-size previews.')
 
 if __name__ == '__main__':

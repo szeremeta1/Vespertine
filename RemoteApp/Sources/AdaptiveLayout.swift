@@ -31,7 +31,7 @@ nonisolated enum RemoteDestination: String, CaseIterable, Hashable, Sendable {
     }
     static func starting(at screen: String?) -> Self {
         switch screen {
-        case "library", "albums", "coverFlow", "album": .library
+        case "library", "albums", "coverFlow", "album", "search": .library
         case "artists": .artists
         case "playlists": .playlists
         case "favorites": .favorites

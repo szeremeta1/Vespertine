@@ -25,14 +25,17 @@ final class AdaptiveNavigationTests: XCTestCase {
         if let width { app.launchArguments += ["-VTTestWindowWidth", "\(width)"] }
         if largeText { app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"] }
         app.launch()
-        XCTAssertTrue(app.otherElements["now-playing"].waitForExistence(timeout: 15) || screen != "nowPlaying")
+        if screen == "nowPlaying" {
+            XCTAssertTrue(app.otherElements["now-playing"].waitForExistence(timeout: 15))
+            XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
+        }
     }
 
     func testNativeLayoutAndNavigation() {
         launch()
         if UIDevice.current.userInterfaceIdiom == .pad {
             XCTAssertTrue(app.otherElements["regular-layout"].exists)
-            XCTAssertTrue(app.buttons["sidebar-queue"].exists || app.cells["sidebar-queue"].exists)
+            XCTAssertTrue(sidebar("queue").waitForExistence(timeout: 5))
             sidebar("queue").tap()
             XCTAssertTrue(app.navigationBars["Queue"].waitForExistence(timeout: 5))
             sidebar("library").tap()

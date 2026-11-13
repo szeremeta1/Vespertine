@@ -30,6 +30,7 @@ SCREENS = [
     ('13-artists', ['-VTDemo', 'YES', '-VTPlay', 'YES', '-VTScreen', 'artists']),
     ('14-playlists', ['-VTDemo', 'YES', '-VTPlay', 'YES', '-VTScreen', 'playlists']),
     ('15-favorites', ['-VTDemo', 'YES', '-VTPlay', 'YES', '-VTScreen', 'favorites']),
+    ('16-search', ['-VTDemo', 'YES', '-VTPlay', 'YES', '-VTScreen', 'search']),
 ]
 
 

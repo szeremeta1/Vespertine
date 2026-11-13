@@ -11,6 +11,7 @@ import VespertineRemoteProtocol
 
 struct CoverFlowView: View {
     @Environment(RemoteAppModel.self) private var model
+    @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
     let session: RemoteSession
@@ -35,17 +36,17 @@ struct CoverFlowView: View {
             let side = min(geometry.size.width * 0.6, max(110, (geometry.size.height - 230) / 1.42), 420)
             let layout = CoverFlowLayout(coverSide: side, flat: reduceMotion)
             ScrollView {
-            VStack(spacing: 0) {
-                Spacer(minLength: 0)
-                stage(layout)
-                    .frame(height: side * 1.42)
-                caption
-                    .padding(.top, 4)
-                scrubber
-                    .padding(.horizontal, 28).padding(.top, 14)
-                Spacer(minLength: 0)
-            }
-            .frame(maxWidth: .infinity, minHeight: geometry.size.height)
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    stage(layout)
+                        .frame(height: side * 1.42)
+                    caption
+                        .padding(.top, 4)
+                    scrubber
+                        .padding(.horizontal, 28).padding(.top, 14)
+                    Spacer(minLength: 0)
+                }
+                .frame(maxWidth: .infinity, minHeight: geometry.size.height)
             }
             .scrollBounceBehavior(.basedOnSize)
         }
@@ -166,15 +167,18 @@ struct CoverFlowView: View {
     @ViewBuilder private var caption: some View {
         if let album {
             VStack(spacing: 5) {
-                Text(album.title).font(.serif(.title3, weight: .semibold)).foregroundStyle(Palette.text).lineLimit(1)
+                Text(album.title).font(.serif(.title3, weight: .semibold)).foregroundStyle(Palette.text).lineLimit(2)
                 Text(album.artist).font(.subheadline).foregroundStyle(Palette.text2).lineLimit(1)
-                HStack(spacing: 6) {
-                    Chip(text: album.format, highlighted: album.hiRes || album.dsd)
-                    if let year = album.year { Chip(text: String(year)) }
-                    Chip(text: String(localized: "\(album.trackCount) songs"))
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        Chip(text: album.format, highlighted: album.hiRes || album.dsd)
+                        if let year = album.year { Chip(text: String(year)) }
+                        Chip(text: String(localized: "\(album.trackCount) songs"))
+                    }
                 }
                 .padding(.top, 2)
-                HStack(spacing: 12) {
+                let buttons = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 12)) : AnyLayout(HStackLayout(spacing: 12))
+                buttons {
                     Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: false)) } label: {
                         Label("Play", systemImage: "play.fill").frame(minWidth: 96)
                     }

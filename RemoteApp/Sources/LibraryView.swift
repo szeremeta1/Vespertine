@@ -44,6 +44,9 @@ struct LibraryView: View {
                 }
             }
             .onAppear {
+                #if DEBUG
+                if model.startScreen == "search" { search = "Harbor"; model.startScreen = nil }
+                #endif
                 guard section == nil else { return }
                 switch model.startScreen {
                 case "albums", "coverFlow", "album": path = ["albums"]; if model.startScreen != "album" { model.startScreen = nil }
@@ -132,32 +135,32 @@ struct AlbumsGrid: View {
 
     private var grid: some View {
         GeometryReader { geometry in
-        ScrollView {
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: RemoteLayout.albumColumns(width: min(geometry.size.width, 1200), accessibilityText: typeSize.isAccessibilitySize)), spacing: 20) {
-                ForEach(albums) { album in
-                    NavigationLink { AlbumView(session: session, album: album) } label: {
-                        VStack(alignment: .leading, spacing: 4) {
-                            ArtworkView(key: album.artworkKey)
-                                .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
-                            Text(album.title).font(.serif(.subheadline, weight: .medium)).foregroundStyle(Palette.text).lineLimit(1)
-                            Text(album.artist).font(.caption).foregroundStyle(Palette.text2).lineLimit(1)
+            ScrollView {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: RemoteLayout.albumColumns(width: min(geometry.size.width, 1200), accessibilityText: typeSize.isAccessibilitySize)), spacing: 20) {
+                    ForEach(albums) { album in
+                        NavigationLink { AlbumView(session: session, album: album) } label: {
+                            VStack(alignment: .leading, spacing: 4) {
+                                ArtworkView(key: album.artworkKey)
+                                    .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
+                                Text(album.title).font(.serif(.subheadline, weight: .medium)).foregroundStyle(Palette.text).lineLimit(1)
+                                Text(album.artist).font(.caption).foregroundStyle(Palette.text2).lineLimit(1)
+                            }
+                            .accessibilityElement(children: .combine)
                         }
-                        .accessibilityElement(children: .combine)
+                        .buttonStyle(.plain)
+                        .hoverEffect(.lift)
+                        .onAppear { if album.key == albums.last?.key { Task { await loadMore() } } }
                     }
-                    .buttonStyle(.plain)
-                    .hoverEffect(.lift)
-                    .onAppear { if album.key == albums.last?.key { Task { await loadMore() } } }
+                }
+                .padding()
+                .frame(maxWidth: 1200)
+                .frame(maxWidth: .infinity)
+                if loading { ProgressView().padding() }
+                if !loading, albums.isEmpty, total != nil {
+                    Text("No albums yet").font(.serif(.title3)).foregroundStyle(Palette.text2).padding(.top, 60)
                 }
             }
-            .padding()
-            .frame(maxWidth: 1200)
-            .frame(maxWidth: .infinity)
-            if loading { ProgressView().padding() }
-            if !loading, albums.isEmpty, total != nil {
-                Text("No albums yet").font(.serif(.title3)).foregroundStyle(Palette.text2).padding(.top, 60)
-            }
-        }
-        .accessibilityIdentifier("albums-grid")
+            .accessibilityIdentifier("albums-grid")
         }
     }
 
@@ -215,25 +218,25 @@ struct AlbumView: View {
     }
 
     private var albumInfo: some View {
-                VStack(spacing: 10) {
-                    Text(album.title).font(.serif(.title3, weight: .semibold)).multilineTextAlignment(.center)
-                    Text(album.artist).foregroundStyle(Palette.text2)
-                    HStack(spacing: 6) {
-                        Chip(text: album.format, highlighted: album.hiRes || album.dsd)
-                        if let year = album.year { Chip(text: String(year)) }
-                    }
-                    HStack {
-                        Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: false)) } label: {
-                            Label("Play", systemImage: "play.fill").frame(maxWidth: .infinity)
-                        }
-                        Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: true)) } label: {
-                            Label("Shuffle", systemImage: "shuffle").frame(maxWidth: .infinity)
-                        }
-                    }
-                    .buttonStyle(.bordered)
-                    .disabled(!session.isConnected)
+        VStack(spacing: 10) {
+            Text(album.title).font(.serif(.title3, weight: .semibold)).multilineTextAlignment(.center)
+            Text(album.artist).foregroundStyle(Palette.text2)
+            HStack(spacing: 6) {
+                Chip(text: album.format, highlighted: album.hiRes || album.dsd)
+                if let year = album.year { Chip(text: String(year)) }
+            }
+            HStack {
+                Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: false)) } label: {
+                    Label("Play", systemImage: "play.fill").frame(maxWidth: .infinity)
                 }
-                .frame(maxWidth: .infinity)
+                Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: true)) } label: {
+                    Label("Shuffle", systemImage: "shuffle").frame(maxWidth: .infinity)
+                }
+            }
+            .buttonStyle(.bordered)
+            .disabled(!session.isConnected)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 

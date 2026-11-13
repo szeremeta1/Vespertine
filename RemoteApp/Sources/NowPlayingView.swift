@@ -132,7 +132,7 @@ struct NowPlayingView: View {
                         .sensoryFeedback(.success, trigger: track.favorite)
                     }
                 }
-                Text("\(track.artist) · \(track.album)").font(.subheadline).foregroundStyle(Palette.text2).lineLimit(1)
+                Text("\(track.artist) · \(track.album)").font(.subheadline).foregroundStyle(Palette.text2).lineLimit(typeSize.isAccessibilitySize ? 3 : 1)
                 signalPath(track)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
