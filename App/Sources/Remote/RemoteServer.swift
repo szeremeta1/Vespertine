@@ -326,7 +326,7 @@ final class RemoteServer {
     }
 
     /// A browser typed the pairing code: it gets a token for its cookie (stored here only as a hash).
-    func pairBrowser(code: String, name: String?, userAgent: String? = nil) -> Result<String, BrowserPairingFailure> {
+    func pairBrowser(code: String, name: String?, userAgent: String? = nil, maxTouchPoints: Int? = nil) -> Result<String, BrowserPairingFailure> {
         guard let pairing else { return .failure(.notPairing) }
         let typed = PairingSecret.normalizedCode(code)
         guard RemoteWebServer.constantTimeEqual(Data(typed.utf8), Data(pairing.code.utf8)) else {
@@ -336,7 +336,7 @@ final class RemoteServer {
         }
         let token = PairingSecret.makeLinkSecret() + PairingSecret.makeLinkSecret()
         // Named from its user agent ("Chrome on Mac"); a name the page sent is the fallback.
-        let cleanName = userAgent.flatMap(RemoteBrowserName.name(userAgent:))
+        let cleanName = userAgent.flatMap({ RemoteBrowserName.name(userAgent: $0, maxTouchPoints: maxTouchPoints) })
             ?? String((name ?? "").trimmingCharacters(in: .whitespacesAndNewlines).prefix(80))
         let displayName = cleanName.isEmpty ? String(localized: "Web browser", comment: "Settings › Remote: name of a paired web browser.") : cleanName
         let id = "web-" + UUID().uuidString.lowercased()

@@ -1140,7 +1140,7 @@ async function pair() {
   $("pairButton").disabled = true;
   $("pairError").textContent = "";
   try {
-    const response = await fetch("/pair", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: code, name: deviceName() }), credentials: "same-origin" });
+    const response = await fetch("/pair", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: code, name: deviceName(), touchPoints: navigator.maxTouchPoints || 0 }), credentials: "same-origin" });
     if (response.ok) { buzz(14); $("code").value = ""; await start(); }
     else {
       let reason = "";
