@@ -32,6 +32,15 @@
 
 ---
 
+### Task 0: Master switch and query filtering
+
+**Files:** Modify `App/Sources/Models/AppSettings.swift` (`tidalEnabled`, default false), `App/Sources/Views/SetupViews.swift` or wherever `OnlineSettings` lives (a toggle titled "TIDAL integration" with the footnote "Stream, sync and download from your TIDAL account. Off: Vespertine shows only your own music."), and `Packages/VespertineKit/Sources/VespertineLibrary/LibraryDatabase.swift` / `LibraryFilter.swift` (an `excludedSourceKinds` or `includeTidal: Bool` applied to every track, album, artist, genre, stats and smart-playlist query). Test `Tests/VespertineLibraryTests/TidalHiddenTests.swift`.
+
+- [ ] Tests: with TIDAL rows present and `includeTidal = false`, the stats, albums, artists, genres, songs, favorites and a smart playlist ("Hi-Res ≥ 88.2 kHz") all equal a DB without those rows; flipping it to true shows them.
+- [ ] Every later task's UI is gated on `settings.tidalEnabled`. `TidalModel.start()` is a no-op while it's off; toggling it on starts and toggling it off stops (unregister the reader, cancel the sync timer and downloads).
+- [ ] Build the app. With it off, screenshot the main window and compare it with the baseline build from `tidal-integration`'s merge base: no visible difference.
+- [ ] Commit `Put TIDAL behind one switch, off by default`.
+
 ### Task 1: `TidalModel`
 
 **Files:** Create `App/Sources/Models/TidalModel.swift`. Modify `App/Sources/Models/AppModel.swift` (own `tidal: TidalModel`, created at startup) and `App/Sources/Models/AppSettings.swift` (`tidalQuality`, `tidalDownloadsFolder`, `tidalAddDownloadsToLibrary`). Test `App/Tests/TidalModelTests.swift`. If the app has no test target, put the state machine in `Packages/VespertineKit/Sources/VespertineTidal/TidalSessionState.swift` and test it there.

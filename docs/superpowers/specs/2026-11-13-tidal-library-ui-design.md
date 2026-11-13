@@ -12,6 +12,15 @@ TIDAL music looks and behaves like the rest of the library, in Vespertine's exis
 
 The app gets no second visual language.
 
+## Master switch
+
+Everything below exists only while **Settings › Online › "TIDAL integration"** is on. It is off by default. With it off, the app is exactly as before (decision 209):
+- no TIDAL tab, sidebar section, Source column or inspector group;
+- no reader registration, sync or network traffic;
+- TIDAL-source rows filtered out of all library queries (`LibraryFilter`/stats/albums/smart playlists).
+
+Turning it off keeps all data.
+
 ## App wiring (`App/Sources/Models/TidalModel.swift`, new)
 
 - `@MainActor @Observable final class TidalModel`, owned by `AppModel`. It holds:

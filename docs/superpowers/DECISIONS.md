@@ -38,3 +38,13 @@ Decisions made while working on my own (the owner said "fly solo, take the best 
 300. **A TIDAL-linked playlist accepts only TIDAL tracks.** A dropped local track is matched by ISRC; if there's no match, the drop is refused. Plain playlists mix sources freely.
 301. **Conflicts:** TIDAL wins on etag mismatch (412). Pending adds and removes are re-applied, moves are skipped, and skipped ops are reported.
 302. **Writes queue persistently** when offline, signed out or backing off. The UI updates optimistically, with a "waiting to sync" clock on affected rows.
+
+## Master switch (owner request, 2026-11-13)
+
+209. **The whole TIDAL integration sits behind one switch, off by default:** Settings › Online › "TIDAL integration". With it off, Vespertine looks and behaves exactly as before:
+     - no TIDAL settings tab, sidebar section, Source column or inspector group;
+     - no `tidal` reader registered, no sync, no network calls to TIDAL;
+     - TIDAL rows (including downloaded ones) are filtered out of every library query, so counts, albums and smart playlists match a TIDAL-free library.
+
+     Turning it off deletes nothing: the rows, tokens and downloaded files stay. Turning it back on restores everything. The database migration still runs, but adds only empty tables.
+210. **UPnP output gets the same treatment**, with its own switch: Settings › Playback › "UPnP renderers (beta)", off by default, following the Speaker Groups beta pattern. With it off, no SSDP traffic and nothing new in the output picker.
