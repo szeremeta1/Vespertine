@@ -137,3 +137,10 @@ Made solo on branch `airplay-raop` (spec `docs/superpowers/specs/2026-11-13-airp
 624. **Receiver volume**: the signal path's note follows a volume change at once (not only when a song opens); a receiver nobody set a level for starts at 100% (0 dB), not at the app's digital volume for other outputs; volume SET_PARAMETERs are coalesced (one in flight, the latest level wins).
 625. **A lost session** (keep-alive refused or failing) closes its RTSP connection and sockets before the playback hears of it; the session's deinit cancels the keep-alive and closes the connection. Random AES keys and challenges come from `SecRandomCopyBytes` with its status checked: a failure fails the connect, never a zero key.
 626. **A failure is reported only by the play it belongs to** (an overtaken play stays silent), and **a chosen network output whose playback can't be made counts as missing** (`AppModel.missingNetworkOutput`), so it is never handed to the Mac's own output.
+
+### AirPlay phase 1, fix round 2
+
+627. **The pacer holds for a next song at most 1.5 s** (it looks again every 50 ms). Within that, what it then sends late still arrives inside the lead and the receiver's two seconds. Past it, the stream stops after the song before; that song is heard to its end (and announced if it wasn't yet), the receiver is flushed, and the next song starts from its first frame on a fresh stream once it opens, with the notice "Gap before <title>: it took too long to open." Nothing is announced for frames the receiver couldn't play.
+628. **A song that doesn't open within 120 s** (the network cache's own no-progress limit), or can't be opened, fails through the normal failure path and the song after it is tried. Opening runs on a concurrent queue, so one stuck on a hung share doesn't hold up the next.
+629. **An opening that finishes for a song that is no longer next is dropped**, and a queue change while the old next song is still opening opens the new one at once.
+630. **The sender's clock maps nanoseconds to frames in Double**, so it can't overflow however long one stream runs (an Int64 product would after about 58 h).
