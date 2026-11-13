@@ -162,7 +162,7 @@ struct TrackTable: View {
 
             if showsSource {
                 TableColumn("Source", value: \.track.sourceSortKey) { row in
-                    SourceCell(track: row.track)
+                    SourceCell(model: model, track: row.track)
                 }
                 .width(min: 44, ideal: 52, max: 64)
             }
@@ -569,8 +569,10 @@ extension View {
 }
 
 /// Where a song comes from: a drive, a share, or the TIDAL account (a "T" in a rounded square; a check once downloaded).
+/// Takes the model as a property, as `FavoriteCell` does: a table cell can be laid out where the environment's model isn't
+/// reachable (a filter that rebuilds the rows crashed with "No Observable object of type AppModel found").
 struct SourceCell: View {
-    @Environment(AppModel.self) private var model
+    let model: AppModel
     let track: Track
 
     var body: some View {
