@@ -75,3 +75,32 @@ struct RendererDiscoveryTests {
         #expect(discovery.renderers.isEmpty)
     }
 }
+
+@Suite("Renderer switch, flipped quickly", .serialized)
+struct RendererSwitchRaceTests {
+    @Test("On, off, on, off in a row ends with nothing listening and nothing searching", arguments: 0..<5)
+    func rapidToggle(_ run: Int) async throws {
+        let searcher = CountingSearcher()
+        let service = RendererService(discovery: RendererDiscovery(searcher: searcher))
+        service.want(true)
+        service.want(false)
+        service.want(true)
+        service.want(false)
+        await service.settled()
+        #expect(!service.isEnabled)
+        #expect(!service.media.isRunning)
+        #expect(!service.discovery.isRunning)
+        let searches = searcher.searches
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(searcher.searches == searches)
+        // And the last word wins the other way too.
+        service.want(false)
+        service.want(true)
+        await service.settled()
+        #expect(service.media.isRunning)
+        #expect(service.discovery.isRunning)
+        service.want(false)
+        await service.settled()
+        #expect(!service.media.isRunning)
+    }
+}

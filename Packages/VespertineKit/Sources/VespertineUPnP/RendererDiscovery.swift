@@ -177,17 +177,58 @@ public final class RendererService: @unchecked Sendable {
     }
 
     public var isEnabled: Bool { lock.withLock { enabled } }
+    /// The last time starting the media server failed, why.
+    public private(set) var lastError: Error? {
+        get { lock.withLock { _lastError } }
+        set { lock.withLock { _lastError = newValue } }
+    }
+    private var _lastError: Error?
+    /// Every change runs after the one before it, so a quick on-off-on can't leave a listener or a search loop behind.
+    private var chain: Task<Void, Never>?
 
-    /// Starts (on) or stops (off) discovery and the media server.
-    public func setEnabled(_ on: Bool) async throws {
-        lock.withLock { enabled = on }
-        if on {
-            discovery.start()
-            try await media.start()
-        } else {
+    /// Turns everything on or off. Changes are applied in order, each after the last has finished, and each looks at what is
+    /// wanted *now* once its awaits are done; `settled()` waits for them.
+    public func want(_ on: Bool) {
+        lock.withLock {
+            enabled = on
+            let previous = chain
+            chain = Task { [weak self] in
+                await previous?.value
+                await self?.apply()
+            }
+        }
+    }
+
+    /// Waits until every change asked for has been applied.
+    public func settled() async {
+        while true {
+            let current = lock.withLock { chain }
+            await current?.value
+            if lock.withLock({ chain }) == current { return }
+        }
+    }
+
+    private func apply() async {
+        guard isEnabled else {
             discovery.stop()
             media.stop()
+            return
         }
+        do {
+            try await media.start()
+            lastError = nil
+        } catch {
+            lastError = error
+        }
+        // Switched off while the server was starting: it doesn't stay up.
+        if isEnabled { discovery.start() } else { discovery.stop(); media.stop() }
+    }
+
+    /// Turns it on or off and waits for that; throws when the media server couldn't start.
+    public func setEnabled(_ on: Bool) async throws {
+        want(on)
+        await settled()
+        if on, isEnabled, let lastError { throw lastError }
     }
 
     /// Searches again, only while on.
