@@ -261,7 +261,7 @@ enum DeviceQuery {
         let transport = Transport((try? HAL.get(id, .global(kAudioDevicePropertyTransportType), initial: UInt32(0))) ?? 0)
         let manufacturer = HAL.getString(id, .global(kAudioObjectPropertyManufacturer)) ?? ""
         let modelUID = HAL.getString(id, .global(kAudioDevicePropertyModelUID))
-        return OutputDevice(
+        var device = OutputDevice(
             id: id,
             uid: uid,
             name: displayName(HAL.getString(id, .global(kAudioObjectPropertyName)) ?? String(localized: "Unknown Device"),
@@ -274,6 +274,15 @@ enum DeviceQuery {
             hasHardwareVolume: !volumeElements(id).isEmpty,
             isDefault: id == defaultID,
             builtInDataSource: transport == .builtIn ? try? HAL.get(id, .output(kAudioDevicePropertyDataSource), initial: UInt32(0)) : nil)
+        if transport == .bluetooth || transport == .bluetoothLE {
+            // Whether AirPods Max are on the cable or the radio (`isAirPodsMaxAudioOnCable`), read once here rather than on every
+            // look at the profile.
+            device.outputLatencyFrames = (try? HAL.get(id, .output(kAudioDevicePropertyLatency), initial: UInt32(0))).map(Int.init)
+            if device.name.lowercased().contains("airpods max") {
+                device.airPodsMaxCableAttached = USBRegistry.isConnected(productContaining: DeviceProfile.airPodsMaxUSBProduct)
+            }
+        }
+        return device
     }
 
     /// UIDs of the connected outputs: cheap, no formats read.

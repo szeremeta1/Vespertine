@@ -76,7 +76,8 @@ final class DeviceStore {
                 switch change {
                 case .devices: self?.refresh(notify: true)
                 case .volume: self?.readVolume()
-                case .format: break
+                // The output's rate or channels moved (a headset into or out of call mode): read the list again, nothing more.
+                case .format: self?.refresh()
                 }
             }
         }

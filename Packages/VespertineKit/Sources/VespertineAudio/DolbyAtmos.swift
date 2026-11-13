@@ -88,6 +88,10 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
     private var meter: BedMeterSource?
     /// Tests: sees each compressed buffer as it goes to the renderer (never changes it).
     var enqueueObserver: (@Sendable (CMSampleBuffer) -> Void)?
+    /// The route-change flush notice (`AVSampleBufferAudioRendererWasFlushedAutomatically`) for this session's renderer.
+    private var flushObserver: NSObjectProtocol?
+    /// `stop()` was called: a late flush notice doesn't start reading again. Under `lock`.
+    private var stopped = false
 
     init(item: PlayableItem, url: URL, deviceUID: String?, spatial: Bool, volume: Float) throws {
         self.item = item
@@ -105,22 +109,56 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
         origin = start
         duration = max(0, CMTimeGetSeconds(total) - max(0, CMTimeGetSeconds(start)))
         meter = BedMeterSource(decoder: SystemBedDecoder(url: url), position: { [weak self] in self?.position ?? 0 })
+        // When the output's configuration changes under it (AirPods Max moving between A2DP, call mode and the USB-C cable, a
+        // headset reconnecting), macOS throws away what the renderer had queued and says from what time. It is fed again from
+        // there; otherwise everything that was queued (about a second of the song) is skipped.
+        flushObserver = NotificationCenter.default.addObserver(forName: .AVSampleBufferAudioRendererWasFlushedAutomatically,
+                                                               object: renderer, queue: nil) { [weak self] notice in
+            let time = (notice.userInfo?[AVSampleBufferAudioRendererFlushTimeKey] as? NSValue)?.timeValue
+            self?.refillAfterAutomaticFlush(from: time)
+        }
     }
 
-    deinit { stop() }
+    deinit {
+        if let flushObserver { NotificationCenter.default.removeObserver(flushObserver) }
+        stop()
+    }
 
     /// Positions at `seconds` (paused) and starts feeding the renderer.
     func prepare(at seconds: TimeInterval) throws {
+        let target = CMTimeAdd(origin, CMTime(seconds: max(0, min(seconds, duration)), preferredTimescale: 48_000))
+        try feed(from: target, flushing: true)
+        synchronizer.setRate(0, time: target)
+        meter?.start(at: seconds)
+    }
+
+    /// macOS flushed the renderer on a route change: feed it again from `time` (where it flushed from), playing on. No time
+    /// given: from where playback is.
+    private func refillAfterAutomaticFlush(from time: CMTime?) {
+        lock.lock(); let stopped = stopped; lock.unlock()
+        guard !stopped else { return }
+        let from = time.flatMap { $0.isValid && $0.isNumeric ? $0 : nil } ?? synchronizer.currentTime()
+        let start = CMTimeMaximum(origin, from)
+        log.notice("macOS flushed the Atmos renderer (the output changed); feeding it again from \(CMTimeGetSeconds(CMTimeSubtract(start, self.origin)), privacy: .public) s")
+        do { try feed(from: start, flushing: false) } catch {
+            log.error("Couldn't feed the Atmos renderer again after a flush: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    /// Starts reading the track at `target` and handing it to the renderer, replacing any reading under way. `flushing`: the
+    /// renderer's queue is emptied first (a seek); after macOS's own flush it already is, and flushing again would reset its time.
+    private func feed(from target: CMTime, flushing: Bool) throws {
         lock.lock()
         generation += 1
+        stopped = false
         let gen = generation
         renderer.stopRequestingMediaData()
-        renderer.flush()
+        if flushing { renderer.flush() }
         reader?.cancelReading()
         inputDone = false
-        let target = CMTimeAdd(origin, CMTime(seconds: max(0, min(seconds, duration)), preferredTimescale: 48_000))
         guard let track else { lock.unlock(); throw SourceOpenerError.unsupported(url) }
-        let reader = try AVAssetReader(asset: asset)
+        let reader: AVAssetReader
+        do { reader = try AVAssetReader(asset: asset) } catch { lock.unlock(); throw error }   // never left locked
         reader.timeRange = CMTimeRange(start: target, duration: .positiveInfinity)
         let output = AVAssetReaderTrackOutput(track: track, outputSettings: nil)   // compressed: the renderer decodes
         output.alwaysCopiesSampleData = false
@@ -129,8 +167,6 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
         self.reader = reader
         enqueuedEnd = target
         lock.unlock()
-        synchronizer.setRate(0, time: target)
-        meter?.start(at: seconds)
         renderer.requestMediaDataWhenReady(on: queue) { [weak self] in
             guard let self else { return }
             self.lock.lock(); defer { self.lock.unlock() }
@@ -154,7 +190,7 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
     func setVolume(_ volume: Float) { renderer.volume = volume }
 
     func stop() {
-        lock.lock(); generation += 1; lock.unlock()
+        lock.lock(); generation += 1; stopped = true; lock.unlock()
         meter?.stop()
         synchronizer.rate = 0
         renderer.stopRequestingMediaData()

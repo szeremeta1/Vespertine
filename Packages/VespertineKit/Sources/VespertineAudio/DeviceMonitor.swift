@@ -85,6 +85,8 @@ final class HALDeviceProvider: DeviceProvider {
 /// stayed missing until the default output moved. Every device without output is therefore watched for streams
 /// arriving, and one that just joined is also re-checked a few times a second for a while, in case no notice comes.
 public final class DeviceMonitor: @unchecked Sendable {
+    /// `format`: the watched output's rate or channels changed (AirPods going into or out of call mode): the device list is
+    /// out of date, though no device came or went.
     public enum Change: Sendable { case devices, volume, format }
 
     private let queue: DispatchQueue
@@ -94,6 +96,7 @@ public final class DeviceMonitor: @unchecked Sendable {
     private let recheckWindow: TimeInterval
     private var stopSystem: (@Sendable () -> Void)?
     private var stopVolume: (@Sendable () -> Void)?
+    private var stopFormat: (@Sendable () -> Void)?
 
     // On `queue` only.
     private var known: Set<AudioObjectID> = []
@@ -161,10 +164,13 @@ public final class DeviceMonitor: @unchecked Sendable {
         return true
     }
 
-    /// Follows hardware volume (and mute) changes of one device, e.g. from the keyboard or the DAC.
+    /// Follows hardware volume (and mute) changes of one device, e.g. from the keyboard or the DAC, and its rate and output
+    /// channels (`Change.format`): a Bluetooth headset that macOS moves into call mode stays the same device, so nothing else
+    /// says that what the device list holds for it (24 kHz, mono, the call-mode warning) has changed.
     public func watchVolume(of device: AudioObjectID?) {
         unwatchVolume()
         guard let device else { return }
+        stopFormat = provider.observe(device, Self.formatAddresses, on: queue) { [onChange] in onChange(.format) }
         let elements = provider.volumeElements(of: device)
         guard !elements.isEmpty else { return }
         stopVolume = provider.observe(device, Self.volumeAddresses(elements: elements), on: queue) { [onChange] in onChange(.volume) }
@@ -178,8 +184,16 @@ public final class DeviceMonitor: @unchecked Sendable {
             + muteElements.map { AudioObjectPropertyAddress.output(kAudioDevicePropertyMute, element: $0) }
     }
 
+    /// What the format watch listens to: the nominal rate and the output streams' channels.
+    static let formatAddresses: [AudioObjectPropertyAddress] = [
+        .global(kAudioDevicePropertyNominalSampleRate),
+        .output(kAudioDevicePropertyStreamConfiguration),
+    ]
+
     private func unwatchVolume() {
         stopVolume?()
         stopVolume = nil
+        stopFormat?()
+        stopFormat = nil
     }
 }
