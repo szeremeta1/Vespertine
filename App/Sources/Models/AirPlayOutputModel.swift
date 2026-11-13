@@ -114,13 +114,23 @@ extension AppSettings {
     /// volume, digital volume.
     func airPlaySettings(uid: String) -> RendererSettings {
         let engine = engineSettings()
-        let digital = airPlayDigitalVolume.contains(uid) ? Self.decibels(appVolumeLevel(for: uid)) : nil
+        let digital = airPlayDigitalVolume.contains(uid) ? Self.decibels(airPlayLevel(uid: uid)) : nil
         return RendererSettings(equalizer: engine.equalizers[uid], roomCorrection: engine.roomCorrections[uid], digitalVolumeDB: digital)
     }
 
     /// The receiver's own volume: the level while the receiver sets it, 0 dB while Vespertine does.
     func airPlayReceiverVolumeDB(uid: String) -> Double {
-        airPlayDigitalVolume.contains(uid) ? 0 : RAOPVolume.decibels(level: appVolumeLevel(for: uid))
+        airPlayDigitalVolume.contains(uid) ? 0 : RAOPVolume.decibels(level: airPlayLevel(uid: uid))
+    }
+
+    /// A receiver's level: what the listener set for it, else full (its own volume left at 100%, not the app's digital
+    /// volume for other outputs).
+    func airPlayLevel(uid: String) -> Double { appVolumeLevels[uid] ?? 1 }
+
+    /// Volume Up, Down and Mute for a receiver, from its own level.
+    func applyAirPlayVolume(_ action: VolumeControls.Action, uid: String) {
+        if appVolumeLevels[uid] == nil { setAppVolumeLevel(1, for: uid) }
+        applyVolume(action, for: uid)
     }
 
     func setAirPlayDigitalVolume(_ digital: Bool, for uid: String) {

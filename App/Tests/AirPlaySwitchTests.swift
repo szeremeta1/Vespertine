@@ -88,12 +88,24 @@ struct AirPlaySwitchTests {
         defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
         let uid = "raop:B827EB000001"
+        // A receiver nobody set a level for starts at full receiver volume, whatever the app's digital volume elsewhere.
+        settings.digitalVolume = 0.3
+        #expect(settings.airPlayReceiverVolumeDB(uid: uid) == 0)
         settings.setAppVolumeLevel(0.5, for: uid)
         #expect(settings.airPlaySettings(uid: uid).digitalVolumeDB == nil)
         #expect(settings.airPlayReceiverVolumeDB(uid: uid) == -15)
         settings.setAirPlayDigitalVolume(true, for: uid)
         #expect(settings.airPlaySettings(uid: uid).digitalVolumeDB != nil)
         #expect(settings.airPlayReceiverVolumeDB(uid: uid) == 0)
+    }
+
+    @Test("A chosen receiver (or player) whose playback can't be made counts as missing: never handed to the Mac's output")
+    func neverFallsBack() {
+        #expect(AppModel.missingNetworkOutput(chosen: true, hasPlayback: false, missing: nil, name: "moOde") == "moOde")
+        #expect(AppModel.missingNetworkOutput(chosen: true, hasPlayback: false, missing: "Gone", name: "moOde") == "Gone")
+        #expect(AppModel.missingNetworkOutput(chosen: true, hasPlayback: false, missing: nil, name: nil) != nil)
+        #expect(AppModel.missingNetworkOutput(chosen: true, hasPlayback: true, missing: nil, name: "moOde") == nil)
+        #expect(AppModel.missingNetworkOutput(chosen: false, hasPlayback: false, missing: nil, name: nil) == nil)
     }
 
     @Test("The mini player's words for an AirPlay song match its badge")

@@ -112,7 +112,7 @@ struct AirPlayVolumeControl: View {
     var body: some View {
         let settings = model.settings
         let digital = settings.airPlayDigitalVolume.contains(device.uid)
-        BrassSlider(value: Binding(get: { settings.appVolumeLevel(for: device.uid) },
+        BrassSlider(value: Binding(get: { settings.airPlayLevel(uid: device.uid) },
                                    set: { settings.setAppVolumeLevel($0, for: device.uid); model.syncEngine() }),
                     tint: digital ? Palette.copper : Palette.text2, showsThumb: false,
                     accessibilityName: digital ? String(localized: "Digital volume") : String(localized: "Receiver volume"))
