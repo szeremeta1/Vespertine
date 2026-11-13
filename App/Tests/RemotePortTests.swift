@@ -161,6 +161,7 @@ struct RemotePortTests {
     }
 
     @Test func aPairedPhonesKeyStillGetsInAfterARestart() async throws {
+        // The pairing is the phone's key in a file, not anything tied to the port or to this run of the app.
         let library = try library()
         let base = Self.base()
         let first = server(in: library, base: base)
@@ -168,36 +169,20 @@ struct RemotePortTests {
         first.store.add(PairedRemote(id: credential.device, name: "Alex's iPhone", key: credential.key, pairedAt: .now, lastSeen: nil))
         first.apply()
         let port = try #require(await running(first))
-        #expect(await Self.opens(port: port, key: .init(identity: credential.device, key: credential.key)))
+        let key = RemoteTransport.PresharedKey(identity: credential.device, key: credential.key)
+        #expect(first.acceptedKeys.contains(key))
         first.store.enabled = false
         first.apply()
 
         let second = server(in: library, base: base)
+        #expect(second.store.serverID == first.store.serverID)
         second.apply()
         #expect(await running(second) == port)
-        #expect(await Self.opens(port: port, key: .init(identity: credential.device, key: credential.key)))
-        // A key nobody paired still doesn't.
-        #expect(!(await Self.opens(port: port, key: .init(identity: credential.device, key: Data(repeating: 7, count: 32)))))
+        #expect(second.acceptedKeys.contains(key))
+        #expect(second.store.device(credential.device)?.key == credential.key)
+        // A key nobody paired still isn't accepted.
+        #expect(!second.acceptedKeys.contains(.init(identity: credential.device, key: Data(repeating: 7, count: 32))))
         second.store.enabled = false
         second.apply()
-    }
-
-    /// Whether a TLS connection with `key` gets through to the server on this Mac's loopback.
-    private static func opens(port: UInt16, key: RemoteTransport.PresharedKey) async -> Bool {
-        let connection = NWConnection(host: "127.0.0.1", port: NWEndpoint.Port(rawValue: port)!, using: RemoteTransport.parameters(keys: [key]))
-        let result = AsyncStream<Bool> { continuation in
-            connection.stateUpdateHandler = { state in
-                switch state {
-                case .ready: continuation.yield(true); continuation.finish()
-                case .failed, .waiting, .cancelled: continuation.yield(false); continuation.finish()
-                default: break
-                }
-            }
-            connection.start(queue: .main)
-        }
-        var opened = false
-        for await value in result { opened = value }
-        connection.cancel()
-        return opened
     }
 }

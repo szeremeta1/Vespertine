@@ -43,8 +43,9 @@ final class RemoteServer {
     private enum PortPlan {
         /// This port is ours now: a restart (new keys) binds it again, a few times over if the last listener hasn't let go.
         case held(UInt16, retries: Int)
-        /// Ports still to try, the first next.
-        case trying([UInt16])
+        /// Ports still to try, the first next. The first (the saved one) is tried again a few times before it counts
+        /// as taken: the listener that had it a moment ago (before a restart of the server) may not have let go yet.
+        case trying([UInt16], retriesLeft: Int)
         /// Every candidate was taken: let the system choose.
         case system
     }
@@ -69,9 +70,9 @@ final class RemoteServer {
     /// Failed handshakes while pairing (wrong codes) after which the window closes, so a code can't be guessed.
     static let pairingAttempts = 10
 
-    /// How often a restart on the port we hold tries again before the port counts as taken, and how long it waits between.
-    static let restartTries = 8
-    static let restartDelay: Duration = .milliseconds(250)
+    /// How often a port we held (or saved) is tried again before it counts as taken, and how long it waits between.
+    static let restartTries = 6
+    static let restartDelay: Duration = .milliseconds(150)
 
     init(store: RemoteStore, preferredPort: UInt16 = RemotePort.preferred) {
         self.store = store
@@ -126,7 +127,7 @@ final class RemoteServer {
     }
 
     /// The keys the listener accepts: every paired phone's, and the pairing keys while a window is open.
-    private var acceptedKeys: [RemoteTransport.PresharedKey] {
+    var acceptedKeys: [RemoteTransport.PresharedKey] {
         var keys = store.devices.filter { !$0.isWeb }.map { RemoteTransport.PresharedKey(identity: $0.id, key: $0.key) }
         if let pairing {
             keys.append(.init(identity: RemoteProtocol.pairingLinkIdentity, key: PairingKey.derive(secret: pairing.link.secret, serverID: store.serverID)))
@@ -163,12 +164,12 @@ final class RemoteServer {
     }
 
     private func startListener(keys: [RemoteTransport.PresharedKey]) {
-        let plan = portPlan ?? .trying(RemotePort.candidates(saved: store.port, preferred: preferredPort))
+        let plan = portPlan ?? .trying(RemotePort.candidates(saved: store.port, preferred: preferredPort), retriesLeft: Self.restartTries)
         portPlan = plan
         let wanted: UInt16?
         switch plan {
         case .held(let port, _): wanted = port
-        case .trying(let ports): wanted = ports.first
+        case .trying(let ports, _): wanted = ports.first
         case .system: wanted = nil
         }
         let parameters = RemoteTransport.parameters(keys: keys)
@@ -233,23 +234,30 @@ final class RemoteServer {
     /// The port the listener tried couldn't be bound. A port we held a moment ago is tried again shortly (the last
     /// listener may not have let go yet); a candidate that's taken gives way to the next; after the last, the system chooses.
     private func portUnavailable(_ error: any Error) {
+        func again(_ next: PortPlan) {
+            portPlan = next
+            restart = Task { [weak self] in
+                try? await Task.sleep(for: Self.restartDelay)
+                guard !Task.isCancelled, let self, self.store.enabled, self.listener == nil else { return }
+                self.startListener()
+            }
+        }
         switch portPlan {
         case .held(let port, let retries):
             if retries < Self.restartTries {
-                portPlan = .held(port, retries: retries + 1)
-                restart = Task { [weak self] in
-                    try? await Task.sleep(for: Self.restartDelay)
-                    guard !Task.isCancelled, let self, self.store.enabled, self.listener == nil else { return }
-                    self.startListener()
-                }
+                again(.held(port, retries: retries + 1))
             } else {
                 // Taken since: the rest of the candidates, without this one.
-                portPlan = .trying(RemotePort.candidates(saved: nil, preferred: preferredPort).filter { $0 != port })
+                portPlan = .trying(RemotePort.candidates(saved: nil, preferred: preferredPort).filter { $0 != port }, retriesLeft: 0)
                 startListener()
             }
-        case .trying(let ports):
+        case .trying(let ports, let retriesLeft):
+            if retriesLeft > 0 {
+                again(.trying(ports, retriesLeft: retriesLeft - 1))
+                return
+            }
             let rest = Array(ports.dropFirst())
-            portPlan = rest.isEmpty ? .system : .trying(rest)
+            portPlan = rest.isEmpty ? .system : .trying(rest, retriesLeft: 0)
             startListener()
         case .system, nil:
             status = .failed(error.localizedDescription)
