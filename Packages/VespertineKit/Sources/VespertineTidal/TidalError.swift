@@ -23,3 +23,35 @@ public enum TidalError: Error, Equatable {
     case notStreamable(String)
     case unavailable
 }
+
+extension TidalError: LocalizedError {
+    /// What the player shows (the spec's error table where it words a case).
+    public var errorDescription: String? {
+        switch self {
+        case .notSignedIn:
+            String(localized: "Sign in to TIDAL", comment: "A TIDAL track can't play: no TIDAL session.")
+        case .missingCredentials:
+            String(localized: "TIDAL client credentials are missing. Add them in Settings › TIDAL.")
+        case .backingOff(let remaining, _):
+            Self.waitMessage(remaining)
+        case .abuse(let retryAfter):
+            Self.waitMessage(retryAfter)
+        case .http(let status, _):
+            String(localized: "TIDAL answered with an error (HTTP \(status)).")
+        case .encrypted:
+            String(localized: "This track's stream is encrypted", comment: "A TIDAL track whose stream is DRM-protected.")
+        case .malformedStream:
+            String(localized: "TIDAL sent a stream Vespertine can't read.")
+        case .notStreamable(let reason):
+            reason
+        case .unavailable:
+            String(localized: "This track isn't available on TIDAL.")
+        }
+    }
+
+    /// "TIDAL asked us to wait N min", N rounded up, at least 1.
+    private static func waitMessage(_ seconds: TimeInterval) -> String {
+        let minutes = max(1, Int((seconds / 60).rounded(.up)))
+        return String(localized: "TIDAL asked us to wait \(minutes) min", comment: "A TIDAL backoff is in force.")
+    }
+}

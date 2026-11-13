@@ -118,7 +118,9 @@ public struct TidalStreamResolver: Sendable {
 
     private static func httpsURL(_ string: String) -> URL? {
         guard var components = URLComponents(string: string), let scheme = components.scheme?.lowercased(),
-              scheme == "https" || scheme == "http", components.host != nil else { return nil }
+              scheme == "https" || scheme == "http", let host = components.host else { return nil }
+        // A loopback address is a server on this Mac (the tests' CDN, a debugging proxy), never TIDAL's: it is left as it is.
+        if ["127.0.0.1", "localhost", "::1", "[::1]"].contains(host.lowercased()) { return components.url }
         components.scheme = "https"
         return components.url
     }
