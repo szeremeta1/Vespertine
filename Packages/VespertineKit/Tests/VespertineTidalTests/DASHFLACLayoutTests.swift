@@ -35,15 +35,23 @@ struct DASHFLACLayoutTests {
 
     private func box(_ type: String, _ payload: Data = Data()) -> Data { be32(8 + payload.count) + Data(type.utf8) + payload }
 
-    /// styp + moof(mfhd, traf(tfhd, trun)) + mdat, with `sizes` in the trun and `payload` in the mdat.
-    private func segment(sizes: [Int], payload: Data, trunSizeFlag: Bool = true) -> Data {
-        let mfhd = box("mfhd", be32(0) + be32(1))
-        let tfhd = box("tfhd", be32(0x020000) + be32(1))
-        var trunBody = be32(trunSizeFlag ? 0x000201 : 0x000001) + be32(sizes.count) + be32(0)
-        if trunSizeFlag { for size in sizes { trunBody += be32(size) } }
-        let trun = box("trun", trunBody)
-        let moof = box("moof", mfhd + box("traf", tfhd + trun))
-        return box("styp", Data("msdh".utf8) + be32(0)) + moof + box("mdat", payload)
+    /// One movie fragment: moof(mfhd, traf(tfhd, trun)) + mdat, with `sizes` in the trun and `payload` in the mdat. The trun's
+    /// data_offset points at the mdat payload, as a real encoder writes it unless `dataOffsetDelta` skews it.
+    private func fragment(sizes: [Int], payload: Data, trunSizeFlag: Bool = true, dataOffsetDelta: Int = 0) -> Data {
+        func moof(dataOffset: Int) -> Data {
+            let mfhd = box("mfhd", be32(0) + be32(1))
+            let tfhd = box("tfhd", be32(0x020000) + be32(1))
+            var trunBody = be32(trunSizeFlag ? 0x000201 : 0x000001) + be32(sizes.count) + be32(dataOffset)
+            if trunSizeFlag { for size in sizes { trunBody += be32(size) } }
+            return box("moof", mfhd + box("traf", tfhd + box("trun", trunBody)))
+        }
+        let moofSize = moof(dataOffset: 0).count
+        return moof(dataOffset: moofSize + 8 + dataOffsetDelta) + box("mdat", payload)
+    }
+
+    /// styp + one fragment.
+    private func segment(sizes: [Int], payload: Data, trunSizeFlag: Bool = true, dataOffsetDelta: Int = 0) -> Data {
+        box("styp", Data("msdh".utf8) + be32(0)) + fragment(sizes: sizes, payload: payload, trunSizeFlag: trunSizeFlag, dataOffsetDelta: dataOffsetDelta)
     }
 
     // MARK: Header
@@ -90,9 +98,10 @@ struct DASHFLACLayoutTests {
         var stream = try DASHFLACLayout.flacHeader(fromInit: initSegment())
         for chunk in try chunks() {
             let info = try #require(try DASHFLACLayout.mediaPayload(segmentPrefix: chunk))
-            #expect(info.payloadOffset + info.payloadLength == chunk.count)
-            #expect(info.sampleSizesTotal == info.payloadLength)
-            stream += chunk[info.payloadOffset..<(info.payloadOffset + info.payloadLength)]
+            #expect(info.payloads.count == 1 && info.payloads[0].upperBound == chunk.count)
+            #expect(info.endOffset == chunk.count)
+            #expect(info.sampleSizesTotal == info.totalPayloadLength)
+            for range in info.payloads { stream += chunk[range] }
         }
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("dashflac-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
@@ -127,7 +136,7 @@ struct DASHFLACLayoutTests {
     func prefixThroughMdatHeader() throws {
         let chunk = try #require(try chunks().first)
         let full = try #require(try DASHFLACLayout.mediaPayload(segmentPrefix: chunk))
-        let needed = full.payloadOffset
+        let needed = full.payloads[0].lowerBound
         #expect(try DASHFLACLayout.mediaPayload(segmentPrefix: chunk.prefix(needed - 1)) == nil)
         #expect(try DASHFLACLayout.mediaPayload(segmentPrefix: chunk.prefix(needed)) == full)
         #expect(try DASHFLACLayout.mediaPayload(segmentPrefix: chunk.prefix(needed + 10)) == full)
@@ -139,19 +148,20 @@ struct DASHFLACLayoutTests {
         let payload = Data(repeating: 0xAB, count: sizes.reduce(0, +))
         let data = segment(sizes: sizes, payload: payload)
         let full = try #require(try DASHFLACLayout.mediaPayload(segmentPrefix: data))
-        #expect(full.payloadLength == payload.count && full.sampleSizesTotal == payload.count)
-        #expect(full.payloadOffset > 4096)
-        #expect(data[full.payloadOffset...].count == payload.count)
+        let start = full.payloads[0].lowerBound
+        #expect(full.totalPayloadLength == payload.count && full.sampleSizesTotal == payload.count)
+        #expect(start > 4096)
+        #expect(data[start...].count == payload.count)
         #expect(try DASHFLACLayout.mediaPayload(segmentPrefix: data.prefix(4096)) == nil)
-        #expect(try DASHFLACLayout.mediaPayload(segmentPrefix: data.prefix(full.payloadOffset - 1)) == nil)
-        #expect(try DASHFLACLayout.mediaPayload(segmentPrefix: data.prefix(full.payloadOffset)) == full)
+        #expect(try DASHFLACLayout.mediaPayload(segmentPrefix: data.prefix(start - 1)) == nil)
+        #expect(try DASHFLACLayout.mediaPayload(segmentPrefix: data.prefix(start)) == full)
     }
 
     @Test("trun sizes that don't add up to the mdat payload are malformed, never a payload")
     func corruptedSum() throws {
         let payload = Data(repeating: 1, count: 300)
         let good = segment(sizes: [100, 100, 100], payload: payload)
-        #expect(try DASHFLACLayout.mediaPayload(segmentPrefix: good)?.payloadLength == 300)
+        #expect(try DASHFLACLayout.mediaPayload(segmentPrefix: good)?.totalPayloadLength == 300)
         let short = segment(sizes: [100, 100, 99], payload: payload)
         #expect(throws: TidalError.self) { try DASHFLACLayout.mediaPayload(segmentPrefix: short) }
         let long = segment(sizes: [100, 100, 101], payload: payload)
@@ -172,12 +182,83 @@ struct DASHFLACLayoutTests {
     func noSampleSizes() throws {
         let data = segment(sizes: [10, 10], payload: Data(repeating: 3, count: 20), trunSizeFlag: false)
         let info = try #require(try DASHFLACLayout.mediaPayload(segmentPrefix: data))
-        #expect(info.sampleSizesTotal == nil && info.payloadLength == 20)
+        #expect(info.sampleSizesTotal == nil && info.totalPayloadLength == 20)
     }
 
     @Test("a segment with an mdat but no moof is malformed")
     func mdatWithoutMoof() {
         let data = box("styp", Data("msdh".utf8) + be32(0)) + box("mdat", Data(repeating: 1, count: 10))
+        #expect(throws: TidalError.self) { try DASHFLACLayout.mediaPayload(segmentPrefix: data) }
+    }
+
+    // MARK: Fix round 1
+
+    @Test("a segment of several fragments yields every payload, in order, and decodes sample for sample")
+    func multiFragmentSegment() throws {
+        let all = try chunks()
+        #expect(all.count == 3)
+        // Chunked CMAF: three moof/mdat pairs in one segment (the second and third keep their styp/sidx, which are skipped).
+        let combined = all.reduce(Data(), +)
+        let info = try #require(try DASHFLACLayout.mediaPayload(segmentPrefix: combined))
+        #expect(info.payloads.count == 3)
+        #expect(info.endOffset == combined.count)
+        var single: [Int] = []
+        for chunk in all { single.append(try #require(try DASHFLACLayout.mediaPayload(segmentPrefix: chunk)).totalPayloadLength) }
+        #expect(info.payloads.map(\.count) == single)
+        #expect(info.payloads == info.payloads.sorted { $0.lowerBound < $1.lowerBound })
+
+        var stream = try DASHFLACLayout.flacHeader(fromInit: initSegment())
+        for range in info.payloads { stream += combined[range] }
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("dashflac-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let rebuilt = directory.appendingPathComponent("rebuilt.flac")
+        try stream.write(to: rebuilt)
+        let expected = try decode(fixtureDirectory().appendingPathComponent("source.flac"))
+        let actual = try decode(rebuilt)
+        #expect(actual.frames == expected.frames && actual.bytes == expected.bytes)
+    }
+
+    @Test("with hand-built fragments: both payloads in order; a prefix ending inside the second fragment stops after the first")
+    func twoFragments() throws {
+        let a = Data(repeating: 0xA1, count: 200), b = Data(repeating: 0xB2, count: 300)
+        let first = fragment(sizes: [100, 100], payload: a), second = fragment(sizes: [150, 150], payload: b)
+        let data = box("styp", Data("msdh".utf8) + be32(0)) + first + second
+        let info = try #require(try DASHFLACLayout.mediaPayload(segmentPrefix: data))
+        #expect(info.payloads.map { Data(data[$0]) } == [a, b])
+        #expect(info.sampleSizesTotal == 500 && info.endOffset == data.count)
+        // Cut inside the second moof: the first fragment is reported, and endOffset says where the unparsed bytes begin.
+        let cut = data.prefix(data.count - 300 - 20)
+        let partial = try #require(try DASHFLACLayout.mediaPayload(segmentPrefix: cut))
+        #expect(partial.payloads.count == 1)
+        #expect(partial.endOffset == 16 + first.count)
+        #expect(Data(data[partial.payloads[0]]) == a)
+    }
+
+    @Test("a second mdat with no moof before it is malformed")
+    func orphanMdat() {
+        let first = fragment(sizes: [10], payload: Data(repeating: 1, count: 10))
+        #expect(throws: TidalError.self) { try DASHFLACLayout.mediaPayload(segmentPrefix: first + box("mdat", Data(repeating: 2, count: 4))) }
+    }
+
+    @Test("a trun data_offset that doesn't point at the mdat payload is malformed")
+    func badDataOffset() throws {
+        let payload = Data(repeating: 5, count: 40)
+        #expect(try DASHFLACLayout.mediaPayload(segmentPrefix: segment(sizes: [20, 20], payload: payload)) != nil)
+        for delta in [-4, 1, 16] {
+            let skewed = segment(sizes: [20, 20], payload: payload, dataOffsetDelta: delta)
+            #expect(throws: TidalError.self) { try DASHFLACLayout.mediaPayload(segmentPrefix: skewed) }
+        }
+    }
+
+    @Test("a crafted trun whose default size times count overflows is malformed, not a crash")
+    func overflowingRun() {
+        let mfhd = box("mfhd", be32(0) + be32(1))
+        // tfhd: default-base-is-moof + default-sample-size-present, size 0xFFFFFFFF.
+        let tfhd = box("tfhd", be32(0x020010) + be32(1) + be32(0xFFFF_FFFF))
+        // trun without sizes: count 0xFFFFFFFF.
+        let trun = box("trun", be32(0) + be32(0xFFFF_FFFF))
+        let data = box("moof", mfhd + box("traf", tfhd + trun)) + box("mdat", Data(repeating: 0, count: 8))
         #expect(throws: TidalError.self) { try DASHFLACLayout.mediaPayload(segmentPrefix: data) }
     }
 
