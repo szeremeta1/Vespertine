@@ -428,11 +428,11 @@ final class PlayerController {
     // MARK: Network renderer (UPnP renderers, beta)
 
     /// The network renderer playing in place of the engine, while one is the chosen output; nil: the engine plays, as always.
-    @ObservationIgnored private(set) var renderer: RendererPlayback?
+    @ObservationIgnored private(set) var renderer: (any NetworkPlayback)?
 
     /// Hands playback to `playback` (a network renderer) or back to the engine (nil). A song that was playing carries on, at
     /// its position, on the new one.
-    func useRenderer(_ playback: RendererPlayback?, missing: String? = nil) {
+    func useRenderer(_ playback: (any NetworkPlayback)?, missing: String? = nil) {
         let missing = playback == nil ? missing : nil
         guard playback !== renderer || missing != missingRenderer else { return }
         let wasActive = state == .playing || requested != nil
