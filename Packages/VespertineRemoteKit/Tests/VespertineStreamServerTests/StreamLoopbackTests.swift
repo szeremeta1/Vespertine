@@ -5,6 +5,7 @@
 //
 
 #if canImport(Network)
+import AVFAudio
 import Foundation
 import Network
 import Testing
@@ -12,7 +13,7 @@ import VespertineRemoteClient
 @testable import VespertineRemoteProtocol
 @testable import VespertineStreamServer
 
-private struct FlacMaker: StreamTranscoding {
+struct FlacMaker: StreamTranscoding {
     static let bytes = Data((0..<300_000).map { UInt8(truncatingIfNeeded: $0 &* 7 &+ 3) })
     func transcode(_ request: TranscodeRequest, to destination: URL, progress: @Sendable (Double) -> Void) async throws -> TranscodeResult {
         try Self.bytes.write(to: destination)
@@ -23,7 +24,7 @@ private struct FlacMaker: StreamTranscoding {
 }
 
 /// A Mac that welcomes a phone at the version its hello negotiates, and serves stream commands from a real `StreamPreparer`.
-private final class StreamMac: @unchecked Sendable {
+final class StreamMac: @unchecked Sendable {
     let listener: NWListener
     private let queue = DispatchQueue(label: "stream-loopback.server")
     let info = ServerInfo(name: "Test Mac", serverID: "S-TEST", appVersion: "1.2.0")
@@ -84,14 +85,14 @@ private final class StreamMac: @unchecked Sendable {
     deinit { listener.cancel() }
 }
 
-private final class OnceBox: @unchecked Sendable {
+final class OnceBox: @unchecked Sendable {
     private let lock = NSLock()
     private var done = false
     func run(_ body: () -> Void) { let go = lock.withLock { () -> Bool in defer { done = true }; return !done }; if go { body() } }
 }
 
 @MainActor
-private func waitUntil(_ condition: () -> Bool, seconds: Double = 5) async -> Bool {
+func waitUntil(_ condition: () -> Bool, seconds: Double = 5) async -> Bool {
     let deadline = Date().addingTimeInterval(seconds)
     while Date() < deadline {
         if condition() { return true }
@@ -100,25 +101,29 @@ private func waitUntil(_ condition: () -> Bool, seconds: Double = 5) async -> Bo
     return condition()
 }
 
-private struct Rig {
+struct WireRig {
     let dir: URL
     let mac: StreamMac
     let session: RemoteSession
     let original: Data
 
     @MainActor
-    static func make(allowed: Bool = true) async throws -> Rig {
+    static func make(allowed: Bool = true) async throws -> WireRig {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("stream-loop-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         let flac = dir.appendingPathComponent("a.flac")
         let original = Data((0..<500_000).map { UInt8(truncatingIfNeeded: $0 &* 13 &+ 1) })
         try original.write(to: flac)
+        let wav = dir.appendingPathComponent("c.wav")
+        try Self.writeTone(to: wav)
         let dsf = dir.appendingPathComponent("b.dsf")
         try Data(count: 1000).write(to: dsf)
         let now = Date(timeIntervalSince1970: 1)
         let songs: [Int64: StreamSourceFacts] = [
             1: StreamSourceFacts(id: 1, url: flac, fileExtension: "flac", codec: "FLAC", isDSD: false, isLossless: true, sampleRate: 96_000, bitDepth: 24, channels: 2,
                                  duration: 10, fileSize: Int64(original.count), modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
+            3: StreamSourceFacts(id: 3, url: wav, fileExtension: "wav", codec: "WAV", isDSD: false, isLossless: true, sampleRate: 44_100, bitDepth: 16, channels: 2,
+                                 duration: 1, fileSize: Int64((try? Data(contentsOf: wav).count) ?? 0), modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
             2: StreamSourceFacts(id: 2, url: dsf, fileExtension: "dsf", codec: "DSD", isDSD: true, isLossless: true, sampleRate: 2_822_400, bitDepth: 1, channels: 6,
                                  duration: 10, fileSize: 1000, modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
         ]
@@ -131,20 +136,31 @@ private struct Rig {
         let session = RemoteSession(pairing: saved, clientName: "Test phone") { _ in endpoint }
         session.connect()
         guard await waitUntil({ session.isConnected }) else { throw RigError.notConnected }
-        return Rig(dir: dir, mac: mac, session: session, original: original)
+        return WireRig(dir: dir, mac: mac, session: session, original: original)
     }
 
     enum RigError: Error { case notConnected }
+
+    /// One second of two tones, 16-bit stereo WAV at 44.1 kHz (a file Core Audio opens, as on the phone).
+    static func writeTone(to url: URL) throws {
+        let settings: [String: Any] = [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: 44_100.0, AVNumberOfChannelsKey: 2,
+                                       AVLinearPCMBitDepthKey: 16, AVLinearPCMIsFloatKey: false, AVLinearPCMIsBigEndianKey: false]
+        let file = try AVAudioFile(forWriting: url, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
+        let buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: 44_100)!
+        buffer.frameLength = 44_100
+        for c in 0..<2 { for i in 0..<44_100 { buffer.floatChannelData![c][i] = Float(0.25 * sin(2 * Double.pi * (300 + 150 * Double(c)) * Double(i) / 44_100)) } }
+        try file.write(from: buffer)
+    }
 }
 
 @Suite(.serialized) @MainActor struct StreamOverTheWire {
     @Test func aPhoneThatSpeaksVersionTwoLearnsTheMacCanStream() async throws {
-        let rig = try await Rig.make(); defer { try? FileManager.default.removeItem(at: rig.dir) }
+        let rig = try await WireRig.make(); defer { try? FileManager.default.removeItem(at: rig.dir) }
         #expect(rig.session.canStream)
     }
 
     @Test func aWholeSongReadInRangesIsByteForByteTheFile() async throws {
-        let rig = try await Rig.make(); defer { try? FileManager.default.removeItem(at: rig.dir) }
+        let rig = try await WireRig.make(); defer { try? FileManager.default.removeItem(at: rig.dir) }
         guard case .streamOpened(let descriptor) = await rig.session.send(.streamOpen(id: 1, maxSampleRate: nil)) else { Issue.record("not opened"); return }
         #expect(descriptor.kind == .original && descriptor.byteSize == Int64(rig.original.count) && descriptor.format.container == "flac")
         var received = Data()
@@ -161,7 +177,7 @@ private struct Rig {
     }
 
     @Test func manyReadsInFlightAreMatchedToTheirOwnRanges() async throws {
-        let rig = try await Rig.make(); defer { try? FileManager.default.removeItem(at: rig.dir) }
+        let rig = try await WireRig.make(); defer { try? FileManager.default.removeItem(at: rig.dir) }
         guard case .streamOpened(let d) = await rig.session.send(.streamOpen(id: 1, maxSampleRate: nil)) else { Issue.record("not opened"); return }
         let session = rig.session
         let original = rig.original
@@ -178,7 +194,7 @@ private struct Rig {
     }
 
     @Test func aDsdFiveOneIsConvertedAndItsSpeakersTravelWithIt() async throws {
-        let rig = try await Rig.make(); defer { try? FileManager.default.removeItem(at: rig.dir) }
+        let rig = try await WireRig.make(); defer { try? FileManager.default.removeItem(at: rig.dir) }
         var descriptor: StreamDescriptor?
         for _ in 0..<100 {
             let reply = await rig.session.send(.streamOpen(id: 2, maxSampleRate: 48_000))
@@ -193,7 +209,7 @@ private struct Rig {
     }
 
     @Test func aRefusedReadThrowsTheMacsReason() async throws {
-        let rig = try await Rig.make(); defer { try? FileManager.default.removeItem(at: rig.dir) }
+        let rig = try await WireRig.make(); defer { try? FileManager.default.removeItem(at: rig.dir) }
         do {
             _ = try await rig.session.readStream(99, offset: 0, length: 10)
             Issue.record("a read of a stream that isn't open succeeded")
@@ -203,7 +219,7 @@ private struct Rig {
     }
 
     @Test func streamingTurnedOffOnTheMacIsSaidInWords() async throws {
-        let rig = try await Rig.make(allowed: false); defer { try? FileManager.default.removeItem(at: rig.dir) }
+        let rig = try await WireRig.make(allowed: false); defer { try? FileManager.default.removeItem(at: rig.dir) }
         guard case .failed(let reason) = await rig.session.send(.streamOpen(id: 1, maxSampleRate: nil)) else { Issue.record("opened"); return }
         #expect(reason.contains("Settings"))
     }
