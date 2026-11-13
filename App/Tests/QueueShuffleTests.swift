@@ -44,6 +44,34 @@ struct QueueShuffleTests {
         player.jump(to: try #require(player.queue.first { $0.track.title == title }?.id))
     }
 
+    @Test("Jumping past songs in Playing Next leaves them behind the song playing, as the Mac's Up Next does (the phone remote jumps the same way)")
+    func jumpingPastPlayingNextSongs() throws {
+        try fixture { player, album, x, y in
+            player.play(album)
+            player.playNext([x, y])
+            #expect(titles(player.playingNext) == ["X", "Y"])
+            try jump(player, to: "Y")
+            #expect(player.current?.track.title == "Y")
+            // X had its turn (skipped): it is no longer upcoming; the rest of the album carries on.
+            #expect(titles(player.upcoming) == ["S2", "S3", "S4", "S5"])
+            #expect(titles(player.queue) == ["S1", "X", "Y", "S2", "S3", "S4", "S5"])
+        }
+    }
+
+    @Test("Play Next goes ahead of what was added before; Add to Queue goes after it, both before the rest of the album")
+    func playNextAndAddToQueuePlacement() throws {
+        try fixture { player, album, x, y in
+            player.play(album)
+            player.addToQueue([x])
+            player.addToQueue([y])
+            #expect(titles(player.playingNext) == ["X", "Y"])
+            #expect(titles(player.continuing) == ["S2", "S3", "S4", "S5"])
+            var z = x; z.id = 8; z.title = "Z"; z.location = "/nowhere/Z.wav"; z.filePath = z.location
+            player.playNext([z])
+            #expect(titles(player.playingNext) == ["Z", "X", "Y"])
+        }
+    }
+
     @Test("Turning shuffle off during a song added with Play Next carries on with the album from where it was")
     func shuffleOffDuringAPlayNextSong() throws {
         try fixture { player, album, x, _ in
