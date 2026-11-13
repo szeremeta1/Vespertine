@@ -17,6 +17,8 @@ let package = Package(
         // The Mac's side of the stream channel: what to send for a song (the file or a FLAC made from it), the transcode
         // cache, and ranged reads. Plain Foundation: the actual conversion is injected (VespertineAudio does it in the app).
         .library(name: "VespertineStreamServer", targets: ["VespertineStreamServer"]),
+        // The phone's player (M3 skeleton, behind a feature flag): downloads a stream's bytes and plays them with AVAudioEngine.
+        .library(name: "VespertinePhonePlayer", targets: ["VespertinePhonePlayer"]),
         // A command-line remote for testing a Mac's remote server (pair, send commands, watch what it pushes).
         .executable(name: "vespertine-remote", targets: ["vespertine-remote"]),
     ],
@@ -24,8 +26,10 @@ let package = Package(
         .target(name: "VespertineRemoteProtocol"),
         .target(name: "VespertineRemoteClient", dependencies: ["VespertineRemoteProtocol"]),
         .target(name: "VespertineStreamServer", dependencies: ["VespertineRemoteProtocol"]),
+        .target(name: "VespertinePhonePlayer", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient"]),
         .executableTarget(name: "vespertine-remote", dependencies: ["VespertineRemoteProtocol"]),
         .testTarget(name: "VespertineRemoteProtocolTests", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient"]),
         .testTarget(name: "VespertineStreamServerTests", dependencies: ["VespertineStreamServer", "VespertineRemoteProtocol", "VespertineRemoteClient"]),
+        .testTarget(name: "VespertinePhonePlayerTests", dependencies: ["VespertinePhonePlayer", "VespertineRemoteProtocol", "VespertineRemoteClient"]),
     ]
 )
