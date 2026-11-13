@@ -112,3 +112,24 @@ struct RAOPSessionTests {
         #expect(Date().timeIntervalSince(start) < 6)
     }
 }
+
+@Suite("RTSP connection")
+struct RTSPConnectionTests {
+    @Test("Requests sent at once are answered in order, each with its own answer")
+    func serialized() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        let connection = RTSPConnection(endpoint: endpoint(receiver))
+        try await connection.connect()
+        #expect(await connection.remoteAddress == "127.0.0.1")
+        let answers = try await withThrowingTaskGroup(of: (Int, String?).self) { group in
+            for i in 0..<20 {
+                group.addTask { (i, try await connection.send(.request("OPTIONS", "*", headers: [("CSeq", String(i))]))["CSeq"]) }
+            }
+            return try await group.reduce(into: []) { $0.append($1) }
+        }
+        #expect(answers.count == 20)
+        #expect(answers.allSatisfy { String($0.0) == $0.1 })
+        await connection.close()
+    }
+}
