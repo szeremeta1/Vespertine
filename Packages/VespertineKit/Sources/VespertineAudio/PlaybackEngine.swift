@@ -83,6 +83,9 @@ public enum EngineEvent: Sendable {
     case deviceNotResponding(String)
     /// DACs of a speaker group set to carry on went away (`without`, by name); the group plays on with the others.
     case speakerGroupCarriesOn(group: String, without: [String])
+    /// Something to tell the listener about the output while playback carries on as it was (a network renderer refused a
+    /// pause or seek). Not sent by the engine itself.
+    case notice(String)
 }
 
 public struct EngineSettings: Sendable, Equatable {

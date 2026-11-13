@@ -73,6 +73,7 @@ public final class RendererPlayback: @unchecked Sendable {
         var next: Entry?
         var anchor: (position: TimeInterval, at: Date)?
         var pendingSeek: TimeInterval?
+        var pendingSeekTries = 0
         var failedPolls = 0
         var wantsPlaying = false
         var shutDown = false
@@ -118,6 +119,10 @@ public final class RendererPlayback: @unchecked Sendable {
     // MARK: Commands (any thread)
 
     public func play(_ item: PlayableItem) { play(item, at: 0, announce: true) }
+
+    /// Plays `item` from `seconds` in (an output change carrying a song over): the position is reached once the renderer
+    /// plays, not asked of it while it is still loading.
+    public func play(_ item: PlayableItem, at seconds: TimeInterval) { play(item, at: seconds, announce: true) }
 
     private func play(_ item: PlayableItem, at seconds: TimeInterval, announce: Bool) {
         let g = generation.withLock { $0 += 1; return $0 }
@@ -175,9 +180,9 @@ public final class RendererPlayback: @unchecked Sendable {
             case .play(let item, let at, let announce, let g):
                 guard generation.withLock({ $0 }) == g else { return }   // overtaken by a later skip or stop
                 try await start(item, at: at, announce: announce, generation: g)
-            case .pause: try await transport.pause()
-            case .resume: try await transport.play()
-            case .seek(let seconds): try await seek(seconds)
+            case .pause: await retrying(String(localized: "pause")) { try await self.transport.pause() }
+            case .resume: await retrying(String(localized: "play")) { try await self.transport.play() }
+            case .seek(let seconds): await retrying(String(localized: "seek")) { try await self.seek(seconds) }
             case .stop:
                 try? await transport.stop()
                 let old = state.withLock { s -> [Entry] in
@@ -193,6 +198,17 @@ public final class RendererPlayback: @unchecked Sendable {
             let item = state.withLock { $0.current?.item ?? $0.snapshot.item }
             log.error("Renderer \(self.renderer.name, privacy: .public): \(String(describing: error), privacy: .public)")
             fail(item, error)
+        }
+    }
+
+    /// Pause, play and seek: a renderer busy changing state refuses them now and then (UPnP 701, "transition not available").
+    /// Tried again once after a moment; refused again, the listener is told and the song plays on as it was.
+    private func retrying(_ what: String, _ body: @escaping () async throws -> Void) async {
+        do { try await body(); return } catch {}
+        try? await Task.sleep(for: .milliseconds(300))
+        do { try await body() } catch {
+            let reason = (error as? UPnPError)?.message ?? error.localizedDescription
+            emit(.notice(String(localized: "\(renderer.name) didn't \(what) (\(reason)).", comment: "%1$@ is a network player's name, %2$@ an action (pause, play, seek), %3$@ the reason.")))
         }
     }
 
@@ -282,6 +298,7 @@ public final class RendererPlayback: @unchecked Sendable {
                 s.anchor = nil
                 s.failedPolls = 0
                 s.pendingSeek = current.processedFile == nil && seconds > 0 ? seconds : nil
+                s.pendingSeekTries = 0
                 s.snapshot.item = item
                 s.snapshot.signalPath = current.path
                 s.snapshot.position = seconds
@@ -368,8 +385,14 @@ public final class RendererPlayback: @unchecked Sendable {
             if current.announces { emit(.trackStarted(item)) }
         }
         if let seek = state.withLock({ $0.pendingSeek }), status.state == .playing, status.currentURI == current.mediaURL {
-            state.withLock { $0.pendingSeek = nil }
-            try? await transport.seek(to: seek)
+            do {
+                try await transport.seek(to: seek)
+                state.withLock { $0.pendingSeek = nil }
+            } catch {
+                // Still settling: tried again at the next polls, then given up on (the song plays from where it is).
+                let giveUp = state.withLock { s -> Bool in s.pendingSeekTries += 1; if s.pendingSeekTries >= 5 { s.pendingSeek = nil; return true }; return false }
+                if giveUp { emit(.notice(String(localized: "\(renderer.name) didn't seek (\((error as? UPnPError)?.message ?? error.localizedDescription)).", comment: "%1$@ is a network player's name, %2$@ the reason."))) }
+            }
             return
         }
         let ended = state.withLock { s -> Bool in

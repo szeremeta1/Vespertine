@@ -29,7 +29,7 @@ final class FakeRenderer: @unchecked Sendable {
     private var state = "Stopped"        // OpenHome words; AV maps them
     private var seconds = 0
     private var _fetched: [String: Data] = [:]
-    private var failures: [String: Int] = [:]
+    private var failures: [String: (code: Int, times: Int)] = [:]
     private var sourceIndex = 0          // starts on the radio, as a real one may
 
     init(kind: Kind) async throws {
@@ -58,7 +58,7 @@ final class FakeRenderer: @unchecked Sendable {
 
     func setPosition(_ s: Int) { lock.withLock { seconds = s } }
     /// The next call of `action` fails with UPnP error `code`.
-    func fail(_ action: String, code: Int) { lock.withLock { failures[action] = code } }
+    func fail(_ action: String, code: Int, times: Int = 1) { lock.withLock { failures[action] = (code, times) } }
 
     /// The bytes fetched from `uri` once the fetch is complete (waits up to 10 s).
     func fetched(_ uri: String) async -> Data? {
@@ -122,7 +122,10 @@ final class FakeRenderer: @unchecked Sendable {
         var toFetch: String?
         let result: Result<[(String, String)], FakeFault> = lock.withLock {
             _calls.append(Call(service: service, action: action, arguments: arguments))
-            if let code = failures.removeValue(forKey: action) { return .failure(FakeFault(code: code)) }
+            if let failure = failures[action] {
+                failures[action] = failure.times > 1 ? (failure.code, failure.times - 1) : nil
+                return .failure(FakeFault(code: failure.code))
+            }
             switch (service, action) {
             case ("ConnectionManager", "GetProtocolInfo"): return .success([("Source", ""), ("Sink", sink)])
             case ("Product", "SourceXml"):

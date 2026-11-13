@@ -451,8 +451,14 @@ final class PlayerController {
         }
         signalPath = nil
         if let carried {
-            start(carried)
-            if at > 1 { seek(to: at) }
+            if let playback {
+                // The renderer reaches the position once it plays (asked while it loads, it refuses).
+                start(carried, at: at > 1 ? at : 0)
+
+            } else {
+                start(carried)
+                if at > 1 { seek(to: at) }
+            }
         }
     }
 
@@ -553,7 +559,7 @@ final class PlayerController {
     /// play as well; Play then tries that song again, as before.
     @ObservationIgnored private var failedSinceStart = false
 
-    private func start(_ entry: QueueEntry) {
+    private func start(_ entry: QueueEntry, at seconds: TimeInterval = 0) {
         requested = entry.id
         requestedState = nil
         seekRestart = nil
@@ -569,7 +575,15 @@ final class PlayerController {
         channelLevels = []
         shares.skipped(to: entry.track, upcoming: upcoming.map(\.track))
         rendererInfo?.withLock { $0[entry.id] = Self.rendererInfo(entry.track) }
-        if let renderer { renderer.play(entry.item) } else { engine.play(entry.item) }
+        if let renderer {
+            if seconds > 0 {
+                position = seconds
+                requestedPosition = (seconds, .now)
+            }
+            renderer.play(entry.item, at: seconds)
+        } else {
+            engine.play(entry.item)
+        }
         updateNowPlayingInfo()
     }
 
@@ -704,6 +718,8 @@ final class PlayerController {
                 : String(localized: "\(name) didn’t come back. Press play to continue on another output.", comment: "%@ is the name of an audio output device.")
         case .deviceNotResponding(let name):
             lastError = String(localized: "\(name) is connected but won’t start. Quit and reopen Vespertine, then press play.", comment: "%@ is the name of an audio output device.")
+        case .notice(let message):
+            lastError = message
         case .speakerGroupCarriesOn(let group, let without):
             guard !without.isEmpty else { break }
             let names = ListFormatter.localizedString(byJoining: without)
