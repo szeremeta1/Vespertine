@@ -196,14 +196,15 @@ struct AlbumView: View {
             Section {
                 ViewThatFits(in: .horizontal) {
                     if sizeClass == .regular && !typeSize.isAccessibilitySize {
-                        HStack(spacing: 28) {
+                        HStack(alignment: .bottom, spacing: 28) {
                             ArtworkView(key: album.artworkKey, size: 800, cornerRadius: 10).frame(width: 240, height: 240)
-                            albumInfo.frame(minWidth: 260, maxWidth: 520)
+                            albumInfo(leading: true).frame(minWidth: 260, maxWidth: 420)
+                            Spacer(minLength: 0)
                         }
                     }
                     VStack(spacing: 16) {
                         ArtworkView(key: album.artworkKey, size: 800, cornerRadius: 10).frame(maxWidth: 280)
-                        albumInfo
+                        albumInfo(leading: false)
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -217,9 +218,9 @@ struct AlbumView: View {
         .task(id: session.isConnected) { if tracks.isEmpty, case .tracks(let items) = await session.send(.albumTracks(key: album.key)) { tracks = items } }
     }
 
-    private var albumInfo: some View {
-        VStack(spacing: 10) {
-            Text(album.title).font(.serif(.title3, weight: .semibold)).multilineTextAlignment(.center)
+    private func albumInfo(leading: Bool) -> some View {
+        VStack(alignment: leading ? .leading : .center, spacing: 10) {
+            Text(album.title).font(.serif(leading ? .title2 : .title3, weight: .semibold)).multilineTextAlignment(leading ? .leading : .center)
             Text(album.artist).foregroundStyle(Palette.text2)
             HStack(spacing: 6) {
                 Chip(text: album.format, highlighted: album.hiRes || album.dsd)

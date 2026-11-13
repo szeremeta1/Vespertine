@@ -49,10 +49,12 @@ nonisolated enum RemoteLayout {
     static func playerColumns(width: CGFloat, height: CGFloat, accessibilityText: Bool) -> Bool {
         !accessibilityText && width >= 680 && height >= 260 && width > height * 1.05
     }
+    /// Width of the player's text and controls column (the cover matches it when stacked).
+    static func controlsWidth(width: CGFloat) -> CGFloat { max(0, min(560, width - 48)) }
     static func coverSide(width: CGFloat, height: CGFloat, columns: Bool) -> CGFloat {
         let available = max(0, width - 48)
         if columns { return max(0, min(520, (available - 32) * 0.48, height - 24)) }
-        return max(0, min(480, available, max(160, height - 440)))
+        return max(0, min(controlsWidth(width: width), max(160, height - 440)))
     }
     static func albumColumns(width: CGFloat, accessibilityText: Bool) -> Int {
         let minimum: CGFloat = accessibilityText ? 240 : 160

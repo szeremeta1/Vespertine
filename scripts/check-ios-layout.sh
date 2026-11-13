@@ -7,7 +7,7 @@ cat > build/layout-checks/main.swift <<'SWIFT'
 import XCTest
 let suite = XCTestSuite(forTestCaseClass: AdaptiveLayoutTests.self)
 suite.run()
-guard let result = suite.testRun, result.executionCount == 6, result.failureCount == 0 else {
+guard let result = suite.testRun, result.executionCount == 7, result.failureCount == 0 else {
     fatalError("Layout tests did not all pass")
 }
 SWIFT

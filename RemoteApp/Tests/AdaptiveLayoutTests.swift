@@ -32,13 +32,23 @@ final class AdaptiveLayoutTests: XCTestCase {
                 let side = RemoteLayout.coverSide(width: width, height: height, columns: columns)
                 XCTAssertGreaterThanOrEqual(side, 0)
                 XCTAssertLessThanOrEqual(side, width - 48)
-                XCTAssertLessThanOrEqual(side, 520)
+                XCTAssertLessThanOrEqual(side, 560)
                 if columns {
                     XCTAssertLessThanOrEqual(side, height - 24)
                     XCTAssertGreaterThanOrEqual(width - 48 - 32 - side, 300)
                 }
             }
         }
+    }
+    func testStackedCoverLinesUpWithTheControlsWhenThereIsRoom() {
+        // iPad portrait and Split View: the cover is as wide as the title, scrubber and transport beneath it.
+        for (width, height) in [(CGFloat(1032), CGFloat(1376)), (700, 1100), (744, 1000), (600, 1000)] {
+            XCTAssertFalse(RemoteLayout.playerColumns(width: width, height: height, accessibilityText: false))
+            XCTAssertEqual(RemoteLayout.coverSide(width: width, height: height, columns: false),
+                           RemoteLayout.controlsWidth(width: width), accuracy: 0.5)
+        }
+        // Short windows shrink the cover but never make it wider than the controls.
+        XCTAssertLessThan(RemoteLayout.coverSide(width: 700, height: 600, columns: false), RemoteLayout.controlsWidth(width: 700))
     }
     func testAlbumGridAdaptsWithoutTinyCovers() {
         XCTAssertEqual(RemoteLayout.albumColumns(width: 320, accessibilityText: false), 1)
