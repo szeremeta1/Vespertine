@@ -145,14 +145,20 @@ public struct SOAPClient: Sendable {
         return try SOAP.parseResponse(data, action: action)
     }
 
-    /// GET of a description or SCPD.
-    public func get(_ url: URL) async throws -> Data {
+    /// GET of a description or SCPD, at most `limit` bytes (more is an error, and isn't read).
+    public func get(_ url: URL, limit: Int = 1 << 20) async throws -> Data {
         var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: timeout)
         request.httpMethod = "GET"
         do {
-            let (data, response) = try await Self.session.data(for: request)
+            let (bytes, response) = try await Self.session.bytes(for: request)
             let status = (response as? HTTPURLResponse)?.statusCode ?? 0
             guard status == 200 else { throw UPnPError.http(status) }
+            if response.expectedContentLength > Int64(limit) { throw UPnPError.badResponse }
+            var data = Data()
+            for try await byte in bytes {
+                data.append(byte)
+                if data.count > limit { throw UPnPError.badResponse }
+            }
             return data
         } catch let error as UPnPError {
             throw error

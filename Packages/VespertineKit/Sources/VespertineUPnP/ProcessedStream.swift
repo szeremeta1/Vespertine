@@ -37,6 +37,7 @@ public enum FLACStreamWriter {
         guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frames), let words = buffer.int32ChannelData?[0] else {
             throw RendererPlaybackError.unplayable("FLAC buffer")
         }
+        guard !isCancelled() else { return }
         while !isCancelled() {
             let samples = render.next(maxFrames: Int(frames))
             if samples.isEmpty { break }
@@ -75,6 +76,8 @@ public final class ProcessedStreamMaker: ProcessedStreamMaking, @unchecked Senda
                 log.error("Processed stream failed: \(String(describing: error), privacy: .public)")
                 file.fail()
             }
+            // Let go of while it was starting or writing: the encoder may have made the file again after it was removed.
+            if file.isAbandoned { try? FileManager.default.removeItem(at: file.url) }
         }
         thread.name = "Vespertine renderer stream"
         thread.qualityOfService = .userInitiated
