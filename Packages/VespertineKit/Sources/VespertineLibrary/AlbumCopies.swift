@@ -71,6 +71,10 @@ public struct AlbumCopy: Sendable, Hashable, Identifiable {
     /// How many of the album's songs this copy has, and how many songs the album has across its copies.
     public internal(set) var songCount: Int
     public internal(set) var albumSongCount: Int
+    /// The album as the TIDAL account has it (streamed, or downloaded: a download is still this copy).
+    public let isTidal: Bool
+    /// Some of its songs have to be streamed: no file stands in for them.
+    public var isStreamed: Bool { tracks.contains { $0.isTidalTrack && $0.filePath.isEmpty } }
 
     public var isComplete: Bool { songCount >= albumSongCount }
     public var isLossless: Bool { tracks.allSatisfy(\.isLossless) }
@@ -136,7 +140,9 @@ public struct AlbumCopies: Sendable {
     /// in the folder name, then the folder's own name). Two copies never read the same unless their folders do.
     public func labels(location: (String) -> String = { ($0 as NSString).lastPathComponent }) -> [String: String] {
         var labels: [String: String] = [:]
-        let bySummary = Dictionary(grouping: copies, by: \.summary)
+        // The TIDAL account's copy is named for what it is; the others are told apart as they always were.
+        for c in copies where c.isTidal { labels[c.id] = "TIDAL" }
+        let bySummary = Dictionary(grouping: copies.filter { !$0.isTidal }, by: \.summary)
         for (summary, group) in bySummary {
             if group.count == 1 { labels[group[0].id] = summary; continue }
             let byEdition = Dictionary(grouping: group) { $0.edition ?? "" }
@@ -202,7 +208,7 @@ public enum LibraryCopies {
         for s in songs { for id in s.copyIDs { counts[id, default: 0] += 1 } }
         let copies = raw.map { c in
             AlbumCopy(id: c.id, tracks: c.tracks, folder: c.folder, layout: c.layout, format: c.format, edition: c.edition,
-                      place: c.place, songCount: counts[c.id] ?? 0, albumSongCount: songs.count)
+                      place: c.place, songCount: counts[c.id] ?? 0, albumSongCount: songs.count, isTidal: c.tracks.contains(where: \.isTidalTrack))
         }
         return AlbumCopies(copies: copies, songs: ordered(songs))
     }
@@ -306,6 +312,8 @@ public enum LibraryCopies {
     /// The folder that holds the album: the file's folder, or the one above disc and layer folders ("CD 01",
     /// "Digital Media 02", "Stereo", "Multichannel 5.1", "VIDEO_TS"). A disc image is a copy of its own.
     public static func albumFolder(_ t: Track) -> String {
+        // The TIDAL account is one place, however many of its songs are downloaded and wherever the downloads are.
+        if t.isTidalTrack { return LibrarySource.tidalPath }
         if t.sacdArea != nil || (t.dvdStream != nil && !t.isDVDFolderTrack) { return t.filePath }
         var dir = (t.filePath as NSString).deletingLastPathComponent
         for _ in 0..<3 {
@@ -387,8 +395,10 @@ public enum LibraryCopies {
     struct MatchKey {
         let recording: String?, isrc: String?, strict: String, loose: String
         let duration: Double, disc: Int, number: Int?
+        let isTidal: Bool
 
         init(_ t: Track) {
+            isTidal = t.isTidalTrack
             recording = t.musicBrainzRecordingID.flatMap { $0.isEmpty ? nil : $0.lowercased() }
             isrc = t.isrc.flatMap { $0.isEmpty ? nil : $0.uppercased() }
             strict = LibraryCopies.strictTitle(t.title)
@@ -428,7 +438,8 @@ public enum LibraryCopies {
             } else { return 0 }
             // Lengths unknown (0) don't count against a match.
             if duration > 0, o.duration > 0 {
-                let delta = abs(duration - o.duration), tolerance = max(6, 0.04 * max(duration, o.duration))
+                // A song of the TIDAL account against a file: the lengths must agree within 2 s (the files' own tolerance is wider).
+                let delta = abs(duration - o.duration), tolerance = isTidal != o.isTidal ? 2 : max(6, 0.04 * max(duration, o.duration))
                 guard delta <= tolerance else { return 0 }
                 score += Int(50 * (1 - delta / tolerance))
             }
@@ -479,9 +490,11 @@ extension AlbumCopies {
         guard copies.count > 1 else { return copies.first }
         let most = copies.map(\.songCount).max() ?? 0
         // Copies equal in all of these: the first, which has the most songs.
+        // A copy streamed from TIDAL ranks below files at equal layout and losslessness: the format TIDAL lists for it is unconfirmed
+        // until played, and it needs the network.
         func rank(_ c: AlbumCopy) -> (Int, Int, Int, Double, Int, Int) {
             (Double(c.songCount) >= 0.8 * Double(most) ? 1 : 0, c.layout.isMultichannel == wantsMultichannel ? 1 : 0,
-             c.isLossless ? 1 : 0, c.maxSampleRate, c.maxBitDepth, isLocal(c) ? 1 : 0)
+             (c.isLossless ? 2 : 0) + (c.isStreamed ? 0 : 1), c.maxSampleRate, c.maxBitDepth, isLocal(c) ? 1 : 0)
         }
         return copies.enumerated().max { a, b in
             let (ra, rb) = (rank(a.element), rank(b.element))

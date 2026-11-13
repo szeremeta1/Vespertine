@@ -55,8 +55,9 @@ public enum TrackVersions {
         let match = versions.filter { $0.isMultichannel == wantsMultichannel }
         let pool = match.isEmpty ? versions : match
         if let preferred = pool.first(where: isPreferred) { return preferred }
+        // A TIDAL song with no file (streamed) ranks below a file of the same kind of format: its listed format is unconfirmed.
         func rank(_ t: Track) -> (Int, Int, Double, Int, Int) {
-            (t.isLossless ? 1 : 0, t.channels, t.sampleRate, t.bitDepth ?? (t.isDSD ? 1 : 0), isLocal(t) ? 1 : 0)
+            ((t.isLossless ? 2 : 0) + (t.isTidalTrack && t.filePath.isEmpty ? 0 : 1), t.channels, t.sampleRate, t.bitDepth ?? (t.isDSD ? 1 : 0), isLocal(t) ? 1 : 0)
         }
         return pool.enumerated().max { a, b in
             let (ra, rb) = (rank(a.element), rank(b.element))
