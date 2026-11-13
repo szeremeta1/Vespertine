@@ -267,11 +267,20 @@ struct NetworkPlaybackCacheTests {
         let cache = NetworkPlaybackCache(directory: dir, budget: 1 << 20, chunk: 4096)
         let entry = try cache.entry(key: "song", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
         let seen = Locked([Int64]())
+        let whole = DispatchSemaphore(value: 0)
+        let size = entry.size
         share.stall(true)
-        entry.setProgress { copied in seen.withLock { $0.append(copied) } }
+        entry.setProgress { copied in
+            seen.withLock { $0.append(copied) }
+            if copied == size { whole.signal() }
+        }
         share.stall(false)
         try entry.prepare(full: true, lead: 0, cancelled: { false })
         #expect(entry.copiedBytes == entry.size)
+        // `prepare` returns the moment the last block is on disk; the copy thread that wrote it reports it an instant later (a
+        // report is made after the block is marked local, under its own lock), so the report of the whole file is waited for,
+        // not assumed to be in already. It always comes: a bounded wait, and a copy that never reports it fails here.
+        #expect(whole.wait(timeout: .now() + 30) == .success, "the whole file was never reported")
         let steps = seen.withLock { $0 }
         #expect(!steps.isEmpty && steps == steps.sorted() && steps.last == entry.size, "\(steps.suffix(3))")
         entry.setProgress(nil)
