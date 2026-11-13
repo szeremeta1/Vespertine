@@ -34,12 +34,8 @@ public final class GrowingFile: @unchecked Sendable {
     public var isAbandoned: Bool { lock.withLock { abandoned } }
     public func abandon() {
         lock.withLock { abandoned = true }
-        let url = self.url
-        Task.detached {
-            // Give the writer a moment to notice and close it.
-            try? await Task.sleep(for: .seconds(2))
-            try? FileManager.default.removeItem(at: url)
-        }
+        // Unlinked now: a writer still holding it open finishes into nothing and its space comes back when it closes.
+        try? FileManager.default.removeItem(at: url)
     }
 
     /// The writer gave up: readers stop where the file ends.
@@ -145,11 +141,13 @@ public final class MediaServer: @unchecked Sendable {
     }
 
     public func stop() {
-        let server = lock.withLock { () -> HTTPServer? in
+        let (server, dropped) = lock.withLock { () -> (HTTPServer?, [MediaResource]) in
             defer { self.server = nil; port = nil; resources.removeAll() }
-            return self.server
+            return (self.server, Array(resources.values))
         }
         server?.stop()
+        // Processed streams nobody can fetch any more: their encoders stop and their files go.
+        for case .growing(let file, _) in dropped { file.abandon() }
     }
 
     /// The URL `resource` is served at for a renderer at `host`; nil while not running or when no interface reaches it.

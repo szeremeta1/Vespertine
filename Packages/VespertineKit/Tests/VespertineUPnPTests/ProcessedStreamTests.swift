@@ -138,3 +138,49 @@ struct ProcessedStreamTests {
         #expect(events.all.filter { $0.hasPrefix("started") }.count == 1)   // a restart isn't a new song
     }
 }
+
+@Suite("Processed stream housekeeping", .serialized)
+struct ProcessedHousekeepingTests {
+    @Test("Stopping the media server abandons processed streams and deletes their files")
+    func stopDeletes() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-upnp-\(UUID().uuidString)")
+        let media = MediaServer()
+        try await media.start()
+        let wav = try makeWAV(seconds: 2, seed: 7)
+        let (file, _) = try ProcessedStreamMaker(directory: directory).makeStream(item: PlayableItem(url: wav), url: wav, settings: RendererSettings(), startSeconds: 0)
+        _ = try #require(media.register(.growing(file, mime: "audio/flac"), toward: "127.0.0.1"))
+        media.stop()
+        #expect(file.isAbandoned)
+        for _ in 0..<100 where ((try? FileManager.default.contentsOfDirectory(atPath: directory.path)) ?? []).contains(where: { $0.hasSuffix(".flac") }) {
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        #expect(((try? FileManager.default.contentsOfDirectory(atPath: directory.path)) ?? []).filter { $0.hasSuffix(".flac") }.isEmpty)
+    }
+
+    @Test("Dragging the volume restarts the stream once, after the drag, not once per step")
+    func debouncedRestart() async throws {
+        let fake = try await FakeRenderer(kind: .openHome)
+        let media = MediaServer()
+        try await media.start()
+        defer { media.stop(); fake.stop() }
+        let device = try await RendererDevice.load(location: fake.location)
+        let playback = RendererPlayback(renderer: device, transport: try device.makeTransport(), media: media,
+                                        processed: ProcessedStreamMaker(directory: FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-upnp-\(UUID().uuidString)")),
+                                        pollInterval: 0.05)
+        defer { playback.shutdown() }
+        let events = EventLog()
+        playback.eventHandler = { events.add($0) }
+        playback.update(settings: RendererSettings(digitalVolumeDB: -3))
+        try await Task.sleep(for: .milliseconds(400))
+        playback.play(PlayableItem(url: try makeWAV(seconds: 2, seed: 8)))
+        #expect(await events.wait(for: "started"))
+        let loadsBefore = fake.actions.filter { $0 == "DeleteAll" }.count
+        for step in 1...10 {
+            playback.update(settings: RendererSettings(digitalVolumeDB: -3 - Double(step)))
+            try await Task.sleep(for: .milliseconds(30))
+        }
+        try await Task.sleep(for: .milliseconds(900))
+        #expect(fake.actions.filter { $0 == "DeleteAll" }.count - loadsBefore == 1)
+        #expect(playback.snapshot.signalPath?.volume == .digital(dB: -13))
+    }
+}
