@@ -34,6 +34,7 @@ struct CoverFlowView: View {
         GeometryReader { geometry in
             let side = min(geometry.size.width * 0.6, max(110, (geometry.size.height - 230) / 1.42), 420)
             let layout = CoverFlowLayout(coverSide: side, flat: reduceMotion)
+            ScrollView {
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
                 stage(layout)
@@ -44,7 +45,9 @@ struct CoverFlowView: View {
                     .padding(.horizontal, 28).padding(.top, 14)
                 Spacer(minLength: 0)
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, minHeight: geometry.size.height)
+            }
+            .scrollBounceBehavior(.basedOnSize)
         }
         .background(floor.ignoresSafeArea())
         .feedback(feedback)
@@ -117,6 +120,11 @@ struct CoverFlowView: View {
         .rotation3DEffect(.degrees(layout.stagePitch(tilt: tilt)), axis: (x: 1, y: 0, z: 0), perspective: 0.4)
         .contentShape(Rectangle())
         .gesture(drag(layout))
+        .focusable()
+        .onKeyPress(.leftArrow) { move(to: front - 1); return .handled }
+        .onKeyPress(.rightArrow) { move(to: front + 1); return .handled }
+        .onKeyPress(.return) { opened = album; return .handled }
+        .hoverEffect(.highlight)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(album.map { Text("\($0.title), \($0.artist)") } ?? Text("No albums"))
         .accessibilityValue(albums.isEmpty ? Text(verbatim: "") : Text("Album \(front + 1) of \(albums.count)"))
@@ -171,7 +179,7 @@ struct CoverFlowView: View {
                         Label("Play", systemImage: "play.fill").frame(minWidth: 96)
                     }
                     .buttonStyle(.borderedProminent)
-                    .foregroundStyle(Color(hex: 0x1A140A))
+                    .foregroundStyle(Palette.base)
                     Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: true)) } label: {
                         Label("Shuffle", systemImage: "shuffle").frame(minWidth: 96)
                     }

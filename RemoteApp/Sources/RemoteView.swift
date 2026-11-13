@@ -8,46 +8,139 @@ import VespertineRemoteClient
 import VespertineRemoteProtocol
 
 struct RemoteView: View {
-    enum Tab: String, Hashable { case nowPlaying, library, queue, output }
-
     @Environment(RemoteAppModel.self) private var model
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let session: RemoteSession
-    @State private var tab: Tab = .nowPlaying
+    @State private var destination: RemoteDestination = .nowPlaying
+    @State private var visibility: NavigationSplitViewVisibility = .all
+    @State private var showingSettings = false
+    @State private var feedback = CommandFeedback()
 
     var body: some View {
-        VStack(spacing: 0) {
-            ConnectionBanner(session: session)
-            tabs
-        }
-        .background(Palette.surface.ignoresSafeArea(edges: .top))
-        .onAppear {
-            switch model.startScreen {
-            case "library", "albums", "coverFlow", "album", "artists": tab = .library
-            case "queue": tab = .queue
-            case "output": tab = .output
-            default: break
+        GeometryReader { geometry in
+            if RemoteLayout.usesSidebar(regularWidth: sizeClass == .regular, width: geometry.size.width) {
+                splitView.accessibilityIdentifier("regular-layout")
+            } else {
+                VStack(spacing: 0) {
+                    ConnectionBanner(session: session)
+                    tabs
+                }
+                .accessibilityIdentifier("compact-layout")
             }
+        }
+        .background(Palette.base.ignoresSafeArea())
+        .sheet(isPresented: $showingSettings) { SettingsView() }
+        .feedback(feedback)
+        .onAppear { destination = .starting(at: model.startScreen) }
+    }
+
+    private var splitView: some View {
+        NavigationSplitView(columnVisibility: $visibility) {
+            List(selection: Binding<RemoteDestination?>(get: { destination }, set: {
+                if let selected = $0 { destination = selected }
+            })) {
+                Section {
+                    sidebarLink(.nowPlaying)
+                    sidebarLink(.queue)
+                }
+                Section("Library") {
+                    sidebarLink(.library)
+                    sidebarLink(.artists)
+                    sidebarLink(.playlists)
+                    sidebarLink(.favorites)
+                }
+                Section("Mac") { sidebarLink(.output) }
+            }
+            .listStyle(.sidebar)
+            .obsidianList()
+            .navigationTitle(session.pairing.name)
+            .navigationSplitViewColumnWidth(min: 220, ideal: 250, max: 300)
+            .toolbar {
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Macs", systemImage: "desktopcomputer") { model.leave() }
+                }
+            }
+        } detail: {
+            VStack(spacing: 0) {
+                ConnectionBanner(session: session)
+                regularDetail.frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+            .background(Palette.base)
+            .toolbar {
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    navigationMenu
+                    Button { showingSettings = true } label: { Image(systemName: "gearshape") }
+                        .accessibilityLabel("Settings")
+                        .keyboardShortcut(",", modifiers: .command)
+                }
+            }
+        }
+        .navigationSplitViewStyle(.balanced)
+    }
+
+    private func sidebarLink(_ place: RemoteDestination) -> some View {
+        NavigationLink(value: place) { Label(place.title, systemImage: place.symbol) }
+            .accessibilityIdentifier("sidebar-" + place.rawValue)
+            .hoverEffect(.highlight)
+    }
+
+    @ViewBuilder private var regularDetail: some View {
+        switch destination {
+        case .nowPlaying:
+            NavigationStack {
+                NowPlayingView(session: session).navigationTitle("Now Playing")
+                    .navigationBarTitleDisplayMode(.inline)
+            }
+        case .queue:
+            QueueView(session: session).readablePane()
+                .miniPlayer(session: session) { destination = .nowPlaying }
+        case .output:
+            OutputsView(session: session).readablePane()
+                .miniPlayer(session: session) { destination = .nowPlaying }
+        case .library, .artists, .playlists, .favorites:
+            LibraryView(session: session, section: destination)
+                .id(destination)
+                .miniPlayer(session: session) { destination = .nowPlaying }
         }
     }
 
     private var tabs: some View {
-        TabView(selection: $tab) {
+        TabView(selection: Binding(get: { destination.compactTab }, set: { destination = $0 })) {
             NowPlayingView(session: session)
                 .tabItem { Label("Now Playing", systemImage: "play.circle") }
-                .tag(Tab.nowPlaying)
-            LibraryView(session: session)
-                .miniPlayer(session: session) { tab = .nowPlaying }
+                .tag(RemoteDestination.nowPlaying)
+            LibraryView(session: session, section: destination.isLibrary && destination != .library ? destination : nil)
+                .miniPlayer(session: session) { destination = .nowPlaying }
                 .tabItem { Label("Library", systemImage: "square.stack") }
-                .tag(Tab.library)
+                .tag(RemoteDestination.library)
             QueueView(session: session)
-                .miniPlayer(session: session) { tab = .nowPlaying }
+                .miniPlayer(session: session) { destination = .nowPlaying }
                 .tabItem { Label("Queue", systemImage: "list.bullet") }
-                .tag(Tab.queue)
+                .tag(RemoteDestination.queue)
             OutputsView(session: session)
-                .miniPlayer(session: session) { tab = .nowPlaying }
+                .miniPlayer(session: session) { destination = .nowPlaying }
                 .tabItem { Label("Output", systemImage: "hifispeaker") }
-                .tag(Tab.output)
+                .tag(RemoteDestination.output)
         }
+    }
+
+    private var navigationMenu: some View {
+        Menu {
+            Button("Now Playing") { destination = .nowPlaying }.keyboardShortcut("1")
+            Button("Library") { destination = .library }.keyboardShortcut("2")
+            Button("Queue") { destination = .queue }.keyboardShortcut("3")
+            Button("Output") { destination = .output }.keyboardShortcut("4")
+            Divider()
+            Button("Play / Pause") { feedback.run(session, .playPause) }.keyboardShortcut("p")
+                .disabled(!session.isConnected)
+            Button("Next") { feedback.run(session, .next) }.keyboardShortcut(.rightArrow, modifiers: [.command, .option])
+                .disabled(!session.isConnected)
+            Button("Previous") { feedback.run(session, .previous) }.keyboardShortcut(.leftArrow, modifiers: [.command, .option])
+                .disabled(!session.isConnected)
+        } label: {
+            Image(systemName: "ellipsis.circle")
+        }
+        .accessibilityLabel("Navigation and Playback")
     }
 }
 
@@ -76,11 +169,11 @@ struct MiniPlayer: View {
                 .accessibilityHint(Text("Opens Now Playing"))
                 Button { feedback.run(session, .playPause) } label: {
                     Image(systemName: session.player?.playback == .playing ? "pause.fill" : "play.fill")
-                        .font(.title3).frame(width: 40, height: 40).contentShape(Rectangle())
+                        .font(.title3).frame(width: 44, height: 44).contentShape(Rectangle())
                 }
                 .accessibilityLabel(session.player?.playback == .playing ? Text("Pause") : Text("Play"))
                 Button { feedback.run(session, .next) } label: {
-                    Image(systemName: "forward.fill").font(.body).frame(width: 36, height: 40).contentShape(Rectangle())
+                    Image(systemName: "forward.fill").font(.body).frame(width: 44, height: 44).contentShape(Rectangle())
                 }
                 .accessibilityLabel(Text("Next"))
             }
@@ -91,7 +184,9 @@ struct MiniPlayer: View {
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(alignment: .bottom) { MiniProgress(session: session).padding(.horizontal, 14) }
             .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
+            .frame(maxWidth: 760)
             .padding(.horizontal, 10).padding(.bottom, 6)
+            .frame(maxWidth: .infinity)
             .sensoryFeedback(.impact(weight: .light), trigger: session.player?.playback)
         }
     }
@@ -146,7 +241,7 @@ struct ConnectionBanner: View {
                 unreachable
             case .unpaired:
                 VStack(spacing: 8) {
-                    Text("“\(session.pairing.name)” no longer knows this iPhone. Pair it again from the Mac’s Settings › Remote.")
+                    Text("“\(session.pairing.name)” no longer knows this device. Pair it again from the Mac’s Settings › Remote.")
                     Button("Pair Again") { model.forget(session.pairing) }
                         .buttonStyle(.borderedProminent)
                 }
@@ -166,7 +261,7 @@ struct ConnectionBanner: View {
                 ProgressView()
                 Group {
                     if !model.isOnline {
-                        Text("This iPhone is offline. Vespertine Remote connects again when the network is back.")
+                        Text("This device is offline. Vespertine Remote connects again when the network is back.")
                     } else if hasAddress {
                         Text("Can’t reach “\(name)”. Trying again… Check that the Mac is awake with Vespertine open, and that Tailscale or your VPN is connected on both.")
                     } else {

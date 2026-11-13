@@ -1,5 +1,5 @@
 //
-// Vespertine Remote: how this iPhone reaches one paired Mac: on this network, or by an address (its Tailscale name,
+// Vespertine Remote: how this device reaches one paired Mac: on this network, or by an address (its Tailscale name,
 // say) from anywhere else.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
@@ -62,7 +62,7 @@ struct MacConnectionView: View {
                     } header: {
                         Text("Ways to reach “\(pairing.name)”")
                     } footer: {
-                        Text("Vespertine Remote tries these together and uses the first that answers. The connection is encrypted with this iPhone’s own key either way.")
+                        Text("Vespertine Remote tries these together and uses the first that answers. The connection is encrypted with this device’s own key either way.")
                     }
 
                     Section {
@@ -94,7 +94,7 @@ struct MacConnectionView: View {
                     } header: {
                         Text("Address for away from home")
                     } footer: {
-                        Text("Bonjour only finds the Mac on the same network. With Tailscale (or another VPN) on both the Mac and this iPhone, type the Mac’s Tailscale name or its 100.x address here. The Mac must be awake with Vespertine open; Settings › Remote on the Mac can keep it awake.")
+                        Text("Bonjour only finds the Mac on the same network. With Tailscale (or another VPN) on both the Mac and this device, type the Mac’s Tailscale name or its 100.x address here. The Mac must be awake with Vespertine open; Settings › Remote on the Mac can keep it awake.")
                     }
 
                     Section {

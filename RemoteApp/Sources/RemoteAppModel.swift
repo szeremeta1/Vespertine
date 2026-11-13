@@ -23,7 +23,7 @@ final class RemoteAppModel {
     let artwork = ArtworkCache()
     let settings = AppSettings()
     let tiltSensor = TiltSensor()
-    /// This iPhone has a network at all (Wi-Fi, cellular or a VPN).
+    /// This device has a network at all (Wi-Fi, cellular or a VPN).
     private(set) var isOnline = true
     /// Which screen the remote opens on (set by a launch option in debug builds).
     var startScreen: String?
@@ -162,7 +162,7 @@ final class RemoteAppModel {
             }
             guard let self, !Task.isCancelled else { return }
             self.pendingLink = nil
-            self.pairingError = String(localized: "Couldn’t find “\(link.name)” on this network. Pair while the iPhone and the Mac are on the same Wi-Fi network; after that, you can reach the Mac from anywhere by its address.")
+            self.pairingError = String(localized: "Couldn’t find “\(link.name)” on this network. Pair while this device and the Mac are on the same Wi-Fi network; after that, you can reach the Mac from anywhere by its address.")
         }
     }
 
@@ -184,7 +184,7 @@ final class RemoteAppModel {
                     ? String(localized: "That pairing code has expired. On the Mac, choose Pair a Phone again and scan the new code.")
                     : String(localized: "That code didn’t work. Check the code on the Mac, or choose Pair a Phone there again for a new one.")
             case .failed(let reason):
-                pairingError = reason.isEmpty ? String(localized: "The Mac didn’t accept this iPhone.") : reason
+                pairingError = reason.isEmpty ? String(localized: "The Mac didn’t accept this device.") : reason
             case .unreachable:
                 pairingError = String(localized: "The Mac stopped answering. Check that it’s awake and on the same network.")
             }

@@ -114,6 +114,7 @@ struct MacsView: View {
                 }
             }
             .obsidianList()
+            .readablePane(maxWidth: 760)
             .navigationTitle("Macs")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

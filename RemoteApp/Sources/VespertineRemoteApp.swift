@@ -18,7 +18,7 @@ struct VespertineRemoteApp: App {
                 .environment(model)
                 .onOpenURL { url in model.open(url) }
                 .tint(Color.accentColor)
-                .preferredColorScheme(.dark)
+                .foregroundStyle(Palette.text)
         }
         .onChange(of: scenePhase) { _, phase in
             model.scenePhaseChanged(phase)

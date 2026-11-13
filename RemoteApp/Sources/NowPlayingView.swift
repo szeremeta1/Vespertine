@@ -9,6 +9,7 @@ import VespertineRemoteProtocol
 
 struct NowPlayingView: View {
     @Environment(RemoteAppModel.self) private var model
+    @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let session: RemoteSession
     @State private var feedback = CommandFeedback()
@@ -19,27 +20,30 @@ struct NowPlayingView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let wide = geometry.size.width > geometry.size.height
+            let wide = RemoteLayout.playerColumns(width: geometry.size.width, height: geometry.size.height, accessibilityText: typeSize.isAccessibilitySize)
+            let side = RemoteLayout.coverSide(width: geometry.size.width, height: geometry.size.height, columns: wide)
             ScrollView {
                 Group {
                     if wide {
                         HStack(alignment: .center, spacing: 32) {
-                            cover.frame(maxWidth: min(geometry.size.height - 60, 520))
+                            cover.frame(width: side, height: side)
                             controls
                         }
                     } else {
                         VStack(spacing: 22) {
-                            cover.frame(maxWidth: min(520, max(220, geometry.size.height - 430)))
+                            cover.frame(width: side, height: side)
                             controls
                         }
                     }
                 }
                 .padding(.horizontal, 24).padding(.vertical, 12)
+                .frame(maxWidth: 1160)
                 .frame(maxWidth: .infinity, minHeight: geometry.size.height)
             }
             .scrollBounceBehavior(.basedOnSize)
         }
         .background(backdrop)
+        .accessibilityIdentifier("now-playing")
         .feedback(feedback)
         .sensoryFeedback(.impact(weight: .light), trigger: player?.playback)
         .sensoryFeedback(.selection, trigger: player?.nowPlaying?.entry)
@@ -52,7 +56,7 @@ struct NowPlayingView: View {
             ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: 160, cornerRadius: 0, placeholder: false)
                 .scaleEffect(1.6)
                 .blur(radius: 70)
-                .opacity(0.42)
+                .opacity(0.24)
             LinearGradient(colors: [Palette.base.opacity(0.15), Palette.base.opacity(0.9)], startPoint: .top, endPoint: .bottom)
         }
         .ignoresSafeArea()
@@ -79,7 +83,7 @@ struct NowPlayingView: View {
                 Image(systemName: model.settings.vinyl ? "photo" : "record.circle")
                     .font(.body.weight(.medium))
                     .foregroundStyle(Palette.text)
-                    .frame(width: 38, height: 38)
+                    .frame(width: 44, height: 44)
                     .background(.ultraThinMaterial, in: Circle())
                     .overlay(Circle().strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
             }
@@ -128,7 +132,7 @@ struct NowPlayingView: View {
                         .sensoryFeedback(.success, trigger: track.favorite)
                     }
                 }
-                Text("\(track.artist) — \(track.album)").font(.subheadline).foregroundStyle(Palette.text2).lineLimit(1)
+                Text("\(track.artist) · \(track.album)").font(.subheadline).foregroundStyle(Palette.text2).lineLimit(1)
                 signalPath(track)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -142,9 +146,8 @@ struct NowPlayingView: View {
 
     /// The signal path, as the Mac's badge says it: what the file is, what the DAC receives, and where it plays.
     private func signalPath(_ track: TrackSummary) -> some View {
-        ViewThatFits(in: .horizontal) {
+        ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 6) { signalChips(track, output: true) }
-            HStack(spacing: 6) { signalChips(track, output: false) }
         }
         .padding(.top, 2)
         .accessibilityElement(children: .combine)
@@ -192,7 +195,7 @@ struct NowPlayingView: View {
     }
 
     private var transport: some View {
-        HStack(spacing: 40) {
+        HStack(spacing: 24) {
             Button { feedback.run(session, .previous) } label: {
                 Image(systemName: "backward.fill").frame(width: 56, height: 56).contentShape(Rectangle())
             }

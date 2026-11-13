@@ -10,13 +10,16 @@ import VespertineRemoteProtocol
 struct LibraryView: View {
     @Environment(RemoteAppModel.self) private var model
     let session: RemoteSession
+    var section: RemoteDestination? = nil
     @State private var search = ""
     @State private var path: [String] = []
 
     var body: some View {
         NavigationStack(path: $path) {
             Group {
-                if search.trimmingCharacters(in: .whitespaces).isEmpty {
+                if let section {
+                    sectionContent(section)
+                } else if search.trimmingCharacters(in: .whitespaces).isEmpty {
                     List {
                         NavigationLink(value: "albums") { Label("Albums", systemImage: "square.stack") }
                         NavigationLink(value: "artists") { Label("Artists", systemImage: "music.mic") }
@@ -35,15 +38,31 @@ struct LibraryView: View {
             .navigationDestination(for: String.self) { place in
                 switch place {
                 case "artists": ArtistsList(session: session)
+                case "playlists": PlaylistsList(session: session)
+                case "favorites": TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil)
                 default: AlbumsGrid(session: session)
                 }
             }
             .onAppear {
+                guard section == nil else { return }
                 switch model.startScreen {
                 case "albums", "coverFlow", "album": path = ["albums"]; if model.startScreen != "album" { model.startScreen = nil }
                 case "artists": path = ["artists"]; model.startScreen = nil
                 default: break
                 }
+            }
+        }
+    }
+
+    @ViewBuilder private func sectionContent(_ place: RemoteDestination) -> some View {
+        if !search.trimmingCharacters(in: .whitespaces).isEmpty {
+            SearchResults(session: session, text: search)
+        } else {
+            switch place {
+            case .artists: ArtistsList(session: session).readablePane()
+            case .playlists: PlaylistsList(session: session).readablePane()
+            case .favorites: TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil).readablePane()
+            default: AlbumsGrid(session: session)
             }
         }
     }
@@ -68,6 +87,7 @@ private struct SearchResults: View {
 }
 
 struct AlbumsGrid: View {
+    @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(RemoteAppModel.self) private var model
     let session: RemoteSession
     @State private var albums: [AlbumSummary] = []
@@ -109,8 +129,9 @@ struct AlbumsGrid: View {
     }
 
     private var grid: some View {
+        GeometryReader { geometry in
         ScrollView {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 16)], spacing: 20) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 16), count: RemoteLayout.albumColumns(width: min(geometry.size.width, 1200), accessibilityText: typeSize.isAccessibilitySize)), spacing: 20) {
                 ForEach(albums) { album in
                     NavigationLink { AlbumView(session: session, album: album) } label: {
                         VStack(alignment: .leading, spacing: 4) {
@@ -122,14 +143,19 @@ struct AlbumsGrid: View {
                         .accessibilityElement(children: .combine)
                     }
                     .buttonStyle(.plain)
+                    .hoverEffect(.lift)
                     .onAppear { if album.key == albums.last?.key { Task { await loadMore() } } }
                 }
             }
             .padding()
+            .frame(maxWidth: 1200)
+            .frame(maxWidth: .infinity)
             if loading { ProgressView().padding() }
             if !loading, albums.isEmpty, total != nil {
                 Text("No albums yet").font(.serif(.title3)).foregroundStyle(Palette.text2).padding(.top, 60)
             }
+        }
+        .accessibilityIdentifier("albums-grid")
         }
     }
 
@@ -157,12 +183,37 @@ struct AlbumView: View {
     let album: AlbumSummary
     @State private var tracks: [TrackSummary] = []
     @State private var feedback = CommandFeedback()
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         List {
             Section {
+                ViewThatFits(in: .horizontal) {
+                    if sizeClass == .regular && !typeSize.isAccessibilitySize {
+                        HStack(spacing: 28) {
+                            ArtworkView(key: album.artworkKey, size: 800, cornerRadius: 10).frame(width: 240, height: 240)
+                            albumInfo.frame(minWidth: 260, maxWidth: 520)
+                        }
+                    }
+                    VStack(spacing: 16) {
+                        ArtworkView(key: album.artworkKey, size: 800, cornerRadius: 10).frame(maxWidth: 280)
+                        albumInfo
+                    }
+                }
+                .frame(maxWidth: .infinity)
+                .listRowBackground(Color.clear)
+            }
+            TrackRows(session: session, tracks: tracks, play: { .playAlbum(key: album.key, startAt: $0, shuffled: false) }, numbered: true)
+        }
+        .obsidianList()
+        .navigationBarTitleDisplayMode(.inline)
+        .feedback(feedback)
+        .task(id: session.isConnected) { if tracks.isEmpty, case .tracks(let items) = await session.send(.albumTracks(key: album.key)) { tracks = items } }
+    }
+
+    private var albumInfo: some View {
                 VStack(spacing: 10) {
-                    ArtworkView(key: album.artworkKey, size: 600, cornerRadius: 10).frame(maxWidth: 280)
                     Text(album.title).font(.serif(.title3, weight: .semibold)).multilineTextAlignment(.center)
                     Text(album.artist).foregroundStyle(Palette.text2)
                     HStack(spacing: 6) {
@@ -181,14 +232,6 @@ struct AlbumView: View {
                     .disabled(!session.isConnected)
                 }
                 .frame(maxWidth: .infinity)
-                .listRowBackground(Color.clear)
-            }
-            TrackRows(session: session, tracks: tracks, play: { .playAlbum(key: album.key, startAt: $0, shuffled: false) }, numbered: true)
-        }
-        .obsidianList()
-        .navigationBarTitleDisplayMode(.inline)
-        .feedback(feedback)
-        .task(id: session.isConnected) { if tracks.isEmpty, case .tracks(let items) = await session.send(.albumTracks(key: album.key)) { tracks = items } }
     }
 }
 

@@ -7,22 +7,29 @@ import SwiftUI
 import UIKit
 
 enum Palette {
-    static let base = Color(hex: 0x09090A)
-    static let surface = Color(hex: 0x16161A)
-    static let raised = Color(hex: 0x1C1C21)
-    static let hairline = Color(hex: 0xECE6DA, opacity: 0.07)
-    static let hairlineStrong = Color(hex: 0xECE6DA, opacity: 0.12)
-
-    static let text = Color(hex: 0xECE6DA)
-    static let text2 = Color(hex: 0xA29B8F)
-    static let text3 = Color(hex: 0x8C867C)
-
-    static let brass = Color(hex: 0xC8A66A)
-    static let brassHi = Color(hex: 0xE7CD98)
+    // Ivory is the plan's existing light field. Reuse the brand tokens for contrast.
+    static let base = adaptive(light: 0xECE6DA, dark: 0x09090A)
+    static let surface = adaptive(light: 0xECE6DA, dark: 0x16161A)
+    static let raised = adaptive(light: 0xECE6DA, dark: 0x1C1C21)
+    static let hairline = adaptive(light: 0x09090A, dark: 0xECE6DA).opacity(0.07)
+    static let hairlineStrong = adaptive(light: 0x09090A, dark: 0xECE6DA).opacity(0.12)
+    static let text = adaptive(light: 0x09090A, dark: 0xECE6DA)
+    static let text2 = adaptive(light: 0x69645C, dark: 0xA29B8F)
+    static let text3 = adaptive(light: 0x69645C, dark: 0x8C867C)
+    static let brass = adaptive(light: 0x7C6541, dark: 0xC8A66A)
+    static let brassHi = adaptive(light: 0x7C6541, dark: 0xE7CD98)
     static let brassLo = Color(hex: 0x7C6541)
-    static let copper = Color(hex: 0xC98B5B)
+    static let copper = adaptive(light: 0x7C6541, dark: 0xC98B5B)
+    // The transport is always a brass object, with dark ink in both appearances.
+    static let brassGradient = LinearGradient(colors: [Color(hex: 0xE7CD98), Color(hex: 0xC8A66A)], startPoint: .top, endPoint: .bottom)
 
-    static let brassGradient = LinearGradient(colors: [brassHi, brass], startPoint: .top, endPoint: .bottom)
+    private static func adaptive(light: UInt32, dark: UInt32) -> Color {
+        Color(uiColor: UIColor { traits in
+            let h = traits.userInterfaceStyle == .dark ? dark : light
+            return UIColor(red: CGFloat((h >> 16) & 255) / 255, green: CGFloat((h >> 8) & 255) / 255,
+                           blue: CGFloat(h & 255) / 255, alpha: 1)
+        })
+    }
 }
 
 extension Color {
@@ -45,6 +52,12 @@ extension Font {
 }
 
 extension View {
+    /// Keep text and controls readable on a full-screen iPad without changing the window background.
+    func readablePane(maxWidth: CGFloat = 900) -> some View {
+        frame(maxWidth: maxWidth).frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Palette.base)
+    }
+
     /// The app's background behind a screen's content.
     func obsidianBackground() -> some View {
         background(Palette.base.ignoresSafeArea())
