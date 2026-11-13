@@ -40,6 +40,7 @@ final class EventLog: @unchecked Sendable {
         case .queueEnded: "ended"
         case .failed(_, let message): "failed \(message)"
         case .deviceLost(let name): "lost \(name)"
+        case .notice(let message): "notice \(message)"
         default: "other"
         }
         lock.withLock { events.append(text) }
@@ -225,5 +226,53 @@ struct RendererPlaybackTests {
         if case .unplayable = RendererMode.decide(item: wav, url: wav.url, source: nil, settings: .init(), capabilities: none) {} else { Issue.record("expected unplayable") }
         // A renderer that says nothing accepts everything.
         #expect(RendererMode.decide(item: wav, url: wav.url, source: nil, settings: .init(), capabilities: .init()) == .passThrough(mime: "audio/wav"))
+    }
+}
+
+@Suite("Renderer playback: transient refusals", .serialized)
+struct RendererTransientTests {
+    @Test("Starting at a position waits for the renderer to play, and a 701 on that seek is tried again, not a failed song")
+    func startAtPosition() async throws {
+        let h = try await Harness.make(kind: .av(setNext: true))
+        defer { h.close() }
+        h.fake.fail("Seek", code: 701)   // "Transition not available" while it is still loading
+        h.playback.play(h.queue[0], at: 30)
+        #expect(await h.events.wait(for: "started"))
+        for _ in 0..<100 where !h.fake.calls.contains(where: { $0.action == "Seek" && $0.arguments["Target"] == "0:00:30" && h.fake.calls.filter { $0.action == "Seek" }.count >= 2 }) {
+            try await Task.sleep(for: .milliseconds(20))
+        }
+        #expect(h.fake.calls.filter { $0.action == "Seek" }.count >= 2)
+        #expect(!h.events.all.contains { $0.hasPrefix("failed") })
+        #expect(h.playback.snapshot.state == .playing)
+    }
+
+    @Test("A pause refused once is tried again and lands")
+    func pauseRetried() async throws {
+        let h = try await Harness.make(kind: .openHome)
+        defer { h.close() }
+        h.playback.play(h.queue[0])
+        #expect(await h.events.wait(for: "started"))
+        h.fake.fail("Pause", code: 701)
+        h.playback.pause()
+        try await Task.sleep(for: .milliseconds(800))
+        #expect(h.fake.transportState == "Paused")
+        #expect(!h.events.all.contains { $0.hasPrefix("failed") })
+    }
+
+    @Test("A seek refused twice says so, and the song plays on (not stopped, not skipped)")
+    func seekRefused() async throws {
+        let h = try await Harness.make(kind: .openHome)
+        defer { h.close() }
+        h.playback.play(h.queue[0])
+        #expect(await h.events.wait(for: "started"))
+        let uri = h.fake.currentURI
+        h.fake.fail("SeekSecondAbsolute", code: 701, times: 2)
+        h.playback.seek(to: 40)
+        #expect(await h.events.wait(for: "notice"))
+        #expect(!h.events.all.contains { $0.hasPrefix("failed") })
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(h.fake.transportState == "Playing")
+        #expect(h.fake.currentURI == uri)
+        #expect(h.playback.snapshot.state == .playing)
     }
 }
