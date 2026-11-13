@@ -359,6 +359,7 @@ final class AppModel {
         remote.model = self
         remote.apply()
         tidal.start()   // nothing while TIDAL is switched off
+        tidalAnalysisHook(settings.tidalEnabled)
         // Hand the DAC back when Vespertine quits: stop, release exclusive access, then restore or
         // standardize its format as chosen in Settings. Core Audio decides how long that takes (a device that won't
         // switch rate can hold it for many seconds), so it runs off the main thread and quitting waits for it only
@@ -589,6 +590,7 @@ final class AppModel {
             if item != sidebar { sidebar = item }
             if route != path { path = route }
         }
+        tidalAnalysisHook(on)
         if on {
             tidal.start()
             // One flow (UX amendment 1): Settings › TIDAL, and the login sheet when there is an account to sign in to.
@@ -654,6 +656,20 @@ final class AppModel {
         Task { await downloader.enqueue(playlist: uuid) }
     }
 
+    /// Reads the songs from TIDAL again (interactive priority) and gives their rows TIDAL's current details.
+    func refreshFromTidal(_ tracks: [Track]) {
+        let ids = tracks.filter(\.isTidalTrack).compactMap { URL(string: $0.location).flatMap(TidalPlayback.trackId(from:)) }
+        guard let catalog = tidal.catalog, let userId = tidal.userId, !ids.isEmpty else { return }
+        Task {
+            var inputs: [TidalTrackInput] = []
+            for id in ids {
+                do { inputs.append(TidalTrackInput(try await catalog.track(id, priority: .interactive))) } catch { tidal.note(error) }
+            }
+            guard !inputs.isEmpty, let source = try? library.database.tidalSource(userId: userId).id else { return }
+            try? library.database.upsertTidalTracks(inputs, sourceId: source)
+        }
+    }
+
     /// Deletes a TIDAL row's downloaded file (to the Trash): the song streams again.
     func removeDownload(_ tracks: [Track]) {
         for track in tracks where track.isTidalTrack {
@@ -661,6 +677,13 @@ final class AppModel {
             try? FileManager.default.trashItem(at: URL(fileURLWithPath: path), resultingItemURL: nil)
             try? library.database.setTidalDownload(tidalId: record.tidalId, path: nil)
         }
+    }
+
+    /// Streamed TIDAL songs are analyzed from their complete staged copy (decision 206), while TIDAL is on.
+    private func tidalAnalysisHook(_ on: Bool) {
+        guard on else { NetworkPlaybackCache.setCompletionHandler(scheme: TidalPlayback.scheme, nil); return }
+        let analysis = self.analysis
+        NetworkPlaybackCache.setCompletionHandler(scheme: TidalPlayback.scheme) { url, file in analysis.analyzeStaged(file: file, url: url) }
     }
 
     /// Settings › TIDAL › "Add downloads folder to the library": the folder (made if needed) becomes a library folder, referenced in

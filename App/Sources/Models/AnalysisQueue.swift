@@ -7,6 +7,7 @@
 import Foundation
 import VespertineAudio
 import VespertineLibrary
+import VespertineTidal
 import Observation
 
 @Observable
@@ -73,6 +74,31 @@ final class AnalysisQueue {
         self.library = library
         self.settings = settings
         self.shares = shares
+    }
+
+    /// A streamed TIDAL song's staged copy, complete, handed over before its lease goes (`NetworkPlaybackCache.setCompletionHandler`):
+    /// analyzed on the analysis queue, stored under `tidal://track/<id>`, and the file deleted whatever happens (decision 206).
+    nonisolated func analyzeStaged(file: URL, url: URL) {
+        let database = library.database
+        Self.analysisThreads.async {
+            guard Self.analyzeStaged(file: file, url: url, database: database) else { return }
+            Task { @MainActor [weak self] in
+                self?.revision += 1
+                self?.library.analysisSaved()
+            }
+        }
+    }
+
+    /// The work of `analyzeStaged`, on the calling thread. True when an analysis was stored.
+    @discardableResult
+    nonisolated static func analyzeStaged(file: URL, url: URL, database: LibraryDatabase) -> Bool {
+        defer { try? FileManager.default.removeItem(at: file) }
+        guard let id = TidalPlayback.trackId(from: url),
+              let done = try? FileAnalyzer.analyzeWithProfile(url: file, shouldContinue: nil) else { return false }
+        let location = LibraryDatabase.tidalLocation(id)
+        guard (try? database.saveAnalysis(done.analysis, filePath: location)) != nil else { return false }
+        if let profile = done.profile { try? database.saveTransitionProfiles([(profile, location)]) }
+        return true
     }
 
     /// Starts the periodic server sync and the playback watch. Call once, after launch.

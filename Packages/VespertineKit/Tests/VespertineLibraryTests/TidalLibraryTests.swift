@@ -7,6 +7,7 @@
 import AVFAudio
 import Foundation
 import GRDB
+import VespertineAudio
 import Testing
 @testable import VespertineLibrary
 
@@ -150,6 +151,20 @@ struct TidalLibraryTests {
         #expect(track.id == nil && track.isTidalTrack && track.location == "tidal://track/5" && track.filePath.isEmpty)
         #expect(track.title == "Live" && track.artist == "Artist" && track.album == "Album" && track.artworkKey == "tidal:ab-cd")
         #expect(track.codec == "FLAC" && track.sampleRate == 44_100 && track.duration == 200 && track.isrc == "XX00000005")
+    }
+
+    @Test("An analysis saved under tidal://track/<id> belongs to the streamed row")
+    func streamedAnalysis() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try #require(try db.tidalSource(userId: 1).id)
+        let ids = try db.upsertTidalTracks([input(5)], sourceId: source)
+        let track = try #require(try db.allTracks().first)
+        #expect(try db.storedAnalysis(for: track) == nil)
+        try db.saveAnalysis(FileAnalysis(claimedBitDepth: 16, effectiveBitDepth: 16, sampleRate: 44_100, bandwidthHz: 20_000, peakDBFS: -1,
+                                         clippedSamples: 0, verdict: .genuine, summary: "", spectrum: [], version: FileAnalysis.currentVersion), filePath: LibraryDatabase.tidalLocation(5))
+        let row = try #require(try db.allTracks().first { $0.id == ids[5] })
+        let stored = try #require(try db.storedAnalysis(for: row))
+        #expect(stored.isCurrent && stored.analysis.effectiveBitDepth == 16)
     }
 
     @Test("A download is the track's file, and clearing it empties the path again")

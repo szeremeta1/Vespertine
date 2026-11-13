@@ -406,6 +406,7 @@ struct AlbumMenu: View {
         }
         Button("Look Up on MusicBrainz…") { model.lookupTracks = tracks }
         Button("Show in Finder") { model.showInFinder(Array(tracks.prefix(1))) }
+        TidalRowsMenu(tracks: tracks)
         let network = tracks.filter(model.shares.isNetwork)
         if !network.isEmpty {
             Divider()

@@ -544,6 +544,7 @@ struct TrackMenu: View {
         }
         Button("Look Up on MusicBrainz…") { model.lookupTracks = tracks }
         Button("Show in Finder") { model.showInFinder(tracks) }
+        TidalRowsMenu(tracks: tracks)
         if let playlist, !playlist.isSmart {
             Divider()
             Button("Remove from Playlist", role: .destructive) {

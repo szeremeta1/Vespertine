@@ -1099,7 +1099,9 @@ public extension LibraryDatabase {
     public func saveAnalysis(_ analysis: FileAnalysis, filePath: String) throws {
         let data = try Self.analysisEncoder().encode(analysis)
         try writer.write { db in
-            for track in try Track.filter(Column("filePath") == filePath).fetchAll(db) {
+            // A streamed TIDAL song has no file: its analysis (of the stream's staged copy) is saved under its location.
+            let tracks = try Track.filter(Column("filePath") == filePath || (Column("filePath") == "" && Column("location") == filePath)).fetchAll(db)
+            for track in tracks {
                 guard let id = track.id else { continue }
                 try db.execute(sql: """
                     INSERT OR REPLACE INTO analysis (trackId, fileSize, modifiedAt, version, analyzedAt, data)

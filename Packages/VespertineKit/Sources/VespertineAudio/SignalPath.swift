@@ -335,3 +335,14 @@ public struct SignalPath: Sendable, Hashable {
     /// channels, and some channels have no speaker of their own, so they are mixed into the nearest ones. nil: not folded.
     public var foldedOnto: String? = nil
 }
+
+extension SignalPath {
+    /// The source line for a song streamed from TIDAL (`tidal://…`): "TIDAL · FLAC 24/192 (DASH)", "TIDAL · FLAC 16/44.1". The format
+    /// is what the stream turned out to be, not what TIDAL lists. Nil for files and shares.
+    public static func remoteSourceLabel(url: URL?, source: SourceFormat, isDASH: Bool?) -> String? {
+        guard url?.scheme?.lowercased() == "tidal" else { return nil }
+        let rate = SampleRate.format(source.sampleRate)
+        let format = source.bitDepth.map { "\($0)/\(rate)" } ?? rate
+        return "TIDAL · \(source.codec) \(format)" + (isDASH == true ? " (DASH)" : "")
+    }
+}
