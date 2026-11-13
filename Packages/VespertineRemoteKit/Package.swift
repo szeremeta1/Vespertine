@@ -14,13 +14,18 @@ let package = Package(
         .library(name: "VespertineRemoteProtocol", targets: ["VespertineRemoteProtocol"]),
         // The phone's side: finding Macs, pairing, the Keychain, and a session that keeps the Mac's state.
         .library(name: "VespertineRemoteClient", targets: ["VespertineRemoteClient"]),
+        // The Mac's side of the stream channel: what to send for a song (the file or a FLAC made from it), the transcode
+        // cache, and ranged reads. Plain Foundation: the actual conversion is injected (VespertineAudio does it in the app).
+        .library(name: "VespertineStreamServer", targets: ["VespertineStreamServer"]),
         // A command-line remote for testing a Mac's remote server (pair, send commands, watch what it pushes).
         .executable(name: "vespertine-remote", targets: ["vespertine-remote"]),
     ],
     targets: [
         .target(name: "VespertineRemoteProtocol"),
         .target(name: "VespertineRemoteClient", dependencies: ["VespertineRemoteProtocol"]),
+        .target(name: "VespertineStreamServer", dependencies: ["VespertineRemoteProtocol"]),
         .executableTarget(name: "vespertine-remote", dependencies: ["VespertineRemoteProtocol"]),
         .testTarget(name: "VespertineRemoteProtocolTests", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient"]),
+        .testTarget(name: "VespertineStreamServerTests", dependencies: ["VespertineStreamServer", "VespertineRemoteProtocol"]),
     ]
 )
