@@ -44,7 +44,8 @@ struct MainWindow: View {
         }
         .background(Palette.window)
         .tint(Palette.brass)
-        .searchable(text: $model.searchText, placement: .toolbar, prompt: "Search albums, artists and songs")
+        .searchable(text: $model.searchText, placement: .toolbar,
+                    prompt: model.sidebar == .tidalSearch ? Text("Search TIDAL") : Text("Search albums, artists and songs"))
         .toolbar {
             ToolbarItem(placement: .navigation) {
                 Button { _ = model.path.popLast() } label: { Label("Back", systemImage: "chevron.backward") }
@@ -156,10 +157,12 @@ struct ContentRouter: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        let searching = !model.searchText.trimmingCharacters(in: .whitespaces).isEmpty
+        // On TIDAL › Search the search field searches TIDAL: that page shows the results, not the library's.
+        let searching = !model.searchText.trimmingCharacters(in: .whitespaces).isEmpty && model.sidebar != .tidalSearch
         let path = model.path
         Group {
-            if model.library.stats.tracks == 0 && model.library.scanProgress == nil && model.library.sources.isEmpty && !searching {
+            if model.library.stats.tracks == 0 && model.library.scanProgress == nil && model.library.sources.isEmpty && !searching
+                && !model.sidebar.isTidal {
                 EmptyLibraryView()
             } else {
                 ZStack {
@@ -173,6 +176,7 @@ struct ContentRouter: View {
                 }
             }
         }
+        .safeAreaInset(edge: .top, spacing: 0) { TidalOfflineBanner() }
         .background(Palette.window)
     }
 
@@ -186,6 +190,10 @@ struct ContentRouter: View {
         case .favorites: FavoritesView()
         case .playlist(let id): PlaylistView(playlistID: id)
         case .source(let id): SourceView(sourceID: id)
+        case .tidalSearch: TidalSearchView(query: model.searchText)
+        case .tidalMixes: TidalMixesView()
+        case .tidalNewReleases: TidalNewReleasesView()
+        case .tidalDownloads: TidalDownloadsView()
         }
     }
 

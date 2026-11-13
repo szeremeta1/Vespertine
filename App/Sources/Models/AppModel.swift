@@ -16,6 +16,15 @@ enum SidebarItem: Hashable {
     case albums, artists, songs, genres, recentlyAdded, favorites
     case playlist(Int64)
     case source(Int64)
+    /// The TIDAL section (only while TIDAL is switched on): the catalog, the account's mixes and new releases, the downloads.
+    case tidalSearch, tidalMixes, tidalNewReleases, tidalDownloads
+
+    var isTidal: Bool {
+        switch self {
+        case .tidalSearch, .tidalMixes, .tidalNewReleases, .tidalDownloads: true
+        default: false
+        }
+    }
 }
 
 enum DetailRoute: Hashable {
@@ -592,6 +601,68 @@ final class AppModel {
         tidalSwitchChanged?(on)
     }
 
+    /// Whether the sidebar has its TIDAL section: TIDAL is on, and there is an account (synced, or signed in now).
+    var showsTidalSection: Bool { settings.tidalEnabled && (library.tidalSource != nil || tidal.state.isSignedIn) }
+
+    /// Catalog tracks as the lists show them: the library's row when the library has the track, else a track with no row (it plays
+    /// all the same, and offers Add to Library).
+    func tracks(forCatalog tidalTracks: [TidalTrack]) -> [Track] {
+        for track in tidalTracks { catalogTracks[track.id] = track }
+        let rows = Dictionary(library.tidalRecords.values.map { ($0.tidalId, $0.trackId) }, uniquingKeysWith: { a, _ in a })
+        let known = Dictionary(library.tracks(ids: tidalTracks.compactMap { rows[$0.id] }).compactMap { t in t.id.map { ($0, t) } },
+                               uniquingKeysWith: { a, _ in a })
+        return tidalTracks.map { tidal in rows[tidal.id].flatMap { known[$0] } ?? Track.tidal(TidalTrackInput(tidal), sourceId: nil) }
+    }
+
+    /// The catalog tracks the TIDAL pages listed, by TIDAL id, for the menus of their rows (Add to Library, Download).
+    @ObservationIgnored private(set) var catalogTracks: [Int: TidalTrack] = [:]
+
+    /// The catalog track behind a row with no library id.
+    func catalogTrack(of track: Track) -> TidalTrack? {
+        URL(string: track.location).flatMap(TidalPlayback.trackId(from:)).flatMap { catalogTracks[$0] }
+    }
+
+    /// Downloads catalog tracks (the downloads folder joins the library first, when Settings says so).
+    func download(_ tracks: [TidalTrack]) {
+        guard let downloader = tidal.downloader, !tracks.isEmpty else { return }
+        addTidalDownloadsFolder()
+        downloader.enqueue(tracks: tracks)
+    }
+
+    /// Downloads library TIDAL rows: their tracks are read from TIDAL (one request each, at interactive priority) and queued.
+    func download(libraryTracks tracks: [Track]) {
+        let ids = tracks.filter(\.isTidalTrack).compactMap { URL(string: $0.location).flatMap(TidalPlayback.trackId(from:)) }
+        guard let catalog = tidal.catalog, !ids.isEmpty else { return }
+        Task {
+            var found: [TidalTrack] = []
+            for id in ids {
+                do { found.append(try await catalog.track(id, priority: .interactive)) } catch { tidal.note(error) }
+            }
+            download(found)
+        }
+    }
+
+    func download(album id: Int) {
+        guard let downloader = tidal.downloader else { return }
+        addTidalDownloadsFolder()
+        Task { await downloader.enqueue(album: id) }
+    }
+
+    func download(playlist uuid: String) {
+        guard let downloader = tidal.downloader else { return }
+        addTidalDownloadsFolder()
+        Task { await downloader.enqueue(playlist: uuid) }
+    }
+
+    /// Deletes a TIDAL row's downloaded file (to the Trash): the song streams again.
+    func removeDownload(_ tracks: [Track]) {
+        for track in tracks where track.isTidalTrack {
+            guard let id = track.id, let record = library.tidalRecords[id], let path = record.downloadPath else { continue }
+            try? FileManager.default.trashItem(at: URL(fileURLWithPath: path), resultingItemURL: nil)
+            try? library.database.setTidalDownload(tidalId: record.tidalId, path: nil)
+        }
+    }
+
     /// Settings › TIDAL › "Add downloads folder to the library": the folder (made if needed) becomes a library folder, referenced in
     /// place, so downloaded files are scanned and linked to their TIDAL rows. Turning the setting off leaves a folder already added.
     func addTidalDownloadsFolder() {
@@ -625,6 +696,7 @@ final class AppModel {
     static func navigation(afterTidalOff sidebar: SidebarItem, path: [DetailRoute], sourceIDs: Set<Int64>, playlistIDs: Set<Int64>,
                            albumExists: (String) -> Bool, artistExists: (String) -> Bool) -> (SidebarItem, [DetailRoute]) {
         switch sidebar {
+        case let item where item.isTidal: return (.albums, [])
         case .source(let id) where !sourceIDs.contains(id): return (.albums, [])
         case .playlist(let id) where !playlistIDs.contains(id): return (.albums, [])
         default: break

@@ -424,6 +424,10 @@ public final class LibraryDatabase: Sendable {
                 t.primaryKey(["list", "itemId"])
             }
         }
+        m.registerMigration("v26-tidal-origin") { db in
+            // How each TIDAL row arrived: the account's sync ("favorite") or Add to Library from the catalog ("added", never removed by sync).
+            try db.alter(table: "tidalTrack") { t in t.add(column: "origin", .text).notNull().defaults(to: "favorite") }
+        }
         return m
     }
 }

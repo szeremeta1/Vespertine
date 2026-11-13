@@ -103,6 +103,8 @@ final class TidalModel {
     private(set) var countryCode: String?
     /// Writes the sync queue skipped or dropped (conflicts, playlists deleted on TIDAL), for Settings › TIDAL › Status.
     private(set) var skippedOps: [String] = []
+    /// TIDAL doesn't offer this account's mixes to Vespertine: the sidebar leaves My Mixes out.
+    private(set) var mixesUnavailable = false
     /// Settings › TIDAL opens the login sheet when it sees this (the switch was just turned on, signed out: one flow).
     var wantsLoginSheet = false
 
@@ -151,6 +153,7 @@ final class TidalModel {
     func start() {
         guard settings.tidalEnabled, !isStarted else { return }
         isStarted = true
+        ArtworkCache.shared.fetchesTidalCovers = true
         loadSession()
         environment.reachability.start { [weak self] up in self?.reachabilityChanged(up) }
         downloader?.isPaused = false
@@ -168,6 +171,7 @@ final class TidalModel {
     func stop() {
         guard isStarted else { return }
         isStarted = false
+        ArtworkCache.shared.fetchesTidalCovers = false
         environment.reachability.stop()
         environment.unregister()
         timer?.cancel(); timer = nil
@@ -248,6 +252,12 @@ final class TidalModel {
             }
         }
         startRefresh()
+        Task { [weak self, userId = tokens.userId] in
+            guard let catalog = self?.catalog else { return }
+            do { _ = try await catalog.mixes(userId: userId) ; self?.mixesUnavailable = false }
+            catch TidalError.http { self?.mixesUnavailable = true }
+            catch {}
+        }
         if settings.tidalAccountName == nil { Task { await fetchAccountName(userId: tokens.userId) } }
     }
 
@@ -324,6 +334,31 @@ final class TidalModel {
         countryCode = nil
         state = credentialsProblem == nil && auth != nil ? .signedOut : .missingCredentials
         publish()
+    }
+
+    // MARK: The catalog in the library
+
+    /// The signed-in user's id, nil when signed out.
+    var userId: Int? { state.isSignedIn ? environment.tokens.load()?.userId : nil }
+
+    /// "Add to Library": the tracks become library rows (origin `added`, which the sync never removes). They aren't made TIDAL
+    /// favorites (decision 207).
+    func addToLibrary(_ tracks: [TidalTrack], album: TidalAlbum? = nil) throws {
+        guard let userId, !tracks.isEmpty else { return }
+        let source = try library.database.tidalSource(userId: userId)
+        guard let sourceId = source.id else { return }
+        try library.database.addTidalTracks(tracks.map { TidalTrackInput($0, album: album) }, sourceId: sourceId)
+        publish()
+    }
+
+    /// An album's tracks, then "Add to Library".
+    func addToLibrary(album: TidalAlbum) async {
+        guard let catalog else { return }
+        do {
+            try addToLibrary(try await catalog.albumTracks(album.id, priority: .interactive), album: album)
+        } catch {
+            note(error)
+        }
     }
 
     // MARK: Sync

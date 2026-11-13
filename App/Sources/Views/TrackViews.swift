@@ -187,7 +187,11 @@ struct TrackTable: View {
         .contextMenu(forSelectionType: Int64.self) { ids in
             let chosenRows = rows.filter { ids.contains($0.id) }
             let chosen = chosenRows.map(\.track)
-            if !chosen.isEmpty { TrackMenu(tracks: chosen, playlist: reorderable, all: allTracks ?? tracks, positions: Set(chosenRows.map(\.place))) }
+            if chosen.contains(where: { $0.id == nil && $0.isTidalTrack }) {
+                TidalCatalogTrackMenu(tracks: chosen)   // catalog songs with no library row
+            } else if !chosen.isEmpty {
+                TrackMenu(tracks: chosen, playlist: reorderable, all: allTracks ?? tracks, positions: Set(chosenRows.map(\.place)))
+            }
         } primaryAction: { ids in
             // Double-clicking a row of a multi-selection gets the whole selection: play the row clicked, not whichever
             // song the set happens to list first (else the first selected, in the order shown).

@@ -38,6 +38,10 @@ public final class TidalDownloader {
         public var album: TidalAlbum?
         public var state: State
 
+        public init(kind: Kind, album: TidalAlbum?, state: State) {
+            self.kind = kind; self.album = album; self.state = state
+        }
+
         /// `track:<id>`, `album:<id>` or `playlist:<uuid>`.
         public var id: String {
             switch kind {

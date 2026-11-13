@@ -84,6 +84,26 @@ struct SidebarView: View {
                 }
             }
 
+            if model.showsTidalSection {
+                Section("TIDAL") {
+                    row(.tidalSearch, "Search", "magnifyingglass", count: nil)
+                    if !model.tidal.mixesUnavailable {
+                        row(.tidalMixes, "My Mixes", "square.stack", count: nil)
+                    }
+                    row(.tidalNewReleases, "New Releases", "sparkles", count: nil)
+                    Label {
+                        HStack {
+                            Text("Downloads").lineLimit(1).minimumScaleFactor(0.8)
+                            Spacer()
+                            TidalDownloadsBadge(progress: TidalDownloadProgress(items: model.tidal.downloader?.items ?? []))
+                        }
+                    } icon: {
+                        Image(systemName: "arrow.down.circle")
+                    }
+                    .tag(SidebarItem.tidalDownloads)
+                }
+            }
+
             Section {
                 ForEach(model.library.sources) { source in
                     if let id = source.id {

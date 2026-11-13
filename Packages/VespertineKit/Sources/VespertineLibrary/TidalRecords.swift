@@ -26,8 +26,13 @@ public struct TidalTrackRecord: Codable, Sendable, Hashable, FetchableRecord, Pe
     /// `codec`, `sampleRate` and `bitDepth` of the track are the stream's own (read after the first play or download), not what TIDAL lists.
     public var formatIsProbed: Bool
     public var lastSyncedAt: Date?
+    /// How the row arrived: `favoriteOrigin` (the account's sync) or `addedOrigin` ("Add to Library" from the catalog, which the
+    /// sync never removes).
+    public var origin: String = TidalTrackRecord.favoriteOrigin
 
     public static let databaseTableName = "tidalTrack"
+    public static let favoriteOrigin = "favorite"
+    public static let addedOrigin = "added"
     /// A downloaded track that left the favorites stays, with this reason.
     public static let notInFavorites = "notInFavorites"
 }
@@ -103,6 +108,38 @@ extension LibrarySource {
     public var isTidal: Bool { path == Self.tidalPath }
 }
 
+extension Track {
+    /// A TIDAL track as the library stores it: its row for the sync, or (with no id) a catalog track shown and played without one.
+    public static func tidal(_ input: TidalTrackInput, sourceId: Int64?, now: Date = Date()) -> Track {
+        let format = input.listedFormat
+        var track = Track(id: nil, sourceId: sourceId, location: LibraryDatabase.tidalLocation(input.tidalId), filePath: "", fileSize: 0,
+                          modifiedAt: now, addedAt: now, codec: format.codec, isLossless: format.lossless, isDSD: false,
+                          sampleRate: format.sampleRate, bitDepth: format.bitDepth, channels: 2, duration: input.duration,
+                          bitrate: format.bitrate, cueStartFrame: nil, cueFrameLength: nil, title: input.title, artist: nil,
+                          album: nil, albumArtist: nil, composer: nil, genre: nil, releaseDate: nil, year: nil, trackNumber: nil,
+                          trackTotal: nil, discNumber: nil, discTotal: nil, compilation: false, grouping: nil, comment: nil,
+                          lyrics: nil, bpm: nil, rating: nil, isrc: nil, label: nil, musicBrainzReleaseID: nil,
+                          musicBrainzRecordingID: nil, titleSort: nil, artistSort: nil, albumSort: nil, albumArtistSort: nil,
+                          extraTags: [:], rgTrackGain: nil, rgTrackPeak: nil, rgAlbumGain: nil, rgAlbumPeak: nil, artworkKey: nil,
+                          playCount: 0, lastPlayedAt: nil, isMissing: false, effectiveBitDepth: nil, bandwidthHz: nil,
+                          analysisVerdict: nil)
+        track.artist = input.artist
+        track.album = input.album
+        track.albumArtist = input.albumArtist
+        track.trackNumber = input.trackNumber
+        track.discNumber = input.discNumber
+        track.trackTotal = input.trackTotal
+        track.discTotal = input.discTotal
+        track.isrc = input.isrc
+        track.releaseDate = input.releaseDate
+        track.year = input.year
+        track.artworkKey = input.coverUUID.map { "tidal:\($0)" }
+        track.rgTrackGain = input.replayGain.trackGain
+        track.rgTrackPeak = input.replayGain.trackPeak
+        return track
+    }
+}
+
 extension LibraryDatabase {
     public static func tidalLocation(_ tidalId: Int) -> String { "tidal://track/\(tidalId)" }
 
@@ -155,17 +192,7 @@ extension LibraryDatabase {
                 if let existing, let stored = try Track.fetchOne(db, key: existing.trackId) {
                     track = stored
                 } else {
-                    track = Track(id: nil, sourceId: sourceId, location: Self.tidalLocation(input.tidalId), filePath: "", fileSize: 0,
-                                  modifiedAt: now, addedAt: now, codec: format.codec, isLossless: format.lossless, isDSD: false,
-                                  sampleRate: format.sampleRate, bitDepth: format.bitDepth, channels: 2, duration: input.duration,
-                                  bitrate: format.bitrate, cueStartFrame: nil, cueFrameLength: nil, title: input.title, artist: nil,
-                                  album: nil, albumArtist: nil, composer: nil, genre: nil, releaseDate: nil, year: nil, trackNumber: nil,
-                                  trackTotal: nil, discNumber: nil, discTotal: nil, compilation: false, grouping: nil, comment: nil,
-                                  lyrics: nil, bpm: nil, rating: nil, isrc: nil, label: nil, musicBrainzReleaseID: nil,
-                                  musicBrainzRecordingID: nil, titleSort: nil, artistSort: nil, albumSort: nil, albumArtistSort: nil,
-                                  extraTags: [:], rgTrackGain: nil, rgTrackPeak: nil, rgAlbumGain: nil, rgAlbumPeak: nil, artworkKey: nil,
-                                  playCount: 0, lastPlayedAt: nil, isMissing: false, effectiveBitDepth: nil, bandwidthHz: nil,
-                                  analysisVerdict: nil)
+                    track = Track.tidal(input, sourceId: sourceId, now: now)
                 }
                 track.sourceId = sourceId
                 track.location = Self.tidalLocation(input.tidalId)
@@ -263,6 +290,22 @@ extension LibraryDatabase {
             try db.execute(sql: "UPDATE transitionProfile SET trackId = ? WHERE trackId = ?", arguments: [trackId, old])
         }
         try db.execute(sql: "DELETE FROM track WHERE id = ?", arguments: [old])
+    }
+
+    /// Catalog tracks added by hand ("Add to Library"): stored like synced ones, and the rows made here are marked `addedOrigin`,
+    /// so the sync never removes them. A track the library already has keeps its origin.
+    @discardableResult
+    public func addTidalTracks(_ inputs: [TidalTrackInput], sourceId: Int64) throws -> [Int: Int64] {
+        let before = try tidalTrackIds()
+        let ids = try upsertTidalTracks(inputs, sourceId: sourceId)
+        let new = ids.filter { !before.contains($0.key) }.map(\.value)
+        guard !new.isEmpty else { return ids }
+        try writer.write { db in
+            for trackId in new {
+                try db.execute(sql: "UPDATE tidalTrack SET origin = ? WHERE trackId = ?", arguments: [TidalTrackRecord.addedOrigin, trackId])
+            }
+        }
+        return ids
     }
 
     /// The TIDAL ids of every TIDAL row.
@@ -382,8 +425,9 @@ extension LibraryDatabase {
         try writer.write { db in
             var removed = 0
             let rows = try Row.fetchAll(db, sql: """
-                SELECT d.trackId, d.tidalId, d.downloadPath FROM tidalTrack d JOIN track t ON t.id = d.trackId WHERE t.sourceId = ?
-                """, arguments: [sourceId])
+                SELECT d.trackId, d.tidalId, d.downloadPath FROM tidalTrack d JOIN track t ON t.id = d.trackId
+                WHERE t.sourceId = ? AND d.origin != ?
+                """, arguments: [sourceId, TidalTrackRecord.addedOrigin])
             for row in rows {
                 let tidalId: Int = row["tidalId"], trackId: Int64 = row["trackId"]
                 guard !keep.contains(tidalId) else { continue }

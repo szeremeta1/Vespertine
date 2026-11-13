@@ -42,7 +42,7 @@ struct TidalLibraryTests {
         #expect(try Set(queue.read { try String.fetchAll($0, sql: "SELECT identifier FROM grdb_migrations") }).contains("v23-tidal"))
         let columns = try queue.read { try Row.fetchAll($0, sql: "PRAGMA table_info(tidalTrack)").map { $0["name"] as String } }
         #expect(Set(columns) == ["trackId", "tidalId", "albumId", "artistIds", "listedQuality", "mediaTags", "explicit", "copyright",
-                                 "popularity", "streamable", "unavailableReason", "downloadPath", "formatIsProbed", "lastSyncedAt"])
+                                 "popularity", "streamable", "unavailableReason", "downloadPath", "formatIsProbed", "lastSyncedAt", "origin"])
     }
 
     @Test("The TIDAL source is created once, with its address and name")
@@ -127,6 +127,29 @@ struct TidalLibraryTests {
         // Back in the favorites, it is an ordinary row again.
         try db.upsertTidalTracks([input(2)], sourceId: source)
         #expect(try db.tidalRecord(trackId: ids[2]!)?.unavailableReason == nil)
+    }
+
+    @Test("Rows added from the catalog are marked added; sync's removal keeps them, and a sync doesn't turn them into favorites")
+    func addedRowsStay() throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try #require(try db.tidalSource(userId: 1).id)
+        let synced = try db.upsertTidalTracks([input(1, title: "Fav")], sourceId: source)
+        let added = try db.addTidalTracks([input(2, title: "Added"), input(1, title: "Fav")], sourceId: source)
+        #expect(added[2] != nil && added[1] == synced[1])
+        #expect(try db.tidalRecord(trackId: synced[1]!)?.origin == TidalTrackRecord.favoriteOrigin, "already there: stays a favorite")
+        #expect(try db.tidalRecord(trackId: added[2]!)?.origin == TidalTrackRecord.addedOrigin)
+        try db.upsertTidalTracks([input(2, title: "Added")], sourceId: source)
+        #expect(try db.tidalRecord(trackId: added[2]!)?.origin == TidalTrackRecord.addedOrigin)
+        #expect(try db.removeTidalTracks(notIn: [], sourceId: source) == 1)
+        #expect(try db.allTracks().map(\.title) == ["Added"])
+    }
+
+    @Test("A catalog track not in the library is a track with no id, as the library would store it")
+    func transient() {
+        let track = Track.tidal(input(5, title: "Live"), sourceId: nil)
+        #expect(track.id == nil && track.isTidalTrack && track.location == "tidal://track/5" && track.filePath.isEmpty)
+        #expect(track.title == "Live" && track.artist == "Artist" && track.album == "Album" && track.artworkKey == "tidal:ab-cd")
+        #expect(track.codec == "FLAC" && track.sampleRate == 44_100 && track.duration == 200 && track.isrc == "XX00000005")
     }
 
     @Test("A download is the track's file, and clearing it empties the path again")
