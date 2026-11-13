@@ -71,9 +71,9 @@ public extension SavedPairing {
     func routes(nearby: NWEndpoint?) -> [RemoteRoute] {
         var out: [RemoteRoute] = []
         if let nearby { out.append(RemoteRoute(kind: .nearby, endpoint: nearby)) }
-        let typed = address?.withPort(from: lastKnown)
+        // An address at the typed host is the typed address (whatever port it has); the rest is where the Mac was seen.
         for saved in savedAddresses {
-            if let route = RemoteRoute(kind: saved == typed ? .address : .lastKnown, address: saved) { out.append(route) }
+            if let route = RemoteRoute(kind: saved.host == address?.host ? .address : .lastKnown, address: saved) { out.append(route) }
         }
         return out
     }

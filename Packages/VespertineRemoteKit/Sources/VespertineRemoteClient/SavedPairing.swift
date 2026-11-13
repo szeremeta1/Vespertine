@@ -34,12 +34,30 @@ public struct SavedPairing: Codable, Sendable, Equatable, Identifiable {
     }
 
     /// The addresses to try besides Bonjour, most likely first: the typed one (with the last known port if it has
-    /// none), then the last known one. Addresses without a port are left out.
+    /// none), then the last known one; then each of those hosts at the port the Mac tries first
+    /// (`RemotePort.preferred`), for a Mac that restarted on it (and for a pairing made before the port was fixed).
+    /// A host with no port known anywhere is only tried at that port.
     public var savedAddresses: [RemoteAddress] {
         var out: [RemoteAddress] = []
-        if let typed = address?.withPort(from: lastKnown), typed.port != nil { out.append(typed) }
-        if let lastKnown, lastKnown.port != nil, !out.contains(lastKnown) { out.append(lastKnown) }
+        func add(_ address: RemoteAddress?) {
+            if let address, address.port != nil, !out.contains(address) { out.append(address) }
+        }
+        add(address?.withPort(from: lastKnown))
+        add(lastKnown)
+        for host in [address?.host, lastKnown?.host] {
+            if let host { add(RemoteAddress(host: host, port: RemotePort.preferred)) }
+        }
         return out
+    }
+
+    /// This pairing after the Mac announced `port` (Bonjour TXT): where it was last seen moves to that port, so a typed
+    /// name reached from away (Tailscale) uses it. A typed address with a port of its own is the user's choice and stays.
+    public func noting(advertisedPort port: UInt16) -> SavedPairing {
+        var copy = self
+        if let host = lastKnown?.host ?? address?.host, lastKnown?.port != port {
+            copy.lastKnown = RemoteAddress(host: host, port: port)
+        }
+        return copy
     }
 
     public var presharedKey: RemoteTransport.PresharedKey {
