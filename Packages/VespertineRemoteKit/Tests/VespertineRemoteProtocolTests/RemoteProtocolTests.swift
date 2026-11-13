@@ -20,6 +20,14 @@ private let track = TrackSummary(id: 42, title: "So What", artist: "Miles Davis"
                                  albumKey: "miles davis\u{1F}kind of blue", duration: 562.3, trackNumber: 1, discNumber: 1,
                                  format: "FLAC · 24/192", artworkKey: "abc123", favorite: true)
 
+/// A favorite the library has twice: the ALAC file and a Dolby Atmos mix.
+private let copied: TrackSummary = {
+    var song = track
+    song.copies = [TrackCopy(id: 42, format: "ALAC · 24/96", hiRes: true, edition: nil, location: "Music › Miles Davis/Kind of Blue", duration: 562.3, favorite: true, preferred: false),
+                   TrackCopy(id: 43, format: "Dolby Atmos · 768k · 5.1", hiRes: false, edition: "Dolby Atmos", location: "Music Share › Spatial", duration: 562.3, favorite: true, preferred: true)]
+    return song
+}()
+
 @Suite struct WireFormat {
     @Test func commandsKeepTheirShape() throws {
         // The web remote and other clients write these by hand: the shape is part of the protocol.
@@ -59,6 +67,8 @@ private let track = TrackSummary(id: 42, title: "So What", artist: "Miles Davis"
             .volume(action: .mute), .setVolume(level: 0.5), .setTransitions(on: true),
             .songs(offset: 200, limit: 100), .find(text: "blue", limit: 20), .addToPlaylist(id: 2, ids: [4, 5]),
             .createPlaylist(name: "Sunday", ids: []),
+            .library, .genres, .genreAlbums(key: "jazz"), .recentlyAdded(limit: 150), .sourceAlbums(id: 3),
+            .playAlbums(keys: ["k", "l"], shuffled: true), .playCopy(ids: [1, 2], startAt: 1),
         ]
         for command in commands {
             let message = ClientMessage(id: 7, command: command)
@@ -88,6 +98,10 @@ private let track = TrackSummary(id: 42, title: "So What", artist: "Miles Davis"
             .reply(id: 11, result: .found(SearchResults(
                 tracks: [track], albums: [], artists: [ArtistSummary(name: "Miles Davis", albumCount: 3, artworkKey: nil)],
                 playlists: [PlaylistSummary(id: 1, name: "Late", smart: false, trackCount: 12, artworkKeys: ["a", "b"])]))),
+            .reply(id: 12, result: .genres(items: [GenreSummary(key: "jazz", name: "Jazz", albumCount: 12, artworkKeys: ["a", "b"])])),
+            .reply(id: 13, result: .library(LibraryOverview(albums: 900, artists: 300, songs: 11_000, genres: 40, favorites: 120, playlists: 9, sources: [
+                SourceSummary(id: 3, name: "Music Share", kind: .network, online: true, scanning: false, albumCount: 800, detail: "REFERENCED IN PLACE · ONLINE")]))),
+            .reply(id: 14, result: .tracks(items: [copied])),
         ]
         for message in messages { #expect(try roundTrip(message) == message) }
     }
@@ -101,6 +115,25 @@ private let track = TrackSummary(id: 42, title: "So What", artist: "Miles Davis"
         #expect(try json(RemoteCommand.addToPlaylist(id: 2, ids: [4, 5])) == #"{"addToPlaylist":{"id":2,"ids":[4,5]}}"#)
         #expect(try json(RemoteCommand.createPlaylist(name: "Sunday", ids: [])) == #"{"createPlaylist":{"ids":[],"name":"Sunday"}}"#)
         #expect(try json(RemoteReply.songs(items: [], total: 0)) == #"{"songs":{"items":[],"total":0}}"#)
+    }
+
+    @Test func theLibrarySectionCommandsKeepTheirShape() throws {
+        #expect(try json(RemoteCommand.library) == #"{"library":{}}"#)
+        #expect(try json(RemoteCommand.genres) == #"{"genres":{}}"#)
+        #expect(try json(RemoteCommand.genreAlbums(key: "jazz")) == #"{"genreAlbums":{"key":"jazz"}}"#)
+        #expect(try json(RemoteCommand.recentlyAdded(limit: 150)) == #"{"recentlyAdded":{"limit":150}}"#)
+        #expect(try json(RemoteCommand.sourceAlbums(id: 3)) == #"{"sourceAlbums":{"id":3}}"#)
+        #expect(try json(RemoteCommand.playAlbums(keys: ["k"], shuffled: nil)) == #"{"playAlbums":{"keys":["k"]}}"#)
+        #expect(try json(RemoteCommand.playCopy(ids: [1, 2], startAt: 1)) == #"{"playCopy":{"ids":[1,2],"startAt":1}}"#)
+    }
+
+    @Test func aSongFromAnOlderMacHasNoCopies() throws {
+        // 1.1.2 doesn't say `copies`: the song decodes, and a remote shows it as a song in one copy.
+        let old = #"{"album":"Kind of Blue","albumKey":"k","artist":"Miles Davis","duration":562.3,"favorite":true,"format":"FLAC · 24/192","id":42,"title":"So What"}"#
+        let song = try RemoteProtocol.decoder().decode(TrackSummary.self, from: Data(old.utf8))
+        #expect(song.copies == nil && song.title == "So What")
+        // And a song in one copy is sent as before, with no `copies` key for an older remote to trip over.
+        #expect(try !json(track).contains("copies"))
     }
 
     @Test func aPlaylistFromAnOlderMacStillDecodes() throws {

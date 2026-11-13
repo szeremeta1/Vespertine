@@ -675,7 +675,7 @@ struct SourceView: View {
                 HStack(alignment: .firstTextBaseline) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(source.url.lastPathComponent).font(Typeface.serif(26, weight: .medium)).foregroundStyle(Palette.text)
-                        Text(status(source))
+                        Text(source.statusLine)
                             .font(Typeface.mono(10.5)).foregroundStyle(Palette.text3)
                         Text(source.path).font(Typeface.ui(12)).foregroundStyle(Palette.text2).textSelection(.enabled)
                     }
@@ -690,12 +690,15 @@ struct SourceView: View {
             .background(Palette.window)
         }
     }
+}
 
-    /// "MANAGED · COPIED & ORGANIZED · ONLINE · SCANNED 2 HOURS AGO"
-    private func status(_ source: LibrarySource) -> String {
-        var parts = [source.mode == .managed ? String(localized: "MANAGED · COPIED & ORGANIZED") : String(localized: "REFERENCED IN PLACE"),
-                     source.isOnline ? String(localized: "ONLINE") : String(localized: "OFFLINE")]
-        if let scanned = source.lastScannedAt {
+extension LibrarySource {
+    /// "MANAGED · COPIED & ORGANIZED · ONLINE · SCANNED 2 HOURS AGO": the line under a source's name on its page (and
+    /// on a remote's list of sources).
+    var statusLine: String {
+        var parts = [mode == .managed ? String(localized: "MANAGED · COPIED & ORGANIZED") : String(localized: "REFERENCED IN PLACE"),
+                     isOnline ? String(localized: "ONLINE") : String(localized: "OFFLINE")]
+        if let scanned = lastScannedAt {
             parts.append(String(localized: "SCANNED \(scanned.formatted(.relative(presentation: .named)).localizedUppercase)",
                                 comment: "Followed by when the source was last scanned, e.g. 2 HOURS AGO"))
         }

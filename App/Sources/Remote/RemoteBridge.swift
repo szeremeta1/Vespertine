@@ -102,6 +102,13 @@ struct RemoteBridge {
                      format: track.formatSummary, artworkKey: model.artworkKey(track), favorite: library.isFavorite(track))
     }
 
+    /// A song listed once with its copies beside it (Favorites).
+    func trackSummary(_ song: Self.ListedSong) -> TrackSummary {
+        var summary = trackSummary(song.shown)
+        summary.copies = Self.copies(of: song, in: library)
+        return summary
+    }
+
     func albumSummary(_ album: Album) -> AlbumSummary {
         AlbumSummary(key: album.key, title: album.title.libraryDisplayName, artist: album.artist.libraryDisplayName, year: album.year,
                      trackCount: album.trackCount, duration: album.duration, format: album.formatSummary, artworkKey: album.artworkKey,
@@ -167,8 +174,61 @@ struct RemoteBridge {
         return .playlists(items: all.compactMap { playlistSummary($0, in: library, artworkKey: artworkKey) })
     }
 
+    // MARK: Songs in several copies
+
+    /// A song as a list of songs shows it: one of its copies, and every copy the library has (just that one, usually).
+    struct ListedSong {
+        var shown: Track
+        var copies: [Track]
+    }
+
+    /// The favorite songs as the Favorites page lists them, the most recently favorited first: each song once, however
+    /// many of its copies are favorites (an ALAC and a Dolby Atmos copy of one song), as the copy `choose` picks among
+    /// the favorite ones (the one that plays on this output), with every copy of it in the library beside it.
+    static func favoriteSongs(in library: LibraryStore, choose: ([Track]) -> Track) -> [ListedSong] {
+        library.songs(listing: library.favoriteTracks()).compactMap { song in
+            song.listed.isEmpty ? nil : ListedSong(shown: choose(song.listed), copies: song.all)
+        }
+    }
+
+    /// A song's copies as the Mac's "COPIES" list has them (format, edition, where it is); nil for a song in one copy.
+    static func copies(of song: ListedSong, in library: LibraryStore) -> [TrackCopy]? {
+        guard song.copies.count > 1 else { return nil }
+        let analyzed = LibraryCopies.analyze(song.copies)
+        return song.copies.compactMap { copy in
+            guard let id = copy.id else { return nil }
+            return TrackCopy(id: id, format: copy.formatSummary, hiRes: copy.isHiRes, edition: analyzed.copy(of: copy)?.edition,
+                             location: library.displayPath((copy.filePath as NSString).deletingLastPathComponent), duration: copy.duration,
+                             favorite: library.isFavorite(copy), preferred: library.isPreferredCopy(copy))
+        }
+    }
+
+    // MARK: Sections of the library
+
+    static func genres(of library: LibraryStore) -> [VespertineRemoteProtocol.GenreSummary] {
+        library.genres.map { .init(key: $0.key, name: $0.name, albumCount: $0.albumCount, artworkKeys: $0.artworkKeys) }
+    }
+
+    /// The sources as the sidebar lists them. `connecting`: a network share that's being mounted now.
+    static func sources(of library: LibraryStore, connecting: (LibrarySource) -> Bool = { _ in false }) -> [SourceSummary] {
+        library.sources.compactMap { source in
+            guard let id = source.id else { return nil }
+            let kind: SourceKind = source.isNetwork ? .network : source.path.hasPrefix("/Volumes/") ? .external : source.mode == .managed ? .managed : .folder
+            return SourceSummary(id: id, name: source.displayName, kind: kind, online: source.isOnline,
+                                 scanning: connecting(source) || library.scanProgress?.sourcePath == source.path,
+                                 albumCount: library.albums(inSource: id).count, detail: source.statusLine)
+        }
+    }
+
+    static func overview(of library: LibraryStore, connecting: (LibrarySource) -> Bool = { _ in false }) -> LibraryOverview {
+        LibraryOverview(albums: library.stats.albums, artists: library.stats.artists, songs: library.stats.tracks, genres: library.genres.count,
+                        favorites: library.favoriteCount, playlists: library.playlists.count, sources: sources(of: library, connecting: connecting))
+    }
+
     /// The most songs one command adds to a playlist.
     static let playlistBatch = 5_000
+    /// The most albums one command plays.
+    static let albumBatch = 2_000
 
     /// Every song by title, kept until the library changes: a remote asks for it a page at a time.
     private static var songList: (library: ObjectIdentifier, revision: Int, count: Int, tracks: [Track])?
@@ -250,6 +310,16 @@ struct RemoteBridge {
             // A song is all its copies, as the heart in the window treats it.
             let all = Set(library.playbackVersions(of: tracks).flatMap { $0 }.compactMap(\.id) + ids)
             library.setFavorite(on, trackIDs: Array(all))
+        case .playAlbums(let keys, let shuffled):
+            // Each album as its own page plays it (its chosen copy, or the best one for the output).
+            let tracks = keys.prefix(Self.albumBatch).flatMap { model.playableTracks(albumKey: $0) }
+            guard !tracks.isEmpty else { return notInLibrary }
+            player.play(tracks, shuffled: shuffled)
+        case .playCopy(let ids, let startAt):
+            let tracks = ordered(ids)
+            guard !tracks.isEmpty else { return notInLibrary }
+            let index = min(max(0, startAt), tracks.count - 1)
+            player.play(tracks, startAt: index, exactly: [tracks[index].location])
 
         case .albums(let offset, let limit):
             let albums = library.albums
@@ -269,7 +339,21 @@ struct RemoteBridge {
             guard let playlist = library.playlists.first(where: { $0.id == id }) else { return notInLibrary }
             return .tracks(items: library.tracks(in: playlist).map(trackSummary))
         case .favorites:
-            return .tracks(items: library.favoriteTracks().map(trackSummary))
+            return .tracks(items: Self.favoriteSongs(in: library, choose: model.listedCopy).map(trackSummary))
+        case .library:
+            return .library(Self.overview(of: library, connecting: { $0.isNetwork && model.shares.status(of: $0) == .connecting }))
+        case .genres:
+            return .genres(items: Self.genres(of: library))
+        case .genreAlbums(let key):
+            let albums = library.albums(genre: key)
+            return .albums(items: albums.map(albumSummary), total: albums.count)
+        case .recentlyAdded(let limit):
+            let albums = library.recentlyAddedAlbums(limit: min(max(1, limit), AppModel.recentlyAddedLimit))
+            return .albums(items: albums.map(albumSummary), total: albums.count)
+        case .sourceAlbums(let id):
+            guard library.sources.contains(where: { $0.id == id }) else { return notInLibrary }
+            let albums = library.albums(inSource: id)
+            return .albums(items: albums.map(albumSummary), total: albums.count)
         case .search(let text, let limit):
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else { return .tracks(items: []) }

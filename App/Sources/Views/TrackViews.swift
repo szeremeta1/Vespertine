@@ -557,18 +557,12 @@ struct SongList {
     /// favorite is the copy hearted; where an album's copies are bundled, all of them are), with every copy of it in the
     /// library a click away (`allCopies`).
     @MainActor init(songs tracks: [Track], model: AppModel) {
-        var index: [String: Int] = [:]
         var listed: [Track] = [], songOf: [Int] = []
-        let given = Set(tracks.map(\.location))
-        for song in model.library.versions(of: tracks) {
-            let key = song.map(\.location).sorted().joined(separator: "\u{1F}")
-            guard index[key] == nil else { continue }
-            let mine = song.filter { given.contains($0.location) }
-            index[key] = songs.count
-            listed += mine
-            songOf += Array(repeating: songs.count, count: mine.count)
-            songs.append(mine)
-            allCopies.append(song)
+        for song in model.library.songs(listing: tracks) {
+            listed += song.listed
+            songOf += Array(repeating: songs.count, count: song.listed.count)
+            songs.append(song.listed)
+            allCopies.append(song.all)
         }
         self.tracks = listed
         self.songOf = songOf
@@ -630,12 +624,7 @@ struct SongsPage<Extra: View, Empty: View>: View {
             if passing[songOf[i]] == nil { order.append(songOf[i]) }
             passing[songOf[i], default: []].append(list.tracks[i])
         }
-        let wanted = model.outputWantsMultichannel() ?? true
-        let shares = model.shares
-        let shown = order.map { s in
-            let versions = passing[s] ?? []
-            return TrackVersions.choose(versions, multichannel: wanted, isLocal: { !shares.isNetwork($0) }, isPreferred: model.library.isPreferredCopy) ?? versions[0]
-        }
+        let shown = order.map { model.listedCopy(of: passing[$0] ?? []) }
         let all = order.map { list.allCopies.indices.contains($0) ? list.allCopies[$0] : list.songs[$0] }
         return (shown, Dictionary(zip(shown, all).compactMap { t, copies in
             guard let id = t.id, copies.count > 1 else { return nil }

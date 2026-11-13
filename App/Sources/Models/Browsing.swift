@@ -239,7 +239,7 @@ extension AppModel {
         let albums = library.albums
         switch scope {
         case .sidebar(.recentlyAdded):
-            return Array(albums.sorted { $0.addedAt > $1.addedAt }.prefix(Self.recentlyAddedLimit))
+            return library.recentlyAddedAlbums(limit: Self.recentlyAddedLimit)
         case .sidebar(.genres):
             return albums.filter { !$0.facts.genres.isEmpty }
         case .sidebar(.artists):
@@ -249,14 +249,14 @@ extension AppModel {
                 return x != y ? x < y : (a.year ?? 0) < (b.year ?? 0)
             }
         case .sidebar(.source(let id)):
-            return albums.filter { $0.facts.sources.contains(id) }
+            return library.albums(inSource: id)
         case .route(.artist(let name)):
             let key = name.lowercased()
             return albums.filter { $0.facts.artist == key }.sorted { a, b in
                 (a.year ?? 0) != (b.year ?? 0) ? (a.year ?? 0) > (b.year ?? 0) : a.title.localizedStandardCompare(b.title) == .orderedAscending
             }
         case .route(.genre(let key)):
-            return albums.filter { $0.facts.genres.contains(key) }
+            return library.albums(genre: key)
         default:
             return albums
         }
@@ -346,6 +346,13 @@ extension AppModel {
         case .search: library.search(searchText)
         default: nil
         }
+    }
+
+    /// The copy of a song a list of songs shows, among `copies` (never empty): the one that plays on this output (the
+    /// listener's preferred copy first), as Favorites lists a song it has in several copies.
+    func listedCopy(of copies: [Track]) -> Track {
+        let wanted = outputWantsMultichannel() ?? true
+        return TrackVersions.choose(copies, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) }, isPreferred: library.isPreferredCopy) ?? copies[0]
     }
 
     /// Songs through a filter, in their order.
