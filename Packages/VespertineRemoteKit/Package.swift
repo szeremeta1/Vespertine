@@ -29,7 +29,7 @@ let package = Package(
         .target(name: "VespertinePhonePlayer", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient"]),
         .executableTarget(name: "vespertine-remote", dependencies: ["VespertineRemoteProtocol"]),
         .testTarget(name: "VespertineRemoteProtocolTests", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient"]),
-        .testTarget(name: "VespertineStreamServerTests", dependencies: ["VespertineStreamServer", "VespertineRemoteProtocol", "VespertineRemoteClient"]),
+        .testTarget(name: "VespertineStreamServerTests", dependencies: ["VespertineStreamServer", "VespertineRemoteProtocol", "VespertineRemoteClient", "VespertinePhonePlayer"]),
         .testTarget(name: "VespertinePhonePlayerTests", dependencies: ["VespertinePhonePlayer", "VespertineRemoteProtocol", "VespertineRemoteClient"]),
     ]
 )
