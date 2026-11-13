@@ -59,6 +59,12 @@ Two or more USB DACs, played as one multichannel system: a Fosi ZD3 and a FiiO K
 
 <sub>The screenshots here were taken on a Mac with two virtual audio devices (Vespertine Loopback and BlackHole 2ch) standing in for two stereo DACs. They show the screens, not a measurement of real DACs.</sub>
 
+<p align="center">
+  <a href="docs/screenshots/speaker-groups-demo.mp4"><img src="docs/screenshots/speaker-groups-demo.png" width="800" alt="Watch the Speaker Groups demo: create a quad from two virtual outputs, edit its room layout, then play an album to the group with the signal path and channel meters"></a>
+</p>
+
+<sub>[Watch the demo](docs/screenshots/speaker-groups-demo.mp4) (37 seconds, no sound): turning the switch on, creating a group from Vespertine Loopback and Vespertine Loopback B, editing the room drawing, then playing an album to the group. Both members are virtual audio devices standing in for stereo DACs. The recording used the 1.1.2 release with a development bundle identifier (ending in <code>.dev</code>) and an ad-hoc signature, which is what lets the group editor offer virtual devices. It shows the interface, not hardware timing or sound quality.</sub>
+
 - **Channel map.** Every channel of every DAC is assigned to a speaker (front left, centre, back right…). An **Identify** button plays three quiet bursts of pink noise (-30 dBFS) on that one channel of that one DAC, so you can check the wiring, and each channel has an **Inverted** box. Presets lay out a Quad, an ITU 5.1 room or two pairs facing each other. Up to 16 output channels in total.
 - **Your room, drawn.** Drag the speakers and your seat on a top-down drawing; each speaker's distance, angle, delay and level are worked out from it, so every speaker reaches the seat together. "Use the Drawing" turns that into a room-correction profile (delays and levels, no microphone needed), or measure the group with a microphone and the wizard also times each follower DAC against the leader.
 - **Per-speaker trims.** Level (-40 to +12 dB), extra delay (0 to 40 ms) and a polarity flip for each speaker. A headroom guard lowers the shared preamp by the largest boost any channel can reach, so a trim doesn't clip a loud song.
