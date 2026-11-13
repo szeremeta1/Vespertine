@@ -135,7 +135,13 @@ public final class MediaServer: @unchecked Sendable {
         }
         lock.withLock { self.server = server }
         let port = try await server.start()
-        lock.withLock { self.port = port }
+        // Stopped while it was starting: it stays stopped.
+        let current = lock.withLock { () -> Bool in
+            guard self.server === server else { return false }
+            self.port = port
+            return true
+        }
+        if !current { server.stop() }
     }
 
     public func stop() {

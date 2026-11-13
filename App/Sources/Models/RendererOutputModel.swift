@@ -36,8 +36,11 @@ final class RendererOutputModel {
     }
 
     func start() {
-        Task {
-            do { try await service.setEnabled(true) } catch { failure = error.localizedDescription }
+        // Asked for in order on this thread; the service applies the changes one after the other (a quick off-on can't race).
+        service.want(true)
+        Task { [service] in
+            await service.settled()
+            if service.isEnabled, let error = service.lastError { failure = error.localizedDescription }
             // A search takes a few seconds; after that "Searching…" gives way to the list, even an empty one.
             try? await Task.sleep(for: .seconds(4))
             searching = false
@@ -47,7 +50,7 @@ final class RendererOutputModel {
     func stop() {
         playback?.shutdown()
         playback = nil
-        Task { try? await service.setEnabled(false) }
+        service.want(false)
         renderers = []
     }
 
