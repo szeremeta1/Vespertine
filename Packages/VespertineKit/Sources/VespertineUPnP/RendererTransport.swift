@@ -195,7 +195,9 @@ public actor AVTransportControl: RendererTransport {
     public func load(current: RendererTrack, next: RendererTrack?) async throws {
         try await setCurrent(current)
         self.next = next
-        if let next { try await setNextOnRenderer(next) }
+        // A next song left from before must not play after this one: an empty NextURI clears it (some renderers refuse
+        // the empty one; setting the current URI clears it on those).
+        if let next { try await setNextOnRenderer(next) } else { try? await setNextOnRenderer(nil) }
         try await play()
     }
 

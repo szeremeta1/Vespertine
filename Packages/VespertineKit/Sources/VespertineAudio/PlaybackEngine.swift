@@ -49,6 +49,8 @@ public struct EngineSnapshot: Sendable {
     /// The channels of the bed Vespertine decodes beside the output while macOS renders the track or a receiver gets it
     /// as a bitstream (the meters' own channels then; `takeChannelPeaks` reads their levels). nil otherwise.
     public var bedMeters: BedMeterLayout?
+
+    public init() {}
 }
 
 extension EngineSnapshot {
