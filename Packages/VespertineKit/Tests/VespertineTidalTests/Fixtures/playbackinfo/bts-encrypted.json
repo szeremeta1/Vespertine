@@ -1,0 +1,13 @@
+{
+  "trackId": 100001,
+  "assetPresentation": "FULL",
+  "audioMode": "STEREO",
+  "audioQuality": "HIGH",
+  "manifestMimeType": "application/vnd.tidal.bts",
+  "manifestHash": "fabricated-hash",
+  "manifest": "eyJtaW1lVHlwZSI6ICJhdWRpby9tcDQiLCAiY29kZWNzIjogImFhYyIsICJlbmNyeXB0aW9uVHlwZSI6ICJPTERfQUVTIiwgInVybHMiOiBbImh0dHBzOi8vZmFrZS1jZG4uZXhhbXBsZS9hdWRpby90cmFjay5tcDQiXSwgImtleUlkIjogImZhYnJpY2F0ZWQta2V5LWlkIn0=",
+  "albumReplayGain": -8.1,
+  "albumPeakAmplitude": 1.0,
+  "trackReplayGain": -7.9,
+  "trackPeakAmplitude": 0.98
+}
