@@ -228,7 +228,8 @@ public final class RAOPSession: @unchecked Sendable {
             guard let anchor = s.anchor else { return nil }
             // Signed: before the anchor (the packets sent ahead of the clock) the frame being "sent now" is behind it.
             let elapsed = Int64(bitPattern: nanoseconds &- anchor.nanos)
-            let frames = elapsed * Int64(RAOPTiming.sampleRate) / 1_000_000_000
+            // In Double: an Int64 product would overflow after about 58 hours on one anchor.
+            let frames = Int64((Double(elapsed) * Double(RAOPTiming.sampleRate) / 1e9).rounded(.down))
             return anchor.rtp &+ UInt32(truncatingIfNeeded: frames)
         }
     }

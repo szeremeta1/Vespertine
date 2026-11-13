@@ -181,4 +181,19 @@ struct RAOPSessionHardeningTests {
         #expect(abs(times[0] - anchorNTP) < 0.001)
         await session.teardown()
     }
+
+    @Test("The clock is still right 60 hours after its anchor (no overflow)")
+    func longAnchor() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        let session = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none)
+        try await session.connect(volumeDB: nil)
+        let anchor = NTPClock.nanosecondsNow()
+        let rtp = session.nextTimestamp
+        session.send(packets(1)[0], startNanos: anchor)
+        let hours: UInt64 = 60
+        let later = try #require(session.clockTimestamp(nanoseconds: anchor + hours * 3_600 * 1_000_000_000))
+        #expect(later == rtp &+ UInt32(truncatingIfNeeded: hours * 3_600 * 44_100))
+        await session.teardown()
+    }
 }

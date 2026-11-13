@@ -57,6 +57,16 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         set { lock.withLock { _wrongCSeq = newValue } }
     }
     private var _wrongCSeq: Set<String> = []
+    /// Wait this long before answering these methods (a receiver that is slow to set up).
+    var stall: [String: TimeInterval] {
+        get { lock.withLock { _stall } }
+        set { lock.withLock { _stall = newValue } }
+    }
+    private var _stall: [String: TimeInterval] = [:]
+    /// The RTP times of the packets that came with the marker (the first of each stream after RECORD or FLUSH).
+    var markerTimestamps: [UInt32] { lock.withLock { _markerTimestamps } }
+    private var _markerTimestamps: [UInt32] = []
+
     /// The RTP time of the first audio packet received.
     var firstTimestamp: UInt32? { lock.withLock { _firstTimestamp } }
 
@@ -159,6 +169,7 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         var cseq = request["CSeq"] ?? "0"
         if wrongCSeq.contains(request.method ?? "") { cseq = String((Int(cseq) ?? 0) + 7) }
         var headers: [(String, String)] = [("CSeq", cseq), ("Server", "AirTunes/366.0")]
+        if let wait = stall[request.method ?? ""] { Thread.sleep(forTimeInterval: wait) }
         if let status = refuse[request.method ?? ""] { return .response(status, "Refused", headers: headers) }
         switch request.method {
         case "ANNOUNCE":
@@ -208,7 +219,7 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private func audio(_ data: Data, resent: Bool) {
         guard let packet = RAOPPacket.parseAudio(data) else { return }
         let lost = lock.withLock { () -> Bool in
-            if !resent, data[data.startIndex + 1] == 0xE0 { _markers += 1 }
+            if !resent, data[data.startIndex + 1] == 0xE0 { _markers += 1; _markerTimestamps.append(packet.timestamp) }
             if !resent { received += 1 }
             if !resent, _drop.contains(packet.seq) { _drop.remove(packet.seq); return true }
             if !resent, let l = loseAfter, received > l.count, received <= l.count + l.lose { return true }

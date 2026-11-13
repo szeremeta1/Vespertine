@@ -81,6 +81,10 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         var prepared: (item: PlayableItem, segment: Segment?)?
         /// The next song being opened now (its id), so it isn't opened twice.
         var preparing: UUID?
+        /// The song a gap waits for (after a hold that ran too long), whose opening is kept though it isn't after the last song.
+        var awaiting: UUID?
+        /// Since when the pacer has been holding for the next song (nanoseconds); nil when it isn't.
+        var holdSince: UInt64?
         /// The receiver volume last sent, and whether a send is queued (volume changes are coalesced: the latest wins).
         var sentVolumeDB: Double?
         var volumeQueued = false
@@ -102,6 +106,14 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     var onOpen: (@Sendable (_ onPacer: Bool) -> Void)?
     /// Tests: how long opening the next song ahead takes at least.
     var preparationDelay: TimeInterval = 0
+    /// Tests: an extra delay before a given song opens (a slow or hung share).
+    var openDelay: (@Sendable (PlayableItem) -> TimeInterval)?
+    /// How long the pacer holds for a next song that isn't open yet: within the lead and the receiver's latency (2.25 s) what
+    /// it sends late still plays; past this it stops, lets the song before be heard to its end, and starts the next on a
+    /// fresh stream when it opens (a gap, said so).
+    static let holdLimit: TimeInterval = 1.5
+    /// How long a song may take to open before it fails (as long as the network cache waits for a share that sends nothing).
+    var openTimeout: TimeInterval = 120
     /// Tests: the next song opened ahead, if any.
     var preparedNext: (item: PlayableItem, segment: AnyObject?)? { state.withLock { $0.prepared.map { ($0.item, $0.segment) } } }
 
@@ -114,6 +126,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     enum Command {
         case play(PlayableItem, at: TimeInterval, announce: Bool, generation: Int)
         case pause, stop, queueChanged, settings(RendererSettings), volume, heard(Segment), lost, ended
+        /// The hold for `next` ran too long: the stream starts again with it once it opens.
+        case gap(after: Segment, next: PlayableItem, since: UInt64, generation: Int)
     }
 
     public init(device: AirPlayDevice, endpoint: NWEndpoint, encryption: RAOPEncryption, rsaKey: SecKey? = nil, lead: TimeInterval = 0.25) {
@@ -284,12 +298,17 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             // Only a different next song drops the one opened ahead.
             guard let last = state.withLock({ $0.segments.last }) else { return }
             let wanted = nextItemProvider?(last.item)
-            let dropped = state.withLock { s -> Bool in
-                guard let prepared = s.prepared, prepared.item.id != wanted?.id else { return false }
-                s.prepared = nil
-                return true
+            let reopen = state.withLock { s -> Bool in
+                if let prepared = s.prepared {
+                    guard prepared.item.id != wanted?.id else { return false }
+                    s.prepared = nil
+                    return true
+                }
+                // Still opening the old next song: the new one is opened now (the old one's result is dropped when it comes).
+                if let preparing = s.preparing, preparing != wanted?.id { s.preparing = nil; return true }
+                return false
             }
-            if dropped { prepareNext(after: last.item) }
+            if reopen { prepareNext(after: last.item) }
         case .settings(let settings):
             let before = state.withLock { s -> RendererSettings in defer { s.settings = settings }; return s.settings }
             // The same settings again (every syncEngine sends them) change nothing: the next song stays as it was opened.
@@ -323,6 +342,9 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                 return s.snapshot.state != .stopped
             }
             if wasActive { emit(.deviceLost(device.name)) }
+        case .gap(let previous, let next, let since, let g):
+            guard generation.withLock({ $0 }) == g else { return }
+            await recover(after: previous, next: next, since: since, generation: g)
         case .ended:
             await halt()
             state.withLock { s in
@@ -379,6 +401,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             s.segments = [segment]
             s.prepared = nil
             s.preparing = nil
+            s.awaiting = nil
+            s.holdSince = nil
             s.queueDone = false
             s.endAnnounced = false
             s.snapshot.item = item
@@ -388,7 +412,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             s.snapshot.lastError = nil
             s.snapshot.state = .playing
         }
-        let pacer = Pacer(lead: lead, session: session, source: { [weak self] count in self?.frames(count) ?? ([], true, false) },
+        let pacer = Pacer(lead: lead, session: session, source: { [weak self] count in self?.frames(count) ?? .frames([], done: true) },
                           tick: { [weak self] in self?.tick() })
         self.pacer = pacer
         pacer.start()
@@ -404,10 +428,12 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         }
     }
 
-    private static let preparation = DispatchQueue(label: "org.szeremeta.vespertine.airplay.prepare", qos: .userInitiated)
+    /// Concurrent: a song stuck opening on a hung share mustn't hold up the one after it.
+    private static let preparation = DispatchQueue(label: "org.szeremeta.vespertine.airplay.prepare", qos: .userInitiated, attributes: .concurrent)
 
     private func makeSegment(_ item: PlayableItem, at seconds: TimeInterval, announces: Bool) throws -> Segment {
         onOpen?(Thread.current.name == Pacer.threadName)
+        if let delay = openDelay?(item), delay > 0 { Thread.sleep(forTimeInterval: delay) }
         let url = urlResolver?(item) ?? item.url
         let (settings, receiverDB) = state.withLock { ($0.settings, $0.receiverVolumeDB) }
         let frames = try AirPlayFrames(item: item, url: url, settings: settings, startSeconds: seconds)
@@ -428,6 +454,12 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     /// Opens the song after `item` ahead of time, so the pacer joins it without a gap.
     private func prepareNext(after item: PlayableItem) {
         guard let next = nextItemProvider?(item) else { return }
+        open(next, after: item)
+    }
+
+    /// Opens `next` (the song after `item`, or the one a gap waits for) on the preparation queue into `prepared`. A result for
+    /// a song that is no longer the next one is dropped.
+    private func open(_ next: PlayableItem, after item: PlayableItem?) {
         let g = generation.withLock { $0 }
         let go = state.withLock { s -> Bool in
             guard s.prepared == nil, s.preparing != next.id else { return false }
@@ -444,9 +476,12 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                 self.log.error("Next song for \(self.device.name, privacy: .public) not opened: \(String(describing: error), privacy: .public)")
                 segment = nil
             }
+            let current = item.flatMap { self.nextItemProvider?($0) }
             self.state.withLock { s in
                 if s.preparing == next.id { s.preparing = nil }
-                guard self.generation.withLock({ $0 }) == g, s.prepared == nil, s.segments.last?.item.id == item.id else { return }
+                guard self.generation.withLock({ $0 }) == g, s.prepared == nil else { return }
+                let stillNext = s.awaiting == next.id || (item != nil && s.segments.last?.item.id == item?.id && current?.id == next.id)
+                guard stillNext else { return }
                 s.prepared = (next, segment)
             }
         }
@@ -456,7 +491,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
 
     /// The next `count` stereo frames of the timeline, crossing into the next song; `done` once the queue has none left;
     /// `waiting` while the next song is still being opened (never here: this is the pacer's real-time thread).
-    private func frames(_ count: Int) -> ([Int16], Bool, Bool) {
+    private func frames(_ count: Int) -> PacerFeed {
         var out: [Int16] = []
         out.reserveCapacity(count * 2)
         while out.count < count * 2 {
@@ -477,14 +512,26 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                 return .some(p.segment)
             }
             guard let found = next else {
-                if wanted == nil {
+                guard let wanted else {
                     state.withLock { $0.queueDone = true }
                     break
                 }
-                state.withLock { s in if s.prepared != nil { s.prepared = nil } }
+                let now = NTPClock.nanosecondsNow()
+                let since = state.withLock { s -> UInt64 in
+                    if s.prepared != nil { s.prepared = nil }
+                    if s.holdSince == nil { s.holdSince = now }
+                    return s.holdSince!
+                }
+                if Double(now - since) / 1e9 > Self.holdLimit {
+                    // Too long: what would be sent now would come too late to play. The stream stops here.
+                    state.withLock { $0.holdSince = nil }
+                    enqueue.yield(.gap(after: segment, next: wanted, since: since, generation: generation.withLock { $0 }))
+                    return .gap(out)
+                }
                 prepareNext(after: segment.item)
-                return (out, false, true)
+                return .wait(out)
             }
+            state.withLock { $0.holdSince = nil }
             guard let following = found else {
                 if let wanted {
                     emit(.failed(wanted, String(localized: "\(device.name) couldn't play the song (it couldn't be opened).", comment: "%@ is an AirPlay receiver's name.")))
@@ -496,7 +543,77 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             prepareNext(after: following.item)
         }
         let done = state.withLock { $0.queueDone }
-        return (out, done, false)
+        return .frames(out, done: done)
+    }
+
+    /// After a hold that ran too long: the song before is heard to its end, the receiver is flushed, and `next` starts from
+    /// its beginning on a fresh stream once it opens (with a notice about the gap). A song that doesn't open within
+    /// `openTimeout`, or can't be opened, fails as any song does and the one after it is tried.
+    private func recover(after previous: Segment, next: PlayableItem, since: UInt64, generation g: Int) async {
+        await halt()
+        // Let what was sent be heard.
+        while generation.withLock({ $0 }) == g, let end = previous.end, let heard = heardTimestamp(), Int32(bitPattern: heard &- end) < 0 {
+            tick()   // the song before still becomes audible (and is announced) while it plays out
+            try? await Task.sleep(for: .milliseconds(50))
+        }
+        tick()
+        guard generation.withLock({ $0 }) == g, let session else { return }
+        do { try await session.flush() } catch { enqueue.yield(.lost); return }
+        var wanted = next
+        var began = since
+        var gapNotice = true
+        while generation.withLock({ $0 }) == g {
+            let found = state.withLock { s -> Segment?? in
+                s.awaiting = wanted.id
+                guard let p = s.prepared, p.item.id == wanted.id else { return .none }
+                s.prepared = nil
+                return .some(p.segment)
+            }
+            if found == nil, state.withLock({ $0.preparing != wanted.id }) { open(wanted, after: nil) }
+            let timedOut = Double(NTPClock.nanosecondsNow() - began) / 1e9 > openTimeout
+            if let found, let segment = found {
+                state.withLock { $0.awaiting = nil }
+                if gapNotice {
+                    let title = metadataProvider?(wanted)?.title ?? wanted.url.deletingPathExtension().lastPathComponent
+                    emit(.notice(String(localized: "Gap before \(title): it took too long to open.", comment: "%@ is a song's title, sent to an AirPlay receiver.")))
+                }
+                restart(with: segment, session: session)
+                return
+            }
+            if found != nil || timedOut {
+                // Couldn't be opened, or not in time: that song fails, the one after is tried.
+                let reason = timedOut ? String(localized: "it took too long to open") : String(localized: "it couldn't be opened")
+                emit(.failed(wanted, String(localized: "\(device.name) couldn't play the song (\(reason)).", comment: "%1$@ is an AirPlay receiver's name, %2$@ the reason.")))
+                state.withLock { s in s.awaiting = nil; if s.prepared?.item.id == wanted.id { s.prepared = nil } }
+                guard let after = nextItemProvider?(wanted) else {
+                    state.withLock { s in s.snapshot.state = .stopped; s.wantsPlaying = false; s.segments = []; s.prepared = nil }
+                    emit(.queueEnded)
+                    return
+                }
+                wanted = after
+                began = NTPClock.nanosecondsNow()
+                gapNotice = false
+                continue
+            }
+            try? await Task.sleep(for: .milliseconds(50))
+        }
+        state.withLock { $0.awaiting = nil }
+    }
+
+    /// A fresh stream starting with `segment` (the receiver has been flushed).
+    private func restart(with segment: Segment, session: RAOPSession) {
+        state.withLock { s in
+            s.segments = [segment]
+            s.prepared = nil
+            s.queueDone = false
+            s.endAnnounced = false
+            s.holdSince = nil
+        }
+        let pacer = Pacer(lead: lead, session: session, source: { [weak self] count in self?.frames(count) ?? .frames([], done: true) },
+                          tick: { [weak self] in self?.tick() })
+        self.pacer = pacer
+        pacer.start()
+        prepareNext(after: segment.item)
     }
 
     /// After each packet: songs that became audible, the end of the queue heard.
@@ -544,18 +661,26 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     }
 }
 
+/// What the pacer gets for a packet: frames (and whether the queue is done), frames so far while it waits for the next song to
+/// open, or frames to send before it stops (a hold that ran too long).
+enum PacerFeed {
+    case frames([Int16], done: Bool)
+    case wait([Int16])
+    case gap([Int16])
+}
+
 /// Sends a packet every 352 frames of real time (with a lead), sync packets about once a second; stops on request.
 final class Pacer: @unchecked Sendable {
     private let lead: TimeInterval
     private let session: RAOPSession
     static let threadName = "Vespertine AirPlay pacer"
-    private let source: @Sendable (Int) -> ([Int16], Bool, Bool)
+    private let source: @Sendable (Int) -> PacerFeed
     private let tick: @Sendable () -> Void
     private let stopped = Locked(false)
     private let finished = DispatchSemaphore(value: 0)
     private var thread: Thread?
 
-    init(lead: TimeInterval, session: RAOPSession, source: @escaping @Sendable (Int) -> ([Int16], Bool, Bool), tick: @escaping @Sendable () -> Void) {
+    init(lead: TimeInterval, session: RAOPSession, source: @escaping @Sendable (Int) -> PacerFeed, tick: @escaping @Sendable () -> Void) {
         self.lead = lead
         self.session = session
         self.source = source
@@ -595,13 +720,26 @@ final class Pacer: @unchecked Sendable {
                 continue
             }
             if !draining {
-                let (samples, done, waiting) = source(packet - pending.count / 2)
-                pending += samples
-                if waiting {
+                let done: Bool
+                switch source(packet - pending.count / 2) {
+                case .wait(let samples):
                     // Held: nothing is sent and the timeline doesn't move on; once the song is open, the packets due go at once.
+                    // Looked at again every 50 ms.
+                    pending += samples
                     tick()
-                    usleep(2000)
+                    usleep(50_000)
                     continue
+                case .gap(let samples):
+                    // The end of the song before goes out, then this stream stops (the playback starts a fresh one).
+                    pending += samples
+                    if !pending.isEmpty {
+                        pending += [Int16](repeating: 0, count: max(0, packet * 2 - pending.count))
+                        session.send(pending, startNanos: anchor)
+                    }
+                    return
+                case .frames(let samples, let isDone):
+                    pending += samples
+                    done = isDone
                 }
                 if !pending.isEmpty {
                     if pending.count < packet * 2 { pending += [Int16](repeating: 0, count: packet * 2 - pending.count) }

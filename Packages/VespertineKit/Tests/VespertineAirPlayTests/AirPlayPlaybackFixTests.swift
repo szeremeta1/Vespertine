@@ -70,7 +70,7 @@ struct AirPlayPlaybackFixTests {
         #expect(onPacer.withLock { $0 } == 0)
         let got = receiver.samples.map(Int32.init)
         #expect(Array(got.prefix(sa.count + sb.count)) == sa + sb)
-        #expect(log.started == [first.id, second.id])
+        #expect(log.started == [first.id, second.id], "\(log.started.map { $0 == first.id ? "A" : $0 == second.id ? "B" : "?" })")
     }
 
     @Test("The receiver-volume note in the signal path follows the volume while the song plays")
@@ -124,21 +124,102 @@ struct AirPlayPlaybackFixTests {
         #expect(p.snapshot.state == .stopped)
     }
 
-    @Test("A play overtaken while it connects says nothing about the old song")
+    @Test("A play stopped while the receiver is still answering its setup says nothing when that setup then fails")
     func staleFailure() async throws {
         let receiver = try FakeRAOPReceiver()
-        let port = receiver.port
-        receiver.stop()
+        defer { receiver.stop() }
+        receiver.stall = ["ANNOUNCE": 1.0]
+        receiver.refuse = ["ANNOUNCE": 453]
         let (url, _) = try writeWAV(seconds: 0.3)
         defer { try? FileManager.default.removeItem(at: url) }
-        let device = AirPlayDevice(deviceID: "B827EB000001", name: "Fake", raop: AirPlayPlaybackTests.record)
-        let p = AirPlayPlayback(device: device, endpoint: .hostPort(host: "127.0.0.1", port: NWEndpoint.Port(rawValue: port)!), encryption: .none)
+        let (p, log) = make(receiver)
         defer { p.shutdown() }
-        let log = EventLog()
-        p.eventHandler = { log.events.append($0) }
         p.play(PlayableItem(url: url), at: 0)
+        await wait { receiver.methods.contains("ANNOUNCE") }
+        #expect(receiver.methods.contains("ANNOUNCE"))
         p.stop()
-        try await Task.sleep(for: .milliseconds(500))
+        try await Task.sleep(for: .milliseconds(1_500))
         #expect(log.failures.isEmpty)
+        // Not stopped, the same refusal is said.
+        p.play(PlayableItem(url: url), at: 0)
+        await wait { !log.failures.isEmpty }
+        #expect(log.failures.count == 1)
+    }
+
+    @Test("A next song that opens after 3 s: the song before plays out, the receiver is flushed, the next starts from its first frame on a fresh stream, with a notice")
+    func slowNextSong() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        let (a, sa) = try writeWAV(seconds: 0.4, seed: 31)
+        let (b, sb) = try writeWAV(seconds: 0.4, seed: 32)
+        defer { try? FileManager.default.removeItem(at: a); try? FileManager.default.removeItem(at: b) }
+        let (p, log) = make(receiver)
+        defer { p.shutdown() }
+        let first = PlayableItem(url: a), second = PlayableItem(url: b)
+        p.nextItemProvider = { $0.id == first.id ? second : nil }
+        p.metadataProvider = { RendererTrackInfo(title: $0.id == second.id ? "Second" : "First") }
+        p.openDelay = { $0.id == second.id ? 3 : 0 }
+        p.play(first, at: 0)
+        await wait({ log.ended }, seconds: 12)
+        #expect(log.ended)
+        #expect(log.events.contains { if case .notice(let m) = $0 { m == "Gap before Second: it took too long to open." } else { false } })
+        #expect(log.started == [first.id, second.id], "\(log.started.map { $0 == first.id ? "A" : $0 == second.id ? "B" : "?" })")
+        #expect(receiver.methods.contains("FLUSH"))
+        let markers = receiver.markerTimestamps
+        #expect(markers.count == 2)
+        guard markers.count == 2 else { return }
+        let all = receiver.samples.map(Int32.init)
+        #expect(Array(all.prefix(sa.count)) == sa)
+        let fresh = receiver.samples(from: markers[1]).map(Int32.init)
+        #expect(Array(fresh.prefix(sb.count)) == sb)
+    }
+
+    @Test("A next song that never opens fails as a song does, and the one after it plays")
+    func neverOpens() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        let (a, _) = try writeWAV(seconds: 0.4, seed: 41)
+        let (b, _) = try writeWAV(seconds: 0.4, seed: 42)
+        let (c, sc) = try writeWAV(seconds: 0.4, seed: 43)
+        defer { [a, b, c].forEach { try? FileManager.default.removeItem(at: $0) } }
+        let (p, log) = make(receiver)
+        defer { p.shutdown() }
+        let first = PlayableItem(url: a), second = PlayableItem(url: b), third = PlayableItem(url: c)
+        p.nextItemProvider = { $0.id == first.id ? second : $0.id == second.id ? third : nil }
+        p.openDelay = { $0.id == second.id ? 30 : 0 }
+        p.openTimeout = 2
+        p.play(first, at: 0)
+        await wait({ log.ended }, seconds: 15)
+        #expect(log.failures.count == 1)
+        #expect(log.failures.first?.contains("took too long to open") == true)
+        #expect(log.started == [first.id, third.id])
+        let markers = receiver.markerTimestamps
+        #expect(markers.count == 2)
+        guard markers.count == 2 else { return }
+        #expect(Array(receiver.samples(from: markers[1]).map(Int32.init).prefix(sc.count)) == sc)
+    }
+
+    @Test("The old next song still opening when the queue changes doesn't win over the new next song")
+    func staleOpening() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        let (a, _) = try writeWAV(seconds: 6, seed: 51)
+        let (b, _) = try writeWAV(seconds: 0.4, seed: 52)
+        let (c, _) = try writeWAV(seconds: 0.4, seed: 53)
+        defer { [a, b, c].forEach { try? FileManager.default.removeItem(at: $0) } }
+        let (p, _) = make(receiver)
+        defer { p.shutdown() }
+        let first = PlayableItem(url: a), second = PlayableItem(url: b), third = PlayableItem(url: c)
+        let next = Locked(second)
+        p.nextItemProvider = { $0.id == first.id ? next.withLock { $0 } : nil }
+        p.openDelay = { $0.id == second.id ? 1 : 0 }
+        p.play(first, at: 0)
+        await wait { receiver.methods.contains("RECORD") }
+        try await Task.sleep(for: .milliseconds(200))
+        next.withLock { $0 = third }
+        p.queueChanged()
+        try await Task.sleep(for: .milliseconds(1_800))
+        #expect(p.preparedNext?.item.id == third.id)
+        #expect(p.preparedNext?.segment != nil)
     }
 }
