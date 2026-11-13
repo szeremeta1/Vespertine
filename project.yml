@@ -58,6 +58,8 @@ targets:
         product: VespertineVisualizer
       - package: VespertineKit
         product: VespertineUPnP
+      - package: VespertineKit
+        product: VespertineAirPlay
       - package: VespertineRemoteKit
         product: VespertineRemoteProtocol
       - package: VespertineRemoteKit
@@ -91,9 +93,10 @@ targets:
         NSHumanReadableCopyright: "Copyright © 2026 Vespertine contributors. Free software under the GNU GPL, version 3 or later."
         # Network shares are probed and mounted over the local network (or a VPN); without this string
         # macOS's Local Network prompt has no explanation, and a denied or unanswered prompt looks like an offline server.
-        NSLocalNetworkUsageDescription: "Vespertine connects to the music servers and network shares you add, on your network or over a VPN. If you turn on Remote, the phones and browsers you pair can control it too. If you turn on Network Players, it finds the network players on your network and sends them the music you play."
-        # The phone remote (Settings › Remote, off by default) advertises this Mac on Bonjour for the Vespertine Remote app.
-        NSBonjourServices: ["_vespertine._tcp"]
+        NSLocalNetworkUsageDescription: "Vespertine connects to the music servers and network shares you add, on your network or over a VPN. If you turn on Remote, the phones and browsers you pair can control it too. If you turn on Network Players or AirPlay Players, it finds the network players and AirPlay receivers on your network and sends them the music you play."
+        # The phone remote (Settings › Remote, off by default) advertises this Mac on Bonjour for the Vespertine Remote app;
+        # AirPlay Players (beta, off by default) browses for AirPlay receivers.
+        NSBonjourServices: ["_vespertine._tcp", "_raop._tcp", "_airplay._tcp"]
         # Room measurement, the loopback self-test and Mac Sound Output. macOS attributes the sound helper's input to
         # this app (it is the helper's responsible process), so this text, not the helper's, is what the prompt shows.
         NSMicrophoneUsageDescription: "Vespertine uses audio input only for what you start: a room measurement records your measurement microphone, the loopback test records a virtual loopback device, and Mac Sound Output receives what your apps play to a speaker group you published, to play it on the group's speakers. Nothing else is recorded."
