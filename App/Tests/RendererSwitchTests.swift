@@ -82,3 +82,18 @@ struct RendererSwitchTests {
         #expect(RendererSwitch.keepsOutput(nil, turningOnTo: false))
     }
 }
+
+@Suite("Renderer verdict words") @MainActor
+struct RendererVerdictTextTests {
+    @Test("The mini player's words for a renderer match its badge: sent bit-perfect, or what processed it; never Converted")
+    func words() {
+        let source = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: 96_000, bitDepth: 24, channels: 2)
+        let sent = SignalPath.renderer(.init(name: "moOde UPNP", protocolName: "OpenHome", processing: [], sentCodec: "FLAC", sentSampleRate: 96_000,
+                                             sentBitDepth: 24, sentChannels: 2, gapless: true), source: source, decoderName: "", volume: .fixed)
+        #expect(MiniPlayerView.verdictText(sent).contains("bit-perfect"))
+        #expect(!MiniPlayerView.verdictLabel(sent).contains("Converted"))
+        let eq = SignalPath.renderer(.init(name: "moOde UPNP", protocolName: "OpenHome", processing: [.equalizer], sentCodec: "FLAC", sentSampleRate: 96_000,
+                                           sentBitDepth: 24, sentChannels: 2, gapless: true), source: source, decoderName: "", volume: .fixed)
+        #expect(MiniPlayerView.verdictText(eq) == "PROCESSED · EQ")
+    }
+}

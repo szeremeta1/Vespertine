@@ -145,7 +145,18 @@ public final class RendererPlayback: @unchecked Sendable {
         enqueue.yield(.stop)
     }
     public func queueChanged() { enqueue.yield(.queueChanged) }
-    public func update(settings: RendererSettings) { enqueue.yield(.settings(settings)) }
+    /// New settings. While a song plays, changes that restart it are applied 300 ms after the last one (a volume drag restarts
+    /// the stream once, not at every step); with nothing playing they apply at once.
+    public func update(settings: RendererSettings) {
+        let g = settingsGeneration.withLock { $0 += 1; return $0 }
+        guard state.withLock({ $0.current != nil }) else { enqueue.yield(.settings(settings)); return }
+        Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(300))
+            guard let self, self.settingsGeneration.withLock({ $0 }) == g else { return }
+            self.enqueue.yield(.settings(settings))
+        }
+    }
+    private let settingsGeneration = Locked(0)
 
     /// Stops and lets go of the renderer (the output changed).
     public func shutdown() {

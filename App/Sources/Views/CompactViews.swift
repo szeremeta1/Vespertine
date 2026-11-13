@@ -43,9 +43,9 @@ struct MiniPlayerView: View {
                                     .font(Typeface.mono(10))
                                     .foregroundStyle(path.isUntouched ? Palette.brassHi : Palette.copper)
                             }
-                            .help(path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted on the way to the device"))
+                            .help(Self.verdictText(path))
                             .accessibilityElement(children: .ignore)
-                            .accessibilityLabel(path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted", comment: "The audio is converted (not bit-perfect) on the way to the device"))
+                            .accessibilityLabel(Self.verdictLabel(path))
                             .accessibilityValue(path.deviceFormatShort)
                         }
                     }
@@ -542,5 +542,23 @@ struct AboutSettings: View {
         }
         .padding(30)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+extension MiniPlayerView {
+    /// The verdict beside the format, in words that match the badge: a network renderer's pass-through is "sent bit-perfect"
+    /// (what Vespertine sent), never a claim about the renderer's DAC.
+    static func verdictText(_ path: SignalPath) -> String {
+        if let renderer = path.renderer {
+            return renderer.passesThrough && path.source.encoding != .lossy
+                ? String(localized: "Sent bit-perfect to \(renderer.name): the original file", comment: "%@ is a network player's name.")
+                : path.statusLine
+        }
+        return path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted on the way to the device")
+    }
+
+    static func verdictLabel(_ path: SignalPath) -> String {
+        if path.renderer != nil { return verdictText(path) }
+        return path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted", comment: "The audio is converted (not bit-perfect) on the way to the device")
     }
 }
