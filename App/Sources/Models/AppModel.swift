@@ -76,6 +76,7 @@ final class DeviceStore {
                 switch change {
                 case .devices: self?.refresh(notify: true)
                 case .volume: self?.readVolume()
+                case .format: break
                 }
             }
         }

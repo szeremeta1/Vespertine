@@ -71,7 +71,8 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
     let url: URL
     let rendering: SystemRendering
     private(set) var duration: TimeInterval = 0
-    private let renderer = AVSampleBufferAudioRenderer()
+    /// Internal for tests (they post its route-change flush notice).
+    let renderer = AVSampleBufferAudioRenderer()
     private let synchronizer = AVSampleBufferRenderSynchronizer()
     private let queue = DispatchQueue(label: "org.szeremeta.vespertine.system-renderer")
     private let lock = NSLock()

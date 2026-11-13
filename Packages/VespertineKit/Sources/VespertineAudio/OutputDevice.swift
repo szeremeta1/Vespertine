@@ -61,6 +61,12 @@ public struct OutputDevice: Identifiable, Sendable, Hashable {
     /// A built-in output's current data source (`kAudioDevicePropertyDataSource`): 'ispk' for the Mac's speakers, 'hdpn'
     /// for the headphone jack. nil for other outputs, or when it couldn't be read.
     public var builtInDataSource: UInt32? = nil
+    /// The output's latency in frames (`kAudioDevicePropertyLatency`), read for Bluetooth outputs. AirPods Max report Bluetooth's
+    /// (7680 frames) while the audio goes over the radio and the cable's (480) while it goes over USB-C. nil when not read.
+    public var outputLatencyFrames: Int? = nil
+    /// AirPods Max: whether their USB-C audio interface is attached (the cable is in), read once per snapshot. nil: not read
+    /// (the profile looks it up then).
+    public var airPodsMaxCableAttached: Bool? = nil
 
     public var profile: DeviceProfile { DeviceProfile.detect(self) }
 

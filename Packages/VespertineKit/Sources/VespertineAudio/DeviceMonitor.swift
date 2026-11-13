@@ -85,7 +85,7 @@ final class HALDeviceProvider: DeviceProvider {
 /// stayed missing until the default output moved. Every device without output is therefore watched for streams
 /// arriving, and one that just joined is also re-checked a few times a second for a while, in case no notice comes.
 public final class DeviceMonitor: @unchecked Sendable {
-    public enum Change: Sendable { case devices, volume }
+    public enum Change: Sendable { case devices, volume, format }
 
     private let queue: DispatchQueue
     private let provider: DeviceProvider

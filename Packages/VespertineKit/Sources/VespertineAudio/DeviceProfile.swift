@@ -74,7 +74,7 @@ public struct DeviceProfile: Sendable, Hashable {
 
         // macOS keeps AirPods Max on their Bluetooth device object even when audio runs over the USB-C cable
         // (Bluetooth stays the control link). The tell is Apple's USB audio interface being attached.
-        let usbAudioActive = isAirPodsMax && USBRegistry.isConnected(productContaining: "AirPods Max USB Audio")
+        let usbAudioActive = isAirPodsMax && (device.airPodsMaxCableAttached ?? USBRegistry.isConnected(productContaining: "AirPods Max USB Audio"))
 
         switch device.transport {
         case .usb where isAirPodsMax, .bluetooth where usbAudioActive, .bluetoothLE where usbAudioActive:
