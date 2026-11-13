@@ -29,6 +29,9 @@ final class RemoteStore {
     var enabled: Bool { didSet { defaults.set(enabled, forKey: Keys.enabled) } }
     /// Web browsers on this network can use the remote too (a page served by this Mac). Off by default.
     var webEnabled: Bool { didSet { defaults.set(webEnabled, forKey: Keys.webEnabled) } }
+    /// Phones may play songs from this Mac's library themselves (the stream channel, protocol 2). Off by default. There is no
+    /// switch for it in Settings yet (its text needs the 44 translations): `defaults write org.szeremeta.Vespertine remoteStreamEnabled -bool YES`.
+    var streamEnabled: Bool { didSet { defaults.set(streamEnabled, forKey: Keys.streamEnabled) } }
     /// Hold off idle sleep while the server runs, so a paused Mac stays reachable. Off by default.
     var keepAwake: Bool { didSet { defaults.set(keepAwake, forKey: Keys.keepAwake) } }
     /// Settings › Remote turned on macOS's Wake for network access (and what it was before, to put back). Off by default.
@@ -49,6 +52,7 @@ final class RemoteStore {
     private enum Keys {
         static let enabled = "remoteEnabled"
         static let webEnabled = "remoteWebEnabled"
+        static let streamEnabled = "remoteStreamEnabled"
         static let keepAwake = "remoteKeepAwake"
         static let wakeForNetwork = "remoteWakeForNetwork"
         static let wakeBefore = "remoteWakeForNetworkBefore"
@@ -56,9 +60,10 @@ final class RemoteStore {
 
     init(dataDirectory: URL, defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        defaults.register(defaults: [Keys.enabled: false, Keys.webEnabled: false, Keys.keepAwake: false, Keys.wakeForNetwork: false])
+        defaults.register(defaults: [Keys.enabled: false, Keys.webEnabled: false, Keys.streamEnabled: false, Keys.keepAwake: false, Keys.wakeForNetwork: false])
         enabled = defaults.bool(forKey: Keys.enabled)
         webEnabled = defaults.bool(forKey: Keys.webEnabled)
+        streamEnabled = defaults.bool(forKey: Keys.streamEnabled)
         keepAwake = defaults.bool(forKey: Keys.keepAwake)
         wakeForNetwork = defaults.bool(forKey: Keys.wakeForNetwork)
         wakeForNetworkBefore = defaults.object(forKey: Keys.wakeBefore) as? Bool
