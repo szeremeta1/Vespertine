@@ -90,7 +90,8 @@ let package = Package(
         .target(
             name: "VespertineAirPlay",
             dependencies: ["VespertineAudio", "VespertineUPnP"],
-            linkerSettings: [.linkedFramework("AudioToolbox"), .linkedFramework("Security"), .linkedFramework("Network")]
+            linkerSettings: [.linkedFramework("AudioToolbox"), .linkedFramework("Security"), .linkedFramework("Network"),
+                            .linkedFramework("SystemConfiguration")]
         ),
         // The visualizer window's analysis (FFT, bands, beats) and Metal renderer. Reads a copy of the samples only.
         .target(
