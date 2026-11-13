@@ -7,6 +7,7 @@ import AppKit
 import CoreAudio
 import VespertineAudio
 import VespertineLibrary
+import VespertineUPnP
 import Observation
 import SwiftUI
 
@@ -183,6 +184,8 @@ final class AppModel {
     let settings: AppSettings
     /// The saved speaker groups; nil unless the Settings switch (Speaker Groups (beta)) is on.
     private(set) var speakerGroups: SpeakerGroupsModel?
+    /// Network renderers; nil unless the Settings switch (UPnP Renderers (beta)) is on.
+    private(set) var renderers: RendererOutputModel?
     /// Mac Sound Output (beta): speaker groups published as outputs of the Mac.
     let systemOutput: SystemOutputModel
     let library: LibraryStore
@@ -328,6 +331,9 @@ final class AppModel {
             speakerGroups = SpeakerGroupsSwitch.apply(true, to: settings, current: nil, onChange: groupsChanged)
             speakerGroups?.followUSBPorts(amongUIDs: devices.devices.map(\.uid))
         }
+        if settings.upnpRenderersFeature {
+            renderers = RendererSwitch.apply(true, to: settings, current: nil, onChange: { [weak self] in self?.syncEngine() })
+        }
         syncEngine()
         dopSetup.onChoicesChanged = { [weak self] in self?.syncEngine() }
         dopSetup.start()
@@ -431,6 +437,8 @@ final class AppModel {
     /// Where the next song would play: the chosen output, or while it isn't connected, the one that stands in for it
     /// (Settings → Playback; nil when set to wait for it, and while playback waits for one that dropped out mid-song).
     var plannedDevice: OutputDevice? {
+        // A network renderer chosen: no Core Audio device plays.
+        if rendererChosen { return nil }
         guard let uid = settings.selectedDeviceUID else {
             // Following the Mac's sound output while it is a group published with Mac Sound Output: that group plays.
             if !devices.devices.contains(where: \.isDefault), let groups = speakerGroups?.groups,
@@ -446,9 +454,29 @@ final class AppModel {
 
     /// The chosen output's name while it isn't connected.
     var missingChosenOutput: String? {
+        if rendererChosen {
+            return chosenRenderer == nil ? (settings.selectedDevice?.name ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")) : nil
+        }
         if let group = chosenGroup { return groupOutput(group) == nil ? group.name : nil }
         guard let uid = settings.selectedDeviceUID, !devices.devices.contains(where: { $0.uid == uid }) else { return nil }
         return settings.selectedDevice.flatMap { $0.uid == uid ? $0.name : nil } ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
+    }
+
+    /// A network renderer is the chosen output (the feature is on), found on the network or not.
+    var rendererChosen: Bool { renderers != nil && RendererDevice.isRendererUID(settings.selectedDeviceUID) }
+
+    /// The chosen network renderer, while it is on the network.
+    var chosenRenderer: RendererDevice? { rendererChosen ? renderers?.renderer(uid: settings.selectedDeviceUID) : nil }
+
+    /// The UPnP Renderers (beta) switch. Turning it off while a renderer is the chosen output lets go of it first (the Mac's sound
+    /// output plays).
+    func setRenderersFeature(_ on: Bool) {
+        if !RendererSwitch.keepsOutput(settings.selectedDeviceUID, turningOnTo: on) {
+            settings.selectedDeviceUID = nil
+            settings.selectedDevice = nil
+        }
+        renderers = RendererSwitch.apply(on, to: settings, current: renderers, onChange: { [weak self] in self?.syncEngine() })
+        syncEngine()
     }
 
     /// The speaker group chosen as the output, when the feature is on and one is.
@@ -570,6 +598,16 @@ final class AppModel {
 
     /// Controls › Volume Up, Volume Down, Mute. Only the output Vespertine plays to: never the Mac's sound output.
     func adjustVolume(_ action: VolumeControls.Action) {
+        if let renderer = chosenRenderer {
+            // A renderer's volume moves only once unlocked (Vespertine's digital volume); locked, the note says why.
+            if settings.rendererVolumeUnlocked.contains(renderer.uid) {
+                settings.applyVolume(action, for: renderer.uid)
+                syncEngine()
+            } else {
+                volumeNoteRequests += 1
+            }
+            return
+        }
         guard let device = activeDevice else { return }
         switch volumeRoute {
         case .software:
@@ -591,6 +629,9 @@ final class AppModel {
         player.engine.update(settings: engineSettings)
         systemOutput.sync(groups: engineSettings.speakerGroups, settings: engineSettings)
         devices.watchVolume(of: device)
+        // A network renderer plays in place of the engine while one is chosen and on the network.
+        let renderer = chosenRenderer
+        player.useRenderer(renderers?.playback(for: renderer, settings: renderer.map { settings.rendererSettings(uid: $0.uid) } ?? RendererSettings()))
         player.resolveVersions()
     }
 
@@ -641,6 +682,7 @@ final class AppModel {
     func selectDevice(_ uid: String?) {
         settings.selectedDeviceUID = uid
         settings.selectedDevice = uid.flatMap { uid in devices.devices.first { $0.uid == uid } }.map { OutputIdentity($0) }
+            ?? renderers?.renderer(uid: uid).map { OutputIdentity(uid: $0.uid, name: $0.name, manufacturer: $0.description.manufacturer) }
             ?? (uid == settings.selectedDevice?.uid ? settings.selectedDevice : nil)
         syncEngine()
     }
