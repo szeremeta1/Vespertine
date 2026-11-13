@@ -12,10 +12,15 @@ public protocol PlaybackCacheReader: AnyObject, Sendable {
     /// The file was rewritten on the server since it was opened (its size or modification date moved): what was copied
     /// so far may not belong with what follows.
     var changedSinceOpen: Bool { get }
+    /// The copy is over (cancelled, failed, or given up on as silent): a read still waiting on the network may give up now, with
+    /// any error, and later reads may fail at once. Called on any thread, possibly with the copy's lock held, so it must not
+    /// block or call back into the cache. A share's file has nothing to stop (its reads are the kernel's).
+    func cancel()
 }
 
 extension PlaybackCacheReader {
     public var changedSinceOpen: Bool { false }
+    public func cancel() {}
 }
 
 /// A source that is not a file on a mounted share (a streaming service's track, say): opened by a URL of its own scheme (see
@@ -24,6 +29,13 @@ public protocol RemoteCacheReader: PlaybackCacheReader {
     /// The extension of the cache file the bytes are copied to (`flac`): decoders and `NetworkStart` choose by it, since the
     /// URL (`tidal://track/1`) has none.
     var fileExtension: String { get }
+    /// What a song says when this source sends nothing for the no-progress limit ("TIDAL isn't answering"); nil for the
+    /// share's wording.
+    var notAnsweringMessage: String? { get }
+}
+
+extension RemoteCacheReader {
+    public var notAnsweringMessage: String? { nil }
 }
 
 private final class ShareFileReader: PlaybackCacheReader, @unchecked Sendable {
@@ -138,10 +150,20 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         .appendingPathComponent((Bundle.main.bundleIdentifier ?? "org.szeremeta.Vespertine") + "/Playback", isDirectory: true))
     /// Opens the files of URLs with a scheme of their own (see `RemoteCacheReader`). Consulted before the test factory and the share.
     private static let remoteOpeners = Locked([String: @Sendable (URL) throws -> any RemoteCacheReader]())
+    /// Each scheme's wording for an open that never returns (see `RemoteCacheReader.notAnsweringMessage`).
+    private static let remoteMessages = Locked([String: String]())
 
     /// Songs at `scheme://…` are staged through `open` instead of read from a share. Registering a scheme again replaces its opener.
-    public static func registerRemoteReader(scheme: String, _ open: @escaping @Sendable (URL) throws -> any RemoteCacheReader) {
+    /// `notAnsweringMessage`: what a song says when its open never returns (nil: the share's wording).
+    public static func registerRemoteReader(scheme: String, notAnsweringMessage: String? = nil,
+                                            _ open: @escaping @Sendable (URL) throws -> any RemoteCacheReader) {
         remoteOpeners.withLock { $0[scheme.lowercased()] = open }
+        remoteMessages.withLock { $0[scheme.lowercased()] = notAnsweringMessage }
+    }
+
+    private static func remoteMessage(for url: URL) -> String? {
+        guard let scheme = url.scheme?.lowercased() else { return nil }
+        return remoteMessages.withLock { $0[scheme] }
     }
 
     private static func remoteOpener(for url: URL) -> (@Sendable (URL) throws -> any RemoteCacheReader)? {
@@ -151,8 +173,9 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
 
     enum Failure: LocalizedError {
         case budgetExceeded, unexpectedEOF, cancelled
-        /// Nothing arrived from the share for `noProgressLimit`, even with the file opened again.
-        case notAnswering
+        /// Nothing arrived from the share for `noProgressLimit`, even with the file opened again. `message`: a remote source's own
+        /// wording (nil: the share's).
+        case notAnswering(String? = nil)
         /// The file was rewritten on the server during its copy.
         case changed
         var errorDescription: String? {
@@ -160,7 +183,9 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
             case .budgetExceeded: CocoaError(.fileReadTooLarge).localizedDescription
             case .unexpectedEOF, .changed: CocoaError(.fileReadCorruptFile).localizedDescription
             case .cancelled: CocoaError(.userCancelled).localizedDescription
-            case .notAnswering:
+            case .notAnswering(let message?):
+                message
+            case .notAnswering(nil):
                 String(localized: "The share is mounted but isn’t answering. Eject it in Finder, then choose Reconnect.", comment: "Reconnect is a command on the share.")
             }
         }
@@ -361,12 +386,12 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         private var result: Result<any PlaybackCacheReader, Error>?
         func finish(_ value: Result<any PlaybackCacheReader, Error>) { done.withLock { result = value; done.broadcast() } }
         /// `silent`: the share has taken longer over this open than a song waits for it (`noProgressLimit`).
-        func wait(cancelled: () -> Bool, silent: () -> Bool) throws -> any PlaybackCacheReader {
+        func wait(cancelled: () -> Bool, silent: () -> Bool, message: String?) throws -> any PlaybackCacheReader {
             try done.withLock {
                 while true {
                     if let result { return try result.get() }
                     if cancelled() { throw CancellationError() }
-                    if silent() { throw Failure.notAnswering }
+                    if silent() { throw Failure.notAnswering(message) }
                     _ = done.wait(until: Date().addingTimeInterval(0.025))
                 }
             }
@@ -400,7 +425,8 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         let token = UUID()
         if foreground { openWaits.withLock { $0[token] = began } }
         defer { if foreground { openWaits.withLock { $0[token] = nil } } }
-        return try job.wait(cancelled: cancelled, silent: { [clock, noProgressLimit] in clock() - began >= noProgressLimit })
+        return try job.wait(cancelled: cancelled, silent: { [clock, noProgressLimit] in clock() - began >= noProgressLimit },
+                            message: Self.remoteMessage(for: url))
     }
 
     /// How long (whole seconds on `clock`) the listener's song has been waiting for its share with nothing from it, once that is
@@ -708,7 +734,11 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
             NetworkPlaybackCache.letGo(&held)
             try? file.close(); try? FileManager.default.removeItem(at: url); release()
         }
-        func cancel() { condition.withLock { cancelled = true; condition.broadcast() }; publishDemand() }
+        func cancel() {
+            let current = condition.withLock { () -> (any PlaybackCacheReader)? in cancelled = true; condition.broadcast(); return held }
+            current?.cancel()
+            publishDemand()
+        }
         func promote() { condition.withLock { foreground = true }; publishDemand() }
 
         /// Library scans of the share wait while this song's bytes are the ones being waited for: its copy is
@@ -737,12 +767,17 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
             return max(0, clock() - lastProgress)
         }
 
+        /// The reader's wording for its silence (nil: the share's). Under `condition`.
+        private var silenceMessage: String? { (held as? any RemoteCacheReader)?.notAnsweringMessage }
+
         /// Nothing has arrived for `noProgressLimit`: the song fails (every waiting read with it) and stops holding scans back.
         /// Called with the condition lock held; true when it gave up.
         private func giveUpIfSilent() -> Bool {
             guard error == nil, clock() - lastProgress >= noProgressLimit else { return false }
-            error = Failure.notAnswering
+            error = Failure.notAnswering(silenceMessage)
             condition.broadcast()
+            // A remote reader may be retrying for as long as it is let: the copy is over, so its lanes should come back.
+            held?.cancel()
             return true
         }
 
@@ -795,7 +830,7 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
                     let gaveUp = giveUpIfSilent()
                     if !gaveUp, !cancelled { _ = condition.wait(until: Date().addingTimeInterval(0.25)) }
                     condition.unlock()
-                    if gaveUp { throw Failure.notAnswering }
+                    if gaveUp { throw Failure.notAnswering(silenceMessage) }
                 }
             }
         }
@@ -910,7 +945,7 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
                     }
                     publishDemand()
                 } catch {
-                    condition.withLock {
+                    let current = condition.withLock { () -> (any PlaybackCacheReader)? in
                         inFlight.remove(block)
                         activeLanes.remove(lane)
                         if self.error == nil {
@@ -918,7 +953,10 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
                             log.error("The song's copy stopped at block \(block, privacy: .public) of \(self.blocks, privacy: .public): \(ShareReadFailure.describe(error), privacy: .public)")
                         }
                         condition.broadcast()
+                        return held
                     }
+                    // The other lanes' reads of a failed copy are of no use: a remote reader stops retrying them.
+                    current?.cancel()
                     publishDemand()
                     return
                 }

@@ -165,7 +165,7 @@ struct NetworkPlaybackCacheTests {
         let entry = try cache.entry(key: "silent", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
         #expect(gate.isPaused, "the song's copy holds the scans back")
         let failure = #expect(throws: NetworkPlaybackCache.Failure.self) { try entry.read(at: 0, count: 4096) }
-        #expect(failure?.localizedDescription == NetworkPlaybackCache.Failure.notAnswering.localizedDescription)
+        #expect(failure?.localizedDescription == NetworkPlaybackCache.Failure.notAnswering().localizedDescription)
         #expect(!entry.isWaiting)
         #expect(!gate.isPaused, "scans may go again")
     }

@@ -125,15 +125,30 @@ extension LibraryDatabase {
     }
 
     /// Stores TIDAL's tracks as library tracks of the TIDAL source, by `tidalId`: a track already there keeps its id, plays, rating,
-    /// date added and download, and takes TIDAL's new descriptions. Returns each tidalId's track id.
+    /// date added and download, and takes TIDAL's new descriptions. A track listed twice is stored once, as its last description.
+    /// A file of another source tagged with the track's `TIDAL_TRACK_ID` (scanned before the TIDAL row existed) is merged into
+    /// it: it becomes the row's download, its playlist places, favorite and plays move over, and its own row goes.
+    /// Returns each tidalId's track id.
     @discardableResult
     public func upsertTidalTracks(_ inputs: [TidalTrackInput], sourceId: Int64) throws -> [Int: Int64] {
-        try writer.write { db in
+        // Last description wins, in the order each id was first listed.
+        var latest: [Int: TidalTrackInput] = [:]
+        var order: [Int] = []
+        for input in inputs {
+            if latest[input.tidalId] == nil { order.append(input.tidalId) }
+            latest[input.tidalId] = input
+        }
+        let unique = order.compactMap { latest[$0] }
+        return try writer.write { db in
             var ids: [Int: Int64] = [:]
             let now = Date()
             var known: [Int: TidalTrackRecord] = [:]
-            for record in try TidalTrackRecord.fetchAll(db) { known[record.tidalId] = record }
-            for input in inputs {
+            // Only this page's rows: a library of many thousand TIDAL tracks is not read whole for every page.
+            for batch in stride(from: 0, to: order.count, by: 500) {
+                let page = Array(order[batch..<min(order.count, batch + 500)])
+                for record in try TidalTrackRecord.filter(page.contains(Column("tidalId"))).fetchAll(db) { known[record.tidalId] = record }
+            }
+            for input in unique {
                 let format = input.listedFormat
                 let existing = known[input.tidalId]
                 var track: Track
@@ -194,16 +209,178 @@ extension LibraryDatabase {
                 record.unavailableReason = input.unavailableReason
                 record.lastSyncedAt = now
                 try record.save(db)
+                if record.downloadPath == nil { try Self.mergeTaggedCopy(db, tidalId: input.tidalId, into: trackId, tidalSourceId: sourceId) }
                 ids[input.tidalId] = trackId
             }
             return ids
         }
     }
 
+    /// A file of another source that carries `TIDAL_TRACK_ID` = `tidalId` (a download scanned as a plain track before its TIDAL
+    /// row existed): it becomes the download of track `trackId`, with the file's own format, and its plain row is folded in.
+    private static func mergeTaggedCopy(_ db: Database, tidalId: Int, into trackId: Int64, tidalSourceId: Int64) throws {
+        guard let copy = try Track.fetchOne(db, sql: """
+            SELECT * FROM track
+            WHERE sourceId IS NOT ? AND id != ? AND isMissing = 0 AND location NOT LIKE 'tidal://%'
+              AND json_valid(extraTags) AND trim(CAST(json_extract(extraTags, '$.TIDAL_TRACK_ID') AS TEXT)) = ?
+            ORDER BY id LIMIT 1
+            """, arguments: [tidalSourceId, trackId, String(tidalId)]), let old = copy.id else { return }
+        try db.execute(sql: """
+            UPDATE track SET filePath = ?, fileSize = ?, modifiedAt = ?, codec = ?, isLossless = ?, isDSD = ?, sampleRate = ?, bitDepth = ?,
+                             channels = ?, bitrate = ?,
+                             playCount = playCount + ?, lastPlayedAt = max(coalesce(lastPlayedAt, 0), coalesce(?, 0)),
+                             rating = coalesce(rating, ?), addedAt = min(addedAt, ?)
+            WHERE id = ?
+            """, arguments: [copy.filePath, copy.fileSize, copy.modifiedAt, copy.codec, copy.isLossless, copy.isDSD, copy.sampleRate,
+                             copy.bitDepth, copy.channels, copy.bitrate, copy.playCount, copy.lastPlayedAt, copy.rating, copy.addedAt, trackId])
+        try db.execute(sql: "UPDATE track SET lastPlayedAt = NULL WHERE id = ? AND lastPlayedAt = 0", arguments: [trackId])
+        try db.execute(sql: "UPDATE tidalTrack SET downloadPath = ?, formatIsProbed = 1 WHERE trackId = ?", arguments: [copy.filePath, trackId])
+        // What belongs to the song moves with it, as for a moved file (`reconcileMovedTracks`). A library-only edit is kept
+        // (TIDAL's descriptions are what the row shows; the edit stays for undo), and so are the file's analysis and transition
+        // profile: the bytes are the same.
+        try db.execute(sql: "UPDATE playlistItem SET trackId = ? WHERE trackId = ?", arguments: [trackId, old])
+        try db.execute(sql: "UPDATE tagHistory SET trackId = ? WHERE trackId = ?", arguments: [trackId, old])
+        try db.execute(sql: "UPDATE playHistory SET trackId = ? WHERE trackId = ?", arguments: [trackId, old])
+        try db.execute(sql: """
+            INSERT OR IGNORE INTO favorite (trackId, favoritedAt, borrowed) SELECT ?, favoritedAt, borrowed FROM favorite WHERE trackId = ?
+            """, arguments: [trackId, old])
+        try db.execute(sql: """
+            INSERT OR IGNORE INTO preferredCopy (trackId, preferredAt) SELECT ?, preferredAt FROM preferredCopy WHERE trackId = ?
+            """, arguments: [trackId, old])
+        try db.execute(sql: "INSERT OR REPLACE INTO cueTagOverride (trackId, metadata) SELECT ?, metadata FROM cueTagOverride WHERE trackId = ?",
+                       arguments: [trackId, old])
+        if try Bool.fetchOne(db, sql: "SELECT NOT EXISTS (SELECT 1 FROM analysis WHERE trackId = ?)", arguments: [trackId]) == true {
+            try db.execute(sql: "UPDATE analysis SET trackId = ? WHERE trackId = ?", arguments: [trackId, old])
+            try db.execute(sql: """
+                UPDATE track SET
+                  analysisVerdict = (SELECT analysisVerdict FROM track WHERE id = :old),
+                  bandwidthHz = (SELECT bandwidthHz FROM track WHERE id = :old),
+                  effectiveBitDepth = (SELECT effectiveBitDepth FROM track WHERE id = :old)
+                WHERE id = :new AND analysisVerdict IS NULL
+                """, arguments: ["old": old, "new": trackId])
+        }
+        if try Bool.fetchOne(db, sql: "SELECT NOT EXISTS (SELECT 1 FROM transitionProfile WHERE trackId = ?)", arguments: [trackId]) == true {
+            try db.execute(sql: "UPDATE transitionProfile SET trackId = ? WHERE trackId = ?", arguments: [trackId, old])
+        }
+        try db.execute(sql: "DELETE FROM track WHERE id = ?", arguments: [old])
+    }
+
+    /// The TIDAL ids of every TIDAL row.
+    public func tidalTrackIds() throws -> Set<Int> {
+        try writer.read { db in Set(try Int.fetchAll(db, sql: "SELECT tidalId FROM tidalTrack")) }
+    }
+
+    /// The TIDAL ids of the rows of each TIDAL album the library has tracks of.
+    public func tidalTrackIdsByAlbum() throws -> [Int: [Int]] {
+        try writer.read { db in
+            var result: [Int: [Int]] = [:]
+            for row in try Row.fetchAll(db, sql: "SELECT albumId, tidalId FROM tidalTrack WHERE albumId IS NOT NULL") {
+                result[row["albumId"], default: []].append(row["tidalId"])
+            }
+            return result
+        }
+    }
+
+    /// A number the TIDAL sync keeps between refreshes (how long each list was), in the library's `meta` table.
+    public func tidalSyncValue(_ key: String) throws -> Int? {
+        try writer.read { db in
+            try Int.fetchOne(db, sql: "SELECT CAST(value AS INTEGER) FROM meta WHERE key = ?", arguments: ["tidal.sync.\(key)"])
+        }
+    }
+
+    /// Stores (or, with nil, forgets) a number of the TIDAL sync.
+    public func setTidalSyncValue(_ key: String, _ value: Int?) throws {
+        try writer.write { db in
+            if let value {
+                try db.execute(sql: "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)", arguments: ["tidal.sync.\(key)", String(value)])
+            } else {
+                try db.execute(sql: "DELETE FROM meta WHERE key = ?", arguments: ["tidal.sync.\(key)"])
+            }
+        }
+    }
+
+    /// How many items TIDAL list `list` held at the last sync that recorded it; nil when none has (a library from before).
+    public func tidalFavoriteCount(_ list: String) throws -> Int? {
+        try writer.read { db in
+            guard try Int.fetchOne(db, sql: "SELECT 1 FROM meta WHERE key = ?", arguments: ["tidal.sync.\(list).recorded"]) != nil else { return nil }
+            return try Int.fetchOne(db, sql: "SELECT count(*) FROM tidalFavorite WHERE list = ?", arguments: [list]) ?? 0
+        }
+    }
+
+    /// Records what TIDAL list `list` holds now.
+    public func setTidalFavorites(_ list: String, ids: Set<Int>) throws {
+        try writer.write { db in
+            try db.execute(sql: "DELETE FROM tidalFavorite WHERE list = ?", arguments: [list])
+            for id in ids { try db.execute(sql: "INSERT INTO tidalFavorite (list, itemId) VALUES (?, ?)", arguments: [list, id]) }
+            try db.execute(sql: "INSERT OR REPLACE INTO meta (key, value) VALUES (?, '1')", arguments: ["tidal.sync.\(list).recorded"])
+        }
+    }
+
+    // MARK: Playlists
+
+    /// Each synced TIDAL playlist's `lastUpdated`, by UUID.
+    public func tidalPlaylistStates() throws -> [String: String?] {
+        try writer.read { db in
+            var result: [String: String?] = [:]
+            for row in try Row.fetchAll(db, sql: "SELECT uuid, lastUpdated FROM tidalPlaylist") { result[row["uuid"]] = row["lastUpdated"] as String? }
+            return result
+        }
+    }
+
+    /// The TIDAL ids of a synced playlist's items, in order.
+    public func tidalIds(inPlaylist uuid: String) throws -> [Int] {
+        try writer.read { db in
+            try Int.fetchAll(db, sql: """
+                SELECT d.tidalId FROM tidalPlaylist p JOIN playlistItem i ON i.playlistId = p.playlistId JOIN tidalTrack d ON d.trackId = i.trackId
+                WHERE p.uuid = ? ORDER BY i.position
+                """, arguments: [uuid])
+        }
+    }
+
+    /// The library playlist standing for TIDAL playlist `uuid`: made the first time, then renamed and refilled in place (its id,
+    /// place in the sidebar and transition style stay). Items are `tidalIds` in order; ids with no TIDAL row are left out.
+    @discardableResult
+    public func setTidalPlaylist(uuid: String, name: String, lastUpdated: String?, tidalIds: [Int]) throws -> Int64 {
+        try writer.write { db in
+            var playlistId = try Int64.fetchOne(db, sql: "SELECT playlistId FROM tidalPlaylist WHERE uuid = ?", arguments: [uuid])
+            if let existing = playlistId {
+                try db.execute(sql: "UPDATE playlist SET name = ? WHERE id = ?", arguments: [name, existing])
+                try db.execute(sql: "UPDATE tidalPlaylist SET lastUpdated = ? WHERE uuid = ?", arguments: [lastUpdated, uuid])
+            } else {
+                let next = (try Int.fetchOne(db, sql: "SELECT max(sortIndex) FROM playlist") ?? 0) + 1
+                var playlist = Playlist(name: name, smartRules: nil, sortIndex: next)
+                try playlist.insert(db)
+                playlistId = playlist.id
+                try db.execute(sql: "INSERT INTO tidalPlaylist (uuid, playlistId, lastUpdated) VALUES (?, ?, ?)",
+                               arguments: [uuid, playlist.id, lastUpdated])
+            }
+            guard let playlistId else { throw DatabaseError(message: "the playlist has no id") }
+            var trackIds: [Int: Int64] = [:]
+            for row in try Row.fetchAll(db, sql: "SELECT tidalId, trackId FROM tidalTrack") { trackIds[row["tidalId"]] = row["trackId"] }
+            try db.execute(sql: "DELETE FROM playlistItem WHERE playlistId = ?", arguments: [playlistId])
+            for (position, trackId) in tidalIds.compactMap({ trackIds[$0] }).enumerated() {
+                try PlaylistItem(playlistId: playlistId, trackId: trackId, position: position).insert(db)
+            }
+            return playlistId
+        }
+    }
+
+    /// Deletes the library playlists of TIDAL playlists that are no longer the user's.
+    public func removeTidalPlaylists(notIn keep: Set<String>) throws {
+        try writer.write { db in
+            for row in try Row.fetchAll(db, sql: "SELECT uuid, playlistId FROM tidalPlaylist") where !keep.contains(row["uuid"]) {
+                try db.execute(sql: "DELETE FROM playlist WHERE id = ?", arguments: [row["playlistId"] as Int64])
+            }
+        }
+    }
+
     /// Takes out the tracks of the TIDAL source that are not in `keep` (the favorites as of now). A downloaded one stays, marked
     /// `notInFavorites`: its file is the user's.
-    public func removeTidalTracks(notIn keep: Set<Int>, sourceId: Int64) throws {
+    /// Returns how many rows were taken out.
+    @discardableResult
+    public func removeTidalTracks(notIn keep: Set<Int>, sourceId: Int64) throws -> Int {
         try writer.write { db in
+            var removed = 0
             let rows = try Row.fetchAll(db, sql: """
                 SELECT d.trackId, d.tidalId, d.downloadPath FROM tidalTrack d JOIN track t ON t.id = d.trackId WHERE t.sourceId = ?
                 """, arguments: [sourceId])
@@ -215,8 +392,10 @@ extension LibraryDatabase {
                                    arguments: [TidalTrackRecord.notInFavorites, trackId])
                 } else {
                     try db.execute(sql: "DELETE FROM track WHERE id = ?", arguments: [trackId])
+                    removed += 1
                 }
             }
+            return removed
         }
     }
 

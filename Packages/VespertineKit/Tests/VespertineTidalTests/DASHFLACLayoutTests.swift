@@ -262,6 +262,19 @@ struct DASHFLACLayoutTests {
         #expect(throws: TidalError.self) { try DASHFLACLayout.mediaPayload(segmentPrefix: data) }
     }
 
+    @Test("an mdat of size 0 whose sample sizes add up to Int.max is malformed, not a crash when its end is computed")
+    func overflowingPayloadEnd() {
+        let mfhd = box("mfhd", be32(0) + be32(1))
+        // tfhd: default-base-is-moof + default-sample-size-present, size 0x7FFFFFFF.
+        let tfhd = box("tfhd", be32(0x020010) + be32(1) + be32(0x7FFF_FFFF))
+        // Run 1 takes the default size: 0x7FFFFFFF × 0xFFFFFFFF bytes. Run 2 states two sizes that bring the total to exactly Int.max.
+        let first = box("trun", be32(0) + be32(0xFFFF_FFFF))
+        let second = box("trun", be32(0x000200) + be32(2) + be32(0xFFFF_FFFF) + be32(0x7FFF_FFFF))
+        // mdat of size 0 runs to the end of the segment: its length is the runs' total.
+        let data = box("moof", mfhd + box("traf", tfhd + first + second)) + be32(0) + Data("mdat".utf8) + Data(repeating: 0, count: 8)
+        #expect(throws: TidalError.self) { try DASHFLACLayout.mediaPayload(segmentPrefix: data) }
+    }
+
     // MARK: Boxes
 
     @Test("a box with a 64-bit largesize parses, header 16 bytes")
