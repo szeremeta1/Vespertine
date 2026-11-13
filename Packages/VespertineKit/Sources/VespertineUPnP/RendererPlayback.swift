@@ -57,6 +57,9 @@ public final class RendererPlayback: @unchecked Sendable {
         var track: RendererTrack
         var path: SignalPath
         var processedFile: GrowingFile?
+        /// A TIDAL song's whole copy in the transient playback cache (the media server serves it, or it is decoded); deleted when
+        /// the entry is let go. Nil for local and share files.
+        var staged: StagedRemoteFile? = nil
         /// Where the stream starts in the song (a processed stream restarted at a position).
         var startOffset: TimeInterval
         var duration: TimeInterval?
@@ -268,7 +271,10 @@ public final class RendererPlayback: @unchecked Sendable {
 
     /// Prepares `item` to be sent: its media URL, metadata and signal path.
     private func prepareEntry(for item: PlayableItem, at seconds: TimeInterval) throws -> Entry {
-        let url = urlResolver?(item) ?? item.url
+        let resolved = urlResolver?(item) ?? item.url
+        // A stream (TIDAL) is copied whole first: the renderer pulls a file, and the decoder reads one.
+        let staged = resolved.isFileURL ? nil : try StagedRemoteFile.stage(item)
+        let url = staged?.url ?? resolved
         let described = try? SourceDescription.describe(item, url: url)
         let settings = state.withLock { $0.settings }
         let decision = RendererMode.decide(item: item, url: url, source: described?.format, settings: settings, capabilities: renderer.capabilities)
@@ -309,7 +315,7 @@ public final class RendererPlayback: @unchecked Sendable {
                                        replayGainDB: processing.contains(.replayGain) ? item.replayGainDB : nil,
                                        equalizer: processing.contains(.equalizer) ? settings.activeEqualizer?.name : nil,
                                        roomCorrection: processing.contains(.roomCorrection) ? settings.activeRoomCorrection?.name : nil)
-        return Entry(item: item, mediaURL: mediaURL, track: RendererTrack(uri: mediaURL, metadata: didl), path: path, processedFile: file,
+        return Entry(item: item, mediaURL: mediaURL, track: RendererTrack(uri: mediaURL, metadata: didl), path: path, processedFile: file, staged: staged,
                      startOffset: file == nil ? 0 : seconds, duration: info.duration)
     }
 
@@ -375,7 +381,7 @@ public final class RendererPlayback: @unchecked Sendable {
     private func apply(_ settings: RendererSettings) async throws {
         let before = state.withLock { s -> RendererSettings in defer { s.settings = settings }; return s.settings }
         guard before != settings, let current = state.withLock({ $0.current }) else { return }
-        let url = urlResolver?(current.item) ?? current.item.url
+        let url = current.staged?.url ?? urlResolver?(current.item) ?? current.item.url
         let decision = RendererMode.decide(item: current.item, url: url, source: current.path.source, settings: settings, capabilities: renderer.capabilities)
         let processing: [SignalPath.RendererStage.Processing] = if case .processed(let r) = decision { r } else { [] }
         // The song playing restarts where it is when what's done to it changes; the next one is prepared again either way.

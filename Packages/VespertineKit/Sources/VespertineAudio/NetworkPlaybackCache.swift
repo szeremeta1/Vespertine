@@ -1070,3 +1070,36 @@ final class PlaybackFile {
         return data
     }
 }
+
+/// A song from a registered remote scheme (TIDAL), copied whole into the transient playback cache for an output that needs a
+/// local file of its own (UPnP and AirPlay players: the media server serves the bytes, or the song is decoded and sent). The
+/// copy is a lease like the engine's: it lives as long as this object, and its file is deleted when the last holder lets go,
+/// so nothing stays on disk. Local and share files need none (`stage` returns nil).
+public final class StagedRemoteFile: @unchecked Sendable {
+    /// The complete local copy.
+    public let url: URL
+    private let entry: NetworkPlaybackCache.Entry
+
+    private init(entry: NetworkPlaybackCache.Entry) {
+        self.entry = entry
+        url = entry.url
+    }
+
+    /// Copies `item` whole when its URL is a remote scheme's (it waits for the last byte; call it off the main and real-time
+    /// threads), or returns nil for a file. A cancelled stage gives up the copy.
+    public static func stage(_ item: PlayableItem, cancelled: () -> Bool = { false }) throws -> StagedRemoteFile? {
+        try stage(item, in: .shared, cancelled: cancelled)
+    }
+
+    static func stage(_ item: PlayableItem, in cache: NetworkPlaybackCache, cancelled: () -> Bool) throws -> StagedRemoteFile? {
+        guard !item.url.isFileURL else { return nil }
+        let entry = try cache.entry(key: item.cacheKey ?? item.url.absoluteString, url: item.url, cancelled: cancelled)
+        do {
+            try entry.prepare(full: true, lead: entry.size, cancelled: cancelled)
+        } catch {
+            entry.cancel()
+            throw error
+        }
+        return StagedRemoteFile(entry: entry)
+    }
+}

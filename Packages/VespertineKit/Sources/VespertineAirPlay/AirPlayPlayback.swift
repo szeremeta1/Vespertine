@@ -61,6 +61,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         var start: UInt32?
         var end: UInt32?
         var heard = false
+        /// A TIDAL song's whole copy in the transient playback cache, read by `frames`; deleted when the segment is let go.
+        var staged: StagedRemoteFile?
 
         init(item: PlayableItem, frames: AirPlayFrames, path: SignalPath, offset: TimeInterval, duration: TimeInterval, announces: Bool) {
             self.item = item
@@ -434,7 +436,10 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     private func makeSegment(_ item: PlayableItem, at seconds: TimeInterval, announces: Bool) throws -> Segment {
         onOpen?(Thread.current.name == Pacer.threadName)
         if let delay = openDelay?(item), delay > 0 { Thread.sleep(forTimeInterval: delay) }
-        let url = urlResolver?(item) ?? item.url
+        let resolved = urlResolver?(item) ?? item.url
+        // A stream (TIDAL) is copied whole first: the frames are decoded from a local file.
+        let staged = resolved.isFileURL ? nil : try StagedRemoteFile.stage(item)
+        let url = staged?.url ?? resolved
         let (settings, receiverDB) = state.withLock { ($0.settings, $0.receiverVolumeDB) }
         let frames = try AirPlayFrames(item: item, url: url, settings: settings, startSeconds: seconds)
         let info = metadataProvider?(item)
@@ -448,7 +453,9 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                                        replayGainDB: steps.contains(.replayGain) ? item.replayGainDB : nil,
                                        equalizer: steps.contains(.equalizer) ? settings.activeEqualizer?.name : nil,
                                        roomCorrection: steps.contains(.roomCorrection) ? settings.activeRoomCorrection?.name : nil)
-        return Segment(item: item, frames: frames, path: path, offset: seconds, duration: info?.duration ?? 0, announces: announces)
+        let segment = Segment(item: item, frames: frames, path: path, offset: seconds, duration: info?.duration ?? 0, announces: announces)
+        segment.staged = staged
+        return segment
     }
 
     /// Opens the song after `item` ahead of time, so the pacer joins it without a gap.
