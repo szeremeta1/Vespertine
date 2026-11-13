@@ -81,13 +81,13 @@ def capture_device(device, output, tests=True):
         for orientation in ['portrait', 'landscape']:
             run([*build, '-only-testing:VespertineRemoteUITests/AdaptiveNavigationTests/testSetCaptureOrientation', f'VT_CAPTURE_ORIENTATION={orientation}', 'test'],
                 timeout=300)
-            for appearance in ['light', 'dark']:
+            for appearance in ['dark']:  # the Store set is dark only
                 folder = device_out / orientation / appearance
                 folder.mkdir(parents=True, exist_ok=True)
                 sim('ui', udid, 'appearance', appearance)
                 for name, args in SCREENS:
                     sim('terminate', udid, BUNDLE, check=False, capture=True)
-                    sim('launch', udid, BUNDLE, *args)
+                    sim('launch', udid, BUNDLE, *args, '-VTScreenshot', 'YES')
                     time.sleep(3)
                     capture = folder / (name + '.png')
                     sim('io', udid, 'screenshot', capture)
@@ -105,7 +105,7 @@ def capture_device(device, output, tests=True):
                         raise RuntimeError(f'Wrong Store device dimensions for {device["name"]}: {portrait_size}')
         (device_out / 'capture.json').write_text(json.dumps({
             'device': device, 'screensPerAppearance': len(SCREENS), 'orientations': ['portrait', 'landscape'],
-            'appearances': ['light', 'dark'], 'visualReview': 'pending'
+            'appearances': ['dark'], 'visualReview': 'pending'
         }, indent=2) + '\n')
     finally:
         if owned:

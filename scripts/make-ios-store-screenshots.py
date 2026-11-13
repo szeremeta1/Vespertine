@@ -21,8 +21,8 @@ RAW_DIR = {'iphone69': 'iphone69', 'ipad13': 'ipad13l'}
 SCREENS = {'01-now-playing': '01-now-playing', '02-library': '02-library', '03-queue': '03-queue',
            '04-output': '04-output', '05-connection': '07-macs', '06-cover-flow': '06-cover-flow'}
 
-# On the phone the albums grid scrolls under the mini player and tab bar, so the album page is the cleaner library shot.
-PHONE_OVERRIDE = {'02-library': '09-album'}
+# On the phone the albums grid scrolls under the mini player and tab bar, so the Library list is the cleaner library shot (the album page's song rows also run under the mini player).
+PHONE_OVERRIDE = {'02-library': '10-library'}
 
 
 def font(name, size):

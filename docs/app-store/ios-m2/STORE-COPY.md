@@ -58,6 +58,8 @@ music,mac,controller,library,albums,queue,player,hi-res,lossless,flac,dac,surrou
 A sidebar on iPad, layouts that adapt as you resize the window, keyboard shortcuts, light and dark appearances, and a new app icon.
 
 ## Screenshot headlines (see screenshots/)
+
+Store set: **dark only** (Alex, 2026-11-13). Six screenshots each for iPhone 6.9-inch and iPad 13-inch, captured from the built-in demo with `-VTScreenshot YES`, which hides the "Demo: a made-up library" bar. No light-appearance set is planned. The app itself still follows the device's light or dark setting.
 - 01-now-playing: Your music. Your Mac. (NOW PLAYING); alternative: See what's playing.
 - 02-library: Keep your library close. (ALBUMS, ARTISTS, PLAYLISTS); alternative: Browse the collection.
 - 03-queue: Choose what comes next. (THE MAC'S QUEUE); alternative: Keep the queue in reach.

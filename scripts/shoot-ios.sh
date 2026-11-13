@@ -24,7 +24,7 @@ xcrun simctl status_bar "$udid" override --time "9:41" --batteryState charged --
 shoot() {
   local name="$1"; shift
   xcrun simctl terminate "$udid" "$bundle" >/dev/null 2>&1 || true
-  xcrun simctl launch "$udid" "$bundle" "$@" >/dev/null
+  xcrun simctl launch "$udid" "$bundle" "$@" -VTScreenshot YES >/dev/null
   sleep 3
   xcrun simctl io "$udid" screenshot "$out/$name.png" >/dev/null 2>&1
   echo "$out/$name.png"
