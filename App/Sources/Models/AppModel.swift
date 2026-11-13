@@ -481,6 +481,13 @@ final class AppModel {
     /// The chosen AirPlay receiver, while it is on the network (and one Vespertine can send to).
     var chosenAirPlay: AirPlayDevice? { airPlayChosen ? airPlay?.device(uid: settings.selectedDeviceUID) : nil }
 
+    /// What the player is told is missing: a chosen network output without a playback is missing, even when it is on the
+    /// network but its playback couldn't be made, so the music never falls back to the Mac's own output.
+    nonisolated static func missingNetworkOutput(chosen: Bool, hasPlayback: Bool, missing: String?, name: String?) -> String? {
+        guard chosen, !hasPlayback else { return nil }
+        return missing ?? name ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
+    }
+
     /// A network output (a UPnP player or an AirPlay receiver) is the chosen output: nothing else plays in its place.
     var networkOutputChosen: Bool { rendererChosen || airPlayChosen }
 
@@ -626,7 +633,7 @@ final class AppModel {
     func adjustVolume(_ action: VolumeControls.Action) {
         if let receiver = chosenAirPlay {
             // An AirPlay receiver: the level is its own volume, or Vespertine's digital volume when chosen so.
-            settings.applyVolume(action, for: receiver.uid)
+            settings.applyAirPlayVolume(action, uid: receiver.uid)
             syncEngine()
             return
         }
@@ -670,7 +677,8 @@ final class AppModel {
         let airPlayPlayback = airPlay?.playback(for: receiver, settings: receiver.map { settings.airPlaySettings(uid: $0.uid) } ?? RendererSettings(),
                                                 receiverVolumeDB: receiver.map { settings.airPlayReceiverVolumeDB(uid: $0.uid) } ?? 0)
         let playback: (any NetworkPlayback)? = rendererPlayback ?? airPlayPlayback
-        player.useRenderer(playback, missing: networkOutputChosen && playback == nil ? missingChosenOutput : nil)
+        player.useRenderer(playback, missing: Self.missingNetworkOutput(chosen: networkOutputChosen, hasPlayback: playback != nil, missing: missingChosenOutput,
+                                                                     name: receiver?.name ?? renderer?.name ?? settings.selectedDevice?.name))
         player.resolveVersions()
     }
 

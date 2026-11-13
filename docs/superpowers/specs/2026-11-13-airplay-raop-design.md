@@ -96,8 +96,8 @@ carrying a song over at its position, and the event handling are shared as they 
 
 ### Session (`RAOPSession.swift`)
 
-1. `OPTIONS *` (with `Apple-Challenge` when RSA; the answer is not verified).
-2. `ANNOUNCE` SDP:
+1. `OPTIONS *`.
+2. `ANNOUNCE` SDP (with `Apple-Challenge` when RSA, as OwnTone sends it; the answer is not verified; decision 615):
    ```
    v=0 / o=iTunes <sid> 0 IN IP4 <local> / s=iTunes / c=IN IP4 <receiver> / t=0 0
    m=audio 0 RTP/AVP 96 / a=rtpmap:96 AppleLossless / a=fmtp:96 352 0 16 40 10 14 2 255 0 0 44100
