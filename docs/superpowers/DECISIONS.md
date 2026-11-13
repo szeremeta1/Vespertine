@@ -44,3 +44,14 @@ Made solo on branch `upnp-output` (spec `docs/superpowers/specs/2026-11-13-upnp-
 116. **Renderer metadata**: title, artist, album and duration in DIDL-Lite from the queue's tracks; no artwork URL yet (it would need the media server to serve artwork).
 117. **Transitions/crossfades don't apply to renderers** (each song is its own stream); Spatial Audio, downmix, DoP and bitstream don't either.
 118. **Local Network usage text** (Info.plist and project.yml) now also mentions network players.
+
+### UPnP output, fix round 1
+
+119. **A chosen network player that isn't answering is never replaced by another output**, whatever "When the chosen output isn't connected" says: Play shows "<name> isn't answering." and nothing plays; during the first search after launch Play waits up to 5 s for it. One that drops mid-song stops there with the same message. Its row in the output list says NOT RESPONDING, dimmed.
+120. **Refused pause, play or seek is tried again once after 300 ms**, then reported as a notice (`EngineEvent.notice`, shown like other playback messages) while the song plays on; it is never treated as a failed song. A seek at start (an output change carrying a song over) waits until the player plays and is tried at the next polls, up to 5 times.
+121. **The media server answers a malformed request 400 and closes it** (Content-Length not a plain number in 0…1 MiB, headers over 64 KiB). Every connection has 10 s to send its request; at most 32 are open at once, more are closed on arrival. Connections are closed right after the response; the final empty "end of message" write never completed and left them open.
+122. **The on/off switch is applied in order** (`RendererService.want`, each change after the last, the wanted state re-read after every await), so a quick off-on-off can't leave a search loop or a listener behind.
+123. **Discovery follows a description only on the host that sent the SSDP reply**, keeps only services whose URLs are on the description's host, and reads at most 1 MiB of a description or service description.
+124. **Settings changes that restart a processed song are applied 300 ms after the last one**, so a volume drag restarts the stream once. Stopping the media server abandons processed streams and deletes their files.
+125. **Songs are prepared (probe, decoder, encoder start) on a dispatch queue of their own**, off Swift's cooperative pool, since opening a file can block on a share.
+126. **"Network player" is the interface's word** (Settings switch "Network Players (UPnP, beta)", output-list header "Network players", copy and advice say "player"); "renderer" stays in code and in the technical rows of a player's details (the owner's "Gapless: not guaranteed on this renderer" among them). The signal path's last step says "not verified" for what the player does, as docs/VERIFICATION.md words it.
