@@ -1,0 +1,12 @@
+{
+  "status": "draft for Alex; nothing uploaded",
+  "locale": "en-US",
+  "name": "Vespertine Remote",
+  "subtitle": "Your Mac library, within reach",
+  "subtitleAlternative": "A remote for your Mac music",
+  "promotionalText": "Browse your Vespertine library, choose the Mac's output, and keep the queue in reach. Made for iPhone and iPad. Requires Vespertine on your Mac.",
+  "description": "Control Vespertine on your Mac from your iPhone or iPad.\n\nBrowse albums, artists, playlists and favorites. Search your collection, choose a song, and manage what plays next. Change the Mac's output and see the signal information reported by Vespertine on the Mac.\n\nOn iPad, a sidebar keeps the library, queue and output close by. The layout adapts to portrait, landscape and narrow windows. Use a keyboard to switch sections and control playback.\n\nBrowse albums in a grid or Cover Flow. In Now Playing, choose the cover or a record view. Motion follows your accessibility settings. Light and dark appearances follow your device.\n\nPair with a code shown by Vespertine on your Mac. The connection is encrypted. A saved address lets you reach a paired Mac through your own VPN, including Tailscale, when both devices are connected and the Mac is awake.\n\nVespertine Remote controls playback on the Mac. It does not play music on this device. Try the built-in demo to explore a made-up library without a Mac or account. The demo does not play audio.\n\nRequires Vespertine on a Mac. Free and open source, with no ads or tracking.",
+  "keywords": "music,remote,mac,library,albums,queue,player,hires,lossless,ipad,collection",
+  "whatsNew": "A sidebar on iPad, layouts that adapt as you resize the window, keyboard shortcuts, light and dark appearances, and the horizon app icon.",
+  "reviewNotes": "This is a remote for the open-source Vespertine Mac app. No account is required. Without a Mac, open the app and tap Try the Demo on the Macs screen. The demo shows a generated library and every main remote screen. It does not play audio. Music playback happens on the paired Mac. Local Network access discovers Macs; camera access is used only to scan a pairing code. Nothing in this kit has been submitted."
+}

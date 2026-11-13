@@ -33,7 +33,7 @@ struct LibraryView: View {
                 }
             }
             .obsidianList()
-            .navigationTitle("Library")
+            .navigationTitle(section?.title ?? String(localized: "Library"))
             .searchable(text: $search, prompt: Text("Songs, artists, albums"))
             .navigationDestination(for: String.self) { place in
                 switch place {
@@ -47,7 +47,9 @@ struct LibraryView: View {
                 guard section == nil else { return }
                 switch model.startScreen {
                 case "albums", "coverFlow", "album": path = ["albums"]; if model.startScreen != "album" { model.startScreen = nil }
-                case "artists": path = ["artists"]; model.startScreen = nil
+                case "artists", "playlists", "favorites":
+                    if let screen = model.startScreen { path = [screen] }
+                    model.startScreen = nil
                 default: break
                 }
             }

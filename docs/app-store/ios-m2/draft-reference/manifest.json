@@ -1,0 +1,134 @@
+[
+  {
+    "file": "iphone69/01-now-playing.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "sourceKind": "M1 reference",
+    "source": "/Users/szeremeta/Workspace/scratch/2026-11-12-vt-ios-build/shots/03-now-playing.png",
+    "visualReview": "pending",
+    "uploadReady": false
+  },
+  {
+    "file": "iphone69/02-library.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "sourceKind": "M1 reference",
+    "source": "/Users/szeremeta/Workspace/scratch/2026-11-12-vt-ios-build/shots/08-albums.png",
+    "visualReview": "pending",
+    "uploadReady": false
+  },
+  {
+    "file": "iphone69/03-queue.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "sourceKind": "M1 reference",
+    "source": "/Users/szeremeta/Workspace/scratch/2026-11-12-vt-ios-build/shots/10-queue.png",
+    "visualReview": "pending",
+    "uploadReady": false
+  },
+  {
+    "file": "iphone69/04-output.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "sourceKind": "M1 reference",
+    "source": "/Users/szeremeta/Workspace/scratch/2026-11-12-vt-ios-build/shots/11-output.png",
+    "visualReview": "pending",
+    "uploadReady": false
+  },
+  {
+    "file": "iphone69/05-connection.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "sourceKind": "M1 reference",
+    "source": "/Users/szeremeta/Workspace/scratch/2026-11-12-vt-ios-build/shots/02-connection.png",
+    "visualReview": "pending",
+    "uploadReady": false
+  },
+  {
+    "file": "iphone69/06-cover-flow.png",
+    "size": [
+      1320,
+      2868
+    ],
+    "sourceKind": "M1 reference",
+    "source": "/Users/szeremeta/Workspace/scratch/2026-11-12-vt-ios-build/shots/05-cover-flow.png",
+    "visualReview": "pending",
+    "uploadReady": false
+  },
+  {
+    "file": "ipad13/01-now-playing.png",
+    "size": [
+      2064,
+      2752
+    ],
+    "sourceKind": "missing capture",
+    "source": null,
+    "visualReview": "pending",
+    "uploadReady": false
+  },
+  {
+    "file": "ipad13/02-library.png",
+    "size": [
+      2064,
+      2752
+    ],
+    "sourceKind": "missing capture",
+    "source": null,
+    "visualReview": "pending",
+    "uploadReady": false
+  },
+  {
+    "file": "ipad13/03-queue.png",
+    "size": [
+      2064,
+      2752
+    ],
+    "sourceKind": "missing capture",
+    "source": null,
+    "visualReview": "pending",
+    "uploadReady": false
+  },
+  {
+    "file": "ipad13/04-output.png",
+    "size": [
+      2064,
+      2752
+    ],
+    "sourceKind": "missing capture",
+    "source": null,
+    "visualReview": "pending",
+    "uploadReady": false
+  },
+  {
+    "file": "ipad13/05-connection.png",
+    "size": [
+      2064,
+      2752
+    ],
+    "sourceKind": "missing capture",
+    "source": null,
+    "visualReview": "pending",
+    "uploadReady": false
+  },
+  {
+    "file": "ipad13/06-cover-flow.png",
+    "size": [
+      2064,
+      2752
+    ],
+    "sourceKind": "missing capture",
+    "source": null,
+    "visualReview": "pending",
+    "uploadReady": false
+  }
+]

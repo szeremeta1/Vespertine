@@ -15,6 +15,7 @@ struct VespertineRemoteApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .modifier(TestWindowWidth())
                 .environment(model)
                 .onOpenURL { url in model.open(url) }
                 .tint(Color.accentColor)
@@ -23,5 +24,24 @@ struct VespertineRemoteApp: App {
         .onChange(of: scenePhase) { _, phase in
             model.scenePhaseChanged(phase)
         }
+    }
+}
+
+// Debug-only width harness for UI tests. Production uses the real system window unchanged.
+private struct TestWindowWidth: ViewModifier {
+    func body(content: Content) -> some View {
+        #if DEBUG
+        let requested = UserDefaults.standard.double(forKey: "VTTestWindowWidth")
+        if requested >= 300 {
+            GeometryReader { geometry in
+                content.frame(width: min(requested, geometry.size.width))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        } else {
+            content
+        }
+        #else
+        content
+        #endif
     }
 }
