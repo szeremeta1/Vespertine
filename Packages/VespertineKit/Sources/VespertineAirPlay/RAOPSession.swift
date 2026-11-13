@@ -20,11 +20,23 @@ public final class RAOPSession: @unchecked Sendable {
     private let rsaKey: SecKey?
     private let log = Logger(subsystem: "org.szeremeta.vespertine.player", category: "airplay")
 
-    private var rtsp: RTSPConnection?
-    private var audio: UDPSocket?
-    private var control: UDPSocket?
-    private var timing: UDPSocket?
-    private var keepAlive: Task<Void, Never>?
+    /// The connection, sockets and keep-alive: set by connect and close (the playback's worker), read by the pacer and the
+    /// socket readers, so behind a lock.
+    private struct Parts {
+        var rtsp: RTSPConnection?
+        var audio: UDPSocket?
+        var control: UDPSocket?
+        var timing: UDPSocket?
+        var keepAlive: Task<Void, Never>?
+        var localAddress = "0.0.0.0"
+        var aesKey = Data()
+        var aesIV = Data()
+    }
+    private let parts = Locked(Parts())
+    private var rtsp: RTSPConnection? { parts.withLock { $0.rtsp } }
+    private var audio: UDPSocket? { parts.withLock { $0.audio } }
+    private var control: UDPSocket? { parts.withLock { $0.control } }
+    private var timing: UDPSocket? { parts.withLock { $0.timing } }
 
     private struct State {
         var connected = false
@@ -41,8 +53,6 @@ public final class RAOPSession: @unchecked Sendable {
     }
     private let state = Locked(State())
     private let encoder: ALACEncoder?
-    private let aesKey = AESCBC.randomBytes(16)
-    private let aesIV = AESCBC.randomBytes(16)
     private let sessionID = UInt32.random(in: 1...UInt32.max)
     private let ssrc = UInt32.random(in: 1...UInt32.max)
     private let clientInstance = String(format: "%016llX", UInt64.random(in: 1...UInt64.max))
@@ -69,8 +79,10 @@ public final class RAOPSession: @unchecked Sendable {
     }
 
     deinit {
-        keepAlive?.cancel()
-        [audio, control, timing].forEach { $0?.close() }
+        let p = parts.withLock { $0 }
+        p.keepAlive?.cancel()
+        [p.audio, p.control, p.timing].forEach { $0?.close() }
+        if let rtsp = p.rtsp { Task { await rtsp.close() } }
     }
 
     public var isConnected: Bool { state.withLock { $0.connected } }
@@ -80,8 +92,7 @@ public final class RAOPSession: @unchecked Sendable {
 
     // MARK: RTSP
 
-    private var url: String { "rtsp://\(localAddress)/\(sessionID)" }
-    private var localAddress = "0.0.0.0"
+    private var url: String { "rtsp://\(parts.withLock { $0.localAddress })/\(sessionID)" }
 
     private func request(_ method: String, url: String? = nil, headers extra: [(String, String)] = [], body: Data = Data()) async throws -> RTSPMessage {
         guard let rtsp else { throw RAOPError.closed }
@@ -91,6 +102,9 @@ public final class RAOPSession: @unchecked Sendable {
         if let session { headers.append(("Session", session)) }
         headers += extra
         let response = try await rtsp.send(.request(method, url ?? self.url, headers: headers, body: body))
+        // Some receivers leave CSeq out (OwnTone notes Reflector and Airfoil); one that names another request is answering
+        // something else.
+        if let answered = response["CSeq"], answered != String(cseq) { throw RAOPError.badResponse("\(method) (CSeq \(answered), not \(cseq))") }
         guard response.status == 200 else { throw RAOPError.refused(method, response.status) }
         return response
     }
@@ -98,11 +112,14 @@ public final class RAOPSession: @unchecked Sendable {
     /// OPTIONS, ANNOUNCE, SETUP and RECORD; then the receiver takes audio. `volumeDB`: sent right after (nil: left alone).
     public func connect(volumeDB: Double?) async throws {
         let rtsp = RTSPConnection(endpoint: endpoint)
-        self.rtsp = rtsp
+        parts.withLock { $0.rtsp = rtsp }
         do {
+            let aesKey = try AESCBC.randomBytes(16), aesIV = try AESCBC.randomBytes(16)
+            parts.withLock { $0.aesKey = aesKey; $0.aesIV = aesIV }
             try await rtsp.connect()
             let host = await rtsp.remoteAddress
-            localAddress = await rtsp.localAddress
+            let localAddress = await rtsp.localAddress
+            parts.withLock { $0.localAddress = localAddress }
             guard !host.isEmpty, !host.contains(":") else { throw RAOPError.unreachable }
             state.withLock { $0.host = host }
             _ = try await request("OPTIONS", url: "*")
@@ -111,20 +128,22 @@ public final class RAOPSession: @unchecked Sendable {
             if encryption == .rsa {
                 guard let rsaKey else { throw RAOPError.badResponse("RSA") }
                 rsa = try RSAWrap.encrypt(aesKey, key: rsaKey)
-                extra.append(("Apple-Challenge", SDP.base64NoPadding(AESCBC.randomBytes(16))))
+                extra.append(("Apple-Challenge", SDP.base64NoPadding(try AESCBC.randomBytes(16))))
             }
             let sdp = SDP.announce(sessionID: sessionID, local: localAddress, remote: host, rsaAESKey: rsa, aesIV: rsa == nil ? nil : aesIV)
             _ = try await request("ANNOUNCE", headers: extra, body: Data(sdp.utf8))
             // The timing port is open before SETUP (Apple TVs ask the time at once).
             let timing = try UDPSocket(), control = try UDPSocket(), audio = try UDPSocket()
-            self.timing = timing
-            self.control = control
-            self.audio = audio
+            parts.withLock { $0.timing = timing; $0.control = control; $0.audio = audio }
             timing.startReceiving(name: "Vespertine AirPlay timing") { [weak self] data, from, port in self?.answerTiming(data, from: from, port: port) }
             control.startReceiving(name: "Vespertine AirPlay control") { [weak self] data, _, _ in self?.answerControl(data) }
             let setup = try await request("SETUP", headers: [("Transport", RAOPTransport.request(control: control.port, timing: timing.port))])
             guard let transport = setup["Transport"].flatMap(RAOPTransport.parse) else { throw RAOPError.badResponse("SETUP") }
-            state.withLock { $0.ports = transport; $0.session = setup["Session"].map { String($0.split(separator: ";")[0]) } }
+            // "Session: <id>[;timeout=…]"; none, or an empty one, is a receiver Vespertine can't go on with.
+            guard let session = setup["Session"]?.split(separator: ";").first.map({ $0.trimmingCharacters(in: .whitespaces) }), !session.isEmpty else {
+                throw RAOPError.badResponse("SETUP (no session)")
+            }
+            state.withLock { $0.ports = transport; $0.session = session }
             let (seq, head) = state.withLock { ($0.seq, $0.head) }
             _ = try await request("RECORD", headers: [("Range", "npt=0-"), ("RTP-Info", "seq=\(seq);rtptime=\(head)")])
             state.withLock { $0.connected = true; $0.first = true; $0.anchor = nil }
@@ -167,16 +186,17 @@ public final class RAOPSession: @unchecked Sendable {
     }
 
     private func close() async {
-        keepAlive?.cancel()
-        keepAlive = nil
+        let p = parts.withLock { p -> Parts in defer { p.keepAlive = nil }; return p }
+        // Not the keep-alive's own task cancelling itself mid-close: it ends by returning.
+        p.keepAlive?.cancel()
         state.withLock { $0.connected = false }
-        [audio, control, timing].forEach { $0?.close() }
-        await rtsp?.close()
+        [p.audio, p.control, p.timing].forEach { $0?.close() }
+        await p.rtsp?.close()
     }
 
     private func startKeepAlive() {
-        keepAlive?.cancel()
-        keepAlive = Task { [weak self] in
+        parts.withLock { $0.keepAlive?.cancel() }
+        let task = Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: Self.keepAliveInterval)
                 guard !Task.isCancelled, let self else { return }
@@ -184,11 +204,16 @@ public final class RAOPSession: @unchecked Sendable {
                     guard !Task.isCancelled, self.isConnected else { return }
                     self.log.error("AirPlay \(self.name, privacy: .public) keep-alive failed: \(String(describing: error), privacy: .public)")
                     self.state.withLock { $0.connected = false }
+                    // The connection is closed (not left half-open) before the playback hears of it.
+                    let p = self.parts.withLock { p -> Parts in defer { p.keepAlive = nil }; return p }
+                    [p.audio, p.control, p.timing].forEach { $0?.close() }
+                    await p.rtsp?.close()
                     self.onLost?()
                     return
                 }
             }
         }
+        parts.withLock { $0.keepAlive = task }
     }
 
     // MARK: Audio
@@ -201,8 +226,10 @@ public final class RAOPSession: @unchecked Sendable {
     public func clockTimestamp(nanoseconds: UInt64 = NTPClock.nanosecondsNow()) -> UInt32? {
         state.withLock { s in
             guard let anchor = s.anchor else { return nil }
-            let elapsed = nanoseconds >= anchor.nanos ? nanoseconds - anchor.nanos : 0
-            return anchor.rtp &+ UInt32(truncatingIfNeeded: elapsed * UInt64(RAOPTiming.sampleRate) / 1_000_000_000)
+            // Signed: before the anchor (the packets sent ahead of the clock) the frame being "sent now" is behind it.
+            let elapsed = Int64(bitPattern: nanoseconds &- anchor.nanos)
+            let frames = elapsed * Int64(RAOPTiming.sampleRate) / 1_000_000_000
+            return anchor.rtp &+ UInt32(truncatingIfNeeded: frames)
         }
     }
 
@@ -212,7 +239,10 @@ public final class RAOPSession: @unchecked Sendable {
     public func send(_ samples: [Int16], startNanos: UInt64 = NTPClock.nanosecondsNow()) -> Bool {
         var payload: Data
         if let encoder, let encoded = try? encoder.encode(samples) { payload = encoded } else { payload = ALACVerbatim.encode(samples) }
-        if encryption == .rsa { try? AESCBC.apply(&payload, key: aesKey, iv: aesIV, encrypt: true) }
+        if encryption == .rsa {
+            let (key, iv) = parts.withLock { ($0.aesKey, $0.aesIV) }
+            guard (try? AESCBC.apply(&payload, key: key, iv: iv, encrypt: true)) != nil else { return false }
+        }
         let (packet, first, host, port) = state.withLock { s -> (Data, Bool, String, UInt16) in
             let first = s.first
             if first { s.anchor = (s.head, startNanos) }

@@ -133,3 +133,52 @@ struct RTSPConnectionTests {
         await connection.close()
     }
 }
+
+@Suite("RAOP session, fix round 1", .serialized)
+struct RAOPSessionHardeningTests {
+    @Test("A SETUP answer with an empty Session header is a protocol error, not a crash")
+    func emptySession() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.sessionHeader = ""
+        let session = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none)
+        await #expect(throws: RAOPError.badResponse("SETUP (no session)")) { try await session.connect(volumeDB: nil) }
+        #expect(!session.isConnected)
+    }
+
+    @Test("An answer that names another request's CSeq is a protocol error")
+    func cseqMismatch() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.wrongCSeq = ["ANNOUNCE"]
+        let session = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none)
+        await #expect(throws: RAOPError.self) { try await session.connect(volumeDB: nil) }
+        #expect(!receiver.methods.contains("SETUP"))
+    }
+
+    @Test("The first sync and later ones put the same frame at the same time (within 1 ms), packets sent ahead or not")
+    func syncConsistency() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        let session = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none)
+        try await session.connect(volumeDB: nil)
+        // As the pacer does: the first packet goes 250 ms before the moment its first frame counts as sent.
+        let anchor = NTPClock.nanosecondsNow() + 250_000_000
+        session.send(packets(1)[0], startNanos: anchor)
+        try await Task.sleep(for: .milliseconds(400))
+        session.sendSync()
+        try await Task.sleep(for: .milliseconds(200))
+        session.sendSync()
+        await receiver.waitFor { receiver.syncs.count >= 3 }
+        let syncs = receiver.syncs.compactMap(RAOPPacket.parseSync)
+        #expect(syncs.count >= 3)
+        let frame = try #require(receiver.firstTimestamp)
+        // When the sync says `frame` is sent: its NTP time plus (frame − rtp) / rate.
+        let times = syncs.map { s in Double(s.ntp) / 4_294_967_296 + Double(Int32(bitPattern: frame &- s.rtp)) / 44_100 }
+        for t in times.dropFirst() { #expect(abs(t - times[0]) < 0.001) }
+        // And that moment is the anchor (250 ms after the packet went), not when it was sent.
+        let anchorNTP = Double(NTPClock.ntp(nanoseconds: anchor)) / 4_294_967_296
+        #expect(abs(times[0] - anchorNTP) < 0.001)
+        await session.teardown()
+    }
+}

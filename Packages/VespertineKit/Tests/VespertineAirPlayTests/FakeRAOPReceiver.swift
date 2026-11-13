@@ -45,6 +45,21 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         set { lock.withLock { _refuse = newValue } }
     }
     private var _refuse: [String: Int] = [:]
+    /// The SETUP answer's Session header ("" for an empty one); nil: the usual.
+    var sessionHeader: String? {
+        get { lock.withLock { _sessionHeader } }
+        set { lock.withLock { _sessionHeader = newValue } }
+    }
+    private var _sessionHeader: String?
+    /// Answer these methods with another request's CSeq.
+    var wrongCSeq: Set<String> {
+        get { lock.withLock { _wrongCSeq } }
+        set { lock.withLock { _wrongCSeq = newValue } }
+    }
+    private var _wrongCSeq: Set<String> = []
+    /// The RTP time of the first audio packet received.
+    var firstTimestamp: UInt32? { lock.withLock { _firstTimestamp } }
+
     /// Lose this many packets (whatever their numbers) after this many have come.
     var loseAfter: (count: Int, lose: Int)?
 
@@ -141,7 +156,8 @@ final class FakeRAOPReceiver: @unchecked Sendable {
 
     private func handle(_ request: RTSPMessage) -> RTSPMessage {
         lock.withLock { _requests.append(request) }
-        let cseq = request["CSeq"] ?? "0"
+        var cseq = request["CSeq"] ?? "0"
+        if wrongCSeq.contains(request.method ?? "") { cseq = String((Int(cseq) ?? 0) + 7) }
         var headers: [(String, String)] = [("CSeq", cseq), ("Server", "AirTunes/366.0")]
         if let status = refuse[request.method ?? ""] { return .response(status, "Refused", headers: headers) }
         switch request.method {
@@ -169,7 +185,7 @@ final class FakeRAOPReceiver: @unchecked Sendable {
             timing.startReceiving(name: "fake timing") { [weak self] data, _, _ in self?.lock.withLock { self?._timingReplies.append(data) } }
             lock.withLock { sockets += [audio, control, timing]; controlSocket = control; timingSocket = timing }
             headers += [("Transport", "RTP/AVP/UDP;unicast;mode=record;server_port=\(audio.port);control_port=\(control.port);timing_port=\(timing.port)"),
-                        ("Session", "DEADBEEF"), ("Audio-Jack-Status", "connected; type=analog")]
+                        ("Session", sessionHeader ?? "DEADBEEF"), ("Audio-Jack-Status", "connected; type=analog")]
         case "RECORD":
             headers.append(("Audio-Latency", "11025"))
             // Asks the sender for the time, as a receiver does before it uses sync packets.
