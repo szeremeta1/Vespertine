@@ -14,6 +14,7 @@ public final class GrowingFile: @unchecked Sendable {
     private let lock = NSLock()
     private var finished = false
     private var failed = false
+    private var abandoned = false
 
     /// Creates (or empties) the file at `url`.
     public init(url: URL) throws {
@@ -29,6 +30,18 @@ public final class GrowingFile: @unchecked Sendable {
     public func grew() {}
     /// The writer is done: the file is complete.
     public func finish() { lock.withLock { finished = true } }
+    /// Nobody will read it any more: the writer may stop, and the file goes once it has.
+    public var isAbandoned: Bool { lock.withLock { abandoned } }
+    public func abandon() {
+        lock.withLock { abandoned = true }
+        let url = self.url
+        Task.detached {
+            // Give the writer a moment to notice and close it.
+            try? await Task.sleep(for: .seconds(2))
+            try? FileManager.default.removeItem(at: url)
+        }
+    }
+
     /// The writer gave up: readers stop where the file ends.
     public func fail() { lock.withLock { finished = true; failed = true } }
 
@@ -145,7 +158,8 @@ public final class MediaServer: @unchecked Sendable {
 
     public func release(_ url: URL) {
         let token = url.deletingPathExtension().lastPathComponent
-        lock.withLock { _ = resources.removeValue(forKey: token) }
+        let removed = lock.withLock { resources.removeValue(forKey: token) }
+        if case .growing(let file, _) = removed { file.abandon() }
     }
 
     /// Every registered URL's token, for tests and bookkeeping.
