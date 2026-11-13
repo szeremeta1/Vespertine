@@ -251,10 +251,17 @@ struct DevicePicker: View {
             deviceRow(nil, name: String(localized: "System Default"), detail: String(localized: "FOLLOWS SOUND SETTINGS"), symbol: "gearshape", selected: model.settings.selectedDeviceUID == nil)
             if let missing = model.missingChosenOutput, let uid = model.settings.selectedDeviceUID {
                 // Still the chosen one: playback goes back to it when it's connected again.
-                deviceRow(uid, name: missing,
-                          detail: model.plannedDevice.map { String(localized: "NOT CONNECTED · USING \($0.name.localizedUppercase)", comment: "Output list: the chosen device is missing; %@ is the device playing in its place") }
-                              ?? String(localized: "NOT CONNECTED · WAITING FOR IT", comment: "Output list: the chosen device is missing and playback waits for it"),
-                          symbol: "cable.connector.slash", selected: true)
+                if model.rendererChosen {
+                    // A network renderer that isn't answering: nothing plays in its place.
+                    deviceRow(uid, name: missing, detail: String(localized: "NOT RESPONDING", comment: "Output list: the chosen network player doesn't answer (short, uppercase)"),
+                              symbol: "hifireceiver", selected: true)
+                        .opacity(0.6)
+                } else {
+                    deviceRow(uid, name: missing,
+                              detail: model.plannedDevice.map { String(localized: "NOT CONNECTED · USING \($0.name.localizedUppercase)", comment: "Output list: the chosen device is missing; %@ is the device playing in its place") }
+                                  ?? String(localized: "NOT CONNECTED · WAITING FOR IT", comment: "Output list: the chosen device is missing and playback waits for it"),
+                              symbol: "cable.connector.slash", selected: true)
+                }
             }
             ForEach(model.devices.devices) { d in
                 deviceRow(d.uid, name: d.name, detail: "\(d.profile.tag) · \(d.rangeSummary)", symbol: d.profile.symbol,

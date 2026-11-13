@@ -324,6 +324,7 @@ final class AppModel {
         }
         followChosenOutput()
         player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
+        player.rendererGrace = { [weak self] in self?.renderers?.searching == true }
         // Which groups are published decides how long a pause keeps one from the other apps.
         systemOutput.onPublishedChanged = { [weak self] in self?.syncEngine() }
         library.bundlesCopiesByDefault = settings.bundleCopies
@@ -630,8 +631,10 @@ final class AppModel {
         systemOutput.sync(groups: engineSettings.speakerGroups, settings: engineSettings)
         devices.watchVolume(of: device)
         // A network renderer plays in place of the engine while one is chosen and on the network.
+        // Chosen and not on the network: nothing plays anywhere else in its place (decision 119).
         let renderer = chosenRenderer
-        player.useRenderer(renderers?.playback(for: renderer, settings: renderer.map { settings.rendererSettings(uid: $0.uid) } ?? RendererSettings()))
+        let playback = renderers?.playback(for: renderer, settings: renderer.map { settings.rendererSettings(uid: $0.uid) } ?? RendererSettings())
+        player.useRenderer(playback, missing: rendererChosen && playback == nil ? missingChosenOutput : nil)
         player.resolveVersions()
     }
 

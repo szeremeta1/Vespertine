@@ -432,11 +432,25 @@ final class PlayerController {
 
     /// Hands playback to `playback` (a network renderer) or back to the engine (nil). A song that was playing carries on, at
     /// its position, on the new one.
-    func useRenderer(_ playback: RendererPlayback?) {
-        guard playback !== renderer else { return }
-        let carried = state == .playing ? current : nil
-        let at = position
-        if let old = renderer { old.shutdown() } else if playback != nil { engine.stop() }
+    func useRenderer(_ playback: RendererPlayback?, missing: String? = nil) {
+        let missing = playback == nil ? missing : nil
+        guard playback !== renderer || missing != missingRenderer else { return }
+        let wasActive = state == .playing || requested != nil
+        let carried = wasActive ? (pendingRendererStart ?? current) : pendingRendererStart
+        let at = pendingRendererStart == nil ? position : 0
+        pendingRendererStart = nil
+        let hadRenderer = renderer != nil || missingRenderer != nil
+        if let old = renderer, old !== playback { old.shutdown() } else if playback != nil || missing != nil { engine.stop() }
+        missingRenderer = missing
+        if let missing {
+            // Nothing plays in its place (not the Mac's DAC, whatever the fallback says).
+            renderer = nil
+            if wasActive, hadRenderer { lastError = Self.notAnswering(missing) }
+            requested = nil
+            requestedState = nil
+            signalPath = nil
+            return
+        }
         renderer = playback
         if let playback {
             let mirror = self.mirror
@@ -460,6 +474,37 @@ final class PlayerController {
                 if at > 1 { seek(to: at) }
             }
         }
+    }
+
+    /// The chosen output is a network renderer that isn't answering: nothing plays anywhere until it is back. Its name.
+    @ObservationIgnored private(set) var missingRenderer: String?
+    /// The first search for renderers is still running (Play then waits a little for the chosen one). Set by the app model.
+    @ObservationIgnored var rendererGrace: () -> Bool = { false }
+    /// How long Play waits for a chosen renderer during the first search.
+    @ObservationIgnored var rendererGraceSeconds: TimeInterval = 5
+    /// The song Play asked for while waiting for the renderer.
+    @ObservationIgnored private var pendingRendererStart: QueueEntry?
+
+    nonisolated static func notAnswering(_ name: String) -> String {
+        String(localized: "\(name) isn't answering.", comment: "%@ is a network player's name: it is the chosen output and doesn't answer.")
+    }
+
+    /// Play with the chosen renderer missing: wait for it during the first search, else say it isn't answering. True when handled.
+    private func holdForMissingRenderer(_ entry: QueueEntry?) -> Bool {
+        guard let missing = missingRenderer else { return false }
+        guard let entry, rendererGrace() else {
+            lastError = Self.notAnswering(missing)
+            return true
+        }
+        pendingRendererStart = entry
+        let wait = rendererGraceSeconds
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(wait))
+            guard let self, self.pendingRendererStart?.id == entry.id, let missing = self.missingRenderer else { return }
+            self.pendingRendererStart = nil
+            self.lastError = Self.notAnswering(missing)
+        }
+        return true
     }
 
     /// Titles for the renderer's display, by queue entry (kept current as the queue changes).
@@ -560,6 +605,7 @@ final class PlayerController {
     @ObservationIgnored private var failedSinceStart = false
 
     private func start(_ entry: QueueEntry, at seconds: TimeInterval = 0) {
+        if holdForMissingRenderer(entry) { return }
         requested = entry.id
         requestedState = nil
         seekRestart = nil
@@ -589,6 +635,10 @@ final class PlayerController {
 
     func togglePlayPause() {
         if canCancelLoading { stop(); return }
+        if missingRenderer != nil, state != .playing {
+            _ = holdForMissingRenderer(current ?? queue.first)
+            return
+        }
         // Waiting for the chosen output to reconnect counts as playing: pressing pause cancels it.
         if waitingForDevice != nil { engine.pause(); return }
         switch state {
