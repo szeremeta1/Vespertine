@@ -10,7 +10,7 @@ import CommonCrypto
 import Foundation
 import Security
 
-public enum RAOPCryptoError: Error { case aes(Int32), rsa(String) }
+public enum RAOPCryptoError: Error { case aes(Int32), rsa(String), random(Int32) }
 
 public enum AESCBC {
     /// Encrypts (or decrypts) the whole blocks of `data` in place; the last `count % 16` bytes stay as they are.
@@ -33,9 +33,11 @@ public enum AESCBC {
         data.replaceSubrange(data.startIndex..<(data.startIndex + whole), with: out)
     }
 
-    public static func randomBytes(_ count: Int) -> Data {
+    /// Random bytes from the system's generator; throws rather than ever hand out a predictable (zero) key.
+    public static func randomBytes(_ count: Int) throws -> Data {
         var d = Data(count: count)
-        _ = d.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, count, $0.baseAddress!) }
+        let status = d.withUnsafeMutableBytes { SecRandomCopyBytes(kSecRandomDefault, count, $0.baseAddress!) }
+        guard status == errSecSuccess else { throw RAOPCryptoError.random(status) }
         return d
     }
 }

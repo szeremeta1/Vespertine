@@ -35,14 +35,15 @@ struct RAOPCryptoTests {
     func airPortKey() throws {
         let key = try RSAWrap.airPortExpressKey()
         #expect(SecKeyGetBlockSize(key) == 256)
-        #expect(try RSAWrap.encrypt(AESCBC.randomBytes(16), key: key).count == 256)
+        #expect(try RSAWrap.encrypt(try AESCBC.randomBytes(16), key: key).count == 256)
     }
 
     @Test("Wrapped with a public key built from modulus and exponent, the AES key comes back with the private key")
     func wrapUnwrap() throws {
         let (privateKey, modulus) = try TestRSA.make()
         let publicKey = try RSAWrap.publicKey(modulus: modulus, exponent: Data([1, 0, 1]))
-        let aes = AESCBC.randomBytes(16)
+        let aes = try AESCBC.randomBytes(16)
+        #expect(aes.count == 16 && aes != Data(count: 16))
         #expect(try RSAWrap.decrypt(try RSAWrap.encrypt(aes, key: publicKey), key: privateKey) == aes)
     }
 }
