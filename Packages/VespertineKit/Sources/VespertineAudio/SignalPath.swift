@@ -151,6 +151,7 @@ public struct SignalPath: Sendable, Hashable {
             return plan.spatial == .headTracked ? String(localized: "SPATIAL · HEAD TRACKED", comment: "Status badge (short, uppercase).") : String(localized: "SPATIAL AUDIO", comment: "Status badge (short, uppercase).")
         }
         if let onto = foldedOnto { return foldNotice(onto: onto) }
+        if isBluetoothCallMode { return String(localized: "BLUETOOTH · CALL MODE", comment: "Status badge (short, uppercase): a Bluetooth headset is in its hands-free call mode, so music plays at phone quality.") }
         // A bitstream's two channels are IEC 61937 frames that carry all of the source's: nothing is mixed down.
         if plan.mode == .pcm, plan.channels < source.channels { return downmixNotice(from: ChannelLayouts.name(channels: source.channels), channels: plan.channels) }
         if !deviceProfile.canBeBitPerfect && !isResampling && !plan.dsdConvertedToPCM {

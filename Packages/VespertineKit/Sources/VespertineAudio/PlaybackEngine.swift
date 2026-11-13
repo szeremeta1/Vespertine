@@ -1464,15 +1464,15 @@ public final class PlaybackEngine: @unchecked Sendable {
         var plan: OutputPlan
         if isGroup {
             // PCM only, no integer mode, no 16-bit match, no Spatial Audio: the group's rules (GroupFormatRules).
-            plan = groupPlan(for: probed, device: device) ?? GroupFormatRules.plan(source: probed.format, device: device.capabilities, policy: ratePolicy(for: device))
+            plan = groupPlan(for: probed, device: device) ?? GroupFormatRules.plan(source: probed.format, device: device.planningCapabilities, policy: ratePolicy(for: device))
         } else {
-            plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
+            plan = FormatPlanner.plan(source: probed.format, device: device.planningCapabilities,
                                       policy: ratePolicy(for: device),
                                       spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                       dsdToPCMForRoom: settings.convertsDSDForRoom(device),
                                       dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
             plan.integerSamples = wantsIntegerMode(plan, source: probed, item: item, device: device)
-            plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
+            plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.planningCapabilities,
                                                  eligible: mayMatchSixteenBit(item: item, device: device))
         }
         if session == nil || !GroupOutput.isSameOutput(sessionDevice, device) || !(session!.plan.isDeviceCompatible(with: plan)) {
@@ -1589,7 +1589,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         let keep = old.map { $0.deviceID == device.id && $0.applied.exclusive && exclusive } ?? false
         // Moving to another output lets the old one go: it gets its own rate back (a DoP carrier rate is no music rate).
         old?.invalidate(releaseHog: !keep, restoreFormat: !keep, idle: old.map { $0.deviceID != device.id } ?? false)
-        let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: exclusive)
+        let new = try OutputSession(deviceID: device.id, plan: plan, exclusive: exclusive, leavingFormatAlone: device.isBluetoothLink)
         transitionWindows.removeAll()
         sessionLock.lock()
         session = new
@@ -1702,7 +1702,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// it by where the speakers stand (`GroupRouting`). nil for a single device.
     private func groupPlan(for probed: ProbedSource, device: OutputDevice, policy: RatePolicy? = nil) -> OutputPlan? {
         guard GroupOutput.isGroupOutput(device) else { return nil }
-        let base = GroupFormatRules.plan(source: probed.format, device: device.capabilities, policy: policy ?? ratePolicy(for: device))
+        let base = GroupFormatRules.plan(source: probed.format, device: device.planningCapabilities, policy: policy ?? ratePolicy(for: device))
         guard let group = routingGroup(for: device) else { return base }
         return GroupRouting.routed(base, content: GroupRouting.content(source: probed.format, group: group), group: group, source: probed.format)
     }
@@ -1860,7 +1860,7 @@ public final class PlaybackEngine: @unchecked Sendable {
             && plan.channels == source.channels && source.encoding == .pcm && probed.exactAsIntegers
             && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
             && settings.roomCorrection(for: device) == nil
-            && device.capabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }
+            && device.planningCapabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }
     }
 
     /// The engine's half of "Match 16-bit sources" (the plan's half is `FormatPlanner.matchSixteenBit`): the setting
@@ -2204,12 +2204,12 @@ public final class PlaybackEngine: @unchecked Sendable {
             var formatB = BoundaryFormat.systemRenderer
             var planB: OutputPlan?
             if !(probed.format.codec == DolbyAtmos.codecName && settings.atmosBySystem && !bitstream) {
-                var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: ratePolicy(for: device),
+                var plan = FormatPlanner.plan(source: probed.format, device: device.planningCapabilities, policy: ratePolicy(for: device),
                                               spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                               dsdToPCMForRoom: settings.convertsDSDForRoom(device),
                                               dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
-                plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
+                plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.planningCapabilities,
                                                      eligible: mayMatchSixteenBit(item: next, device: device))
                 if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
                 formatB = .plan(plan)
@@ -2287,7 +2287,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         guard settings.transitions.avoidsUnmixableModes, plan.mode == .pcm, session.plan.mode == .pcm,
               plan.deviceSampleRate != session.plan.deviceSampleRate else { return nil }
         let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
-        var resampled = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: .fixed(session.plan.deviceSampleRate),
+        var resampled = FormatPlanner.plan(source: probed.format, device: device.planningCapabilities, policy: .fixed(session.plan.deviceSampleRate),
                                            spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                            dsdToPCMForRoom: settings.convertsDSDForRoom(device), dsdToPCMForTransitions: true)
         resampled.integerSamples = false
@@ -2360,12 +2360,12 @@ public final class PlaybackEngine: @unchecked Sendable {
             let probed = try SourceOpener.probe(prepareFile(next), area: next.sacdArea, dvd: next.dvd, audioStream: next.audioStream)
             let bitstream = settings.bitstreamDeviceUIDs.contains(device.uid) && SourceInspector.canBitstream(probed.url, codec: probed.format.codec)
             guard !(probed.format.codec == DolbyAtmos.codecName && settings.atmosBySystem && !bitstream) else { return skipFades(session) }
-            var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities, policy: ratePolicy(for: device),
+            var plan = FormatPlanner.plan(source: probed.format, device: device.planningCapabilities, policy: ratePolicy(for: device),
                                           spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                           dsdToPCMForRoom: settings.convertsDSDForRoom(device),
                                           dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
             plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
-            plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
+            plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.planningCapabilities,
                                                  eligible: mayMatchSixteenBit(item: next, device: device))
             if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
             if !session.plan.isDeviceCompatible(with: plan),
@@ -2532,13 +2532,13 @@ public final class PlaybackEngine: @unchecked Sendable {
                     nrt_context_set_draining(session.context, true)
                     return
                 }
-                var plan = FormatPlanner.plan(source: probed.format, device: device.capabilities,
+                var plan = FormatPlanner.plan(source: probed.format, device: device.planningCapabilities,
                                               policy: ratePolicy(for: device),
                                               spatial: settings.spatialMode(for: device), bitstream: bitstream, spatializeStereo: settings.spatializesStereo(for: device),
                                               dsdToPCMForRoom: settings.convertsDSDForRoom(device),
                                               dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
-                plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.capabilities,
+                plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.planningCapabilities,
                                                      eligible: mayMatchSixteenBit(item: next, device: device))
                 if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
                 if session.plan.isDeviceCompatible(with: plan) {
