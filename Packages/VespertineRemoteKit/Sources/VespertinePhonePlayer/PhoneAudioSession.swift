@@ -24,6 +24,8 @@ public enum PhoneAudioSession {
         public var maximumChannels: Int
         /// The speaker of each channel, as the output describes them (often it doesn't).
         public var channelLabels: [UInt32]
+        /// iOS's identifier for the output port.
+        public var uid: String
     }
 
     /// `.playback`, so music plays with the silent switch on and in the background (once the app has the audio background mode).
@@ -38,7 +40,7 @@ public enum PhoneAudioSession {
         guard let output = session.currentRoute.outputs.first else { return nil }
         return Route(outputName: output.portName, portType: output.portType.rawValue, sampleRate: session.sampleRate,
                      outputChannels: output.channels?.count ?? 0, isSpatialAudioEnabled: output.isSpatialAudioEnabled,
-                     maximumChannels: session.maximumOutputNumberOfChannels, channelLabels: output.channels?.map(\.channelLabel) ?? [])
+                     maximumChannels: session.maximumOutputNumberOfChannels, channelLabels: output.channels?.map(\.channelLabel) ?? [], uid: output.uid)
     }
 }
 #endif

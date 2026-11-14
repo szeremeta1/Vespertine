@@ -21,6 +21,8 @@ public struct StreamPlan: Sendable, Equatable {
     public var cutOnly = false
     /// Asked for the smaller form, and the rate came down for it (below what this song would otherwise be sent at).
     public var reduced = false
+    /// The FLAC holds the DSD song's own bits as DoP frames; this is the DSD rate.
+    public var dsdRate: Double?
 }
 
 public enum StreamPlanner {
@@ -42,11 +44,19 @@ public enum StreamPlanner {
     public static let defaultDSDCeiling = 192_000.0
 
     /// `smaller`: the phone keeps this song and asked for less of it: a lossless file above `maxSampleRate` is converted down.
-    public static func plan(_ facts: StreamSourceFacts, maxSampleRate: Double?, smaller: Bool = false) -> StreamPlan {
+    /// `dop`: the phone's output takes DoP up to this carrier rate (see `RemoteCommand.streamOpen`).
+    public static func plan(_ facts: StreamSourceFacts, maxSampleRate: Double?, smaller: Bool = false, dop: Double? = nil) -> StreamPlan {
         let source = sourceFormat(facts)
         guard facts.channels >= 1, facts.channels <= maximumChannels else {
             return StreamPlan(kind: nil, delivered: nil, transcode: nil,
                               macOnlyReason: StreamWords.say(.tooManyChannels(facts.channels, most: maximumChannels)))
+        }
+        if let carrier = dopCarrier(facts, ceiling: dop, smaller: smaller) {
+            let request = TranscodeRequest(source: facts.url, sourceSize: facts.fileSize, sourceModified: facts.modifiedAt, regionKey: facts.regionKey,
+                                           trackID: facts.id, sampleRate: carrier, bitDepth: 24, channels: facts.channels, dop: true)
+            let delivered = StreamFormat(codec: "FLAC", container: "flac", sampleRate: carrier, bitDepth: 24, channels: facts.channels,
+                                         channelLabels: nil, lossless: true)
+            return StreamPlan(kind: .flac, delivered: delivered, transcode: request, macOnlyReason: nil, dsdRate: facts.sampleRate)
         }
         let ext = facts.fileExtension.lowercased()
         let nativeContainer = native[ext]
@@ -76,6 +86,18 @@ public enum StreamPlanner {
         let unreduced = facts.isDSD ? targetRate(source: facts.sampleRate, isDSD: true, ceiling: nil) : facts.sampleRate
         return StreamPlan(kind: .flac, delivered: delivered, transcode: request, macOnlyReason: nil, cutOnly: cutOnly,
                           reduced: smaller && rate < unreduced - 0.5)
+    }
+
+    /// The lowest DSD rate (DSD64 of the 44.1 kHz family); anything slower isn't DSD as DoP knows it.
+    static let lowestDSDRate = 2_822_400.0
+
+    /// The carrier rate a DSD song's bits are sent at as DoP (16 of them a frame), or nil when it is converted to PCM: not
+    /// DSD, not two channels (the phone sends DoP only where each of a stereo song's channels has an output of its own and
+    /// nothing mixes them), a song being kept in its smaller form, or a carrier above what the phone said its DAC takes.
+    static func dopCarrier(_ facts: StreamSourceFacts, ceiling: Double?, smaller: Bool) -> Double? {
+        guard let ceiling, facts.isDSD, !smaller, facts.channels == 2, facts.sampleRate >= lowestDSDRate - 0.5 else { return nil }
+        let carrier = facts.sampleRate / 16
+        return carrier <= ceiling + 0.5 ? carrier : nil
     }
 
     /// The rate of a conversion: the source's own rate (DSD: a PCM rate of its family), never raised, never above the phone's

@@ -23,7 +23,7 @@ baseline (a v2 phone sends 1, so an old Mac accepts it) and the new optional `hi
 | Command | Answer |
 |---|---|
 | `streamInfo(ids, maxSampleRate)` | `.streamInfo([StreamInfo])`: per song, original or FLAC, the format that would arrive, or why it plays on the Mac only |
-| `streamOpen(id, maxSampleRate, smaller?)` | `.streamOpened(StreamDescriptor)`, or `.streamPreparing(progress)` while the Mac converts (ask again), or `.failed(reason)`. `smaller: true` (a song kept on the phone in its smaller form) also converts a lossless file above `maxSampleRate` down to it |
+| `streamOpen(id, maxSampleRate, smaller?, dop?)` | `.streamOpened(StreamDescriptor)`, or `.streamPreparing(progress)` while the Mac converts (ask again), or `.failed(reason)`. `smaller: true` (a song kept on the phone in its smaller form) also converts a lossless file above `maxSampleRate` down to it. `dop: 176400` (the highest DoP carrier rate the phone's DAC takes) has a two-channel DSD song sent as its own bits in DoP frames |
 | `streamRead(stream, offset, length)` | a **binary `StreamFrame`** carrying the command's `id`, or `.failed(reason)` |
 | `streamClose(stream)` | `.ok` |
 
@@ -40,6 +40,12 @@ Added since, all additive (no version bump; an older peer ignores or refuses the
 - `StreamDescriptor.cut` and `.reduced`: `cut` is true when a conversion only cut a CUE track out of a lossless file (same rate, no bits
   dropped), so the phone says "cut on the Mac" rather than "converted". `reduced` is true when a song asked for in its smaller form was
   really brought down; a kept album shows SMALLER COPIES only when one of its songs was.
+- `streamOpen`'s `dop` and `StreamDescriptor.dsdRate` (both optional, so an older Mac or phone never sees them): asked with `dop`, a
+  two-channel DSD song whose carrier rate (a sixteenth of the DSD rate) is within it is not converted. Its own DSD bits are written as
+  DoP 1.1 frames (marker 0x05/0xFA, then 16 bits) into a 24-bit FLAC at the carrier rate, which FLAC carries exactly, and the descriptor
+  says `dsdRate` (2822400 for DSD64). The FLAC is a whole number of marker pairs long, so the next song's first marker carries on the
+  alternation. Anything else (PCM, surround or mono DSD, a carrier above `dop`, a song kept in its smaller form) arrives as it would
+  without `dop`. An older Mac ignores `dop` and sends PCM with no `dsdRate`, which the phone plays as PCM.
 - `ServerMessage.streamsClosed(reason)`: sent when Stream to Phones, or this phone's own permission, is turned off. The phone stops what
   it plays from the Mac at once, the song it had fetched ahead included, and removes its stream files; songs kept on the phone play on.
   Only sent to a connection on protocol 2; an older phone would pass over it anyway.
@@ -105,6 +111,16 @@ with a small metadata file beside each). One conversion runs at a time. The libr
   of its own, unmixed; on a stereo output it is folded. The Output screen's "What Reaches the Output" lists what was read back: the song,
   the output's rate and channels, whether iOS resamples, and the volume. The engine applies no gain. A DAC, headphones or AirPlay giving way
   to the phone's speaker pauses; playback is never carried on from the speaker.
+- **DSD on that DAC** (`PhoneDoP.swift`, `DoPProbe`): DSD is sent as DoP only to a DAC that passed a listening test on this phone. The test
+  (Output › Play DSD natively? › Test DoP) plays five seconds of DSD64 made on the phone, a soft chord, as DoP at 176.4 kHz and asks
+  "music or hiss?". A DAC can only play the chord if every frame reached it as sent, so "music" is the evidence; nothing is taken from the
+  DAC's name. The answer is kept by iOS's identifier for the output (`DoPDACs`). Nothing is saved unless the sound went out to the same
+  stereo USB output at 176.4 kHz with the volume at 100% from start to end. After "music", `PhonePlayback` asks for DSD with `dop`, and
+  before a DoP song starts it has iOS bring the output to the carrier rate and reads back that it did (`DoPOutput.bring`); if not, the song
+  is asked for again as PCM and that rate is not tried on that DAC again. A song lined up behind another comes as DoP only at the rate the
+  output already runs at, so nothing changes under the song being heard. If the volume leaves 100%, or the output or its rate changes
+  mid-song, the song is asked for again as PCM and carries on from where it was (`PhonePlayback.outputChanged`). The badge says
+  NATIVE DSD · DoP only for such a stream on such a DAC.
 
 ## The listener's safety
 
@@ -116,7 +132,10 @@ signing in is not counted, since a phone trying every route at once hangs up on 
 
 - Nothing here has been measured on hardware yet: see `docs/IOS-AUDIO-BENCH.md`. No claim of bit-perfect output or of Spatial Audio behaviour is
   made until those scripts have been run.
-- More than 8 channels plays on the Mac only. DoP to a USB DAC from the phone is not built.
+- More than 8 channels plays on the Mac only.
+- DoP from the phone has not been run on a DAC yet (bench B8): whether iOS grants 176.4 kHz to a given DAC before a song starts, and
+  whether its volume at 100% leaves samples untouched, are exactly what the listening test finds out per DAC. Surround and mono DSD are
+  always PCM. A DSD song lined up behind a PCM song at another rate plays as PCM; started on its own, it plays as DoP.
 - Favorites and play counts made while offline are not sent back to the Mac.
 - Finding the Mac from away and moving between networks are covered by unit tests against a fake Mac only; B9 and B10 are not run.
 - DSD→FLAC speed in a release build is unmeasured (debug: about 20 s of CPU per second of 5.1 DSD64 on a loaded machine).

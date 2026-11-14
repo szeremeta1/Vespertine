@@ -83,6 +83,55 @@ private func facts(_ ext: String, codec: String? = nil, rate: Double = 44_100, d
     }
 }
 
+@Suite struct DSDAsDoP {
+    private let dsd64 = facts("dsf", rate: 2_822_400, depth: 1, channels: 2, dsd: true)
+
+    @Test func aDacThatTakesDoPGetsTheSongsOwnBitsAtTheCarrierRate() {
+        let plan = StreamPlanner.plan(dsd64, maxSampleRate: nil, dop: 176_400)
+        #expect(plan.kind == .flac && plan.dsdRate == 2_822_400)
+        #expect(plan.transcode?.dop == true && plan.transcode?.sampleRate == 176_400 && plan.transcode?.bitDepth == 24 && plan.transcode?.channels == 2)
+        #expect(plan.delivered?.sampleRate == 176_400 && plan.delivered?.bitDepth == 24 && plan.delivered?.lossless == true)
+        #expect(!plan.cutOnly && !plan.reduced)
+    }
+
+    @Test func nobodyGetsDoPWithoutAskingForIt() {
+        let plan = StreamPlanner.plan(dsd64, maxSampleRate: nil)
+        #expect(plan.dsdRate == nil && plan.transcode?.dop == false)
+    }
+
+    @Test func aCarrierAboveWhatTheDacTakesIsConvertedToPCM() {
+        // DSD128 needs 352.8 kHz; a DAC that passed at 176.4 gets it as PCM.
+        let plan = StreamPlanner.plan(facts("dsf", rate: 5_644_800, depth: 1, dsd: true), maxSampleRate: nil, dop: 176_400)
+        #expect(plan.dsdRate == nil && plan.transcode?.dop == false && plan.transcode?.sampleRate == 176_400)
+        let higher = StreamPlanner.plan(facts("dsf", rate: 5_644_800, depth: 1, dsd: true), maxSampleRate: nil, dop: 352_800)
+        #expect(higher.dsdRate == 5_644_800 && higher.transcode?.sampleRate == 352_800)
+    }
+
+    @Test func dsdOfThe48kFamilyIsCarriedAt192() {
+        let plan = StreamPlanner.plan(facts("dff", rate: 3_072_000, depth: 1, dsd: true), maxSampleRate: nil, dop: 192_000)
+        #expect(plan.dsdRate == 3_072_000 && plan.transcode?.sampleRate == 192_000)
+    }
+
+    @Test func onlyTwoChannelDsdGoesAsDoP() {
+        // Surround would have to be folded and mono spread over two outputs: both mean mixing, which DoP doesn't survive.
+        for channels in [1, 3, 6] {
+            let plan = StreamPlanner.plan(facts("dff", rate: 2_822_400, depth: 1, channels: channels, dsd: true), maxSampleRate: nil, dop: 176_400)
+            #expect(plan.dsdRate == nil && plan.transcode?.dop == false && plan.transcode?.channels == channels)
+        }
+    }
+
+    @Test func pcmIsNeverTouchedByTheDoPWord() {
+        #expect(StreamPlanner.plan(facts("flac", rate: 176_400, depth: 24), maxSampleRate: nil, dop: 176_400).kind == .original)
+        let ape = StreamPlanner.plan(facts("ape", rate: 176_400, depth: 24), maxSampleRate: nil, dop: 176_400)
+        #expect(ape.dsdRate == nil && ape.transcode?.dop == false)
+    }
+
+    @Test func aSongKeptOnThePhoneInItsSmallerFormIsPCM() {
+        let plan = StreamPlanner.plan(dsd64, maxSampleRate: 48_000, smaller: true, dop: 176_400)
+        #expect(plan.dsdRate == nil && plan.transcode?.dop == false && plan.transcode?.sampleRate == 44_100)
+    }
+}
+
 @Suite struct ConversionTargets {
     @Test func dsd64BecomesPCMAt176Point4() {
         let plan = StreamPlanner.plan(facts("dsf", rate: 2_822_400, depth: 1, channels: 2, dsd: true), maxSampleRate: nil)

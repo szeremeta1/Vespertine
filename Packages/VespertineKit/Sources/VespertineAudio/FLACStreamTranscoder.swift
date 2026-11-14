@@ -8,6 +8,9 @@
 // through untouched: the samples that come out are the samples that went in. Channels stay in the decoder's order, and `labels`
 // says which speaker each is.
 //
+// Asked for DoP, a DSD song isn't converted at all: its own bits are written as DoP frames (a marker byte and 16 DSD bits in
+// each 24-bit sample, at a sixteenth of the DSD rate), which FLAC carries exactly. A DAC that takes DoP plays them as DSD.
+//
 
 import Accelerate
 import AVFAudio
@@ -41,8 +44,12 @@ public enum FLACStreamTranscoder {
 
     /// Writes `item` to `destination` as FLAC at `sampleRate` and `bitDepth` (16 or 24), keeping every channel (1…8). `destination`
     /// must not exist; it is removed again if the conversion fails or is cancelled. `progress` receives 0…1.
+    ///
+    /// `dop`: `item` is DSD and its own bits are written as DoP frames, 24-bit at a sixteenth of the DSD rate (which
+    /// `sampleRate` must be). The file is a whole number of marker pairs long (an odd last frame is followed by one of DSD
+    /// silence), so the next song's first marker carries on the alternation.
     @discardableResult
-    public static func transcode(_ item: PlayableItem, sampleRate target: Double, bitDepth: Int, to destination: URL,
+    public static func transcode(_ item: PlayableItem, sampleRate target: Double, bitDepth: Int, dop: Bool = false, to destination: URL,
                                  progress: ((Double) -> Void)? = nil, isCancelled: (() -> Bool)? = nil) throws -> Result {
         guard bitDepth == 16 || bitDepth == 24 else { throw Failure.unsupported("\(bitDepth)-bit") }
         guard target >= 8_000, target <= 655_000 else { throw Failure.unsupported("a rate of \(Int(target)) Hz") }
@@ -52,9 +59,13 @@ public enum FLACStreamTranscoder {
         let format = probed.format
         guard format.channels >= 1, format.channels <= 8 else { throw Failure.unsupported("\(format.channels) channels") }
         let isDSD = format.encoding == .dsd
-        let decodedRate = isDSD ? FormatPlanner.dsdToPCMRate(format.sampleRate) : format.sampleRate
-        let plan = OutputPlan(mode: .pcm, deviceSampleRate: decodedRate, decodedSampleRate: decodedRate, physicalBitDepth: 24,
-                              channels: format.channels, dsdConvertedToPCM: isDSD, reason: "")
+        if dop {
+            guard isDSD else { throw Failure.unsupported("DoP of a song that isn't DSD") }
+            guard bitDepth == 24, abs(target - format.sampleRate / 16) < 0.5 else { throw Failure.unsupported("DoP at \(Int(target)) Hz") }
+        }
+        let decodedRate = dop ? target : (isDSD ? FormatPlanner.dsdToPCMRate(format.sampleRate) : format.sampleRate)
+        let plan = OutputPlan(mode: dop ? .dop : .pcm, deviceSampleRate: decodedRate, decodedSampleRate: decodedRate, physicalBitDepth: 24,
+                              channels: format.channels, dsdConvertedToPCM: isDSD && !dop, reason: "")
         let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: item)
         let inFormat = decoder.processingFormat
         let channels = Int(inFormat.channelCount)
@@ -66,6 +77,8 @@ public enum FLACStreamTranscoder {
             throw Failure.unsupported("\(channels) channels")
         }
         let direct = inFormat.commonFormat == .pcmFormatFloat32 && !inFormat.isInterleaved && abs(inFormat.sampleRate - target) < 0.5
+        // DoP frames are written as they are or not at all: a converter of any kind would make noise of them.
+        if dop, !direct { throw Failure.unsupported("DoP frames in another format") }
         let converter: AVAudioConverter?
         if direct {
             converter = nil
@@ -78,7 +91,7 @@ public enum FLACStreamTranscoder {
             converter = made
         }
         // Dither only where the samples are re-quantized to 16 bits: a rate change, or a source of more than 16 bits (or float).
-        let requantized = abs(inFormat.sampleRate - target) > 0.5 || isDSD || (format.bitDepth ?? 32) > bitDepth
+        let requantized = abs(inFormat.sampleRate - target) > 0.5 || (isDSD && !dop) || (format.bitDepth ?? 32) > bitDepth
         let dither = bitDepth == 16 && requantized
 
         // The encoder's own integer format for this depth (a 24-bit sample sits in the top of a 32-bit word).
@@ -178,6 +191,14 @@ public enum FLACStreamTranscoder {
                 if input.frameLength == 0 { break }
                 try encode(input)
             }
+        }
+        if dop, written % 2 == 1 {
+            // One frame of DSD silence under the marker that is due, so the file ends on a whole marker pair.
+            let word = DoP.word(marker: Int(written), DoP.silence, DoP.silence)
+            let sample = Float(Int32(bitPattern: word << 8)) / 2_147_483_648
+            for channel in 0..<channels { input.floatChannelData?[channel][0] = sample }
+            input.frameLength = 1
+            try encode(input)
         }
         // `finish()` writes the last, partial block and the header's totals; `close()` alone drops them (the tail of the song).
         do { try encoder.finish(); try encoder.close() } catch { throw Failure.encoder(error.localizedDescription) }

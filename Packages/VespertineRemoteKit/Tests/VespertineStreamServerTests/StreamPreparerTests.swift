@@ -426,6 +426,48 @@ private final class SlowDisk: @unchecked Sendable {
     }
 }
 
+@Suite struct DoPStreams {
+    @Test func aPhoneThatAsksForDoPIsToldItGotIt() async throws {
+        let rig = try Rig.make()
+        defer { rig.cleanup() }
+        try rig.addFile(1, ext: "dsf", bytes: 4_000, rate: 2_822_400, depth: 1, dsd: true)
+        let dop = await settle { await rig.preparer.open(client: "a", id: 1, maxSampleRate: nil, dop: 176_400) }
+        #expect(dop?.dsdRate == 2_822_400 && dop?.kind == .flac && dop?.format.sampleRate == 176_400 && dop?.format.bitDepth == 24)
+        #expect(rig.transcoder.calls.map(\.dop) == [true])
+        // The same song without the word is a conversion of its own, with its own bytes and its own tag.
+        let pcm = await settle { await rig.preparer.open(client: "a", id: 1, maxSampleRate: nil) }
+        #expect(pcm != nil && pcm?.dsdRate == nil && pcm?.tag != dop?.tag)
+        #expect(rig.transcoder.calls.map(\.dop) == [true, false])
+        // Asked again, the DoP copy comes from the cache and still says what it is.
+        let again = await settle { await rig.preparer.open(client: "b", id: 1, maxSampleRate: nil, dop: 176_400) }
+        #expect(again?.dsdRate == 2_822_400 && again?.tag == dop?.tag && rig.transcoder.calls.count == 2)
+    }
+
+    @Test func aPhoneWhoseDacStopsBelowTheCarrierGetsPCM() async throws {
+        let rig = try Rig.make()
+        defer { rig.cleanup() }
+        try rig.addFile(1, ext: "dsf", bytes: 4_000, rate: 5_644_800, depth: 1, dsd: true)
+        let stream = await settle { await rig.preparer.open(client: "a", id: 1, maxSampleRate: nil, dop: 176_400) }
+        #expect(stream != nil && stream?.dsdRate == nil && rig.transcoder.calls.map(\.dop) == [false])
+    }
+
+    @Test func theCommandCarriesTheWordToThePlanner() async throws {
+        let rig = try Rig.make()
+        defer { rig.cleanup() }
+        try rig.addFile(1, ext: "dsf", bytes: 4_000, rate: 2_822_400, depth: 1, dsd: true)
+        var descriptor: StreamDescriptor?
+        for _ in 0..<200 where descriptor == nil {
+            if case .reply(.streamOpened(let d))? = await rig.preparer.handle(.streamOpen(id: 1, maxSampleRate: nil, dop: 176_400), id: 1, client: "a",
+                                                                                protocolVersion: RemoteProtocol.streamVersion, allowed: true) {
+                descriptor = d
+            } else {
+                try? await Task.sleep(for: .milliseconds(10))
+            }
+        }
+        #expect(descriptor?.dsdRate == 2_822_400)
+    }
+}
+
 /// Asks until the stream is ready (the conversion runs in the background), up to two seconds.
 private func settle(_ ask: @escaping () async -> StreamPreparer.Opened) async -> StreamDescriptor? {
     for _ in 0..<200 {

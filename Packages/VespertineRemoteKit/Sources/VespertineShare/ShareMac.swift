@@ -210,7 +210,7 @@ public final class ShareMac: RemoteChannel {
                 self.onPush?(.outputs(OutputsState(outputs: [])))
             }
             return .welcome(info)
-        case .streamOpen(let id, _, _):
+        case .streamOpen(let id, _, _, _):
             return await openStream(id)
         case .artwork(let key, let size):
             return await artwork(key, size: size)

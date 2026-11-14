@@ -67,7 +67,7 @@ struct PhoneTranscoder: StreamTranscoding {
                 // Somebody is waiting to hear this: it runs on the fast cores, not held back to the efficiency ones as
                 // background work is.
                 try await Task.detached(priority: .userInitiated) {
-                    try FLACStreamTranscoder.transcode(playable, sampleRate: request.sampleRate, bitDepth: request.bitDepth, to: destination,
+                    try FLACStreamTranscoder.transcode(playable, sampleRate: request.sampleRate, bitDepth: request.bitDepth, dop: request.dop, to: destination,
                                                        progress: relay, isCancelled: { Task.isCancelled })
                 }.value
             }

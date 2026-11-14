@@ -151,9 +151,10 @@ public final class PhonePlayer {
 
     /// Starts `item` in place of whatever is playing. A stream still arriving opens off the main thread (`state` is `.loading`
     /// until its first audio is decoded); a failure arrives through `onFailure`.
-    public func start(_ item: Item, playing: Bool = true) {
+    /// `seconds`: where in the song to start.
+    public func start(_ item: Item, playing: Bool = true, at seconds: Double = 0) {
         halt()
-        begin(item, playing: playing, at: 0)
+        begin(item, playing: playing, at: Int64(max(0, seconds) * item.format.sampleRate))
     }
 
     /// Opens the current song again where it is: the way its channels are decoded depends on the output.
@@ -319,6 +320,13 @@ public final class PhonePlayer {
         finished = false
         isBuffering = false
         state = .idle
+    }
+
+    /// Stops, forgets the song and stops the engine too, so nothing of this player's reaches the output (not even
+    /// silence) while something else plays to it. `play()` starts the engine again.
+    public func rest() {
+        halt()
+        if engine.isRunning { engine.stop() }
     }
 
     /// Moves to `seconds` and keeps playing if it was. Into a part of the stream that isn't here yet, that part is fetched first.

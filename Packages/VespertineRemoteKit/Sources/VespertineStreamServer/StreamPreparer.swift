@@ -85,9 +85,9 @@ public actor StreamPreparer {
 
     // MARK: Open
 
-    public func open(client: String, id: Int64, maxSampleRate: Double?, smaller: Bool = false) async -> Opened {
+    public func open(client: String, id: Int64, maxSampleRate: Double?, smaller: Bool = false, dop: Double? = nil) async -> Opened {
         guard let facts = await source(id) else { return .failed(StreamWords.say(.notInLibrary)) }
-        let plan = StreamPlanner.plan(facts, maxSampleRate: maxSampleRate, smaller: smaller)
+        let plan = StreamPlanner.plan(facts, maxSampleRate: maxSampleRate, smaller: smaller, dop: dop)
         guard let kind = plan.kind, var delivered = plan.delivered else { return .failed(plan.macOnlyReason ?? StreamWords.say(.cannotStream)) }
         switch kind {
         case .original:
@@ -101,7 +101,7 @@ public actor StreamPreparer {
         case .flac:
             guard let request = plan.transcode else { return .failed(StreamWords.say(.cannotStream)) }
             let key = StreamCache.key(for: request)
-            if let ready = openCached(client: client, key: key, song: id, cut: plan.cutOnly, reduced: plan.reduced) { return .ready(ready) }
+            if let ready = openCached(client: client, key: key, song: id, cut: plan.cutOnly, reduced: plan.reduced, dsdRate: plan.dsdRate) { return .ready(ready) }
             if var job = jobs[key] {
                 if let failure = job.failure {
                     jobs[key] = nil
@@ -140,21 +140,21 @@ public actor StreamPreparer {
         cache.evict(keeping: pinned().union([key]))
     }
 
-    private func openCached(client: String, key: String, song: Int64, cut: Bool, reduced: Bool) -> StreamDescriptor? {
+    private func openCached(client: String, key: String, song: Int64, cut: Bool, reduced: Bool, dsdRate: Double?) -> StreamDescriptor? {
         let url = cache.url(for: key)
         guard let meta = (try? Data(contentsOf: cache.metadataURL(for: key))).flatMap({ try? JSONDecoder().decode(Cached.self, from: $0) }),
               let handle = StreamFile(url) else { return nil }
         let size = ((try? FileManager.default.attributesOfItem(atPath: url.path)[.size]) as? NSNumber)?.int64Value ?? 0
         cache.touch(key)
-        return register(client: client, kind: .flac, size: size, format: meta.format, frames: meta.frames, tag: key, file: handle, cacheKey: key, song: song, cut: cut, reduced: reduced)
+        return register(client: client, kind: .flac, size: size, format: meta.format, frames: meta.frames, tag: key, file: handle, cacheKey: key, song: song, cut: cut, reduced: reduced, dsdRate: dsdRate)
     }
 
     private func register(client: String, kind: StreamKind, size: Int64, format: StreamFormat, frames: Int64?, tag: String, file: StreamFile,
-                          cacheKey: String?, song: Int64, cut: Bool = false, reduced: Bool = false) -> StreamDescriptor {
+                          cacheKey: String?, song: Int64, cut: Bool = false, reduced: Bool = false, dsdRate: Double? = nil) -> StreamDescriptor {
         let number = (nextNumber[client] ?? 0) + 1
         nextNumber[client] = number
         let descriptor = StreamDescriptor(stream: number, kind: kind, byteSize: size, format: format, frames: frames, tag: tag,
-                                          chunkSize: RemoteProtocol.defaultChunkSize, cut: cut ? true : nil, reduced: reduced ? true : nil)
+                                          chunkSize: RemoteProtocol.defaultChunkSize, cut: cut ? true : nil, reduced: reduced ? true : nil, dsdRate: dsdRate)
         var mine = streams[client] ?? []
         while mine.count >= maxStreamsPerClient { mine.removeFirst() }
         mine.append(OpenStream(descriptor: descriptor, file: file, cacheKey: cacheKey, song: song))
