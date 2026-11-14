@@ -98,8 +98,56 @@ final class RemoteServer {
     /// The preparer if one was made (closing a connection must not make one).
     var activeStreamPreparer: StreamPreparer? { streams }
     var streamPreparer: StreamPreparer? {
-        if streams == nil, let model { streams = RemoteStreaming.makePreparer(model: model) }
+        if streams == nil, let model { streams = RemoteStreaming.makePreparer(model: model, gigabytes: store.streamCacheGigabytes) }
         return streams
+    }
+
+    // MARK: Stream to Phones (Settings › Remote)
+
+    /// What each phone is playing from this Mac right now: its device ID and the songs' titles.
+    private(set) var streaming: [String: [String]] = [:]
+    /// How much disk the copies converted for phones take.
+    private(set) var streamCacheBytes: Int64 = 0
+
+    func setStreamEnabled(_ on: Bool) {
+        store.streamEnabled = on
+        if !on, let streams { Task { await streams.closeEverything(); await refreshStreaming() } }
+    }
+
+    /// Lets a paired phone play songs itself, or stops it (its open streams close at once).
+    func setMayStream(_ device: String, _ may: Bool) {
+        store.setMayStream(device, may)
+        if !may, let streams { Task { await streams.closeAll(clientsOf: device); await refreshStreaming() } }
+    }
+
+    func setStreamCache(gigabytes: Int) {
+        store.streamCacheGigabytes = gigabytes
+        if let streams { Task { await streams.setCacheLimit(RemoteStreaming.bytes(gigabytes: gigabytes)); await refreshStreaming() } }
+    }
+
+    func clearStreamCache() {
+        guard let preparer = streamPreparer else { return }
+        Task { await preparer.clearCache(); await refreshStreaming() }
+    }
+
+    /// Reads who plays what and the cache's size (Settings asks while it is on screen).
+    func refreshStreaming() async {
+        // The cache is looked at even before a phone has streamed in this run, so its size and Empty are there.
+        guard store.streamEnabled, let preparer = streamPreparer else {
+            if !streaming.isEmpty { streaming = [:] }
+            return
+        }
+        let activity = await preparer.activity()
+        let bytes = await preparer.cacheBytes()
+        let titles = Dictionary((model?.library.tracks(ids: Array(Set(activity.map(\.song)))) ?? []).compactMap { track in track.id.map { ($0, track.title) } },
+                                uniquingKeysWith: { first, _ in first })
+        var now: [String: [String]] = [:]
+        for item in activity {
+            let device = String(item.client.split(separator: "#").first ?? "")
+            if let title = titles[item.song], !(now[device] ?? []).contains(title) { now[device, default: []].append(title) }
+        }
+        if now != streaming { streaming = now }
+        if bytes != streamCacheBytes { streamCacheBytes = bytes }
     }
 
     /// This Mac's Bonjour host name ("Living-Room-Mac.local"), for the web remote's address.
@@ -569,7 +617,12 @@ final class RemoteClient {
     private func handleStream(_ message: ClientMessage) {
         guard let server else { return }
         // Off (the default): answer in words, without making the preparer or its cache folder. A phone on protocol 1 never gets here.
-        guard server.store.streamEnabled else { return reply(message.id, .failed(reason: StreamPreparer.refusalWhenOff)) }
+        guard server.store.streamEnabled else {
+            return reply(message.id, .failed(reason: String(localized: "Streaming to phones is off on this Mac. Turn on Stream to Phones in Vespertine › Settings › Remote.", comment: "Remote control: a phone asked to play a song itself while the Mac's Stream to Phones switch is off.")))
+        }
+        guard let device, server.store.mayStream(device) else {
+            return reply(message.id, .failed(reason: String(localized: "This Mac doesn’t let this device play songs itself. Allow it in Vespertine › Settings › Remote on the Mac.", comment: "Remote control: this phone was switched off under Stream to Phones on the Mac.")))
+        }
         guard let preparer = server.streamPreparer else {
             return reply(message.id, .failed(reason: "This Mac can’t stream right now."))
         }

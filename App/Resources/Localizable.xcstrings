@@ -554881,270 +554881,270 @@
         }
       }
     },
-    "Control playback, the queue, your library and the output from the Vespertine Remote app on an iPhone or iPad. Phones connect over your local network only, encrypted, and only after you pair them here. Volume follows the same rules as on this Mac: an output with a fixed volume stays fixed.": {
+    "Control playback, the queue, your library and the output from the Vespertine app on an iPhone or iPad. Phones connect over your local network only, encrypted, and only after you pair them here. Volume follows the same rules as on this Mac: an output with a fixed volume stays fixed.": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "መጫወትን፣ ወረፋውን፣ ቤተ-መጻሕፍትዎን እና ውፅዓቱን በiPhone ወይም iPad ላይ ካለው የVespertine Remote መተግበሪያ ይቆጣጠሩ። ስልኮች የሚገናኙት በአካባቢያዊ አውታረ መረብዎ ላይ ብቻ፣ በምስጠራ፣ እና እዚህ ካጣመሯቸው በኋላ ብቻ ነው። የድምፅ መጠን በዚህ Mac ላይ ያሉትን ተመሳሳይ ደንቦች ይከተላል፦ ቋሚ የድምፅ መጠን ያለው ውፅዓት ቋሚ ሆኖ ይቆያል።"
+            "value": "መጫወትን፣ ወረፋውን፣ ቤተ-መጻሕፍትዎን እና ውፅዓቱን በiPhone ወይም iPad ላይ ካለው የVespertine መተግበሪያ ይቆጣጠሩ። ስልኮች የሚገናኙት በአካባቢያዊ አውታረ መረብዎ ላይ ብቻ፣ በምስጠራ፣ እና እዚህ ካጣመሯቸው በኋላ ብቻ ነው። የድምፅ መጠን በዚህ Mac ላይ ያሉትን ተመሳሳይ ደንቦች ይከተላል፦ ቋሚ የድምፅ መጠን ያለው ውፅዓት ቋሚ ሆኖ ይቆያል።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "تحكّم في التشغيل وقائمة الانتظار ومكتبتك والمخرج من تطبيق Vespertine Remote على iPhone أو iPad. تتصل الهواتف عبر شبكتك المحلية فقط، بشكل مشفّر، وفقط بعد إقرانها هنا. يتبع مستوى الصوت القواعد نفسها المتبعة على هذا الـ Mac: يظل المخرج ذو مستوى الصوت الثابت ثابتًا."
+            "value": "تحكّم في التشغيل وقائمة الانتظار ومكتبتك والمخرج من تطبيق Vespertine على iPhone أو iPad. تتصل الهواتف عبر شبكتك المحلية فقط، بشكل مشفّر، وفقط بعد إقرانها هنا. يتبع مستوى الصوت القواعد نفسها المتبعة على هذا الـ Mac: يظل المخرج ذو مستوى الصوت الثابت ثابتًا."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone বা iPad-এ Vespertine Remote অ্যাপ থেকে প্লেব্যাক, সারি, আপনার লাইব্রেরি এবং আউটপুট নিয়ন্ত্রণ করুন। ফোন শুধু আপনার লোকাল নেটওয়ার্কে, এনক্রিপ্ট করা অবস্থায় এবং এখানে পেয়ার করার পরেই সংযুক্ত হয়। ভলিউম এই Mac-এর মতোই একই নিয়ম মেনে চলে: নির্দিষ্ট ভলিউমের আউটপুট নির্দিষ্টই থাকে।"
+            "value": "iPhone বা iPad-এ Vespertine অ্যাপ থেকে প্লেব্যাক, সারি, আপনার লাইব্রেরি এবং আউটপুট নিয়ন্ত্রণ করুন। ফোন শুধু আপনার লোকাল নেটওয়ার্কে, এনক্রিপ্ট করা অবস্থায় এবং এখানে পেয়ার করার পরেই সংযুক্ত হয়। ভলিউম এই Mac-এর মতোই একই নিয়ম মেনে চলে: নির্দিষ্ট ভলিউমের আউটপুট নির্দিষ্টই থাকে।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ovládejte přehrávání, frontu, knihovnu a výstup z aplikace Vespertine Remote na iPhonu nebo iPadu. Telefony se připojují pouze přes místní síť, šifrovaně, a teprve poté, co je zde spárujete. Hlasitost se řídí stejnými pravidly jako na tomto Macu: výstup s pevnou hlasitostí zůstává pevný."
+            "value": "Ovládejte přehrávání, frontu, knihovnu a výstup z aplikace Vespertine na iPhonu nebo iPadu. Telefony se připojují pouze přes místní síť, šifrovaně, a teprve poté, co je zde spárujete. Hlasitost se řídí stejnými pravidly jako na tomto Macu: výstup s pevnou hlasitostí zůstává pevný."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Styr afspilningen, køen, dit bibliotek og outputtet fra appen Vespertine Remote på en iPhone eller iPad. Telefoner opretter kun forbindelse via dit lokale netværk, krypteret, og først når du har parret dem her. Lydstyrken følger de samme regler som på denne Mac: Et output med fast lydstyrke forbliver fast."
+            "value": "Styr afspilningen, køen, dit bibliotek og outputtet fra appen Vespertine på en iPhone eller iPad. Telefoner opretter kun forbindelse via dit lokale netværk, krypteret, og først når du har parret dem her. Lydstyrken følger de samme regler som på denne Mac: Et output med fast lydstyrke forbliver fast."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Steuere die Wiedergabe, die Warteschlange, deine Mediathek und die Ausgabe mit der App „Vespertine Remote“ auf einem iPhone oder iPad. Telefone verbinden sich nur über dein lokales Netzwerk, verschlüsselt und erst, nachdem du sie hier gekoppelt hast. Für die Lautstärke gelten dieselben Regeln wie auf diesem Mac: Eine Ausgabe mit fester Lautstärke bleibt fest."
+            "value": "Steuere die Wiedergabe, die Warteschlange, deine Mediathek und die Ausgabe mit der App „Vespertine“ auf einem iPhone oder iPad. Telefone verbinden sich nur über dein lokales Netzwerk, verschlüsselt und erst, nachdem du sie hier gekoppelt hast. Für die Lautstärke gelten dieselben Regeln wie auf diesem Mac: Eine Ausgabe mit fester Lautstärke bleibt fest."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ελέγξτε την αναπαραγωγή, την ουρά, τη βιβλιοθήκη σας και την έξοδο από την εφαρμογή Vespertine Remote σε iPhone ή iPad. Τα τηλέφωνα συνδέονται μόνο μέσω του τοπικού σας δικτύου, με κρυπτογράφηση, και μόνο αφού κάνετε σύζευξη εδώ. Η ένταση ακολουθεί τους ίδιους κανόνες όπως σε αυτό το Mac: μια έξοδος με σταθερή ένταση παραμένει σταθερή."
+            "value": "Ελέγξτε την αναπαραγωγή, την ουρά, τη βιβλιοθήκη σας και την έξοδο από την εφαρμογή Vespertine σε iPhone ή iPad. Τα τηλέφωνα συνδέονται μόνο μέσω του τοπικού σας δικτύου, με κρυπτογράφηση, και μόνο αφού κάνετε σύζευξη εδώ. Η ένταση ακολουθεί τους ίδιους κανόνες όπως σε αυτό το Mac: μια έξοδος με σταθερή ένταση παραμένει σταθερή."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Controla la reproducción, la cola, tu biblioteca y la salida desde la app Vespertine Remote en un iPhone o iPad. Los teléfonos se conectan solo a través de tu red local, con cifrado, y solo después de que los enlaces aquí. El volumen sigue las mismas reglas que en este Mac: una salida con volumen fijo sigue siendo fija."
+            "value": "Controla la reproducción, la cola, tu biblioteca y la salida desde la app Vespertine en un iPhone o iPad. Los teléfonos se conectan solo a través de tu red local, con cifrado, y solo después de que los enlaces aquí. El volumen sigue las mismas reglas que en este Mac: una salida con volumen fijo sigue siendo fija."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "پخش، صف پخش، کتابخانه و خروجی را از برنامهٔ Vespertine Remote روی iPhone یا iPad کنترل کنید. گوشی‌ها فقط از طریق شبکهٔ محلی شما، به‌صورت رمزگذاری‌شده، و تنها پس از اینکه آن‌ها را اینجا جفت کنید وصل می‌شوند. بلندی صدا از همان قواعدی پیروی می‌کند که روی این Mac: خروجی با صدای ثابت، ثابت می‌ماند."
+            "value": "پخش، صف پخش، کتابخانه و خروجی را از برنامهٔ Vespertine روی iPhone یا iPad کنترل کنید. گوشی‌ها فقط از طریق شبکهٔ محلی شما، به‌صورت رمزگذاری‌شده، و تنها پس از اینکه آن‌ها را اینجا جفت کنید وصل می‌شوند. بلندی صدا از همان قواعدی پیروی می‌کند که روی این Mac: خروجی با صدای ثابت، ثابت می‌ماند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ohjaa toistoa, jonoa, kirjastoasi ja ulostuloa Vespertine Remote -apilla iPhonessa tai iPadissa. Puhelimet yhdistävät vain paikallisen verkkosi kautta, salattuina ja vasta, kun olet paritanut ne täällä. Äänenvoimakkuus noudattaa samoja sääntöjä kuin tällä Macilla: kiinteän äänenvoimakkuuden ulostulo pysyy kiinteänä."
+            "value": "Ohjaa toistoa, jonoa, kirjastoasi ja ulostuloa Vespertine -apilla iPhonessa tai iPadissa. Puhelimet yhdistävät vain paikallisen verkkosi kautta, salattuina ja vasta, kun olet paritanut ne täällä. Äänenvoimakkuus noudattaa samoja sääntöjä kuin tällä Macilla: kiinteän äänenvoimakkuuden ulostulo pysyy kiinteänä."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kontrolin ang playback, ang queue, ang library mo at ang output mula sa Vespertine Remote app sa iPhone o iPad. Sa local network mo lang kumokonekta ang mga telepono, naka-encrypt, at pagkatapos mo lang silang i-pair dito. Pareho ang mga patakaran ng volume gaya sa Mac na ito: nananatiling nakapirmi ang output na may nakapirming volume."
+            "value": "Kontrolin ang playback, ang queue, ang library mo at ang output mula sa Vespertine app sa iPhone o iPad. Sa local network mo lang kumokonekta ang mga telepono, naka-encrypt, at pagkatapos mo lang silang i-pair dito. Pareho ang mga patakaran ng volume gaya sa Mac na ito: nananatiling nakapirmi ang output na may nakapirming volume."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Contrôlez la lecture, la file d’attente, votre bibliothèque et la sortie depuis l’app Vespertine Remote sur un iPhone ou un iPad. Les téléphones se connectent uniquement via votre réseau local, de façon chiffrée, et seulement après avoir été jumelés ici. Le volume suit les mêmes règles que sur ce Mac : une sortie à volume fixe reste fixe."
+            "value": "Contrôlez la lecture, la file d’attente, votre bibliothèque et la sortie depuis l’app Vespertine sur un iPhone ou un iPad. Les téléphones se connectent uniquement via votre réseau local, de façon chiffrée, et seulement après avoir été jumelés ici. Le volume suit les mêmes règles que sur ce Mac : une sortie à volume fixe reste fixe."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone અથવા iPad પરની Vespertine Remote ઍપમાંથી પ્લેબૅક, કતાર, તમારી લાઇબ્રેરી અને આઉટપુટ નિયંત્રિત કરો. ફોન ફક્ત તમારા સ્થાનિક નેટવર્ક પર, એન્ક્રિપ્ટેડ રીતે, અને તમે અહીં પેર કરો પછી જ કનેક્ટ થાય છે. વૉલ્યૂમ આ Mac જેવા જ નિયમો અનુસરે છે: નિશ્ચિત વૉલ્યૂમવાળું આઉટપુટ નિશ્ચિત જ રહે છે."
+            "value": "iPhone અથવા iPad પરની Vespertine ઍપમાંથી પ્લેબૅક, કતાર, તમારી લાઇબ્રેરી અને આઉટપુટ નિયંત્રિત કરો. ફોન ફક્ત તમારા સ્થાનિક નેટવર્ક પર, એન્ક્રિપ્ટેડ રીતે, અને તમે અહીં પેર કરો પછી જ કનેક્ટ થાય છે. વૉલ્યૂમ આ Mac જેવા જ નિયમો અનુસરે છે: નિશ્ચિત વૉલ્યૂમવાળું આઉટપુટ નિશ્ચિત જ રહે છે."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sarrafa kunnawa, jerin jira, laburarenku da fitarwa daga manhajar Vespertine Remote a iPhone ko iPad. Wayoyi suna haɗuwa ta cibiyar sadarwarku ta gida kawai, a rufaffen tsari, kuma sai bayan kun haɗa su a nan. Ƙara tana bin ƙa'idoji iri ɗaya da na wannan Mac: fitarwa mai tsayayyiyar ƙara tana nan a tsaye."
+            "value": "Sarrafa kunnawa, jerin jira, laburarenku da fitarwa daga manhajar Vespertine a iPhone ko iPad. Wayoyi suna haɗuwa ta cibiyar sadarwarku ta gida kawai, a rufaffen tsari, kuma sai bayan kun haɗa su a nan. Ƙara tana bin ƙa'idoji iri ɗaya da na wannan Mac: fitarwa mai tsayayyiyar ƙara tana nan a tsaye."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "שלוט בהשמעה, בתור, בספריה ובפלט מהיישום Vespertine Remote ב־iPhone או ב־iPad. טלפונים מתחברים דרך הרשת המקומית בלבד, בהצפנה, ורק אחרי שצימדת אותם כאן. עוצמת הקול פועלת לפי אותם כללים כמו ב־Mac הזה: פלט עם עוצמת קול קבועה נשאר קבוע."
+            "value": "שלוט בהשמעה, בתור, בספריה ובפלט מהיישום Vespertine ב־iPhone או ב־iPad. טלפונים מתחברים דרך הרשת המקומית בלבד, בהצפנה, ורק אחרי שצימדת אותם כאן. עוצמת הקול פועלת לפי אותם כללים כמו ב־Mac הזה: פלט עם עוצמת קול קבועה נשאר קבוע."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone या iPad पर Vespertine Remote ऐप से प्लेबैक, कतार, अपनी लाइब्रेरी और आउटपुट नियंत्रित करें। फ़ोन केवल आपके लोकल नेटवर्क पर, एन्क्रिप्टेड रूप में, और यहाँ पेयर किए जाने के बाद ही कनेक्ट होते हैं। वॉल्यूम पर वही नियम लागू होते हैं जो इस Mac पर: निश्चित वॉल्यूम वाला आउटपुट निश्चित ही रहता है।"
+            "value": "iPhone या iPad पर Vespertine ऐप से प्लेबैक, कतार, अपनी लाइब्रेरी और आउटपुट नियंत्रित करें। फ़ोन केवल आपके लोकल नेटवर्क पर, एन्क्रिप्टेड रूप में, और यहाँ पेयर किए जाने के बाद ही कनेक्ट होते हैं। वॉल्यूम पर वही नियम लागू होते हैं जो इस Mac पर: निश्चित वॉल्यूम वाला आउटपुट निश्चित ही रहता है।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vezérelje a lejátszást, a lejátszási sort, a könyvtárat és a kimenetet a Vespertine Remote appból iPhone-on vagy iPaden. A telefonok csak a helyi hálózaton, titkosítva csatlakoznak, és csak azután, hogy itt párosította őket. A hangerőre ugyanazok a szabályok vonatkoznak, mint ezen a Macen: a rögzített hangerejű kimenet rögzített marad."
+            "value": "Vezérelje a lejátszást, a lejátszási sort, a könyvtárat és a kimenetet a Vespertine appból iPhone-on vagy iPaden. A telefonok csak a helyi hálózaton, titkosítva csatlakoznak, és csak azután, hogy itt párosította őket. A hangerőre ugyanazok a szabályok vonatkoznak, mint ezen a Macen: a rögzített hangerejű kimenet rögzített marad."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kontrol pemutaran, antrean, perpustakaan, dan output dari app Vespertine Remote di iPhone atau iPad. Ponsel hanya terhubung melalui jaringan lokal Anda, dengan enkripsi, dan hanya setelah Anda memasangkannya di sini. Volume mengikuti aturan yang sama seperti di Mac ini: output dengan volume tetap akan tetap."
+            "value": "Kontrol pemutaran, antrean, perpustakaan, dan output dari app Vespertine di iPhone atau iPad. Ponsel hanya terhubung melalui jaringan lokal Anda, dengan enkripsi, dan hanya setelah Anda memasangkannya di sini. Volume mengikuti aturan yang sama seperti di Mac ini: output dengan volume tetap akan tetap."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Controlla la riproduzione, la coda, la libreria e l’uscita dall’app Vespertine Remote su iPhone o iPad. I telefoni si connettono solo tramite la rete locale, in modo crittografato, e solo dopo che li hai abbinati qui. Il volume segue le stesse regole di questo Mac: un’uscita con volume fisso resta fissa."
+            "value": "Controlla la riproduzione, la coda, la libreria e l’uscita dall’app Vespertine su iPhone o iPad. I telefoni si connettono solo tramite la rete locale, in modo crittografato, e solo dopo che li hai abbinati qui. Il volume segue le stesse regole di questo Mac: un’uscita con volume fisso resta fissa."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhoneまたはiPadのVespertine Remoteアプリから、再生、キュー、ライブラリ、出力を操作できます。スマートフォンはローカルネットワーク経由でのみ暗号化して接続され、ここでペアリングした後にのみ接続できます。音量はこのMacと同じルールに従います。音量が固定された出力は固定のままです。"
+            "value": "iPhoneまたはiPadのVespertineアプリから、再生、キュー、ライブラリ、出力を操作できます。スマートフォンはローカルネットワーク経由でのみ暗号化して接続され、ここでペアリングした後にのみ接続できます。音量はこのMacと同じルールに従います。音量が固定された出力は固定のままです。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone ಅಥವಾ iPad ನಲ್ಲಿರುವ Vespertine Remote ಆ್ಯಪ್‌ನಿಂದ ಪ್ಲೇಬ್ಯಾಕ್, ಸರದಿ, ನಿಮ್ಮ ಲೈಬ್ರರಿ ಮತ್ತು ಔಟ್‌ಪುಟ್ ಅನ್ನು ನಿಯಂತ್ರಿಸಿ. ಫೋನ್‌ಗಳು ನಿಮ್ಮ ಸ್ಥಳೀಯ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ ಮಾತ್ರ, ಎನ್‌ಕ್ರಿಪ್ಟ್ ಆಗಿ, ಮತ್ತು ನೀವು ಅವುಗಳನ್ನು ಇಲ್ಲಿ ಜೋಡಿಸಿದ ನಂತರವೇ ಸಂಪರ್ಕಗೊಳ್ಳುತ್ತವೆ. ವಾಲ್ಯೂಮ್ ಈ Mac ನಲ್ಲಿರುವ ನಿಯಮಗಳನ್ನೇ ಅನುಸರಿಸುತ್ತದೆ: ಸ್ಥಿರ ವಾಲ್ಯೂಮ್ ಇರುವ ಔಟ್‌ಪುಟ್ ಸ್ಥಿರವಾಗಿಯೇ ಇರುತ್ತದೆ."
+            "value": "iPhone ಅಥವಾ iPad ನಲ್ಲಿರುವ Vespertine ಆ್ಯಪ್‌ನಿಂದ ಪ್ಲೇಬ್ಯಾಕ್, ಸರದಿ, ನಿಮ್ಮ ಲೈಬ್ರರಿ ಮತ್ತು ಔಟ್‌ಪುಟ್ ಅನ್ನು ನಿಯಂತ್ರಿಸಿ. ಫೋನ್‌ಗಳು ನಿಮ್ಮ ಸ್ಥಳೀಯ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ ಮಾತ್ರ, ಎನ್‌ಕ್ರಿಪ್ಟ್ ಆಗಿ, ಮತ್ತು ನೀವು ಅವುಗಳನ್ನು ಇಲ್ಲಿ ಜೋಡಿಸಿದ ನಂತರವೇ ಸಂಪರ್ಕಗೊಳ್ಳುತ್ತವೆ. ವಾಲ್ಯೂಮ್ ಈ Mac ನಲ್ಲಿರುವ ನಿಯಮಗಳನ್ನೇ ಅನುಸರಿಸುತ್ತದೆ: ಸ್ಥಿರ ವಾಲ್ಯೂಮ್ ಇರುವ ಔಟ್‌ಪುಟ್ ಸ್ಥಿರವಾಗಿಯೇ ಇರುತ್ತದೆ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone 또는 iPad의 Vespertine Remote 앱에서 재생, 대기열, 보관함 및 출력을 제어합니다. 휴대폰은 로컬 네트워크를 통해서만 암호화된 상태로 연결되며, 여기에서 페어링한 후에만 연결할 수 있습니다. 음량은 이 Mac에서와 같은 규칙을 따릅니다. 음량이 고정된 출력은 고정된 상태로 유지됩니다."
+            "value": "iPhone 또는 iPad의 Vespertine 앱에서 재생, 대기열, 보관함 및 출력을 제어합니다. 휴대폰은 로컬 네트워크를 통해서만 암호화된 상태로 연결되며, 여기에서 페어링한 후에만 연결할 수 있습니다. 음량은 이 Mac에서와 같은 규칙을 따릅니다. 음량이 고정된 출력은 고정된 상태로 유지됩니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone-ലോ iPad-ലോ ഉള്ള Vespertine Remote ആപ്പിൽ നിന്ന് പ്ലേബാക്ക്, ക്യൂ, നിങ്ങളുടെ ലൈബ്രറി, ഔട്ട്‌പുട്ട് എന്നിവ നിയന്ത്രിക്കുക. ഫോണുകൾ നിങ്ങളുടെ ലോക്കൽ നെറ്റ്‌വർക്കിൽ മാത്രം, എൻക്രിപ്റ്റ് ചെയ്ത്, നിങ്ങൾ ഇവിടെ ജോടിയാക്കിയ ശേഷം മാത്രമേ കണക്റ്റ് ചെയ്യൂ. വോളിയം ഈ Mac-ലെ അതേ നിയമങ്ങൾ പാലിക്കുന്നു: സ്ഥിരമായ വോളിയമുള്ള ഔട്ട്‌പുട്ട് സ്ഥിരമായിത്തന്നെ തുടരും."
+            "value": "iPhone-ലോ iPad-ലോ ഉള്ള Vespertine ആപ്പിൽ നിന്ന് പ്ലേബാക്ക്, ക്യൂ, നിങ്ങളുടെ ലൈബ്രറി, ഔട്ട്‌പുട്ട് എന്നിവ നിയന്ത്രിക്കുക. ഫോണുകൾ നിങ്ങളുടെ ലോക്കൽ നെറ്റ്‌വർക്കിൽ മാത്രം, എൻക്രിപ്റ്റ് ചെയ്ത്, നിങ്ങൾ ഇവിടെ ജോടിയാക്കിയ ശേഷം മാത്രമേ കണക്റ്റ് ചെയ്യൂ. വോളിയം ഈ Mac-ലെ അതേ നിയമങ്ങൾ പാലിക്കുന്നു: സ്ഥിരമായ വോളിയമുള്ള ഔട്ട്‌പുട്ട് സ്ഥിരമായിത്തന്നെ തുടരും."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone किंवा iPad वरील Vespertine Remote ॲपमधून प्लेबॅक, रांग, तुमची लायब्ररी आणि आउटपुट नियंत्रित करा. फोन फक्त तुमच्या स्थानिक नेटवर्कवर, एन्क्रिप्ट केलेल्या स्वरूपात आणि तुम्ही येथे पेअर केल्यानंतरच कनेक्ट होतात. व्हॉल्यूमला या Mac वरीलच नियम लागू होतात: निश्चित व्हॉल्यूम असलेले आउटपुट निश्चितच राहते."
+            "value": "iPhone किंवा iPad वरील Vespertine ॲपमधून प्लेबॅक, रांग, तुमची लायब्ररी आणि आउटपुट नियंत्रित करा. फोन फक्त तुमच्या स्थानिक नेटवर्कवर, एन्क्रिप्ट केलेल्या स्वरूपात आणि तुम्ही येथे पेअर केल्यानंतरच कनेक्ट होतात. व्हॉल्यूमला या Mac वरीलच नियम लागू होतात: निश्चित व्हॉल्यूम असलेले आउटपुट निश्चितच राहते."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kawal main balik, baris gilir, pustaka dan output daripada app Vespertine Remote pada iPhone atau iPad. Telefon hanya bersambung melalui rangkaian setempat anda, disulitkan, dan hanya selepas anda memasangkannya di sini. Kelantangan mengikut peraturan yang sama seperti pada Mac ini: output dengan kelantangan tetap kekal tetap."
+            "value": "Kawal main balik, baris gilir, pustaka dan output daripada app Vespertine pada iPhone atau iPad. Telefon hanya bersambung melalui rangkaian setempat anda, disulitkan, dan hanya selepas anda memasangkannya di sini. Kelantangan mengikut peraturan yang sama seperti pada Mac ini: output dengan kelantangan tetap kekal tetap."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Styr avspillingen, køen, biblioteket og utgangen fra Vespertine Remote-appen på en iPhone eller iPad. Telefoner kobler seg bare til via det lokale nettverket ditt, kryptert, og først etter at du har sammenkoblet dem her. Volumet følger de samme reglene som på denne Macen: En utgang med fast volum forblir fast."
+            "value": "Styr avspillingen, køen, biblioteket og utgangen fra Vespertine-appen på en iPhone eller iPad. Telefoner kobler seg bare til via det lokale nettverket ditt, kryptert, og først etter at du har sammenkoblet dem her. Volumet følger de samme reglene som på denne Macen: En utgang med fast volum forblir fast."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bedien het afspelen, de wachtrij, je bibliotheek en de uitvoer met de Vespertine Remote-app op een iPhone of iPad. Telefoons maken alleen verbinding via je lokale netwerk, versleuteld, en pas nadat je ze hier hebt gekoppeld. Het volume volgt dezelfde regels als op deze Mac: een uitvoer met een vast volume blijft vast."
+            "value": "Bedien het afspelen, de wachtrij, je bibliotheek en de uitvoer met de Vespertine-app op een iPhone of iPad. Telefoons maken alleen verbinding via je lokale netwerk, versleuteld, en pas nadat je ze hier hebt gekoppeld. Het volume volgt dezelfde regels als op deze Mac: een uitvoer met een vast volume blijft vast."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone ਜਾਂ iPad ’ਤੇ Vespertine Remote ਐਪ ਤੋਂ ਪਲੇਬੈਕ, ਕਤਾਰ, ਆਪਣੀ ਲਾਇਬ੍ਰੇਰੀ ਅਤੇ ਆਉਟਪੁੱਟ ਕੰਟਰੋਲ ਕਰੋ। ਫ਼ੋਨ ਸਿਰਫ਼ ਤੁਹਾਡੇ ਲੋਕਲ ਨੈੱਟਵਰਕ ’ਤੇ, ਇਨਕ੍ਰਿਪਟ ਕੀਤੇ ਰੂਪ ਵਿੱਚ, ਅਤੇ ਇੱਥੇ ਪੇਅਰ ਕਰਨ ਤੋਂ ਬਾਅਦ ਹੀ ਕਨੈਕਟ ਹੁੰਦੇ ਹਨ। ਵੌਲਿਊਮ ਉਹੀ ਨਿਯਮ ਮੰਨਦਾ ਹੈ ਜੋ ਇਸ Mac ’ਤੇ ਹਨ: ਸਥਿਰ ਵੌਲਿਊਮ ਵਾਲਾ ਆਉਟਪੁੱਟ ਸਥਿਰ ਹੀ ਰਹਿੰਦਾ ਹੈ।"
+            "value": "iPhone ਜਾਂ iPad ’ਤੇ Vespertine ਐਪ ਤੋਂ ਪਲੇਬੈਕ, ਕਤਾਰ, ਆਪਣੀ ਲਾਇਬ੍ਰੇਰੀ ਅਤੇ ਆਉਟਪੁੱਟ ਕੰਟਰੋਲ ਕਰੋ। ਫ਼ੋਨ ਸਿਰਫ਼ ਤੁਹਾਡੇ ਲੋਕਲ ਨੈੱਟਵਰਕ ’ਤੇ, ਇਨਕ੍ਰਿਪਟ ਕੀਤੇ ਰੂਪ ਵਿੱਚ, ਅਤੇ ਇੱਥੇ ਪੇਅਰ ਕਰਨ ਤੋਂ ਬਾਅਦ ਹੀ ਕਨੈਕਟ ਹੁੰਦੇ ਹਨ। ਵੌਲਿਊਮ ਉਹੀ ਨਿਯਮ ਮੰਨਦਾ ਹੈ ਜੋ ਇਸ Mac ’ਤੇ ਹਨ: ਸਥਿਰ ਵੌਲਿਊਮ ਵਾਲਾ ਆਉਟਪੁੱਟ ਸਥਿਰ ਹੀ ਰਹਿੰਦਾ ਹੈ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Steruj odtwarzaniem, kolejką, biblioteką i wyjściem z aplikacji Vespertine Remote na iPhonie lub iPadzie. Telefony łączą się wyłącznie przez sieć lokalną, z szyfrowaniem, i dopiero po sparowaniu ich tutaj. Głośność działa tak samo jak na tym Macu: wyjście ze stałą głośnością pozostaje stałe."
+            "value": "Steruj odtwarzaniem, kolejką, biblioteką i wyjściem z aplikacji Vespertine na iPhonie lub iPadzie. Telefony łączą się wyłącznie przez sieć lokalną, z szyfrowaniem, i dopiero po sparowaniu ich tutaj. Głośność działa tak samo jak na tym Macu: wyjście ze stałą głośnością pozostaje stałe."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Controle a reprodução, a fila, sua biblioteca e a saída pelo app Vespertine Remote em um iPhone ou iPad. Os telefones se conectam somente pela sua rede local, com criptografia, e só depois que você os emparelhar aqui. O volume segue as mesmas regras deste Mac: uma saída com volume fixo continua fixa."
+            "value": "Controle a reprodução, a fila, sua biblioteca e a saída pelo app Vespertine em um iPhone ou iPad. Os telefones se conectam somente pela sua rede local, com criptografia, e só depois que você os emparelhar aqui. O volume segue as mesmas regras deste Mac: uma saída com volume fixo continua fixa."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Controle a reprodução, a fila, a biblioteca e a saída a partir da app Vespertine Remote num iPhone ou iPad. Os telefones ligam-se apenas através da rede local, com encriptação, e só depois de os emparelhar aqui. O volume segue as mesmas regras que neste Mac: uma saída com volume fixo mantém-se fixa."
+            "value": "Controle a reprodução, a fila, a biblioteca e a saída a partir da app Vespertine num iPhone ou iPad. Os telefones ligam-se apenas através da rede local, com encriptação, e só depois de os emparelhar aqui. O volume segue as mesmas regras que neste Mac: uma saída com volume fixo mantém-se fixa."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Controlați redarea, coada, biblioteca și ieșirea din aplicația Vespertine Remote de pe un iPhone sau iPad. Telefoanele se conectează doar prin rețeaua locală, criptat, și numai după ce le asociați aici. Volumul respectă aceleași reguli ca pe acest Mac: o ieșire cu volum fix rămâne fixă."
+            "value": "Controlați redarea, coada, biblioteca și ieșirea din aplicația Vespertine de pe un iPhone sau iPad. Telefoanele se conectează doar prin rețeaua locală, criptat, și numai după ce le asociați aici. Volumul respectă aceleași reguli ca pe acest Mac: o ieșire cu volum fix rămâne fixă."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Styr uppspelningen, kön, ditt bibliotek och utgången från appen Vespertine Remote på en iPhone eller iPad. Telefoner ansluter bara via ditt lokala nätverk, krypterat, och först efter att du har parkopplat dem här. Volymen följer samma regler som på den här Macen: en utgång med fast volym förblir fast."
+            "value": "Styr uppspelningen, kön, ditt bibliotek och utgången från appen Vespertine på en iPhone eller iPad. Telefoner ansluter bara via ditt lokala nätverk, krypterat, och först efter att du har parkopplat dem här. Volymen följer samma regler som på den här Macen: en utgång med fast volym förblir fast."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dhibiti uchezaji, foleni, maktaba yako na kifaa cha kutoa sauti kutoka programu ya Vespertine Remote kwenye iPhone au iPad. Simu huunganishwa kupitia mtandao wako wa karibu pekee, kwa usimbaji fiche, na baada tu ya kuzioanisha hapa. Kiwango cha sauti hufuata kanuni zilezile kama kwenye Mac hii: kifaa chenye kiwango cha sauti kisichobadilika hubaki hivyo."
+            "value": "Dhibiti uchezaji, foleni, maktaba yako na kifaa cha kutoa sauti kutoka programu ya Vespertine kwenye iPhone au iPad. Simu huunganishwa kupitia mtandao wako wa karibu pekee, kwa usimbaji fiche, na baada tu ya kuzioanisha hapa. Kiwango cha sauti hufuata kanuni zilezile kama kwenye Mac hii: kifaa chenye kiwango cha sauti kisichobadilika hubaki hivyo."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone அல்லது iPad-இல் உள்ள Vespertine Remote ஆப்ஸிலிருந்து இயக்கம், வரிசை, உங்கள் லைப்ரரி மற்றும் வெளியீட்டைக் கட்டுப்படுத்தலாம். ஃபோன்கள் உங்கள் உள்ளூர் நெட்வொர்க்கில் மட்டுமே, என்க்ரிப்ட் செய்யப்பட்டு, நீங்கள் இங்கே ஜோடியாக்கிய பிறகே இணைகின்றன. ஒலியளவு இந்த Mac-இல் உள்ள அதே விதிகளைப் பின்பற்றும்: நிலையான ஒலியளவு கொண்ட வெளியீடு நிலையாகவே இருக்கும்."
+            "value": "iPhone அல்லது iPad-இல் உள்ள Vespertine ஆப்ஸிலிருந்து இயக்கம், வரிசை, உங்கள் லைப்ரரி மற்றும் வெளியீட்டைக் கட்டுப்படுத்தலாம். ஃபோன்கள் உங்கள் உள்ளூர் நெட்வொர்க்கில் மட்டுமே, என்க்ரிப்ட் செய்யப்பட்டு, நீங்கள் இங்கே ஜோடியாக்கிய பிறகே இணைகின்றன. ஒலியளவு இந்த Mac-இல் உள்ள அதே விதிகளைப் பின்பற்றும்: நிலையான ஒலியளவு கொண்ட வெளியீடு நிலையாகவே இருக்கும்."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone లేదా iPadలోని Vespertine Remote యాప్ నుండి ప్లేబ్యాక్, క్యూ, మీ లైబ్రరీ, అవుట్‌పుట్‌ను నియంత్రించండి. ఫోన్‌లు మీ లోకల్ నెట్‌వర్క్‌లో మాత్రమే, ఎన్‌క్రిప్ట్ చేయబడి, మీరు వాటిని ఇక్కడ జత చేసిన తర్వాతే కనెక్ట్ అవుతాయి. వాల్యూమ్ ఈ Macలోని నియమాలనే అనుసరిస్తుంది: స్థిర వాల్యూమ్ ఉన్న అవుట్‌పుట్ స్థిరంగానే ఉంటుంది."
+            "value": "iPhone లేదా iPadలోని Vespertine యాప్ నుండి ప్లేబ్యాక్, క్యూ, మీ లైబ్రరీ, అవుట్‌పుట్‌ను నియంత్రించండి. ఫోన్‌లు మీ లోకల్ నెట్‌వర్క్‌లో మాత్రమే, ఎన్‌క్రిప్ట్ చేయబడి, మీరు వాటిని ఇక్కడ జత చేసిన తర్వాతే కనెక్ట్ అవుతాయి. వాల్యూమ్ ఈ Macలోని నియమాలనే అనుసరిస్తుంది: స్థిర వాల్యూమ్ ఉన్న అవుట్‌పుట్ స్థిరంగానే ఉంటుంది."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "ควบคุมการเล่น คิว คลัง และขาออกจากแอป Vespertine Remote บน iPhone หรือ iPad โทรศัพท์จะเชื่อมต่อผ่านเครือข่ายภายในของคุณเท่านั้น โดยมีการเข้ารหัส และหลังจากที่คุณจับคู่ที่นี่แล้วเท่านั้น ระดับเสียงใช้กฎเดียวกับบน Mac เครื่องนี้ ขาออกที่มีระดับเสียงคงที่จะยังคงที่"
+            "value": "ควบคุมการเล่น คิว คลัง และขาออกจากแอป Vespertine บน iPhone หรือ iPad โทรศัพท์จะเชื่อมต่อผ่านเครือข่ายภายในของคุณเท่านั้น โดยมีการเข้ารหัส และหลังจากที่คุณจับคู่ที่นี่แล้วเท่านั้น ระดับเสียงใช้กฎเดียวกับบน Mac เครื่องนี้ ขาออกที่มีระดับเสียงคงที่จะยังคงที่"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bir iPhone veya iPad’deki Vespertine Remote uygulamasından çalmayı, sırayı, arşivinizi ve çıkışı denetleyin. Telefonlar yalnızca yerel ağınız üzerinden, şifreli olarak ve yalnızca onları burada eşledikten sonra bağlanır. Ses düzeyi bu Mac’tekiyle aynı kurallara uyar: sabit ses düzeyli bir çıkış sabit kalır."
+            "value": "Bir iPhone veya iPad’deki Vespertine uygulamasından çalmayı, sırayı, arşivinizi ve çıkışı denetleyin. Telefonlar yalnızca yerel ağınız üzerinden, şifreli olarak ve yalnızca onları burada eşledikten sonra bağlanır. Ses düzeyi bu Mac’tekiyle aynı kurallara uyar: sabit ses düzeyli bir çıkış sabit kalır."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Керуйте відтворенням, чергою, медіатекою та виходом із програми Vespertine Remote на iPhone або iPad. Телефони під’єднуються лише через вашу локальну мережу, із шифруванням, і тільки після того, як ви створите з ними пару тут. Гучність підпорядковується тим самим правилам, що й на цьому Mac: вихід із фіксованою гучністю лишається фіксованим."
+            "value": "Керуйте відтворенням, чергою, медіатекою та виходом із програми Vespertine на iPhone або iPad. Телефони під’єднуються лише через вашу локальну мережу, із шифруванням, і тільки після того, як ви створите з ними пару тут. Гучність підпорядковується тим самим правилам, що й на цьому Mac: вихід із фіксованою гучністю лишається фіксованим."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone یا iPad پر Vespertine Remote ایپ سے پلے بیک، قطار، اپنی لائبریری اور آؤٹ پٹ کنٹرول کریں۔ فونز صرف آپ کے مقامی نیٹ ورک پر، انکرپٹڈ طور پر، اور صرف یہاں پیئر کرنے کے بعد منسلک ہوتے ہیں۔ والیوم انہی اصولوں پر چلتا ہے جیسے اس Mac پر: مقررہ والیوم والا آؤٹ پٹ مقررہ ہی رہتا ہے۔"
+            "value": "iPhone یا iPad پر Vespertine ایپ سے پلے بیک، قطار، اپنی لائبریری اور آؤٹ پٹ کنٹرول کریں۔ فونز صرف آپ کے مقامی نیٹ ورک پر، انکرپٹڈ طور پر، اور صرف یہاں پیئر کرنے کے بعد منسلک ہوتے ہیں۔ والیوم انہی اصولوں پر چلتا ہے جیسے اس Mac پر: مقررہ والیوم والا آؤٹ پٹ مقررہ ہی رہتا ہے۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Điều khiển phát lại, hàng đợi, thư viện và đầu ra từ ứng dụng Vespertine Remote trên iPhone hoặc iPad. Điện thoại chỉ kết nối qua mạng cục bộ của bạn, có mã hóa, và chỉ sau khi bạn ghép đôi ở đây. Âm lượng tuân theo các quy tắc giống như trên máy Mac này: đầu ra có âm lượng cố định vẫn giữ cố định."
+            "value": "Điều khiển phát lại, hàng đợi, thư viện và đầu ra từ ứng dụng Vespertine trên iPhone hoặc iPad. Điện thoại chỉ kết nối qua mạng cục bộ của bạn, có mã hóa, và chỉ sau khi bạn ghép đôi ở đây. Âm lượng tuân theo các quy tắc giống như trên máy Mac này: đầu ra có âm lượng cố định vẫn giữ cố định."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "通过 iPhone 或 iPad 上的 Vespertine Remote App 控制播放、待播清单、资料库和输出。手机仅通过你的本地网络以加密方式连接，并且只有在此处配对后才能连接。音量遵循与这台 Mac 相同的规则：音量固定的输出将保持固定。"
+            "value": "通过 iPhone 或 iPad 上的 Vespertine App 控制播放、待播清单、资料库和输出。手机仅通过你的本地网络以加密方式连接，并且只有在此处配对后才能连接。音量遵循与这台 Mac 相同的规则：音量固定的输出将保持固定。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "透過 iPhone 或 iPad 上的 Vespertine Remote App 控制播放、待播清單、資料庫和輸出。手機只會透過你的區域網路以加密方式連線，且必須先在此處配對才能連線。音量遵循與這部 Mac 相同的規則：音量固定的輸出會維持固定。"
+            "value": "透過 iPhone 或 iPad 上的 Vespertine App 控制播放、待播清單、資料庫和輸出。手機只會透過你的區域網路以加密方式連線，且必須先在此處配對才能連線。音量遵循與這部 Mac 相同的規則：音量固定的輸出會維持固定。"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "透過 iPhone 或 iPad 上的 Vespertine Remote App 控制播放、待播清單、資料庫及輸出。手機只會經你的本地網絡以加密方式連接，而且必須先在此配對才可連接。音量遵循與這部 Mac 相同的規則：音量固定的輸出會保持固定。"
+            "value": "透過 iPhone 或 iPad 上的 Vespertine App 控制播放、待播清單、資料庫及輸出。手機只會經你的本地網絡以加密方式連接，而且必須先在此配對才可連接。音量遵循與這部 Mac 相同的規則：音量固定的輸出會保持固定。"
           }
         }
       }
@@ -561065,270 +561065,270 @@
         }
       }
     },
-    "In the Vespertine Remote app, scan this code, or choose this Mac and type the code under it.": {
+    "In the Vespertine app, scan this code, or choose this Mac and type the code under it.": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "በVespertine Remote መተግበሪያ ውስጥ ይህን ኮድ ይቃኙ፣ ወይም ይህን Mac ይምረጡና ከሥሩ ያለውን ኮድ ይተይቡ።"
+            "value": "በVespertine መተግበሪያ ውስጥ ይህን ኮድ ይቃኙ፣ ወይም ይህን Mac ይምረጡና ከሥሩ ያለውን ኮድ ይተይቡ።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "في تطبيق Vespertine Remote، امسح هذا الرمز ضوئيًا، أو اختر هذا الـ Mac واكتب الرمز الظاهر أسفله."
+            "value": "في تطبيق Vespertine، امسح هذا الرمز ضوئيًا، أو اختر هذا الـ Mac واكتب الرمز الظاهر أسفله."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote অ্যাপে এই কোডটি স্ক্যান করুন, অথবা এই Mac বেছে নিয়ে এর নিচের কোডটি টাইপ করুন।"
+            "value": "Vespertine অ্যাপে এই কোডটি স্ক্যান করুন, অথবা এই Mac বেছে নিয়ে এর নিচের কোডটি টাইপ করুন।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "V aplikaci Vespertine Remote naskenujte tento kód, nebo zvolte tento Mac a zadejte kód pod ním."
+            "value": "V aplikaci Vespertine naskenujte tento kód, nebo zvolte tento Mac a zadejte kód pod ním."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Scan denne kode i appen Vespertine Remote, eller vælg denne Mac, og skriv koden under den."
+            "value": "Scan denne kode i appen Vespertine, eller vælg denne Mac, og skriv koden under den."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Scanne diesen Code in der App „Vespertine Remote“ oder wähle diesen Mac aus und gib den Code darunter ein."
+            "value": "Scanne diesen Code in der App „Vespertine“ oder wähle diesen Mac aus und gib den Code darunter ein."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Στην εφαρμογή Vespertine Remote, σαρώστε αυτόν τον κωδικό ή επιλέξτε αυτό το Mac και πληκτρολογήστε τον κωδικό που εμφανίζεται από κάτω."
+            "value": "Στην εφαρμογή Vespertine, σαρώστε αυτόν τον κωδικό ή επιλέξτε αυτό το Mac και πληκτρολογήστε τον κωδικό που εμφανίζεται από κάτω."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "En la app Vespertine Remote, escanea este código o elige este Mac e introduce el código que aparece debajo."
+            "value": "En la app Vespertine, escanea este código o elige este Mac e introduce el código que aparece debajo."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "در برنامهٔ Vespertine Remote، این کد را اسکن کنید، یا این Mac را انتخاب کنید و کد زیر آن را وارد کنید."
+            "value": "در برنامهٔ Vespertine، این کد را اسکن کنید، یا این Mac را انتخاب کنید و کد زیر آن را وارد کنید."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Skannaa tämä koodi Vespertine Remote -apissa tai valitse tämä Mac ja kirjoita sen alla oleva koodi."
+            "value": "Skannaa tämä koodi Vespertine -apissa tai valitse tämä Mac ja kirjoita sen alla oleva koodi."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sa Vespertine Remote app, i-scan ang code na ito, o piliin ang Mac na ito at i-type ang code sa ilalim nito."
+            "value": "Sa Vespertine app, i-scan ang code na ito, o piliin ang Mac na ito at i-type ang code sa ilalim nito."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dans l’app Vespertine Remote, scannez ce code, ou choisissez ce Mac et saisissez le code affiché en dessous."
+            "value": "Dans l’app Vespertine, scannez ce code, ou choisissez ce Mac et saisissez le code affiché en dessous."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote ઍપમાં આ કોડ સ્કૅન કરો, અથવા આ Mac પસંદ કરો અને તેની નીચેનો કોડ ટાઇપ કરો."
+            "value": "Vespertine ઍપમાં આ કોડ સ્કૅન કરો, અથવા આ Mac પસંદ કરો અને તેની નીચેનો કોડ ટાઇપ કરો."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "A manhajar Vespertine Remote, yi sikan na wannan lambar, ko zaɓi wannan Mac sannan ku rubuta lambar da ke ƙarƙashinta."
+            "value": "A manhajar Vespertine, yi sikan na wannan lambar, ko zaɓi wannan Mac sannan ku rubuta lambar da ke ƙarƙashinta."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "ביישום Vespertine Remote, סרוק קוד זה, או בחר את ה־Mac הזה והקלד את הקוד שמתחתיו."
+            "value": "ביישום Vespertine, סרוק קוד זה, או בחר את ה־Mac הזה והקלד את הקוד שמתחתיו."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote ऐप में यह कोड स्कैन करें, या यह Mac चुनें और इसके नीचे दिया कोड टाइप करें।"
+            "value": "Vespertine ऐप में यह कोड स्कैन करें, या यह Mac चुनें और इसके नीचे दिया कोड टाइप करें।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A Vespertine Remote appban olvassa be ezt a kódot, vagy válassza ezt a Macet, és írja be az alatta látható kódot."
+            "value": "A Vespertine appban olvassa be ezt a kódot, vagy válassza ezt a Macet, és írja be az alatta látható kódot."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Di app Vespertine Remote, pindai kode ini, atau pilih Mac ini dan ketik kode di bawahnya."
+            "value": "Di app Vespertine, pindai kode ini, atau pilih Mac ini dan ketik kode di bawahnya."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nell’app Vespertine Remote, scansiona questo codice oppure scegli questo Mac e inserisci il codice qui sotto."
+            "value": "Nell’app Vespertine, scansiona questo codice oppure scegli questo Mac e inserisci il codice qui sotto."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remoteアプリでこのコードをスキャンするか、このMacを選択してその下にあるコードを入力してください。"
+            "value": "Vespertineアプリでこのコードをスキャンするか、このMacを選択してその下にあるコードを入力してください。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote ಆ್ಯಪ್‌ನಲ್ಲಿ ಈ ಕೋಡ್ ಅನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ, ಅಥವಾ ಈ Mac ಅನ್ನು ಆಯ್ಕೆಮಾಡಿ ಅದರ ಕೆಳಗಿನ ಕೋಡ್ ಅನ್ನು ಟೈಪ್ ಮಾಡಿ."
+            "value": "Vespertine ಆ್ಯಪ್‌ನಲ್ಲಿ ಈ ಕೋಡ್ ಅನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ, ಅಥವಾ ಈ Mac ಅನ್ನು ಆಯ್ಕೆಮಾಡಿ ಅದರ ಕೆಳಗಿನ ಕೋಡ್ ಅನ್ನು ಟೈಪ್ ಮಾಡಿ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote 앱에서 이 코드를 스캔하거나, 이 Mac을 선택하고 그 아래에 있는 코드를 입력하십시오."
+            "value": "Vespertine 앱에서 이 코드를 스캔하거나, 이 Mac을 선택하고 그 아래에 있는 코드를 입력하십시오."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote ആപ്പിൽ ഈ കോഡ് സ്കാൻ ചെയ്യുക, അല്ലെങ്കിൽ ഈ Mac തിരഞ്ഞെടുത്ത് അതിന് താഴെയുള്ള കോഡ് ടൈപ്പ് ചെയ്യുക."
+            "value": "Vespertine ആപ്പിൽ ഈ കോഡ് സ്കാൻ ചെയ്യുക, അല്ലെങ്കിൽ ഈ Mac തിരഞ്ഞെടുത്ത് അതിന് താഴെയുള്ള കോഡ് ടൈപ്പ് ചെയ്യുക."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote ॲपमध्ये हा कोड स्कॅन करा, किंवा हा Mac निवडा आणि त्याखालील कोड टाइप करा."
+            "value": "Vespertine ॲपमध्ये हा कोड स्कॅन करा, किंवा हा Mac निवडा आणि त्याखालील कोड टाइप करा."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dalam app Vespertine Remote, imbas kod ini, atau pilih Mac ini dan taipkan kod di bawahnya."
+            "value": "Dalam app Vespertine, imbas kod ini, atau pilih Mac ini dan taipkan kod di bawahnya."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Skann denne koden i Vespertine Remote-appen, eller velg denne Macen og skriv inn koden under den."
+            "value": "Skann denne koden i Vespertine-appen, eller velg denne Macen og skriv inn koden under den."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Scan deze code in de Vespertine Remote-app, of kies deze Mac en typ de code eronder."
+            "value": "Scan deze code in de Vespertine-app, of kies deze Mac en typ de code eronder."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote ਐਪ ਵਿੱਚ ਇਹ ਕੋਡ ਸਕੈਨ ਕਰੋ, ਜਾਂ ਇਹ Mac ਚੁਣੋ ਅਤੇ ਇਸਦੇ ਹੇਠਾਂ ਦਿੱਤਾ ਕੋਡ ਟਾਈਪ ਕਰੋ।"
+            "value": "Vespertine ਐਪ ਵਿੱਚ ਇਹ ਕੋਡ ਸਕੈਨ ਕਰੋ, ਜਾਂ ਇਹ Mac ਚੁਣੋ ਅਤੇ ਇਸਦੇ ਹੇਠਾਂ ਦਿੱਤਾ ਕੋਡ ਟਾਈਪ ਕਰੋ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "W aplikacji Vespertine Remote zeskanuj ten kod albo wybierz tego Maca i wpisz kod widoczny pod nim."
+            "value": "W aplikacji Vespertine zeskanuj ten kod albo wybierz tego Maca i wpisz kod widoczny pod nim."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "No app Vespertine Remote, escaneie este código ou escolha este Mac e digite o código abaixo dele."
+            "value": "No app Vespertine, escaneie este código ou escolha este Mac e digite o código abaixo dele."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Na app Vespertine Remote, leia este código ou escolha este Mac e introduza o código apresentado por baixo."
+            "value": "Na app Vespertine, leia este código ou escolha este Mac e introduza o código apresentado por baixo."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "În aplicația Vespertine Remote, scanați acest cod sau alegeți acest Mac și introduceți codul de sub el."
+            "value": "În aplicația Vespertine, scanați acest cod sau alegeți acest Mac și introduceți codul de sub el."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Skanna den här koden i appen Vespertine Remote, eller välj den här Macen och skriv koden under den."
+            "value": "Skanna den här koden i appen Vespertine, eller välj den här Macen och skriv koden under den."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Katika programu ya Vespertine Remote, changanua msimbo huu, au chagua Mac hii na uandike msimbo ulio chini yake."
+            "value": "Katika programu ya Vespertine, changanua msimbo huu, au chagua Mac hii na uandike msimbo ulio chini yake."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote ஆப்ஸில் இந்தக் குறியீட்டை ஸ்கேன் செய்யவும், அல்லது இந்த Mac-ஐத் தேர்வுசெய்து அதன் கீழே உள்ள குறியீட்டை உள்ளிடவும்."
+            "value": "Vespertine ஆப்ஸில் இந்தக் குறியீட்டை ஸ்கேன் செய்யவும், அல்லது இந்த Mac-ஐத் தேர்வுசெய்து அதன் கீழே உள்ள குறியீட்டை உள்ளிடவும்."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote యాప్‌లో ఈ కోడ్‌ను స్కాన్ చేయండి, లేదా ఈ Macను ఎంచుకుని దాని కింద ఉన్న కోడ్‌ను టైప్ చేయండి."
+            "value": "Vespertine యాప్‌లో ఈ కోడ్‌ను స్కాన్ చేయండి, లేదా ఈ Macను ఎంచుకుని దాని కింద ఉన్న కోడ్‌ను టైప్ చేయండి."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "ในแอป Vespertine Remote ให้สแกนรหัสนี้ หรือเลือก Mac เครื่องนี้แล้วป้อนรหัสที่อยู่ด้านล่าง"
+            "value": "ในแอป Vespertine ให้สแกนรหัสนี้ หรือเลือก Mac เครื่องนี้แล้วป้อนรหัสที่อยู่ด้านล่าง"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote uygulamasında bu kodu tarayın ya da bu Mac’i seçip altındaki kodu yazın."
+            "value": "Vespertine uygulamasında bu kodu tarayın ya da bu Mac’i seçip altındaki kodu yazın."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "У програмі Vespertine Remote відскануйте цей код або виберіть цей Mac і введіть код під ним."
+            "value": "У програмі Vespertine відскануйте цей код або виберіть цей Mac і введіть код під ним."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine Remote ایپ میں یہ کوڈ اسکین کریں، یا یہ Mac منتخب کریں اور اس کے نیچے والا کوڈ ٹائپ کریں۔"
+            "value": "Vespertine ایپ میں یہ کوڈ اسکین کریں، یا یہ Mac منتخب کریں اور اس کے نیچے والا کوڈ ٹائپ کریں۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Trong ứng dụng Vespertine Remote, hãy quét mã này hoặc chọn máy Mac này và nhập mã bên dưới."
+            "value": "Trong ứng dụng Vespertine, hãy quét mã này hoặc chọn máy Mac này và nhập mã bên dưới."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Vespertine Remote App 中扫描此代码，或者选择这台 Mac 并输入其下方的代码。"
+            "value": "在 Vespertine App 中扫描此代码，或者选择这台 Mac 并输入其下方的代码。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Vespertine Remote App 中掃描此代碼，或選擇這部 Mac 並輸入其下方的代碼。"
+            "value": "在 Vespertine App 中掃描此代碼，或選擇這部 Mac 並輸入其下方的代碼。"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "在 Vespertine Remote App 中掃描此代碼，或選擇這部 Mac 並輸入其下方的代碼。"
+            "value": "在 Vespertine App 中掃描此代碼，或選擇這部 Mac 並輸入其下方的代碼。"
           }
         }
       }

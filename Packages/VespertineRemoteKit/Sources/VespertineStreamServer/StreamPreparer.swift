@@ -204,6 +204,12 @@ public actor StreamPreparer {
         nextNumber[client] = nil
     }
 
+    /// Closes every phone's streams (Stream to Phones was turned off).
+    public func closeEverything() {
+        streams = [:]
+        nextNumber = [:]
+    }
+
     /// Closes the streams of every connection a device has: the server names a connection "device#connection".
     public func closeAll(clientsOf device: String) {
         for client in streams.keys where client == device || client.hasPrefix(device + "#") { closeAll(client: client) }

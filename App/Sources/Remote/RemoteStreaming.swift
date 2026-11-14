@@ -84,14 +84,14 @@ struct PhoneTranscoder: StreamTranscoding {
 
 @MainActor
 enum RemoteStreaming {
-    /// How much the converted FLACs may take in Caches (least recently used go first).
-    static let cacheLimit: Int64 = 8 * 1024 * 1024 * 1024
+    static func bytes(gigabytes: Int) -> Int64 { Int64(gigabytes) * 1024 * 1024 * 1024 }
 
-    static func makePreparer(model: AppModel) -> StreamPreparer? {
+    /// `gigabytes`: how much the converted FLACs may take in Caches (least recently used go first).
+    static func makePreparer(model: AppModel, gigabytes: Int) -> StreamPreparer? {
         let base = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first ?? FileManager.default.temporaryDirectory
         let folder = base.appendingPathComponent("Vespertine", isDirectory: true).appendingPathComponent("Remote", isDirectory: true)
             .appendingPathComponent("Streams", isDirectory: true)
-        guard let cache = try? StreamCache(directory: folder, limitBytes: cacheLimit) else { return nil }
+        guard let cache = try? StreamCache(directory: folder, limitBytes: bytes(gigabytes: gigabytes)) else { return nil }
         let transcoder = PhoneTranscoder { [weak model] id in
             await MainActor.run { model?.library.tracks(ids: [id]).first?.streamItem }
         }

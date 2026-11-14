@@ -30,7 +30,7 @@ struct RemoteSettingsView: View {
             } header: {
                 Text("Remote")
             } footer: {
-                Text("Control playback, the queue, your library and the output from the Vespertine Remote app on an iPhone or iPad. Phones connect over your local network only, encrypted, and only after you pair them here. Volume follows the same rules as on this Mac: an output with a fixed volume stays fixed.")
+                Text("Control playback, the queue, your library and the output from the Vespertine app on an iPhone or iPad. Phones connect over your local network only, encrypted, and only after you pair them here. Volume follows the same rules as on this Mac: an output with a fixed volume stays fixed.")
                     .font(.caption).foregroundStyle(.secondary)
             }
 
@@ -46,6 +46,31 @@ struct RemoteSettingsView: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
 
+                Section {
+                    Toggle("Stream to Phones", isOn: Binding(get: { store.streamEnabled }, set: { server.setStreamEnabled($0) }))
+                    if store.streamEnabled {
+                        Picker("Space for converted copies", selection: Binding(get: { store.streamCacheGigabytes }, set: { server.setStreamCache(gigabytes: $0) })) {
+                            ForEach(Array(Set(RemoteStore.streamCacheChoices + [store.streamCacheGigabytes])).sorted(), id: \.self) { gigabytes in
+                                Text(verbatim: Self.size(RemoteStreaming.bytes(gigabytes: gigabytes))).tag(gigabytes)
+                            }
+                        }
+                        LabeledContent {
+                            Button("Empty") { server.clearStreamCache() }.disabled(server.streamCacheBytes == 0)
+                        } label: {
+                            Text("In use: \(Self.size(server.streamCacheBytes))", comment: "Settings › Remote › Stream to Phones: %@ is the disk space the converted copies take, e.g. “1.2 GB”.")
+                        }
+                    }
+                } footer: {
+                    Text("The phones you paired can play songs from this Mac’s library themselves, through their own speaker, headphones or DAC. Songs an iPhone can’t open (DSD, disc images and a few other formats) are converted to FLAC on this Mac first, with nothing lost, and each copy is kept so it’s made once. What this Mac is playing isn’t affected.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                .task(id: store.streamEnabled) {
+                    while store.streamEnabled, !Task.isCancelled {
+                        await server.refreshStreaming()
+                        try? await Task.sleep(for: .seconds(2))
+                    }
+                }
+
                 Section("Paired phones") {
                     if store.devices.isEmpty {
                         Text("No phones yet.").foregroundStyle(.secondary)
@@ -55,6 +80,10 @@ struct RemoteSettingsView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(device.name)
                                 Text(detail(device)).font(.caption).foregroundStyle(.secondary)
+                                if store.streamEnabled, !device.isWeb {
+                                    Toggle("May play songs from this Mac", isOn: Binding(get: { device.streams != false }, set: { server.setMayStream(device.id, $0) }))
+                                        .toggleStyle(.checkbox).font(.caption)
+                                }
                             }
                             Spacer()
                             Button("Remove…") { removing = device }
@@ -124,7 +153,13 @@ struct RemoteSettingsView: View {
         }
     }
 
+    /// "8 GB"
+    static func size(_ bytes: Int64) -> String { ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file) }
+
     private func detail(_ device: PairedRemote) -> String {
+        if let title = server.streaming[device.id]?.first {
+            return String(localized: "Playing “\(title)” on the phone", comment: "Settings › Remote: a paired phone is playing a song from this Mac itself; %@ is the song's title.")
+        }
         if server.connected.contains(device.id) { return String(localized: "Connected", comment: "Settings › Remote: a paired phone is connected now.") }
         guard let seen = device.lastSeen else { return String(localized: "Not connected yet", comment: "Settings › Remote: a paired phone hasn't connected since pairing.") }
         return String(localized: "Last connected \(seen.formatted(.relative(presentation: .named)))", comment: "Settings › Remote: %@ is a relative time, e.g. “2 hours ago”.")
@@ -177,7 +212,7 @@ struct RemotePairingSheet: View {
                 Button("Done", action: done).keyboardShortcut(.defaultAction)
             } else if let pairing = server.pairing {
                 Text("Pair a Phone").font(.title3)
-                Text("In the Vespertine Remote app, scan this code, or choose this Mac and type the code under it.")
+                Text("In the Vespertine app, scan this code, or choose this Mac and type the code under it.")
                     .multilineTextAlignment(.center).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 if let image = Self.qrImage(pairing.link.url.absoluteString) {
                     Image(nsImage: image).interpolation(.none).resizable().frame(width: 200, height: 200)
