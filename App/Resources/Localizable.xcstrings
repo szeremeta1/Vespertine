@@ -346436,6 +346436,282 @@
         }
       }
     },
+    "Reading this song from the share failed: %@": {
+      "comment": "A read of a song on a network share failed part way through. The placeholder is the system's reason, such as “The operation couldn’t be completed. Stale NFS file handle”.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህን ዘፈን ከማጋሪያው ማንበብ አልተሳካም፦ %@"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فشلت قراءة هذه الأغنية من المشاركة: %@"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "শেয়ার থেকে এই গানটি পড়া ব্যর্থ হয়েছে: %@"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Čtení této skladby ze sdílení se nezdařilo: %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det lykkedes ikke at læse dette nummer fra delingen: %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Lesen dieses Titels von der Freigabe ist fehlgeschlagen: %@"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η ανάγνωση αυτού του τραγουδιού από τον κοινόχρηστο φάκελο απέτυχε: %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading this song from the share failed: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo leer esta canción del recurso compartido: %@"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خواندن این آهنگ از اشتراک ناموفق بود: %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kappaleen lukeminen jaosta epäonnistui: %@"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi nabasa ang kantang ito mula sa share: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La lecture de ce morceau depuis le partage a échoué : %@"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "શેરમાંથી આ ગીત વાંચવામાં નિષ્ફળ: %@"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karanta wannan waƙar daga raba ya gaza: %@"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קריאת השיר הזה מהשיתוף נכשלה: %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "शेयर से यह गाना पढ़ना विफल रहा: %@"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A szám beolvasása a megosztásból nem sikerült: %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gagal membaca lagu ini dari berbagi: %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lettura di questo brano dalla condivisione non riuscita: %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共有からこの曲を読み込めませんでした: %@"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಶೇರ್‌ನಿಂದ ಈ ಹಾಡನ್ನು ಓದುವುದು ವಿಫಲವಾಯಿತು: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "공유에서 이 곡을 읽지 못했습니다: %@"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഷെയറിൽ നിന്ന് ഈ ഗാനം വായിക്കുന്നത് പരാജയപ്പെട്ടു: %@"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "शेअरमधून हे गाणे वाचणे अयशस्वी झाले: %@"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gagal membaca lagu ini daripada perkongsian: %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kunne ikke lese denne sangen fra delingen: %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Het lezen van dit nummer van de share is mislukt: %@"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸ਼ੇਅਰ ਤੋਂ ਇਹ ਗੀਤ ਪੜ੍ਹਨਾ ਅਸਫਲ ਰਿਹਾ: %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie udało się odczytać tego utworu z udziału: %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falha ao ler esta música do compartilhamento: %@"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falha ao ler esta música da partilha: %@"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Citirea acestei melodii din partajare a eșuat: %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det gick inte att läsa det här spåret från delningen: %@"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kusoma wimbo huu kutoka kwenye mgao kumeshindwa: %@"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பகிர்விலிருந்து இந்தப் பாடலைப் படிப்பது தோல்வியடைந்தது: %@"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "షేర్ నుండి ఈ పాటను చదవడం విఫలమైంది: %@"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อ่านเพลงนี้จากการแชร์ไม่สำเร็จ: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu şarkı paylaşımdan okunamadı: %@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не вдалося прочитати цю композицію зі спільного ресурсу: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شیئر سے یہ گانا پڑھنا ناکام رہا: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không đọc được bài hát này từ thư mục chia sẻ: %@"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由共享讀取這首歌曲失敗：%@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从共享读取这首歌曲失败：%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從共享讀取這首歌曲失敗：%@"
+          }
+        }
+      }
+    },
     "Ready to measure": {
       "localizations": {
         "am": {

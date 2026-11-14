@@ -3,6 +3,7 @@
 
 import CVespertineGuard
 import Foundation
+import os
 import SFBAudioEngine
 
 protocol PlaybackCacheReader: AnyObject, Sendable {
@@ -47,6 +48,77 @@ private final class ShareFileReader: PlaybackCacheReader, @unchecked Sendable {
         guard n >= 0 else { throw POSIXError(POSIXErrorCode(rawValue: errno) ?? .EIO) }
         data.count = n
         return data
+    }
+}
+
+/// A read of a song's file on a share failed: what the user is told, with the cause kept. SFBAudioEngine's decoders turn a failed read
+/// into "An error occurred during PCM audio decoding.", which blames the file when it is the share that failed.
+struct ShareReadFailure: LocalizedError, CustomNSError {
+    let underlying: Error
+    init(_ underlying: Error) { self.underlying = underlying }
+
+    var errorDescription: String? {
+        let reason = underlying.localizedDescription
+        return String(localized: "Reading this song from the share failed: \(reason)",
+                      comment: "A read of a song on a network share failed part way through. The placeholder is the system's reason, such as “The operation couldn’t be completed. Stale NFS file handle”.")
+    }
+    static var errorDomain: String { "org.szeremeta.vespertine.share-read" }
+    var errorCode: Int { 1 }
+    var errorUserInfo: [String: Any] { [NSUnderlyingErrorKey: underlying as NSError] }
+
+    /// The error as one log line: where it came from, its code and the system's words for it.
+    static func describe(_ error: Error) -> String {
+        let ns = error as NSError
+        var text = "domain=\(ns.domain) code=\(ns.code)"
+        if ns.domain == NSPOSIXErrorDomain, let name = errnoName(Int32(truncatingIfNeeded: ns.code)) { text += " (\(name))" }
+        if let inner = ns.userInfo[NSUnderlyingErrorKey] as? NSError { text += " underlying=\(inner.domain)/\(inner.code)" }
+        return text + " “\(ns.localizedDescription)”"
+    }
+    private static func errnoName(_ code: Int32) -> String? {
+        switch code {
+        case ESTALE: "ESTALE"
+        case EBADF: "EBADF"
+        case ENXIO: "ENXIO"
+        case EIO: "EIO"
+        case ETIMEDOUT: "ETIMEDOUT"
+        case ENOENT: "ENOENT"
+        case ECONNRESET: "ECONNRESET"
+        case ENOTCONN: "ENOTCONN"
+        case EHOSTUNREACH: "EHOSTUNREACH"
+        case ENETDOWN: "ENETDOWN"
+        case ENETRESET: "ENETRESET"
+        case EINTR: "EINTR"
+        default: nil
+        }
+    }
+
+    /// Errnos a share's open file can give while the share reconnects or is mounted again, so the same bytes may be had by waiting
+    /// (and, for the first three, by opening the file again: a handle on a dead mount never works again).
+    static let deadHandleErrnos: [Int] = [Int(ESTALE), Int(EBADF), Int(ENXIO)]
+    static let transientErrnos: [Int] = [Int(EIO), Int(EINTR), Int(ETIMEDOUT), Int(ENETDOWN), Int(ENETRESET),
+                                         Int(ENOTCONN), Int(ECONNRESET), Int(EHOSTUNREACH)] + deadHandleErrnos
+
+    /// The POSIX error inside `error` (itself or an underlying one), if any.
+    static func posixCode(of error: Error) -> Int? {
+        var cause = error as NSError
+        for _ in 0..<5 {
+            if cause.domain == NSPOSIXErrorDomain { return cause.code }
+            guard let underlying = cause.userInfo[NSUnderlyingErrorKey] as? NSError else { return nil }
+            cause = underlying
+        }
+        return nil
+    }
+
+    /// A read that may work if it is made again through a file opened afresh: what a copy may carry on from. Not a copy that was
+    /// given up on, one whose share stayed silent, a file rewritten on the server, or the local disk failing.
+    static func isRetryable(_ error: Error) -> Bool {
+        if let failure = error as? NetworkPlaybackCache.Failure {
+            if case .unexpectedEOF = failure { return true }
+            return false
+        }
+        if error is CancellationError { return false }
+        if posixCode(of: error) != nil { return true }
+        return (error as NSError).domain == NSCocoaErrorDomain && (error as NSError).code == CocoaError.fileReadUnknown.rawValue
     }
 }
 
@@ -475,6 +547,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         /// Whether a start is filling the lead of this file (it has asked to be told how many bytes are on disk).
         var isFillingLead: Bool { storage.condition.withLock { storage.progress != nil } }
         func cancel() { storage.cancel() }
+        /// The copy failed on a read that may work again (see `ShareReadFailure.isRetryable`): opens the file on the share afresh and
+        /// carries the copy on from the blocks it has. True when the copy is going again (or never failed); false when it can't be
+        /// carried on (cancelled, the share silent for too long, the file rewritten, the disk failing).
+        func resumeAfterReadFailure() -> Bool { storage.resumeAfterReadFailure() }
         /// The prefetched next song became the one being played.
         func promote() { storage.promote() }
 
@@ -482,11 +558,18 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         /// bytes to be on disk (the copy fetches what is asked for first), so a decoder can start on the first megabytes
         /// of a song and never sees an unwritten range as zeros or as the end of the file. It keeps the entry alive.
         func inputSource() -> InputSource {
-            VTCacheInputSource(url: url, length: size) { [self] offset, buffer, count in
-                guard let data = try? read(at: offset, count: count) else { return -1 }
-                data.copyBytes(to: buffer.assumingMemoryBound(to: UInt8.self), count: data.count)
-                return data.count
-            }
+            VTCacheInputSource(url: url, length: size, readReportingErrors: { [self] offset, buffer, count, failure in
+                do {
+                    let data = try read(at: offset, count: count)
+                    data.copyBytes(to: buffer.assumingMemoryBound(to: UInt8.self), count: data.count)
+                    return data.count
+                } catch {
+                    // The decoder drops the reason a read failed; the source keeps it (`lastReadError`) for whoever sees the decoder fail.
+                    log.error("Read of \(count, privacy: .public) bytes at \(offset, privacy: .public) of \(self.size, privacy: .public) from the song's copy failed: \(ShareReadFailure.describe(error), privacy: .public)")
+                    failure?.pointee = error as NSError
+                    return -1
+                }
+            })
         }
 
         func prepare(full: Bool, lead: Int64, at offset: Int64 = 0, cancelled: () -> Bool) throws {
@@ -564,6 +647,8 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var waiters = 0
         var cancelled = false
         var error: Error?
+        /// The copy lanes that have not ended (a lane ends when the copy is over, cancelled or failed). Under `condition`.
+        var activeLanes: Set<Int> = []
         var progress: (@Sendable (Int64) -> Void)?
         /// On `clock`: when the copy started.
         let startedAt: TimeInterval
@@ -640,27 +725,27 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                 catch {
                     // SMB/NFS can return a temporary POSIX failure during reconnection. Keep the local
                     // lead playing and retry the same bytes; disk-write failures are never retried here.
-                    var cause = error as NSError
-                    var transient = false
-                    for _ in 0..<5 {
-                        if cause.domain == NSPOSIXErrorDomain,
-                           [Int(EIO), Int(EINTR), Int(ETIMEDOUT), Int(ENETDOWN), Int(ENETRESET),
-                            Int(ENOTCONN), Int(ECONNRESET), Int(EHOSTUNREACH)].contains(cause.code) {
-                            transient = true; break
-                        }
-                        guard let underlying = cause.userInfo[NSUnderlyingErrorKey] as? NSError else { break }
-                        cause = underlying
+                    let code = ShareReadFailure.posixCode(of: error)
+                    guard let code, ShareReadFailure.transientErrnos.contains(code) else {
+                        log.error("Share read at \(offset, privacy: .public) failed, not retried here: \(ShareReadFailure.describe(error), privacy: .public)")
+                        throw error
                     }
-                    guard transient else { throw error }
                     // A handle on a share that was mounted again fails for ever: after a second of errors, open the file again
-                    // (every few seconds), and carry on with the new handle if it is the same size.
+                    // (every few seconds), and carry on with the new handle if it is the same size. ESTALE, EBADF and ENXIO say the
+                    // handle itself is dead, so the file is opened again at once.
+                    let handleDead = ShareReadFailure.deadHandleErrnos.contains(code)
                     let now = Date()
                     let since = failingSince ?? now
+                    if failingSince == nil {
+                        log.error("Share read at \(offset, privacy: .public) failed, retrying: \(ShareReadFailure.describe(error), privacy: .public)")
+                    }
                     failingSince = since
-                    if let reopen, now.timeIntervalSince(since) >= 1, now.timeIntervalSince(reopenedAt) >= 3 {
+                    if let reopen, handleDead || now.timeIntervalSince(since) >= 1, now.timeIntervalSince(reopenedAt) >= (handleDead ? 0.5 : 3) {
                         reopenedAt = now
-                        if let fresh = try? reopen() {
+                        do {
+                            let fresh = try reopen()
                             guard fresh.size == size else { throw Failure.unexpectedEOF }
+                            log.notice("Opened the song's file on the share again after a failed read")
                             // The dead handle is closed on the closing queue, not under the copy's lock (the engine reads it).
                             var dead = condition.withLock { () -> (any PlaybackCacheReader)? in
                                 let old = held
@@ -669,6 +754,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                             }
                             NetworkPlaybackCache.letGo(&dead)
                             continue
+                        } catch let mismatch as Failure {
+                            throw mismatch
+                        } catch {
+                            log.error("Couldn't open the song's file on the share again: \(ShareReadFailure.describe(error), privacy: .public)")
                         }
                     }
                     condition.lock()
@@ -738,6 +827,8 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                         _ = condition.wait(until: Date().addingTimeInterval(0.025))
                         claim = claimBlock(lane: lane)
                     }
+                    // Ending is decided under the same lock as the claim, so `resumeAfterReadFailure` never counts a lane that is going.
+                    if case .block = claim {} else { activeLanes.remove(lane) }
                     return claim
                 }
                 guard case .block(let block) = claim else { return }
@@ -751,7 +842,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                             (cancelled, Int64(ready.count) * Int64(chunk) < NetworkPlaybackCache.startBytes
                                 || clock() - startedAt < NetworkPlaybackCache.startSeconds)
                         }
-                        if stop { condition.withLock { _ = inFlight.remove(block) }; return }
+                        if stop { condition.withLock { _ = inFlight.remove(block); activeLanes.remove(lane) }; return }
                         let ask = beginning ? min(length - data.count, NetworkPlaybackCache.startReadBytes) : length - data.count
                         let part = try readPart(at: offset + Int64(data.count), count: ask)
                         guard !part.isEmpty, part.count <= length - data.count else { throw Failure.unexpectedEOF }
@@ -790,7 +881,11 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                 } catch {
                     condition.withLock {
                         inFlight.remove(block)
-                        if self.error == nil { self.error = error }
+                        activeLanes.remove(lane)
+                        if self.error == nil {
+                            self.error = error
+                            log.error("The song's copy stopped at block \(block, privacy: .public) of \(self.blocks, privacy: .public): \(ShareReadFailure.describe(error), privacy: .public)")
+                        }
                         condition.broadcast()
                     }
                     publishDemand()
@@ -801,13 +896,50 @@ final class NetworkPlaybackCache: @unchecked Sendable {
 
         func start() {
             // Only the copy lanes read the share. Decoders and the audio callback never do duplicate remote reads.
-            for lane in 0..<max(1, min(lanes, blocks)) {
+            condition.withLock { startLanes() }
+            publishDemand()
+        }
+
+        /// Starts a thread for each lane that isn't running. Under `condition`.
+        private func startLanes() {
+            for lane in 0..<max(1, min(lanes, blocks)) where !activeLanes.contains(lane) {
+                activeLanes.insert(lane)
                 let thread = Thread { [self] in copyLane(lane) }
                 thread.name = "Vespertine Network Copy \(lane + 1)"
                 thread.qualityOfService = .userInitiated
                 thread.start()
             }
+        }
+
+        /// See `Entry.resumeAfterReadFailure`.
+        func resumeAfterReadFailure() -> Bool {
+            let (failure, over) = condition.withLock { (error, cancelled) }
+            guard !over else { return false }
+            guard let failure else { return true }
+            guard ShareReadFailure.isRetryable(failure) else { return false }
+            // Opened outside the lock: it is a call to the share. A file of another size is another file.
+            if let reopen, let fresh = try? reopen() {
+                guard fresh.size == size else { return false }
+                var dead = condition.withLock { () -> (any PlaybackCacheReader)? in
+                    let old = held
+                    held = fresh
+                    return old
+                }
+                NetworkPlaybackCache.letGo(&dead)
+            }
+            let resumed = condition.withLock { () -> Bool in
+                guard !cancelled else { return false }
+                if error != nil {
+                    error = nil
+                    lastProgress = clock()
+                    startLanes()
+                    condition.broadcast()
+                }
+                return true
+            }
+            if resumed { log.notice("The song's copy carries on after: \(ShareReadFailure.describe(failure), privacy: .public)") }
             publishDemand()
+            return resumed
         }
     }
 }

@@ -807,6 +807,15 @@ public final class PlaybackEngine: @unchecked Sendable {
         DispatchQueue.main.async { MainActor.assumeIsolated { handler(event) } }
     }
 
+    /// A song failed: says so to the app, and writes down why (the message shown names only what the user can act on, and a failure that
+    /// ended a song used to leave no line in the log but the codec library's).
+    private func emitFailure(_ item: PlayableItem, _ error: Error) {
+        let ns = error as NSError
+        let underlying = (ns.userInfo[NSUnderlyingErrorKey] as? NSError).map { "\($0.domain)/\($0.code)" } ?? "none"
+        log.error("Song failed: domain=\(ns.domain, privacy: .public) code=\(ns.code, privacy: .public) underlying=\(underlying, privacy: .public) “\(error.localizedDescription, privacy: .public)” file=\(item.url.lastPathComponent, privacy: .private)")
+        emit(.failed(item, error.localizedDescription))
+    }
+
     // MARK: Engine thread
 
     private func runIteration() {
@@ -1407,7 +1416,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 }
                 return
             } catch {
-                emit(.failed(current, error.localizedDescription))
+                emitFailure(current, error)
                 shared.withLock { $0.snapshot.lastError = error.localizedDescription }
                 teardownDecoding()
                 candidate = songToTry(after: current, failedWith: error)
@@ -1908,7 +1917,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// Moves on when macOS has played the Atmos track out (or couldn't).
     private func checkSystemRenderer(_ session: SystemRendererSession) {
         if let failure = session.failure {
-            emit(.failed(session.item, failure.localizedDescription))
+            emitFailure(session.item, failure)
         } else if !session.finished {
             return
         }
@@ -2096,7 +2105,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         if chunk.ended {
             decoding.finished = true
             if let error = chunk.error {
-                emit(.failed(decoding.item, error.localizedDescription))
+                emitFailure(decoding.item, error)
             }
         }
         // Waiting on a share with nothing new: no work done, so the engine thread rests a moment.
@@ -2136,7 +2145,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         }
         if chunk.ended {
             decoding.finished = true
-            if let error = chunk.error { emit(.failed(decoding.item, error.localizedDescription)) }
+            if let error = chunk.error { emitFailure(decoding.item, error) }
         }
         if let crossfade, crossfade.done { handOver(crossfade, session: session) }
         return frames > 0 || !chunk.waiting || decoding.finished
@@ -2167,7 +2176,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     /// The overlap is written: the incoming song carries on alone.
     private func handOver(_ crossfade: Crossfade, session: OutputSession) {
         crossfade.flushIncoming { _ = nrt_ring_write(session.ring, $0, UInt32($1)) }
-        if let error = crossfade.incomingError { emit(.failed(crossfade.incoming.item, error.localizedDescription)) }
+        if let error = crossfade.incomingError { emitFailure(crossfade.incoming.item, error) }
         self.crossfade = nil
         decoding = crossfade.incoming
         emptyTransitions = 0
@@ -2597,7 +2606,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 retryAdvance = (finished, produced)
                 return
             } catch {
-                emit(.failed(next, error.localizedDescription))
+                emitFailure(next, error)
                 candidate = songToTry(after: next, failedWith: error)
             }
         }
@@ -2667,7 +2676,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                 teardownDecoding()
             } catch {
                 log.error("Next song couldn't start on \(pending.device.name, privacy: .public): \(error.localizedDescription, privacy: .public)")
-                emit(.failed(pending.item, error.localizedDescription))
+                emitFailure(pending.item, error)
                 if let next = songToTry(after: pending.item, failedWith: error) { start(next, at: 0, autoplay: true) }
                 else { finishQueue() }
             }

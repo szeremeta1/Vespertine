@@ -10,6 +10,10 @@
 - (NSError *)posixErrorWithCode:(NSInteger)code;
 @end
 
+@interface VTCacheInputSource ()
+@property (atomic, readwrite, nullable) NSError *lastReadError;
+@end
+
 @implementation VTCacheInputSource {
     int64_t _length;
     int64_t _offset;
@@ -17,16 +21,25 @@
     /// Where the block first answered "end of file" short of `_length` (a file cut short on the share, or a copy that ended early):
     /// the end of the file as far as any decoder is concerned. -1 until then.
     int64_t _endedAt;
-    VTCacheReadBlock _read;
+    VTCacheReadWithErrorBlock _read;
 }
 
-- (instancetype)initWithURL:(NSURL *)url length:(int64_t)length read:(VTCacheReadBlock)read {
+@synthesize lastReadError = _lastReadError;
+
+- (instancetype)initWithURL:(NSURL *)url length:(int64_t)length readReportingErrors:(VTCacheReadWithErrorBlock)read {
     if ((self = [super initWithURL:url])) {
         _length = length;
         _endedAt = -1;
         _read = [read copy];
     }
     return self;
+}
+
+- (instancetype)initWithURL:(NSURL *)url length:(int64_t)length read:(VTCacheReadBlock)read {
+    VTCacheReadBlock plain = [read copy];
+    return [self initWithURL:url length:length readReportingErrors:^NSInteger(int64_t offset, void *buffer, NSInteger count, NSError **error) {
+        return plain(offset, buffer, count);
+    }];
 }
 
 - (BOOL)openReturningError:(NSError **)error { _open = YES; _offset = 0; return YES; }
@@ -47,9 +60,17 @@
     NSInteger want = MIN((int64_t)length, MAX((int64_t)0, [self effectiveLength] - _offset));
     NSInteger got = 0;
     while (got < want) {
-        NSInteger n = _read(_offset + got, (char *)buffer + got, want - got);
+        NSError *cause = nil;
+        NSInteger n = _read(_offset + got, (char *)buffer + got, want - got, &cause);
         if (n < 0) {
-            if (error) *error = [self posixErrorWithCode:EIO];
+            NSError *failure = [self posixErrorWithCode:EIO];
+            if (cause) {
+                NSMutableDictionary *info = [failure.userInfo mutableCopy] ?: [NSMutableDictionary dictionary];
+                info[NSUnderlyingErrorKey] = cause;
+                failure = [NSError errorWithDomain:failure.domain code:failure.code userInfo:info];
+            }
+            self.lastReadError = cause ?: failure;
+            if (error) *error = failure;
             return NO;
         }
         if (n == 0) {
@@ -60,6 +81,7 @@
         got += n;
     }
     _offset += got;
+    if (self.lastReadError) self.lastReadError = nil;
     if (bytesRead) *bytesRead = got;
     return YES;
 }
