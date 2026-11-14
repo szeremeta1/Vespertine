@@ -87,13 +87,15 @@ struct PhoneTranscoder: StreamTranscoding {
 
 @MainActor
 enum RemoteStreaming {
-    static func bytes(gigabytes: Int) -> Int64 { Int64(gigabytes) * 1024 * 1024 * 1024 }
+    static func bytes(gigabytes: Int) -> Int64 { StreamCache.bytes(gigabytes: gigabytes) }
 
     /// `gigabytes`: how much the converted FLACs may take in Caches (least recently used go first).
     static func makePreparer(model: AppModel, gigabytes: Int) -> StreamPreparer? {
         let base = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first ?? FileManager.default.temporaryDirectory
-        let folder = base.appendingPathComponent("Vespertine", isDirectory: true).appendingPathComponent("Remote", isDirectory: true)
-            .appendingPathComponent("Streams", isDirectory: true)
+        // Each app copy has its own (a test build beside the real app, a run on a test library).
+        let isolated = LaunchArguments().string(forKey: "VespertineDataDirectory") != nil
+        let folder = StreamCache.folder(caches: base, bundleID: Bundle.main.bundleIdentifier,
+                                        dataDirectoryOverride: isolated ? model.settings.dataDirectory : nil)
         guard let cache = try? StreamCache(directory: folder, limitBytes: bytes(gigabytes: gigabytes)) else { return nil }
         let transcoder = PhoneTranscoder { [weak model] id in
             await MainActor.run { model?.library.tracks(ids: [id]).first?.streamItem }

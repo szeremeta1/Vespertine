@@ -113,8 +113,17 @@ public struct StreamDescriptor: Codable, Sendable, Equatable {
     public var tag: String
     /// A good read size for this stream.
     public var chunkSize: Int
+    /// For a `.flac` stream: the Mac only cut the song out of a longer lossless file (a CUE track), at the file's own rate
+    /// and depth, so the samples are the file's own. nil from a Mac that doesn't say.
+    public var cut: Bool?
+    /// The phone asked for a smaller form to keep, and this is one: the Mac brought the rate down. nil from a Mac that
+    /// doesn't say, and for a song that needed no reducing.
+    public var reduced: Bool?
 
-    public init(stream: Int, kind: StreamKind, byteSize: Int64, format: StreamFormat, frames: Int64?, tag: String, chunkSize: Int) {
+    public init(stream: Int, kind: StreamKind, byteSize: Int64, format: StreamFormat, frames: Int64?, tag: String, chunkSize: Int,
+                cut: Bool? = nil, reduced: Bool? = nil) {
+        self.cut = cut
+        self.reduced = reduced
         self.stream = stream
         self.kind = kind
         self.byteSize = byteSize

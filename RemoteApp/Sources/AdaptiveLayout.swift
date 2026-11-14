@@ -1,6 +1,7 @@
 // Layout decisions use the window, never the device model or the full screen.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 import Foundation
+import SwiftUI
 
 /// Where pieces of given sizes go when they are set left to right and wrap onto another line when the width runs out
 /// (the signal badges: never clipped, never scrolled).
@@ -123,6 +124,13 @@ nonisolated enum RemoteDestination: Hashable, Sendable {
 }
 
 nonisolated enum RemoteLayout {
+    /// How much of a song has played, 0…1, for a bar's width: never negative and never not a number (the Mac's clock can
+    /// run a moment ahead of the phone's, and a song may have no length yet), either of which SwiftUI faults on.
+    static func played(position: Double, duration: Double) -> Double {
+        guard duration > 0, duration.isFinite, position.isFinite else { return 0 }
+        return min(1, max(0, position / duration))
+    }
+
     static func usesSidebar(regularWidth: Bool, width: CGFloat) -> Bool {
         regularWidth && width >= 600
     }
@@ -136,6 +144,13 @@ nonisolated enum RemoteLayout {
         if columns { return max(0, min(520, (available - 32) * 0.48, height - 24)) }
         return max(0, min(controlsWidth(width: width), max(160, height - 440)))
     }
+    /// Lines a row's name may take: one at ordinary text sizes, as many as it needs at the accessibility sizes, where one
+    /// line cut "Albums" and "Artists" down to the same stub.
+    static func rowTitleLines(accessibilityText: Bool) -> Int? { accessibilityText ? nil : 1 }
+
+    /// The largest text the mini player follows: past it, its buttons no longer fit beside a title of any length.
+    static let miniPlayerLargestText = DynamicTypeSize.accessibility1
+
     static func albumColumns(width: CGFloat, accessibilityText: Bool) -> Int {
         let minimum: CGFloat = accessibilityText ? 240 : 160
         return max(1, Int((max(0, width - 32) + 16) / (minimum + 16)))

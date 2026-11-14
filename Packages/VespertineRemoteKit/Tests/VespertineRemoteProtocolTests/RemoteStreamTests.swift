@@ -105,6 +105,13 @@ private let fiveOne = StreamFormat(codec: "FLAC", container: "flac", sampleRate:
         #expect(try roundTrip(ServerMessage.reply(id: 3, result: .streamInfo(items: [info]))) == .reply(id: 3, result: .streamInfo(items: [info])))
     }
 
+    @Test func theMacSayingItsStreamsAreClosedSurvivesTheWire() throws {
+        #expect(try roundTrip(ServerMessage.streamsClosed(reason: "Not here.")) == .streamsClosed(reason: "Not here."))
+        #expect(try roundTrip(ServerMessage.streamsClosed(reason: nil)) == .streamsClosed(reason: nil))
+        // What an older phone already knows keeps its shape beside it.
+        #expect(try json(ServerMessage.goodbye(reason: .serverStopped)) == #"{"goodbye":{"reason":"serverStopped"}}"#)
+    }
+
     @Test func aMacOnlyTrackSaysWhy() throws {
         let info = StreamInfo(id: 1, streamable: false, kind: nil, source: fiveOne, delivered: nil,
                               macOnlyReason: "More than 8 channels", byteSize: nil, totalFrames: nil, replayGain: nil, encoderDelay: nil, endPadding: nil)

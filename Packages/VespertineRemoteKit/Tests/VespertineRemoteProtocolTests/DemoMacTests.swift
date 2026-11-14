@@ -180,6 +180,27 @@ struct DemoMacTests {
         #expect(pushes.lastQueue?.current?.track.id == ids[0])
     }
 
+    @Test func theDemoSpeaksTheWordsItIsGiven() async throws {
+        let words = DemoWords(systemDefault: "Systemstandard", builtInSpeakers: "MacBook Pro-Lautsprecher", dac: "USB-DAC", receiver: "HDMI · 8 Kanäle",
+                              speakerGroup: "Lautsprechergruppe · 2 Ausgänge", bitPerfect: "BITGENAU", sourceOnline: "ONLINE", sourceOffline: "OFFLINE")
+        let mac = DemoMac(name: "Demo", words: words) { _, _ in nil }
+        let pushes = Pushes()
+        mac.onPush = { pushes.messages.append($0) }
+        try await mac.open(timeout: .seconds(1))
+        _ = try await ask(mac, .hello(device: "demo", name: "Phone", protocolVersion: RemoteProtocol.version))
+        for _ in 0..<20 where pushes.messages.count < 3 { await Task.yield() }
+        var outputs: [OutputSummary] = []
+        for case .outputs(let state) in pushes.messages { outputs = state.outputs }
+        #expect(outputs.first?.name == "Systemstandard" && outputs.first?.detail == "MacBook Pro-Lautsprecher")
+        #expect(outputs.map(\.detail).suffix(3) == ["USB-DAC", "HDMI · 8 Kanäle", "Lautsprechergruppe · 2 Ausgänge"])
+        #expect(pushes.lastPlayer?.signal?.badge == "BITGENAU")
+        guard case .library(let overview) = try await ask(mac, .library) else { Issue.record("no library"); return }
+        #expect(Set(overview.sources.map(\.detail)).isSubset(of: ["ONLINE", "OFFLINE"]) && !overview.sources.isEmpty)
+        // Nothing of the demo's own English is left in what it says about itself.
+        #expect(!outputs.contains { $0.detail.contains("channels") || $0.detail.contains("Speaker") })
+        mac.close()
+    }
+
     @Test func refusesOnceClosed() async throws {
         let (mac, _) = try await opened()
         var closed = false

@@ -24,6 +24,12 @@ public struct SavedPairing: Codable, Sendable, Equatable, Identifiable {
     /// Where the Mac said it can be reached, the last time it was asked (`ServerInfo.addresses`): its addresses at home and
     /// its Tailscale or VPN address. This is what finds the Mac from away without anybody typing anything.
     public var advertised: [RemoteAddress]?
+    /// The Mac said it is a notebook, the last time it was asked (nil: it never said).
+    public var portable: Bool?
+
+    /// The SF Symbol that pictures a Mac: a notebook when it says it is one, else the small desktop (a music Mac is
+    /// most often one, and nothing says which desktop it is).
+    public static func symbol(portable: Bool?) -> String { portable == true ? "laptopcomputer" : "macmini" }
 
     public init(serverID: String, name: String, device: String, key: Data, pairedAt: Date = .now,
                 address: RemoteAddress? = nil, lastKnown: RemoteAddress? = nil, advertised: [RemoteAddress]? = nil) {
@@ -63,6 +69,7 @@ public struct SavedPairing: Codable, Sendable, Equatable, Identifiable {
     public func noting(server: ServerInfo) -> SavedPairing {
         var copy = self
         if !server.name.isEmpty { copy.name = server.name }
+        if let portable = server.portable { copy.portable = portable }
         if let told = server.addresses, !told.isEmpty {
             copy.advertised = Array(told.filter { $0.port != nil }.prefix(LocalAddresses.maximumAdvertised))
         }

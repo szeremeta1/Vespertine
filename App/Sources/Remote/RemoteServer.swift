@@ -8,8 +8,10 @@
 //
 
 import Foundation
+import IOKit.ps
 import Network
 import Observation
+import OSLog
 import SystemConfiguration
 import VespertineRemoteProtocol
 import VespertineStreamServer
@@ -51,6 +53,11 @@ final class RemoteServer {
         case system
     }
     @ObservationIgnored private var portPlan: PortPlan?
+    private static let log = Logger(subsystem: "org.szeremeta.vespertine.player", category: "remote")
+    @ObservationIgnored private var advertising = AdvertisingWatch()
+    /// The listener is up, but Bonjour announces it nowhere: phones on this network can't find this Mac by themselves
+    /// (macOS hasn't let Vespertine onto the local network, usually).
+    private(set) var notAnnounced = false
     @ObservationIgnored private var restart: Task<Void, Never>?
     @ObservationIgnored private let preferredPort: UInt16
     @ObservationIgnored private var clients: [ObjectIdentifier: RemoteClient] = [:]
@@ -82,6 +89,16 @@ final class RemoteServer {
         web.onPortChange = { [weak self] port in self?.webPort = port }
     }
 
+    /// A notebook: it has a battery of its own (a UPS on a desktop is not one).
+    static let isPortable: Bool = {
+        guard let info = IOPSCopyPowerSourcesInfo()?.takeRetainedValue(),
+              let sources = IOPSCopyPowerSourcesList(info)?.takeRetainedValue() as? [CFTypeRef] else { return false }
+        return sources.contains { source in
+            let facts = IOPSGetPowerSourceDescription(info, source)?.takeUnretainedValue() as? [String: Any]
+            return facts?[kIOPSTypeKey] as? String == kIOPSInternalBatteryType
+        }
+    }()
+
     var isRunning: Bool { if case .running = status { true } else { false } }
 
     var serverInfo: ServerInfo { serverInfo(protocolVersion: RemoteProtocol.version) }
@@ -90,7 +107,7 @@ final class RemoteServer {
     func serverInfo(protocolVersion: Int) -> ServerInfo {
         ServerInfo(name: Self.computerName, serverID: store.serverID,
                    appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "",
-                   protocolVersion: protocolVersion, addresses: reachableAddresses)
+                   protocolVersion: protocolVersion, addresses: reachableAddresses, portable: Self.isPortable)
     }
 
     /// Where a phone can reach this Mac right now (nil while the server isn't listening): its addresses on this network and
@@ -142,12 +159,15 @@ final class RemoteServer {
     func setStreamEnabled(_ on: Bool) {
         store.streamEnabled = on
         if !on, let streams { Task { await streams.closeEverything(); await refreshStreaming() } }
+        if !on { for client in clients.values { client.streamsClosed(.off) } }
     }
 
     /// Lets a paired phone play songs itself, or stops it (its open streams close at once).
     func setMayStream(_ device: String, _ may: Bool) {
         store.setMayStream(device, may)
         if !may, let streams { Task { await streams.closeAll(clientsOf: device); await refreshStreaming() } }
+        // The phone is told, so the song it had already fetched stops too.
+        if !may { for client in clients.values where client.device == device { client.streamsClosed(.thisDevice) } }
     }
 
     func setStreamCache(gigabytes: Int) {
@@ -212,6 +232,8 @@ final class RemoteServer {
         listener?.cancel()
         listener = nil
         portPlan = nil
+        advertising.stopped()
+        notAnnounced = false
         web.stop()
         pushTask?.cancel()
         pushTask = nil
@@ -252,6 +274,7 @@ final class RemoteServer {
             RemoteProtocol.TXTKey.appVersion: info.appVersion,
         ])
         if let port { record[RemoteProtocol.TXTKey.port] = String(port) }
+        if info.portable == true { record[RemoteProtocol.TXTKey.portable] = "1" }
         return record
     }
 
@@ -281,6 +304,20 @@ final class RemoteServer {
         listener.stateUpdateHandler = { [weak self] state in
             MainActor.assumeIsolated { self?.listenerChanged(state, listener) }
         }
+        advertising.stopped()
+        listener.serviceRegistrationUpdateHandler = { [weak self] change in
+            let added: Bool
+            switch change {
+            case .add: added = true
+            case .remove: added = false
+            @unknown default: return
+            }
+            MainActor.assumeIsolated {
+                guard let self, listener === self.listener else { return }
+                self.advertising.announced(added: added)
+                self.checkAnnounced()
+            }
+        }
         listener.newConnectionHandler = { [weak self] connection in
             MainActor.assumeIsolated { self?.accept(connection) }
         }
@@ -291,9 +328,18 @@ final class RemoteServer {
             pushTask = Task { [weak self] in
                 while !Task.isCancelled {
                     self?.push()
+                    self?.checkAnnounced()
                     try? await Task.sleep(for: .milliseconds(250))
                 }
             }
+        }
+    }
+
+    private func checkAnnounced() {
+        let silent = listener != nil && advertising.isSilent()
+        if silent != notAnnounced {
+            notAnnounced = silent
+            if silent { Self.log.error("The remote listener is up, but Bonjour has not announced it: phones on this network won't find this Mac by themselves.") }
         }
     }
 
@@ -305,6 +351,7 @@ final class RemoteServer {
             portPlan = .held(port, retries: 0)
             if port != 0 { store.setPort(port) }
             status = .running(port: port)
+            advertising.listening()
         case .failed(let error):
             self.listener = nil
             listener.cancel()
@@ -588,6 +635,24 @@ final class RemoteClient {
         server?.ended(self, handshakeFailed: !becameReady)
     }
 
+    enum StreamsClosed { case off, thisDevice }
+
+    /// Tells a phone that plays songs itself to stop: nothing more comes from this Mac. Only a phone that speaks the
+    /// stream protocol is told.
+    func streamsClosed(_ why: StreamsClosed) {
+        guard isSignedIn, StreamNotice.tells(protocolVersion: protocolVersion) else { return }
+        send(.streamsClosed(reason: ReplyWords.speaking(language) {
+            switch why {
+            case .off: ReplyWords.stream(.streamingOff)
+            case .thisDevice: Self.notThisDevice
+            }
+        }))
+    }
+
+    private static var notThisDevice: String {
+        String(localized: "This Mac doesn’t let this device play songs itself. Allow it in Vespertine › Settings › Remote on the Mac.", bundle: ReplyWords.bundle, comment: "Remote control: this phone was switched off under Stream to Phones on the Mac.")
+    }
+
     func close(saying reason: GoodbyeReason) {
         guard !closed else { return }
         send(.goodbye(reason: reason)) { [weak self] in self?.connection.cancel() }
@@ -673,9 +738,7 @@ final class RemoteClient {
             return reply(message.id, .failed(reason: ReplyWords.speaking(language) { ReplyWords.stream(.streamingOff) }))
         }
         guard let device, server.store.mayStream(device) else {
-            return reply(message.id, .failed(reason: ReplyWords.speaking(language) {
-                String(localized: "This Mac doesn’t let this device play songs itself. Allow it in Vespertine › Settings › Remote on the Mac.", bundle: ReplyWords.bundle, comment: "Remote control: this phone was switched off under Stream to Phones on the Mac.")
-            }))
+            return reply(message.id, .failed(reason: ReplyWords.speaking(language) { Self.notThisDevice }))
         }
         guard let preparer = server.streamPreparer else {
             return reply(message.id, .failed(reason: ReplyWords.speaking(language) {

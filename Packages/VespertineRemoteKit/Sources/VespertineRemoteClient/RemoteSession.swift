@@ -70,6 +70,9 @@ public final class RemoteSession {
 
     /// How this phone introduces itself (shown in the Mac's list of paired phones).
     @ObservationIgnored public var clientName: String
+    /// The Mac closed this phone's streams and won't open more (it was told to stop sending songs here, or this phone was
+    /// removed from it), with its words when it gave some.
+    @ObservationIgnored public var onStreamsClosed: (@MainActor (String?) -> Void)?
     /// Called once signed in, with the address the Mac answered at (to remember for next time).
     @ObservationIgnored public var onConnected: (@MainActor (RemoteRoute.Kind?, RemoteAddress?) -> Void)?
     /// The language this phone shows, told to the Mac after signing in so its refusals come back in it (nil: not told).
@@ -340,9 +343,12 @@ public final class RemoteSession {
             volume.reported(state.volume.level)
         case .queue(let state): queue = state
         case .outputs(let state): outputs = state
+        case .streamsClosed(let reason): onStreamsClosed?(reason)
         case .goodbye(let reason):
             switch reason {
-            case .notPaired, .deviceRemoved: setPhase(.unpaired)
+            case .notPaired, .deviceRemoved:
+                setPhase(.unpaired)
+                onStreamsClosed?(nil)
             case .protocolMismatch: setPhase(.incompatible)
             case .serverStopped: setPhase(.unreachable(""))
             }

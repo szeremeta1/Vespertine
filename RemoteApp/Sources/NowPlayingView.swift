@@ -177,7 +177,7 @@ struct NowPlayingView: View {
     private var scrubber: some View {
         TimelineView(.periodic(from: .now, by: 0.5)) { context in
             let duration = max(player?.duration ?? 0, 0)
-            let position = scrubbing ?? player?.expectedPosition(at: context.date) ?? 0
+            let position = max(0, scrubbing ?? player?.expectedPosition(at: context.date) ?? 0)
             VStack(spacing: 2) {
                 Slider(value: Binding(get: { min(position, duration) }, set: { scrubbing = $0 }),
                        in: 0...max(duration, 1), onEditingChanged: { editing in
@@ -200,6 +200,7 @@ struct NowPlayingView: View {
                 .accessibilityHidden(true)
             }
         }
+        .playbackDirection()
     }
 
     private var transport: some View {
@@ -222,6 +223,7 @@ struct NowPlayingView: View {
         .buttonStyle(.plain)
         .disabled(!session.canControl)
         .opacity(session.canControl ? 1 : 0.5)
+        .playbackDirection()
     }
 
     private var modes: some View {

@@ -224,7 +224,7 @@ struct KeptListPage: View {
                         if !list.subtitle.isEmpty { Text(list.subtitle).foregroundStyle(Palette.text2) }
                         FlowLayout(spacing: 6, lineSpacing: 6, centered: true) {
                             Chip(text: KeptListsView.count(keeper.progress(of: id)))
-                            if list.smaller { Chip(text: String(localized: "SMALLER COPIES", comment: "Chip on a kept album: its songs were kept in the smaller form.")) }
+                            if keeper.store.madeSmaller(id) { Chip(text: String(localized: "SMALLER COPIES", comment: "Chip on a kept album: its songs were kept in the smaller form.")) }
                         }
                         HStack {
                             Button { PlayTarget.shared.playKept(list.tracks, startAt: 0, shuffled: false, session: session) } label: {

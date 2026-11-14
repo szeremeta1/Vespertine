@@ -37,8 +37,20 @@ Added since, all additive (no version bump; an older peer ignores or refuses the
   30 that the line is dead. An older Mac answers `.failed`, which proves the line just as well.
 - `setLanguage(code)`: sent after `welcome`. The Mac then words its refusals ("Stream to Phones is off…") in the phone's language when it
   has it (`ReplyWords`), otherwise in its own.
+- `StreamDescriptor.cut` and `.reduced`: `cut` is true when a conversion only cut a CUE track out of a lossless file (same rate, no bits
+  dropped), so the phone says "cut on the Mac" rather than "converted". `reduced` is true when a song asked for in its smaller form was
+  really brought down; a kept album shows SMALLER COPIES only when one of its songs was.
+- `ServerMessage.streamsClosed(reason)`: sent when Stream to Phones, or this phone's own permission, is turned off. The phone stops what
+  it plays from the Mac at once, the song it had fetched ahead included, and removes its stream files; songs kept on the phone play on.
+  Only sent to a connection on protocol 2; an older phone would pass over it anyway.
+- `ServerInfo.portable` and the Bonjour TXT key `nb`: the Mac is a notebook, so the phone pictures it as one.
+- Hi-Res in the album filter means 88.2 kHz and up (`AlbumFilter.countsAsHiRes`), as the Hi-Res smart playlist does.
+- `albumTracks` lists an album whole when its "copies" have no song in common (a stereo album with one surround song is not two copies).
 
 ## Finding the Mac (`RemoteSession`)
+
+If the listener is up but Bonjour has announced it nowhere after 8 seconds (`AdvertisingWatch`; macOS keeps an app off the local network
+until it is allowed under Privacy & Security › Local Network), Settings › Remote says so and the log has a line under category `remote`.
 
 Once paired, the phone tries every way it knows at once: Bonjour on this network, the address it last used, each advertised address, and a
 typed one if there is one. Nearby routes start first (others wait 150 to 350 ms, or less if everything ahead of them has failed), the first
@@ -71,7 +83,7 @@ to spare while a song changes; opening a fifth closes the oldest).
 
 ## Cache and safety
 
-Conversions are cached in `~/Library/Caches/Vespertine/Remote/Streams` (8 GB, least recently used out first, never a file a phone is reading, kept across restarts
+Conversions are cached in `~/Library/Caches/Vespertine/Remote/Streams` (a build with another bundle identifier uses its identifier in place of `Vespertine`, and a run with `-VespertineDataDirectory` keeps them in `Remote Streams` inside that directory, so app copies never share them; 8 GB, least recently used out first, never a file a phone is reading, kept across restarts
 with a small metadata file beside each). One conversion runs at a time. The library files are only ever read. Opened files are closed with the connection.
 
 ## The phone's side (`VespertinePhonePlayer`)

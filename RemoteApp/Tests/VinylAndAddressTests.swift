@@ -137,3 +137,16 @@ import VespertineRemoteProtocol
         for text in words.dropFirst() { #expect(text.contains("Studio Mac")) }
     }
 }
+
+@MainActor @Suite struct WaitingForTheMac {
+    @Test func aMacThatJustStoppedAnsweringIsWaitedForBeforeAnythingIsCalledWrong() {
+        #expect(ConnectionBanner.waitsQuietly(.notAnswering, patient: true))
+        #expect(ConnectionBanner.waitsQuietly(.notOnThisNetwork, patient: true))
+        #expect(!ConnectionBanner.waitsQuietly(.notAnswering, patient: false))
+        #expect(ConnectionBanner.patience == .seconds(10))
+    }
+
+    @Test func thisDeviceBeingOfflineIsSaidAtOnce() {
+        #expect(!ConnectionBanner.waitsQuietly(.offline, patient: true))
+    }
+}

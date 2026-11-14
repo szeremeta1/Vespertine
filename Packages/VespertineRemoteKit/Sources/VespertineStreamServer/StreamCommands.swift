@@ -56,3 +56,9 @@ extension StreamPreparer {
         }
     }
 }
+
+/// Who is told when the Mac stops sending songs.
+public enum StreamNotice {
+    /// A phone that speaks the stream protocol; an older one never played songs itself and doesn't know the message.
+    public static func tells(protocolVersion: Int) -> Bool { protocolVersion >= RemoteProtocol.streamVersion }
+}

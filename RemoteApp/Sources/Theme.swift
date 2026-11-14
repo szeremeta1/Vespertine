@@ -24,11 +24,17 @@ enum Palette {
     static let brassGradient = LinearGradient(colors: [Color(hex: 0xE7CD98), Color(hex: 0xC8A66A)], startPoint: .top, endPoint: .bottom)
 
     private static func adaptive(light: UInt32, dark: UInt32) -> Color {
-        Color(uiColor: UIColor { traits in
+        Color(uiColor: dynamic(light: light, dark: dark))
+    }
+
+    /// A colour for each appearance. Whoever draws asks for it, and SwiftUI draws animated transitions on a thread of its
+    /// own: the choice must not belong to the main actor (it did, by the app's default, and that stopped the app).
+    nonisolated static func dynamic(light: UInt32, dark: UInt32) -> UIColor {
+        UIColor { @Sendable traits in
             let h = traits.userInterfaceStyle == .dark ? dark : light
             return UIColor(red: CGFloat((h >> 16) & 255) / 255, green: CGFloat((h >> 8) & 255) / 255,
                            blue: CGFloat(h & 255) / 255, alpha: 1)
-        })
+        }
     }
 }
 
@@ -62,6 +68,10 @@ extension View {
     /// at the pane's edge while the readable content is centred.
     func screenTitleStyle() -> some View { modifier(ScreenTitleStyle()) }
 
+    /// Playback controls and a song's timeline read left to right in every language, as Apple's guidelines ask: in Arabic
+    /// and Hebrew "next" still points right and time still runs from the left.
+    func playbackDirection() -> some View { environment(\.layoutDirection, .leftToRight) }
+
     /// The app's background behind a screen's content.
     func obsidianBackground() -> some View {
         background(Palette.base.ignoresSafeArea())
@@ -69,7 +79,7 @@ extension View {
 
     /// A list drawn on obsidian, with surface-coloured rows.
     func obsidianList() -> some View {
-        scrollContentBackground(.hidden).background(Palette.base.ignoresSafeArea())
+        scrollContentBackground(.hidden).background(Palette.base.ignoresSafeArea()).clearsMiniPlayer()
     }
 }
 
@@ -116,7 +126,7 @@ struct Chip: View {
 
 /// Lays its pieces out left to right and wraps them onto more lines when they don't fit: the signal badges stay whole on
 /// a narrow screen and at large text sizes.
-struct FlowLayout: Layout {
+nonisolated struct FlowLayout: Layout {
     var spacing: CGFloat = 6
     var lineSpacing: CGFloat = 6
     /// Each line in the middle (under a centred title).

@@ -8,6 +8,43 @@
 import Foundation
 import VespertineRemoteProtocol
 
+/// What the demo's Mac says in words, as a real Mac says them in its own language. The demo's names (its outputs, its
+/// albums) are names and stay as they are.
+public struct DemoWords: Sendable, Equatable {
+    public var systemDefault: String
+    public var builtInSpeakers: String
+    public var dac: String
+    public var receiver: String
+    public var speakerGroup: String
+    public var bitPerfect: String
+    public var sourceOnline: String
+    public var sourceOffline: String
+
+    public init(systemDefault: String, builtInSpeakers: String, dac: String, receiver: String, speakerGroup: String, bitPerfect: String,
+                sourceOnline: String, sourceOffline: String) {
+        self.systemDefault = systemDefault
+        self.builtInSpeakers = builtInSpeakers
+        self.dac = dac
+        self.receiver = receiver
+        self.speakerGroup = speakerGroup
+        self.bitPerfect = bitPerfect
+        self.sourceOnline = sourceOnline
+        self.sourceOffline = sourceOffline
+    }
+
+    /// In the language the app shows.
+    public static var localized: DemoWords {
+        DemoWords(systemDefault: String(localized: "System Default", comment: "Demo: the name of the Mac's default sound output."),
+                  builtInSpeakers: String(localized: "MacBook Pro Speakers", comment: "Demo: what the Mac's default output is right now."),
+                  dac: String(localized: "USB DAC · 44.1–768 kHz · DSD512", comment: "Demo: a USB DAC's description in the outputs list: kind, sample rates, highest DSD rate."),
+                  receiver: String(localized: "HDMI · 8 channels · 32–192 kHz", comment: "Demo: an HDMI receiver's description in the outputs list."),
+                  speakerGroup: String(localized: "Speaker group · 2 outputs", comment: "Demo: a group of two outputs playing as one, in the outputs list."),
+                  bitPerfect: String(localized: "BIT-PERFECT", comment: "Demo: the Mac's badge when the output gets the song's samples unchanged. Keep it short, in capitals where the script has them."),
+                  sourceOnline: String(localized: "REFERENCED IN PLACE · ONLINE · SCANNED 2 HOURS AGO", comment: "Demo: a music folder's state on the Mac. Capitals where the script has them."),
+                  sourceOffline: String(localized: "REFERENCED IN PLACE · OFFLINE · SCANNED LAST WEEK", comment: "Demo: a disconnected music folder's state on the Mac. Capitals where the script has them."))
+    }
+}
+
 @MainActor
 public final class DemoMac: RemoteChannel {
     public static let serverID = "vespertine-demo"
@@ -56,15 +93,19 @@ public final class DemoMac: RemoteChannel {
     private var isOpen = false
     private var clock: Task<Void, Never>?
 
-    public init(name: String, appVersion: String = "1.1.0", artwork: @escaping @MainActor (String, Int) -> Data?) {
+    private let words: DemoWords
+
+    /// `words`: what a real Mac would say in its own language (output descriptions, the signal badge, a source's state).
+    public init(name: String, appVersion: String = "1.1.0", words: DemoWords = .localized, artwork: @escaping @MainActor (String, Int) -> Data?) {
         info = ServerInfo(name: name, serverID: Self.serverID, appVersion: appVersion)
         self.artwork = artwork
+        self.words = words
         makeLibrary()
         outputs = [
-            OutputSummary(uid: nil, name: "System Default", detail: "MacBook Pro Speakers", kind: .systemDefault, selected: false, ready: true),
-            OutputSummary(uid: "demo-dac", name: "Desk DAC", detail: "USB DAC · 44.1–768 kHz · DSD512", kind: .device, selected: true, ready: true),
-            OutputSummary(uid: "demo-receiver", name: "Living Room Receiver", detail: "HDMI · 8 channels · 32–192 kHz", kind: .device, selected: false, ready: true),
-            OutputSummary(uid: "demo-group", name: "Bar", detail: "Speaker group · 2 outputs", kind: .speakerGroup, selected: false, ready: false),
+            OutputSummary(uid: nil, name: words.systemDefault, detail: words.builtInSpeakers, kind: .systemDefault, selected: false, ready: true),
+            OutputSummary(uid: "demo-dac", name: "Desk DAC", detail: words.dac, kind: .device, selected: true, ready: true),
+            OutputSummary(uid: "demo-receiver", name: "Living Room Receiver", detail: words.receiver, kind: .device, selected: false, ready: true),
+            OutputSummary(uid: "demo-group", name: "Bar", detail: words.speakerGroup, kind: .speakerGroup, selected: false, ready: false),
         ]
         if let first = albums.first {
             load(first.tracks, startAt: 0)
@@ -434,7 +475,7 @@ public final class DemoMac: RemoteChannel {
         let output = outputs.first(where: \.selected)
         let format = current?.track.format ?? ""
         let signal = current.map { _ in
-            SignalSummary(bitPerfect: true, badge: "BIT-PERFECT", deviceFormat: Self.deviceFormat(for: format), exclusive: true)
+            SignalSummary(bitPerfect: true, badge: words.bitPerfect, deviceFormat: Self.deviceFormat(for: format), exclusive: true)
         }
         return PlayerState(
             playback: playback, loading: false,
@@ -473,7 +514,7 @@ public final class DemoMac: RemoteChannel {
     private var sources: [SourceSummary] {
         sourceNames.map { id, name, kind in
             SourceSummary(id: id, name: name, kind: kind, online: kind != .external, scanning: false, albumCount: albums.filter { $0.source == id }.count,
-                          detail: kind == .external ? "REFERENCED IN PLACE · OFFLINE · SCANNED LAST WEEK" : "REFERENCED IN PLACE · ONLINE · SCANNED 2 HOURS AGO")
+                          detail: kind == .external ? words.sourceOffline : words.sourceOnline)
         }
     }
 

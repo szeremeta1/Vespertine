@@ -70,7 +70,14 @@ public final class PhonePlayback {
     public private(set) var preparing: (entry: String, progress: Double?)?
     /// The last thing that went wrong, in words.
     public private(set) var notice: String?
-    public private(set) var position: Double = 0
+    /// Where the song was when that last changed otherwise than by playing on (`positionAt`): see `PositionAnchor`.
+    public var position: Double { anchor.position }
+    public var positionAt: Date { anchor.at }
+    /// Where the song is this instant.
+    public var livePosition: Double { player.state == .playing || player.state == .paused ? player.position : anchor.position }
+    public private(set) var anchor = PositionAnchor()
+    private var advancing: Bool { player.state == .playing && !player.isBuffering }
+    private func place(_ seconds: Double) { anchor.place(seconds, moving: advancing) }
 
     /// How long to wait for a conversion on the Mac, and how often to ask again.
     @ObservationIgnored public var preparingTimeout: Duration = .seconds(600)
@@ -142,6 +149,7 @@ public final class PhonePlayback {
 
     public convenience init(session: RemoteSession, player: PhonePlayer, cacheDirectory: URL) {
         self.init(client: PhoneStreamClient(session: session), player: player, cacheDirectory: cacheDirectory)
+        session.onStreamsClosed = { [weak self] reason in self?.cutOff(saying: reason) }
     }
 
     /// Playing, or about to: a song that was started counts from the tap, while its stream is still being opened.
@@ -180,7 +188,7 @@ public final class PhonePlayback {
         followingEntry = nil
         stream = nil
         notice = nil
-        position = 0
+        place(0)
         release(keeping: [entry.id])
         loading = Task { [weak self] in
             guard let self else { return }
@@ -324,7 +332,7 @@ public final class PhonePlayback {
     }
 
     private func finished() {
-        position = 0
+        place(0)
         switch queue.advance() {
         case .start(let entry): start(entry)
         case .restart, .end:
@@ -384,13 +392,14 @@ public final class PhonePlayback {
             return
         }
         do { try player.play() } catch { notice = Self.words(error, title: nowPlaying?.track.title ?? "") }
+        place(player.position)
         startTicker()
     }
 
     public func pause() {
         if loading != nil { startsPlaying = false }
         player.pause()
-        position = player.position
+        place(player.position)
     }
 
     public func next() {
@@ -408,7 +417,7 @@ public final class PhonePlayback {
     public func seek(to seconds: Double) {
         do {
             try player.seek(to: seconds)
-            position = player.position
+            place(player.position)
         } catch {
             notice = Self.words(error, title: nowPlaying?.track.title ?? "")
         }
@@ -426,7 +435,30 @@ public final class PhonePlayback {
         preparing = nil
         decoding = nil
         followingEntry = nil
-        position = 0
+        place(0)
+    }
+
+    /// The Mac won't send songs here any more: whatever came from it stops now, the song fetched ahead included. A song kept
+    /// on this device plays on (it is the phone's own), with nothing from the Mac lined up after it.
+    public func cutOff(saying reason: String?) {
+        let fromMac = Set(open.filter { $0.value.stream != nil }.keys).union(opening.keys)
+        let heard = [nowPlaying?.id, decoding].compactMap { $0 }
+        let wasBusy = loading != nil || heard.contains(where: fromMac.contains)
+        guard wasBusy || !fromMac.isEmpty else { return }
+        if wasBusy {
+            stop()
+        } else {
+            following?.cancel()
+            player.setFollowing(nil)
+            followingEntry = nil
+            release(keeping: Set(open.filter { $0.value.stream == nil }.keys))
+        }
+        // What had arrived whole is given up too.
+        try? FileManager.default.removeItem(at: cacheDirectory)
+        if wasBusy {
+            notice = reason.flatMap { $0.isEmpty ? nil : $0 }
+                ?? String(localized: "The Mac stopped sending songs to this device.", comment: "Phone player: playing here was turned off on the Mac while a song from it played.")
+        }
     }
 
     // MARK: Editing the queue
@@ -454,8 +486,8 @@ public final class PhonePlayback {
     public func tick() {
         player.tick()
         if player.state == .playing || player.state == .paused {
-            let now = player.position
-            if abs(now - position) > 0.01 { position = now }
+            var next = anchor
+            if next.read(player.position, moving: advancing) { anchor = next }
         }
     }
 }

@@ -113,6 +113,13 @@ public final class KeptStore {
         return KeptProgress(done: list.tracks.filter { $0.id.map { songs[$0] != nil } ?? false }.count, total: list.tracks.count)
     }
 
+    /// Whether a list's songs really are smaller copies: it was kept that way, and the Mac brought at least one of them down.
+    /// A list whose songs needed nothing done to them is not, whatever was asked.
+    public func madeSmaller(_ id: String) -> Bool {
+        guard let list = list(id), list.smaller else { return false }
+        return list.tracks.contains { $0.id.flatMap { songs[$0]?.descriptor.reduced } == true }
+    }
+
     /// The songs of kept lists whose files aren't here yet, in the order they were asked for, each with whether its list
     /// asked for the smaller form.
     public var missing: [(track: TrackSummary, smaller: Bool)] {

@@ -7,6 +7,7 @@
 import Foundation
 import Testing
 import VespertineRemoteProtocol
+import VespertinePhonePlayer
 @testable import VespertineStreamServer
 
 private func facts(_ ext: String, codec: String? = nil, rate: Double = 44_100, depth: Int? = 16, channels: Int = 2, dsd: Bool = false,
@@ -174,5 +175,50 @@ private func facts(_ ext: String, codec: String? = nil, rate: Double = 44_100, d
         #expect(said.2 == "DE")
         // Outside it, English again.
         #expect(StreamPreparer.refusalWhenOff == StreamRefusal.streamingOff.english)
+    }
+}
+
+@Suite struct ReducedForKeeping {
+    @Test func onlyASongBroughtDownForKeepingIsReduced() {
+        // Above 48 kHz and lossless: brought down.
+        #expect(StreamPlanner.plan(facts("flac", rate: 96_000, depth: 24), maxSampleRate: 48_000, smaller: true).reduced)
+        #expect(StreamPlanner.plan(facts("flac", rate: 88_200, depth: 24, region: true), maxSampleRate: 48_000, smaller: true).reduced)
+        // CD quality, lossy, or not asked: sent as it would be anyway.
+        #expect(!StreamPlanner.plan(facts("flac"), maxSampleRate: 48_000, smaller: true).reduced)
+        #expect(!StreamPlanner.plan(facts("mp3", lossless: false), maxSampleRate: 48_000, smaller: true).reduced)
+        #expect(!StreamPlanner.plan(facts("flac", rate: 96_000, depth: 24), maxSampleRate: nil).reduced)
+        #expect(!StreamPlanner.plan(facts("flac", rate: 96_000, depth: 24), maxSampleRate: 48_000).reduced)
+    }
+}
+
+@Suite struct CutNotConverted {
+    @Test func aCueTrackOfALosslessFileIsOnlyCut() {
+        #expect(StreamPlanner.plan(facts("flac", region: true), maxSampleRate: nil).cutOnly)
+        #expect(StreamPlanner.plan(facts("flac", rate: 96_000, depth: 24, region: true), maxSampleRate: nil).cutOnly)
+        // An APE image is decoded by the Mac, and its samples still arrive as they are.
+        #expect(StreamPlanner.plan(facts("ape", region: true, macDecoder: true), maxSampleRate: nil).cutOnly)
+    }
+
+    @Test func anythingMoreThanACutIsAConversion() {
+        // A whole file that needed converting, a lossy source, DSD, a rate brought down, bits dropped.
+        #expect(!StreamPlanner.plan(facts("wv", macDecoder: true), maxSampleRate: nil).cutOnly)
+        #expect(!StreamPlanner.plan(facts("mp3", lossless: false, region: true), maxSampleRate: nil).cutOnly)
+        #expect(!StreamPlanner.plan(facts("dsf", rate: 2_822_400, depth: 1, dsd: true, region: true), maxSampleRate: nil).cutOnly)
+        #expect(!StreamPlanner.plan(facts("flac", rate: 192_000, depth: 24, channels: 6, region: true), maxSampleRate: 48_000).cutOnly)
+        #expect(!StreamPlanner.plan(facts("wav", depth: 32, region: true), maxSampleRate: nil).cutOnly)
+        // A song sent as its own file is neither.
+        #expect(!StreamPlanner.plan(facts("flac"), maxSampleRate: nil).cutOnly)
+    }
+
+    @Test func thePhoneSaysCutOnlyWhenTheMacDoes() throws {
+        let format = StreamFormat(codec: "FLAC", container: "flac", sampleRate: 44_100, bitDepth: 16, channels: 2, channelLabels: nil, lossless: true)
+        let cut = StreamDescriptor(stream: 1, kind: .flac, byteSize: 1, format: format, frames: 1, tag: "t", chunkSize: 1, cut: true)
+        let plain = StreamDescriptor(stream: 1, kind: .flac, byteSize: 1, format: format, frames: 1, tag: "t", chunkSize: 1)
+        #expect(PhoneSignal(stream: cut, route: nil).cut)
+        #expect(!PhoneSignal(stream: plain, route: nil).cut)
+        // An older Mac's descriptor has no such field, and an older phone ignores it.
+        let old = try JSONDecoder().decode(StreamDescriptor.self, from: JSONEncoder().encode(plain))
+        #expect(old.cut == nil)
+        #expect(!String(decoding: try JSONEncoder().encode(plain), as: UTF8.self).contains("cut"))
     }
 }

@@ -35,6 +35,8 @@ private final class KeepingMac: @unchecked Sendable {
     private var reads = 0
     var files: [Int64: Data] = [:]
     var refused: Set<Int64> = []
+    /// Songs the Mac brings down when asked for the smaller form.
+    var bringsDown: Set<Int64> = []
 
     var opened: [Int64] { lock.withLock { _opened } }
     var rates: [Double?] { lock.withLock { _rates } }
@@ -61,7 +63,8 @@ private final class KeepingMac: @unchecked Sendable {
                 _opened.append(id)
                 _rates.append(rate)
                 return .streamOpened(StreamDescriptor(stream: next, kind: .original, byteSize: Int64(data.count), format: Self.format(), frames: nil,
-                                                      tag: "tag-\(id)", chunkSize: 1000))
+                                                      tag: "tag-\(id)", chunkSize: 1000,
+                                                      reduced: rate == nil ? nil : bringsDown.contains(id)))
             }
         }, read: { [self] stream, offset, length in
             let data: Data? = lock.withLock {
@@ -198,6 +201,25 @@ private func bytes(_ id: Int64, count: Int = 3500) -> Data { Data((0..<count).ma
         #expect(mac.rates == [48_000, nil])
     }
 
+    @Test func anAlbumIsSmallerCopiesOnlyWhenTheMacBroughtSomethingDown() async throws {
+        let (keeper, mac, directory) = try made([1, 2, 3, 4])
+        mac.bringsDown = [2]
+        // Asked for smaller, and one song came down: smaller copies.
+        keeper.keep(album([1, 2], smaller: true))
+        // Asked for smaller, and nothing needed it: not smaller copies.
+        keeper.keep(album([3], id: "album:b", smaller: true))
+        // Not asked.
+        keeper.keep(album([4], id: "album:c"))
+        try await wait { keeper.isIdle }
+        #expect(keeper.store.madeSmaller("album:a"))
+        #expect(!keeper.store.madeSmaller("album:b"))
+        #expect(!keeper.store.madeSmaller("album:c"))
+        #expect(!keeper.store.madeSmaller("album:gone"))
+        // Still so when the app opens again.
+        let again = try KeptStore(directory: directory)
+        #expect(again.madeSmaller("album:a") && !again.madeSmaller("album:b"))
+    }
+
     @Test func fetchingWaitsWhileThePhoneHoldsBack() async throws {
         let (keeper, mac, _) = try made([1])
         var reason: String? = "Playing over cellular data is off."
@@ -209,6 +231,73 @@ private func bytes(_ id: Int64, count: Int = 3500) -> Data { Data((0..<count).ma
         keeper.resume()
         try await wait { keeper.isIdle }
         #expect(keeper.store.kept(1) != nil && keeper.notice == nil)
+    }
+
+    /// A short real WAV file: the player has to open it.
+    private func tone(seconds: Double = 0.5) throws -> Data {
+        let frames = AVAudioFrameCount(seconds * 44_100)
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("kept-\(UUID()).wav")
+        defer { try? FileManager.default.removeItem(at: url) }
+        do {
+            let settings: [String: Any] = [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: 44_100.0, AVNumberOfChannelsKey: 2,
+                                           AVLinearPCMBitDepthKey: 24, AVLinearPCMIsFloatKey: false, AVLinearPCMIsBigEndianKey: false]
+            let file = try AVAudioFile(forWriting: url, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
+            let buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: frames)!
+            buffer.frameLength = frames
+            for c in 0..<2 { for i in 0..<Int(frames) { buffer.floatChannelData![c][i] = Float(0.3 * sin(Double(i) / 20)) } }
+            try file.write(from: buffer)
+        }
+        return try Data(contentsOf: url)
+    }
+
+    private func offlinePlayback(_ mac: KeepingMac) throws -> PhonePlayback {
+        let engine = AVAudioEngine()
+        try engine.enableManualRenderingMode(.offline, format: AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 44_100, channels: 2, interleaved: false)!,
+                                             maximumFrameCount: 4096)
+        return PhonePlayback(client: mac.client, player: PhonePlayer(engine: engine), cacheDirectory: folder())
+    }
+
+    @Test func aPhoneToldToStopLetsGoOfTheSongItHadFetchedToo() async throws {
+        let (_, mac, _) = try made([])
+        mac.files[1] = try tone()
+        mac.files[2] = try tone()
+        let playback = try offlinePlayback(mac)
+        playback.play([song(1), song(2)])
+        // The first plays and the second is fetched ahead: both have arrived whole.
+        try await wait { playback.player.state == .playing && mac.opened == [1, 2] }
+        mac.refused = [1, 2]
+
+        playback.cutOff(saying: "Not from this Mac.")
+        #expect(playback.player.state != .playing && !playback.isPlaying)
+        #expect(playback.notice == "Not from this Mac.")
+        #expect(!FileManager.default.fileExists(atPath: playback.cacheDirectory.path))
+        // Playing again asks the Mac, which says no: nothing left on the phone plays.
+        playback.resume()
+        try await wait { playback.notice == "This song plays on the Mac only." }
+        #expect(playback.player.state != .playing)
+        playback.stop()
+    }
+
+    @Test func aKeptSongPlaysOnWhenThePhoneIsToldToStop() async throws {
+        let (keeper, mac, _) = try made([])
+        // Long enough that the player isn't already decoding the song after it.
+        mac.files[1] = try tone(seconds: 30)
+        mac.files[2] = try tone()
+        keeper.keep(album([1]))
+        try await wait(30) { keeper.isIdle }
+        let playback = try offlinePlayback(mac)
+        playback.kept = { [store = keeper.store] id in store.kept(id).map { ($0.file, $0.descriptor) } }
+        playback.play([song(1), song(2)])
+        // The kept song plays from its file; the one after it is fetched ahead from the Mac.
+        try await wait { playback.player.state == .playing && mac.opened == [1, 2] }
+
+        playback.cutOff(saying: "Not from this Mac.")
+        #expect(playback.player.state == .playing && playback.nowPlaying?.track.id == 1)
+        #expect(playback.notice == nil)
+        // Nothing to let go of: nothing happens.
+        playback.cutOff(saying: "Again.")
+        #expect(playback.player.state == .playing && playback.notice == nil)
+        playback.stop()
     }
 
     @Test func aKeptSongPlaysWithTheMacOffAndWithoutAskingIt() async throws {

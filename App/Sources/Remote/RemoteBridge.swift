@@ -112,7 +112,8 @@ struct RemoteBridge {
     func albumSummary(_ album: Album) -> AlbumSummary {
         AlbumSummary(key: album.key, title: album.title.libraryDisplayName, artist: album.artist.libraryDisplayName, year: album.year,
                      trackCount: album.trackCount, duration: album.duration, format: album.formatSummary, artworkKey: album.artworkKey,
-                     hiRes: album.isHiRes, dsd: album.isDSD, multichannel: album.isMultichannel)
+                     hiRes: AlbumFilter.countsAsHiRes(aboveCD: album.isHiRes, dsd: album.isDSD, maxSampleRate: album.maxSampleRate),
+                     dsd: album.isDSD, multichannel: album.isMultichannel)
     }
 
     // MARK: The library's own commands
@@ -338,6 +339,9 @@ struct RemoteBridge {
         case .tracks(let ids):
             return .tracks(items: ordered(ids).map(trackSummary))
         case .albumTracks(let key):
+            // An album whose "copies" are different songs (a stereo album with a surround bonus track) is listed whole:
+            // choosing one copy would leave songs off the phone's page, where they could be neither played nor kept.
+            if library.albumCopies(albumKey: key).sharesNoSongs { return .tracks(items: library.tracks(albumKey: key).map(trackSummary)) }
             return .tracks(items: model.playableTracks(albumKey: key).map(trackSummary))
         case .artists:
             return .artists(items: library.artists.map { ArtistSummary(name: $0.name.libraryDisplayName, albumCount: $0.albumCount, artworkKey: $0.artworkKey) })

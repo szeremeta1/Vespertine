@@ -44,6 +44,19 @@ struct AlbumCopiesTests {
         }
     }
 
+    @Test("Different songs in different layouts are one album's songs, not copies of each other")
+    func differentSongsAreNotCopies() {
+        let folder = "/Music/Artist/Too Many"
+        let mixed = LibraryCopies.analyze([track(folder, "1.wav", title: "Ten Channels", n: 1, seconds: 20, codec: "WAV", rate: 48_000, channels: 10),
+                                         track(folder, "2.flac", title: "After The Refusal", n: 2, seconds: 20, rate: 48_000)])
+        #expect(mixed.copies.count == 2)
+        #expect(mixed.sharesNoSongs)
+        // A real album in two forms shares its songs.
+        #expect(!LibraryCopies.analyze(rush()).sharesNoSongs)
+        // One copy is one copy.
+        #expect(!LibraryCopies.analyze([track(folder, "2.flac", title: "After The Refusal", n: 2, seconds: 20)]).sharesNoSongs)
+    }
+
     @Test("Three copies of one album are three copies, each whole, and every song has all three")
     func coldplay() throws {
         let copies = LibraryCopies.analyze(rush())

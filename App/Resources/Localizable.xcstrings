@@ -577194,6 +577194,275 @@
           }
         }
       }
+    },
+    "Phones can’t find this Mac by themselves right now. Allow Vespertine under System Settings › Privacy & Security › Local Network, or type this Mac’s address on the phone.": {
+      "comment": "Shown on the Mac, in Vespertine › Settings › Remote, as a warning. Vespertine is listening for phones, but macOS is not announcing it on the network because the Local Network permission is off. “System Settings › Privacy & Security › Local Network” is a path in macOS System Settings: use Apple's own names for these panes in your language. “the phone” means the iPhone or iPad, as in the Mac app's other remote strings.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ስልኮች አሁን ይህን Mac በራሳቸው ማግኘት አይችሉም። በSystem Settings › Privacy & Security › Local Network ውስጥ ለVespertine ይፍቀዱ፣ ወይም የዚህን Mac አድራሻ በስልኩ ላይ ይተይቡ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتعذّر على الهواتف العثور على هذا الـ Mac بنفسها حاليًا. اسمح لـ Vespertine من إعدادات النظام › الخصوصية والأمن › الشبكة المحلية، أو اكتب عنوان هذا الـ Mac على الهاتف."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ফোনগুলো এই মুহূর্তে নিজে থেকে এই Mac খুঁজে পাচ্ছে না। সিস্টেম সেটিংস › গোপনীয়তা ও নিরাপত্তা › স্থানীয় নেটওয়ার্ক-এ Vespertine-কে অনুমতি দিন, অথবা ফোনে এই Mac-এর ঠিকানা টাইপ করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefony teď tento Mac samy nenajdou. Povolte Vespertine v Nastavení systému › Soukromí a zabezpečení › Místní síť, nebo na telefonu zadejte adresu tohoto Macu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoner kan ikke selv finde denne Mac lige nu. Tillad Vespertine under Systemindstillinger › Anonymitet & sikkerhed › Lokalt netværk, eller skriv denne Macs adresse på telefonen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefone können diesen Mac momentan nicht von selbst finden. Erlaube Vespertine unter „Systemeinstellungen › Datenschutz & Sicherheit › Lokales Netzwerk“, oder gib die Adresse dieses Mac auf dem Telefon ein."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτήν τη στιγμή, τα τηλέφωνα δεν μπορούν να βρουν μόνα τους αυτό το Mac. Επιτρέψτε το Vespertine στις Ρυθμίσεις συστήματος › Απόρρητο και ασφάλεια › Τοπικό δίκτυο ή πληκτρολογήστε τη διεύθυνση αυτού του Mac στο τηλέφωνο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ahora mismo los teléfonos no pueden encontrar este Mac por sí solos. Permite Vespertine en Ajustes del Sistema › Privacidad y seguridad › Red local, o escribe la dirección de este Mac en el teléfono."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گوشی‌ها در حال حاضر نمی‌توانند خودشان این Mac را پیدا کنند. در System Settings › Privacy & Security › Local Network به Vespertine اجازه دهید، یا نشانی این Mac را در گوشی تایپ کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puhelimet eivät juuri nyt löydä tätä Macia itse. Salli Vespertine kohdassa Järjestelmäasetukset › Tietosuoja ja suojaus › Lähiverkko tai kirjoita tämän Macin osoite puhelimeen."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sa ngayon, hindi mahanap ng mga telepono ang Mac na ito nang mag-isa. Payagan ang Vespertine sa System Settings › Privacy & Security › Local Network, o i-type ang address ng Mac na ito sa telepono."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pour le moment, les téléphones ne peuvent pas trouver ce Mac par eux-mêmes. Autorisez Vespertine dans Réglages Système › Confidentialité et sécurité › Réseau local, ou saisissez l’adresse de ce Mac sur le téléphone."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ફોન હમણાં આ Mac ને જાતે શોધી શકતા નથી. System Settings › Privacy & Security › Local Network માં Vespertine ને મંજૂરી આપો, અથવા ફોન પર આ Mac નું સરનામું ટાઇપ કરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wayoyi ba za su iya gano wannan Mac da kansu ba a yanzu. Ba Vespertine izini a System Settings › Privacy & Security › Local Network, ko ku rubuta adireshin wannan Mac a kan wayar."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "טלפונים אינם יכולים כרגע למצוא את ה־Mac הזה בעצמם. אפשר את Vespertine ב״הגדרות המערכת״ › ״פרטיות ואבטחה״ › ״רשת מקומית״, או הקלד את הכתובת של ה־Mac הזה בטלפון."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फ़ोन अभी इस Mac को अपने आप नहीं ढूँढ सकते। सिस्टम सेटिंग्ज़ › गोपनीयता और सुरक्षा › स्थानीय नेटवर्क में Vespertine को अनुमति दें, या फ़ोन पर इस Mac का पता टाइप करें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A telefonok jelenleg nem találják meg maguktól ezt a Macet. Engedélyezze a Vespertine-t a Rendszerbeállítások › Adatvédelem és biztonság › Helyi hálózat alatt, vagy írja be ennek a Macnek a címét a telefonon."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saat ini ponsel tidak dapat menemukan Mac ini dengan sendirinya. Izinkan Vespertine di Pengaturan Sistem › Privasi & Keamanan › Jaringan Lokal, atau ketik alamat Mac ini di ponsel."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Al momento i telefoni non riescono a trovare questo Mac da soli. Consenti Vespertine in Impostazioni di Sistema › Privacy e sicurezza › Rete locale, oppure inserisci l’indirizzo di questo Mac sul telefono."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在、スマートフォンはこのMacを自動的に見つけることができません。「システム設定」›「プライバシーとセキュリティ」›「ローカルネットワーク」でVespertineを許可するか、スマートフォンでこのMacのアドレスを入力してください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಫೋನ್‌ಗಳಿಗೆ ಸದ್ಯ ಈ Mac ಅನ್ನು ತಾವಾಗಿಯೇ ಹುಡುಕಲು ಸಾಧ್ಯವಿಲ್ಲ. ಸಿಸ್ಟಂ ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ಗೌಪ್ಯತೆ ಮತ್ತು ಭದ್ರತೆ › ಸ್ಥಳೀಯ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ Vespertine ಗೆ ಅನುಮತಿಸಿ, ಅಥವಾ ಫೋನ್‌ನಲ್ಲಿ ಈ Mac ನ ವಿಳಾಸವನ್ನು ಟೈಪ್ ಮಾಡಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지금은 휴대폰이 이 Mac을 스스로 찾을 수 없습니다. 시스템 설정 › 개인정보 보호 및 보안 › 로컬 네트워크에서 Vespertine을 허용하거나, 휴대폰에서 이 Mac의 주소를 입력하십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഫോണുകൾക്ക് ഇപ്പോൾ ഈ Mac സ്വയം കണ്ടെത്താനാവുന്നില്ല. സിസ്റ്റം ക്രമീകരണങ്ങൾ › സ്വകാര്യതയും സുരക്ഷയും › ലോക്കൽ നെറ്റ്‌വർക്ക് എന്നതിൽ Vespertine-ന് അനുമതി നൽകുക, അല്ലെങ്കിൽ ഫോണിൽ ഈ Mac-ന്റെ വിലാസം ടൈപ്പ് ചെയ്യുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फोनना सध्या हा Mac स्वतःहून सापडत नाही. System Settings › Privacy & Security › Local Network मध्ये Vespertine ला परवानगी द्या, किंवा फोनवर या Mac चा पत्ता टाइप करा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buat masa ini, telefon tidak dapat mencari Mac ini dengan sendirinya. Benarkan Vespertine dalam Seting Sistem › Privasi & Keselamatan › Rangkaian Setempat, atau taip alamat Mac ini pada telefon."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoner kan ikke finne denne Macen på egen hånd akkurat nå. Tillat Vespertine under Systeminnstillinger › Personvern og sikkerhet › Lokalt nettverk, eller skriv inn adressen til denne Macen på telefonen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoons kunnen deze Mac op dit moment niet zelf vinden. Geef Vespertine toegang in ‘Systeeminstellingen › Privacy en beveiliging › Lokaal netwerk’, of typ het adres van deze Mac op de telefoon."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਫ਼ੋਨ ਇਸ ਵੇਲੇ ਇਸ Mac ਨੂੰ ਆਪਣੇ ਆਪ ਨਹੀਂ ਲੱਭ ਸਕਦੇ। ਸਿਸਟਮ ਸੈਟਿੰਗਾਂ › ਪਰਦੇਦਾਰੀ ਅਤੇ ਸੁਰੱਖਿਆ › ਸਥਾਨਕ ਨੈੱਟਵਰਕ ਵਿੱਚ Vespertine ਨੂੰ ਇਜਾਜ਼ਤ ਦਿਓ, ਜਾਂ ਫ਼ੋਨ ’ਤੇ ਇਸ Mac ਦਾ ਪਤਾ ਟਾਈਪ ਕਰੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefony nie mogą teraz same znaleźć tego Maca. Zezwól Vespertine w Ustawieniach systemowych › Prywatność i ochrona › Sieć lokalna albo wpisz adres tego Maca na telefonie."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No momento, os telefones não conseguem encontrar este Mac sozinhos. Permita o Vespertine em Ajustes do Sistema › Privacidade e Segurança › Rede Local ou digite o endereço deste Mac no telefone."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De momento, os telemóveis não conseguem encontrar este Mac sozinhos. Permita o Vespertine em Definições do Sistema › Privacidade e segurança › Rede local, ou escreva o endereço deste Mac no telemóvel."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Momentan, telefoanele nu pot găsi singure acest Mac. Permiteți accesul pentru Vespertine în Configurări sistem › Intimitate și securitate › Rețea locală sau introduceți adresa acestui Mac pe telefon."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoner kan inte hitta den här datorn på egen hand just nu. Tillåt Vespertine under Systeminställningar › Integritet och säkerhet › Lokalt nätverk, eller skriv den här datorns adress på telefonen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simu haziwezi kuipata Mac hii zenyewe kwa sasa. Ruhusu Vespertine katika System Settings › Privacy & Security › Local Network, au andika anwani ya Mac hii kwenye simu."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஃபோன்களால் இப்போது இந்த Mac-ஐத் தாமாகக் கண்டறிய முடியவில்லை. சிஸ்டம் அமைப்புகள் › தனியுரிமை & பாதுகாப்பு › உள்ளூர் நெட்வொர்க் என்பதில் Vespertine-ஐ அனுமதிக்கவும், அல்லது ஃபோனில் இந்த Mac-இன் முகவரியை டைப் செய்யவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఫోన్‌లు ప్రస్తుతం ఈ Macను తమంతట తాము కనుగొనలేకపోతున్నాయి. సిస్టమ్ సెట్టింగ్‌లు › గోప్యత & భద్రత › స్థానిక నెట్‌వర్క్‌లో Vespertineకు అనుమతి ఇవ్వండి, లేదా ఫోన్‌లో ఈ Mac చిరునామాను టైప్ చేయండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ขณะนี้โทรศัพท์ค้นหา Mac เครื่องนี้เองไม่ได้ ให้อนุญาต Vespertine ใน การตั้งค่าระบบ › ความเป็นส่วนตัวและความปลอดภัย › เครือข่ายภายใน หรือป้อนที่อยู่ของ Mac เครื่องนี้บนโทรศัพท์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefonlar şu anda bu Mac’i kendiliğinden bulamıyor. Sistem Ayarları › Gizlilik ve Güvenlik › Yerel Ağ bölümünde Vespertine’e izin verin veya telefonda bu Mac’in adresini yazın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Зараз телефони не можуть самі знайти цей Mac. Дозвольте Vespertine у меню «Системні параметри» › «Приватність і безпека» › «Локальна мережа» або введіть адресу цього Mac на телефоні."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فونز فی الحال اس Mac کو خود تلاش نہیں کر سکتے۔ System Settings › Privacy & Security › Local Network میں Vespertine کو اجازت دیں، یا فون پر اس Mac کا پتہ ٹائپ کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiện tại điện thoại không thể tự tìm thấy máy Mac này. Hãy cho phép Vespertine trong Cài đặt hệ thống › Quyền riêng tư & Bảo mật › Mạng cục bộ, hoặc nhập địa chỉ của máy Mac này trên điện thoại."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手機現時無法自行找到這部 Mac。請在「系統設定」›「私隱與保安」›「本地網絡」中允許 Vespertine，或在手機上輸入這部 Mac 的地址。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手机目前无法自行找到这台 Mac。请在“系统设置”›“隐私与安全性”›“本地网络”中允许 Vespertine，或在手机上输入这台 Mac 的地址。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手機目前無法自行找到這部 Mac。請在「系統設定」›「隱私權與安全性」›「區域網路」中允許 Vespertine，或在手機上輸入這部 Mac 的位址。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

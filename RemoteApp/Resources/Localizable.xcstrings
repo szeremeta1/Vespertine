@@ -7857,6 +7857,275 @@
         }
       }
     },
+    "BIT-PERFECT": {
+      "comment": "Shown on the iPhone or iPad. Part of the built-in demo, which shows a pretend Mac. This is what a real Mac would say in its own language: use the Mac app's established translation where one exists (look it up in /mnt/project-files/l10n/final/<lang>.json). The Mac's badge when the output receives the song's samples unchanged. The Mac app has this exact key: use its translation unchanged.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ቢት-ፍጹም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مطابق للبتات"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "বিট-পারফেক্ট"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BITPERFEKT"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFEKT"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بیت‌به‌بیت"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BITTITARKKA"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "બિટ-પરફેક્ટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מדויק לסיבית"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बिट-परफ़ेक्ट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ビットパーフェクト"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비트 퍼펙트"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ബിറ്റ്-പെർഫെക്റ്റ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बिट-परफेक्ट"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BITPERFEKT"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BITPERFECT"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਬਿੱਟ-ਪਰਫ਼ੈਕਟ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BITPERFEKT"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பிட்-பெர்ஃபெக்ட்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "బిట్-పర్ఫెక్ట్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บิตเพอร์เฟกต์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "БІТ-У-БІТ"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بٹ پرفیکٹ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BIT-PERFECT"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "位元完美"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "比特完美"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "位元完美"
+          }
+        }
+      }
+    },
     "Bonjour only finds the Mac on the same network. With Tailscale (or another VPN) on both the Mac and this device, type the Mac’s Tailscale name or its 100.x address here. The Mac must be awake with Vespertine open; Settings › Remote on the Mac can keep it awake.": {
       "localizations": {
         "am": {
@@ -14031,6 +14300,275 @@
         }
       }
     },
+    "CUT ON THE MAC": {
+      "comment": "Shown on the iPhone or iPad. Small badge in Now Playing for a track of a CUE sheet (one long lossless file holding a whole album): the Mac cut this track out of the file and sent its samples unchanged. It replaces the badge “CONVERTED ON THE MAC”; match how that badge was translated (/mnt/project-files/l10n/ios/out/<lang>.json), with “cut” (as in cutting a piece out) in place of “converted”. Capitals where the script has them. Very short.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በMac ላይ ተቆርጧል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقتطَع على الـ Mac"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-এ কেটে নেওয়া"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VYSTŘIŽENO NA MACU"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KLIPPET UD PÅ MAC’EN"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AUF DEM MAC AUSGESCHNITTEN"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ΑΠΟΚΟΠΗ ΣΤΟ MAC"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CORTADO EN EL MAC"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بریده‌شده در Mac"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LEIKATTU MACILLA"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NA-CUT SA MAC"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DÉCOUPÉ SUR LE MAC"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac પર કાપેલું"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AN YANKE A KAN MAC"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נחתך ב־Mac"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac पर काटा गया"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KIVÁGVA A MACEN"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DIPOTONG DI MAC"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TAGLIATO SUL MAC"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macで切り出し"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ನಲ್ಲಿ ಕತ್ತರಿಸಲಾಗಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac에서 잘라냄"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ൽ മുറിച്ചെടുത്തു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac वर कापलेले"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DIPOTONG PADA MAC"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KLIPPET UT PÅ MACEN"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UITGEKNIPT OP DE MAC"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ’ਤੇ ਕੱਟਿਆ ਗਿਆ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "WYCIĘTY NA MACU"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CORTADA NO MAC"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CORTADA NO MAC"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DECUPAT PE MAC"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UTKLIPPT PÅ MACEN"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IMEKATWA KWENYE MAC"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-இல் வெட்டப்பட்டது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macలో కత్తిరించబడింది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ตัดบน Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MAC’TE KESİLDİ"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ВИРІЗАНО НА MAC"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac پر کاٹا گیا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ĐÃ CẮT TRÊN MÁY MAC"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已在 Mac 上裁切"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已在 Mac 上截取"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已在 Mac 上裁切"
+          }
+        }
+      }
+    },
     "Demo Mac": {
       "localizations": {
         "am": {
@@ -18329,6 +18867,275 @@
         }
       }
     },
+    "HDMI · 8 channels · 32–192 kHz": {
+      "comment": "Shown on the iPhone or iPad. Part of the built-in demo, which shows a pretend Mac. This is what a real Mac would say in its own language: use the Mac app's established translation where one exists (look it up in /mnt/project-files/l10n/final/<lang>.json). One line describing an HDMI receiver in the outputs list. Keep “HDMI”, “kHz”, the “·” separators and the en dash.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 ቻናሎች · 32–192 kHz"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 قنوات · 32–192 kHz"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 চ্যানেল · 32–192 kHz"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 kanálů · 32–192 kHz"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 kanaler · 32–192 kHz"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 Kanäle · 32–192 kHz"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 κανάλια · 32–192 kHz"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 canales · 32–192 kHz"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · ۸ کانال · ۳۲–۱۹۲ kHz"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 kanavaa · 32–192 kHz"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 channel · 32–192 kHz"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 canaux · 32–192 kHz"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 ચૅનલો · 32–192 kHz"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · tashoshi 8 · 32–192 kHz"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 ערוצים · 32–192 kHz"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 चैनल · 32–192 kHz"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 csatorna · 32–192 kHz"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 saluran · 32–192 kHz"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 canali · 32–192 kHz"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8チャンネル · 32–192 kHz"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 ಚಾನೆಲ್‌ಗಳು · 32–192 kHz"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8채널 · 32–192 kHz"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 ചാനലുകൾ · 32–192 kHz"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 चॅनेल · 32–192 kHz"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 saluran · 32–192 kHz"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 kanaler · 32–192 kHz"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 kanalen · 32–192 kHz"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 ਚੈਨਲ · 32–192 kHz"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 kanałów · 32–192 kHz"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 canais · 32–192 kHz"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 canais · 32–192 kHz"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 canale · 32–192 kHz"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 kanaler · 32–192 kHz"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · chaneli 8 · 32–192 kHz"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 சேனல்கள் · 32–192 kHz"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 ఛానెల్‌లు · 32–192 kHz"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 ช่องสัญญาณ · 32–192 kHz"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 kanal · 32–192 kHz"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 каналів · 32–192 kHz"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 چینلز · 32–192 kHz"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 kênh · 32–192 kHz"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 聲道 · 32–192 kHz"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 声道 · 32–192 kHz"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HDMI · 8 聲道 · 32–192 kHz"
+          }
+        }
+      }
+    },
     "Head Tracked": {
       "comment": "Spatial Audio mode.",
       "localizations": {
@@ -22100,6 +22907,275 @@
     },
     "mac-name.tailnet.ts.net": {
       "shouldTranslate": false
+    },
+    "MacBook Pro Speakers": {
+      "comment": "Shown on the iPhone or iPad. Part of the built-in demo, which shows a pretend Mac. This is what a real Mac would say in its own language: use the Mac app's established translation where one exists (look it up in /mnt/project-files/l10n/final/<lang>.json). The built-in speakers of a MacBook Pro, as macOS names them in your language. Keep “MacBook Pro”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የMacBook Pro ድምፅ ማጉያዎች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مكبرات صوت MacBook Pro"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro স্পিকার"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduktory MacBooku Pro"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro-højttalere"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro-Lautsprecher"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ηχεία MacBook Pro"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altavoces del MacBook Pro"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلندگوهای MacBook Pro"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pron kaiuttimet"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga Speaker ng MacBook Pro"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haut-parleurs MacBook Pro"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro સ્પીકર"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lasifikokin MacBook Pro"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "רמקולים של MacBook Pro"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro स्पीकर"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro hangszórói"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaker MacBook Pro"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altoparlanti MacBook Pro"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Proのスピーカー"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro ಸ್ಪೀಕರ್‌ಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro 스피커"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro സ്പീക്കറുകൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro स्पीकर"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pembesar Suara MacBook Pro"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro-høyttalere"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro-luidsprekers"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro ਸਪੀਕਰ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Głośniki MacBooka Pro"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alto-falantes do MacBook Pro"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altifalantes do MacBook Pro"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Difuzoare MacBook Pro"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro-högtalare"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spika za MacBook Pro"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro ஸ்பீக்கர்கள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro స్పీకర్‌లు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ลำโพง MacBook Pro"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro Hoparlörleri"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Динаміки MacBook Pro"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro اسپیکرز"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loa MacBook Pro"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro 揚聲器"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro 扬声器"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacBook Pro 揚聲器"
+          }
+        }
+      }
     },
     "Macs": {
       "comment": "Button and title: the list of Macs this device is paired with.",
@@ -38471,6 +39547,544 @@
         }
       }
     },
+    "REFERENCED IN PLACE · OFFLINE · SCANNED LAST WEEK": {
+      "comment": "Shown on the iPhone or iPad. Part of the built-in demo, which shows a pretend Mac. This is what a real Mac would say in its own language: use the Mac app's established translation where one exists (look it up in /mnt/project-files/l10n/final/<lang>.json). As above, for a folder on a disconnected drive.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ባሉበት የተገናኙ · ከመስመር ውጭ · ባለፈው ሳምንት ተቃኝቷል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "محال إليه في مكانه · غير متصل · تم الفحص الأسبوع الماضي"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "মূল স্থানে রেফারেন্স · অফলাইন · স্ক্যান করা হয়েছে: গত সপ্তাহে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ODKAZOVÁNO NA MÍSTĚ · OFFLINE · PROHLEDÁNO MINULÝ TÝDEN"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HENVIST PÅ STEDET · OFFLINE · SCANNET I SIDSTE UGE"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AM SPEICHERORT REFERENZIERT · OFFLINE · GESCANNT LETZTE WOCHE"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ΑΝΑΦΟΡΑ ΣΤΗ ΘΕΣΗ ΤΟΥΣ · ΕΚΤΟΣ ΣΥΝΔΕΣΗΣ · ΣΑΡΩΘΗΚΕ ΤΗΝ ΠΕΡΑΣΜΕΝΗ ΕΒΔΟΜΑΔΑ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERENCIADA EN SU UBICACIÓN · SIN CONEXIÓN · ESCANEADA LA SEMANA PASADA"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ارجاع در محل · آفلاین · هفتهٔ گذشته اسکن شد"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VIITATTU PAIKALLAAN · OFFLINE · SKANNATTU VIIME VIIKOLLA"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NIRE-REFERENCE SA KINALALAGYAN · OFFLINE · NA-SCAN NOONG NAKARAANG LINGGO"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RÉFÉRENCÉE SUR PLACE · HORS LIGNE · INDEXÉE LA SEMAINE DERNIÈRE"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "મૂળ જગ્યાએ સંદર્ભિત · ઑફલાઇન · ગયા અઠવાડિયે સ્કૅન કર્યું"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ANA NUNI A INDA YAKE · A WAJEN LAYI · AN BINCIKA MAKON JIYA"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מופנה במקום · לא מקוון · נסרק בשבוע שעבר"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मूल स्थान पर रेफ़रेंस · ऑफ़लाइन · स्कैन किया गया: पिछले सप्ताह"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HIVATKOZVA A HELYÉN · OFFLINE · BEOLVASVA: MÚLT HÉTEN"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DIRUJUK DI TEMPAT · OFFLINE · DIPINDAI MINGGU LALU"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RIFERIMENTO SUL POSTO · OFFLINE · SCANSIONATA LA SETTIMANA SCORSA"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その場で参照 · オフライン · スキャン: 先週"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇರುವಲ್ಲೇ ಉಲ್ಲೇಖಿಸಲಾಗಿದೆ · ಆಫ್‌ಲೈನ್ · ಕಳೆದ ವಾರ ಸ್ಕ್ಯಾನ್ ಮಾಡಲಾಗಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "제자리에서 참조됨 · 오프라인 · 스캔: 지난주"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്ഥലത്തുതന്നെ റഫറൻസ് ചെയ്തത് · ഓഫ്‌ലൈൻ · കഴിഞ്ഞ ആഴ്ച സ്കാൻ ചെയ്തു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मूळ जागी संदर्भित · ऑफलाइन · गेल्या आठवड्यात स्कॅन केले"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DIRUJUK DI TEMPAT · LUAR TALIAN · DIIMBAS MINGGU LALU"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERERT PÅ STEDET · FRAKOBLET · SKANNET FORRIGE UKE"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VERWEZEN OP LOCATIE · OFFLINE · GESCAND VORIGE WEEK"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਮੌਜੂਦਾ ਥਾਂ ਤੋਂ ਵਰਤਿਆ · ਔਫ਼ਲਾਈਨ · ਪਿਛਲੇ ਹਫ਼ਤੇ ਸਕੈਨ ਕੀਤਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "POZOSTAWIONE NA MIEJSCU · OFFLINE · ZESKANOWANO W ZESZŁYM TYGODNIU"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERENCIADA NO LOCAL · OFFLINE · ESCANEADA SEMANA PASSADA"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERENCIADA NO LOCAL · OFFLINE · ANALISADA NA SEMANA PASSADA"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERENȚIATĂ PE LOC · OFFLINE · SCANATĂ SĂPTĂMÂNA TRECUTĂ"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERERAD PÅ PLATS · OFFLINE · SKANNAD FÖRRA VECKAN"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IMEREJELEWA MAHALI ILIPO · NJE YA MTANDAO · ILICHANGANULIWA WIKI ILIYOPITA"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இருக்கும் இடத்திலேயே பயன்படுத்தப்படுவது · ஆஃப்லைன் · கடந்த வாரம் ஸ்கேன் செய்யப்பட்டது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఉన్నచోటే రిఫరెన్స్ చేయబడింది · ఆఫ్‌లైన్ · గత వారం స్కాన్ చేయబడింది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อ้างอิงในตำแหน่งเดิม · ออฟไลน์ · สแกนเมื่อสัปดาห์ที่แล้ว"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YERİNDE BAŞVURULAN · ÇEVRİMDIŞI · TARANDI: GEÇEN HAFTA"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ФАЙЛИ НА МІСЦІ · ОФЛАЙН · ПРОСКАНОВАНО МИНУЛОГО ТИЖНЯ"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اپنی جگہ پر حوالہ · آف لائن · پچھلے ہفتے اسکین کیا گیا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "THAM CHIẾU TẠI CHỖ · NGOẠI TUYẾN · ĐÃ QUÉT TUẦN TRƯỚC"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在原位置參照 · 離線 · 掃描時間：上星期"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原位引用 · 离线 · 扫描于上周"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原地參照 · 離線 · 掃描於上週"
+          }
+        }
+      }
+    },
+    "REFERENCED IN PLACE · ONLINE · SCANNED 2 HOURS AGO": {
+      "comment": "Shown on the iPhone or iPad. Part of the built-in demo, which shows a pretend Mac. This is what a real Mac would say in its own language: use the Mac app's established translation where one exists (look it up in /mnt/project-files/l10n/final/<lang>.json). State line of a music folder on the Mac: its files stay where they are (not copied into the library), the folder is reachable, and when it was last scanned. The Mac app has “REFERENCED IN PLACE”: reuse it. Capitals where the script has them; keep the “·” separators.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ባሉበት የተገናኙ · በመስመር ላይ · ከ2 ሰዓት በፊት ተቃኝቷል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "محال إليه في مكانه · متصل · تم الفحص قبل ساعتين"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "মূল স্থানে রেফারেন্স · অনলাইন · স্ক্যান করা হয়েছে: 2 ঘণ্টা আগে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ODKAZOVÁNO NA MÍSTĚ · ONLINE · PROHLEDÁNO PŘED 2 HODINAMI"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HENVIST PÅ STEDET · ONLINE · SCANNET FOR 2 TIMER SIDEN"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AM SPEICHERORT REFERENZIERT · ONLINE · GESCANNT VOR 2 STUNDEN"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ΑΝΑΦΟΡΑ ΣΤΗ ΘΕΣΗ ΤΟΥΣ · ΣΕ ΣΥΝΔΕΣΗ · ΣΑΡΩΘΗΚΕ ΠΡΙΝ ΑΠΟ 2 ΩΡΕΣ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERENCIADA EN SU UBICACIÓN · CONECTADA · ESCANEADA HACE 2 HORAS"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ارجاع در محل · آنلاین · ۲ ساعت پیش اسکن شد"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VIITATTU PAIKALLAAN · ONLINE · SKANNATTU 2 TUNTIA SITTEN"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NIRE-REFERENCE SA KINALALAGYAN · ONLINE · NA-SCAN 2 ORAS ANG NAKALIPAS"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RÉFÉRENCÉE SUR PLACE · EN LIGNE · INDEXÉE IL Y A 2 HEURES"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "મૂળ જગ્યાએ સંદર્ભિત · ઑનલાઇન · 2 કલાક પહેલાં સ્કૅન કર્યું"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ANA NUNI A INDA YAKE · A KAN LAYI · AN BINCIKA AWANNI 2 DA SUKA WUCE"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מופנה במקום · מקוון · נסרק לפני שעתיים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मूल स्थान पर रेफ़रेंस · ऑनलाइन · स्कैन किया गया: 2 घंटे पहले"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "HIVATKOZVA A HELYÉN · ONLINE · BEOLVASVA: 2 ÓRÁJA"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DIRUJUK DI TEMPAT · ONLINE · DIPINDAI 2 JAM YANG LALU"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "RIFERIMENTO SUL POSTO · ONLINE · SCANSIONATA 2 ORE FA"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その場で参照 · オンライン · スキャン: 2時間前"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇರುವಲ್ಲೇ ಉಲ್ಲೇಖಿಸಲಾಗಿದೆ · ಆನ್‌ಲೈನ್ · 2 ಗಂಟೆಗಳ ಹಿಂದೆ ಸ್ಕ್ಯಾನ್ ಮಾಡಲಾಗಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "제자리에서 참조됨 · 온라인 · 스캔: 2시간 전"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്ഥലത്തുതന്നെ റഫറൻസ് ചെയ്തത് · ഓൺലൈൻ · 2 മണിക്കൂർ മുമ്പ് സ്കാൻ ചെയ്തു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मूळ जागी संदर्भित · ऑनलाइन · 2 तासांपूर्वी स्कॅन केले"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DIRUJUK DI TEMPAT · DALAM TALIAN · DIIMBAS 2 JAM LALU"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERERT PÅ STEDET · TILKOBLET · SKANNET FOR 2 TIMER SIDEN"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VERWEZEN OP LOCATIE · ONLINE · GESCAND 2 UUR GELEDEN"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਮੌਜੂਦਾ ਥਾਂ ਤੋਂ ਵਰਤਿਆ · ਔਨਲਾਈਨ · 2 ਘੰਟੇ ਪਹਿਲਾਂ ਸਕੈਨ ਕੀਤਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "POZOSTAWIONE NA MIEJSCU · ONLINE · ZESKANOWANO 2 GODZINY TEMU"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERENCIADA NO LOCAL · ONLINE · ESCANEADA HÁ 2 HORAS"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERENCIADA NO LOCAL · ONLINE · ANALISADA HÁ 2 HORAS"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERENȚIATĂ PE LOC · ONLINE · SCANATĂ ACUM 2 ORE"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "REFERERAD PÅ PLATS · ONLINE · SKANNAD FÖR 2 TIMMAR SEDAN"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IMEREJELEWA MAHALI ILIPO · MTANDAONI · ILICHANGANULIWA SAA 2 ZILIZOPITA"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இருக்கும் இடத்திலேயே பயன்படுத்தப்படுவது · ஆன்லைன் · 2 மணிநேரத்திற்கு முன் ஸ்கேன் செய்யப்பட்டது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఉన్నచోటే రిఫరెన్స్ చేయబడింది · ఆన్‌లైన్ · 2 గంటల క్రితం స్కాన్ చేయబడింది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อ้างอิงในตำแหน่งเดิม · ออนไลน์ · สแกนเมื่อ 2 ชั่วโมงที่ผ่านมา"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YERİNDE BAŞVURULAN · ÇEVRİMİÇİ · TARANDI: 2 SAAT ÖNCE"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ФАЙЛИ НА МІСЦІ · ОНЛАЙН · ПРОСКАНОВАНО 2 ГОДИНИ ТОМУ"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اپنی جگہ پر حوالہ · آن لائن · 2 گھنٹے پہلے اسکین کیا گیا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "THAM CHIẾU TẠI CHỖ · TRỰC TUYẾN · ĐÃ QUÉT 2 GIỜ TRƯỚC"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在原位置參照 · 在線 · 掃描時間：2 小時前"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原位引用 · 在线 · 扫描于 2 小时前"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原地參照 · 線上 · 掃描於 2 小時前"
+          }
+        }
+      }
+    },
     "Remove": {
       "localizations": {
         "am": {
@@ -46787,6 +48401,275 @@
         }
       }
     },
+    "Speaker group · 2 outputs": {
+      "comment": "Shown on the iPhone or iPad. Part of the built-in demo, which shows a pretend Mac. This is what a real Mac would say in its own language: use the Mac app's established translation where one exists (look it up in /mnt/project-files/l10n/final/<lang>.json). One line describing a group of two sound outputs that play together as one. The Mac app has “Speaker group” and “Speaker group · %@”: reuse its term.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የድምጽ ማጉያ ቡድን · 2 ውፅዓቶች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مجموعة مكبرات الصوت · مخرجان"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "স্পিকার গ্রুপ · 2টি আউটপুট"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skupina reproduktorů · 2 výstupy"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Højttalergruppe · 2 udgange"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lautsprechergruppe · 2 Ausgänge"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ομάδα ηχείων · 2 έξοδοι"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grupo de altavoces · 2 salidas"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گروه بلندگو · ۲ خروجی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaiutinryhmä · 2 ulostuloa"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaker group · 2 output"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Groupe d’enceintes · 2 sorties"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સ્પીકર ગ્રુપ · 2 આઉટપુટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙungiyar lasifika · fitarwa 2"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קבוצת רמקולים · 2 פלטים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्पीकर ग्रुप · 2 आउटपुट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hangszórócsoport · 2 kimenet"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grup speaker · 2 output"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gruppo di altoparlanti · 2 uscite"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スピーカーグループ · 2個の出力"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸ್ಪೀಕರ್ ಗುಂಪು · 2 ಔಟ್‌ಪುಟ್‌ಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스피커 그룹 · 출력 2개"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്പീക്കർ ഗ്രൂപ്പ് · 2 ഔട്ട്‌പുട്ടുകൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "स्पीकर ग्रुप · 2 आउटपुट"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kumpulan pembesar suara · 2 output"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Høyttalergruppe · 2 utganger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Luidsprekergroep · 2 uitgangen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਪੀਕਰ ਗਰੁੱਪ · 2 ਆਉਟਪੁੱਟਾਂ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grupa głośników · 2 wyjścia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grupo de alto-falantes · 2 saídas"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grupo de altifalantes · 2 saídas"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grup de boxe · 2 ieșiri"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Högtalargrupp · 2 utgångar"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kikundi cha spika · vifaa 2 vya kutoa sauti"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஸ்பீக்கர் குழு · 2 வெளியீடுகள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్పీకర్ గ్రూప్ · 2 అవుట్‌పుట్‌లు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กลุ่มลำโพง · 2 ขาออก"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoparlör grubu · 2 çıkış"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Група гучномовців · 2 виходи"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسپیکر گروپ · 2 آؤٹ پٹس"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhóm loa · 2 đầu ra"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "喇叭群組 · 2 個輸出"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扬声器组 · 2 个输出"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "喇叭群組 · 2 個輸出"
+          }
+        }
+      }
+    },
     "Still": {
       "comment": "VoiceOver value: the record is not turning.",
       "localizations": {
@@ -48395,6 +50278,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "向上或向下滑動來切換下一張或上一張專輯。點兩下來打開。"
+          }
+        }
+      }
+    },
+    "System Default": {
+      "comment": "Shown on the iPhone or iPad. Part of the built-in demo, which shows a pretend Mac. This is what a real Mac would say in its own language: use the Mac app's established translation where one exists (look it up in /mnt/project-files/l10n/final/<lang>.json). The name of the Mac's default sound output in the outputs list.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የስርዓት ነባሪ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الافتراضي للنظام"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সিস্টেম ডিফল্ট"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Výchozí systémové"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systemstandard"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systemstandard"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Προεπιλογή συστήματος"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Por omisión del sistema"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پیش‌فرض سیستم"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Järjestelmän oletus"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Default ng System"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valeur par défaut du système"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સિસ્ટમ ડિફૉલ્ટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tsohon Saitin Tsarin"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ברירת המחדל של המערכת"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सिस्टम डिफ़ॉल्ट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rendszer alapértelmezése"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Default Sistem"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Predefinito di sistema"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "システムのデフォルト"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಿಸ್ಟಂ ಡೀಫಾಲ್ಟ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시스템 기본값"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സിസ്റ്റം ഡിഫോൾട്ട്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सिस्टम डीफॉल्ट"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lalai Sistem"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systemstandard"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systeemstandaard"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਿਸਟਮ ਪੂਰਵ-ਨਿਰਧਾਰਿਤ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Domyślne systemowe"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Padrão do Sistema"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Predefinição do sistema"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Implicit sistem"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Systemets standard"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaguomsingi la Mfumo"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "சிஸ்டம் இயல்புநிலை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "సిస్టమ్ డిఫాల్ట్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ค่าเริ่มต้นของระบบ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistem Varsayılanı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Типовий у системі"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سسٹم ڈیفالٹ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mặc định hệ thống"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系統預設"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系统默认"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "系統預設值"
           }
         }
       }
@@ -51364,6 +53516,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac 已停止回應。請確認它處於喚醒狀態且位於相同網路上。"
+          }
+        }
+      }
+    },
+    "The Mac stopped sending songs to this device.": {
+      "comment": "Shown on the iPhone or iPad. Notice when playback on the iPhone stops because, on the Mac, someone turned off letting this device play songs itself.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ወደዚህ መሣሪያ ዘፈኖችን መላክ አቁሟል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "توقف الـ Mac عن إرسال الأغاني إلى هذا الجهاز."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac এই ডিভাইসে গান পাঠানো বন্ধ করেছে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac přestal posílat skladby do tohoto zařízení."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’en er holdt op med at sende sange til denne enhed."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Mac sendet keine Titel mehr an dieses Gerät."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Mac σταμάτησε να στέλνει τραγούδια σε αυτήν τη συσκευή."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El Mac ha dejado de enviar canciones a este dispositivo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ارسال آهنگ‌ها به این دستگاه را متوقف کرد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac lakkasi lähettämästä kappaleita tähän laitteeseen."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Huminto ang Mac sa pagpapadala ng mga kanta sa device na ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Mac a cessé d’envoyer des morceaux à cet appareil."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac એ આ ડિવાઇસને ગીતો મોકલવાનું બંધ કર્યું છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ɗin ta daina aika waƙoƙi zuwa wannan na'ura."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ה־Mac הפסיק לשלוח שירים למכשיר זה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ने इस डिवाइस पर गीत भेजना बंद कर दिया।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Mac már nem küld dalokat erre az eszközre."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac berhenti mengirim lagu ke perangkat ini."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il Mac ha smesso di inviare brani a questo dispositivo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macがこのデバイスへの曲の送信を停止しました。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ಈ ಸಾಧನಕ್ಕೆ ಹಾಡುಗಳನ್ನು ಕಳುಹಿಸುವುದನ್ನು ನಿಲ್ಲಿಸಿದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac이 이 기기로 노래를 보내는 것을 중단했습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ഈ ഉപകരണത്തിലേക്ക് പാട്ടുകൾ അയയ്ക്കുന്നത് നിർത്തി."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ने या डिव्हाइसला गाणी पाठवणे थांबवले."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac berhenti menghantar lagu ke peranti ini."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macen har sluttet å sende sanger til denne enheten."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De Mac stuurt geen nummers meer naar dit apparaat."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ਨੇ ਇਸ ਡਿਵਾਈਸ ਨੂੰ ਗੀਤ ਭੇਜਣੇ ਬੰਦ ਕਰ ਦਿੱਤੇ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac przestał wysyłać utwory do tego urządzenia."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Mac parou de enviar músicas para este dispositivo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Mac deixou de enviar músicas para este dispositivo."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ul a încetat să trimită melodii către acest dispozitiv."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macen har slutat skicka låtar till den här enheten."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac imeacha kutuma nyimbo kwenye kifaa hiki."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac இந்தச் சாதனத்திற்குப் பாடல்களை அனுப்புவதை நிறுத்திவிட்டது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ఈ పరికరానికి పాటలను పంపడం ఆపివేసింది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac หยุดส่งเพลงมายังอุปกรณ์เครื่องนี้แล้ว"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac bu aygıta şarkı göndermeyi bıraktı."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac припинив надсилати пісні на цей пристрій."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac نے اس ڈیوائس کو گانے بھیجنا بند کر دیا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy Mac đã ngừng gửi bài hát đến thiết bị này."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 已停止傳送歌曲至此裝置。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 已停止向此设备发送歌曲。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 已停止傳送歌曲到此裝置。"
           }
         }
       }
@@ -56735,6 +59156,275 @@
         }
       }
     },
+    "USB DAC · 44.1–768 kHz · DSD512": {
+      "comment": "Shown on the iPhone or iPad. Part of the built-in demo, which shows a pretend Mac. This is what a real Mac would say in its own language: use the Mac app's established translation where one exists (look it up in /mnt/project-files/l10n/final/<lang>.json). One line describing a USB DAC in the outputs list: kind, sample-rate range, highest DSD rate. Keep “USB”, “DAC” as your language's audio press writes it, “kHz”, “DSD512”, the “·” separators and the en dash. Use your language's decimal separator in 44.1.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB-DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB-DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DAC USB · 44,1–768 kHz · DSD512"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · ۴۴٫۱–۷۶۸ kHz · DSD512"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB-DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DAC USB · 44,1–768 kHz · DSD512"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DAC USB · 44,1–768 kHz · DSD512"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB-DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB-DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DAC USB · 44,1–768 kHz · DSD512"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DAC USB · 44,1–768 kHz · DSD512"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DAC USB · 44,1–768 kHz · DSD512"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DAC USB · 44,1–768 kHz · DSD512"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB-DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB-ЦАП · 44,1–768 kHz · DSD512"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44,1–768 kHz · DSD512"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "USB DAC · 44.1–768 kHz · DSD512"
+          }
+        }
+      }
+    },
     "Use the volume buttons on this device.": {
       "localizations": {
         "am": {
@@ -59954,6 +62644,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "正在等待「%@」連線"
+          }
+        }
+      }
+    },
+    "Waiting for “%@”…": {
+      "comment": "Shown on the iPhone or iPad. Banner for the first seconds after the connection to the Mac drops, before the app says it can't reach it. %@ is the Mac's name. Short, one line. Keep the quotation marks in your language's style and the single ellipsis character.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@»ን በመጠበቅ ላይ…"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "في انتظار “%@”…"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”-এর অপেক্ষায়…"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Čeká se na Mac „%@“…"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Venter på “%@”…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warten auf „%@“ …"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αναμονή για το «%@»…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando a “%@”…"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "در انتظار «%@»…"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odotetaan Macia ”%@”…"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinihintay ang “%@”…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En attente de « %@ »…"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ની રાહ જોઈ રહ્યાં છીએ…"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana jiran “%@”…"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ממתין ל־“%@”…"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” की प्रतीक्षा है…"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Várakozás erre: „%@”…"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menunggu “%@”…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In attesa di “%@”…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」を待っています…"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ಗಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‘%@’을(를) 기다리는 중…"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”-നായി കാത്തിരിക്കുന്നു…"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ची प्रतीक्षा करत आहे…"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menunggu “%@”…"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Venter på «%@» …"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wachten op ‘%@’…"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ਦੀ ਉਡੀਕ ਹੈ…"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oczekiwanie na „%@”…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aguardando “%@”…"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A aguardar “%@”…"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se așteaptă „%@”…"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Väntar på ”%@” …"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inasubiri “%@”…"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”-க்காகக் காத்திருக்கிறது…"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” కోసం వేచి ఉంది…"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กำลังรอ “%@”…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” bekleniyor…"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очікування на «%@»…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” کا انتظار ہے…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang chờ “%@”…"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待「%@」…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待“%@”…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待「%@」…"
           }
         }
       }

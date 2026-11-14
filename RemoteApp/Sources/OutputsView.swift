@@ -10,6 +10,7 @@ import VespertineRemoteProtocol
 
 struct OutputsView: View {
     @Environment(RemoteAppModel.self) private var model
+    @Environment(\.horizontalSizeClass) private var sizeClass
     let session: RemoteSession
     @State private var feedback = CommandFeedback()
     @State private var editingConnection = false
@@ -84,17 +85,28 @@ struct OutputsView: View {
                         }
                         .foregroundStyle(Palette.text)
                     }
-                    Button("Choose Another Mac") { model.leave() }
-                }
-                Section {
-                    Button { showingSettings = true } label: { Label("Settings", systemImage: "gearshape") }
                 }
             }
             .obsidianList()
             .navigationTitle("Output").screenTitleStyle()
+            .toolbar {
+                // On an iPad's wide window the gear and "Macs" are in the window's own bars.
+                if sizeClass != .regular {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Menu {
+                            Button { showingSettings = true } label: { Label("Settings", systemImage: "gearshape") }
+                            Button { model.leave() } label: { Label("Choose Another Mac", systemImage: "desktopcomputer") }
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                        .accessibilityLabel(Text("Settings"))
+                        .accessibilityIdentifier("output-gear")
+                    }
+                }
+            }
             .feedback(feedback)
-            .sheet(isPresented: $editingConnection) { MacConnectionView(serverID: session.pairing.serverID) }
-            .sheet(isPresented: $showingSettings) { SettingsView() }
+            .sheet(isPresented: $editingConnection) { MacConnectionView(serverID: session.pairing.serverID).withoutMiniPlayer() }
+            .sheet(isPresented: $showingSettings) { SettingsView().withoutMiniPlayer() }
         }
     }
 

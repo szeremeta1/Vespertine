@@ -191,27 +191,31 @@ struct MiniPlayer: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel(Text("Now Playing: \(track.title), \(track.artist)"))
                 .accessibilityHint(Text("Opens Now Playing"))
-                Button { feedback.run(session, .playPause) } label: {
-                    Image(systemName: session.shownPlayer?.playback == .playing ? "pause.fill" : "play.fill")
-                        .font(.title3).frame(width: 44, height: 44).contentShape(Rectangle())
+                HStack(spacing: 12) {
+                    Button { feedback.run(session, .playPause) } label: {
+                        Image(systemName: session.shownPlayer?.playback == .playing ? "pause.fill" : "play.fill")
+                            .font(.title3).frame(width: 44, height: 44).contentShape(Rectangle())
+                    }
+                    .accessibilityLabel(session.shownPlayer?.playback == .playing ? Text("Pause") : Text("Play"))
+                    Button { feedback.run(session, .next) } label: {
+                        Image(systemName: "forward.fill").font(.body).frame(width: 44, height: 44).contentShape(Rectangle())
+                    }
+                    .accessibilityLabel(Text("Next"))
                 }
-                .accessibilityLabel(session.shownPlayer?.playback == .playing ? Text("Pause") : Text("Play"))
-                Button { feedback.run(session, .next) } label: {
-                    Image(systemName: "forward.fill").font(.body).frame(width: 44, height: 44).contentShape(Rectangle())
-                }
-                .accessibilityLabel(Text("Next"))
+                .playbackDirection()
             }
             .buttonStyle(.plain)
             .foregroundStyle(Palette.text)
             .disabled(!session.canControl)
             .padding(.leading, 10).padding(.trailing, 6).padding(.vertical, 7)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(alignment: .bottom) { MiniProgress(session: session).padding(.horizontal, 14) }
+            .overlay(alignment: .bottom) { MiniProgress(session: session).padding(.horizontal, 14).playbackDirection() }
             .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
             .frame(maxWidth: 760)
             .padding(.horizontal, 10).padding(.bottom, 6)
             .frame(maxWidth: .infinity)
             .sensoryFeedback(.impact(weight: .light), trigger: session.shownPlayer?.playback)
+            .dynamicTypeSize(...RemoteLayout.miniPlayerLargestText)
         }
     }
 }
@@ -221,11 +225,11 @@ private struct MiniProgress: View {
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
-            let duration = max(session.shownPlayer?.duration ?? 0, 0)
-            let position = session.shownPlayer?.expectedPosition(at: context.date) ?? 0
+            let played = RemoteLayout.played(position: session.shownPlayer?.expectedPosition(at: context.date) ?? 0,
+                                             duration: session.shownPlayer?.duration ?? 0)
             GeometryReader { geometry in
                 Capsule().fill(Palette.brass)
-                    .frame(width: duration > 0 ? geometry.size.width * min(1, position / duration) : 0, height: 1.5)
+                    .frame(width: max(0, geometry.size.width) * played, height: 1.5)
             }
             .frame(height: 1.5)
         }
@@ -234,9 +238,46 @@ private struct MiniProgress: View {
 }
 
 extension View {
-    /// Keeps the mini player above the tab bar on this tab.
+    /// Keeps the mini player above the tab bar on this tab, and tells every list inside how much room it takes
+    /// (`clearsMiniPlayer`), so their last rows scroll clear of it.
     func miniPlayer(session: RemoteSession, open: @escaping () -> Void) -> some View {
-        safeAreaInset(edge: .bottom, spacing: 0) { MiniPlayer(session: session, open: open) }
+        modifier(MiniPlayerHost(session: session, open: open))
+    }
+
+    /// On a list or a scrolling page: its end stops above the mini player rather than under it. A safe-area inset set
+    /// outside a navigation stack doesn't reach the lists inside it, which left the last row of Output under the player.
+    func clearsMiniPlayer() -> some View { modifier(ClearsMiniPlayer()) }
+
+    /// For a sheet shown from a screen that has the mini player: the sheet covers it, so nothing needs clearing.
+    func withoutMiniPlayer() -> some View { environment(\.miniPlayerClearance, 0) }
+}
+
+extension EnvironmentValues {
+    /// The height the mini player takes at the bottom of this screen (0 when it isn't showing).
+    @Entry var miniPlayerClearance: CGFloat = 0
+}
+
+private struct MiniPlayerHost: ViewModifier {
+    let session: RemoteSession
+    let open: () -> Void
+    @State private var height: CGFloat = 0
+
+    func body(content: Content) -> some View {
+        content
+            .environment(\.miniPlayerClearance, height)
+            .overlay(alignment: .bottom) {
+                MiniPlayer(session: session, open: open)
+                    .accessibilityIdentifier("mini-player")
+                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height = $0 }
+            }
+    }
+}
+
+private struct ClearsMiniPlayer: ViewModifier {
+    @Environment(\.miniPlayerClearance) private var clearance
+
+    func body(content: Content) -> some View {
+        content.safeAreaInset(edge: .bottom, spacing: 0) { Color.clear.frame(height: clearance).accessibilityHidden(true) }
     }
 }
 
@@ -245,6 +286,8 @@ struct ConnectionBanner: View {
     @Environment(RemoteAppModel.self) private var model
     let session: RemoteSession
     @State private var editing = false
+    /// Still within the first seconds of the Mac not answering.
+    @State private var patient = true
 
     var body: some View {
         Group {
@@ -277,11 +320,31 @@ struct ConnectionBanner: View {
             }
         }
         .sheet(isPresented: $editing) { MacConnectionView(serverID: session.pairing.serverID) }
+        .onChange(of: session.isConnected) { _, connected in if connected { patient = true } }
     }
 
     @ViewBuilder private var unreachable: some View {
         let name = session.pairing.name
         let trouble = model.trouble(reaching: session.pairing.serverID)
+        if Self.waitsQuietly(trouble, patient: patient) {
+            banner(Text("Waiting for “\(name)”…", comment: "Connection banner on the iPhone for the first seconds after the Mac stops answering (it may just be restarting). %@ is the Mac's name."), busy: true)
+                .task {
+                    try? await Task.sleep(for: Self.patience)
+                    patient = false
+                }
+        } else {
+            troubled(trouble, name: name)
+        }
+    }
+
+    /// How long a Mac that stopped answering is simply waited for before the banner says what may be wrong.
+    static let patience: Duration = .seconds(10)
+
+    /// A Mac that just stopped answering is usually restarting or changing networks: for the first seconds, wait without
+    /// alarm. Not when this device itself is offline: that is known at once, and worth saying.
+    static func waitsQuietly(_ trouble: ReachTrouble, patient: Bool) -> Bool { patient && trouble != .offline }
+
+    private func troubled(_ trouble: ReachTrouble, name: String) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 10) {
                 ProgressView()

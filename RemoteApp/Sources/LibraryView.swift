@@ -343,6 +343,7 @@ struct AlbumsGrid: View {
                     Text(problem).font(.callout).foregroundStyle(Palette.text2).multilineTextAlignment(.center).padding(.top, 60).padding(.horizontal, 32)
                 }
             }
+            .clearsMiniPlayer()
             .accessibilityIdentifier("albums-grid")
         }
     }
@@ -563,7 +564,7 @@ struct TrackRows: View {
             }
         }
         .feedback(feedback)
-        .sheet(item: $adding) { AddToPlaylistSheet(session: session, addition: $0) }
+        .sheet(item: $adding) { AddToPlaylistSheet(session: session, addition: $0).withoutMiniPlayer() }
     }
 }
 

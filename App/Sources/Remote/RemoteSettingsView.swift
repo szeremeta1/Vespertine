@@ -27,6 +27,10 @@ struct RemoteSettingsView: View {
             Section {
                 Toggle("Let phones control Vespertine", isOn: Binding(get: { store.enabled }, set: { store.enabled = $0; server.apply() }))
                 if store.enabled { Text(statusLine).font(.caption).foregroundStyle(.secondary) }
+                if store.enabled, server.notAnnounced {
+                    Text("Phones can’t find this Mac by themselves right now. Allow Vespertine under System Settings › Privacy & Security › Local Network, or type this Mac’s address on the phone.", comment: "Settings › Remote: the Mac is listening, but macOS isn't announcing it on the network (Local Network permission is off).")
+                        .font(.caption).foregroundStyle(.orange)
+                }
             } header: {
                 Text("Remote")
             } footer: {

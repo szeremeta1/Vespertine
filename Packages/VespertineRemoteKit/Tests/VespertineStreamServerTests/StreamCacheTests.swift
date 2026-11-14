@@ -82,3 +82,31 @@ private func put(_ cache: StreamCache, _ key: String, bytes: Int, at age: TimeIn
         #expect(cache.totalBytes == 150)
     }
 }
+
+@Suite struct StreamCacheFolderTests {
+    private let caches = URL(fileURLWithPath: "/Users/someone/Library/Caches", isDirectory: true)
+
+    @Test func eachAppCopyKeepsItsOwnConvertedSongs() {
+        let released = StreamCache.folder(caches: caches, bundleID: "org.szeremeta.Vespertine", dataDirectoryOverride: nil)
+        let dev = StreamCache.folder(caches: caches, bundleID: "org.szeremeta.Vespertine.dev", dataDirectoryOverride: nil)
+        let test = StreamCache.folder(caches: caches, bundleID: "org.szeremeta.VespertineIOSTest", dataDirectoryOverride: nil)
+        #expect(released.path == "/Users/someone/Library/Caches/Vespertine/Remote/Streams")
+        #expect(dev.path == "/Users/someone/Library/Caches/org.szeremeta.Vespertine.dev/Remote/Streams")
+        #expect(Set([released, dev, test]).count == 3)
+        // No bundle (a command-line run): the plain folder.
+        #expect(StreamCache.folder(caches: caches, bundleID: nil, dataDirectoryOverride: nil) == released)
+    }
+
+    @Test func aRunOnATestLibraryKeepsThemInsideIt() {
+        let library = URL(fileURLWithPath: "/tmp/qa-library", isDirectory: true)
+        let folder = StreamCache.folder(caches: caches, bundleID: "org.szeremeta.Vespertine", dataDirectoryOverride: library)
+        #expect(folder.path == "/tmp/qa-library/Remote Streams")
+    }
+
+    @Test func aLimitInGigabytesIsShownAsThatManyGigabytes() {
+        #expect(StreamCache.bytes(gigabytes: 8) == 8_000_000_000)
+        let shown = ByteCountFormatter.string(fromByteCount: StreamCache.bytes(gigabytes: 8), countStyle: .file)
+        #expect(shown.contains("8") && !shown.contains("59"))
+        #expect(StreamCache.bytes(gigabytes: -1) == 0)
+    }
+}

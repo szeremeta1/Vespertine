@@ -113,7 +113,7 @@ public final class PhonePlayer {
         engine.attach(node)
         // "Played back" allows for the output's latency (a Bluetooth route's is long); an engine rendering offline has no
         // output to wait for and only says "rendered".
-        pump = Pump(node: node, completion: engine.isInManualRenderingMode ? .dataRendered : .dataPlayedBack)
+        pump = Pump(node: node, engine: engine, completion: engine.isInManualRenderingMode ? .dataRendered : .dataPlayedBack)
         pump.send = { [weak self] event in
             Task { @MainActor in self?.handle(event) }
         }
@@ -431,8 +431,13 @@ private final class Pump: @unchecked Sendable {
 
     private let completion: AVAudioPlayerNodeCompletionCallbackType
 
-    init(node: AVAudioPlayerNode, completion: AVAudioPlayerNodeCompletionCallbackType) {
+    /// Held so the node keeps its engine for as long as a fill may be in flight: a buffer scheduled on a node whose engine
+    /// has gone is an exception, and the player can be let go while the pump's queue is still decoding.
+    private let engine: AVAudioEngine
+
+    init(node: AVAudioPlayerNode, engine: AVAudioEngine, completion: AVAudioPlayerNodeCompletionCallbackType) {
         self.node = node
+        self.engine = engine
         self.completion = completion
     }
 

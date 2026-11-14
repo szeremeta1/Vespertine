@@ -46,6 +46,8 @@ public enum RemoteProtocol {
         public static let appVersion = "app"
         /// The port the Mac listens on (the same one Bonjour resolves to, for a phone to keep against its typed address).
         public static let port = "port"
+        /// "1" when the Mac is a notebook; absent otherwise and from a Mac that doesn't say.
+        public static let portable = "nb"
     }
 
     /// The TLS pre-shared key identity a phone uses while pairing with the code from the QR link, and with the typed code.
@@ -203,6 +205,13 @@ public enum AlbumSort: String, Codable, Sendable, Equatable, CaseIterable {
 /// Which albums the Albums page shows.
 public enum AlbumFilter: String, Codable, Sendable, Equatable, CaseIterable {
     case all, hiRes, dsd, surround
+
+    /// What the Hi-Res filter and the Hi-Res mark on the phone mean: DSD, or lossless at 88.2 kHz and up, the same line
+    /// the "Hi-Res ≥ 88.2 kHz" smart playlist draws. A 24-bit album at 44.1 or 48 kHz isn't on that side of it.
+    /// `aboveCD`: lossless with more than 16 bits or more than 48 kHz, or DSD (what the Mac's library calls hi-res).
+    public static func countsAsHiRes(aboveCD: Bool, dsd: Bool, maxSampleRate: Double) -> Bool {
+        dsd || (aboveCD && maxSampleRate >= 88_200)
+    }
 }
 
 public enum AlbumListing {
@@ -262,6 +271,11 @@ public enum ServerMessage: Codable, Sendable, Equatable {
     case outputs(OutputsState)
     /// The Mac is closing the connection (the remote server was turned off, or this phone was removed).
     case goodbye(reason: GoodbyeReason)
+    /// Protocol 2: the Mac has closed this phone's streams and won't open more (Stream to Phones was turned off, or this
+    /// phone was). The phone stops what it plays from the Mac at once, the songs it had fetched ahead included; songs kept
+    /// on the phone are its own. `reason` is a sentence for showing as it is. An older phone doesn't know the message and
+    /// passes over it.
+    case streamsClosed(reason: String?)
 }
 
 public enum GoodbyeReason: String, Codable, Sendable, Equatable {
@@ -303,9 +317,13 @@ public struct ServerInfo: Codable, Sendable, Equatable {
     /// other VPN) address and name when it has them. A phone keeps them and tries them all next time, so it finds the Mac
     /// from away without anybody typing an address. nil from a Mac that doesn't say.
     public var addresses: [RemoteAddress]?
+    /// The Mac is a notebook (it has a battery of its own), for showing the right picture of it. nil from a Mac that
+    /// doesn't say.
+    public var portable: Bool?
 
     public init(name: String, serverID: String, appVersion: String, protocolVersion: Int = RemoteProtocol.version,
-                addresses: [RemoteAddress]? = nil) {
+                addresses: [RemoteAddress]? = nil, portable: Bool? = nil) {
+        self.portable = portable
         self.name = name
         self.serverID = serverID
         self.appVersion = appVersion

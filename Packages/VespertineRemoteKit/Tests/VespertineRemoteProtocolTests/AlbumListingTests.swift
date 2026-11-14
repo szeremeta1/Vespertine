@@ -44,4 +44,15 @@ private func album(_ title: String, _ artist: String, _ year: Int?, hiRes: Bool 
         let old = try RemoteProtocol.decoder().decode(ClientMessage.self, from: Data(#"{"command":{"albums":{"limit":5,"offset":0}},"id":1}"#.utf8))
         #expect(old.command == .albums(offset: 0, limit: 5, sort: nil, filter: nil))
     }
+
+    @Test func hiResStartsAt88Point2LikeTheSmartPlaylist() {
+        // 24-bit at CD-era rates is above CD, but not on the Hi-Res side of the line.
+        #expect(!AlbumFilter.countsAsHiRes(aboveCD: true, dsd: false, maxSampleRate: 44_100))
+        #expect(!AlbumFilter.countsAsHiRes(aboveCD: true, dsd: false, maxSampleRate: 48_000))
+        #expect(AlbumFilter.countsAsHiRes(aboveCD: true, dsd: false, maxSampleRate: 88_200))
+        #expect(AlbumFilter.countsAsHiRes(aboveCD: true, dsd: false, maxSampleRate: 192_000))
+        #expect(AlbumFilter.countsAsHiRes(aboveCD: true, dsd: true, maxSampleRate: 2_822_400))
+        // A lossy file at a high rate isn't hi-res.
+        #expect(!AlbumFilter.countsAsHiRes(aboveCD: false, dsd: false, maxSampleRate: 96_000))
+    }
 }

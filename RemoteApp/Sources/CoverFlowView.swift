@@ -50,6 +50,7 @@ struct CoverFlowView: View {
             }
             .scrollBounceBehavior(.basedOnSize)
         }
+        .clearsMiniPlayer()
         .background(floor.ignoresSafeArea())
         .feedback(feedback)
         .sensoryFeedback(.selection, trigger: front)
@@ -58,6 +59,7 @@ struct CoverFlowView: View {
                 AlbumView(session: session, album: album)
                     .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { opened = nil } } }
             }
+            .withoutMiniPlayer()
             .presentationDetents([.medium, .large])
         }
         .onChange(of: front) { _, new in

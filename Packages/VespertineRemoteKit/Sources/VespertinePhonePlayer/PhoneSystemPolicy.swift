@@ -34,6 +34,41 @@ public struct InterruptionPolicy: Sendable, Equatable {
     public mutating func userActed() { resumesAfter = false }
 }
 
+/// Where the song is, told only when it's news. A song that plays moves by itself, and whoever shows it works out where
+/// it has got to from where it was and when (`PlayerState.expectedPosition`); telling every reading afresh redrew the
+/// whole player four times a second, in the background too.
+public struct PositionAnchor: Sendable, Equatable {
+    /// The reading may run this far from where the anchor expects it before the anchor moves.
+    public static let tolerance = 0.25
+
+    public private(set) var position: Double
+    public private(set) var at: Date
+    /// The song was advancing at `at`.
+    public private(set) var moving: Bool
+
+    public init(position: Double = 0, at: Date = Date(), moving: Bool = false) {
+        self.position = position
+        self.at = at
+        self.moving = moving
+    }
+
+    public func expected(at date: Date) -> Double { moving ? position + date.timeIntervalSince(at) : position }
+
+    /// Takes a reading. True when it is news: the song started or stopped moving, or isn't where it was expected.
+    public mutating func read(_ now: Double, moving: Bool, at date: Date = Date()) -> Bool {
+        guard moving != self.moving || abs(now - expected(at: date)) > Self.tolerance else { return false }
+        place(now, moving: moving, at: date)
+        return true
+    }
+
+    /// The song was put here (a seek, another song).
+    public mutating func place(_ now: Double, moving: Bool, at date: Date = Date()) {
+        position = now
+        at = date
+        self.moving = moving
+    }
+}
+
 public enum RouteChangePolicy {
     public enum Reason: Sendable, Equatable { case oldDeviceUnavailable, newDeviceAvailable, other }
 

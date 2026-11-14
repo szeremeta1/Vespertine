@@ -52,7 +52,7 @@ struct MacsView: View {
                             HStack(spacing: 4) {
                                 Button { model.choose(saved) } label: {
                                     HStack(spacing: 12) {
-                                        Image(systemName: "macmini").foregroundStyle(Palette.brass).frame(width: 28)
+                                        Image(systemName: SavedPairing.symbol(portable: saved.portable)).foregroundStyle(Palette.brass).frame(width: 28)
                                         VStack(alignment: .leading, spacing: 2) {
                                             Text(saved.name).font(.serif(.body, weight: .medium)).foregroundStyle(Palette.text)
                                             Text(reach(saved)).font(.caption).foregroundStyle(Palette.text2)
@@ -83,7 +83,7 @@ struct MacsView: View {
                         }
                     }
                     ForEach(unpaired) { mac in
-                        Button { pairing = mac } label: { Label(mac.name, systemImage: "macmini") }
+                        Button { pairing = mac } label: { Label(mac.name, systemImage: SavedPairing.symbol(portable: mac.portable)) }
                     }
                     Button { scanning = true } label: { Label("Scan the Pairing Code", systemImage: "qrcode.viewfinder") }
                 } header: {

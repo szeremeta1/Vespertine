@@ -27,6 +27,25 @@ public final class StreamCache: @unchecked Sendable {
     public func metadataURL(for key: String) -> URL { directory.appendingPathComponent(key).appendingPathExtension("json") }
 
     /// A stable name for a conversion: everything the bytes depend on.
+    /// A limit given in gigabytes, in bytes: decimal gigabytes, the ones Finder and the "In use" figure beside it count
+    /// in, so "8 GB" is shown as 8 GB (in binary ones it read "8.59 GB").
+    public static func bytes(gigabytes: Int) -> Int64 { Int64(max(0, gigabytes)) * 1_000_000_000 }
+
+    /// The bundle identifier of the released app, whose folder is plainly "Vespertine".
+    public static let releasedBundleID = "org.szeremeta.Vespertine"
+
+    /// Where an app copy keeps its converted songs, so two copies never share them: a run on its own data directory (a test
+    /// library) keeps them inside it; otherwise in Caches, under the released app's name or, for any other build (a
+    /// development or test copy), under its bundle identifier.
+    public static func folder(caches: URL, bundleID: String?, dataDirectoryOverride: URL?) -> URL {
+        if let dataDirectoryOverride {
+            return dataDirectoryOverride.appendingPathComponent("Remote Streams", isDirectory: true)
+        }
+        let name = bundleID.flatMap { $0 == releasedBundleID || $0.isEmpty ? nil : $0 } ?? "Vespertine"
+        return caches.appendingPathComponent(name, isDirectory: true).appendingPathComponent("Remote", isDirectory: true)
+            .appendingPathComponent("Streams", isDirectory: true)
+    }
+
     public static func key(for request: TranscodeRequest) -> String {
         let text = ["v1", request.source.path, String(request.sourceSize), String(request.sourceModified.timeIntervalSince1970), request.regionKey ?? "",
                     String(request.sampleRate), String(request.bitDepth), String(request.channels)].joined(separator: "|")

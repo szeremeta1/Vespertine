@@ -50,6 +50,12 @@ final class AdaptiveLayoutTests: XCTestCase {
         // Short windows shrink the cover but never make it wider than the controls.
         XCTAssertLessThan(RemoteLayout.coverSide(width: 700, height: 600, columns: false), RemoteLayout.controlsWidth(width: 700))
     }
+    func testRowNamesWrapAtAccessibilityTextSizesAndTheMiniPlayerStopsGrowing() {
+        XCTAssertEqual(RemoteLayout.rowTitleLines(accessibilityText: false), 1)
+        XCTAssertNil(RemoteLayout.rowTitleLines(accessibilityText: true))
+        XCTAssertLessThan(RemoteLayout.miniPlayerLargestText, .accessibility3)
+    }
+
     func testAlbumGridAdaptsWithoutTinyCovers() {
         XCTAssertEqual(RemoteLayout.albumColumns(width: 320, accessibilityText: false), 1)
         XCTAssertEqual(RemoteLayout.albumColumns(width: 440, accessibilityText: false), 2)
@@ -105,5 +111,16 @@ final class FlowRowsTests: XCTestCase {
 
     func testNothingToPlaceTakesNoRoom() {
         XCTAssertEqual(FlowRows.place([], width: 300, spacing: 6, lineSpacing: 6).size, .zero)
+    }
+
+    func testTheProgressBarNeverGetsAWidthItCannotDraw() {
+        XCTAssertEqual(RemoteLayout.played(position: 30, duration: 120), 0.25)
+        // The Mac's clock a moment ahead of the phone's: a position just before the start.
+        XCTAssertEqual(RemoteLayout.played(position: -0.2, duration: 120), 0)
+        XCTAssertEqual(RemoteLayout.played(position: 500, duration: 120), 1)
+        // No length yet, or nonsense.
+        XCTAssertEqual(RemoteLayout.played(position: 5, duration: 0), 0)
+        XCTAssertEqual(RemoteLayout.played(position: .nan, duration: 120), 0)
+        XCTAssertEqual(RemoteLayout.played(position: 5, duration: .infinity), 0)
     }
 }

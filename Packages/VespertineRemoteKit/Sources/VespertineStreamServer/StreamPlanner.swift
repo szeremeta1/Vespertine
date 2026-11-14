@@ -16,6 +16,11 @@ public struct StreamPlan: Sendable, Equatable {
     /// Set when `kind` is `.flac`.
     public var transcode: TranscodeRequest?
     public var macOnlyReason: String?
+    /// The FLAC is the song cut out of a longer lossless file (a CUE track) with nothing else done to it: same rate, no
+    /// bits dropped. The phone says "cut", not "converted".
+    public var cutOnly = false
+    /// Asked for the smaller form, and the rate came down for it (below what this song would otherwise be sent at).
+    public var reduced = false
 }
 
 public enum StreamPlanner {
@@ -67,7 +72,10 @@ public enum StreamPlanner {
                                        trackID: facts.id, sampleRate: rate, bitDepth: depth, channels: facts.channels)
         let delivered = StreamFormat(codec: "FLAC", container: "flac", sampleRate: rate, bitDepth: depth, channels: facts.channels,
                                      channelLabels: nil, lossless: facts.isLossless)
-        return StreamPlan(kind: .flac, delivered: delivered, transcode: request, macOnlyReason: nil)
+        let cutOnly = facts.isRegion && facts.isLossless && !facts.isDSD && abs(rate - facts.sampleRate) < 0.5 && depth >= (facts.bitDepth ?? 16)
+        let unreduced = facts.isDSD ? targetRate(source: facts.sampleRate, isDSD: true, ceiling: nil) : facts.sampleRate
+        return StreamPlan(kind: .flac, delivered: delivered, transcode: request, macOnlyReason: nil, cutOnly: cutOnly,
+                          reduced: smaller && rate < unreduced - 0.5)
     }
 
     /// The rate of a conversion: the source's own rate (DSD: a PCM rate of its family), never raised, never above the phone's
