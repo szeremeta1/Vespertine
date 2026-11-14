@@ -95,6 +95,9 @@ public enum FLACStreamTranscoder {
         do {
             encoder = try AudioEncoder(url: destination, encoderName: .FLAC)
             try encoder.setSourceFormat(sourceFormat)
+            // Somebody is waiting to hear this: a lighter FLAC setting encodes noticeably quicker for a file a few percent
+            // bigger. Lossless either way; the samples are the same.
+            encoder.settings = [.flacCompressionLevel: 2]
             encoder.estimatedFramesToEncode = Int64((Double(decoder.length) * target / inFormat.sampleRate).rounded())
             try encoder.openReturningError()
         } catch {
