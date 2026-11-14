@@ -29,14 +29,16 @@ final class PlayTarget {
     /// Why songs aren't fetched right now (cellular data with playing over it turned off), or nil.
     @ObservationIgnored var holdReason: String?
     /// How much has been fetched from the Mac for playing here since the app opened.
-    var bytesReceived: Int64 { made?.remote.playback.bytesReceived ?? 0 }
+    var bytesReceived: Int64 { (made?.remote.playback.bytesReceived ?? 0) + KeptShelf.shared.bytesReceived }
     private var made: (session: ObjectIdentifier, remote: PhoneRemote, system: PhoneSystem)?
 
     /// The phone's player for `session` when this device is where music plays and the Mac can send songs; nil when the
     /// Mac plays.
     func phone(for session: RemoteSession) -> PhoneRemote? {
-        guard onThisDevice, session.canStream, !session.isDemo else { return nil }
+        guard onThisDevice, !session.isDemo else { return nil }
+        // Once made it stays, connected or not: a song that is playing doesn't vanish from Now Playing when the Mac does.
         if let made, made.session == ObjectIdentifier(session) { return made.remote }
+        guard session.canStream || KeptShelf.shared.hasKept(session) else { return nil }
         return make(for: session)
     }
 
@@ -68,6 +70,8 @@ final class PlayTarget {
         remote.words = { signal in (Self.badge(signal), Self.output(signal)) }
         remote.surroundChoice = surround
         playback.holdReason = { [weak self] in self?.holdReason }
+        let keeper = KeptShelf.shared.keeper(for: session)
+        playback.kept = { [weak keeper] song in keeper?.store.kept(song).map { ($0.file, $0.descriptor) } }
         remote.macName = session.server?.name ?? session.pairing.name
         let system = PhoneSystem(remote: remote) { [weak session] key in
             guard let session, case .artwork(_, _, _, let data) = await session.send(.artwork(key: key, size: 600)) else { return nil }

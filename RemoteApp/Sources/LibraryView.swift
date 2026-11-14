@@ -5,6 +5,7 @@
 //
 
 import SwiftUI
+import VespertinePhonePlayer
 import VespertineRemoteClient
 import VespertineRemoteProtocol
 
@@ -38,6 +39,7 @@ struct LibraryView: View {
                 case "genres": GenresGrid(session: session)
                 case "recentlyAdded": AlbumsGrid(session: session, listing: .recentlyAdded)
                 case "playlists": PlaylistsList(session: session)
+                case "kept": KeptListsView(session: session)
                 case "favorites": TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil)
                 default: AlbumsGrid(session: session)
                 }
@@ -53,7 +55,7 @@ struct LibraryView: View {
                 guard section == nil else { return }
                 switch model.startScreen {
                 case "albums", "coverFlow", "album": path = ["albums"]; if model.startScreen != "album" { model.startScreen = nil }
-                case "artists", "songs", "genres", "recentlyAdded", "playlists", "favorites":
+                case "artists", "songs", "genres", "recentlyAdded", "playlists", "favorites", "kept":
                     if let screen = model.startScreen { path = [screen] }
                     model.startScreen = nil
                 default: break
@@ -73,6 +75,9 @@ struct LibraryView: View {
                 rootLink("recentlyAdded", .recentlyAdded)
                 rootLink("favorites", .favorites, count: overview?.favorites)
                 rootLink("playlists", .playlists, count: overview?.playlists)
+            }
+            if !session.isDemo {
+                Section { rootLink("kept", .kept, count: KeptShelf.shared.keeper(for: session)?.store.lists.count) }
             }
             if let sources = overview?.sources, !sources.isEmpty {
                 Section("Sources") {
@@ -100,6 +105,7 @@ struct LibraryView: View {
             case .genres: GenresGrid(session: session)
             case .recentlyAdded: AlbumsGrid(session: session, listing: .recentlyAdded)
             case .playlists: PlaylistsList(session: session).readablePane()
+            case .kept: KeptListsView(session: session).readablePane()
             case .favorites: TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil).readablePane()
             case .source(let id):
                 if let source = overview?.sources.first(where: { $0.id == id }) {
@@ -306,6 +312,14 @@ struct AlbumView: View {
         }
         .obsidianList()
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                KeepButton(session: session, id: KeptList.albumID(album.key)) {
+                    tracks.isEmpty ? nil : KeptList(id: KeptList.albumID(album.key), kind: .album, reference: album.key, title: album.title, subtitle: album.artist,
+                                                    artworkKey: album.artworkKey, tracks: tracks, smaller: KeptShelf.shared.smaller)
+                }
+            }
+        }
         .feedback(feedback)
         .task(id: session.isConnected) { if tracks.isEmpty, case .tracks(let items) = await session.send(.albumTracks(key: album.key)) { tracks = items } }
     }
@@ -365,7 +379,11 @@ struct PlaylistsList: View {
         List(playlists) { playlist in
             NavigationLink {
                 TrackListView(session: session, title: Text(playlist.name), load: .playlistTracks(id: playlist.id),
-                              play: { _ in .playPlaylist(id: playlist.id, shuffled: false) })
+                              play: { _ in .playPlaylist(id: playlist.id, shuffled: false) },
+                              keep: { tracks in
+                                  KeptList(id: KeptList.playlistID(playlist.id), kind: .playlist, reference: String(playlist.id), title: playlist.name, subtitle: "",
+                                           artworkKey: tracks.first?.artworkKey, tracks: tracks, smaller: KeptShelf.shared.smaller)
+                              }, keepID: KeptList.playlistID(playlist.id))
             } label: {
                 Label(playlist.name, systemImage: playlist.smart ? "gearshape" : "music.note.list")
             }
@@ -383,6 +401,9 @@ struct TrackListView: View {
     let load: RemoteCommand
     /// How to play from a row (nil: play these songs from that row).
     let play: ((Int) -> RemoteCommand)?
+    /// For a list that can be kept on this device (a playlist): makes the kept list from its songs.
+    var keep: (([TrackSummary]) -> KeptList)? = nil
+    var keepID: String? = nil
     @State private var tracks: [TrackSummary] = []
 
     var body: some View {
@@ -391,6 +412,11 @@ struct TrackListView: View {
         }
         .obsidianList()
         .navigationTitle(title).screenTitleStyle()
+        .toolbar {
+            if let keep, let keepID {
+                ToolbarItem(placement: .topBarTrailing) { KeepButton(session: session, id: keepID) { tracks.isEmpty ? nil : keep(tracks) } }
+            }
+        }
         .task(id: session.isConnected) { if case .tracks(let items) = await session.send(load) { tracks = items } }
     }
 }

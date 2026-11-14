@@ -71,7 +71,10 @@ final class RemoteAppModel {
         let session = RemoteSession(pairing: pairing, clientName: deviceName, routes: { [weak self] in
             self?.routes(to: serverID) ?? []
         })
-        session.onConnected = { [weak self] _, address in self?.remember(address, for: serverID) }
+        session.onConnected = { [weak self, weak session] _, address in
+            self?.remember(address, for: serverID)
+            if let session { KeptShelf.shared.connected(session) }
+        }
         self.session = session
         artwork.session = session
         UserDefaults.standard.set(pairing.serverID, forKey: Self.lastMacKey)
@@ -103,6 +106,7 @@ final class RemoteAppModel {
     func forget(_ pairing: SavedPairing) {
         if session?.pairing.serverID == pairing.serverID { leave() }
         if !transientPairings.contains(pairing.serverID) { keychain.remove(serverID: pairing.serverID) }
+        KeptShelf.shared.forget(serverID: pairing.serverID)
         pairings.removeAll { $0.serverID == pairing.serverID }
     }
 
@@ -194,6 +198,8 @@ final class RemoteAppModel {
         PlayTarget.shared.holdReason = cellular && !settings.cellularPlayback
             ? String(localized: "Playing over cellular data is off. Connect to Wi-Fi, or turn it on in Settings.") : nil
         if online { session?.networkChanged() }
+        // Fetching to keep waits out cellular data too, and carries on when Wi-Fi is back.
+        if PlayTarget.shared.holdReason == nil, let session { KeptShelf.shared.keeper(for: session)?.resume() }
     }
 
     // MARK: Pairing

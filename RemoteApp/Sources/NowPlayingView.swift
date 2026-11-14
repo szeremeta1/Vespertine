@@ -179,7 +179,7 @@ struct NowPlayingView: View {
                     }
                 })
                 .tint(Palette.brass)
-                .disabled(duration <= 0 || !session.isConnected)
+                .disabled(duration <= 0 || !session.canControl)
                 .accessibilityLabel(Text("Position"))
                 .accessibilityValue(Text("\(formatTime(position)) of \(formatTime(duration))"))
                 HStack {
@@ -211,8 +211,8 @@ struct NowPlayingView: View {
         .font(.title)
         .foregroundStyle(Palette.text)
         .buttonStyle(.plain)
-        .disabled(!session.isConnected)
-        .opacity(session.isConnected ? 1 : 0.5)
+        .disabled(!session.canControl)
+        .opacity(session.canControl ? 1 : 0.5)
     }
 
     private var modes: some View {
@@ -234,7 +234,7 @@ struct NowPlayingView: View {
         }
         .font(.body)
         .buttonStyle(.plain)
-        .disabled(!session.isConnected)
+        .disabled(!session.canControl)
     }
 
     private func modeButton(_ symbol: String, on: Bool, label: Text, value: Text? = nil, command: @escaping () -> RemoteCommand) -> some View {

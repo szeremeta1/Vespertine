@@ -4,6 +4,8 @@ import Foundation
 
 nonisolated enum RemoteDestination: Hashable, Sendable {
     case nowPlaying, library, artists, songs, genres, recentlyAdded, favorites, playlists, queue, output
+    /// What is kept on this device, playable without the Mac.
+    case kept
     /// One of the Mac's sources (`SourceSummary.id`), listed in the sidebar as on the Mac.
     case source(Int64)
 
@@ -23,6 +25,7 @@ nonisolated enum RemoteDestination: Hashable, Sendable {
         case .playlists: "playlists"
         case .queue: "queue"
         case .output: "output"
+        case .kept: "kept"
         case .source(let id): "source-\(id)"
         }
     }
@@ -47,6 +50,7 @@ nonisolated enum RemoteDestination: Hashable, Sendable {
         case .playlists: "music.note.list"
         case .queue: "list.bullet"
         case .output: "hifispeaker"
+        case .kept: "arrow.down.circle"
         case .source: "folder"
         }
     }
@@ -62,6 +66,7 @@ nonisolated enum RemoteDestination: Hashable, Sendable {
         case .playlists: String(localized: "Playlists")
         case .queue: String(localized: "Queue")
         case .output: String(localized: "Output")
+        case .kept: String(localized: "On This Device")
         case .source: String(localized: "Source")
         }
     }
@@ -74,6 +79,7 @@ nonisolated enum RemoteDestination: Hashable, Sendable {
         case "recentlyAdded": .recentlyAdded
         case "playlists": .playlists
         case "favorites": .favorites
+        case "kept": .kept
         case "queue": .queue
         case "output": .output
         default: .nowPlaying

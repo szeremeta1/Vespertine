@@ -58,6 +58,7 @@ struct RemoteView: View {
                     sidebarLink(.recentlyAdded)
                     sidebarLink(.favorites, count: overview?.favorites)
                     sidebarLink(.playlists, count: overview?.playlists)
+                    if !session.isDemo { sidebarLink(.kept) }
                 }
                 if let sources = overview?.sources, !sources.isEmpty {
                     Section("Sources") {
@@ -116,7 +117,7 @@ struct RemoteView: View {
         case .output:
             OutputsView(session: session).readablePane()
                 .miniPlayer(session: session) { destination = .nowPlaying }
-        case .library, .artists, .songs, .genres, .recentlyAdded, .favorites, .playlists, .source:
+        case .library, .artists, .songs, .genres, .recentlyAdded, .favorites, .playlists, .kept, .source:
             LibraryView(session: session, section: destination)
                 .id(destination)
                 .miniPlayer(session: session) { destination = .nowPlaying }
@@ -151,11 +152,11 @@ struct RemoteView: View {
             Button("Output") { destination = .output }.keyboardShortcut("4")
             Divider()
             Button("Play / Pause") { feedback.run(session, .playPause) }.keyboardShortcut("p")
-                .disabled(!session.isConnected)
+                .disabled(!session.canControl)
             Button("Next") { feedback.run(session, .next) }.keyboardShortcut(.rightArrow, modifiers: [.command, .option])
-                .disabled(!session.isConnected)
+                .disabled(!session.canControl)
             Button("Previous") { feedback.run(session, .previous) }.keyboardShortcut(.leftArrow, modifiers: [.command, .option])
-                .disabled(!session.isConnected)
+                .disabled(!session.canControl)
         } label: {
             Image(systemName: "ellipsis.circle")
         }
@@ -198,7 +199,7 @@ struct MiniPlayer: View {
             }
             .buttonStyle(.plain)
             .foregroundStyle(Palette.text)
-            .disabled(!session.isConnected)
+            .disabled(!session.canControl)
             .padding(.leading, 10).padding(.trailing, 6).padding(.vertical, 7)
             .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .overlay(alignment: .bottom) { MiniProgress(session: session).padding(.horizontal, 14) }
