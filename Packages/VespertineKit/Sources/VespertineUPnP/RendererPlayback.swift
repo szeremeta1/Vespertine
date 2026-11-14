@@ -433,7 +433,7 @@ public final class RendererPlayback: @unchecked Sendable {
         // The song is sent first, alone: the one after it is prepared (a stream is copied whole) while this one plays.
         let next: Entry? = nil
         do {
-            do { try await transport.load(current: current.track, next: nil) } catch where Self.isTransient(error) {
+            do { try await transport.load(current: current.track, next: nil) } catch let error where Self.isTransient(error) {
                 // A renderer still changing state refuses now and then (UPnP 701): once more after a moment.
                 try await Task.sleep(for: .milliseconds(300))
                 try await transport.load(current: current.track, next: nil)
@@ -514,7 +514,7 @@ public final class RendererPlayback: @unchecked Sendable {
 
     /// Tells the renderer its next song, once more after a moment when it refuses (UPnP 701 while it changes state).
     private func setNext(_ next: Entry?) async throws {
-        do { try await transport.replaceNext(next?.track) } catch where Self.isTransient(error) {
+        do { try await transport.replaceNext(next?.track) } catch let error where Self.isTransient(error) {
             try await Task.sleep(for: .milliseconds(300))
             try await transport.replaceNext(next?.track)
         }

@@ -567,7 +567,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             if !chunk.isEmpty { out += chunk; continue }
             state.withLock { _ in segment.end = head }
             // A decoder that stopped on an error is the song cut short, not its end: said once, and the queue goes on.
-            if let error = segment.frames.error, !state.withLock({ _ in defer { segment.errorSaid = true }; return segment.errorSaid }) {
+            if let error = segment.frames.error, !state.withLock({ _ -> Bool in defer { segment.errorSaid = true }; return segment.errorSaid }) {
                 let reason = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
                 emit(.failed(segment.item, String(localized: "\(device.name) couldn't play the song (\(reason)).", comment: "%1$@ is an AirPlay receiver's name, %2$@ the reason.")))
             }
