@@ -5,6 +5,12 @@
 // network: it says so ("Buffering from the network…") and it is not a buffer underrun. It used to say nothing and count every
 // empty output buffer as an underrun: thousands in one wait.
 // The rig is the play/pause one (PlayPauseRigSupport.swift): the real engine, a simulated output, a share the test controls.
+// Nothing here is timed. The output's clock is held and the test moves it a quarter second at a time, each step only once the
+// engine has what the step will play; the next song's share is not slow but stopped, until the test lets it go. So the first
+// song is over exactly when the test has played it out, the wait lasts exactly the three seconds the test steps through, and
+// a machine that stands still for a minute changes none of it. The only clock is a patience of two minutes on each thing the
+// engine must get round to, which ends a hung run and decides nothing. The cache's own clock, by which it gives up on a share
+// that stays silent, runs a thousand times slow here (`slowCacheClock`), so a stopped share is never given up on by the time.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -14,94 +20,113 @@ import Testing
 
 @Suite("The next song's share is slower than the music", .serialized)
 struct SlowNextSongTests {
-    /// The wait itself must count nothing, and that is checked exactly (it used to count thousands). Once the next song plays,
-    /// the half second of it these tests listen to runs beside every other test on a shared machine, where the engine can
-    /// truly be late with a buffer or two: those are real underruns and not the wait's, so they are bounded, not forbidden.
-    static let startingUnderLoad = 50
+    /// What a run saw, judged afterwards.
+    private struct Run: Sendable {
+        var problem: String?
+        var buffering = false
+        /// Underruns counted when the output had run three seconds with nothing to play.
+        var duringWait = 0
+        var advanced = false
+        var afterWait = 0
+        var bufferingAfter = true
+        var end = ""
+    }
+
+    private static let patience = 120.0
+    private static let step = Int(PlayPauseRig.rate / 4)
+
+    /// Plays `first` out and into the wait for `second`, whose share stands still, then lets the share go and plays into `second`.
+    private func run(_ rig: PlayPauseRig, seconds: Int) async throws -> Run {
+        let first = rig.item(), second = rig.nextItem()
+        rig.engine.nextItemProvider = { $0.id == first.id ? second : nil }
+        rig.nextShare.stall(true)
+        rig.holdOutput(true)
+        let song = Int(PlayPauseRig.rate) * seconds
+        return try await rig.runScript { rig -> Run in
+            defer { rig.nextShare.stall(false) }
+            var run = Run()
+            func readable() -> Int { rig.engine.currentSessionForTesting?.readableFrames ?? 0 }
+            // The engine has been round its loop twice: what the output did before this is in the snapshot.
+            func settled() -> Bool {
+                rig.engine.waitForCommandsForTesting(timeout: Self.patience) && rig.engine.waitForCommandsForTesting(timeout: Self.patience)
+            }
+            rig.engine.play(first)
+            guard rig.scriptWait(timeout: Self.patience, { $0.state == .playing && readable() >= Self.step }),
+                  let output = rig.outputs.withLock({ $0.last }) else {
+                run.problem = "the first song never played: \(rig.engine.snapshot.state)"
+                return run
+            }
+            // The first song, a quarter second at a time, each one only when it is there to be played (or is all that is left).
+            var steps = 0
+            while song - rig.audibleFrames > Self.step / 5 {
+                guard steps < seconds * 4 + 40,
+                      rig.scriptWait(timeout: Self.patience, { _ in readable() >= Self.step || song - rig.audibleFrames - readable() <= Self.step / 5 }) else {
+                    run.problem = "the first song stopped \(song - rig.audibleFrames) frames short, with \(readable()) to play, after \(steps) steps"
+                    return run
+                }
+                output.advance(seconds: 0.25)
+                steps += 1
+            }
+            // Three seconds of the output asking and getting nothing.
+            for _ in 0..<12 { output.advance(seconds: 0.25) }
+            run.buffering = rig.scriptWait(timeout: Self.patience) { $0.isBuffering }
+            // The engine is inside its wait for the share and takes no command until it is over: what it says now is read as
+            // it stands, and what the output counted meanwhile is collected after the wait, where it is checked again.
+            run.duringWait = rig.engine.snapshot.underruns
+
+            // The share answers: the next song starts by itself, and the wait has still counted nothing.
+            rig.nextShare.stall(false)
+            // The engine says a song is the one playing once the output has reached it, so the steps wait only for sound to play.
+            func arrived() -> Bool {
+                let now = rig.engine.snapshot
+                return now.item?.id == second.id && now.state == .playing && now.position > 0.5
+            }
+            // The output holds until the next song has filled the buffer again (five seconds of it, more after stalls in a row):
+            // ten seconds buffered and a round of the engine's loop, and the hold is over before the first step.
+            guard rig.scriptWait(timeout: Self.patience, { _ in readable() >= Self.step * 40 }), settled() else {
+                run.problem = "the next song never filled the buffer: \(readable()) frames, \(rig.engine.snapshot.state)"
+                return run
+            }
+            for _ in 0..<12 where !arrived() {
+                guard rig.scriptWait(timeout: Self.patience, { _ in readable() >= Self.step }) else { break }
+                output.advance(seconds: 0.25)
+                guard settled() else { run.problem = "the engine stopped answering after the wait"; return run }
+            }
+            run.advanced = arrived()
+            let snapshot = rig.engine.snapshot
+            run.afterWait = snapshot.underruns
+            // A song that starts on a prefix is still being copied while its first second plays, and says so until the copy is
+            // ahead of it: the notice has to go, whenever the share has delivered enough.
+            run.bufferingAfter = !rig.scriptWait(timeout: Self.patience) { !$0.isBuffering }
+            run.end = "\(snapshot.state) in \(snapshot.item?.url.lastPathComponent ?? "no song") at \(snapshot.position) s"
+            return run
+        }
+    }
+
+    private func judge(_ run: Run) {
+        #expect(run.problem == nil, "\(run.problem ?? "")")
+        guard run.problem == nil else { return }
+        #expect(run.buffering, "the wait for the next song's bytes shows as buffering from the network")
+        #expect(run.duringWait == 0, "\(run.duringWait) underruns counted during the wait")
+        #expect(run.advanced, "the next song started: \(run.end)")
+        #expect(run.afterWait == 0, "\(run.afterWait) underruns after the wait")
+        #expect(!run.bufferingAfter, "no longer buffering once it plays")
+    }
 
     @Test("Waiting for the next song's first bytes shows as buffering and counts no underruns")
     func waitForNextSongIsBufferingNotUnderruns() async throws {
-        // The song that plays: 24 s, on a quick share. The next one: 0.1 MB/s, so the prefix it starts on (4 MB) is not there when
-        // the first song ends, whatever was copied ahead meanwhile.
-        let rig = try PlayPauseRig(seconds: 24, nextBytesPerSecond: 0.1 * 1_048_576)
-        let first = rig.item(), second = rig.nextItem()
-        rig.engine.nextItemProvider = { $0.id == first.id ? second : nil }
-        rig.engine.play(first)
-        let playing = await rig.wait(timeout: 60) { $0.state == .playing && $0.position > 0.5 }
-        #expect(playing, "the first song played: \(rig.engine.snapshot.state)")
-
-        // The first song has played out and the second has not started: nothing audible, the engine waits on the share.
-        let observed: (waited: Bool, buffering: Bool, underruns: Int) = await rig.onOwnThread { rig in
-            var quietSince: Date?
-            var last = rig.audibleFrames
-            let end = Date().addingTimeInterval(90)
-            while Date() < end {
-                Thread.sleep(forTimeInterval: 0.25)
-                let now = rig.audibleFrames
-                let snapshot = rig.engine.snapshot
-                if snapshot.item?.id == second.id, now != last { return (false, false, snapshot.underruns) }   // it started: no wait seen
-                if now == last, snapshot.position > 20 || quietSince != nil {
-                    quietSince = quietSince ?? Date()
-                    // Three seconds into the silence: what does the engine say?
-                    if Date().timeIntervalSince(quietSince!) >= 3 { return (true, snapshot.isBuffering, snapshot.underruns) }
-                } else { quietSince = nil }
-                last = now
-            }
-            return (false, false, rig.engine.snapshot.underruns)
-        }
-        #expect(observed.waited, "the output went quiet while the next song's start was on its way")
-        #expect(observed.buffering, "the wait for the next song's bytes shows as buffering from the network")
-        #expect(observed.underruns == 0, "\(observed.underruns) underruns counted during the wait")
-
-        // Give the share its speed back: the next song starts by itself, and the wait has still counted nothing.
-        rig.nextShare.bytesPerSecond = 50 * 1_048_576
-        var whileWaiting = 0
-        let advanced = await rig.wait(timeout: 120) {
-            if $0.item?.id != second.id || $0.isBuffering { whileWaiting = $0.underruns }
-            return $0.item?.id == second.id && $0.state == .playing && $0.position > 0.5
-        }
-        let snapshot = rig.engine.snapshot
-        #expect(advanced, "the next song started: \(snapshot.state) in \(snapshot.item?.url.lastPathComponent ?? "no song") at \(snapshot.position) s")
-        #expect(whileWaiting == 0, "\(whileWaiting) underruns counted by the end of the wait")
-        #expect(snapshot.underruns < SlowNextSongTests.startingUnderLoad, "\(snapshot.underruns) underruns once the next song played")
-        #expect(!snapshot.isBuffering, "no longer buffering once it plays")
+        // 24 s of 96 kHz WAV starts on a prefix (4 MB), and none of the next song's is there when the first one ends.
+        let rig = try PlayPauseRig(seconds: 24, cacheClock: PlayPauseRig.slowCacheClock())
+        try #require(NetworkStart.startsEarly(fileExtension: "wav", size: rig.share.size, isRegion: false), "the songs start on a prefix")
+        judge(try await run(rig, seconds: 24))
     }
 
     @Test("A next song that is copied whole first (a small file) arrives late: the wait counts no underruns either")
     func waitForWholeCopyCountsNoUnderruns() async throws {
-        // 20 s of 96 kHz WAV is under the size that starts on a prefix: the next song plays from its whole copy (not streamed), and
-        // at 0.3 MB/s that copy takes longer than the first song lasts.
-        let rig = try PlayPauseRig(seconds: 20, nextBytesPerSecond: 0.3 * 1_048_576)
+        // 20 s of 96 kHz WAV is under the size that starts on a prefix: the next song plays from its whole copy (not streamed),
+        // and that copy has not begun when the first song ends.
+        let rig = try PlayPauseRig(seconds: 20, cacheClock: PlayPauseRig.slowCacheClock())
         try #require(!NetworkStart.startsEarly(fileExtension: "wav", size: rig.share.size, isRegion: false), "the songs are copied whole")
-        let first = rig.item(), second = rig.nextItem()
-        rig.engine.nextItemProvider = { $0.id == first.id ? second : nil }
-        rig.engine.play(first)
-        let playing = await rig.wait(timeout: 60) { $0.state == .playing && $0.position > 0.5 }
-        #expect(playing, "the first song played: \(rig.engine.snapshot.state)")
-        // The first song plays out while the second is still copying: the output goes quiet for a few seconds.
-        let quiet: Bool = await rig.onOwnThread { rig in
-            var last = rig.audibleFrames, quietFor = 0
-            let end = Date().addingTimeInterval(90)
-            while Date() < end, quietFor < 8 {
-                Thread.sleep(forTimeInterval: 0.25)
-                let now = rig.audibleFrames
-                quietFor = now == last && rig.engine.snapshot.position > 15 ? quietFor + 1 : 0
-                last = now
-            }
-            return quietFor >= 8
-        }
-        #expect(quiet, "the output went quiet while the next song was copied")
-        #expect(rig.engine.snapshot.isBuffering, "the wait shows as buffering from the network")
-        rig.nextShare.bytesPerSecond = 50 * 1_048_576
-        var whileWaiting = 0
-        let advanced = await rig.wait(timeout: 120) {
-            if $0.item?.id != second.id || $0.isBuffering { whileWaiting = $0.underruns }
-            return $0.item?.id == second.id && $0.state == .playing && $0.position > 0.5
-        }
-        let snapshot = rig.engine.snapshot
-        #expect(advanced, "the next song started: \(snapshot.state) in \(snapshot.item?.url.lastPathComponent ?? "no song") at \(snapshot.position) s")
-        #expect(whileWaiting == 0, "\(whileWaiting) underruns counted by the end of the wait")
-        #expect(snapshot.underruns < SlowNextSongTests.startingUnderLoad, "\(snapshot.underruns) underruns once the next song played")
-        #expect(!snapshot.isBuffering, "no longer buffering once it plays")
+        judge(try await run(rig, seconds: 20))
     }
 }
