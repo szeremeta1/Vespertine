@@ -166,6 +166,8 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     private var strobe: Float = 0
     /// Seconds since the last flash.
     private var sinceFlash: Double = 1
+    /// The analysis's count of beats as of the last frame drawn (nil before the first).
+    private var beatsSeen: UInt32?
     private var signal: Float = 0
     private var rings: [SIMD4<Float>] = []
     private var ringColour: Float = 0.55
@@ -554,7 +556,18 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         return atan2(s.y - p.y, s.x - p.x)
     }
 
+    /// The beats that began since the last frame drawn. The analysis runs on its own clock, so a frame can be drawn
+    /// twice or never: its count of beats is what's compared, not its one-frame flag. None on the first frame (what
+    /// came before the window showed isn't news), nor when the count starts again.
+    private func newBeats(in frame: VisualizerFrame) -> Int {
+        defer { beatsSeen = frame.beatCount }
+        guard let seen = beatsSeen else { return 0 }
+        let new = frame.beatCount &- seen
+        return new < 64 ? Int(new) : 0
+    }
+
     private func advance(frame: VisualizerFrame, scene: VisualizerScene, dt: Double) {
+        let beat = newBeats(in: frame) > 0
         signal += ((frame.hasSignal ? 1 : 0) - signal) * VisualizerAnalyzer.coefficient(dt, 0.25)
 
         // Spectrogram: columns at the chosen speed.
@@ -614,16 +627,16 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             rings[i].y *= Float(exp(-dt / 0.7))
         }
         rings.removeAll { $0.y < 0.01 || $0.x > 2.4 }
-        if frame.beat {
+        if beat {
             ringColour = ringColour >= 0.95 ? 0.55 : ringColour + 0.15
             rings.insert(SIMD4(0.16 + 0.1 * frame.bass, 0.35 + 0.65 * frame.bass, 0.010 + 0.018 * frame.bass, ringColour), at: 0)
             if rings.count > 16 { rings.removeLast() }
         }
         let spin = reduceMotion ? 0.08 : 0.22 + 0.9 * Double(frame.mid)
-        laserAngle = (laserAngle + dt * spin + (frame.beat && !reduceMotion ? 0.12 : 0)).truncatingRemainder(dividingBy: 2 * .pi)
+        laserAngle = (laserAngle + dt * spin + (beat && !reduceMotion ? 0.12 : 0)).truncatingRemainder(dividingBy: 2 * .pi)
         sinceFlash += dt
-        if strobeAllowed && frame.beat && frame.bass > 0.8 && sinceFlash >= Self.flashInterval {
-            strobe = 0.6
+        if strobeAllowed && settings.style == .club && beat && frame.beatStrength >= Self.strobeStrength && sinceFlash >= Self.flashInterval {
+            strobe = 1
             sinceFlash = 0
         }
         strobe *= Float(exp(-dt / 0.045))
@@ -653,7 +666,11 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     /// Ofcom/Harding) allow, however fast the beats come.
     static let flashInterval = 0.4
 
-    /// The strobe's brightness this frame, 0…0.6 (tests).
+    /// How hard a beat has to be (`VisualizerFrame.beatStrength`, against the hardest of the last few seconds) to
+    /// flash: the kicks and snares that carry a song, not the notes between them.
+    static let strobeStrength: Float = 0.6
+
+    /// The strobe's brightness this frame, 0…1 (tests).
     var strobeLevel: Float { strobe }
 
     /// The strobe only flashes when it's switched on, its warning was accepted, and neither Reduce Motion nor Dim

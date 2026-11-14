@@ -459,6 +459,13 @@ fragment float4 vz_vinyl(VOut in [[stage_in]], constant U &u [[buffer(0)]], cons
 
 // MARK: Club
 
+// The beat strobe: the whole window toward white, up to 85 % of the way, over everything else (after the picture's
+// own roll-off, so a flash is as bright in a dark scene as in a bright one). `u.e.z` is 0 unless the strobe is switched
+// on, its warning accepted, and neither Reduce Motion nor Dim Flashing Lights is on (the renderer sees to that).
+static float3 strobed(float3 col, constant U &u) {
+    return mix(col, float3(1), saturate(u.e.z) * 0.85);
+}
+
 fragment float4 vz_club(VOut in [[stage_in]], constant U &u [[buffer(0)]], constant float *fine [[buffer(3)]],
                         texture2d<float> overlay [[texture(0)]]) {
     float2 size = u.a.xy;
@@ -527,10 +534,9 @@ fragment float4 vz_club(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
     col = mix(col, mix(u.stops[2].rgb, float3(1), 0.35 + 0.4 * pulse), orb * (0.6 + 0.4 * signal));
     col += u.stops[2].rgb * glow * (0.25 + 0.75 * bass) * (0.4 + 0.6 * signal);
 
-    // Strobe (only when switched on, never with Reduce Motion).
-    col += float3(u.e.z) * 0.85;
     col *= 1 - 0.3 * pow(length(in.uv - 0.5) * 1.2, 2.0);
     col = col / (1 + max(max(col.r, col.g), col.b) * 0.25);   // soft roll-off instead of clipping
+    col = strobed(col, u);
     float4 ov = overlay.sample(linearClamp, in.uv);
     return overlayOver(col + dither(px), ov);
 }
@@ -606,10 +612,9 @@ fragment float4 vz_club_waves(VOut in [[stage_in]], constant U &u [[buffer(0)]],
     // The emitter on the floor glows with the bass.
     col += ramp(u, 0.6) * exp(-length(q - floorAt) * 2.2) * (0.15 + 0.6 * bass) * (0.35 + 0.65 * signal);
 
-    // Strobe (only when switched on, never with Reduce Motion).
-    col += float3(u.e.z) * 0.85;
     col *= 1 - 0.3 * pow(length(in.uv - 0.5) * 1.2, 2.0);
     col = col / (1 + max(max(col.r, col.g), col.b) * 0.25);
+    col = strobed(col, u);
     float4 ov = overlay.sample(linearClamp, in.uv);
     return overlayOver(col + dither(px), ov);
 }

@@ -264,6 +264,21 @@ public struct VisualizerSettings: Codable, Sendable, Equatable {
         self = normalized
     }
 
+    /// Turns the beat strobe on or off, as its switch does. Turning it on before its photosensitivity warning has been
+    /// accepted changes nothing and returns false: the caller shows the warning, and `acceptStrobeWarning` turns it on.
+    @discardableResult
+    public mutating func turnStrobe(on: Bool) -> Bool {
+        if on && !strobeWarningAccepted { return false }
+        strobe = on
+        return true
+    }
+
+    /// The warning was read and accepted: the strobe is on, and isn't asked about again.
+    public mutating func acceptStrobeWarning() {
+        strobeWarningAccepted = true
+        strobe = true
+    }
+
     /// Values pulled into range (a hand-edited or older file can hold anything).
     public var normalized: VisualizerSettings {
         var s = self
