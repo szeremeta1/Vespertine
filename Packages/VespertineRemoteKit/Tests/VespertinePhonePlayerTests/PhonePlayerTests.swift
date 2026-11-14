@@ -171,7 +171,7 @@ private final class SlowMac: @unchecked Sendable {
         player.onAdvance = { advanced.append($0) }
         player.start(.init(id: "a", source: try FileByteSource(url: first), format: stereo()), playing: true)
         player.setFollowing(.init(id: "b", source: try FileByteSource(url: second), format: stereo()))
-        try await wait { scheduled == ["b"] }
+        try await wait { scheduled == ["b"] && player.decodedAhead > 0.749 }
         #expect(player.currentID == "a")
         let out = try render(engine, frames: a[0].count + b[0].count)
         #expect(out[0] == a[0] + b[0], "the second song's first sample comes right after the first song's last")

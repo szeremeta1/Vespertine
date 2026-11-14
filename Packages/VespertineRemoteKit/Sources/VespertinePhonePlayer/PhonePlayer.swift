@@ -67,6 +67,9 @@ public final class PhonePlayer {
     /// A song couldn't be opened or read. Playback of it has stopped.
     @ObservationIgnored public var onFailure: ((Error) -> Void)?
 
+    /// Seconds of audio decoded ahead of what is being heard: what plays on if the Mac went away now.
+    public var decodedAhead: Double { pump.ahead() }
+
     /// Where the song is, in seconds.
     public var position: Double {
         if state == .paused, let held { return held }
@@ -87,7 +90,9 @@ public final class PhonePlayer {
     public init(engine: AVAudioEngine = AVAudioEngine()) {
         self.engine = engine
         engine.attach(node)
-        pump = Pump(node: node)
+        // "Played back" allows for the output's latency (a Bluetooth route's is long); an engine rendering offline has no
+        // output to wait for and only says "rendered".
+        pump = Pump(node: node, completion: engine.isInManualRenderingMode ? .dataRendered : .dataPlayedBack)
         pump.send = { [weak self] event in
             Task { @MainActor in self?.handle(event) }
         }
@@ -387,7 +392,20 @@ private final class Pump: @unchecked Sendable {
     private var known: [String: (item: PhonePlayer.Item, frames: Int64, rate: Double)] = [:]
     private var decoder: StreamDecoder?
 
-    init(node: AVAudioPlayerNode) { self.node = node }
+    private let completion: AVAudioPlayerNodeCompletionCallbackType
+
+    init(node: AVAudioPlayerNode, completion: AVAudioPlayerNodeCompletionCallbackType) {
+        self.node = node
+        self.completion = completion
+    }
+
+    /// Seconds of audio decoded and not yet played.
+    func ahead() -> Double {
+        lock.withLock {
+            guard let rate = decoder?.processingFormat.sampleRate, rate > 0 else { return 0 }
+            return Double(max(0, scheduled - consumed)) / rate
+        }
+    }
 
     // MARK: From the main thread
 
@@ -535,7 +553,7 @@ private final class Pump: @unchecked Sendable {
                 return true
             }
             guard live else { return }
-            node.scheduleBuffer(buffer, completionCallbackType: .dataPlayedBack) { [weak self] _ in
+            node.scheduleBuffer(buffer, completionCallbackType: completion) { [weak self] _ in
                 self?.played(Int64(count), mine)
             }
             made += 1
