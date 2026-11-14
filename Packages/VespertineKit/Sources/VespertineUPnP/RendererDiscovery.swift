@@ -141,6 +141,8 @@ public final class RendererDiscovery: @unchecked Sendable {
         // A reply naming a description on another host than its own isn't followed (it could point Vespertine anywhere).
         for reply in replies where locations[reply.udn] == nil {
             if let responder = reply.responder, reply.location.host != responder { continue }
+            // UPnP descriptions are served over plain HTTP; nothing else (a file, another scheme) is read.
+            guard reply.location.scheme?.lowercased() == "http" else { continue }
             locations[reply.udn] = reply.location
         }
         var loaded: [String: RendererDevice] = [:]
