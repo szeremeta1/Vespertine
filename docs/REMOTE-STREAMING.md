@@ -29,6 +29,28 @@ baseline (a v2 phone sends 1, so an old Mac accepts it) and the new optional `hi
 
 A phone names songs by library ID. No path ever comes from the network.
 
+Added since, all additive (no version bump; an older peer ignores or refuses them harmlessly):
+
+- `ServerInfo.addresses`: where the Mac can be reached (its local addresses, its Tailscale address and name), sent in every `welcome`. The
+  phone keeps them with the pairing (`SavedPairing.advertised`, at most 10) so it can find the Mac from another network without anything typed.
+- `ping`: answered `.ok`. The phone sends it when the network changes or nothing has arrived for a while, to learn in 3 seconds rather than
+  30 that the line is dead. An older Mac answers `.failed`, which proves the line just as well.
+- `setLanguage(code)`: sent after `welcome`. The Mac then words its refusals ("Stream to Phones is off…") in the phone's language when it
+  has it (`ReplyWords`), otherwise in its own.
+
+## Finding the Mac (`RemoteSession`)
+
+Once paired, the phone tries every way it knows at once: Bonjour on this network, the address it last used, each advertised address, and a
+typed one if there is one. Nearby routes start first (others wait 150 to 350 ms, or less if everything ahead of them has failed), the first
+to finish the handshake wins and the rest are closed. The same key signs in on every route. `RemoteSession.reach` says which kind won
+(this network, Tailscale, elsewhere), which the app shows as the route. It stays on a working route until that route breaks: it does not
+move back to Wi-Fi on its own while a cellular line still answers.
+
+When the network changes, or the system says the connection is no longer viable, the phone pings; no answer in 3 seconds and it reconnects
+at once by whatever route now works. A song being played carries on from its buffer and its stream is reopened at the same byte
+(`StreamLine`). Opening a song while disconnected waits up to 20 seconds for the Mac rather than failing. When nothing answers, the phone
+says the likeliest reason (`ReachTrouble`: no network, Mac not on this network and no way from away, Tailscale off, or Mac not answering).
+
 ## The frame
 
 A message on the wire is a 4-byte big-endian length and then the message. JSON messages start with `{`; a stream frame starts with `0x01`:
@@ -69,7 +91,8 @@ with a small metadata file beside each). One conversion runs at a time. The libr
 ## The listener's safety
 
 The listener is reachable from wherever the Mac is (a tailnet, a forwarded port). `ConnectionThrottle`: a host that fails the handshake 10 times in
-a minute is shut out for 5 minutes, and at most 16 connections may wait unsigned at once.
+a minute is shut out for 5 minutes, and at most 16 connections may wait unsigned at once. A failure within 10 seconds of the same host
+signing in is not counted, since a phone trying every route at once hangs up on the slower ones.
 
 ## Known limits
 
@@ -77,5 +100,6 @@ a minute is shut out for 5 minutes, and at most 16 connections may wait unsigned
   made until those scripts have been run.
 - More than 8 channels plays on the Mac only. DoP to a USB DAC from the phone is not built.
 - Favorites and play counts made while offline are not sent back to the Mac.
+- Finding the Mac from away and moving between networks are covered by unit tests against a fake Mac only; B9 and B10 are not run.
 - DSD→FLAC speed in a release build is unmeasured (debug: about 20 s of CPU per second of 5.1 DSD64 on a loaded machine).
 - ReplayGain values are sent; gapless delay/padding are not (`encoderDelay`/`endPadding` are always nil).

@@ -55,7 +55,7 @@ nonisolated enum ReplyWords {
         case .cannotReadNow:
             return String(localized: "The Mac can’t read this file right now.", bundle: bundle, comment: "Stream to phone: the song's file couldn't be opened (a share that is away, say).")
         case .tooManyChannels(let channels, let most):
-            return String(localized: "This has \(channels) channels; Vespertine streams up to \(most). It plays on the Mac.", bundle: bundle, comment: "Stream to phone: a song with more channels than can be sent. Both values are whole numbers, e.g. 12 and 8.")
+            return String(localized: "This has \(String(channels)) channels; Vespertine streams up to \(String(most)). It plays on the Mac.", bundle: bundle, comment: "Stream to phone: a song with more channels than can be sent. Both %@ are whole numbers, e.g. 12 and 8; the first is always above 8.")
         case .cannotConvert(let fileExtension):
             return String(localized: "Vespertine on the Mac can’t convert this kind of file (.\(fileExtension)) for the phone. It plays on the Mac.", bundle: bundle, comment: "Stream to phone: %@ is a file extension, e.g. “mid”.")
         case .streamNotOpen:

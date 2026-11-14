@@ -574235,6 +574235,2965 @@
           }
         }
       }
+    },
+    "This Mac can’t stream right now.": {
+      "comment": "Stored in the Mac app but shown on the iPhone or iPad (the Mac answers a phone in the phone's language). The Mac couldn't prepare to send songs to the phone.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ Mac አሁን ማሰራጨት አይችልም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتعذر على هذا الـ Mac البث حاليًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই Mac এখন স্ট্রিম করতে পারছে না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tento Mac teď nemůže streamovat."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne Mac kan ikke streame lige nu."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Mac kann gerade nicht streamen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτό το Mac δεν μπορεί να κάνει ροή αυτήν τη στιγμή."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este Mac no puede transmitir en este momento."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این Mac در حال حاضر نمی‌تواند استریم کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tämä Mac ei voi suoratoistaa juuri nyt."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi makapag-stream ang Mac na ito sa ngayon."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce Mac ne peut pas diffuser pour le moment."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ Mac અત્યારે સ્ટ્રીમ કરી શકતું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan Mac ba za ta iya aika waƙoƙi ba a yanzu."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac זה אינו יכול להזרים כרגע."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यह Mac अभी स्ट्रीम नहीं कर सकता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez a Mac most nem tud streamelni."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ini tidak dapat melakukan streaming saat ini."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo Mac non può eseguire lo streaming in questo momento."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このMacは現在ストリーミングできません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ Mac ಗೆ ಈಗ ಸ್ಟ್ರೀಮ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 Mac은 지금 스트리밍할 수 없습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ Mac-ന് ഇപ്പോൾ സ്ട്രീം ചെയ്യാനാവില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हा Mac आत्ता स्ट्रीम करू शकत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ini tidak dapat menstrim sekarang."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne Macen kan ikke strømme akkurat nå."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze Mac kan nu niet streamen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਹ Mac ਇਸ ਵੇਲੇ ਸਟ੍ਰੀਮ ਨਹੀਂ ਕਰ ਸਕਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ten Mac nie może teraz strumieniować."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este Mac não pode transmitir no momento."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este Mac não pode transmitir neste momento."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acest Mac nu poate face streaming în acest moment."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den här Macen kan inte strömma just nu."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac hii haiwezi kutiririsha kwa sasa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த Mac-ஆல் இப்போது ஸ்ட்ரீம் செய்ய முடியவில்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ Mac ప్రస్తుతం స్ట్రీమ్ చేయలేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac เครื่องนี้สตรีมไม่ได้ในขณะนี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac şu anda yayın yapamıyor."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей Mac зараз не може транслювати."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ Mac اس وقت اسٹریم نہیں کر سکتا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy Mac này hiện không thể truyền phát."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這部 Mac 現時無法串流。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 Mac 现在无法流播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這部 Mac 目前無法串流。"
+          }
+        }
+      }
+    },
+    "Too many reads at once; wait for one to finish.": {
+      "comment": "Stored in the Mac app but shown on the iPhone or iPad (the Mac answers a phone in the phone's language). Rarely seen technical refusal: the phone asked for too many pieces of a song at once.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በአንድ ጊዜ በጣም ብዙ የንባብ ጥያቄዎች፤ አንዱ እስኪጨርስ ይጠብቁ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طلبات قراءة كثيرة في وقت واحد؛ انتظر حتى ينتهي أحدها."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "একসাথে অনেক বেশি রিড অনুরোধ; একটি শেষ হওয়া পর্যন্ত অপেক্ষা করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Příliš mnoho čtení najednou; počkejte, až jedno skončí."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For mange læsninger på én gang; vent, til en af dem er færdig."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zu viele Lesevorgänge gleichzeitig; warte, bis einer abgeschlossen ist."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Πάρα πολλές αναγνώσεις ταυτόχρονα· περιμένετε να ολοκληρωθεί μία."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demasiadas lecturas a la vez; espera a que termine una."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعداد خواندن‌های هم‌زمان زیاد است؛ صبر کنید تا یکی تمام شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liian monta lukupyyntöä yhtä aikaa; odota, että jokin niistä valmistuu."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masyadong maraming sabay-sabay na pagbasa; hintaying matapos ang isa."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trop de requêtes simultanées ; attendez que l’une d’elles se termine."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "એકસાથે ઘણી બધી રીડ વિનંતીઓ; એક પૂરી થાય ત્યાં સુધી રાહ જુઓ."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buƙatun karatu sun yi yawa a lokaci guda; jira ɗaya ta ƙare."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יותר מדי קריאות בו־זמנית; המתן עד שאחת מהן תסתיים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "एक साथ बहुत ज़्यादा रीड अनुरोध; किसी एक के पूरा होने तक प्रतीक्षा करें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Túl sok olvasás egyszerre; várja meg, amíg az egyik befejeződik."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terlalu banyak pembacaan sekaligus; tunggu hingga salah satunya selesai."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Troppe letture contemporanee; attendi che una finisca."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同時の読み出しが多すぎます。1つが終わるまでお待ちください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಒಂದೇ ಬಾರಿಗೆ ತೀರಾ ಹೆಚ್ಚು ರೀಡ್ ವಿನಂತಿಗಳು; ಒಂದು ಮುಗಿಯುವವರೆಗೆ ಕಾಯಿರಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "동시에 읽는 요청이 너무 많습니다. 하나가 끝날 때까지 기다리십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഒരേസമയം വളരെയധികം റീഡുകൾ; ഒന്ന് പൂർത്തിയാകുന്നതുവരെ കാത്തിരിക്കുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "एकाच वेळी खूप जास्त रीड विनंत्या; एक पूर्ण होईपर्यंत थांबा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terlalu banyak bacaan serentak; tunggu sehingga satu selesai."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "For mange lesinger samtidig; vent til en av dem er ferdig."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Te veel leesbewerkingen tegelijk; wacht tot er een klaar is."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇੱਕੋ ਵੇਲੇ ਬਹੁਤ ਜ਼ਿਆਦਾ ਰੀਡ ਬੇਨਤੀਆਂ; ਕਿਸੇ ਇੱਕ ਦੇ ਪੂਰਾ ਹੋਣ ਤੱਕ ਉਡੀਕ ਕਰੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zbyt wiele odczytów naraz; poczekaj, aż jeden się zakończy."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muitas leituras ao mesmo tempo; aguarde uma delas terminar."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demasiadas leituras em simultâneo; aguarde que uma termine."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prea multe citiri simultane; așteptați să se termine una."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "För många läsningar samtidigt; vänta tills en av dem är klar."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maombi mengi mno ya kusoma kwa wakati mmoja; subiri moja limalizike."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒரே நேரத்தில் மிக அதிகமான ரீடுகள்; ஒன்று முடியும் வரை காத்திருக்கவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఒకేసారి చాలా ఎక్కువ రీడ్‌లు; ఒకటి పూర్తయ్యే వరకు వేచి ఉండండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "มีการอ่านพร้อมกันมากเกินไป ให้รอจนกว่าจะเสร็จหนึ่งรายการ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aynı anda çok fazla okuma var; birinin bitmesini bekleyin."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Забагато зчитувань одночасно; зачекайте, доки одне завершиться."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایک ہی وقت میں پڑھنے کی بہت زیادہ درخواستیں؛ کسی ایک کے مکمل ہونے کا انتظار کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quá nhiều yêu cầu đọc cùng lúc; hãy đợi một yêu cầu hoàn tất."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同時讀取的要求太多；請等待其中一項完成。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同时读取的请求过多；请等待其中一个完成。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同時讀取的要求太多；請等待其中一項完成。"
+          }
+        }
+      }
+    },
+    "That song isn’t in the Mac’s library.": {
+      "comment": "Stored in the Mac app but shown on the iPhone or iPad (the Mac answers a phone in the phone's language). The phone asked to play a song the Mac no longer has.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ያ ዘፈን በMac ቤተ-መጻሕፍት ውስጥ የለም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هذه الأغنية ليست في مكتبة الـ Mac."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ওই গানটি Mac-এর লাইব্রেরিতে নেই।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tato skladba není v knihovně Macu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den sang er ikke i Mac’ens bibliotek."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Titel ist nicht in der Mediathek des Mac."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτό το τραγούδι δεν υπάρχει στη βιβλιοθήκη του Mac."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esa canción no está en la biblioteca del Mac."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آن آهنگ در کتابخانهٔ Mac نیست."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kappale ei ole Macin kirjastossa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wala sa library ng Mac ang kantang iyon."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce morceau ne figure pas dans la bibliothèque du Mac."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તે ગીત Mac ની લાઇબ્રેરીમાં નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan waƙar ba ta cikin laburaren Mac ɗin."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "השיר הזה אינו בספריה של ה־Mac."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वह गीत Mac की लाइब्रेरी में नहीं है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez a dal nincs a Mac könyvtárában."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagu itu tidak ada di perpustakaan Mac."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il brano non è nella libreria del Mac."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その曲はMacのライブラリにありません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಆ ಹಾಡು Mac ನ ಲೈಬ್ರರಿಯಲ್ಲಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "해당 노래는 Mac의 보관함에 없습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ആ പാട്ട് Mac-ന്റെ ലൈബ്രറിയിൽ ഇല്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ते गाणे Mac च्या लायब्ररीत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagu itu tiada dalam pustaka Mac."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den sangen er ikke i Macens bibliotek."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dat nummer staat niet in de bibliotheek van de Mac."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਉਹ ਗੀਤ Mac ਦੀ ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਨਹੀਂ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tego utworu nie ma w bibliotece Maca."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Essa música não está na biblioteca do Mac."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Essa música não está na biblioteca do Mac."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Melodia respectivă nu este în biblioteca Mac-ului."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den låten finns inte i Macens bibliotek."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wimbo huo hauko kwenye maktaba ya Mac."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அந்தப் பாடல் Mac-இன் லைப்ரரியில் இல்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఆ పాట Mac లైబ్రరీలో లేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพลงนั้นไม่อยู่ในคลังของ Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu şarkı Mac’in arşivinde yok."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цієї пісні немає в медіатеці Mac."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وہ گانا Mac کی لائبریری میں نہیں ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bài hát đó không có trong thư viện của máy Mac."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該歌曲不在 Mac 的資料庫中。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该歌曲不在 Mac 的资料库中。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該歌曲不在 Mac 的資料庫中。"
+          }
+        }
+      }
+    },
+    "This can’t be streamed.": {
+      "comment": "Stored in the Mac app but shown on the iPhone or iPad (the Mac answers a phone in the phone's language). A song the Mac can't send to the phone to play there.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ ሊሰራጭ አይችልም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتعذر بث هذا العنصر."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এটি স্ট্রিম করা যায় না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toto nelze streamovat."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dette kan ikke streames."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dies kann nicht gestreamt werden."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν είναι δυνατή η ροή αυτού του στοιχείου."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esto no se puede transmitir."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این را نمی‌توان استریم کرد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tätä ei voi suoratoistaa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi ito mai-stream."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet élément ne peut pas être diffusé."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ સ્ટ્રીમ કરી શકાતું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba za a iya aika wannan zuwa waya ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן להזרים פריט זה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इसे स्ट्रीम नहीं किया जा सकता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez nem streamelhető."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ini tidak dapat di-streaming."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile eseguire lo streaming di questo elemento."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "これはストリーミングできません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇದನ್ನು ಸ್ಟ್ರೀಮ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 항목은 스트리밍할 수 없습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഇത് സ്ട്രീം ചെയ്യാനാവില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हे स्ट्रीम करता येत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ini tidak boleh distrim."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dette kan ikke strømmes."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit kan niet worden gestreamd."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸਨੂੰ ਸਟ੍ਰੀਮ ਨਹੀਂ ਕੀਤਾ ਜਾ ਸਕਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tego nie można strumieniować."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível transmitir este item."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível transmitir este elemento."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acest element nu poate fi transmis prin streaming."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det här kan inte strömmas."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hii haiwezi kutiririshwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இதை ஸ்ட்ரீம் செய்ய முடியாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "దీన్ని స్ట్రీమ్ చేయడం సాధ్యం కాదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สตรีมรายการนี้ไม่ได้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu öğe yayınlanamıyor."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Це неможливо транслювати."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسے اسٹریم نہیں کیا جا سکتا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể truyền phát mục này."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此項目無法串流。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此项目无法流播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此項目無法串流。"
+          }
+        }
+      }
+    },
+    "The Mac can’t read this file right now.": {
+      "comment": "Stored in the Mac app but shown on the iPhone or iPad (the Mac answers a phone in the phone's language). The song's file couldn't be opened (for example its network share is away).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ይህን ፋይል አሁን ማንበብ አይችልም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتعذر على الـ Mac قراءة هذا الملف حاليًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac এখন এই ফাইলটি পড়তে পারছে না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac teď tento soubor nemůže přečíst."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’en kan ikke læse denne fil lige nu."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Mac kann diese Datei gerade nicht lesen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Mac δεν μπορεί να διαβάσει αυτό το αρχείο αυτήν τη στιγμή."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El Mac no puede leer este archivo en este momento."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac در حال حاضر نمی‌تواند این فایل را بخواند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ei voi lukea tätä tiedostoa juuri nyt."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi mabasa ng Mac ang file na ito sa ngayon."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Mac ne peut pas lire ce fichier pour le moment."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac અત્યારે આ ફાઇલ વાંચી શકતું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ɗin ba za ta iya karanta wannan fayil ba a yanzu."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ה־Mac אינו יכול לקרוא את הקובץ הזה כרגע."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac अभी इस फ़ाइल को नहीं पढ़ सकता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Mac most nem tudja olvasni ezt a fájlt."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac tidak dapat membaca file ini saat ini."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il Mac non riesce a leggere questo file in questo momento."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macは現在このファイルを読み込めません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ಗೆ ಈಗ ಈ ಫೈಲ್ ಅನ್ನು ಓದಲು ಸಾಧ್ಯವಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac이 지금 이 파일을 읽을 수 없습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ന് ഇപ്പോൾ ഈ ഫയൽ വായിക്കാനാവുന്നില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac आत्ता ही फाइल वाचू शकत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac tidak dapat membaca fail ini sekarang."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macen kan ikke lese denne filen akkurat nå."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De Mac kan dit bestand nu niet lezen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ਇਸ ਵੇਲੇ ਇਸ ਫ਼ਾਈਲ ਨੂੰ ਨਹੀਂ ਪੜ੍ਹ ਸਕਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac nie może teraz odczytać tego pliku."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Mac não consegue ler este arquivo no momento."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Mac não consegue ler este ficheiro neste momento."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ul nu poate citi acest fișier în acest moment."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macen kan inte läsa den här filen just nu."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac haiwezi kusoma faili hii kwa sasa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ஆல் இப்போது இந்தக் கோப்பைப் படிக்க முடியவில்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ప్రస్తుతం ఈ ఫైల్‌ను చదవలేకపోతోంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac อ่านไฟล์นี้ไม่ได้ในขณะนี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac şu anda bu dosyayı okuyamıyor."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac зараз не може прочитати цей файл."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac اس وقت یہ فائل نہیں پڑھ سکتا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy Mac hiện không thể đọc tệp này."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 現時無法讀取此檔案。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 现在无法读取此文件。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 目前無法讀取此檔案。"
+          }
+        }
+      }
+    },
+    "This has %@ channels; Vespertine streams up to %@. It plays on the Mac.": {
+      "comment": "Stored in the Mac app but shown on the iPhone or iPad (the Mac answers a phone in the phone's language). A song with too many audio channels to send to the phone. Both %@ are whole numbers, e.g. 12 and 8; the first is always more than 8, so one plural form is enough. “It plays on the Mac” = it can still be played on the Mac itself.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ %@ ቻናሎች አሉት፤ Vespertine እስከ %@ ድረስ ያሰራጫል። በMac ላይ ይጫወታል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "عدد القنوات هنا %@؛ ويبث Vespertine حتى %@ قنوات. يمكن تشغيله على الـ Mac."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এতে %1$@টি চ্যানেল আছে; Vespertine সর্বোচ্চ %2$@টি স্ট্রিম করে। এটি Mac-এ চলে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Počet kanálů skladby: %@; Vespertine streamuje nejvýše %@. Přehrát ji lze na Macu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dette har %@ kanaler; Vespertine streamer op til %@. Det kan afspilles på Mac’en."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dies hat %@ Kanäle; Vespertine streamt bis zu %@. Auf dem Mac lässt es sich abspielen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτό έχει %@ κανάλια· το Vespertine κάνει ροή έως και %@. Παίζει στο Mac."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiene %@ canales; Vespertine transmite hasta %@. Se puede reproducir en el Mac."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این %@ کانال دارد؛ Vespertine حداکثر %@ کانال را استریم می‌کند. روی Mac پخش می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tässä on %@ kanavaa; Vespertine suoratoistaa enintään %@. Sen voi toistaa Macilla."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "May %1$@ channel ito; hanggang %2$@ lang ang ini-stream ng Vespertine. Nape-play ito sa Mac."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet élément comporte %@ canaux ; Vespertine en diffuse jusqu’à %@. Il peut être lu sur le Mac."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આમાં %1$@ ચૅનલો છે; Vespertine વધુમાં વધુ %2$@ સ્ટ્રીમ કરે છે. તે Mac પર વાગે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan yana da tashoshi %@; Vespertine yana aikawa har zuwa %@. Ana iya kunna shi a kan Mac."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יש כאן %@ ערוצים; Vespertine מזרים עד %@. ניתן לנגן זאת ב־Mac."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इसमें %1$@ चैनल हैं; Vespertine अधिकतम %2$@ चैनल स्ट्रीम करता है। यह Mac पर चलता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez %@ csatornás; a Vespertine legfeljebb %@ csatornát streamel. A Macen lejátszható."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ini memiliki %1$@ saluran; Vespertine melakukan streaming hingga %2$@ saluran. Ini dapat diputar di Mac."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ha %@ canali; Vespertine ne trasmette in streaming fino a %@. Si può riprodurre sul Mac."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "これは%@チャンネルですが、Vespertineがストリーミングできるのは%@チャンネルまでです。Macでは再生できます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇದರಲ್ಲಿ %1$@ ಚಾನೆಲ್‌ಗಳಿವೆ; Vespertine ಗರಿಷ್ಠ %2$@ ಚಾನೆಲ್‌ಗಳವರೆಗೆ ಸ್ಟ್ರೀಮ್ ಮಾಡುತ್ತದೆ. ಇದು Mac ನಲ್ಲಿ ಪ್ಲೇ ಆಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 항목은 %@채널이며, Vespertine은 최대 %@채널까지 스트리밍합니다. Mac에서는 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഇതിൽ %1$@ ചാനലുകളുണ്ട്; Vespertine %2$@ വരെ മാത്രമേ സ്ട്രീം ചെയ്യൂ. ഇത് Mac-ൽ പ്ലേ ചെയ്യും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यात %1$@ चॅनेल आहेत; Vespertine जास्तीत जास्त %2$@ स्ट्रीम करते. हे Mac वर वाजते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ini mempunyai %1$@ saluran; Vespertine menstrim sehingga %2$@ saluran. Ia boleh dimainkan pada Mac."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dette har %@ kanaler; Vespertine strømmer opptil %@. Det kan spilles på Macen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit heeft %@ kanalen; Vespertine streamt er maximaal %@. Het speelt wel af op de Mac."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ ਵਿੱਚ %1$@ ਚੈਨਲ ਹਨ; Vespertine ਵੱਧ ਤੋਂ ਵੱਧ %2$@ ਸਟ੍ਰੀਮ ਕਰਦਾ ਹੈ। ਇਹ Mac ’ਤੇ ਚੱਲਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Liczba kanałów tego utworu: %@; Vespertine strumieniuje najwyżej %@. Można go odtwarzać na Macu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este item tem %@ canais; o Vespertine transmite até %@. Ele pode ser reproduzido no Mac."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este elemento tem %@ canais; o Vespertine transmite até %@. Pode ser reproduzido no Mac."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acest element are %@ canale; Vespertine transmite prin streaming cel mult %@. Poate fi redat pe Mac."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det här har %@ kanaler; Vespertine strömmar upp till %@. Det kan spelas på Macen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hii ina chaneli %@; Vespertine hutiririsha hadi %@. Inacheza kwenye Mac."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இதில் %1$@ சேனல்கள் உள்ளன; Vespertine %2$@ வரை மட்டுமே ஸ்ட்ரீம் செய்யும். இது Mac-இல் இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఇందులో %1$@ ఛానెల్‌లు ఉన్నాయి; Vespertine %2$@ వరకు మాత్రమే స్ట్రీమ్ చేస్తుంది. ఇది Macలో ప్లే అవుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รายการนี้มี %1$@ ช่องสัญญาณ แต่ Vespertine สตรีมได้สูงสุด %2$@ ช่องสัญญาณ รายการนี้เล่นได้บน Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bunda %@ kanal var; Vespertine en çok %@ kanal yayınlar. Mac’te çalınabilir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кількість каналів у цій пісні: %@; Vespertine транслює щонайбільше %@. Її можна відтворити на Mac."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس میں %@ چینلز ہیں؛ Vespertine زیادہ سے زیادہ %@ اسٹریم کرتا ہے۔ یہ Mac پر چلتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mục này có %1$@ kênh; Vespertine truyền phát tối đa %2$@ kênh. Mục này phát được trên máy Mac."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此項目有 %@ 個聲道；Vespertine 最多可串流 %@ 個聲道。它可以在 Mac 上播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此项目有 %@ 个声道；Vespertine 最多可流播放 %@ 个声道。它可以在 Mac 上播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此項目有 %@ 個聲道；Vespertine 最多可串流 %@ 個聲道。它可以在 Mac 上播放。"
+          }
+        }
+      }
+    },
+    "Vespertine on the Mac can’t convert this kind of file (.%@) for the phone. It plays on the Mac.": {
+      "comment": "Stored in the Mac app but shown on the iPhone or iPad (the Mac answers a phone in the phone's language). %@ is a file extension, e.g. “mid”; keep the dot and parentheses.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በMac ላይ ያለው Vespertine ይህን ዓይነት ፋይል (.%@) ለስልኩ መቀየር አይችልም። በMac ላይ ይጫወታል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتعذر على Vespertine على الـ Mac تحويل هذا النوع من الملفات (.%@) للهاتف. يمكن تشغيله على الـ Mac."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-এর Vespertine এই ধরনের ফাইল (.%@) ফোনের জন্য রূপান্তর করতে পারে না। এটি Mac-এ চলে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine na Macu neumí tento typ souboru (.%@) převést pro telefon. Přehrát ho lze na Macu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine på Mac’en kan ikke konvertere denne type fil (.%@) til telefonen. Den kan afspilles på Mac’en."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine auf dem Mac kann diesen Dateityp (.%@) nicht für das Telefon konvertieren. Auf dem Mac lässt sich die Datei abspielen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Vespertine στο Mac δεν μπορεί να μετατρέψει αυτό το είδος αρχείου (.%@) για το τηλέφωνο. Παίζει στο Mac."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine en el Mac no puede convertir este tipo de archivo (.%@) para el teléfono. Se puede reproducir en el Mac."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine در Mac نمی‌تواند این نوع فایل (.%@) را برای تلفن تبدیل کند. روی Mac پخش می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macin Vespertine ei voi muuntaa tämäntyyppistä tiedostoa (.%@) puhelinta varten. Sen voi toistaa Macilla."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi mako-convert ng Vespertine sa Mac ang ganitong uri ng file (.%@) para sa phone. Nape-play ito sa Mac."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine sur le Mac ne peut pas convertir ce type de fichier (.%@) pour le téléphone. Il peut être lu sur le Mac."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac પરનું Vespertine આ પ્રકારની ફાઇલ (.%@) ને ફોન માટે રૂપાંતરિત કરી શકતું નથી. તે Mac પર વાગે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine a kan Mac ba zai iya canza irin wannan fayil (.%@) don wayar ba. Ana iya kunna shi a kan Mac."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ב־Mac אינו יכול להמיר סוג קובץ זה (.%@) עבור הטלפון. ניתן לנגן אותו ב־Mac."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac पर Vespertine इस तरह की फ़ाइल (.%@) को फ़ोन के लिए रूपांतरित नहीं कर सकता। यह Mac पर चलती है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Macen futó Vespertine nem tudja átalakítani az ilyen típusú fájlt (.%@) a telefon számára. A Macen lejátszható."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine di Mac tidak dapat mengonversi jenis file ini (.%@) untuk ponsel. File ini dapat diputar di Mac."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine sul Mac non può convertire questo tipo di file (.%@) per il telefono. Si può riprodurre sul Mac."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacのVespertineは、この種類のファイル（.%@）をスマートフォン用に変換できません。Macでは再生できます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ನಲ್ಲಿರುವ Vespertine ಈ ಬಗೆಯ ಫೈಲ್ ಅನ್ನು (.%@) ಫೋನ್‌ಗಾಗಿ ಪರಿವರ್ತಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ. ಇದು Mac ನಲ್ಲಿ ಪ್ಲೇ ಆಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac의 Vespertine은 이 종류의 파일(.%@)을 휴대폰용으로 변환할 수 없습니다. Mac에서는 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ലെ Vespertine-ന് ഈ തരം ഫയൽ (.%@) ഫോണിനായി പരിവർത്തനം ചെയ്യാനാവില്ല. ഇത് Mac-ൽ പ്ലേ ചെയ്യും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac वरील Vespertine या प्रकारची फाइल (.%@) फोनसाठी रूपांतरित करू शकत नाही. ती Mac वर वाजते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine pada Mac tidak dapat menukar jenis fail ini (.%@) untuk telefon. Ia boleh dimainkan pada Mac."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine på Macen kan ikke konvertere denne filtypen (.%@) for telefonen. Den kan spilles på Macen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine op de Mac kan dit type bestand (.%@) niet omzetten voor de telefoon. Het speelt wel af op de Mac."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ’ਤੇ Vespertine ਇਸ ਕਿਸਮ ਦੀ ਫ਼ਾਈਲ (.%@) ਨੂੰ ਫ਼ੋਨ ਲਈ ਨਹੀਂ ਬਦਲ ਸਕਦਾ। ਇਹ Mac ’ਤੇ ਚੱਲਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine na Macu nie potrafi przekonwertować tego rodzaju pliku (.%@) dla telefonu. Można go odtwarzać na Macu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine no Mac não consegue converter este tipo de arquivo (.%@) para o telefone. Ele pode ser reproduzido no Mac."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine no Mac não consegue converter este tipo de ficheiro (.%@) para o telemóvel. Pode ser reproduzido no Mac."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine de pe Mac nu poate converti acest tip de fișier (.%@) pentru telefon. Poate fi redat pe Mac."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine på Macen kan inte konvertera den här typen av fil (.%@) för telefonen. Den kan spelas på Macen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine kwenye Mac haiwezi kugeuza aina hii ya faili (.%@) kwa ajili ya simu. Inacheza kwenye Mac."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-இல் உள்ள Vespertine-ஆல் இந்த வகைக் கோப்பை (.%@) ஃபோனுக்காக மாற்ற முடியாது. இது Mac-இல் இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macలోని Vespertine ఈ రకం ఫైల్‌ను (.%@) ఫోన్ కోసం మార్చలేదు. ఇది Macలో ప్లే అవుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine บน Mac แปลงไฟล์ประเภทนี้ (.%@) สำหรับโทรศัพท์ไม่ได้ รายการนี้เล่นได้บน Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’teki Vespertine bu tür dosyayı (.%@) telefon için dönüştüremiyor. Mac’te çalınabilir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine на Mac не може перетворити файл такого типу (.%@) для телефона. Його можна відтворити на Mac."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac پر Vespertine اس قسم کی فائل (.%@) کو فون کے لیے تبدیل نہیں کر سکتا۔ یہ Mac پر چلتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine trên máy Mac không thể chuyển đổi loại tệp này (.%@) cho điện thoại. Tệp này phát được trên máy Mac."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 上的 Vespertine 無法為手機轉換這類檔案（.%@）。它可以在 Mac 上播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 上的 Vespertine 无法为手机转换这种文件（.%@）。它可以在 Mac 上播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 上的 Vespertine 無法為手機轉換這類檔案（.%@）。它可以在 Mac 上播放。"
+          }
+        }
+      }
+    },
+    "That stream isn’t open.": {
+      "comment": "Stored in the Mac app but shown on the iPhone or iPad (the Mac answers a phone in the phone's language). Rarely seen technical refusal.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ያ ስርጭት አልተከፈተም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هذا البث غير مفتوح."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ওই স্ট্রিমটি খোলা নেই।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tento stream není otevřený."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den stream er ikke åben."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Stream ist nicht geöffnet."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτή η ροή δεν είναι ανοιχτή."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esa transmisión no está abierta."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آن استریم باز نیست."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suoratoisto ei ole avoinna."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi nakabukas ang stream na iyon."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce flux n’est pas ouvert."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તે સ્ટ્રીમ ખુલ્લી નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba a buɗe wannan aikawar ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ההזרמה הזו אינה פתוחה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वह स्ट्रीम खुली नहीं है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez a stream nincs megnyitva."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stream itu tidak terbuka."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo stream non è aperto."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "そのストリームは開かれていません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಆ ಸ್ಟ್ರೀಮ್ ತೆರೆದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "해당 스트림이 열려 있지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ആ സ്ട്രീം തുറന്നിട്ടില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ती स्ट्रीम उघडी नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strim itu tidak dibuka."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den strømmen er ikke åpen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die stream is niet geopend."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਉਹ ਸਟ੍ਰੀਮ ਖੁੱਲ੍ਹੀ ਨਹੀਂ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ten strumień nie jest otwarty."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Essa transmissão não está aberta."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Essa transmissão não está aberta."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fluxul respectiv nu este deschis."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den strömmen är inte öppen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mtiririko huo haujafunguliwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அந்த ஸ்ட்ரீம் திறக்கப்படவில்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఆ స్ట్రీమ్ తెరిచి లేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สตรีมนั้นไม่ได้เปิดอยู่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu yayın açık değil."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей потік не відкрито."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وہ اسٹریم کھلی نہیں ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Luồng đó chưa được mở."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該串流尚未開啟。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该流未打开。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該串流尚未開啟。"
+          }
+        }
+      }
+    },
+    "That range isn’t valid.": {
+      "comment": "Stored in the Mac app but shown on the iPhone or iPad (the Mac answers a phone in the phone's language). Rarely seen technical refusal: the phone asked for bytes outside the file.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ያ ክልል ትክክል አይደለም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هذا النطاق غير صالح."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ওই রেঞ্জটি বৈধ নয়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tento rozsah není platný."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det område er ikke gyldigt."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Bereich ist ungültig."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτό το εύρος δεν είναι έγκυρο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ese intervalo no es válido."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آن محدوده معتبر نیست."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alue ei kelpaa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi valid ang range na iyon."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette plage n’est pas valide."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તે રેન્જ માન્ય નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan zangon ba daidai ba ne."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הטווח הזה אינו תקין."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वह रेंज मान्य नहीं है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez a tartomány érvénytelen."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rentang itu tidak valid."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’intervallo non è valido."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その範囲は無効です。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಆ ವ್ಯಾಪ್ತಿ ಮಾನ್ಯವಾಗಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "해당 범위가 유효하지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ആ ശ്രേണി സാധുവല്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ती रेंज वैध नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Julat itu tidak sah."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det området er ikke gyldig."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dat bereik is ongeldig."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਉਹ ਰੇਂਜ ਵੈਧ ਨਹੀਂ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ten zakres jest nieprawidłowy."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esse intervalo não é válido."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esse intervalo não é válido."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intervalul respectiv nu este valid."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det intervallet är inte giltigt."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Masafa hayo si sahihi."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அந்த வரம்பு செல்லுபடியாகாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఆ పరిధి చెల్లదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ช่วงนั้นไม่ถูกต้อง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu aralık geçerli değil."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей діапазон недійсний."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وہ رینج درست نہیں ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phạm vi đó không hợp lệ."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該範圍無效。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该范围无效。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該範圍無效。"
+          }
+        }
+      }
+    },
+    "The Mac couldn’t read the file.": {
+      "comment": "Stored in the Mac app but shown on the iPhone or iPad (the Mac answers a phone in the phone's language). Reading the song's file failed part-way.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ፋይሉን ማንበብ አልቻለም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعذّر على الـ Mac قراءة الملف."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ফাইলটি পড়তে পারেনি।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac soubor nedokázal přečíst."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’en kunne ikke læse filen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Mac konnte die Datei nicht lesen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Mac δεν μπόρεσε να διαβάσει το αρχείο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El Mac no ha podido leer el archivo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac نتوانست فایل را بخواند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ei voinut lukea tiedostoa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi nabasa ng Mac ang file."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Mac n’a pas pu lire le fichier."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ફાઇલ વાંચી શક્યું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ɗin ba ta iya karanta fayil ɗin ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ה־Mac לא הצליח לקרוא את הקובץ."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac फ़ाइल नहीं पढ़ सका।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Mac nem tudta beolvasni a fájlt."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac tidak dapat membaca file tersebut."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il Mac non è riuscito a leggere il file."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macがファイルを読み込めませんでした。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ಗೆ ಫೈಲ್ ಅನ್ನು ಓದಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac이 파일을 읽지 못했습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ന് ഫയൽ വായിക്കാനായില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ला फाइल वाचता आली नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac tidak dapat membaca fail tersebut."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macen kunne ikke lese filen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De Mac kon het bestand niet lezen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ਫ਼ਾਈਲ ਨਹੀਂ ਪੜ੍ਹ ਸਕਿਆ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac nie mógł odczytać pliku."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Mac não conseguiu ler o arquivo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Mac não conseguiu ler o ficheiro."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ul nu a putut citi fișierul."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macen kunde inte läsa filen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac imeshindwa kusoma faili."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ஆல் கோப்பைப் படிக்க முடியவில்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ఫైల్‌ను చదవలేకపోయింది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac อ่านไฟล์ไม่ได้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac dosyayı okuyamadı."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac не зміг прочитати файл."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac فائل نہیں پڑھ سکا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy Mac không thể đọc tệp."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 無法讀取該檔案。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 未能读取该文件。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 無法讀取該檔案。"
+          }
+        }
+      }
+    },
+    "This Mac’s connection with the phone is the older kind, which can’t stream. Update Vespertine on the phone.": {
+      "comment": "Stored in the Mac app but shown on the iPhone or iPad (the Mac answers a phone in the phone's language). The phone's app is too old to play songs itself.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የዚህ Mac ከስልኩ ጋር ያለው ግንኙነት ማሰራጨት የማይችል የቆየ ዓይነት ነው። በስልኩ ላይ Vespertineን ያዘምኑ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اتصال هذا الـ Mac بالهاتف من النوع الأقدم الذي لا يدعم البث. حدّث Vespertine على الهاتف."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ফোনের সাথে এই Mac-এর সংযোগটি পুরোনো ধরনের, যা স্ট্রিম করতে পারে না। ফোনে Vespertine আপডেট করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spojení tohoto Macu s telefonem je staršího typu, který streamovat neumí. Aktualizujte Vespertine na telefonu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne Macs forbindelse til telefonen er af den ældre type, som ikke kan streame. Opdater Vespertine på telefonen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Verbindung dieses Mac mit dem Telefon ist von der älteren Art, die nicht streamen kann. Aktualisiere Vespertine auf dem Telefon."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η σύνδεση αυτού του Mac με το τηλέφωνο είναι παλαιότερου τύπου, που δεν υποστηρίζει ροή. Ενημερώστε το Vespertine στο τηλέφωνο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La conexión de este Mac con el teléfono es del tipo antiguo, que no permite transmitir. Actualiza Vespertine en el teléfono."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اتصال این Mac با تلفن از نوع قدیمی‌تر است که نمی‌تواند استریم کند. Vespertine را در تلفن به‌روزرسانی کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tämän Macin yhteys puhelimeen on vanhempaa tyyppiä, joka ei voi suoratoistaa. Päivitä puhelimen Vespertine."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lumang uri ang koneksyon ng Mac na ito sa phone, na hindi makapag-stream. I-update ang Vespertine sa phone."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La connexion de ce Mac avec le téléphone est de l’ancien type, qui ne permet pas la diffusion. Mettez à jour Vespertine sur le téléphone."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ફોન સાથેનું આ Mac નું કનેક્શન જૂના પ્રકારનું છે, જે સ્ટ્રીમ કરી શકતું નથી. ફોન પર Vespertine અપડેટ કરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haɗin wannan Mac da wayar tsohon iri ne, wanda ba zai iya aika waƙoƙi ba. Sabunta Vespertine a kan wayar."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "החיבור של Mac זה עם הטלפון הוא מהסוג הישן, שאינו תומך בהזרמה. עדכן את Vespertine בטלפון."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस Mac का फ़ोन के साथ कनेक्शन पुराने प्रकार का है, जो स्ट्रीम नहीं कर सकता। फ़ोन पर Vespertine अपडेट करें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ennek a Macnek a telefonnal létesített kapcsolata régebbi típusú, amely nem tud streamelni. Frissítse a Vespertine-t a telefonon."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koneksi Mac ini dengan ponsel adalah jenis lama, yang tidak dapat melakukan streaming. Perbarui Vespertine di ponsel."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La connessione di questo Mac con il telefono è del tipo precedente, che non supporta lo streaming. Aggiorna Vespertine sul telefono."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このMacとスマートフォンの接続は古い方式のもので、ストリーミングできません。スマートフォンのVespertineをアップデートしてください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಫೋನ್‌ನೊಂದಿಗೆ ಈ Mac ನ ಸಂಪರ್ಕವು ಹಳೆಯ ಬಗೆಯದು, ಅದರಲ್ಲಿ ಸ್ಟ್ರೀಮ್ ಮಾಡಲು ಸಾಧ್ಯವಿಲ್ಲ. ಫೋನ್‌ನಲ್ಲಿ Vespertine ಅಪ್‌ಡೇಟ್ ಮಾಡಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 Mac과 휴대폰의 연결은 스트리밍할 수 없는 이전 방식입니다. 휴대폰의 Vespertine을 업데이트하십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഫോണുമായുള്ള ഈ Mac-ന്റെ കണക്ഷൻ പഴയ തരത്തിലുള്ളതാണ്; അതിന് സ്ട്രീം ചെയ്യാനാവില്ല. ഫോണിലെ Vespertine അപ്ഡേറ്റ് ചെയ്യുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या Mac चे फोनसोबतचे कनेक्शन जुन्या प्रकारचे आहे, जे स्ट्रीम करू शकत नाही. फोनवरील Vespertine अपडेट करा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sambungan Mac ini dengan telefon ialah jenis lama, yang tidak dapat menstrim. Kemas kini Vespertine pada telefon."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne Macens tilkobling til telefonen er av den eldre typen, som ikke kan strømme. Oppdater Vespertine på telefonen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De verbinding van deze Mac met de telefoon is van het oudere type, dat niet kan streamen. Werk Vespertine op de telefoon bij."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ Mac ਦਾ ਫ਼ੋਨ ਨਾਲ ਕਨੈਕਸ਼ਨ ਪੁਰਾਣੀ ਕਿਸਮ ਦਾ ਹੈ, ਜੋ ਸਟ੍ਰੀਮ ਨਹੀਂ ਕਰ ਸਕਦਾ। ਫ਼ੋਨ ’ਤੇ Vespertine ਅੱਪਡੇਟ ਕਰੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Połączenie tego Maca z telefonem jest starszego typu i nie pozwala na strumieniowanie. Uaktualnij Vespertine na telefonie."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A conexão deste Mac com o telefone é do tipo antigo, que não permite transmitir. Atualize o Vespertine no telefone."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A ligação deste Mac com o telemóvel é do tipo antigo, que não permite transmitir. Atualize o Vespertine no telemóvel."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conexiunea acestui Mac cu telefonul este de tipul vechi, care nu permite streamingul. Actualizați Vespertine pe telefon."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den här Macens anslutning till telefonen är av den äldre typen, som inte kan strömma. Uppdatera Vespertine på telefonen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muunganisho wa Mac hii na simu ni wa aina ya zamani, ambao hauwezi kutiririsha. Sasisha Vespertine kwenye simu."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஃபோனுடனான இந்த Mac-இன் இணைப்பு பழைய வகையைச் சேர்ந்தது; அதனால் ஸ்ட்ரீம் செய்ய முடியாது. ஃபோனில் Vespertine-ஐப் புதுப்பிக்கவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఫోన్‌తో ఈ Mac కనెక్షన్ పాత రకానికి చెందినది; అది స్ట్రీమ్ చేయలేదు. ఫోన్‌లో Vespertineను అప్‌డేట్ చేయండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การเชื่อมต่อระหว่าง Mac เครื่องนี้กับโทรศัพท์เป็นแบบเก่าซึ่งสตรีมไม่ได้ ให้อัปเดต Vespertine บนโทรศัพท์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’in telefonla bağlantısı, yayın yapamayan eski türden. Telefondaki Vespertine’i güncelleyin."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "З’єднання цього Mac із телефоном старішого типу, який не підтримує трансляцію. Оновіть Vespertine на телефоні."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس Mac کا فون کے ساتھ کنکشن پرانی قسم کا ہے، جو اسٹریم نہیں کر سکتا۔ فون پر Vespertine کو اپ ڈیٹ کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kết nối giữa máy Mac này và điện thoại thuộc loại cũ, không thể truyền phát. Hãy cập nhật Vespertine trên điện thoại."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這部 Mac 與手機之間的連接屬於較舊的類型，無法串流。請更新手機上的 Vespertine。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 Mac 与手机之间的连接是较旧的类型，无法流播放。请更新手机上的 Vespertine。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這部 Mac 與手機之間的連線屬於較舊的類型，無法串流。請更新手機上的 Vespertine。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
