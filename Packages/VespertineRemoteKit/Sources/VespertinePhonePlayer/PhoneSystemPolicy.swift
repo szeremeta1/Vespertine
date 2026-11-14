@@ -6,6 +6,11 @@
 
 import Foundation
 
+/// Off, Fixed or Head Tracked, as the Mac's Spatial Audio setting has them (`SpatialMode` where Core Audio exists).
+public enum SpatialModeChoice: String, Sendable, Equatable, CaseIterable, Codable {
+    case off, fixed, headTracked
+}
+
 /// A call, Siri or an alarm takes the sound: music that was playing pauses, and comes back when iOS says it may, unless
 /// you paused or played it yourself in between.
 public struct InterruptionPolicy: Sendable, Equatable {
@@ -37,6 +42,17 @@ public enum RouteChangePolicy {
 }
 
 extension PhoneRoute {
+    /// Headphones of some kind: Bluetooth, the headphone jack or adapter, or a USB DAC (which usually feeds headphones from
+    /// a phone).
+    public var isHeadphones: Bool { isBluetooth || isUSB || portType == "Headphones" }
+
+    /// How a surround song is played on this output when you asked for `wanted`: rendered for headphones only on
+    /// headphones, head tracked only where the headphones follow your head, folded to stereo everywhere else.
+    public func surroundMode(wanted: SpatialModeChoice) -> SpatialModeChoice {
+        guard isHeadphones, wanted != .off else { return .off }
+        return wanted == .headTracked && !spatial ? .fixed : wanted
+    }
+
     /// The rate to ask iOS for so `streamRate` isn't resampled: only on outputs that can change rate (a USB DAC, the
     /// headphone adapter), and only when they aren't there already. iOS may still decline: the app reads back what it got.
     public func rateToAsk(for streamRate: Double) -> Double? {

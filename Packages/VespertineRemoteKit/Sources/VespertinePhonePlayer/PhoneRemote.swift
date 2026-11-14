@@ -51,6 +51,8 @@ public struct PhoneSignal: Equatable, Sendable {
     public var outputRate: Double?
     /// iOS changes the rate between the two.
     public var resampled: Bool { outputRate.map { $0 > 0 && abs($0 - streamRate) > 0.5 } ?? false }
+    /// For a surround song: how it is being played (`.off` is the fold to stereo). nil for stereo and mono.
+    public var surround: SpatialModeChoice?
 
     public init(stream: StreamDescriptor, route: PhoneRoute?) {
         converted = stream.kind != .original
@@ -75,13 +77,26 @@ public struct PhoneSignal: Equatable, Sendable {
 
 #if canImport(Network) && canImport(AVFAudio)
 import Observation
+import VespertineChannels
 
 @MainActor
 @Observable
 public final class PhoneRemote {
     public let playback: PhonePlayback
     /// Where the sound goes (the app keeps it current from the audio session).
-    public var route: PhoneRoute?
+    public var route: PhoneRoute? { didSet { applySurround() } }
+    /// How you want surround songs played; the output decides what it gets (`PhoneRoute.surroundMode`).
+    public var surroundChoice: SpatialModeChoice = .headTracked { didSet { applySurround() } }
+
+    private func applySurround() {
+        let mode = route.map { $0.surroundMode(wanted: surroundChoice) } ?? surroundChoice
+        let wanted: SpatialMode = switch mode {
+        case .off: .off
+        case .fixed: .fixed
+        case .headTracked: .headTracked
+        }
+        if playback.player.spatialMode != wanted { playback.player.spatialMode = wanted }
+    }
     /// A signal in the app's language: the badge ("ORIGINAL FILE", "CONVERTED ON THE MAC"…) and what the output runs at
     /// ("48 kHz", or that iOS resampled to it).
     @ObservationIgnored public var words: (PhoneSignal) -> (badge: String, output: String) = { signal in
@@ -96,6 +111,7 @@ public final class PhoneRemote {
         self.playback = playback
         self.library = library
         playback.maxSampleRate = { [weak self] in self?.route?.conversionCap }
+        applySurround()
     }
 
     /// Whether a command is about playing (the phone takes it) or about the Mac's library and outputs (the Mac does).
@@ -181,7 +197,17 @@ public final class PhoneRemote {
 
     public var queueState: QueueState { playback.queue.state }
 
-    public var signal: PhoneSignal? { playback.stream.map { PhoneSignal(stream: $0, route: route) } }
+    public var signal: PhoneSignal? {
+        playback.stream.map { stream in
+            var signal = PhoneSignal(stream: stream, route: route)
+            switch playback.player.rendering {
+            case .untouched: signal.surround = nil
+            case .downmix: signal.surround = .off
+            case .spatial(let tracked): signal.surround = tracked ? .headTracked : .fixed
+            }
+            return signal
+        }
+    }
 
     public var playerState: PlayerState {
         let entry = playback.nowPlaying

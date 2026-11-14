@@ -18,6 +18,14 @@ final class PlayTarget {
 
     /// "This iPhone" is chosen in Output. Kept between launches.
     private(set) var onThisDevice = UserDefaults.standard.bool(forKey: PlayTarget.key)
+    /// How surround songs are played on headphones here: Head Tracked unless chosen otherwise. Kept between launches.
+    var surround = SpatialModeChoice(rawValue: UserDefaults.standard.string(forKey: PlayTarget.surroundKey) ?? "") ?? .headTracked {
+        didSet {
+            UserDefaults.standard.set(surround.rawValue, forKey: Self.surroundKey)
+            made?.remote.surroundChoice = surround
+        }
+    }
+    private static let surroundKey = "surroundOnThisDevice"
     private var made: (session: ObjectIdentifier, remote: PhoneRemote, system: PhoneSystem)?
 
     /// The phone's player for `session` when this device is where music plays and the Mac can send songs; nil when the
@@ -54,6 +62,7 @@ final class PlayTarget {
         let playback = PhonePlayback(session: session, player: PhonePlayer(), cacheDirectory: caches.appendingPathComponent("Streams", isDirectory: true))
         let remote = PhoneRemote(playback: playback) { [weak session] command in await session?.send(command) ?? .failed(reason: "") }
         remote.words = { signal in (Self.badge(signal), Self.output(signal)) }
+        remote.surroundChoice = surround
         let system = PhoneSystem(remote: remote) { [weak session] key in
             guard let session, case .artwork(_, _, _, let data) = await session.send(.artwork(key: key, size: 600)) else { return nil }
             return data
@@ -72,6 +81,12 @@ final class PlayTarget {
 
     /// The badge: whether the song arrives as the file it is, or as a copy the Mac made in a format this device can open.
     static func badge(_ signal: PhoneSignal) -> String {
+        switch signal.surround {
+        case .headTracked?: return String(localized: "SPATIAL AUDIO · HEAD TRACKED", comment: "Signal badge on the iPhone: a surround song rendered for headphones, following the head.")
+        case .fixed?: return String(localized: "SPATIAL AUDIO · FIXED", comment: "Signal badge on the iPhone: a surround song rendered for headphones, not following the head.")
+        case .off?: return String(localized: "SURROUND FOLDED TO STEREO", comment: "Signal badge on the iPhone: a surround song mixed down to two channels.")
+        case nil: break
+        }
         signal.converted ? String(localized: "CONVERTED ON THE MAC", comment: "Signal badge: the Mac converted this song to a format the iPhone can play.")
                          : String(localized: "ORIGINAL FILE", comment: "Signal badge: the iPhone plays the song's own file, as it is on the Mac.")
     }

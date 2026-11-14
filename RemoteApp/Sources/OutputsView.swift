@@ -35,8 +35,15 @@ struct OutputsView: View {
                     .buttonStyle(.plain)
                     .disabled(!PlayTarget.shared.canPlayHere(session))
                     .accessibilityAddTraits(playsHere ? .isSelected : [])
+                    if playsHere {
+                        Picker("Surround on Headphones", selection: Binding(get: { PlayTarget.shared.surround }, set: { PlayTarget.shared.surround = $0 })) {
+                            Text("Off").tag(SpatialModeChoice.off)
+                            Text("Fixed").tag(SpatialModeChoice.fixed)
+                            Text("Head Tracked").tag(SpatialModeChoice.headTracked)
+                        }
+                    }
                 } footer: {
-                    Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched.")
+                    Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
                 }
                 Section {
                     ForEach(Array((session.outputs?.outputs ?? []).enumerated()), id: \.offset) { _, output in
