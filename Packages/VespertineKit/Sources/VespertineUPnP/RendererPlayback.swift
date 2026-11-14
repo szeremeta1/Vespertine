@@ -97,6 +97,8 @@ public final class RendererPlayback: @unchecked Sendable {
     private let commands: AsyncStream<Command>
     private let enqueue: AsyncStream<Command>.Continuation
     private var worker: Task<Void, Never>?
+    /// Signalled when the worker has run its last command.
+    private let workerDone = DispatchSemaphore(value: 0)
     private var poller: Task<Void, Never>?
     /// Every play, stop and restart counts up, so a slow one that was overtaken drops its result.
     private let generation = Locked(0)
@@ -119,7 +121,9 @@ public final class RendererPlayback: @unchecked Sendable {
         self.media = media
         self.processed = processed
         (commands, enqueue) = AsyncStream<Command>.makeStream()
+        let done = workerDone
         worker = Task { [weak self, commands] in
+            defer { done.signal() }
             for await command in commands {
                 guard let self else { return }
                 await self.run(command)
@@ -213,6 +217,11 @@ public final class RendererPlayback: @unchecked Sendable {
         refreshActivity()
         enqueue.finish()
         poller?.cancel()
+    }
+
+    public func stopAndWait(timeout: TimeInterval) {
+        shutdown()
+        _ = workerDone.wait(timeout: .now() + timeout)
     }
 
     /// A song is loaded on the renderer and it is answering: the renderer is there, whatever a search on the network says.

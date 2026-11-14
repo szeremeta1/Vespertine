@@ -50,6 +50,11 @@ public final class RAOPSession: @unchecked Sendable {
         var anchor: (rtp: UInt32, nanos: UInt64)?
         var backlog: [UInt16: Data] = [:]
         var resent = 0
+        /// The receiver's clock questions: how many, and when the last one came (nanoseconds). One that has asked and then
+        /// falls silent while audio is being sent has probably gone.
+        var timingRequests = 0
+        var lastTiming: UInt64 = 0
+        var lastAudio: UInt64 = 0
     }
     private let state = Locked(State())
     private let encoder: ALACEncoder?
@@ -67,6 +72,9 @@ public final class RAOPSession: @unchecked Sendable {
 
     public static let backlogPackets = 1024
     public static let keepAliveInterval: Duration = .seconds(25)
+    /// A receiver that was asking the time and has asked nothing for this long, while audio goes to it, is asked at once
+    /// whether it is still there (it asks every few seconds while it plays).
+    public static let silenceBeforeProbe: TimeInterval = 8
 
     /// `rsaKey`: the key the AES key is wrapped with (the AirPort Express key unless a test gives its own).
     public init(name: String, endpoint: NWEndpoint, encryption: RAOPEncryption, rsaKey: SecKey? = nil) {
@@ -136,7 +144,7 @@ public final class RAOPSession: @unchecked Sendable {
             let timing = try UDPSocket(), control = try UDPSocket(), audio = try UDPSocket()
             parts.withLock { $0.timing = timing; $0.control = control; $0.audio = audio }
             timing.startReceiving(name: "Vespertine AirPlay timing") { [weak self] data, from, port in self?.answerTiming(data, from: from, port: port) }
-            control.startReceiving(name: "Vespertine AirPlay control") { [weak self] data, _, _ in self?.answerControl(data) }
+            control.startReceiving(name: "Vespertine AirPlay control") { [weak self] data, from, _ in self?.answerControl(data, from: from) }
             let setup = try await request("SETUP", headers: [("Transport", RAOPTransport.request(control: control.port, timing: timing.port))])
             guard let transport = setup["Transport"].flatMap(RAOPTransport.parse) else { throw RAOPError.badResponse("SETUP") }
             // "Session: <id>[;timeout=…]"; none, or an empty one, is a receiver Vespertine can't go on with.
@@ -146,7 +154,7 @@ public final class RAOPSession: @unchecked Sendable {
             state.withLock { $0.ports = transport; $0.session = session }
             let (seq, head) = state.withLock { ($0.seq, $0.head) }
             _ = try await request("RECORD", headers: [("Range", "npt=0-"), ("RTP-Info", "seq=\(seq);rtptime=\(head)")])
-            state.withLock { $0.connected = true; $0.first = true; $0.anchor = nil }
+            state.withLock { $0.connected = true; $0.first = true; $0.anchor = nil; $0.timingRequests = 0; $0.lastTiming = 0; $0.lastAudio = 0 }
             if let volumeDB { try? await setVolume(volumeDB) }
             startKeepAlive()
         } catch {
@@ -197,10 +205,18 @@ public final class RAOPSession: @unchecked Sendable {
     private func startKeepAlive() {
         parts.withLock { $0.keepAlive?.cancel() }
         let task = Task { [weak self] in
+            var asked = ContinuousClock.now
             while !Task.isCancelled {
-                try? await Task.sleep(for: Self.keepAliveInterval)
+                // Looked at every two seconds; asked every `keepAliveInterval`, or at once when the receiver has gone quiet.
+                try? await Task.sleep(for: .seconds(2))
                 guard !Task.isCancelled, let self else { return }
-                do { _ = try await self.request("OPTIONS", url: "*") } catch {
+                guard ContinuousClock.now - asked >= Self.keepAliveInterval || self.hasGoneQuiet() else { continue }
+                asked = .now
+                do {
+                    _ = try await self.request("OPTIONS", url: "*")
+                    // It answered: quiet or not, it is there (not asked again before another silence as long).
+                    self.state.withLock { $0.lastTiming = NTPClock.nanosecondsNow() }
+                } catch {
                     guard !Task.isCancelled, self.isConnected else { return }
                     self.log.error("AirPlay \(self.name, privacy: .public) keep-alive failed: \(String(describing: error), privacy: .public)")
                     self.state.withLock { $0.connected = false }
@@ -214,6 +230,14 @@ public final class RAOPSession: @unchecked Sendable {
             }
         }
         parts.withLock { $0.keepAlive = task }
+    }
+
+    /// Audio is going out, the receiver has been asking the time, and it has stopped asking.
+    func hasGoneQuiet(now: UInt64 = NTPClock.nanosecondsNow()) -> Bool {
+        state.withLock { s in
+            guard s.connected, s.timingRequests >= 2, now >= s.lastAudio, now - s.lastAudio < 2_000_000_000, now >= s.lastTiming else { return false }
+            return Double(now - s.lastTiming) / 1e9 >= Self.silenceBeforeProbe
+        }
     }
 
     // MARK: Audio
@@ -253,6 +277,7 @@ public final class RAOPSession: @unchecked Sendable {
             s.seq &+= 1
             s.head &+= UInt32(RAOPTiming.framesPerPacket)
             s.first = false
+            s.lastAudio = NTPClock.nanosecondsNow()
             return (packet, first, s.host, s.ports.server)
         }
         if first { sendSync(first: true) }
@@ -269,11 +294,19 @@ public final class RAOPSession: @unchecked Sendable {
 
     private func answerTiming(_ data: Data, from: String, port: UInt16) {
         let receive = NTPClock.now()
+        // Only the session's own receiver counts as a sign of life (these ports take datagrams from anyone on the network).
+        state.withLock { s in
+            guard from == s.host else { return }
+            s.timingRequests += 1
+            s.lastTiming = NTPClock.nanosecondsNow()
+        }
         guard let reply = RAOPPacket.timingReply(request: data, receive: receive, transmit: NTPClock.now()) else { return }
         timing?.send(reply, to: from, port: port)
     }
 
-    private func answerControl(_ data: Data) {
+    private func answerControl(_ data: Data, from: String) {
+        // Packets are sent again only when the receiver itself asks: anyone else could have it flooded with them.
+        guard from == state.withLock({ $0.host }) else { return }
         guard let (seq, count) = RAOPPacket.parseResendRequest(data) else { return }
         let (packets, host, port) = state.withLock { s -> ([Data], String, UInt16) in
             let list = (0..<min(count, UInt16(Self.backlogPackets))).compactMap { s.backlog[seq &+ $0] }

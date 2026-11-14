@@ -356,11 +356,14 @@ final class AppModel {
             MainActor.assumeIsolated {
                 guard let self else { return }
                 let relay = self.player.volumeRelay, engine = self.player.engine
+                // A network player or AirPlay receiver is told to stop too: it would otherwise play on by itself.
+                let network = self.player.renderer
                 let discord = self.player.discord.shutdownStep()
                 let onQuit = self.settings.deviceOnQuit
                 QuitSequence.run(steps: [
                     { relay.stop() },
                     discord,
+                    { network?.stopAndWait(timeout: 1.5) },
                     { engine.stopAndWait() },
                     { DeviceRestore.finish(onQuit) },
                 ])

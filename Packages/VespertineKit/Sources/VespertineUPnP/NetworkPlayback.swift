@@ -31,6 +31,10 @@ public protocol NetworkPlayback: AnyObject, Sendable {
     /// A song is loaded on the output and it is answering. While it is, the output is there, whatever a search of the
     /// network says: a missed search or an expired Bonjour record doesn't end the music.
     var isEngaged: Bool { get }
+    /// Vespertine is quitting: the player is told to stop, and this returns once it has been (or `timeout` has passed).
+    /// Left alone it would play on to the end of the song, reading from a server that is gone. Blocks: not for the
+    /// main thread's ordinary work, only the quit sequence.
+    func stopAndWait(timeout: TimeInterval)
 }
 
 /// Keeps the Mac from idle sleep while a network output is meant to be playing. Nothing plays through Core Audio then, so

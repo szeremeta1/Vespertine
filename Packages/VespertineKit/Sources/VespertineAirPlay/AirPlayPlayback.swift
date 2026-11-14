@@ -61,6 +61,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         var start: UInt32?
         var end: UInt32?
         var heard = false
+        /// Its decoder stopped on an error, and that has been said.
+        var errorSaid = false
 
         init(item: PlayableItem, frames: AirPlayFrames, path: SignalPath, offset: TimeInterval, duration: TimeInterval, announces: Bool) {
             self.item = item
@@ -120,6 +122,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     private let commands: AsyncStream<Command>
     private let enqueue: AsyncStream<Command>.Continuation
     private var worker: Task<Void, Never>?
+    /// Signalled when the worker has run its last command.
+    private let workerDone = DispatchSemaphore(value: 0)
     private let generation = Locked(0)
     private let settingsGeneration = Locked(0)
     /// Keeps the Mac awake while the receiver is meant to be playing (nothing plays through Core Audio then, so macOS would
@@ -131,11 +135,21 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     }
 
     /// The session with the receiver is open: it is there, whatever Bonjour says at the moment.
-    public var isEngaged: Bool { state.withLock { !$0.shutDown } && session?.isConnected == true }
+    /// A paused song counts too: its session may have been closed to free the receiver, and is opened again on Play.
+    public var isEngaged: Bool {
+        let (shutDown, paused) = state.withLock { ($0.shutDown, $0.snapshot.state == .paused) }
+        return !shutDown && (paused || session?.isConnected == true)
+    }
+
+    /// How long a paused or finished session is kept open. After that the receiver is let go, so other senders can use
+    /// it (it answers them "busy" while Vespertine holds it); Play opens a new session where the song was.
+    var idleLimit: TimeInterval = 300
 
     enum Command {
         case play(PlayableItem, at: TimeInterval, announce: Bool, generation: Int)
         case pause, stop, queueChanged, settings(RendererSettings), volume, heard(Segment), lost, ended
+        /// Nothing has played since the pause or the queue's end of this generation: the session is closed.
+        case idle(generation: Int)
         /// The hold for `next` ran too long: the stream starts again with it once it opens.
         case gap(after: Segment, next: PlayableItem, since: UInt64, generation: Int)
     }
@@ -147,7 +161,9 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         self.rsaKey = rsaKey
         self.lead = lead
         (commands, enqueue) = AsyncStream<Command>.makeStream()
+        let done = workerDone
         worker = Task { [weak self, commands] in
+            defer { done.signal() }
             for await command in commands {
                 guard let self else { return }
                 await self.run(command)
@@ -266,6 +282,12 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         enqueue.finish()
     }
 
+    /// Vespertine is quitting: the session is torn down (the receiver stops at once and is free for other senders).
+    public func stopAndWait(timeout: TimeInterval) {
+        shutdown()
+        _ = workerDone.wait(timeout: .now() + timeout)
+    }
+
     /// The frame heard now, on the timeline (nil while nothing is).
     private func heardTimestamp() -> UInt32? {
         session?.clockTimestamp().map { $0 &- RAOPTiming.latencyFrames }
@@ -301,6 +323,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         case .pause:
             await halt()
             try? await session?.flush()
+            closeWhenIdle()
         case .stop:
             await halt()
             await session?.teardown()
@@ -350,9 +373,15 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             }
         case .heard(let segment):
             await announce(segment)
+        case .idle(let g):
+            guard generation.withLock({ $0 }) == g, state.withLock({ $0.snapshot.state != .playing }), pacer == nil else { return }
+            await session?.teardown()
+            session = nil
         case .lost:
             await halt()
             session = nil
+            // Lost while paused: the song stays where it is, and Play opens a new session.
+            if state.withLock({ $0.snapshot.state == .paused }) { return }
             let wasActive = state.withLock { s -> Bool in
                 defer { s.snapshot.state = .stopped; s.wantsPlaying = false; s.segments = []; s.prepared = nil }
                 return s.snapshot.state != .stopped
@@ -370,6 +399,16 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                 s.prepared = nil
             }
             emit(.queueEnded)
+            closeWhenIdle()
+        }
+    }
+
+    private func closeWhenIdle() {
+        let g = generation.withLock { $0 }
+        let limit = idleLimit
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(limit))
+            self?.enqueue.yield(.idle(generation: g))
         }
     }
 
@@ -396,9 +435,17 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         }
         guard generation.withLock({ $0 }) == g else { return }
         do {
+            var open = false
             if let session, session.isConnected {
-                try await session.flush()
-            } else {
+                // A session the receiver has dropped since (it restarted, or let go of a paused sender) refuses the
+                // flush: a new one is opened instead of failing the song.
+                do { try await session.flush(); open = true } catch {
+                    log.info("AirPlay \(self.device.name, privacy: .public): the open session refused a flush (\(String(describing: error), privacy: .public)); connecting again")
+                    await session.teardown()
+                    self.session = nil
+                }
+            }
+            if !open {
                 let made = RAOPSession(name: device.name, endpoint: endpoint, encryption: encryption, rsaKey: rsaKey)
                 made.onLost = { [weak self] in self?.enqueue.yield(.lost) }
                 let volume = state.withLock { $0.receiverVolumeDB }
@@ -519,6 +566,11 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             let chunk = segment.frames.next(maxFrames: count - out.count / 2)
             if !chunk.isEmpty { out += chunk; continue }
             state.withLock { _ in segment.end = head }
+            // A decoder that stopped on an error is the song cut short, not its end: said once, and the queue goes on.
+            if let error = segment.frames.error, !state.withLock({ _ in defer { segment.errorSaid = true }; return segment.errorSaid }) {
+                let reason = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+                emit(.failed(segment.item, String(localized: "\(device.name) couldn't play the song (\(reason)).", comment: "%1$@ is an AirPlay receiver's name, %2$@ the reason.")))
+            }
             // On to the next song, opened ahead. Not ready yet: wait for it (the pacer holds the packet; the receiver's two
             // seconds cover the wait), opening it off this thread if nobody has started to.
             let wanted = nextItemProvider?(segment.item)
@@ -549,11 +601,14 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             }
             state.withLock { $0.holdSince = nil }
             guard let following = found else {
-                if let wanted {
-                    emit(.failed(wanted, String(localized: "\(device.name) couldn't play the song (it couldn't be opened).", comment: "%@ is an AirPlay receiver's name.")))
+                guard let wanted else {
+                    state.withLock { $0.queueDone = true }
+                    break
                 }
-                state.withLock { $0.queueDone = true }
-                break
+                // It couldn't be opened. The song before is heard to its end; then this one fails by name and the one
+                // after it is tried, on a fresh stream (the worker's step, as after a hold that ran too long).
+                enqueue.yield(.gap(after: segment, next: wanted, since: NTPClock.nanosecondsNow(), generation: generation.withLock { $0 }))
+                return .gap(out)
             }
             state.withLock { $0.segments.append(following) }
             prepareNext(after: following.item)
