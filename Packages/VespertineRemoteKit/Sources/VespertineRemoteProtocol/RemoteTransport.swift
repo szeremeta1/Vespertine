@@ -51,6 +51,22 @@ public enum RemoteTransport {
         return parameters
     }
 
+    /// The listener a Mac takes phones on, with the Bonjour service (`RemoteProtocol.serviceType`) that lets a phone on the same
+    /// network find it. `port` nil: the system chooses one. The service takes the computer's name, and is announced once the
+    /// listener is started (macOS only announces for an app that is allowed on the local network).
+    public static func listener(keys: [PresharedKey], port: UInt16?, txtRecord: NWTXTRecord) throws -> NWListener {
+        let parameters = parameters(keys: keys)
+        parameters.allowLocalEndpointReuse = true
+        let listener: NWListener
+        if let port, let wanted = NWEndpoint.Port(rawValue: port) {
+            listener = try NWListener(using: parameters, on: wanted)
+        } else {
+            listener = try NWListener(using: parameters)
+        }
+        listener.service = NWListener.Service(type: RemoteProtocol.serviceType, txtRecord: txtRecord)
+        return listener
+    }
+
     /// The context to send one JSON message with.
     public static var textContext: NWConnection.ContentContext {
         NWConnection.ContentContext(identifier: "vespertine-remote", metadata: [NWProtocolFramer.Message(definition: RemoteFrame.definition)])
