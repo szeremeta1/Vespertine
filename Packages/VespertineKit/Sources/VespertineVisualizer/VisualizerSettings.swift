@@ -394,4 +394,3 @@ extension VisualizerAnalyzer.Configuration {
         meterExtras = settings.meterExtras
     }
 }
-
