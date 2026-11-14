@@ -35,15 +35,19 @@ final class PlayTarget {
     /// The phone's player for `session` when this device is where music plays and the Mac can send songs; nil when the
     /// Mac plays.
     func phone(for session: RemoteSession) -> PhoneRemote? {
-        guard onThisDevice, !session.isDemo else { return nil }
+        guard onThisDevice else { return nil }
+        #if DEBUG
+        // App Store captures use the demo and must stay silent on whatever machine takes them.
+        if session.isDemo, LaunchOptions.screenshot { return nil }
+        #endif
         // Once made it stays, connected or not: a song that is playing doesn't vanish from Now Playing when the Mac does.
         if let made, made.session == ObjectIdentifier(session) { return made.remote }
-        guard session.canStream || KeptShelf.shared.hasKept(session) else { return nil }
+        guard session.isDemo || session.canStream || KeptShelf.shared.hasKept(session) else { return nil }
         return make(for: session)
     }
 
     /// Whether `session`'s Mac can send songs to this device (a Mac whose Vespertine speaks the stream channel).
-    func canPlayHere(_ session: RemoteSession) -> Bool { session.canStream && !session.isDemo }
+    func canPlayHere(_ session: RemoteSession) -> Bool { session.canStream || session.isDemo }
 
     func choose(thisDevice: Bool) {
         guard thisDevice != onThisDevice else { return }
@@ -65,7 +69,10 @@ final class PlayTarget {
     private func make(for session: RemoteSession) -> PhoneRemote {
         leave()
         let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first ?? FileManager.default.temporaryDirectory
-        let playback = PhonePlayback(session: session, player: PhonePlayer(), cacheDirectory: caches.appendingPathComponent("Streams", isDirectory: true))
+        // The demo has no Mac to send songs: its songs are sound the app makes, through the same player.
+        let playback = session.isDemo
+            ? PhonePlayback(client: DemoSound.client(), player: PhonePlayer(), cacheDirectory: caches.appendingPathComponent("DemoStreams", isDirectory: true))
+            : PhonePlayback(session: session, player: PhonePlayer(), cacheDirectory: caches.appendingPathComponent("Streams", isDirectory: true))
         let remote = PhoneRemote(playback: playback) { [weak session] command in await session?.send(command) ?? .failed(reason: "") }
         remote.words = { signal in (Self.badge(signal), Self.output(signal)) }
         remote.surroundChoice = surround

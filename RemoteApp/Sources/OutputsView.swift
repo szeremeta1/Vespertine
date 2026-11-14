@@ -102,8 +102,8 @@ struct OutputsView: View {
 
     /// Under "This iPhone": where its sound goes now, or why it can't play here.
     private var hereDetail: String {
-        if session.isDemo { return String(localized: "Not in the demo") }
-        guard session.canStream else { return String(localized: "Update Vespertine on the Mac to play here.") }
+        if session.isDemo, session.phone == nil { return String(localized: "Plays the demo’s made-up songs with sound") }
+        guard session.canStream || session.isDemo else { return String(localized: "Update Vespertine on the Mac to play here.") }
         guard let route = session.phone?.route else { return String(localized: "Plays through this device") }
         return route.sampleRate > 0 ? "\(route.name) · \(PhoneSignal.kilohertz(route.sampleRate)) kHz" : route.name
     }

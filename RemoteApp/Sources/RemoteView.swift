@@ -249,7 +249,7 @@ struct ConnectionBanner: View {
                 EmptyView()
             case .connected where session.isDemo:
                 HStack(spacing: 10) {
-                    Text("Demo: a made-up library. Nothing plays.").font(.footnote)
+                    Text(session.phone == nil ? "Demo: a made-up library. To hear it, choose this device in Output." : "Demo: a made-up library, with sound the app makes itself.").font(.footnote)
                     Spacer(minLength: 0)
                     Button("Leave Demo") { model.leave() }.font(.footnote.weight(.medium))
                 }
