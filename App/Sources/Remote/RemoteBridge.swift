@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import VespertineAirPlay
 import VespertineAudio
 import VespertineLibrary
 import VespertineRemoteProtocol
+import VespertineUPnP
 
 /// The app as the remote server drives it.
 @MainActor
@@ -81,7 +83,10 @@ struct RemoteBridge {
         var outputs = [OutputSummary(uid: nil, name: String(localized: "System Default"), detail: String(localized: "FOLLOWS SOUND SETTINGS"),
                                      kind: .systemDefault, selected: selected == nil, ready: true)]
         if let missing = model.missingChosenOutput, let uid = selected {
-            outputs.append(OutputSummary(uid: uid, name: missing, detail: String(localized: "NOT CONNECTED · WAITING FOR IT", bundle: ReplyWords.bundle, comment: "Output list: the chosen device is missing and playback waits for it"),
+            let detail = model.networkOutputChosen
+                ? String(localized: "NOT RESPONDING", comment: "Output list: the chosen network player doesn't answer (short, uppercase)")
+                : String(localized: "NOT CONNECTED · WAITING FOR IT", bundle: ReplyWords.bundle, comment: "Output list: the chosen device is missing and playback waits for it")
+            outputs.append(OutputSummary(uid: uid, name: missing, detail: detail,
                                          kind: model.chosenGroup == nil ? .device : .speakerGroup, selected: true, ready: false))
         }
         for device in model.devices.devices where !outputs.contains(where: { $0.uid == device.uid }) {
@@ -91,6 +96,18 @@ struct RemoteBridge {
         if let groups = model.speakerGroups {
             for row in GroupOutputRows.rows(groups: groups.groups, devices: model.devices.devices) where !outputs.contains(where: { $0.uid == row.uid }) {
                 outputs.append(OutputSummary(uid: row.uid, name: row.name, detail: row.detail, kind: .speakerGroup, selected: selected == row.uid, ready: row.isReady))
+            }
+        }
+        // Network players and AirPlay receivers, while their switches are on, as the Mac's own list has them (a phone that
+        // doesn't know of them shows them as devices). Receivers Vespertine can't send to are left out: they can't be chosen.
+        if let renderers = model.renderers {
+            for r in renderers.renderers where !outputs.contains(where: { $0.uid == r.uid }) {
+                outputs.append(OutputSummary(uid: r.uid, name: r.name, detail: RendererText.detail(r), kind: .device, selected: selected == r.uid, ready: true))
+            }
+        }
+        if let airPlay = model.airPlay {
+            for d in airPlay.devices where d.isSupported && !outputs.contains(where: { $0.uid == d.uid }) {
+                outputs.append(OutputSummary(uid: d.uid, name: d.name, detail: AirPlayText.detail(d), kind: .device, selected: selected == d.uid, ready: true))
             }
         }
         return OutputsState(outputs: outputs)
