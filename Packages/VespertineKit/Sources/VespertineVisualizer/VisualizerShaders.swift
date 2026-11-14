@@ -513,7 +513,7 @@ fragment float4 vz_club(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
     int fineCount = int(u.d.y);
 
     // Haze, drifting, lit from the middle by the bass.
-    float fog = fbm2(q * 1.4 + float2(time * 0.03, -time * 0.02));
+    float fog = noise(q * 1.4 + float2(time * 0.03, -time * 0.02));
     float3 col = u.stops[0].rgb * (0.30 + 0.30 * fog);
     col += clubColour(u, turn + 0.5) * exp(-r * 1.7) * (0.05 + 0.22 * bass * signal + 0.25 * kick) * (0.6 + 0.8 * fog);
 
@@ -523,13 +523,14 @@ fragment float4 vz_club(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
     float loud = spec * spec;
 
     // Rays: each part of the spectrum thrown out across the room as light, as far as it is loud.
-    float streak = 0.55 + 0.45 * noise(float2(theta * 28.0, 3.0 + floor(time * 0.5) * 0.0));
+    float streak = 0.55 + 0.45 * noise(float2(theta * 28.0, 3.0));
     float rays = loud * exp(-max(r - base, 0.0) / (0.12 + 1.1 * spec)) * smoothstep(base - 0.02, base + 0.12, r);
     col += ramp(u, 0.4 + 0.6 * spec) * rays * streak * 0.5;
 
     // The tunnel: rings of light running outward, a surge after every beat.
     float run = fract(log(max(r, 0.05)) * 1.5 - u.g.z);
-    float tunnel = exp(-pow((run - 0.5) / 0.045, 2.0)) * smoothstep(0.35, 0.9, r);
+    float off = (run - 0.5) / 0.045;
+    float tunnel = exp(-off * off) * smoothstep(0.35, 0.9, r);
     col += clubColour(u, turn + 0.25) * tunnel * (0.03 + 0.10 * mid * signal + 0.10 * kick);
 
     // Lasers: two fans of six beams from the middle, turning opposite ways. Each beam is lit by its own part of the
