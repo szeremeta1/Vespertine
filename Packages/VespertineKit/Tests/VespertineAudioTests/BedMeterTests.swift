@@ -340,7 +340,7 @@ struct BedMeterTests {
     // MARK: The output isn't touched
 
     /// What macOS's renderer was handed for the fixture: a digest of every compressed buffer, and whether it took them all.
-    private struct Rendered {
+    private struct Rendered: Sendable {
         var digest = "", exhausted = false, buffers = 0, bytes = 0
     }
 
@@ -381,6 +381,11 @@ struct BedMeterTests {
     /// the cooperative pool (a test blocked on one starves every other test that needs a thread); the test fails after
     /// `patience` instead, and the stuck thread (and its session, which `stop()` would wait on) is left behind.
     private static func boundedDigest(metering on: Bool, visualizer: Bool, patience: TimeInterval = 150) async -> Rendered? {
+        // Takes its turn at the renderer: two sessions at once (this and `AtmosRouteChangeTests`) stalled together on CI.
+        await RendererSessionGate.shared.exclusive { await timedDigest(metering: on, visualizer: visualizer, patience: patience) }
+    }
+
+    private static func timedDigest(metering on: Bool, visualizer: Bool, patience: TimeInterval) async -> Rendered? {
         let result = Box<Result<Rendered, Error>?>(nil)
         Thread.detachNewThread { result.value = Result { try renderedDigest(metering: on, visualizer: visualizer) } }
         let deadline = Date().addingTimeInterval(patience)
