@@ -116,7 +116,11 @@ public final class PhonePlayback {
         self.init(client: PhoneStreamClient(session: session), player: player, cacheDirectory: cacheDirectory)
     }
 
-    public var isPlaying: Bool { player.state == .playing || (player.state == .loading && loading != nil) || preparing != nil }
+    /// Playing, or about to: a song that was started counts from the tap, while its stream is still being opened.
+    public var isPlaying: Bool { player.state == .playing || (loading != nil && startsPlaying) }
+    private var startsPlaying = true
+    /// Whether the song a step leads to should sound: not when you had paused.
+    private var staysPlaying: Bool { loading != nil ? startsPlaying : player.state != .paused }
     public var duration: Double { player.duration > 0 ? player.duration : (nowPlaying?.track.duration ?? 0) }
 
     // MARK: Starting songs
@@ -143,6 +147,7 @@ public final class PhonePlayback {
         following?.cancel()
         player.halt()
         nowPlaying = entry
+        startsPlaying = playing
         decoding = entry.id
         followingEntry = nil
         stream = nil
@@ -155,10 +160,11 @@ public final class PhonePlayback {
                 let opened = try await opened(entry)
                 guard !Task.isCancelled, nowPlaying?.id == entry.id else { return }
                 stream = opened.descriptor
-                player.start(item(entry, opened), playing: playing)
+                player.start(item(entry, opened), playing: startsPlaying)
                 prepareFollowing(after: entry.id)
                 startTicker()
             } catch is CancellationError {
+                return
             } catch {
                 guard nowPlaying?.id == entry.id else { return }
                 failed(entry, error)
@@ -316,13 +322,12 @@ public final class PhonePlayback {
     // MARK: Transport
 
     public func playPause() {
-        switch player.state {
-        case .playing, .loading: pause()
-        default: resume()
-        }
+        if isPlaying || player.state == .loading { pause() } else { resume() }
     }
 
     public func resume() {
+        // Still opening the stream: it starts playing when it is here.
+        if loading != nil { startsPlaying = true; return }
         if player.state == .idle {
             if let entry = queue.current { start(entry) }
             return
@@ -332,17 +337,18 @@ public final class PhonePlayback {
     }
 
     public func pause() {
+        if loading != nil { startsPlaying = false }
         player.pause()
         position = player.position
     }
 
     public func next() {
-        if case .start(let entry) = queue.next() { start(entry, playing: player.state != .paused) }
+        if case .start(let entry) = queue.next() { start(entry, playing: staysPlaying) }
     }
 
     public func previous() {
         switch queue.previous(position: player.position) {
-        case .start(let entry): start(entry, playing: player.state != .paused)
+        case .start(let entry): start(entry, playing: staysPlaying)
         case .restart: seek(to: 0)
         case .end: break
         }
