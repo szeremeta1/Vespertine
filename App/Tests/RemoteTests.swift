@@ -45,6 +45,31 @@ struct RemoteTests {
         #expect(RemoteStore(dataDirectory: try temporaryFolder(), defaults: defaults).serverID != store.serverID)
     }
 
+    @Test func streamingToPhonesStartsOffAndEachPhoneCanBeKeptFromIt() throws {
+        let folder = try temporaryFolder()
+        let defaults = UserDefaults(suiteName: "vespertine-remote-test-\(UUID().uuidString)")!
+        let store = RemoteStore(dataDirectory: folder, defaults: defaults)
+        #expect(!store.streamEnabled)
+        #expect(store.streamCacheGigabytes == 8)
+        let phone = DeviceCredential.make(), tablet = DeviceCredential.make()
+        store.add(PairedRemote(id: phone.device, name: "iPhone", key: phone.key, pairedAt: .now, lastSeen: nil))
+        store.add(PairedRemote(id: tablet.device, name: "iPad", key: tablet.key, pairedAt: .now, lastSeen: nil))
+        // With the switch off nobody streams; with it on, every paired phone may until it is told otherwise.
+        #expect(!store.mayStream(phone.device))
+        store.streamEnabled = true
+        #expect(store.mayStream(phone.device) && store.mayStream(tablet.device))
+        store.setMayStream(tablet.device, false)
+        store.streamCacheGigabytes = 32
+        let again = RemoteStore(dataDirectory: folder, defaults: defaults)
+        #expect(again.streamEnabled && again.streamCacheGigabytes == 32)
+        #expect(again.mayStream(phone.device) && !again.mayStream(tablet.device))
+        // A phone that isn't paired, and a web browser, never stream.
+        #expect(!again.mayStream("nobody"))
+        let browser = DeviceCredential.make()
+        again.add(PairedRemote(id: browser.device, name: "Safari", key: browser.key, pairedAt: .now, lastSeen: nil, web: true))
+        #expect(!again.mayStream(browser.device))
+    }
+
     @Test func wakeForNetworkIsReadFromPmset() {
         let output = """
         System-wide power settings:
