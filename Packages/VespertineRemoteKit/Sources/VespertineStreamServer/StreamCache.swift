@@ -8,13 +8,14 @@ import Foundation
 
 public final class StreamCache: @unchecked Sendable {
     public let directory: URL
-    public let limitBytes: Int64
+    public var limitBytes: Int64 { lock.withLock { limit } }
+    private var limit: Int64
     private let lock = NSLock()
 
     /// Creates the folder, and removes what a crash left half written.
     public init(directory: URL, limitBytes: Int64) throws {
         self.directory = directory
-        self.limitBytes = limitBytes
+        limit = limitBytes
         try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         for url in (try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)) ?? [] where url.pathExtension == "partial" {
             try? FileManager.default.removeItem(at: url)
@@ -49,6 +50,23 @@ public final class StreamCache: @unchecked Sendable {
     /// Removes the least recently used FLACs (and their metadata) until the folder fits, except `keeping`.
     public func evict(keeping: Set<String> = []) {
         lock.lock(); defer { lock.unlock() }
+        evict(to: limit, keeping: keeping)
+    }
+
+    /// Changes how much the folder may hold, and makes it fit now.
+    public func setLimit(_ bytes: Int64, keeping: Set<String> = []) {
+        lock.lock(); defer { lock.unlock() }
+        limit = max(0, bytes)
+        evict(to: limit, keeping: keeping)
+    }
+
+    /// Removes every FLAC except `keeping` (the ones phones are reading).
+    public func clear(keeping: Set<String> = []) {
+        lock.lock(); defer { lock.unlock() }
+        evict(to: 0, keeping: keeping)
+    }
+
+    private func evict(to limitBytes: Int64, keeping: Set<String>) {
         var all = entries().sorted { $0.used < $1.used }
         var total = all.reduce(Int64(0)) { $0 + $1.size }
         while total > limitBytes, let index = all.firstIndex(where: { !keeping.contains($0.key) }) {

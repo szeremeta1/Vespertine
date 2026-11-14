@@ -44,7 +44,7 @@ extension StreamPreparer {
             case .failed(let reason): return .reply(.failed(reason: reason))
             }
         case .streamRead(let stream, let offset, let length):
-            switch read(client: client, request: id, stream: stream, offset: offset, length: length) {
+            switch await read(client: client, request: id, stream: stream, offset: offset, length: length) {
             case .chunk(let frame): return .frame(frame)
             case .failed(let reason): return .reply(.failed(reason: reason))
             }
