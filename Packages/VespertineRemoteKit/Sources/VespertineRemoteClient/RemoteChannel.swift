@@ -32,10 +32,13 @@ public protocol RemoteChannel: AnyObject {
     func close()
     /// Where the channel ended up connected, once open (nil when that means nothing: the demo).
     var remoteAddress: RemoteAddress? { get }
+    /// The network under the connection stopped carrying it (it may come back, or not): worth asking the Mac for a sign of life.
+    var onUnviable: (@MainActor () -> Void)? { get set }
 }
 
 public extension RemoteChannel {
     var remoteAddress: RemoteAddress? { nil }
+    var onUnviable: (@MainActor () -> Void)? { get { nil } set {} }
     func read(stream: Int, offset: Int64, length: Int, timeout: Duration) async throws -> StreamFrame { throw RemoteLinkError.readFailed("") }
 }
 
@@ -51,6 +54,8 @@ public struct RemoteRoute: Sendable, Equatable {
         case address
         /// Where the Mac answered last time.
         case lastKnown
+        /// An address the Mac told this phone it has (at home, on Tailscale or another VPN).
+        case advertised
     }
 
     public var kind: Kind
@@ -62,6 +67,14 @@ public struct RemoteRoute: Sendable, Equatable {
         self.kind = kind
         self.endpoint = endpoint
         self.address = address
+    }
+
+    /// How long this route waits for the ones likelier to be quicker before it is tried too: Bonjour goes first, an
+    /// address on the Mac's own network right behind it, Tailscale and everything else a moment later. They all run at
+    /// once after that, and the first to answer is used; a route starts early when the ones ahead of it have failed.
+    public var headStart: Duration {
+        if kind == .nearby { return .zero }
+        return address?.kind == .localNetwork ? .milliseconds(150) : .milliseconds(350)
     }
 
     /// A route to a typed or remembered address; nil while its port isn't known.
@@ -76,9 +89,12 @@ public extension SavedPairing {
     func routes(nearby: NWEndpoint?) -> [RemoteRoute] {
         var out: [RemoteRoute] = []
         if let nearby { out.append(RemoteRoute(kind: .nearby, endpoint: nearby)) }
-        // An address at the typed host is the typed address (whatever port it has); the rest is where the Mac was seen.
+        // An address at the typed host is the typed address (whatever port it has); one the Mac told is that; the rest is
+        // where the Mac was seen.
+        let told = Set((advertised ?? []).map(\.host))
         for saved in savedAddresses {
-            if let route = RemoteRoute(kind: saved.host == address?.host ? .address : .lastKnown, address: saved) { out.append(route) }
+            let kind: RemoteRoute.Kind = saved.host == address?.host ? .address : (told.contains(saved.host) ? .advertised : .lastKnown)
+            if let route = RemoteRoute(kind: kind, address: saved) { out.append(route) }
         }
         return out
     }

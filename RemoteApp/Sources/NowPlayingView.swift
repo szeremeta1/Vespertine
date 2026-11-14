@@ -100,6 +100,11 @@ struct NowPlayingView: View {
             transport
             modes
             volume
+            if let converting = session.phone?.playback.preparing {
+                Label(Self.converting(progress: converting.progress), systemImage: "arrow.triangle.2.circlepath")
+                    .font(.caption).foregroundStyle(Palette.brass)
+                    .accessibilityIdentifier("converting")
+            }
             if let waiting = player?.waitingFor {
                 Text("Waiting for “\(waiting)” to connect").font(.caption).foregroundStyle(Palette.copper)
             }
@@ -145,10 +150,9 @@ struct NowPlayingView: View {
 
     /// The signal path, as the Mac's badge says it: what the file is, what the DAC receives, and where it plays.
     private func signalPath(_ track: TrackSummary) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 6) { signalChips(track, output: true) }
-        }
+        FlowLayout(spacing: 6, lineSpacing: 6) { signalChips(track, output: true) }
         .padding(.top, 2)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
     }
 
@@ -162,6 +166,11 @@ struct NowPlayingView: View {
         }
         if output, let name = player?.output {
             Label(name, systemImage: "hifispeaker").font(.caption2).foregroundStyle(Palette.text3).lineLimit(1)
+        }
+        // Where this device's songs come from right now: the Mac over the home network or Tailscale, or this device itself.
+        if output, session.phone != nil, let source = Self.source(reach: session.reach, connected: session.isConnected, demo: session.isDemo) {
+            Label(source, systemImage: "arrow.down.left.circle").font(.caption2).foregroundStyle(Palette.text3).lineLimit(1)
+                .accessibilityLabel(Text("Songs arrive over: \(source)"))
         }
     }
 
@@ -254,6 +263,29 @@ struct NowPlayingView: View {
         guard let level else { return String(localized: "Use the volume buttons on this device.") }
         let percent = level.formatted(.percent.precision(.fractionLength(0)))
         return String(localized: "Volume \(percent). Use the volume buttons on this device.", comment: "Now Playing on the iPhone: %@ is the device's volume as a percentage, e.g. “62%”.")
+    }
+
+    /// What Now Playing says while the Mac turns a song into a form this device can play (DSD, WavPack, Vorbis and the like),
+    /// with how far along it is when the Mac knows.
+    static func converting(progress: Double?) -> String {
+        guard let progress, progress > 0 else { return String(localized: "Converting on the Mac…", comment: "Now Playing on the iPhone: the Mac is converting the song before it can send it.") }
+        let percent = min(max(progress, 0), 1).formatted(.percent.precision(.fractionLength(0)))
+        return String(localized: "Converting on the Mac… \(percent)", comment: "Now Playing on the iPhone: the Mac is converting the song; %@ is how far along, e.g. “42%”.")
+    }
+
+    /// The network this device's songs arrive over, in a word or two; nil for the demo.
+    static func source(reach: RemoteSession.Reach?, connected: Bool, demo: Bool) -> String? {
+        if demo { return nil }
+        guard connected, let reach else { return String(localized: "On this device", comment: "Now Playing on the iPhone: the song plays from a copy kept on the device; the Mac isn't connected.") }
+        return reachName(reach)
+    }
+
+    static func reachName(_ reach: RemoteSession.Reach) -> String {
+        switch reach {
+        case .sameNetwork: String(localized: "Home network", comment: "How the iPhone reaches the Mac: on the Mac's own network.")
+        case .tailscale: String(localized: "Tailscale", comment: "How the iPhone reaches the Mac: over Tailscale, a VPN. A product name.")
+        case .elsewhere: String(localized: "Another network", comment: "How the iPhone reaches the Mac: over some other address or VPN.")
+        }
     }
 
     static func nextRepeat(after mode: RepeatModeValue) -> RepeatModeValue {

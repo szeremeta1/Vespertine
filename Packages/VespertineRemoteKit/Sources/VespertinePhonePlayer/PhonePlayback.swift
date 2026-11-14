@@ -79,6 +79,8 @@ public final class PhonePlayback {
     @ObservationIgnored public var holdReason: @MainActor () -> String? = { nil }
     /// How long a song waits for a Mac that stopped answering before it gives up.
     @ObservationIgnored public var patience: Duration = .seconds(120)
+    /// How long a song that is being opened waits for a Mac that isn't connected right now.
+    @ObservationIgnored public var reconnectWait: Duration = .seconds(20)
     /// A stream is waiting for the Mac to come back (the connection dropped mid-song).
     public private(set) var waitingForMac = false
     @ObservationIgnored private var waits = 0
@@ -247,7 +249,7 @@ public final class PhonePlayback {
         while true {
             try Task.checkCancellation()
             if let reason = holdReason() { throw Failure.held(reason) }
-            guard client.isConnected() else { throw Failure.notConnected }
+            try await waitForMac()
             switch await client.open(song, maxSampleRate()) {
             case .streamOpened(let descriptor): return descriptor
             case .streamPreparing(let progress):
@@ -257,6 +259,20 @@ public final class PhonePlayback {
             case .failed(let reason): throw Failure.refused(reason)
             default: throw Failure.refused("")
             }
+        }
+    }
+
+    /// A song opened while the connection is being made again (the network just changed) waits for it rather than failing:
+    /// up to `reconnectWait`, with "Waiting for … to connect" showing.
+    private func waitForMac() async throws {
+        if client.isConnected() { return }
+        lineWaits(true)
+        defer { lineWaits(false) }
+        let deadline = ContinuousClock.now + reconnectWait
+        while !client.isConnected() {
+            try Task.checkCancellation()
+            guard ContinuousClock.now < deadline else { throw Failure.notConnected }
+            try await Task.sleep(for: .milliseconds(100))
         }
     }
 

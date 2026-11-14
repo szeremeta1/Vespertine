@@ -114,6 +114,32 @@ struct Chip: View {
     }
 }
 
+/// Lays its pieces out left to right and wraps them onto more lines when they don't fit: the signal badges stay whole on
+/// a narrow screen and at large text sizes.
+struct FlowLayout: Layout {
+    var spacing: CGFloat = 6
+    var lineSpacing: CGFloat = 6
+    /// Each line in the middle (under a centred title).
+    var centered = false
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? .infinity
+        return FlowRows.place(sizes(subviews, width: width), width: width, spacing: spacing, lineSpacing: lineSpacing, centered: centered).size
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let placed = FlowRows.place(sizes(subviews, width: bounds.width), width: bounds.width, spacing: spacing, lineSpacing: lineSpacing, centered: centered)
+        for (subview, origin) in zip(subviews, placed.origins) {
+            subview.place(at: CGPoint(x: bounds.minX + origin.x, y: bounds.minY + origin.y), anchor: .topLeading,
+                          proposal: ProposedViewSize(width: bounds.width, height: nil))
+        }
+    }
+
+    private func sizes(_ subviews: Subviews, width: CGFloat) -> [CGSize] {
+        subviews.map { $0.sizeThatFits(ProposedViewSize(width: width.isFinite ? width : nil, height: nil)) }
+    }
+}
+
 /// The crescent from the logo, drawn (so it needs no image and takes any colour).
 nonisolated struct Crescent: Shape {
     func path(in rect: CGRect) -> Path {

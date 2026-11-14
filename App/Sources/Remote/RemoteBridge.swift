@@ -81,7 +81,7 @@ struct RemoteBridge {
         var outputs = [OutputSummary(uid: nil, name: String(localized: "System Default"), detail: String(localized: "FOLLOWS SOUND SETTINGS"),
                                      kind: .systemDefault, selected: selected == nil, ready: true)]
         if let missing = model.missingChosenOutput, let uid = selected {
-            outputs.append(OutputSummary(uid: uid, name: missing, detail: String(localized: "NOT CONNECTED · WAITING FOR IT", comment: "Output list: the chosen device is missing and playback waits for it"),
+            outputs.append(OutputSummary(uid: uid, name: missing, detail: String(localized: "NOT CONNECTED · WAITING FOR IT", bundle: ReplyWords.bundle, comment: "Output list: the chosen device is missing and playback waits for it"),
                                          kind: model.chosenGroup == nil ? .device : .speakerGroup, selected: true, ready: false))
         }
         for device in model.devices.devices where !outputs.contains(where: { $0.uid == device.uid }) {
@@ -167,7 +167,7 @@ struct RemoteBridge {
         guard !trimmed.isEmpty else { return unavailable }
         let found = Array(library.tracks(ids: ids).compactMap(\.id).prefix(playlistBatch))
         guard library.createPlaylist(name: trimmed, trackIDs: found) != nil else {
-            return .failed(reason: String(localized: "Couldn't save the playlist: \(trimmed)"))
+            return .failed(reason: String(localized: "Couldn't save the playlist: \(trimmed)", bundle: ReplyWords.bundle))
         }
         // Read from the database: the library's own list hears of the new playlist a moment later.
         let all = (try? library.database.playlists()) ?? library.playlists
@@ -259,8 +259,10 @@ struct RemoteBridge {
     /// Carries out a command (everything but the session ones and artwork, which the connection handles).
     func perform(_ command: RemoteCommand) -> RemoteReply {
         switch command {
-        case .hello, .pair, .artwork, .streamInfo, .streamOpen, .streamRead, .streamClose:
+        case .hello, .pair, .artwork, .streamInfo, .streamOpen, .streamRead, .streamClose, .setLanguage:
             return Self.unavailable
+        case .ping:
+            return .ok
 
         case .playPause: player.togglePlayPause()
         case .play: if player.state != .playing { player.togglePlayPause() }
@@ -383,7 +385,7 @@ struct RemoteBridge {
 
         case .selectOutput(let uid):
             if let uid, !outputsState().outputs.contains(where: { $0.uid == uid }) {
-                return .failed(reason: String(localized: "That output isn’t connected to this Mac.", comment: "Remote control: the phone picked an output the Mac no longer has."))
+                return .failed(reason: String(localized: "That output isn’t connected to this Mac.", bundle: ReplyWords.bundle, comment: "Remote control: the phone picked an output the Mac no longer has."))
             }
             model.selectDevice(uid)
         case .volume(let action):
@@ -401,7 +403,7 @@ struct RemoteBridge {
             }
         case .setTransitions(let on):
             guard settings.transitionsFeature else {
-                return .failed(reason: String(localized: "Transitions are turned off in Vespertine’s settings on the Mac.", comment: "Remote control: the phone tried to turn on transitions, but the feature is off in Settings."))
+                return .failed(reason: String(localized: "Transitions are turned off in Vespertine’s settings on the Mac.", bundle: ReplyWords.bundle, comment: "Remote control: the phone tried to turn on transitions, but the feature is off in Settings."))
             }
             model.setTransitions(on)
         }
@@ -409,21 +411,21 @@ struct RemoteBridge {
     }
 
     private static var unavailable: RemoteReply {
-        .failed(reason: String(localized: "This command isn’t available here.", comment: "Remote control: a phone sent a command at the wrong time."))
+        .failed(reason: String(localized: "This command isn’t available here.", bundle: ReplyWords.bundle, comment: "Remote control: a phone sent a command at the wrong time."))
     }
 
     private var notInQueue: RemoteReply {
-        .failed(reason: String(localized: "That song is no longer in the queue.", comment: "Remote control: the phone acted on a queue entry that has gone."))
+        .failed(reason: String(localized: "That song is no longer in the queue.", bundle: ReplyWords.bundle, comment: "Remote control: the phone acted on a queue entry that has gone."))
     }
 
     private var notInLibrary: RemoteReply { Self.notInLibrary }
 
     private static var notInLibrary: RemoteReply {
-        .failed(reason: String(localized: "Those songs aren’t in the library anymore.", comment: "Remote control: the phone asked for songs, an album or a playlist the Mac no longer has."))
+        .failed(reason: String(localized: "Those songs aren’t in the library anymore.", bundle: ReplyWords.bundle, comment: "Remote control: the phone asked for songs, an album or a playlist the Mac no longer has."))
     }
 
     private var fixedVolume: RemoteReply {
-        .failed(reason: String(localized: "This output has no volume Vespertine can change. Set the level on your amplifier or DAC.", comment: "Remote control: volume asked for on an output whose volume is fixed (bit-perfect, no hardware volume)."))
+        .failed(reason: String(localized: "This output has no volume Vespertine can change. Set the level on your amplifier or DAC.", bundle: ReplyWords.bundle, comment: "Remote control: volume asked for on an output whose volume is fixed (bit-perfect, no hardware volume)."))
     }
 
     private func queueID(_ entry: String) -> UUID? {

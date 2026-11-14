@@ -15,7 +15,12 @@ public struct ConnectionThrottle: Sendable {
     /// Connections that may be open without having signed in yet.
     public var maximumPending: Int
 
+    /// A handshake that fails this soon after the same host signed in isn't counted: a phone tries every way to the Mac at
+    /// once and hangs up on the slower ones, which looks like a failed handshake from here.
+    public var grace: TimeInterval = 10
+
     private var failures: [String: [Date]] = [:]
+    private var signedIn: [String: Date] = [:]
     private var shutOutUntil: [String: Date] = [:]
 
     public init(allowedFailures: Int = 10, window: TimeInterval = 60, lockout: TimeInterval = 300, maximumPending: Int = 16) {
@@ -34,6 +39,7 @@ public struct ConnectionThrottle: Sendable {
     }
 
     public mutating func failed(host: String, now: Date = Date()) {
+        if let last = signedIn[host], now.timeIntervalSince(last) < grace, now >= last { return }
         var recent = (failures[host] ?? []).filter { now.timeIntervalSince($0) < window }
         recent.append(now)
         if recent.count >= allowedFailures {
@@ -44,9 +50,10 @@ public struct ConnectionThrottle: Sendable {
         }
     }
 
-    public mutating func succeeded(host: String) {
+    public mutating func succeeded(host: String, now: Date = Date()) {
         failures[host] = nil
         shutOutUntil[host] = nil
+        signedIn[host] = now
     }
 
     /// Hosts being counted or shut out now.
@@ -54,6 +61,7 @@ public struct ConnectionThrottle: Sendable {
 
     private mutating func forget(before now: Date) {
         shutOutUntil = shutOutUntil.filter { $0.value > now }
+        signedIn = signedIn.filter { now.timeIntervalSince($0.value) < grace }
         failures = failures.compactMapValues { dates in
             let recent = dates.filter { now.timeIntervalSince($0) < window }
             return recent.isEmpty ? nil : recent

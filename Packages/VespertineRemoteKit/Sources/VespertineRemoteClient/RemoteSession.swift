@@ -41,6 +41,30 @@ public final class RemoteSession {
 
     /// How the Mac was reached, while connected (nil for the demo).
     public private(set) var route: RemoteRoute.Kind?
+    /// The address the Mac answered at, while connected (nil for the demo).
+    public private(set) var reached: RemoteAddress?
+
+    /// The network a connection runs over, as far as its route and address say.
+    public enum Reach: Equatable, Sendable {
+        /// The Mac's own network (Bonjour found it, or it answered at a private address).
+        case sameNetwork
+        case tailscale
+        /// Another address (a VPN's, or one that was typed).
+        case elsewhere
+    }
+
+    /// The network this session runs over now; nil when not connected, and for the demo.
+    public var reach: Reach? { isConnected ? Self.reach(route: route, address: reached) : nil }
+
+    public nonisolated static func reach(route: RemoteRoute.Kind?, address: RemoteAddress?) -> Reach? {
+        guard let route else { return nil }
+        switch address?.kind {
+        case .tailscale?: return .tailscale
+        case .localNetwork?: return .sameNetwork
+        case .other?: return route == .nearby ? .sameNetwork : .elsewhere
+        case nil: return route == .nearby ? .sameNetwork : .elsewhere
+        }
+    }
     /// When the phase last changed (for "trying again since…").
     public private(set) var phaseSince = Date()
 
@@ -48,12 +72,21 @@ public final class RemoteSession {
     @ObservationIgnored public var clientName: String
     /// Called once signed in, with the address the Mac answered at (to remember for next time).
     @ObservationIgnored public var onConnected: (@MainActor (RemoteRoute.Kind?, RemoteAddress?) -> Void)?
-    /// How long a second way of reaching the Mac waits for the first before starting too.
-    @ObservationIgnored public var stagger: Duration = .milliseconds(1200)
+    /// The language this phone shows, told to the Mac after signing in so its refusals come back in it (nil: not told).
+    @ObservationIgnored public var language: String?
+    /// How long the Mac has to answer a `ping` before the connection counts as gone.
+    /// How long one stream read waits for its bytes.
+    @ObservationIgnored public var readTimeout: Duration = .seconds(30)
+    @ObservationIgnored public var probeTimeout: Duration = .seconds(3)
+    /// A connection that lasted at least this long is made again at once when it drops (a network change); a shorter one
+    /// waits like any failed attempt, so a Mac that keeps hanging up isn't hammered.
+    @ObservationIgnored public var quickReconnectAfter: Duration = .seconds(5)
 
     private struct Candidate {
         var kind: RemoteRoute.Kind?
         var channel: any RemoteChannel
+        /// How long it waits for the candidates ahead of it (see `RemoteRoute.headStart`).
+        var headStart: Duration = .zero
     }
 
     /// Makes new connections to the Mac, one per way of reaching it, best first (none while it can't be found: its
@@ -65,14 +98,17 @@ public final class RemoteSession {
     @ObservationIgnored private var generation = 0
     @ObservationIgnored private var retry: Task<Void, Never>?
     @ObservationIgnored private var attempts = 0
+    @ObservationIgnored private var probing = false
+    /// When the connection in use signed in.
+    @ObservationIgnored private var connectedAt: ContinuousClock.Instant?
 
-    /// A session with a paired Mac; `routes` lists the ways to reach it now, best first. They're tried together,
-    /// each a little after the one before, and the first to answer wins.
+    /// A session with a paired Mac; `routes` lists the ways to reach it now, best first. They're tried together
+    /// (Bonjour first, the rest a fraction of a second behind), and the first to answer wins.
     public init(pairing: SavedPairing, clientName: String, routes: @escaping @MainActor () -> [RemoteRoute]) {
         self.pairing = pairing
         self.clientName = clientName
         makeChannels = {
-            routes().map { Candidate(kind: $0.kind, channel: RemoteLink(endpoint: $0.endpoint, key: pairing.presharedKey)) }
+            routes().map { Candidate(kind: $0.kind, channel: RemoteLink(endpoint: $0.endpoint, key: pairing.presharedKey), headStart: $0.headStart) }
         }
     }
 
@@ -102,7 +138,7 @@ public final class RemoteSession {
         phase = new
         phaseSince = Date()
         if new != .connected { volume.reset() }
-        if new != .connected { route = nil }
+        if new != .connected { route = nil; reached = nil }
     }
 
     /// Connects now (again), if not connected.
@@ -136,17 +172,18 @@ public final class RemoteSession {
         }
     }
 
-    /// Opens the candidates (the first now, each next one `stagger` later or as soon as those before it have failed)
+    /// Opens the candidates together (each after its head start, or as soon as every candidate ahead of it has failed)
     /// and returns the first that opens; the rest are closed. nil when none opens.
     private func firstToOpen(_ candidates: [Candidate]) async -> Candidate? {
-        let stagger = stagger
         let race = Race()
         let winner = await withCheckedContinuation { (continuation: CheckedContinuation<Int?, Never>) in
             for (index, candidate) in candidates.enumerated() {
+                // The candidates that start before this one: when they have all failed, there is nothing to wait for.
+                let ahead = candidates.filter { $0.headStart < candidate.headStart }.count
                 Task { @MainActor in
                     let start = ContinuousClock.now
-                    while index > 0, !race.won, race.failed < index, ContinuousClock.now - start < stagger * index {
-                        try? await Task.sleep(for: .milliseconds(40))
+                    while ahead > 0, !race.won, race.failed < ahead, ContinuousClock.now - start < candidate.headStart {
+                        try? await Task.sleep(for: .milliseconds(25))
                     }
                     var opened = false
                     if !race.won {
@@ -178,6 +215,7 @@ public final class RemoteSession {
         let link = candidate.channel
         self.link = link
         link.onPush = { [weak self] message in self?.received(message) }
+        link.onUnviable = { [weak self] in self?.checkLink() }
         link.onClose = { [weak self, weak link] reason in
             guard let self, let link else { return }
             self.lost(link, reason: reason)
@@ -188,9 +226,15 @@ public final class RemoteSession {
             if case .welcome(let info) = reply {
                 server = info
                 attempts = 0
+                connectedAt = .now
                 setPhase(.connected)
                 route = candidate.kind
+                reached = link.remoteAddress
                 onConnected?(candidate.kind, link.remoteAddress)
+                if let language, !language.isEmpty {
+                    // An older Mac answers that it doesn't know the command, and keeps its own language.
+                    Task { [weak link] in _ = try? await link?.request(.setLanguage(code: language), timeout: .seconds(15)) }
+                }
             } else {
                 link.close()
                 lost(link, reason: nil)
@@ -206,17 +250,44 @@ public final class RemoteSession {
     private func lost(_ link: any RemoteChannel, reason: String?) {
         guard self.link === link else { return }
         self.link = nil
-        if phase == .connected || phase == .connecting {
+        guard phase == .connected || phase == .connecting else { return }
+        // A connection that was working and dropped (Wi-Fi to cellular, leaving home) is made again at once, over
+        // whatever route answers now: a song playing on this device carries on from what it has while that happens.
+        let wasWorking = phase == .connected && connectedAt.map { ContinuousClock.now - $0 >= quickReconnectAfter } ?? false
+        connectedAt = nil
+        if wasWorking {
+            attempts = 0
+            connect()
+        } else {
             setPhase(.unreachable(reason ?? ""))
             scheduleRetry()
         }
     }
 
-    /// The network changed (Wi-Fi came back, a VPN connected): try now rather than at the next retry.
+    /// The network changed (Wi-Fi came back, a VPN connected, Wi-Fi gave way to cellular): when not connected, try now
+    /// rather than at the next retry; when connected, find out at once whether the connection survived.
     public func networkChanged() {
-        guard phase != .closed, phase != .unpaired, phase != .incompatible, !isConnected, link == nil, racing.isEmpty else { return }
+        guard phase != .closed, phase != .unpaired, phase != .incompatible else { return }
+        if isConnected { checkLink(); return }
+        guard link == nil, racing.isEmpty else { return }
         attempts = 0
         connect()
+    }
+
+    /// Asks the Mac whether it is still there. No answer within `probeTimeout`: the connection is dropped and made again
+    /// over whatever route works now. Any answer counts, also an older Mac's "I don't know that command".
+    public func checkLink() {
+        guard phase == .connected, let link, !probing else { return }
+        probing = true
+        let timeout = probeTimeout
+        Task {
+            let alive = (try? await link.request(.ping, timeout: timeout)) != nil
+            probing = false
+            guard !alive, self.link === link, phase == .connected else { return }
+            // The link is dead whatever its age: go straight to the other routes.
+            connectedAt = ContinuousClock.now - quickReconnectAfter
+            link.close()
+        }
     }
 
     private func abandonAttempt() {
@@ -300,7 +371,13 @@ public final class RemoteSession {
     /// Reads a range of an open stream (`.streamOpen` opens one). Throws when the Mac refuses or the connection ends.
     public func readStream(_ stream: Int, offset: Int64, length: Int) async throws -> StreamFrame {
         guard let link, phase == .connected else { throw RemoteLinkError.closed }
-        return try await link.read(stream: stream, offset: offset, length: length, timeout: .seconds(30))
+        do {
+            return try await link.read(stream: stream, offset: offset, length: length, timeout: readTimeout)
+        } catch RemoteLinkError.timedOut {
+            // Nothing came: the connection may be dead without knowing it (a network that changed under it).
+            checkLink()
+            throw RemoteLinkError.timedOut
+        }
     }
 
     // MARK: Pairing

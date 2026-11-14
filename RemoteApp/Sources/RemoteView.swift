@@ -178,7 +178,11 @@ struct MiniPlayer: View {
                         ArtworkView(key: track.artworkKey, size: 160, cornerRadius: 5).frame(width: 40, height: 40)
                         VStack(alignment: .leading, spacing: 1) {
                             Text(track.title).font(.serif(.subheadline, weight: .medium)).foregroundStyle(Palette.text).lineLimit(1)
-                            Text(track.artist).font(.caption).foregroundStyle(Palette.text2).lineLimit(1)
+                            if let converting = session.phone?.playback.preparing {
+                                Text(NowPlayingView.converting(progress: converting.progress)).font(.caption).foregroundStyle(Palette.brass).lineLimit(1)
+                            } else {
+                                Text(track.artist).font(.caption).foregroundStyle(Palette.text2).lineLimit(1)
+                            }
                         }
                         Spacer(minLength: 0)
                     }
@@ -277,24 +281,16 @@ struct ConnectionBanner: View {
 
     @ViewBuilder private var unreachable: some View {
         let name = session.pairing.name
-        let hasAddress = model.pairing(serverID: session.pairing.serverID)?.address != nil
+        let trouble = model.trouble(reaching: session.pairing.serverID)
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 10) {
                 ProgressView()
-                Group {
-                    if !model.isOnline {
-                        Text("This device is offline. Vespertine connects again when the network is back.")
-                    } else if hasAddress {
-                        Text("Can’t reach “\(name)”. Trying again… Check that the Mac is awake with Vespertine open, and that Tailscale or your VPN is connected on both.")
-                    } else {
-                        Text("Can’t reach “\(name)”. Trying again… Check that the Mac is awake and Vespertine is open.")
-                    }
-                }
-                .font(.footnote)
+                Text(Self.words(trouble, mac: name)).font(.footnote)
                 Spacer(minLength: 0)
             }
+            .accessibilityElement(children: .combine)
             HStack {
-                if !hasAddress, model.isOnline {
+                if trouble == .notOnThisNetwork {
                     Button("Away From Home?") { editing = true }
                 } else {
                     Button("Connection") { editing = true }
@@ -306,6 +302,20 @@ struct ConnectionBanner: View {
         }
         .padding(.horizontal).padding(.vertical, 8)
         .background(Palette.surface)
+    }
+
+    /// Why the Mac can't be reached, and what would fix it. Vespertine keeps trying meanwhile.
+    static func words(_ trouble: ReachTrouble, mac name: String) -> String {
+        switch trouble {
+        case .offline:
+            String(localized: "This device is offline. Vespertine connects again when the network is back.")
+        case .notOnThisNetwork:
+            String(localized: "Can’t find “\(name)” on this network. At home, check that the Mac is awake with Vespertine open. To reach it from away, turn on Tailscale on the Mac and on this device.", comment: "Connection banner on the iPhone: %@ is the Mac's name. Tailscale is a product name.")
+        case .tailscaleOff:
+            String(localized: "“\(name)” isn’t on this network, and Tailscale is off on this device. Turn Tailscale on to reach the Mac from here.", comment: "Connection banner on the iPhone: %@ is the Mac's name. Tailscale is a product name.")
+        case .notAnswering:
+            String(localized: "“\(name)” isn’t answering. It may be asleep, or Vespertine may not be open on it. Trying again…", comment: "Connection banner on the iPhone: %@ is the Mac's name.")
+        }
     }
 
     private func banner(_ text: Text, busy: Bool) -> some View {

@@ -24,6 +24,7 @@ final class RemoteLink: RemoteChannel {
     var onPush: (@MainActor (ServerMessage) -> Void)?
     /// The connection ended (with the reason Network gave, if any).
     var onClose: (@MainActor (String?) -> Void)?
+    var onUnviable: (@MainActor () -> Void)?
 
     init(endpoint: NWEndpoint, key: RemoteTransport.PresharedKey) {
         connection = NWConnection(to: endpoint, using: RemoteTransport.parameters(keys: [key]))
@@ -48,6 +49,12 @@ final class RemoteLink: RemoteChannel {
     func open(timeout: Duration = .seconds(10)) async throws {
         connection.stateUpdateHandler = { [weak self] state in
             MainActor.assumeIsolated { self?.changed(state) }
+        }
+        connection.viabilityUpdateHandler = { [weak self] viable in
+            MainActor.assumeIsolated {
+                guard let self, self.isReady, !self.isClosed, !viable else { return }
+                self.onUnviable?()
+            }
         }
         connection.start(queue: .main)
         let timer = Task { [weak self] in

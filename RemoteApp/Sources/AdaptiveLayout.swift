@@ -2,6 +2,41 @@
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 import Foundation
 
+/// Where pieces of given sizes go when they are set left to right and wrap onto another line when the width runs out
+/// (the signal badges: never clipped, never scrolled).
+nonisolated enum FlowRows {
+    struct Result: Equatable {
+        var origins: [CGPoint]
+        var size: CGSize
+    }
+
+    /// A piece wider than `width` gets a line of its own (and is offered only `width`).
+    /// `centered`: each line sits in the middle of the widest one.
+    static func place(_ sizes: [CGSize], width: CGFloat, spacing: CGFloat, lineSpacing: CGFloat, centered: Bool = false) -> Result {
+        var origins: [CGPoint] = []
+        var x: CGFloat = 0, y: CGFloat = 0, lineHeight: CGFloat = 0, widest: CGFloat = 0
+        for size in sizes {
+            let wide = min(size.width, width)
+            if x > 0, x + wide > width {
+                x = 0
+                y += lineHeight + lineSpacing
+                lineHeight = 0
+            }
+            origins.append(CGPoint(x: x, y: y))
+            x += wide + spacing
+            widest = max(widest, x - spacing)
+            lineHeight = max(lineHeight, size.height)
+        }
+        if centered {
+            // The right edge of each line, by its y.
+            var ends: [CGFloat: CGFloat] = [:]
+            for (origin, size) in zip(origins, sizes) { ends[origin.y] = max(ends[origin.y] ?? 0, origin.x + min(size.width, width)) }
+            origins = origins.map { CGPoint(x: $0.x + (widest - (ends[$0.y] ?? widest)) / 2, y: $0.y) }
+        }
+        return Result(origins: origins, size: CGSize(width: widest, height: sizes.isEmpty ? 0 : y + lineHeight))
+    }
+}
+
 nonisolated enum RemoteDestination: Hashable, Sendable {
     case nowPlaying, library, artists, songs, genres, recentlyAdded, favorites, playlists, queue, output
     /// What is kept on this device, playable without the Mac.

@@ -29,6 +29,19 @@ import Testing
         #expect(admitted5)
     }
 
+    @Test func hangingUpOnTheSlowerRoutesAfterSigningInIsNotCountedAsGuessing() {
+        // A phone tries every way to the Mac at once; the ones it didn't use end without a handshake.
+        var throttle = ConnectionThrottle(allowedFailures: 3, window: 60, lockout: 300, maximumPending: 8)
+        throttle.succeeded(host: "100.64.0.9", now: start)
+        for i in 0..<6 { throttle.failed(host: "100.64.0.9", now: start.addingTimeInterval(Double(i))) }
+        let admitted = throttle.admits(host: "100.64.0.9", pending: 0, now: start.addingTimeInterval(7))
+        #expect(admitted)
+        // Long after the sign-in, failures count again.
+        for i in 0..<3 { throttle.failed(host: "100.64.0.9", now: start.addingTimeInterval(30 + Double(i))) }
+        let shutOut = throttle.admits(host: "100.64.0.9", pending: 0, now: start.addingTimeInterval(34))
+        #expect(!shutOut)
+    }
+
     @Test func failuresSpreadOverALongTimeNeverAddUp() {
         var throttle = ConnectionThrottle(allowedFailures: 3, window: 60, lockout: 300, maximumPending: 8)
         for i in 0..<10 {

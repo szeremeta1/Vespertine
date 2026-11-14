@@ -91,6 +91,13 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     case hello(device: String, name: String, protocolVersion: Int, highestProtocolVersion: Int? = nil)
     /// First message on a connection made with a pairing key: asks to be paired under `name` ("Alex's iPhone").
     case pair(name: String, protocolVersion: Int, highestProtocolVersion: Int? = nil)
+    /// Asks whether the Mac is still there (answered with `.ok`). A phone sends it when its network changes, to learn at
+    /// once whether the connection survived. A Mac from before this command answers `.failed`, which says the same.
+    case ping
+    /// The language this phone shows ("de", "pt-BR"), sent after `hello`: the Mac words its `.failed` reasons in it where it
+    /// has that language, since they are shown on the phone as they are. A Mac from before this command answers `.failed`
+    /// and keeps its own language.
+    case setLanguage(code: String)
 
     // Transport
     case playPause
@@ -263,7 +270,8 @@ public enum GoodbyeReason: String, Codable, Sendable, Equatable {
 
 public enum RemoteReply: Codable, Sendable, Equatable {
     case ok
-    /// The command wasn't carried out; `reason` is a sentence in the Mac's language, for showing as it is.
+    /// The command wasn't carried out; `reason` is a sentence for showing as it is, in the phone's language when it said
+    /// one (`setLanguage`) and the Mac has it, else in the Mac's.
     case failed(reason: String)
     case welcome(ServerInfo)
     /// Pairing worked: connect again with TLS identity `device` and this key from now on.
@@ -291,11 +299,17 @@ public struct ServerInfo: Codable, Sendable, Equatable {
     public var serverID: String
     public var appVersion: String
     public var protocolVersion: Int
+    /// Where this Mac can be reached right now, port included: its addresses on its own network, and its Tailscale (or
+    /// other VPN) address and name when it has them. A phone keeps them and tries them all next time, so it finds the Mac
+    /// from away without anybody typing an address. nil from a Mac that doesn't say.
+    public var addresses: [RemoteAddress]?
 
-    public init(name: String, serverID: String, appVersion: String, protocolVersion: Int = RemoteProtocol.version) {
+    public init(name: String, serverID: String, appVersion: String, protocolVersion: Int = RemoteProtocol.version,
+                addresses: [RemoteAddress]? = nil) {
         self.name = name
         self.serverID = serverID
         self.appVersion = appVersion
         self.protocolVersion = protocolVersion
+        self.addresses = addresses
     }
 }

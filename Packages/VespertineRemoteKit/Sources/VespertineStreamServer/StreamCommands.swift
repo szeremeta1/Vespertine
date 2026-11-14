@@ -21,8 +21,8 @@ extension StreamPreparer {
     }
 
     /// What a phone is told while Stream to Phones is off (the server answers with it without making a preparer).
-    public static let refusalWhenOff = "Streaming to phones is off on this Mac. Turn on Stream to Phones in Vespertine › Settings › Remote."
-    public static let refusalForOlderPhones = "This Mac’s connection with the phone is the older kind, which can’t stream. Update Vespertine on the phone."
+    public static var refusalWhenOff: String { StreamWords.say(.streamingOff) }
+    public static var refusalForOlderPhones: String { StreamWords.say(.olderPhone) }
 
     /// nil when `command` isn't a stream command. `protocolVersion` is what the connection negotiated; `allowed` is the Mac's
     /// "Stream to phones" switch (and this phone's own permission).

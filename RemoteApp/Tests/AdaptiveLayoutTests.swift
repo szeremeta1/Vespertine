@@ -72,3 +72,38 @@ final class AdaptiveLayoutTests: XCTestCase {
         XCTAssertEqual(RemoteDestination.starting(at: nil), .nowPlaying)
     }
 }
+
+final class FlowRowsTests: XCTestCase {
+    private let chip = CGSize(width: 100, height: 20)
+
+    func testPiecesThatFitStayOnOneLine() {
+        let placed = FlowRows.place([chip, chip, chip], width: 320, spacing: 6, lineSpacing: 6)
+        XCTAssertEqual(placed.origins, [CGPoint(x: 0, y: 0), CGPoint(x: 106, y: 0), CGPoint(x: 212, y: 0)])
+        XCTAssertEqual(placed.size, CGSize(width: 312, height: 20))
+    }
+
+    func testPiecesThatDontFitWrapInsteadOfBeingClipped() {
+        // The signal badges on a narrow phone: nothing reaches past the edge, nothing is hidden.
+        let sizes = [CGSize(width: 150, height: 20), CGSize(width: 170, height: 20), CGSize(width: 90, height: 24), CGSize(width: 120, height: 20)]
+        let placed = FlowRows.place(sizes, width: 300, spacing: 6, lineSpacing: 6)
+        XCTAssertEqual(placed.origins, [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 26), CGPoint(x: 176, y: 26), CGPoint(x: 0, y: 56)])
+        for (origin, size) in zip(placed.origins, sizes) { XCTAssertLessThanOrEqual(origin.x + size.width, 300) }
+        XCTAssertEqual(placed.size, CGSize(width: 266, height: 76))
+    }
+
+    func testAPieceWiderThanTheRowGetsItsOwnLineAtTheRowsWidth() {
+        let placed = FlowRows.place([chip, CGSize(width: 500, height: 20), chip], width: 300, spacing: 6, lineSpacing: 4)
+        XCTAssertEqual(placed.origins, [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 24), CGPoint(x: 0, y: 48)])
+        XCTAssertEqual(placed.size.width, 300)
+    }
+
+    func testCentredLinesSitInTheMiddleOfTheWidestLine() {
+        let placed = FlowRows.place([CGSize(width: 200, height: 20), CGSize(width: 80, height: 20), CGSize(width: 60, height: 20)], width: 300, spacing: 6, lineSpacing: 6, centered: true)
+        // First line: 200 + 6 + 80 = 286 wide. Second line: 60 wide, centred in 286.
+        XCTAssertEqual(placed.origins, [CGPoint(x: 0, y: 0), CGPoint(x: 206, y: 0), CGPoint(x: 113, y: 26)])
+    }
+
+    func testNothingToPlaceTakesNoRoom() {
+        XCTAssertEqual(FlowRows.place([], width: 300, spacing: 6, lineSpacing: 6).size, .zero)
+    }
+}

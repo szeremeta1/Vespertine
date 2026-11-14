@@ -91,6 +91,43 @@ public struct TranscodeResult: Sendable, Equatable {
     }
 }
 
+/// Why the Mac won't send something, before it is put into words.
+public enum StreamRefusal: Sendable, Equatable {
+    case notInLibrary
+    case cannotStream
+    case cannotReadNow
+    case tooManyChannels(Int, most: Int)
+    /// A kind of file the Mac's decoders can't turn into FLAC (`fileExtension` without the dot).
+    case cannotConvert(fileExtension: String)
+    case streamNotOpen
+    case badRange
+    case readFailed
+    case streamingOff
+    case olderPhone
+
+    /// The sentence in English: what a phone is told unless the server says it in another language (`StreamWords.say`).
+    public var english: String {
+        switch self {
+        case .notInLibrary: "That song isn’t in the Mac’s library."
+        case .cannotStream: "This can’t be streamed."
+        case .cannotReadNow: "The Mac can’t read this file right now."
+        case .tooManyChannels(let channels, let most): "This has \(channels) channels; Vespertine streams up to \(most). It plays on the Mac."
+        case .cannotConvert(let ext): "Vespertine on the Mac can’t convert this kind of file (.\(ext)) for the phone. It plays on the Mac."
+        case .streamNotOpen: "That stream isn’t open."
+        case .badRange: "That range isn’t valid."
+        case .readFailed: "The Mac couldn’t read the file."
+        case .streamingOff: "Streaming to phones is off on this Mac. Turn on Stream to Phones in Vespertine › Settings › Remote."
+        case .olderPhone: "This Mac’s connection with the phone is the older kind, which can’t stream. Update Vespertine on the phone."
+        }
+    }
+}
+
+/// How a refusal is worded. The Mac's server sets `say` around each phone's command to answer in that phone's language;
+/// left alone, a refusal is said in English.
+public enum StreamWords {
+    @TaskLocal public static var say: @Sendable (StreamRefusal) -> String = { $0.english }
+}
+
 /// A conversion that didn't work, in a sentence for the phone to show.
 public struct TranscodeFailure: Error, Sendable, Equatable {
     public var message: String

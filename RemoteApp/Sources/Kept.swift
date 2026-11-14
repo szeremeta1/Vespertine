@@ -32,7 +32,9 @@ final class KeptShelf {
     var smaller = UserDefaults.standard.bool(forKey: KeptShelf.smallerKey) {
         didSet { UserDefaults.standard.set(smaller, forKey: Self.smallerKey) }
     }
-    private var keepers: [String: Keeper] = [:]
+    /// Made the first time each Mac's kept music is asked for, often while a view is being drawn: not something views
+    /// watch (each `Keeper` is observed in its own right), so filling it in never counts as a change to the screen.
+    @ObservationIgnored private var keepers: [String: Keeper] = [:]
 
     private var limitBytes: Int64? { limitGigabytes > 0 ? Int64(limitGigabytes) * 1_000_000_000 : nil }
 
@@ -220,7 +222,7 @@ struct KeptListPage: View {
                         ArtworkView(key: list.artworkKey ?? list.tracks.first?.artworkKey, size: 600, cornerRadius: 10).frame(maxWidth: 240)
                         Text(list.title).font(.serif(.title3, weight: .semibold)).multilineTextAlignment(.center)
                         if !list.subtitle.isEmpty { Text(list.subtitle).foregroundStyle(Palette.text2) }
-                        HStack(spacing: 6) {
+                        FlowLayout(spacing: 6, lineSpacing: 6, centered: true) {
                             Chip(text: KeptListsView.count(keeper.progress(of: id)))
                             if list.smaller { Chip(text: String(localized: "SMALLER COPIES", comment: "Chip on a kept album: its songs were kept in the smaller form.")) }
                         }

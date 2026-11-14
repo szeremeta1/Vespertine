@@ -41,7 +41,7 @@ public enum StreamPlanner {
         let source = sourceFormat(facts)
         guard facts.channels >= 1, facts.channels <= maximumChannels else {
             return StreamPlan(kind: nil, delivered: nil, transcode: nil,
-                              macOnlyReason: "This has \(facts.channels) channels; Vespertine streams up to \(maximumChannels). It plays on the Mac.")
+                              macOnlyReason: StreamWords.say(.tooManyChannels(facts.channels, most: maximumChannels)))
         }
         let ext = facts.fileExtension.lowercased()
         let nativeContainer = native[ext]
@@ -59,7 +59,7 @@ public enum StreamPlanner {
         }
         guard facts.needsMacDecoder || facts.isRegion || nativeContainer != nil || macDecodable.contains(ext) else {
             return StreamPlan(kind: nil, delivered: nil, transcode: nil,
-                              macOnlyReason: "Vespertine on the Mac can’t convert this kind of file (.\(ext)) for the phone. It plays on the Mac.")
+                              macOnlyReason: StreamWords.say(.cannotConvert(fileExtension: ext)))
         }
         let rate = targetRate(source: facts.sampleRate, isDSD: facts.isDSD, ceiling: maxSampleRate)
         let depth = (facts.bitDepth ?? 16) <= 16 && !facts.isDSD ? 16 : 24

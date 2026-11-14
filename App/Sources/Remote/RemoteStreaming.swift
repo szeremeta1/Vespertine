@@ -33,7 +33,8 @@ extension Track {
     }
 }
 
-/// One conversion at a time: a FLAC of a DSD album is minutes of the Mac's CPU, and the player has first call on it.
+/// One conversion at a time: a FLAC of a DSD album is minutes of the Mac's CPU, and the player has first call on it (its
+/// audio thread runs at real-time priority whatever a conversion does).
 private actor ConversionGate {
     private var busy = false
     private var waiting: [CheckedContinuation<Void, Never>] = []
@@ -57,13 +58,15 @@ struct PhoneTranscoder: StreamTranscoding {
     init(item: @escaping @Sendable (Int64) async -> PlayableItem?) { self.item = item }
 
     func transcode(_ request: TranscodeRequest, to destination: URL, progress: @Sendable (Double) -> Void) async throws -> TranscodeResult {
-        guard let id = request.trackID, let playable = await item(id) else { throw TranscodeFailure(message: "That song isn’t in the library any more.") }
+        guard let id = request.trackID, let playable = await item(id) else { throw TranscodeFailure(message: StreamWords.say(.notInLibrary)) }
         await gate.enter()
         defer { Task { await gate.leave() } }
         do {
             // `progress` is only used while this call runs, so it may be lent to the detached task.
             let result = try await withoutActuallyEscaping(progress) { relay in
-                try await Task.detached(priority: .utility) {
+                // Somebody is waiting to hear this: it runs on the fast cores, not held back to the efficiency ones as
+                // background work is.
+                try await Task.detached(priority: .userInitiated) {
                     try FLACStreamTranscoder.transcode(playable, sampleRate: request.sampleRate, bitDepth: request.bitDepth, to: destination,
                                                        progress: relay, isCancelled: { Task.isCancelled })
                 }.value

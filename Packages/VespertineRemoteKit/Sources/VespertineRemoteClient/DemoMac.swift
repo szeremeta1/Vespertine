@@ -118,6 +118,8 @@ public final class DemoMac: RemoteChannel {
             return RemoteProtocol.negotiate(baseline: version, highest: highest) != nil ? .welcome(info) : .failed(reason: "")
         case .pair:
             return .failed(reason: "")
+        case .ping, .setLanguage:
+            return .ok
         case .streamInfo, .streamOpen, .streamRead, .streamClose:
             // The demo library has no audio files; its sound comes with the phone player's bundled clips.
             return .failed(reason: "The demo library has nothing to stream.")

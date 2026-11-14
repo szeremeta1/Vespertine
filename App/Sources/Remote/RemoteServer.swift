@@ -90,7 +90,37 @@ final class RemoteServer {
     func serverInfo(protocolVersion: Int) -> ServerInfo {
         ServerInfo(name: Self.computerName, serverID: store.serverID,
                    appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "",
-                   protocolVersion: protocolVersion)
+                   protocolVersion: protocolVersion, addresses: reachableAddresses)
+    }
+
+    /// Where a phone can reach this Mac right now (nil while the server isn't listening): its addresses on this network and
+    /// on Tailscale or another VPN, with the port it listens on. Told in every welcome, so a paired phone finds the Mac from
+    /// away without anybody typing an address.
+    var reachableAddresses: [RemoteAddress]? {
+        guard case .running(let port) = status else { return nil }
+        let entries = LocalAddresses.current()
+        refreshTailscaleName(entries)
+        let told = LocalAddresses.advertised(from: entries, port: port, names: tailscaleName.map { [$0.name] } ?? [])
+        return told.isEmpty ? nil : told
+    }
+
+    /// This Mac's Tailscale name ("studio-mac.tailnet.ts.net") and the address it was found for. Looked up off the main
+    /// thread (it asks the resolver), so the first welcome after Tailscale connects goes without it and the next has it.
+    @ObservationIgnored private var tailscaleName: (address: String, name: String)?
+    @ObservationIgnored private var tailscaleLookup: String?
+
+    private func refreshTailscaleName(_ entries: [LocalAddresses.Entry]) {
+        let address = entries.first { $0.isUp && !$0.host.contains(":") && RemoteAddress(host: $0.host).kind == .tailscale }?.host
+        guard let address else { tailscaleName = nil; return }
+        guard tailscaleName?.address != address, tailscaleLookup != address else { return }
+        tailscaleLookup = address
+        Task { [weak self] in
+            let name = await Task.detached(priority: .utility) { LocalAddresses.name(for: address) }.value
+            guard let self, self.tailscaleLookup == address else { return }
+            self.tailscaleLookup = nil
+            // Only a Tailscale name is worth telling: any other answer is some resolver's guess.
+            if let name, RemoteAddress(host: name).kind == .tailscale { self.tailscaleName = (address, name) }
+        }
     }
 
     /// The stream channel's Mac side, made the first time a phone asks to stream.
@@ -511,6 +541,8 @@ final class RemoteClient {
     private var helloTimeout: Task<Void, Never>?
     /// The protocol version the handshake agreed on (1 until a hello says more).
     private var protocolVersion = 1
+    /// The language this phone shows (`setLanguage`): refusals are worded in it. nil: the Mac's own.
+    private var language: String?
     /// `streamRead`s being answered: a phone has a few in flight, not as many as it likes.
     private var readsInFlight = 0
     static let maximumReadsInFlight = 8
@@ -578,7 +610,7 @@ final class RemoteClient {
         guard let message = try? RemoteProtocol.decoder().decode(ClientMessage.self, from: data) else {
             // A command this Mac doesn't know (a newer phone app): say so, but only when the ID can be read.
             if let id = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["id"] as? Int {
-                reply(id, .failed(reason: String(localized: "This Mac’s Vespertine doesn’t know that command. Update Vespertine on the Mac.", comment: "Remote control: the phone app is newer than Vespertine on the Mac.")))
+                reply(id, .failed(reason: String(localized: "This Mac’s Vespertine doesn’t know that command. Update Vespertine on the Mac.", bundle: ReplyWords.speaking(language) { ReplyWords.bundle }, comment: "Remote control: the phone app is newer than Vespertine on the Mac.")))
             }
             return
         }
@@ -601,6 +633,9 @@ final class RemoteClient {
             send(.reply(id: message.id, result: result)) { [weak self] in self?.connection.cancel() }
         case _ where !isSignedIn:
             close(saying: .notPaired)
+        case .setLanguage(let code):
+            language = ReplyWords.localization(for: code, available: Bundle.main.localizations)
+            reply(message.id, .ok)
         case _ where StreamPreparer.isStreamCommand(message.command):
             handleStream(message)
         case .artwork(let key, let size):
@@ -611,11 +646,13 @@ final class RemoteClient {
                 if let found {
                     self.reply(message.id, .artwork(key: key, size: size, mimeType: found.mimeType, data: found.data))
                 } else {
-                    self.reply(message.id, .failed(reason: String(localized: "There’s no cover for this.", comment: "Remote control: the phone asked for a cover the Mac doesn't have.")))
+                    self.reply(message.id, .failed(reason: ReplyWords.speaking(self.language) {
+                        String(localized: "There’s no cover for this.", bundle: ReplyWords.bundle, comment: "Remote control: the phone asked for a cover the Mac doesn't have.")
+                    }))
                 }
             }
         default:
-            reply(message.id, bridge.perform(message.command))
+            reply(message.id, ReplyWords.speaking(language) { bridge.perform(message.command) })
             // A command usually changes what's playing: tell the phone at once rather than at the next tick.
             if let server {
                 let (player, queue, outputs) = server.snapshot(bridge)
@@ -631,26 +668,38 @@ final class RemoteClient {
     private func handleStream(_ message: ClientMessage) {
         guard let server else { return }
         // Off (the default): answer in words, without making the preparer or its cache folder. A phone on protocol 1 never gets here.
+        let language = language
         guard server.store.streamEnabled else {
-            return reply(message.id, .failed(reason: String(localized: "Streaming to phones is off on this Mac. Turn on Stream to Phones in Vespertine › Settings › Remote.", comment: "Remote control: a phone asked to play a song itself while the Mac's Stream to Phones switch is off.")))
+            return reply(message.id, .failed(reason: ReplyWords.speaking(language) { ReplyWords.stream(.streamingOff) }))
         }
         guard let device, server.store.mayStream(device) else {
-            return reply(message.id, .failed(reason: String(localized: "This Mac doesn’t let this device play songs itself. Allow it in Vespertine › Settings › Remote on the Mac.", comment: "Remote control: this phone was switched off under Stream to Phones on the Mac.")))
+            return reply(message.id, .failed(reason: ReplyWords.speaking(language) {
+                String(localized: "This Mac doesn’t let this device play songs itself. Allow it in Vespertine › Settings › Remote on the Mac.", bundle: ReplyWords.bundle, comment: "Remote control: this phone was switched off under Stream to Phones on the Mac.")
+            }))
         }
         guard let preparer = server.streamPreparer else {
-            return reply(message.id, .failed(reason: "This Mac can’t stream right now."))
+            return reply(message.id, .failed(reason: ReplyWords.speaking(language) {
+                String(localized: "This Mac can’t stream right now.", bundle: ReplyWords.bundle, comment: "Stream to phone: the Mac couldn't set up its folder for converted songs.")
+            }))
         }
         let isRead: Bool
         if case .streamRead = message.command { isRead = true } else { isRead = false }
         if isRead {
-            guard readsInFlight < Self.maximumReadsInFlight else { return reply(message.id, .failed(reason: "Too many reads at once; wait for one to finish.")) }
+            guard readsInFlight < Self.maximumReadsInFlight else {
+                return reply(message.id, .failed(reason: ReplyWords.speaking(language) {
+                    String(localized: "Too many reads at once; wait for one to finish.", bundle: ReplyWords.bundle, comment: "Stream to phone: the phone asked for too many pieces of a song at the same time. Rarely seen.")
+                }))
+            }
             readsInFlight += 1
         }
         let allowed = true
         let version = protocolVersion
         let client = streamClient
         Task { [weak self] in
-            let answer = await preparer.handle(message.command, id: message.id, client: client, protocolVersion: version, allowed: allowed)
+            let command = message.command, id = message.id
+            let answer = await ReplyWords.speakingAsync(language) {
+                await preparer.handle(command, id: id, client: client, protocolVersion: version, allowed: allowed)
+            }
             guard let self else { return }
             if isRead { self.readsInFlight -= 1 }
             switch answer {

@@ -151,3 +151,28 @@ private func facts(_ ext: String, codec: String? = nil, rate: Double = 44_100, d
         #expect(!mac.streamable && mac.kind == nil && mac.macOnlyReason != nil && mac.byteSize == nil)
     }
 }
+
+@Suite struct RefusalWords {
+    @Test func aRefusalIsSaidInEnglishUnlessTheServerSaysItAnotherWay() {
+        let plan = StreamPlanner.plan(facts("wav", depth: 24, channels: 12), maxSampleRate: nil)
+        #expect(plan.macOnlyReason == "This has 12 channels; Vespertine streams up to 8. It plays on the Mac.")
+        #expect(StreamPlanner.plan(facts("mid"), maxSampleRate: nil).macOnlyReason
+                == "Vespertine on the Mac can’t convert this kind of file (.mid) for the phone. It plays on the Mac.")
+    }
+
+    @Test func theServerWordsARefusalForThePhoneItAnswers() {
+        // The Mac's server sets the wording around each phone's command: here a stand-in for "in German".
+        let said = StreamWords.$say.withValue({ refusal in
+            if case .tooManyChannels(let channels, let most) = refusal { return "DE:\(channels)/\(most)" }
+            return "DE"
+        }) {
+            (StreamPlanner.plan(facts("wav", depth: 24, channels: 12), maxSampleRate: nil).macOnlyReason,
+             StreamPlanner.plan(facts("mid"), maxSampleRate: nil).macOnlyReason, StreamPreparer.refusalWhenOff)
+        }
+        #expect(said.0 == "DE:12/8")
+        #expect(said.1 == "DE")
+        #expect(said.2 == "DE")
+        // Outside it, English again.
+        #expect(StreamPreparer.refusalWhenOff == StreamRefusal.streamingOff.english)
+    }
+}

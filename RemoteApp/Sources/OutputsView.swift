@@ -111,13 +111,7 @@ struct OutputsView: View {
     /// How the Mac is reached now.
     private var reach: String {
         guard session.isConnected else { return String(localized: "Not connected") }
-        switch session.route {
-        case .nearby, nil: return String(localized: "On this network")
-        case .lastKnown: return String(localized: "By its last address")
-        case .address:
-            let tailscale = model.pairing(serverID: session.pairing.serverID)?.address?.kind == .tailscale
-            return tailscale ? String(localized: "Over Tailscale") : String(localized: "By address")
-        }
+        return session.reach.map(NowPlayingView.reachName) ?? String(localized: "On this network")
     }
 
     private func icon(_ kind: OutputKind) -> String {
