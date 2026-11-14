@@ -321,8 +321,15 @@ struct RemoteBridge {
             let index = min(max(0, startAt), tracks.count - 1)
             player.play(tracks, startAt: index, exactly: [tracks[index].location])
 
-        case .albums(let offset, let limit):
+        case .albums(let offset, let limit, let sort, let filter):
             let albums = library.albums
+            // Sorted or narrowed, the whole list is arranged before a page is cut from it; plain pages skip that.
+            if (sort ?? .library) != .library || (filter ?? .all) != .all {
+                let listed = AlbumListing.arrange(albums.map(albumSummary), sort: sort, filter: filter)
+                let start = min(max(0, offset), listed.count)
+                let end = min(start + min(max(1, limit), 500), listed.count)
+                return .albums(items: Array(listed[start..<end]), total: listed.count)
+            }
             let start = min(max(0, offset), albums.count)
             let end = min(start + min(max(1, limit), 500), albums.count)
             return .albums(items: albums[start..<end].map(albumSummary), total: albums.count)

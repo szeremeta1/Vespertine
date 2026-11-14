@@ -132,7 +132,9 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     case createPlaylist(name: String, ids: [Int64])
 
     // Library (answered with a page or a list)
-    case albums(offset: Int, limit: Int)
+    /// `sort` and `filter` (both from protocol 2; an older Mac ignores them and answers in its own order): the Mac sorts and
+    /// narrows the whole list, then pages it. `total` in the answer counts what the filter left.
+    case albums(offset: Int, limit: Int, sort: AlbumSort? = nil, filter: AlbumFilter? = nil)
     case albumTracks(key: String)
     case artists
     case artistAlbums(name: String)
@@ -179,6 +181,58 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     /// `StreamFrame` (binary) carrying this command's `id`, or `.failed`.
     case streamRead(stream: Int, offset: Int64, length: Int)
     case streamClose(stream: Int)
+}
+
+/// How the Albums page is ordered.
+public enum AlbumSort: String, Codable, Sendable, Equatable, CaseIterable {
+    /// The Mac's own order (by album artist, then title).
+    case library
+    case title, artist
+    /// By year, newest first; albums without a year come last.
+    case newest
+    case oldest
+}
+
+/// Which albums the Albums page shows.
+public enum AlbumFilter: String, Codable, Sendable, Equatable, CaseIterable {
+    case all, hiRes, dsd, surround
+}
+
+public enum AlbumListing {
+    /// `albums` (in the Mac's order) narrowed by `filter`, then sorted by `sort`. Ties keep the Mac's order.
+    public static func arrange(_ albums: [AlbumSummary], sort: AlbumSort?, filter: AlbumFilter?) -> [AlbumSummary] {
+        var list = albums
+        switch filter ?? .all {
+        case .all: break
+        case .hiRes: list = list.filter(\.hiRes)
+        case .dsd: list = list.filter(\.dsd)
+        case .surround: list = list.filter(\.multichannel)
+        }
+        func before(_ a: String, _ b: String) -> Bool {
+            a.compare(b, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedAscending
+        }
+        let numbered = Array(list.enumerated())
+        func sorted(_ earlier: (AlbumSummary, AlbumSummary) -> Bool?) -> [AlbumSummary] {
+            numbered.sorted { earlier($0.element, $1.element) ?? ($0.offset < $1.offset) }.map(\.element)
+        }
+        func byYear(newestFirst: Bool) -> [AlbumSummary] {
+            sorted { a, b in
+                switch (a.year, b.year) {
+                case (nil, nil): nil
+                case (nil, _): false
+                case (_, nil): true
+                case (let x?, let y?): x == y ? nil : (newestFirst ? x > y : x < y)
+                }
+            }
+        }
+        switch sort ?? .library {
+        case .library: return list
+        case .title: return sorted { before($0.title, $1.title) ? true : (before($1.title, $0.title) ? false : nil) }
+        case .artist: return sorted { before($0.artist, $1.artist) ? true : (before($1.artist, $0.artist) ? false : nil) }
+        case .newest: return byYear(newestFirst: true)
+        case .oldest: return byYear(newestFirst: false)
+        }
+    }
 }
 
 public enum RepeatModeValue: String, Codable, Sendable, Equatable {

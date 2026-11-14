@@ -26,7 +26,7 @@ struct LibraryView: View {
                 } else if search.trimmingCharacters(in: .whitespaces).isEmpty {
                     root
                 } else {
-                    SearchResults(session: session, text: search)
+                    SearchPage(session: session, text: search)
                 }
             }
             .obsidianList()
@@ -97,7 +97,7 @@ struct LibraryView: View {
 
     @ViewBuilder private func sectionContent(_ place: RemoteDestination) -> some View {
         if !search.trimmingCharacters(in: .whitespaces).isEmpty {
-            SearchResults(session: session, text: search)
+            SearchPage(session: session, text: search)
         } else {
             switch place {
             case .artists: ArtistsList(session: session).readablePane()
@@ -119,21 +119,78 @@ struct LibraryView: View {
     }
 }
 
-private struct SearchResults: View {
+/// What the Mac found, in the groups its own search shows: artists, albums, playlists, then songs.
+private struct SearchPage: View {
     let session: RemoteSession
     let text: String
-    @State private var tracks: [TrackSummary] = []
+    @State private var found = SearchResults(tracks: [], albums: [], artists: [], playlists: [])
+    @State private var searched = false
 
     var body: some View {
         List {
-            TrackRows(session: session, tracks: tracks, play: { index in .playTracks(ids: tracks.compactMap(\.id), startAt: index, shuffled: nil) })
+            if !found.artists.isEmpty {
+                Section("Artists") {
+                    ForEach(found.artists) { artist in
+                        NavigationLink { AlbumsGrid(session: session, listing: .artist(artist.name)) } label: {
+                            HStack {
+                                ArtworkView(key: artist.artworkKey, size: 120, cornerRadius: 22).frame(width: 44)
+                                Text(artist.name)
+                            }
+                        }
+                    }
+                }
+            }
+            if !found.albums.isEmpty {
+                Section("Albums") {
+                    ForEach(found.albums) { album in
+                        NavigationLink { AlbumView(session: session, album: album) } label: {
+                            HStack {
+                                ArtworkView(key: album.artworkKey, size: 120, cornerRadius: 4).frame(width: 44)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(album.title).lineLimit(1)
+                                    Text(album.artist).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if !found.playlists.isEmpty {
+                Section("Playlists") {
+                    ForEach(found.playlists) { playlist in
+                        NavigationLink {
+                            TrackListView(session: session, title: Text(playlist.name), load: .playlistTracks(id: playlist.id),
+                                          play: { _ in .playPlaylist(id: playlist.id, shuffled: false) })
+                        } label: {
+                            Label(playlist.name, systemImage: playlist.smart ? "gearshape" : "music.note.list")
+                        }
+                    }
+                }
+            }
+            if !found.tracks.isEmpty {
+                Section("Songs") {
+                    TrackRows(session: session, tracks: found.tracks, play: { index in .playTracks(ids: found.tracks.compactMap(\.id), startAt: index, shuffled: nil) })
+                }
+            }
+            if searched, found.tracks.isEmpty, found.albums.isEmpty, found.artists.isEmpty, found.playlists.isEmpty {
+                Text("Nothing found for “\(text)”").foregroundStyle(Palette.text2)
+            }
         }
         .obsidianList()
+        .accessibilityIdentifier("search-results")
         .task(id: text) {
-                try? await Task.sleep(for: .milliseconds(300))
-                guard !Task.isCancelled else { return }
-                if case .tracks(let items) = await session.send(.search(text: text, limit: 200)) { tracks = items }
+            try? await Task.sleep(for: .milliseconds(300))
+            guard !Task.isCancelled else { return }
+            switch await session.send(.find(text: text, limit: 50)) {
+            case .found(let results): found = results
+            default:
+                // An older Mac only knows the search for songs.
+                if case .tracks(let items) = await session.send(.search(text: text, limit: 200)) {
+                    found = SearchResults(tracks: items, albums: [], artists: [], playlists: [])
+                }
             }
+            searched = true
+        }
     }
 }
 
@@ -179,6 +236,13 @@ struct AlbumsGrid: View {
     @State private var problem: String?
     @State private var feedback = CommandFeedback()
     var listing: Listing = .all
+    /// How the page of every album is ordered and narrowed. The Mac does it; kept between launches.
+    @AppStorage("albumSort") private var sortName = AlbumSort.library.rawValue
+    @AppStorage("albumFilter") private var filterName = AlbumFilter.all.rawValue
+    private var sort: AlbumSort { AlbumSort(rawValue: sortName) ?? .library }
+    private var filter: AlbumFilter { AlbumFilter(rawValue: filterName) ?? .all }
+    /// Only a Mac that knows how (the version that streams) is asked to sort and narrow.
+    private var arranges: Bool { listing == .all && session.canStream }
 
     private var coverFlow: Bool { model.settings.albumsLayout == .coverFlow }
 
@@ -206,6 +270,26 @@ struct AlbumsGrid: View {
                     .accessibilityLabel(Text("Play These Albums"))
                     .disabled(albums.isEmpty || !session.isConnected)
                 }
+                if arranges {
+                    Menu {
+                        Picker("Sort By", selection: $sortName) {
+                            Text("The Mac’s Order").tag(AlbumSort.library.rawValue)
+                            Text("Title").tag(AlbumSort.title.rawValue)
+                            Text("Artist").tag(AlbumSort.artist.rawValue)
+                            Text("Newest First").tag(AlbumSort.newest.rawValue)
+                            Text("Oldest First").tag(AlbumSort.oldest.rawValue)
+                        }
+                        Picker("Show", selection: $filterName) {
+                            Text("All Albums").tag(AlbumFilter.all.rawValue)
+                            Text("Hi-Res").tag(AlbumFilter.hiRes.rawValue)
+                            Text("DSD").tag(AlbumFilter.dsd.rawValue)
+                            Text("Surround").tag(AlbumFilter.surround.rawValue)
+                        }
+                    } label: {
+                        Image(systemName: filter == .all ? "line.3.horizontal.decrease.circle" : "line.3.horizontal.decrease.circle.fill")
+                    }
+                    .accessibilityLabel(Text("Sort and Filter"))
+                }
                 Button {
                     withAnimation(.easeInOut(duration: 0.25)) { model.settings.albumsLayout = coverFlow ? .grid : .coverFlow }
                 } label: {
@@ -218,6 +302,11 @@ struct AlbumsGrid: View {
             if let sample { AlbumView(session: session, album: sample) }
         }
         .feedback(feedback)
+        .onChange(of: sortName + "/" + filterName) {
+            albums = []
+            total = nil
+            Task { await loadMore() }
+        }
         .task(id: session.isConnected) {
             if albums.isEmpty { await loadMore() }
             if model.startScreen == "album", let first = albums.first { model.startScreen = nil; sample = first }
@@ -248,7 +337,7 @@ struct AlbumsGrid: View {
                 .frame(maxWidth: .infinity)
                 if loading { ProgressView().padding() }
                 if !loading, albums.isEmpty, total != nil {
-                    Text("No albums yet").font(.serif(.title3)).foregroundStyle(Palette.text2).padding(.top, 60)
+                    Text(arranges && filter != .all ? "No albums match" : "No albums yet").font(.serif(.title3)).foregroundStyle(Palette.text2).padding(.top, 60)
                 }
                 if !loading, albums.isEmpty, let problem {
                     Text(problem).font(.callout).foregroundStyle(Palette.text2).multilineTextAlignment(.center).padding(.top, 60).padding(.horizontal, 32)
@@ -274,7 +363,9 @@ struct AlbumsGrid: View {
         if let total, albums.count >= total { return }
         loading = true
         defer { loading = false }
-        if case .albums(let items, let all) = await session.send(.albums(offset: albums.count, limit: 120)) {
+        let asked = (sortName, filterName)
+        let command: RemoteCommand = arranges ? .albums(offset: albums.count, limit: 120, sort: sort, filter: filter) : .albums(offset: albums.count, limit: 120)
+        if case .albums(let items, let all) = await session.send(command), asked == (sortName, filterName) {
             albums += items
             total = all
         }
@@ -429,6 +520,8 @@ struct TrackRows: View {
     let play: (Int) -> RemoteCommand
     var numbered = false
     @State private var feedback = CommandFeedback()
+    /// The song being added to a playlist.
+    @State private var adding: PlaylistAddition?
 
     var body: some View {
         ForEach(Array(tracks.enumerated()), id: \.offset) { index, track in
@@ -462,9 +555,68 @@ struct TrackRows: View {
                     Button { feedback.run(session, .setFavorite(ids: [id], on: !track.favorite)) } label: {
                         Label(track.favorite ? LocalizedStringKey("Remove from Favorites") : LocalizedStringKey("Add to Favorites"), systemImage: track.favorite ? "heart.slash" : "heart")
                     }
+                    Button { adding = PlaylistAddition(id: id, title: track.title) } label: { Label("Add to a Playlist…", systemImage: "text.badge.plus") }
                 }
             }
         }
         .feedback(feedback)
+        .sheet(item: $adding) { AddToPlaylistSheet(session: session, addition: $0) }
+    }
+}
+
+/// A song on its way into a playlist.
+struct PlaylistAddition: Identifiable {
+    let id: Int64
+    let title: String
+}
+
+/// Adds a song to one of the Mac's playlists, or to a new one.
+struct AddToPlaylistSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let session: RemoteSession
+    let addition: PlaylistAddition
+    @State private var playlists: [PlaylistSummary] = []
+    @State private var name = ""
+    @State private var problem: String?
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    TextField("New Playlist", text: $name)
+                    Button("Create and Add") {
+                        answer(.createPlaylist(name: name.trimmingCharacters(in: .whitespacesAndNewlines), ids: [addition.id]))
+                    }
+                    .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                }
+                // A smart playlist chooses its own songs.
+                let own = playlists.filter { !$0.smart }
+                if !own.isEmpty {
+                    Section("Playlists") {
+                        ForEach(own) { playlist in
+                            Button { answer(.addToPlaylist(id: playlist.id, ids: [addition.id])) } label: {
+                                Label(playlist.name, systemImage: "music.note.list").foregroundStyle(Palette.text)
+                            }
+                        }
+                    }
+                }
+                if let problem { Section { Text(problem).foregroundStyle(.red) } }
+            }
+            .obsidianList()
+            .navigationTitle(Text("Add “\(addition.title)”"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+            .task { if case .playlists(let items) = await session.send(.playlists) { playlists = items } }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func answer(_ command: RemoteCommand) {
+        Task {
+            switch await session.send(command) {
+            case .failed(let reason): problem = reason.isEmpty ? String(localized: "The Mac didn’t answer.") : reason
+            default: dismiss()
+            }
+        }
     }
 }
