@@ -186,7 +186,7 @@ struct RendererVolumeControl: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .help(unlocked ? String(localized: "Digital volume in Vespertine: the song is sent processed (24-bit FLAC). Click to lock it at 100% again.")
+        .help(unlocked ? String(localized: "Digital volume in Vespertine: the song is sent processed (24-bit FLAC). Click to lock it again at 100%.")
                        : String(localized: "Volume locked at 100%: the original file is sent and the player's own volume is left alone. Click to unlock."))
         .accessibilityLabel(unlocked ? String(localized: "Volume control in Vespertine") : String(localized: "Volume locked at 100%"))
         .popover(isPresented: $showOptions, arrowEdge: .top) { options(unlocked: unlocked) }
