@@ -297,7 +297,7 @@ struct DevicePicker: View {
                         Text(renderers.searching ? String(localized: "SEARCHING…") : String(localized: "NONE FOUND ON THIS NETWORK"))
                             .font(Typeface.mono(9.5)).foregroundStyle(Palette.text3)
                         if !renderers.searching {
-                            Text("Check it's on and on the same network as this Mac.").font(Typeface.ui(11)).foregroundStyle(Palette.text3)
+                            Text("Check that the player is on and on the same network as this Mac.").font(Typeface.ui(11)).foregroundStyle(Palette.text3)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                     }
@@ -317,7 +317,7 @@ struct DevicePicker: View {
                         Text(airPlay.searching ? String(localized: "SEARCHING…") : String(localized: "NONE FOUND ON THIS NETWORK"))
                             .font(Typeface.mono(9.5)).foregroundStyle(Palette.text3)
                         if !airPlay.searching {
-                            Text("Check it's on and on the same network as this Mac.").font(Typeface.ui(11)).foregroundStyle(Palette.text3)
+                            Text("Check that the receiver is on and on the same network as this Mac.").font(Typeface.ui(11)).foregroundStyle(Palette.text3)
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                     }

@@ -21,7 +21,7 @@ struct AirPlaySettingsSection: View {
                     if airPlay.searching, airPlay.devices.isEmpty {
                         Text("Looking for AirPlay receivers…")
                     } else if airPlay.devices.isEmpty {
-                        Text("No AirPlay receivers found. Check it's on and on the same network as this Mac.")
+                        Text("No AirPlay receivers found. Check that the receiver is on and on the same network as this Mac.")
                     } else {
                         Text("AirPlay receivers found: \(ListFormatter.localizedString(byJoining: airPlay.devices.map(\.name))). Choose one in the output list.",
                              comment: "%@ is a list of AirPlay receiver names.")
@@ -85,17 +85,20 @@ struct AirPlayDetails: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("For the best result").font(Typeface.ui(12))
                 ForEach(AirPlayText.advice, id: \.self) { line in
-                    Text("· " + line).font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
+                    Text(verbatim: "· " + line).font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
         .padding(.horizontal, 8)
     }
 
+    /// Shown in place of a value the device didn't state.
+    private static let blank = "—"
+
     private func row(_ title: String, _ value: String) -> some View {
         HStack(alignment: .firstTextBaseline) {
             Text(title).font(Typeface.ui(11)).foregroundStyle(Palette.text3).frame(width: 96, alignment: .leading)
-            Text(verbatim: value.isEmpty ? "—" : value).font(Typeface.mono(10.5)).foregroundStyle(Palette.text2)
+            Text(verbatim: value.isEmpty ? Self.blank : value).font(Typeface.mono(10.5)).foregroundStyle(Palette.text2)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }

@@ -20,7 +20,7 @@ struct RendererSettingsSection: View {
                     if renderers.searching {
                         Text("Looking for network players…")
                     } else if renderers.renderers.isEmpty {
-                        Text("No network players found. Check it's on and on the same network as this Mac.")
+                        Text("No network players found. Check that the player is on and on the same network as this Mac.")
                     } else {
                         Text("Network players found: \(ListFormatter.localizedString(byJoining: renderers.renderers.map(\.name))). Choose one in the output list.",
                              comment: "%@ is a list of network player names.")
@@ -101,7 +101,7 @@ struct RendererDetails: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("For the best result").font(Typeface.ui(12))
                 ForEach(RendererText.advice, id: \.self) { line in
-                    Text("· " + line).font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
+                    Text(verbatim: "· " + line).font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
@@ -115,10 +115,13 @@ struct RendererDetails: View {
             ?? String(localized: "\(SampleRate.format(Double(rate))) kHz (as stated)")
     }
 
+    /// Shown in place of a value the device didn't state.
+    private static let blank = "—"
+
     private func row(_ title: String, _ value: String) -> some View {
         HStack(alignment: .firstTextBaseline) {
             Text(title).font(Typeface.ui(11)).foregroundStyle(Palette.text3).frame(width: 96, alignment: .leading)
-            Text(verbatim: value.isEmpty ? "—" : value).font(Typeface.mono(10.5)).foregroundStyle(Palette.text2)
+            Text(verbatim: value.isEmpty ? Self.blank : value).font(Typeface.mono(10.5)).foregroundStyle(Palette.text2)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
@@ -203,7 +206,7 @@ struct RendererVolumeControl: View {
         VStack(alignment: .leading, spacing: 10) {
             SectionLabel(text: renderer.name)
             Text(unlocked
-                 ? "Vespertine sets the volume: each song is decoded, its level changed in 64-bit with dither, and sent as 24-bit FLAC. Lock it to send the original files again."
+                 ? String(localized: "Vespertine sets the volume: each song is decoded, its level changed in 64-bit with dither, and sent as 24-bit FLAC. Lock it to send the original files again.")
                  : lockedText)
                 .font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
             Button(unlocked ? String(localized: "Lock at 100%") : String(localized: "Unlock Volume")) {
