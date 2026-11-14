@@ -218,6 +218,8 @@ public final class DemoMac: RemoteChannel {
             let start = min(max(0, offset), albums.count)
             let end = min(albums.count, start + max(0, limit))
             return .albums(items: albums[start..<end].map(\.summary), total: albums.count)
+        case .tracks(let ids):
+            return .tracks(items: ids.compactMap { tracks[$0] })
         case .albumTracks(let key):
             guard let album = albums.first(where: { $0.summary.key == key }) else { return notInLibrary }
             return .tracks(items: album.tracks.compactMap { tracks[$0] })

@@ -326,6 +326,8 @@ struct RemoteBridge {
             let start = min(max(0, offset), albums.count)
             let end = min(start + min(max(1, limit), 500), albums.count)
             return .albums(items: albums[start..<end].map(albumSummary), total: albums.count)
+        case .tracks(let ids):
+            return .tracks(items: ordered(ids).map(trackSummary))
         case .albumTracks(let key):
             return .tracks(items: model.playableTracks(albumKey: key).map(trackSummary))
         case .artists:

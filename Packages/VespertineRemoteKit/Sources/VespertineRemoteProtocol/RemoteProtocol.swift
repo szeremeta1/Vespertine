@@ -152,6 +152,9 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     case recentlyAdded(limit: Int)
     /// The albums with songs in a source (`SourceSummary.id`).
     case sourceAlbums(id: Int64)
+    /// These songs by library ID, in the order asked (answered with `.tracks`; IDs the library doesn't have are left out). A
+    /// phone that plays songs itself builds its own queue from them.
+    case tracks(ids: [Int64])
     /// A cover by `artworkKey`, about `size` pixels on its long side (160 or 600 are stored; others pick the nearest).
     case artwork(key: String, size: Int)
 
