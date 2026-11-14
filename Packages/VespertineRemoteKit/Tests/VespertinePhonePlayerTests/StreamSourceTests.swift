@@ -27,9 +27,9 @@ private final class FakeMac: @unchecked Sendable {
     private var _offsets: [Int64] = []
     private var failures: [Int64: Int]
     var delay: Duration = .zero
-    /// How many more reads may be answered; nil when there is no limit. A read past the limit waits to be let through, so a
-    /// test decides what has arrived instead of the clock.
-    private var permits: Int?
+    /// The offsets whose reads may be answered; nil when every read may. Any other read waits to be let through, so a test
+    /// decides what has arrived instead of the clock.
+    private var open: Set<Int64>?
     var shortReads = false
     var alwaysFail = false
 
@@ -37,18 +37,13 @@ private final class FakeMac: @unchecked Sendable {
 
     var offsets: [Int64] { lock.withLock { _offsets } }
 
-    /// Holds every read from now on until `allow` or `allowAll`.
-    func hold() { lock.withLock { permits = 0 } }
-    func allow(_ count: Int) { lock.withLock { permits = (permits ?? 0) + count } }
-    func allowAll() { lock.withLock { permits = nil } }
+    /// Holds every read from now on until `allow` names its offset, or `allowAll`.
+    func hold() { lock.withLock { open = [] } }
+    func allow(_ offsets: Int64...) { lock.withLock { open = (open ?? []).union(offsets) } }
+    func allowAll() { lock.withLock { open = nil } }
 
-    private func pass() async throws {
-        while !lock.withLock({ () -> Bool in
-            guard let left = permits else { return true }
-            guard left > 0 else { return false }
-            permits = left - 1
-            return true
-        }) { try await Task.sleep(for: .milliseconds(2)) }
+    private func pass(_ offset: Int64) async throws {
+        while !lock.withLock({ open?.contains(offset) ?? true }) { try await Task.sleep(for: .milliseconds(2)) }
     }
 
     func read(_ offset: Int64, _ length: Int) async throws -> StreamFrame {
@@ -57,7 +52,7 @@ private final class FakeMac: @unchecked Sendable {
             if let left = failures[offset], left > 0 { failures[offset] = left - 1; return true }
             return false
         }
-        try await pass()
+        try await pass(offset)
         try await Task.sleep(for: delay)
         if fail || alwaysFail { throw RemoteLinkError.timedOut }
         let n = shortReads ? min(length, 300) : length
@@ -113,8 +108,8 @@ struct StreamSourceTests {
         source.start()
         let reading = Task { try await blockingRead(source, at: 0, length: 1500) }
         try await untilAReadWaits(source)
-        // The Mac answers two reads and no more: the two chunks the read needs.
-        mac.allow(2)
+        // The Mac answers for the two chunks the read needs and for nothing else.
+        mac.allow(0, 1000)
         #expect(try await reading.value == data.prefix(1500))
         #expect(!source.isComplete)
         #expect(source.bufferedBytes == 2000)
