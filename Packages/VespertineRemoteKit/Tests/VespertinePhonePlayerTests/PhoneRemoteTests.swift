@@ -74,6 +74,21 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         remote.playback.stop()
     }
 
+    @Test func pausingWhileTheStreamIsStillOpeningHoldsAndNextStaysPaused() async throws {
+        let (remote, _) = try made()
+        _ = await remote.run(.playAlbum(key: "a", startAt: 0, shuffled: nil))
+        #expect(remote.playerState.playback == .playing)
+        _ = await remote.run(.playPause)
+        #expect(remote.playerState.playback != .playing)
+        #expect(remote.queueState.current?.track.id == 1)
+        _ = await remote.run(.next)
+        #expect(remote.queueState.current?.track.id == 2)
+        #expect(remote.playerState.playback != .playing)
+        _ = await remote.run(.playPause)
+        #expect(remote.playerState.playback == .playing)
+        remote.playback.stop()
+    }
+
     @Test func songsByIDKeepTheOrderAskedFor() async throws {
         let (remote, library) = try made()
         #expect(await remote.run(.playTracks(ids: [3, 1], startAt: 0, shuffled: false)) == .ok)
