@@ -21,6 +21,8 @@ let package = Package(
         .library(name: "VespertineChannels", targets: ["VespertineChannels"]),
         // The phone's player: reads a stream's bytes as they arrive and plays them with AVAudioEngine.
         .library(name: "VespertinePhonePlayer", targets: ["VespertinePhonePlayer"]),
+        // A music library on an SMB share, read by the phone itself: the SMB client, the tags, the index.
+        .library(name: "VespertineShare", targets: ["VespertineShare"]),
         // A command-line remote for testing a Mac's remote server (pair, send commands, watch what it pushes).
         .executable(name: "vespertine-remote", targets: ["vespertine-remote"]),
     ],
@@ -30,10 +32,12 @@ let package = Package(
         .target(name: "VespertineStreamServer", dependencies: ["VespertineRemoteProtocol"]),
         .target(name: "VespertineChannels"),
         .target(name: "VespertinePhonePlayer", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient", "VespertineChannels"]),
+        .target(name: "VespertineShare", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient"]),
         .executableTarget(name: "vespertine-remote", dependencies: ["VespertineRemoteProtocol"]),
         .testTarget(name: "VespertineRemoteProtocolTests", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient"]),
         .testTarget(name: "VespertineStreamServerTests", dependencies: ["VespertineStreamServer", "VespertineRemoteProtocol", "VespertineRemoteClient", "VespertinePhonePlayer"]),
         .testTarget(name: "VespertineChannelsTests", dependencies: ["VespertineChannels"]),
+        .testTarget(name: "VespertineShareTests", dependencies: ["VespertineShare", "VespertineRemoteProtocol", "VespertineRemoteClient"]),
         .testTarget(name: "VespertinePhonePlayerTests", dependencies: ["VespertinePhonePlayer", "VespertineRemoteProtocol", "VespertineRemoteClient"]),
     ]
 )

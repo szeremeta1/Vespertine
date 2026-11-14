@@ -7,6 +7,7 @@ import SwiftUI
 import VespertinePhonePlayer
 import VespertineRemoteClient
 import VespertineRemoteProtocol
+import VespertineShare
 
 struct OutputsView: View {
     @Environment(RemoteAppModel.self) private var model
@@ -44,7 +45,11 @@ struct OutputsView: View {
                         }
                     }
                 } footer: {
-                    Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
+                    if session.isShare {
+                        Text("This device reads the songs from the share itself and plays them, through its speaker, headphones or a DAC. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
+                    } else {
+                        Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
+                    }
                 }
                 if playsHere, let phone = session.phone, let signal = phone.signal {
                     Section {
@@ -57,47 +62,51 @@ struct OutputsView: View {
                         Text("Read back from iOS while the song plays, not assumed. Vespertine asks a DAC for each song’s own rate and, for surround, an interface for a channel per output (in the order L, R, C, LFE, back pair, side pair). iOS doesn’t tell apps an output’s bit depth. With the volume below 100%, a DAC doesn’t receive the song’s samples unchanged.")
                     }
                 }
-                Section {
-                    ForEach(Array((session.outputs?.outputs ?? []).enumerated()), id: \.offset) { _, output in
-                        Button {
-                            PlayTarget.shared.choose(thisDevice: false)
-                            feedback.run(session, .selectOutput(uid: output.uid))
-                        } label: {
-                            HStack {
-                                Image(systemName: icon(output.kind))
-                                    .frame(width: 28)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(output.name)
-                                    Text(output.detail).font(.caption.monospaced()).foregroundStyle(output.ready ? Color.secondary : Color.orange)
+                if session.isShare, let share = model.openShare {
+                    shareSection(share)
+                } else {
+                    Section {
+                        ForEach(Array((session.outputs?.outputs ?? []).enumerated()), id: \.offset) { _, output in
+                            Button {
+                                PlayTarget.shared.choose(thisDevice: false)
+                                feedback.run(session, .selectOutput(uid: output.uid))
+                            } label: {
+                                HStack {
+                                    Image(systemName: icon(output.kind))
+                                        .frame(width: 28)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(output.name)
+                                        Text(output.detail).font(.caption.monospaced()).foregroundStyle(output.ready ? Color.secondary : Color.orange)
+                                    }
+                                    Spacer()
+                                    if output.selected, !playsHere { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
                                 }
-                                Spacer()
-                                if output.selected, !playsHere { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
+                                .contentShape(Rectangle())
                             }
-                            .contentShape(Rectangle())
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
+                    } footer: {
+                        Text("Choose one of these and Vespertine on the Mac plays there.")
                     }
-                } footer: {
-                    Text("Choose one of these and Vespertine on the Mac plays there.")
-                }
-                Section {
-                    LabeledContent("Mac", value: session.server?.name ?? session.pairing.name)
-                    if let version = session.server?.appVersion, !version.isEmpty {
-                        LabeledContent("Vespertine", value: version)
-                    }
-                    if !session.isDemo {
-                        Button { editingConnection = true } label: {
-                            LabeledContent("Connection") {
-                                HStack(spacing: 6) {
-                                    Circle().fill(session.isConnected ? Palette.brass : Palette.text3).frame(width: 7, height: 7)
-                                    Text(reach)
+                    Section {
+                        LabeledContent("Mac", value: session.server?.name ?? session.pairing.name)
+                        if let version = session.server?.appVersion, !version.isEmpty {
+                            LabeledContent("Vespertine", value: version)
+                        }
+                        if !session.isDemo {
+                            Button { editingConnection = true } label: {
+                                LabeledContent("Connection") {
+                                    HStack(spacing: 6) {
+                                        Circle().fill(session.isConnected ? Palette.brass : Palette.text3).frame(width: 7, height: 7)
+                                        Text(reach)
+                                    }
                                 }
                             }
+                            .foregroundStyle(Palette.text)
                         }
-                        .foregroundStyle(Palette.text)
                     }
                 }
-            }
+                }
             .obsidianList()
             .navigationTitle("Output").screenTitleStyle()
             .toolbar {
@@ -122,6 +131,46 @@ struct OutputsView: View {
     }
 
     private var playsHere: Bool { session.phone != nil }
+
+    /// The share the songs come from: where it is, whether it answers, what the last scan found, and scanning again.
+    @ViewBuilder private func shareSection(_ share: SavedShare) -> some View {
+        let status = model.shareStatus ?? ShareStatus()
+        Section {
+            LabeledContent("SMB Share", value: share.address.display)
+            LabeledContent("Connection") {
+                HStack(spacing: 6) {
+                    Circle().fill(status.reachable == false ? Palette.text3 : Palette.brass).frame(width: 7, height: 7)
+                    Text(status.reachable == false ? String(localized: "Not connected") : ShareWording.network(share.address))
+                }
+            }
+            LabeledContent("Songs", value: status.songs.formatted())
+            if status.needTheMac > 0 {
+                LabeledContent("Files that need the Mac", value: status.needTheMac.formatted())
+            }
+            if status.unreadable > 0 {
+                LabeledContent("Files that couldn’t be read", value: status.unreadable.formatted())
+            }
+            if let scanned = status.scanned {
+                LabeledContent("Last scanned", value: scanned.formatted(date: .abbreviated, time: .shortened))
+            }
+            Button {
+                model.rescanShare()
+            } label: {
+                HStack {
+                    Text("Scan Again")
+                    Spacer()
+                    if status.scan.isRunning { ProgressView() }
+                }
+            }
+            .disabled(status.scan.isRunning)
+            .accessibilityIdentifier("share-rescan")
+        } footer: {
+            VStack(alignment: .leading, spacing: 6) {
+                if let trouble = status.trouble { Text(trouble) }
+                Text("A scan reads only new and changed files, and runs by itself once a day when the share is opened. This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; DSD, APE, WavPack and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.")
+            }
+        }
+    }
 
     /// Under "This iPhone": where its sound goes now, or why it can't play here.
     private var hereDetail: String {

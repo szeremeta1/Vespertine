@@ -6,6 +6,7 @@
 import SwiftUI
 import VespertineRemoteClient
 import VespertineRemoteProtocol
+import VespertineShare
 
 struct RemoteView: View {
     @Environment(RemoteAppModel.self) private var model
@@ -35,7 +36,7 @@ struct RemoteView: View {
         .feedback(feedback)
         .onAppear { destination = .starting(at: model.startScreen) }
         // Again whenever a page is chosen: a heart or a scan since then shows in the counts.
-        .task(id: "\(session.isConnected)#\(destination.id)") {
+        .task(id: "\(session.isConnected)#\(destination.id)#\(model.libraryRevision)") {
             if case .library(let loaded) = await session.send(.library) { overview = loaded }
         }
     }
@@ -57,10 +58,11 @@ struct RemoteView: View {
                     sidebarLink(.genres, count: overview?.genres)
                     sidebarLink(.recentlyAdded)
                     sidebarLink(.favorites, count: overview?.favorites)
-                    sidebarLink(.playlists, count: overview?.playlists)
+                    // Playlists are the Mac's: a share has none, and is its own only source.
+                    if !session.isShare { sidebarLink(.playlists, count: overview?.playlists) }
                     if !session.isDemo { sidebarLink(.kept) }
                 }
-                if let sources = overview?.sources, !sources.isEmpty {
+                if !session.isShare, let sources = overview?.sources, !sources.isEmpty {
                     Section("Sources") {
                         ForEach(sources) { source in
                             NavigationLink(value: RemoteDestination.source(source.id)) { SourceLabel(source: source) }
@@ -69,7 +71,7 @@ struct RemoteView: View {
                         }
                     }
                 }
-                Section("Mac") { sidebarLink(.output) }
+                Section(session.isShare ? LocalizedStringKey("SMB Share") : LocalizedStringKey("Mac")) { sidebarLink(.output) }
             }
             .listStyle(.sidebar)
             .obsidianList()
@@ -119,7 +121,7 @@ struct RemoteView: View {
                 .miniPlayer(session: session) { destination = .nowPlaying }
         case .library, .artists, .songs, .genres, .recentlyAdded, .favorites, .playlists, .kept, .source:
             LibraryView(session: session, section: destination)
-                .id(destination)
+                .id("\(destination.id)#\(model.libraryRevision)")
                 .miniPlayer(session: session) { destination = .nowPlaying }
         }
     }
@@ -130,6 +132,8 @@ struct RemoteView: View {
                 .tabItem { Label("Now Playing", systemImage: "play.circle") }
                 .tag(RemoteDestination.nowPlaying)
             LibraryView(session: session, section: destination.isLibrary && destination != .library ? destination : nil)
+                // A share's scan found new or changed songs: the lists are loaded again.
+                .id(model.libraryRevision)
                 .miniPlayer(session: session) { destination = .nowPlaying }
                 .tabItem { Label("Library", systemImage: "square.stack") }
                 .tag(RemoteDestination.library)
@@ -290,6 +294,30 @@ struct ConnectionBanner: View {
     @State private var patient = true
 
     var body: some View {
+        if session.isShare { shareBanner } else { macBanner }
+    }
+
+    /// A share has no Mac to wait for: what is said is the first scan going on, or why the share can't be used.
+    @ViewBuilder private var shareBanner: some View {
+        let status = model.shareStatus
+        if let trouble = status?.trouble {
+            HStack(spacing: 10) {
+                Text(trouble).font(.footnote)
+                Spacer(minLength: 0)
+                Button("Try Again") { model.rescanShare() }.font(.footnote.weight(.medium))
+                    .disabled(status?.scan.isRunning ?? false)
+                Button("Macs") { model.leave() }.font(.footnote.weight(.medium))
+            }
+            .padding(.horizontal).padding(.vertical, 8)
+            .background(Palette.surface)
+            .accessibilityIdentifier("share-trouble")
+        } else if let status, status.scanned == nil, case .scanning(let songs) = status.scan {
+            banner(Text("Reading “\(session.pairing.name)” for the first time. Songs found so far: \(songs.formatted())", comment: "Banner on the iPhone while an SMB share is scanned for the first time. The first %@ is the share's name, the second a count of songs that goes up."), busy: true)
+                .accessibilityIdentifier("share-scanning")
+        }
+    }
+
+    private var macBanner: some View {
         Group {
             switch session.phase {
             case .connected where session.isDemo && !model.showsDemoNotice:
