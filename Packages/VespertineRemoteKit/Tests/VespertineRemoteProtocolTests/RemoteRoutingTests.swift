@@ -225,6 +225,7 @@ private func waitUntil(_ condition: () -> Bool, seconds: Double = 5) async -> Bo
         session.close()
     }
 }
+#endif
 
 #if canImport(Network)
 @Suite struct ReachTroubleTests {
