@@ -63,13 +63,22 @@ final class RendererOutputModel {
     }
 
     /// The playback for `device`, made once per renderer (nil: none chosen, or it isn't on the network now).
-    func playback(for device: RendererDevice?, settings: RendererSettings) -> RendererPlayback? {
+    /// `chosenUID`: the renderer chosen as the output, found or not. A search that misses it (multicast is the first thing a
+    /// busy Wi-Fi network drops) doesn't end the music: while its playback has a song loaded and the renderer answers, the
+    /// playback stays.
+    func playback(for device: RendererDevice?, chosenUID: String? = nil, settings: RendererSettings) -> RendererPlayback? {
         guard let device else {
+            if let playback, let chosenUID, playback.renderer.uid == chosenUID, playback.isEngaged {
+                playback.update(settings: settings)
+                return playback
+            }
             playback?.shutdown()
             playback = nil
             return nil
         }
-        if let playback, playback.renderer.uid == device.uid {
+        // The same renderer at the same address, or one that is answering as it is: its playback carries on. A renderer that
+        // came back somewhere else (a new port after a restart, a new address from DHCP) gets a new one, to its new address.
+        if let playback, playback.renderer.uid == device.uid, playback.renderer.description == device.description || playback.isEngaged {
             playback.update(settings: settings)
             return playback
         }

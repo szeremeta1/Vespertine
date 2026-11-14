@@ -28,6 +28,37 @@ public protocol NetworkPlayback: AnyObject, Sendable {
     func queueChanged()
     /// Stops and lets go of the output (the output changed).
     func shutdown()
+    /// A song is loaded on the output and it is answering. While it is, the output is there, whatever a search of the
+    /// network says: a missed search or an expired Bonjour record doesn't end the music.
+    var isEngaged: Bool { get }
+}
+
+/// Keeps the Mac from idle sleep while a network output is meant to be playing. Nothing plays through Core Audio then, so
+/// macOS holds no assertion of its own: without this the Mac sleeps in the middle of an album, and the output loses the
+/// stream it gets from this Mac. The display may still sleep.
+public final class PlaybackActivity: @unchecked Sendable {
+    private let lock = NSLock()
+    private var token: NSObjectProtocol?
+    private let reason: String
+
+    public init(reason: String) { self.reason = reason }
+
+    public var isHeld: Bool { lock.withLock { token != nil } }
+
+    public func set(_ active: Bool) {
+        lock.withLock {
+            if active, token == nil {
+                token = ProcessInfo.processInfo.beginActivity(options: [.userInitiated, .idleSystemSleepDisabled], reason: reason)
+            } else if !active, let held = token {
+                ProcessInfo.processInfo.endActivity(held)
+                token = nil
+            }
+        }
+    }
+
+    deinit {
+        if let token { ProcessInfo.processInfo.endActivity(token) }
+    }
 }
 
 extension RendererPlayback: NetworkPlayback {

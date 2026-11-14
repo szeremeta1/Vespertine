@@ -117,7 +117,7 @@ struct TransportTests {
         #expect(fake.calls.last?.arguments["Unit"] == "REL_TIME")
     }
 
-    @Test("AV without SetNext: not gapless; when a song ends, the next one is set and started")
+    @Test("AV without SetNext: not gapless; the renderer is never sent a next song, and stops when one ends")
     func avNoSetNext() async throws {
         let fake = try await FakeRenderer(kind: .av(setNext: false))
         defer { fake.stop() }
@@ -128,10 +128,11 @@ struct TransportTests {
         #expect(!fake.actions.contains("SetNextAVTransportURI"))
         _ = try await transport.status()
         fake.advance()   // stops: nothing next on the renderer
+        // The transport reports it; `RendererPlayback` decides whether the song ended or was stopped on the player.
         let status = try await transport.status()
-        #expect(status.currentURI == track("b").uri)
-        #expect(fake.currentURI == track("b").uri.absoluteString)
-        #expect(fake.transportState == "Playing")
+        #expect(status.state == .stopped)
+        #expect(status.currentURI == track("a").uri)
+        #expect(fake.currentURI == track("a").uri.absoluteString)
     }
 
     @Test("A renderer's refusal comes back as its UPnP error")

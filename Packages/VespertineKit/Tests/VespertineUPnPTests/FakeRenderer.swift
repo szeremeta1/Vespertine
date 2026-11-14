@@ -31,6 +31,12 @@ final class FakeRenderer: @unchecked Sendable {
     private var _fetched: [String: Data] = [:]
     private var failures: [String: (code: Int, times: Int)] = [:]
     private var sourceIndex = 0          // starts on the radio, as a real one may
+    private var _ignoresPlay = false
+    /// Takes a song and says yes to Play, but never plays it (a song it can't fetch or decode).
+    var ignoresPlay: Bool {
+        get { lock.withLock { _ignoresPlay } }
+        set { lock.withLock { _ignoresPlay = newValue } }
+    }
 
     init(kind: Kind) async throws {
         self.kind = kind
@@ -57,6 +63,8 @@ final class FakeRenderer: @unchecked Sendable {
     var selectedSource: Int { lock.withLock { sourceIndex } }
 
     func setPosition(_ s: Int) { lock.withLock { seconds = s } }
+    /// Stop pressed on the player itself: it stops where it is.
+    func stopOnDevice() { lock.withLock { state = "Stopped" } }
     /// The next call of `action` fails with UPnP error `code`.
     func fail(_ action: String, code: Int, times: Int = 1) { lock.withLock { failures[action] = (code, times) } }
 
@@ -152,6 +160,7 @@ final class FakeRenderer: @unchecked Sendable {
                 toFetch = playlist.first { $0.id == currentID }?.uri
                 return .success([])
             case ("Playlist", "Play"), ("AVTransport", "Play"):
+                if _ignoresPlay { return .success([]) }
                 if state == "Stopped", service == "AVTransport" { toFetch = avCurrent }
                 state = "Playing"; return .success([])
             case ("Playlist", "Pause"), ("AVTransport", "Pause"): state = "Paused"; return .success([])

@@ -476,6 +476,15 @@ final class PlayerController {
         }
     }
 
+    /// Stops before the chosen network output is let go of because its switch went off. The song is not carried over: music
+    /// that was playing in another room never starts on this Mac's own output by itself.
+    func stopBeforeLeavingNetworkOutput() {
+        guard renderer != nil || missingRenderer != nil || pendingRendererStart != nil else { return }
+        stop()
+        pendingRendererStart = nil
+        state = .stopped
+    }
+
     /// The chosen output is a network renderer that isn't answering: nothing plays anywhere until it is back. Its name.
     @ObservationIgnored private(set) var missingRenderer: String?
     /// The first search for renderers is still running (Play then waits a little for the chosen one). Set by the app model.

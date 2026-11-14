@@ -122,6 +122,16 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     private var worker: Task<Void, Never>?
     private let generation = Locked(0)
     private let settingsGeneration = Locked(0)
+    /// Keeps the Mac awake while the receiver is meant to be playing (nothing plays through Core Audio then, so macOS would
+    /// let the Mac sleep in the middle of an album and throttle the sender while its window is hidden).
+    private let activity = PlaybackActivity(reason: "Playing to an AirPlay receiver")
+
+    private func refreshActivity() {
+        activity.set(state.withLock { $0.wantsPlaying && !$0.shutDown })
+    }
+
+    /// The session with the receiver is open: it is there, whatever Bonjour says at the moment.
+    public var isEngaged: Bool { state.withLock { !$0.shutDown } && session?.isConnected == true }
 
     enum Command {
         case play(PlayableItem, at: TimeInterval, announce: Bool, generation: Int)
@@ -141,6 +151,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             for await command in commands {
                 guard let self else { return }
                 await self.run(command)
+                // A lost receiver, a failed song or the queue's end stop the sending: the Mac may sleep again.
+                self.refreshActivity()
             }
         }
     }
@@ -174,6 +186,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             $0.wantsPlaying = true
             if announce { $0.snapshot.signalPath = nil }
         }
+        refreshActivity()
         enqueue.yield(.play(item, at: seconds, announce: announce, generation: g))
     }
 
@@ -185,6 +198,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             if $0.snapshot.state == .playing { $0.snapshot.state = .paused }
             $0.snapshot.position = position
         }
+        refreshActivity()
         enqueue.yield(.pause)
     }
 
@@ -203,6 +217,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     public func stop() {
         generation.withLock { $0 += 1 }
         state.withLock { $0.wantsPlaying = false; $0.snapshot.state = .stopped }
+        refreshActivity()
         enqueue.yield(.stop)
     }
 
@@ -247,6 +262,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     public func shutdown() {
         stop()
         state.withLock { $0.shutDown = true }
+        refreshActivity()
         enqueue.finish()
     }
 

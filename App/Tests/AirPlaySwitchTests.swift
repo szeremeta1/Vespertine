@@ -88,9 +88,12 @@ struct AirPlaySwitchTests {
         defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
         let uid = "raop:B827EB000001"
-        // A receiver nobody set a level for starts at full receiver volume, whatever the app's digital volume elsewhere.
-        settings.digitalVolume = 0.3
-        #expect(settings.airPlayReceiverVolumeDB(uid: uid) == 0)
+        // A receiver nobody set a level for starts low (many take the AirPlay volume as their master volume), never at
+        // full level, and whatever the app's digital volume elsewhere.
+        settings.digitalVolume = 0.9
+        #expect(settings.airPlayLevel(uid: uid) == AppSettings.firstAirPlayLevel)
+        #expect(settings.airPlayReceiverVolumeDB(uid: uid) == RAOPVolume.decibels(level: AppSettings.firstAirPlayLevel))
+        #expect(settings.airPlayReceiverVolumeDB(uid: uid) < -15)
         settings.setAppVolumeLevel(0.5, for: uid)
         #expect(settings.airPlaySettings(uid: uid).digitalVolumeDB == nil)
         #expect(settings.airPlayReceiverVolumeDB(uid: uid) == -15)

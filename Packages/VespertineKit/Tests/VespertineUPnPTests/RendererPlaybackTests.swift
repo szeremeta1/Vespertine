@@ -62,13 +62,14 @@ struct Harness {
     let events: EventLog
     let queue: [PlayableItem]
 
-    static func make(kind: FakeRenderer.Kind, files: Int = 3) async throws -> Harness {
+    static func make(kind: FakeRenderer.Kind, files: Int = 3, startTimeout: TimeInterval = 15, lostAfter: TimeInterval = 0.3) async throws -> Harness {
         let fake = try await FakeRenderer(kind: kind)
         let media = MediaServer()
         try await media.start()
         let device = try await RendererDevice.load(location: fake.location)
         let queue = try (0..<files).map { PlayableItem(url: try makeWAV(seed: $0 + 1)) }
-        let playback = RendererPlayback(renderer: device, transport: try device.makeTransport(), media: media, pollInterval: 0.05)
+        let playback = RendererPlayback(renderer: device, transport: try device.makeTransport(), media: media, pollInterval: 0.05,
+                                        startTimeout: startTimeout, lostAfter: lostAfter)
         let items = Locked(queue)
         playback.nextItemProvider = { finished in
             let q = items.withLock { $0 }
@@ -79,6 +80,14 @@ struct Harness {
         let events = EventLog()
         playback.eventHandler = { events.add($0) }
         return Harness(fake: fake, media: media, playback: playback, events: events, queue: queue)
+    }
+
+    /// The song playing reaches its end on the renderer (the fake's songs are 200 s long): the position is seen there by a
+    /// poll first, as it is on a real one.
+    func playToEnd() async throws {
+        fake.setPosition(198)
+        for _ in 0..<100 where playback.snapshot.position < 190 { try await Task.sleep(for: .milliseconds(20)) }
+        fake.advance()
     }
 
     func close() {
@@ -117,9 +126,88 @@ struct RendererPlaybackTests {
         #expect(h.fake.playlistURIs.first == second)
         // The last song ends: the queue has ended.
         h.fake.advance()
-        try await Task.sleep(for: .milliseconds(200))
-        h.fake.advance()
+        #expect(await h.events.wait(for: "started \(h.queue[2].url.lastPathComponent)"))
+        try await h.playToEnd()
         #expect(await h.events.wait(for: "ended"))
+        #expect(h.playback.snapshot.state == .stopped)
+    }
+
+    @Test("Stopped on the player in the middle of a song: paused there, not skipped to the next and not the end of the queue")
+    func stoppedOnThePlayer() async throws {
+        let h = try await Harness.make(kind: .openHome)
+        defer { h.close() }
+        h.playback.play(h.queue[0])
+        #expect(await h.events.wait(for: "started"))
+        h.fake.setPosition(60)
+        for _ in 0..<100 where h.playback.snapshot.position < 50 { try await Task.sleep(for: .milliseconds(20)) }
+        let uri = h.fake.currentURI
+        h.fake.stopOnDevice()
+        for _ in 0..<100 where h.playback.snapshot.state == .playing { try await Task.sleep(for: .milliseconds(20)) }
+        #expect(h.playback.snapshot.state == .paused)
+        #expect(!h.playback.wantsPlaying)
+        #expect(h.playback.snapshot.item?.id == h.queue[0].id)
+        #expect(h.fake.currentURI == uri)
+        #expect(!h.events.all.contains { $0.hasPrefix("ended") || $0.hasPrefix("failed") })
+    }
+
+    @Test("A renderer that takes a song and never starts it fails the song after a while, by name")
+    func neverStarts() async throws {
+        let h = try await Harness.make(kind: .av(setNext: true), startTimeout: 0.4)
+        defer { h.close() }
+        h.fake.ignoresPlay = true
+        h.playback.play(h.queue[0])
+        #expect(await h.events.wait(for: "failed"))
+        #expect(h.events.all.first { $0.hasPrefix("failed") }?.contains("didn't start playing") == true)
+        #expect(!h.events.all.contains { $0.hasPrefix("started") })
+        #expect(h.playback.snapshot.state == .stopped)
+    }
+
+    @Test("A renderer that refuses its next song plays on, and the next song is started when this one ends")
+    func nextRefused() async throws {
+        let h = try await Harness.make(kind: .av(setNext: true))
+        defer { h.close() }
+        h.fake.fail("SetNextAVTransportURI", code: 716, times: 100)
+        h.playback.play(h.queue[0])
+        #expect(await h.events.wait(for: "started \(h.queue[0].url.lastPathComponent)"))
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(h.playback.snapshot.state == .playing)
+        #expect(!h.events.all.contains { $0.hasPrefix("failed") })
+        try await h.playToEnd()
+        #expect(await h.events.wait(for: "started \(h.queue[1].url.lastPathComponent)"))
+        let uri = try #require(h.fake.currentURI)
+        #expect(await h.fake.fetched(uri) == (try Data(contentsOf: h.queue[1].url)))
+    }
+
+    @Test("A moment without an answer isn't a lost renderer: the song is kept and plays on")
+    func briefSilence() async throws {
+        let h = try await Harness.make(kind: .openHome, lostAfter: 30)
+        defer { h.close() }
+        h.playback.play(h.queue[0])
+        #expect(await h.events.wait(for: "started"))
+        h.fake.fail("TransportState", code: 501, times: 6)
+        try await Task.sleep(for: .milliseconds(800))
+        #expect(!h.events.all.contains { $0.hasPrefix("lost") })
+        #expect(h.playback.snapshot.state == .playing)
+        #expect(h.playback.snapshot.item?.id == h.queue[0].id)
+        #expect(h.playback.isEngaged)
+    }
+
+    @Test("A paused song stays paused when its stream is made again (a change of settings)")
+    func pausedStaysPaused() async throws {
+        let h = try await Harness.make(kind: .openHome)
+        defer { h.close() }
+        h.playback.play(h.queue[0])
+        #expect(await h.events.wait(for: "started"))
+        h.playback.pause()
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(h.fake.transportState == "Paused")
+        // WAV is passed through here; digital volume would need a processed stream, which this harness has no maker for,
+        // so the restart is asked for directly, as a seek in a processed stream does.
+        h.playback.restartForTests(at: 10)
+        try await Task.sleep(for: .milliseconds(500))
+        #expect(h.fake.transportState == "Paused")
+        #expect(h.playback.snapshot.state == .paused)
+        #expect(!h.playback.wantsPlaying)
     }
 
     @Test("Pause, resume and seek reach the renderer; the snapshot follows its position")
@@ -188,8 +276,13 @@ struct RendererPlaybackTests {
         h.playback.play(h.queue[0])
         #expect(await h.events.wait(for: "started \(h.queue[0].url.lastPathComponent)"))
         #expect(h.playback.snapshot.signalPath?.renderer?.gapless == false)
-        h.fake.advance()
+        try await h.playToEnd()
         #expect(await h.events.wait(for: "started \(h.queue[1].url.lastPathComponent)"))
+        let uri = try #require(h.fake.currentURI)
+        #expect(await h.fake.fetched(uri) == (try Data(contentsOf: h.queue[1].url)))
+        // And when the last one ends, the queue has ended.
+        try await h.playToEnd()
+        #expect(await h.events.wait(for: "ended"))
     }
 
     @Test("A renderer that stops answering is lost; one that refuses a song fails it")

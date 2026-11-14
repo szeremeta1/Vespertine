@@ -160,17 +160,14 @@ enum SourceListParser {
 
 // MARK: - UPnP AV
 
-/// AVTransport. With SetNextAVTransportURI the renderer moves on by itself; without it, the next song is set when the
-/// current one ends, which leaves a gap.
+/// AVTransport. With SetNextAVTransportURI the renderer moves on by itself; without it, it stops at the end of each song
+/// and `RendererPlayback` loads the next one, which leaves a gap.
 public actor AVTransportControl: RendererTransport {
     nonisolated public let gapless: Bool
     private let transport: UPnPService
     private let client: SOAPClient
     private var current: RendererTrack?
     private var next: RendererTrack?
-    /// Vespertine asked it to play, and hasn't asked it to stop or pause since.
-    private var shouldPlay = false
-    private var sawPlaying = false
     private static let instance = ("InstanceID", "0")
 
     public init(description: DeviceDescription, gapless: Bool, client: SOAPClient = SOAPClient()) throws {
@@ -183,7 +180,6 @@ public actor AVTransportControl: RendererTransport {
     private func setCurrent(_ track: RendererTrack) async throws {
         _ = try await client.call(transport, "SetAVTransportURI", [Self.instance, ("CurrentURI", track.uri.absoluteString), ("CurrentURIMetaData", track.metadata)])
         current = track
-        sawPlaying = false
     }
 
     private func setNextOnRenderer(_ track: RendererTrack?) async throws {
@@ -208,16 +204,13 @@ public actor AVTransportControl: RendererTransport {
 
     public func play() async throws {
         _ = try await client.call(transport, "Play", [Self.instance, ("Speed", "1")])
-        shouldPlay = true
     }
 
     public func pause() async throws {
-        shouldPlay = false
         _ = try await client.call(transport, "Pause", [Self.instance])
     }
 
     public func stop() async throws {
-        shouldPlay = false
         _ = try await client.call(transport, "Stop", [Self.instance])
     }
 
@@ -228,7 +221,7 @@ public actor AVTransportControl: RendererTransport {
     public func status() async throws -> RendererStatus {
         let info = try await client.call(transport, "GetTransportInfo", [Self.instance])
         let position = try await client.call(transport, "GetPositionInfo", [Self.instance])
-        var state: RendererState = switch info["CurrentTransportState"] ?? "" {
+        let state: RendererState = switch info["CurrentTransportState"] ?? "" {
         case "PLAYING": .playing
         case "PAUSED_PLAYBACK", "PAUSED_RECORDING": .paused
         case "TRANSITIONING": .transitioning
@@ -236,21 +229,11 @@ public actor AVTransportControl: RendererTransport {
         default: .stopped
         }
         let uri = (position["TrackURI"]).flatMap { URL(string: $0) }
-        var currentURI = [current, next].compactMap { $0 }.first { $0.uri == uri }?.uri ?? (uri == nil ? current?.uri : nil)
+        let currentURI = [current, next].compactMap { $0 }.first { $0.uri == uri }?.uri ?? (uri == nil ? current?.uri : nil)
         if let currentURI, currentURI == next?.uri {
             // The renderer moved on to the next song by itself.
             current = next
             next = nil
-        }
-        if state == .playing { sawPlaying = true }
-        // No SetNext: once the song ends by itself, the next one is set and started (a gap is unavoidable).
-        if !gapless, shouldPlay, sawPlaying, state == .stopped || state == .noMedia, let following = next {
-            next = nil
-            try await setCurrent(following)
-            try await play()
-            state = .transitioning
-            currentURI = following.uri
-            return RendererStatus(state: state, position: 0, duration: nil, currentURI: currentURI)
         }
         return RendererStatus(state: state, position: DIDLLite.seconds(position["RelTime"]) ?? 0,
                               duration: DIDLLite.seconds(position["TrackDuration"]).flatMap { $0 > 0 ? $0 : nil }, currentURI: currentURI)

@@ -57,8 +57,15 @@ final class AirPlayOutputModel {
     }
 
     /// The playback for `device`, made once per receiver (nil: none chosen, or it isn't on the network now).
-    func playback(for device: AirPlayDevice?, settings: RendererSettings, receiverVolumeDB: Double) -> AirPlayPlayback? {
+    /// `chosenUID`: the receiver chosen as the output, found or not. A Bonjour record that expires or a browser that starts
+    /// again (the Wi-Fi roamed, a VPN came up) doesn't end the music: while the session with the receiver is open, it stays.
+    func playback(for device: AirPlayDevice?, chosenUID: String? = nil, settings: RendererSettings, receiverVolumeDB: Double) -> AirPlayPlayback? {
         guard let device else {
+            if let playback, let chosenUID, playback.device.uid == chosenUID, playback.isEngaged {
+                playback.update(settings: settings)
+                playback.setReceiverVolume(decibels: receiverVolumeDB)
+                return playback
+            }
             playback?.shutdown()
             playback = nil
             return nil
@@ -123,13 +130,17 @@ extension AppSettings {
         airPlayDigitalVolume.contains(uid) ? 0 : RAOPVolume.decibels(level: airPlayLevel(uid: uid))
     }
 
-    /// A receiver's level: what the listener set for it, else full (its own volume left at 100%, not the app's digital
-    /// volume for other outputs).
-    func airPlayLevel(uid: String) -> Double { appVolumeLevels[uid] ?? 1 }
+    /// The level a receiver starts at until the listener sets one. Low on purpose: many receivers and amplifiers take the
+    /// AirPlay volume as their master volume, and the first song must never arrive at full level.
+    static let firstAirPlayLevel = 0.3
+
+    /// A receiver's level: what the listener set for it, else `firstAirPlayLevel` (never the app's digital volume for
+    /// other outputs).
+    func airPlayLevel(uid: String) -> Double { appVolumeLevels[uid] ?? Self.firstAirPlayLevel }
 
     /// Volume Up, Down and Mute for a receiver, from its own level.
     func applyAirPlayVolume(_ action: VolumeControls.Action, uid: String) {
-        if appVolumeLevels[uid] == nil { setAppVolumeLevel(1, for: uid) }
+        if appVolumeLevels[uid] == nil { setAppVolumeLevel(Self.firstAirPlayLevel, for: uid) }
         applyVolume(action, for: uid)
     }
 

@@ -462,7 +462,9 @@ final class AppModel {
     /// The chosen output's name while it isn't connected.
     var missingChosenOutput: String? {
         if networkOutputChosen {
-            return chosenRenderer == nil && chosenAirPlay == nil ? (settings.selectedDevice?.name ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")) : nil
+            // Playing and answering, it is there, whatever the last search found.
+            let engaged = renderers?.playback?.isEngaged == true || airPlay?.playback?.isEngaged == true
+            return chosenRenderer == nil && chosenAirPlay == nil && !engaged ? (settings.selectedDevice?.name ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")) : nil
         }
         if let group = chosenGroup { return groupOutput(group) == nil ? group.name : nil }
         guard let uid = settings.selectedDeviceUID, !devices.devices.contains(where: { $0.uid == uid }) else { return nil }
@@ -491,9 +493,11 @@ final class AppModel {
     /// A network output (a UPnP player or an AirPlay receiver) is the chosen output: nothing else plays in its place.
     var networkOutputChosen: Bool { rendererChosen || airPlayChosen }
 
-    /// The AirPlay Players (beta) switch. Turning it off while a receiver is the chosen output lets go of it first.
+    /// The AirPlay Players (beta) switch. Turning it off while a receiver is the chosen output stops the music and lets go
+    /// of it: what was playing on the receiver doesn't start on this Mac's own output.
     func setAirPlayFeature(_ on: Bool) {
         if !AirPlaySwitch.keepsOutput(settings.selectedDeviceUID, turningOnTo: on) {
+            player.stopBeforeLeavingNetworkOutput()
             settings.selectedDeviceUID = nil
             settings.selectedDevice = nil
         }
@@ -501,10 +505,11 @@ final class AppModel {
         syncEngine()
     }
 
-    /// The Network Players (UPnP, beta) switch. Turning it off while a renderer is the chosen output lets go of it first (the Mac's sound
-    /// output plays).
+    /// The Network Players (UPnP, beta) switch. Turning it off while a renderer is the chosen output stops the music and lets
+    /// go of it: what was playing on the renderer doesn't start on this Mac's own output.
     func setRenderersFeature(_ on: Bool) {
         if !RendererSwitch.keepsOutput(settings.selectedDeviceUID, turningOnTo: on) {
+            player.stopBeforeLeavingNetworkOutput()
             settings.selectedDeviceUID = nil
             settings.selectedDevice = nil
         }
@@ -670,12 +675,17 @@ final class AppModel {
         devices.watchVolume(of: device)
         // A network renderer plays in place of the engine while one is chosen and on the network.
         // Chosen and not on the network: nothing plays anywhere else in its place (decision 119).
+        // One that a search doesn't find but that is playing and answering is still there (`chosenUID`).
         let renderer = chosenRenderer
-        let rendererPlayback = renderers?.playback(for: renderer, settings: renderer.map { settings.rendererSettings(uid: $0.uid) } ?? RendererSettings())
+        let rendererUID = rendererChosen ? settings.selectedDeviceUID : nil
+        let rendererPlayback = renderers?.playback(for: renderer, chosenUID: rendererUID,
+                                                   settings: rendererUID.map { settings.rendererSettings(uid: $0) } ?? RendererSettings())
         // An AirPlay receiver likewise (decision 614): chosen and gone, nothing plays anywhere else.
         let receiver = chosenAirPlay
-        let airPlayPlayback = airPlay?.playback(for: receiver, settings: receiver.map { settings.airPlaySettings(uid: $0.uid) } ?? RendererSettings(),
-                                                receiverVolumeDB: receiver.map { settings.airPlayReceiverVolumeDB(uid: $0.uid) } ?? 0)
+        let receiverUID = airPlayChosen ? settings.selectedDeviceUID : nil
+        let airPlayPlayback = airPlay?.playback(for: receiver, chosenUID: receiverUID,
+                                                settings: receiverUID.map { settings.airPlaySettings(uid: $0) } ?? RendererSettings(),
+                                                receiverVolumeDB: receiverUID.map { settings.airPlayReceiverVolumeDB(uid: $0) } ?? 0)
         let playback: (any NetworkPlayback)? = rendererPlayback ?? airPlayPlayback
         player.useRenderer(playback, missing: Self.missingNetworkOutput(chosen: networkOutputChosen, hasPlayback: playback != nil, missing: missingChosenOutput,
                                                                      name: receiver?.name ?? renderer?.name ?? settings.selectedDevice?.name))
