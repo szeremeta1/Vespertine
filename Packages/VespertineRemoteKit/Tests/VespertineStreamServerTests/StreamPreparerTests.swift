@@ -319,6 +319,96 @@ private func chunk(_ result: StreamPreparer.Read) -> StreamFrame? {
     }
 }
 
+/// A gate a test closes on one song's reads (a share that has stopped answering).
+private final class SlowDisk: @unchecked Sendable {
+    private let lock = NSCondition()
+    private var held: Set<Int64> = []
+    private var waiting = 0
+    func hold(_ song: Int64) { lock.withLock { _ = held.insert(song) } }
+    func release(_ song: Int64) { lock.withLock { held.remove(song); lock.broadcast() } }
+    var blocked: Int { lock.withLock { waiting } }
+    func before(_ song: Int64) {
+        lock.lock()
+        waiting += 1
+        while held.contains(song) { lock.wait() }
+        waiting -= 1
+        lock.unlock()
+    }
+}
+
+@Suite struct SharedMac {
+    @Test func aReadStuckOnASlowShareDoesNotHoldUpAnotherPhone() async throws {
+        let rig = try Rig.make(); defer { rig.cleanup() }
+        try rig.addFile(1, ext: "flac", bytes: 100)
+        try rig.addFile(2, ext: "flac", bytes: 100)
+        let disk = SlowDisk()
+        await rig.preparer.setReadHook { disk.before($0) }
+        let slow = try #require(opened(await rig.preparer.open(client: "a", id: 1, maxSampleRate: nil)))
+        let quick = try #require(opened(await rig.preparer.open(client: "b", id: 2, maxSampleRate: nil)))
+        disk.hold(1)
+        let preparer = rig.preparer
+        let stuck = Task { await preparer.read(client: "a", request: 1, stream: slow.stream, offset: 0, length: 10) }
+        for _ in 0..<200 where disk.blocked == 0 { try await Task.sleep(for: .milliseconds(5)) }
+        #expect(disk.blocked == 1)
+        // Phone b reads, opens and closes while a's read is still stuck.
+        #expect(chunk(await rig.preparer.read(client: "b", request: 2, stream: quick.stream, offset: 0, length: 10))?.payload.count == 10)
+        #expect(await rig.preparer.activity().count == 2)
+        disk.release(1)
+        #expect(chunk(await stuck.value)?.payload.count == 10)
+    }
+
+    @Test func theMacCanSayWhichPhonePlaysWhat() async throws {
+        let rig = try Rig.make(); defer { rig.cleanup() }
+        try rig.addFile(1, ext: "flac", bytes: 100)
+        try rig.addFile(2, ext: "ape", bytes: 100)
+        _ = try #require(opened(await rig.preparer.open(client: "a", id: 1, maxSampleRate: nil)))
+        _ = try #require(await settle { await rig.preparer.open(client: "b", id: 2, maxSampleRate: nil) })
+        let activity = await rig.preparer.activity().sorted { $0.client < $1.client }
+        #expect(activity.map(\.client) == ["a", "b"])
+        #expect(activity.map(\.song) == [1, 2])
+        #expect(activity.map(\.kind) == [.original, .flac])
+        await rig.preparer.closeAll(client: "a")
+        #expect(await rig.preparer.activity().map(\.client) == ["b"])
+    }
+
+    @Test func aPhoneWhoseLeaveWasTakenAwayLosesItsStreamsAtOnce() async throws {
+        let rig = try Rig.make(); defer { rig.cleanup() }
+        try rig.addFile(1, ext: "flac", bytes: 100)
+        let d = try #require(opened(await rig.preparer.open(client: "phone#1", id: 1, maxSampleRate: nil)))
+        _ = try #require(opened(await rig.preparer.open(client: "other#2", id: 1, maxSampleRate: nil)))
+        await rig.preparer.closeAll(clientsOf: "phone")
+        if case .chunk = await rig.preparer.read(client: "phone#1", request: 1, stream: d.stream, offset: 0, length: 10) { Issue.record("still open") }
+        #expect(await rig.preparer.activity().map(\.client) == ["other#2"])
+    }
+}
+
+@Suite struct CacheControls {
+    @Test func emptyingTheCacheKeepsWhatAPhoneIsReading() async throws {
+        let rig = try Rig.make(); defer { rig.cleanup() }
+        try rig.addFile(1, ext: "ape", bytes: 100)
+        try rig.addFile(2, ext: "ape", bytes: 100)
+        let playing = try #require(await settle { await rig.preparer.open(client: "a", id: 1, maxSampleRate: nil) })
+        let other = try #require(await settle { await rig.preparer.open(client: "a", id: 2, maxSampleRate: nil) })
+        await rig.preparer.close(client: "a", stream: other.stream)
+        #expect(await rig.preparer.cacheBytes() == Int64(FakeTranscoder.flacBytes.count * 2))
+        await rig.preparer.clearCache()
+        #expect(await rig.preparer.cacheBytes() == Int64(FakeTranscoder.flacBytes.count))
+        #expect(chunk(await rig.preparer.read(client: "a", request: 1, stream: playing.stream, offset: 0, length: 100)) != nil)
+    }
+
+    @Test func aSmallerLimitTakesEffectAtOnce() async throws {
+        let rig = try Rig.make(); defer { rig.cleanup() }
+        for id in 1...3 { try rig.addFile(Int64(id), ext: "ape", bytes: 100 + id) }
+        for id in 1...3 {
+            let d = try #require(await settle { await rig.preparer.open(client: "a", id: Int64(id), maxSampleRate: nil) })
+            await rig.preparer.close(client: "a", stream: d.stream)
+        }
+        #expect(await rig.preparer.cacheBytes() == Int64(FakeTranscoder.flacBytes.count * 3))
+        await rig.preparer.setCacheLimit(Int64(FakeTranscoder.flacBytes.count + 10))
+        #expect(await rig.preparer.cacheBytes() == Int64(FakeTranscoder.flacBytes.count))
+    }
+}
+
 /// Asks until the stream is ready (the conversion runs in the background), up to two seconds.
 private func settle(_ ask: @escaping () async -> StreamPreparer.Opened) async -> StreamDescriptor? {
     for _ in 0..<200 {
