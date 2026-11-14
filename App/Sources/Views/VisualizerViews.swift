@@ -132,7 +132,7 @@ struct StrobeToggle: View {
     var body: some View {
         let blocked = reduceMotion || dimFlashing
         Toggle(label, isOn: Binding(get: { settings.strobe && !blocked }, set: { on in
-            if on && !settings.strobeWarningAccepted { asking = true } else { settings.strobe = on }
+            if !settings.turnStrobe(on: on) { asking = true }
         }))
         .disabled(blocked)
         .help(Text("May trigger seizures in people with photosensitive epilepsy."))
@@ -149,8 +149,7 @@ extension View {
     func strobeWarning(isPresented: Binding<Bool>, settings: Binding<VisualizerSettings>) -> some View {
         alert("Photosensitivity Warning", isPresented: isPresented) {
             Button("Turn On Strobe", role: .destructive) {
-                settings.wrappedValue.strobeWarningAccepted = true
-                settings.wrappedValue.strobe = true
+                settings.wrappedValue.acceptStrobeWarning()
             }
             Button("Cancel", role: .cancel) {}
                 .keyboardShortcut(.defaultAction)

@@ -621,3 +621,122 @@ struct VisualizerModeRenderTests {
         #expect(difference(a, b) < 0.5)
     }
 }
+
+/// What the beat moves in the Club and the particles.
+@Suite("Visualizer modes: the beat") @MainActor
+struct VisualizerBeatMotionTests {
+    private func run(_ motion: inout VisualizerClubMotion, seconds: Double, fps: Double, calm: Bool = false,
+                     beatAt: Set<Int> = [], strength: Double = 1, _ each: (Int, VisualizerClubMotion) -> Void = { _, _ in }) {
+        for i in 0..<Int(seconds * fps) {
+            var input = VisualizerClubMotion.Input()
+            input.bass = 0.6; input.mid = 0.5; input.treble = 0.4; input.signal = 1
+            if beatAt.contains(i) { input.beats = 1; input.strength = strength }
+            motion.step(input, dt: 1 / fps, calm: calm)
+            each(i, motion)
+        }
+    }
+
+    @Test("A beat throws the punch up at once and it springs back to rest; a harder beat throws it further")
+    func punch() {
+        var hard = VisualizerClubMotion(), soft = VisualizerClubMotion()
+        var hardPeak = 0.0, softPeak = 0.0, peakAt = 0, lowest = 0.0
+        run(&hard, seconds: 1.5, fps: 60, beatAt: [0]) { i, m in
+            if m.punch > hardPeak { hardPeak = m.punch; peakAt = i }
+            lowest = min(lowest, m.punch)
+        }
+        run(&soft, seconds: 1.5, fps: 60, beatAt: [0], strength: 0.2) { _, m in softPeak = max(softPeak, m.punch) }
+        #expect(hardPeak > 0.8 && hardPeak < 1.3, "peak \(hardPeak)")
+        #expect(peakAt <= 5, "peaked after \(peakAt) frames")              // within a twelfth of a second
+        #expect(softPeak > 0.25 && softPeak < hardPeak * 0.65)
+        #expect(lowest > -0.35)                                             // one small bounce, not a wobble
+        #expect(hard.punch == 0)                                            // at rest again
+    }
+
+    @Test("The punch is the same at 60 and 120 frames a second")
+    func punchAtAnyRate() {
+        var a = VisualizerClubMotion(), b = VisualizerClubMotion()
+        var peakA = 0.0, peakB = 0.0
+        run(&a, seconds: 0.2, fps: 60, beatAt: [0]) { _, m in peakA = max(peakA, m.punch) }
+        run(&b, seconds: 0.2, fps: 120, beatAt: [0]) { _, m in peakB = max(peakB, m.punch) }
+        #expect(abs(peakA - peakB) < 0.06, "\(peakA) at 60, \(peakB) at 120")
+        #expect(abs(a.punch - b.punch) < 0.05)
+    }
+
+    @Test("Every beat sends out a ring, brighter the harder it was, and at most 16 are kept")
+    func rings() {
+        var m = VisualizerClubMotion()
+        run(&m, seconds: 0.1, fps: 60, beatAt: [0], strength: 1)
+        #expect(m.rings.count == 1)
+        let hard = m.rings[0].y
+        run(&m, seconds: 0.1, fps: 60, beatAt: [0], strength: 0.1)
+        #expect(m.rings.count == 2)
+        #expect(m.rings[0].y < hard)                                        // the newest first
+        #expect(m.rings[1].x > m.rings[0].x)                                // the older one is further out
+        run(&m, seconds: 1, fps: 60, beatAt: Set(0..<60))
+        #expect(m.rings.count == VisualizerClubMotion.maximumRings)
+        run(&m, seconds: 6, fps: 60)
+        #expect(m.rings.isEmpty)
+    }
+
+    @Test("With Reduce Motion there is no punch, the fans of beams stay as they are, and everything runs slower")
+    func calm() {
+        var calm = VisualizerClubMotion(), lively = VisualizerClubMotion()
+        var punched = false
+        run(&calm, seconds: 2, fps: 60, calm: true, beatAt: [0, 30, 60, 90]) { _, m in if m.punch != 0 { punched = true } }
+        run(&lively, seconds: 2, fps: 60, beatAt: [0, 30, 60, 90])
+        #expect(!punched)
+        #expect(abs(calm.fanOpening.value - 1) < 1e-6)
+        #expect(calm.ripple < lively.ripple * 0.5)
+        #expect(calm.sway < lively.sway * 0.5)
+    }
+
+    @Test("Waves: the fans of beams swing open and shut with the beats, and the ribbons rise with the music and fall away without it")
+    func wavesMove() {
+        var m = VisualizerClubMotion()
+        var least = 1.0, most = 1.0
+        run(&m, seconds: 4, fps: 60, beatAt: Set(stride(from: 0, to: 240, by: 30))) { _, m in
+            least = min(least, m.fanOpening.value); most = max(most, m.fanOpening.value)
+        }
+        #expect(least < 0.8 && most > 1.2, "the fans went from \(least) to \(most) of their rest")
+        #expect(m.ribbonSize.x > 0.25 && m.ribbonSize.y > 0.2)
+        // Silence: they settle to nothing.
+        for _ in 0..<240 { m.step(VisualizerClubMotion.Input(), dt: 1.0 / 60, calm: false) }
+        #expect(m.ribbonSize.x < 0.01 && m.ribbonSize.z < 0.01)
+    }
+
+    /// How much the picture changes from one frame to the next, on average, over a song: the mean absolute difference of
+    /// the pixels (0…255).
+    private func movement(_ configure: (inout VisualizerSettings) -> Void, song: BeatFixtures.Song) throws -> (onBeats: Double, between: Double) {
+        let renderer = try #require(VisualizerRenderer())
+        var s = VisualizerSettings()
+        configure(&s)
+        s.showsTrackInfo = false
+        renderer.settings = s
+        var last: [UInt8]?
+        var onBeats: [Double] = [], between: [Double] = []
+        var sinceBeat = 100
+        for (time, frame) in BeatFixtures.analyze(song) {
+            guard let bytes = renderer.renderOffscreen(frame: frame, scene: VisualizerScene(isPlaying: true), size: CGSize(width: 160, height: 90), scale: 1, dt: 1.0 / 60) else { continue }
+            sinceBeat = frame.beat ? 0 : sinceBeat + 1
+            if let last, time > 2 {
+                var sum = 0
+                for i in 0..<bytes.count { sum += abs(Int(bytes[i]) - Int(last[i])) }
+                let change = Double(sum) / Double(bytes.count)
+                if sinceBeat <= 3 { onBeats.append(change) } else if sinceBeat >= 14 { between.append(change) }
+            }
+            last = bytes
+        }
+        return (onBeats.reduce(0, +) / Double(max(onBeats.count, 1)), between.reduce(0, +) / Double(max(between.count, 1)))
+    }
+
+    @Test("On screen, the picture moves most on the beat: Club (both modes) and Particles",
+          arguments: [(VisualizerStyle.club, VisualizerClubMode.classic), (.club, .waves), (.particles, .classic)])
+    func movesOnTheBeat(style: VisualizerStyle, mode: VisualizerClubMode) throws {
+        guard MTLCreateSystemDefaultDevice() != nil else { return }
+        // A slow, plain beat: a kick a second and nothing between but the bass and the pad.
+        let song = BeatFixtures.dance(bpm: 60, seconds: 10, snare: false, hats: false)
+        let moved = try movement({ $0.style = style; $0.clubMode = mode }, song: song)
+        #expect(moved.onBeats > 1.6 * moved.between, "\(style) \(mode): \(moved.onBeats) on the beats, \(moved.between) between them")
+        #expect(moved.onBeats > 1.0, "\(style) \(mode): hardly moves on a beat (\(moved.onBeats))")
+    }
+}

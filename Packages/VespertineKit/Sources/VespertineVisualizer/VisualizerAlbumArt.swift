@@ -8,12 +8,31 @@ import CoreGraphics
 import Foundation
 import simd
 
-/// Up to five distinct colours taken from a cover, dark to bright. Extraction is deterministic (a variance-driven
-/// split of the cover's colours into boxes, then a few rounds of k-means, in OKLab), so the same cover always gives
-/// the same palette, and it's meant to run off the main thread (`extract` is a plain function of the image).
+/// Up to five distinct colours taken from a cover, dark to bright: the colours a person would name looking at it,
+/// not the average of its pixels. Extraction is deterministic (a variance-driven split of the cover's colours into
+/// boxes, then a few rounds of k-means, in OKLab), so the same cover always gives the same palette, and it's meant to
+/// run off the main thread (`extract` is a plain function of the image).
+///
+/// What decides it:
+/// - A pixel is a colour when it's far enough from grey for how dark it is (a near-black with a warm cast is black,
+///   not brown). Pixels count for more the more vivid they are, so a red chair in a brown room is found as red.
+/// - Of the clusters, the ones kept are the largest and most vivid first, each clearly different from the ones
+///   already kept, and no more than two dull ones, so wood, skin and shadow don't fill every place.
+/// - A dark colour is made readable by raising its lightness and keeping its hue and its saturation, not by mixing
+///   it with white.
+/// - A cover with no colour to speak of (black and white, sepia) gives its own greys, with whatever tint it has.
+///   Only a cover that is all but black, or no cover, gives no palette.
 public struct AlbumArtPalette: Sendable, Equatable {
     /// The cover's colours, dark to bright, each bright enough to read against the visualizer's dark background.
     public let colors: [SIMD3<Float>]
+    /// How much of the gradient each colour gets (they sum to 1): a cover that is mostly yellow draws mostly in
+    /// yellow, with its other colours as narrower bands.
+    public let weights: [Float]
+    /// The index (in `colors`) of the cover's main colour, and of its second (the main one again if it has one).
+    public let primary: Int
+    public let secondary: Int
+    /// The cover has no colour to speak of: these are its greys.
+    public let isNeutral: Bool
 
     public static let maxColors = 5
     /// The ramp the shaders run along, dark to bright.
@@ -22,73 +41,162 @@ public struct AlbumArtPalette: Sendable, Equatable {
     /// on the background may have: about that of the built-in themes' dimmest drawn colour (Ice's blue, 0.30).
     public static let minimumLuminance: Float = 0.30
 
-    /// The picture is looked at this small: 48 × 48 pixels is plenty for a cover's colours.
-    static let sample = 48
-    /// A pixel counts as colour when it's neither grey (chroma, max - min of sRGB, under this) nor black.
-    static let minimumChroma: Float = 0.08
-    static let minimumValue: Float = 0.18
-    /// Under this share of the picture in colour, the cover is grayscale, blank or too dark and has no palette.
-    static let minimumColourShare = 0.04
-    /// Colours closer than this in OKLab are one colour; clusters under this share of the colour are dropped.
-    static let distinctDistance: Float = 0.09
-    static let minimumClusterShare: Float = 0.025
+    /// The picture is looked at this small: 64 × 64 pixels is plenty for a cover's colours, and small type survives.
+    static let sample = 64
+    /// OKLab chroma (distance from grey; a pure red is about 0.26) a pixel needs to be a colour: this much at mid
+    /// lightness and above, more the darker it is, and nothing under `minimumLightness` is.
+    static let minimumChroma: Float = 0.035
+    static let darkChroma: Float = 0.09
+    static let minimumLightness: Float = 0.13
+    /// Under this share of the picture in colour, the cover is black and white (or sepia, or blank).
+    static let minimumColourShare = 0.03
+    /// Colours closer than this in OKLab are one colour; clusters under this share of the coloured pixels are dropped.
+    static let distinctDistance: Float = 0.10
+    static let minimumClusterShare: Float = 0.012
+    /// A cluster under this chroma is a dull one (browns, beiges, greyed blues): at most two are kept.
+    static let dullChroma: Float = 0.075
+    /// The lightness (OKLab) dark colours are raised to.
+    static let liftedLightness: Float = 0.60
+    /// No colour gets less of the gradient than this.
+    static let minimumWeight: Float = 0.12
 
-    init(colors: [SIMD3<Float>]) { self.colors = colors }
+    init(colors: [SIMD3<Float>], weights: [Float]? = nil, primary: Int? = nil, secondary: Int? = nil, isNeutral: Bool = false) {
+        self.colors = colors
+        let given = weights.map { $0.count == colors.count ? $0 : nil } ?? nil
+        let even = [Float](repeating: 1 / Float(max(colors.count, 1)), count: colors.count)
+        self.weights = Self.normalized(given ?? even)
+        self.primary = min(max(primary ?? colors.count - 1, 0), max(colors.count - 1, 0))
+        self.secondary = min(max(secondary ?? self.primary, 0), max(colors.count - 1, 0))
+        self.isNeutral = isNeutral
+    }
 
-    /// The palette of a cover, or nil when it has none to speak of (no cover, grayscale, blank, or too dark): the
-    /// theme then draws in the default colours.
+    /// Weights that sum to 1, none under `minimumWeight` (when there's room for that).
+    private static func normalized(_ w: [Float]) -> [Float] {
+        guard !w.isEmpty else { return [] }
+        let total = max(w.reduce(0, +), 1e-9)
+        var out = w.map { max($0 / total, 0) }
+        let floor = min(minimumWeight, 1 / Float(w.count))
+        out = out.map { max($0, floor) }
+        let sum = out.reduce(0, +)
+        return out.map { $0 / sum }
+    }
+
+    /// The palette of a cover, or nil when it has none (no cover, or all but black): the theme then draws in the
+    /// default colours.
     public static func extract(from image: CGImage?) -> AlbumArtPalette? {
         guard let image, let pixels = samplePixels(image) else { return nil }
         var points: [Point] = []
-        var counted = 0
+        var labs: [SIMD3<Float>] = []
+        labs.reserveCapacity(pixels.count)
         for p in pixels {
-            counted += 1
-            let mx = max(p.x, p.y, p.z), mn = min(p.x, p.y, p.z)
-            guard mx - mn >= minimumChroma, mx >= minimumValue else { continue }
-            points.append(Point(lab: oklab(fromSRGB: p), weight: 1))
+            let lab = oklab(fromSRGB: p)
+            labs.append(lab)
+            let c = (lab.y * lab.y + lab.z * lab.z).squareRoot()
+            guard isColour(lightness: lab.x, chroma: c) else { continue }
+            // Vivid pixels count for more (up to about six times a barely coloured one).
+            let vivid = min(max(c / 0.06, 0.5), 3.2)
+            points.append(Point(lab: lab, weight: vivid * vivid.squareRoot(), chroma: c))
         }
-        guard counted > 0, points.count >= 8, Double(points.count) / Double(counted) >= minimumColourShare else { return nil }
+        guard points.count >= 8, Double(points.count) / Double(pixels.count) >= minimumColourShare else { return greys(labs) }
 
-        var centres = split(points, into: maxColors + 3)
+        var centres = split(points, into: maxColors + 5)
         for _ in 0..<6 { centres = refine(centres, points) }
-        let weights = weights(of: centres, points)
-        let total = max(weights.reduce(0, +), 1)
+        let (weight, count) = weights(of: centres, points)
+        let totalWeight = max(weight.reduce(0, +), 1), totalCount = max(count.reduce(0, +), 1)
 
-        // The heaviest first; a colour too close to one already taken, or too rare to matter, is left out.
-        var kept: [SIMD3<Float>] = []
-        for i in centres.indices.sorted(by: { weights[$0] != weights[$1] ? weights[$0] > weights[$1] : $0 < $1 }) {
-            guard weights[i] / total >= minimumClusterShare || kept.isEmpty else { continue }
-            guard kept.allSatisfy({ simd_distance($0, centres[i]) >= distinctDistance }) else { continue }
-            kept.append(centres[i])
+        // The largest and most vivid first; a colour too close to one already taken, or too rare to matter, is left
+        // out, and so is a third dull one.
+        func chroma(_ c: SIMD3<Float>) -> Float { (c.y * c.y + c.z * c.z).squareRoot() }
+        func score(_ i: Int) -> Float { (weight[i] / totalWeight).squareRoot() * (0.25 + chroma(centres[i]) / 0.12) }
+        let order = centres.indices.sorted { score($0) != score($1) ? score($0) > score($1) : $0 < $1 }
+        var kept: [Int] = []
+        var dull = 0
+        for i in order {
+            guard count[i] / totalCount >= minimumClusterShare || kept.isEmpty else { continue }
+            guard kept.allSatisfy({ simd_distance(centres[$0], centres[i]) >= distinctDistance }) else { continue }
+            let isDull = chroma(centres[i]) < dullChroma
+            if isDull && dull >= 2 && !kept.isEmpty { continue }
+            if isDull { dull += 1 }
+            kept.append(i)
             if kept.count == maxColors { break }
         }
-        guard !kept.isEmpty else { return nil }
+        guard !kept.isEmpty else { return greys(labs) }
+        // Every coloured pixel belongs to the kept colour nearest it: that's how much of the gradient each gets.
+        let keptCentres = kept.map { centres[$0] }
+        var share = [Float](repeating: 0, count: kept.count)
+        for p in points { share[nearest(p.lab, keptCentres)] += 1 + 0.5 * p.weight }
         // Dark to bright by the cover's own brightness: lifting two dark colours to the floor would leave them tied.
-        let colours = kept.map { srgb(fromOKLab: $0) }.sorted { luminance($0) < luminance($1) }
-        return AlbumArtPalette(colors: colours.map(readable))
+        let sorted = kept.indices.sorted {
+            let a = luminance(srgb(fromOKLab: keptCentres[$0])), b = luminance(srgb(fromOKLab: keptCentres[$1]))
+            return a != b ? a < b : $0 < $1
+        }
+        return AlbumArtPalette(colors: sorted.map { displayed(keptCentres[$0]) }, weights: sorted.map { share[$0] },
+                               primary: sorted.firstIndex(of: 0), secondary: sorted.firstIndex(of: kept.count > 1 ? 1 : 0))
     }
 
-    /// Six colours from dark to bright for the shaders' gradient: a dark tint of the palette's darkest colour (the
-    /// background end), then the palette's colours run through evenly. A single colour runs up to a paler tint of
-    /// itself.
+    /// Whether a pixel of this lightness and chroma (OKLab) is a colour rather than a grey, a black or a white.
+    static func isColour(lightness: Float, chroma: Float) -> Bool {
+        guard lightness >= minimumLightness else { return false }
+        // The darker, the more chroma it takes: from `darkChroma` at the darkest to `minimumChroma` from 0.4 up.
+        let t = min(max((lightness - minimumLightness) / (0.4 - minimumLightness), 0), 1)
+        return chroma >= darkChroma + (minimumChroma - darkChroma) * t
+    }
+
+    /// The palette of a cover without colour: three greys from its own lights and darks, with its own tint (a sepia
+    /// print stays warm). Nil when it's all but black.
+    private static func greys(_ labs: [SIMD3<Float>]) -> AlbumArtPalette? {
+        guard !labs.isEmpty else { return nil }
+        let lightness = labs.map(\.x).sorted()
+        func at(_ q: Float) -> Float { lightness[min(lightness.count - 1, Int(q * Float(lightness.count - 1)))] }
+        guard at(0.9) >= 0.3 else { return nil }
+        var tint = SIMD2<Float>(0, 0)
+        for lab in labs { tint += SIMD2(lab.y, lab.z) }
+        tint /= Float(labs.count)
+        let length = simd_length(tint)
+        if length > 0.03 { tint *= 0.03 / length }
+        // Its mid grey, its light grey and its white, kept apart and readable.
+        let mid = min(max(at(0.5), 0.60), 0.72), light = min(max(at(0.8), mid + 0.12), 0.86), white = min(max(at(0.97), light + 0.08), 0.96)
+        let colours = [mid, light, white].map { srgb(fromOKLab: SIMD3($0, tint.x, tint.y)) }
+        return AlbumArtPalette(colors: colours, weights: [0.3, 0.4, 0.3], primary: 1, secondary: 0, isNeutral: true)
+    }
+
+    /// Six colours from dark to bright for the shaders' gradient: a dark tint of the cover's main colour (the
+    /// background end), then the palette's colours, each over as much of the rest as its share of the cover. A
+    /// single colour runs up to a paler tint of itself.
     public var ramp: [SIMD3<Float>] {
-        var line = colors
-        if line.count == 1 { line.append(Self.mix(line[0], .one, 0.6)) }
-        let dark = colors[0] * (0.05 / max(Self.luminance(colors[0]), 0.05))
+        var line = colors, share = weights
+        if line.count == 1 {
+            line.append(Self.mix(line[0], .one, 0.55))
+            share = [0.6, 0.4]
+        }
+        let main = colors[primary]
+        let dark = main * (0.05 / max(Self.luminance(main), 0.05))
+        // Each colour sits at the middle of its share of the line; between two, they blend.
+        var centre: [Float] = []
+        var run: Float = 0
+        for w in share { centre.append(run + w / 2); run += w }
         var out = [dark]
         let slots = Self.rampSize - 1
         for i in 0..<slots {
-            let t = Float(i) / Float(slots - 1) * Float(line.count - 1)
-            let j = min(Int(t), line.count - 2)
-            out.append(Self.mix(line[j], line[j + 1], t - Float(j)))
+            let x = Float(i) / Float(slots - 1)
+            var j = 0
+            while j < centre.count - 2 && x > centre[j + 1] { j += 1 }
+            let span = max(centre[j + 1] - centre[j], 1e-6)
+            // Hold each colour over the middle of its band and blend only near the joins.
+            let t = min(max((x - centre[j]) / span, 0), 1)
+            out.append(Self.mix(line[j], line[j + 1], t * t * (3 - 2 * t)))
         }
         return out
     }
 
-    /// The four colours the shaders use by role (dark surface, mid, accent, highlight), as the built-in themes have.
+    /// The four colours the shaders use by role (dark surface, mid, accent, highlight), as the built-in themes have:
+    /// a dark tint of the main colour, the second colour, the main colour, and the brightest made paler.
     public var stops: [SIMD3<Float>] {
-        let r = ramp
-        return [r[0], r[2], r[4], Self.mix(r[5], .one, 0.3)]
+        let main = colors[primary]
+        let surface = main * (0.05 / max(Self.luminance(main), 0.05))
+        let mid = secondary != primary ? colors[secondary] : Self.mix(main, surface, 0.35)
+        let brightest = colors[colors.count - 1]
+        return [surface, mid, main, Self.mix(brightest, .one, colors.count == 1 ? 0.55 : 0.35)]
     }
 
     // MARK: Colour
@@ -97,14 +205,27 @@ public struct AlbumArtPalette: Sendable, Equatable {
 
     static func mix(_ a: SIMD3<Float>, _ b: SIMD3<Float>, _ t: Float) -> SIMD3<Float> { a + (b - a) * t }
 
-    /// The colour lightened toward white until it can be read on the dark background.
-    static func readable(_ c: SIMD3<Float>) -> SIMD3<Float> {
-        let c = simd_clamp(c, .zero, .one)
-        let l = luminance(c)
-        guard l < minimumLuminance else { return c }
-        // Solve luminance(mix(c, white, t)) = minimum; luminance(white) = 1.
-        let t = (minimumLuminance - l) / (1 - l)
-        return mix(c, .one, min(max(t, 0), 1))
+    /// A cluster's colour as it's drawn: at least `liftedLightness` light, with its hue, and as much of its chroma
+    /// as sRGB has at that lightness; lighter still if that isn't yet bright enough to read on the background.
+    static func displayed(_ lab: SIMD3<Float>) -> SIMD3<Float> {
+        var lightness = max(lab.x, liftedLightness)
+        var out = fitted(SIMD3(lightness, lab.y, lab.z))
+        while luminance(out) < minimumLuminance && lightness < 0.96 {
+            lightness += 0.02
+            out = fitted(SIMD3(lightness, lab.y, lab.z))
+        }
+        return out
+    }
+
+    /// The sRGB colour for an OKLab one, its chroma brought in (hue and lightness kept) until it fits sRGB.
+    static func fitted(_ lab: SIMD3<Float>) -> SIMD3<Float> {
+        if let c = srgbIfInGamut(lab) { return c }
+        var low: Float = 0, high: Float = 1
+        for _ in 0..<12 {
+            let mid = (low + high) / 2
+            if srgbIfInGamut(SIMD3(lab.x, lab.y * mid, lab.z * mid)) != nil { low = mid } else { high = mid }
+        }
+        return srgb(fromOKLab: SIMD3(lab.x, lab.y * low, lab.z * low))
     }
 
     private static func linear(_ v: Float) -> Float { v <= 0.04045 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4) }
@@ -120,19 +241,30 @@ public struct AlbumArtPalette: Sendable, Equatable {
                      0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s)
     }
 
-    static func srgb(fromOKLab c: SIMD3<Float>) -> SIMD3<Float> {
+    private static func linearRGB(fromOKLab c: SIMD3<Float>) -> SIMD3<Float> {
         let l = pow(c.x + 0.3963377774 * c.y + 0.2158037573 * c.z, 3)
         let m = pow(c.x - 0.1055613458 * c.y - 0.0638541728 * c.z, 3)
         let s = pow(c.x - 0.0894841775 * c.y - 1.2914855480 * c.z, 3)
-        let r = 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s
-        let g = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s
-        let b = -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s
-        return simd_clamp(SIMD3(encoded(max(r, 0)), encoded(max(g, 0)), encoded(max(b, 0))), .zero, .one)
+        return SIMD3(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+                     -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+                     -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s)
+    }
+
+    static func srgb(fromOKLab c: SIMD3<Float>) -> SIMD3<Float> {
+        let rgb = linearRGB(fromOKLab: c)
+        return simd_clamp(SIMD3(encoded(max(rgb.x, 0)), encoded(max(rgb.y, 0)), encoded(max(rgb.z, 0))), .zero, .one)
+    }
+
+    /// The sRGB colour, or nil when the OKLab one is outside sRGB (by more than rounding).
+    private static func srgbIfInGamut(_ c: SIMD3<Float>) -> SIMD3<Float>? {
+        let rgb = linearRGB(fromOKLab: c)
+        guard rgb.min() >= -0.002, rgb.max() <= 1.002 else { return nil }
+        return simd_clamp(SIMD3(encoded(max(rgb.x, 0)), encoded(max(rgb.y, 0)), encoded(max(rgb.z, 0))), .zero, .one)
     }
 
     // MARK: Pixels
 
-    /// The picture as 48 × 48 sRGB pixels (0…1), transparent ones left out.
+    /// The picture as 64 × 64 sRGB pixels (0…1), transparent ones left out.
     private static func samplePixels(_ image: CGImage) -> [SIMD3<Float>]? {
         let n = sample
         var data = [UInt8](repeating: 0, count: n * n * 4)
@@ -161,6 +293,7 @@ public struct AlbumArtPalette: Sendable, Equatable {
     private struct Point {
         var lab: SIMD3<Float>
         var weight: Float
+        var chroma: Float
     }
 
     /// Splits the points into up to `count` boxes: always the box with the most spread (summed squared distance from
@@ -177,8 +310,9 @@ public struct AlbumArtPalette: Sendable, Equatable {
             let m = mean(box)
             return box.reduce(0) { $0 + $1.weight * simd_length_squared($1.lab - m) }
         }
+        let total = points.reduce(Float(0)) { $0 + $1.weight }
         while boxes.count < count {
-            var best = -1, bestSpread: Float = 0.0005 * Float(points.count)   // a box this tight is one colour
+            var best = -1, bestSpread: Float = 0.0005 * total   // a box this tight is one colour
             for (i, box) in boxes.enumerated() where box.count > 1 {
                 let s = spread(box)
                 if s > bestSpread { best = i; bestSpread = s }
@@ -207,10 +341,15 @@ public struct AlbumArtPalette: Sendable, Equatable {
         return centres.indices.map { weights[$0] > 0 ? sums[$0] / weights[$0] : centres[$0] }
     }
 
-    private static func weights(of centres: [SIMD3<Float>], _ points: [Point]) -> [Float] {
-        var w = [Float](repeating: 0, count: centres.count)
-        for p in points { w[nearest(p.lab, centres)] += p.weight }
-        return w
+    /// Each centre's points: their summed weight, and how many they are.
+    private static func weights(of centres: [SIMD3<Float>], _ points: [Point]) -> (weight: [Float], count: [Float]) {
+        var w = [Float](repeating: 0, count: centres.count), n = w
+        for p in points {
+            let i = nearest(p.lab, centres)
+            w[i] += p.weight
+            n[i] += 1
+        }
+        return (w, n)
     }
 
     private static func nearest(_ lab: SIMD3<Float>, _ centres: [SIMD3<Float>]) -> Int {

@@ -13,7 +13,8 @@
 // --layout circle|line (mirrored), --no-trails (particles), --strobe (club; as if its warning had been accepted),
 // --spectrum classic|noPeaks|smooth (bars), --club classic|waves, --cover label|sleeveFront|sleeveBehind (vinyl),
 // --calm (as with Reduce Motion), --cycle-cover <s> (vinyl: the cover moves on every <s> seconds, as a click does),
-// --frames <dir> (with --start/--seconds: every frame as a PNG there). --no-peaks takes the peak caps off Spectrum and Mirrored alike.
+// --frames <dir> (with --start/--seconds: every frame as a PNG there), --beats <file> (a CSV of every frame's beat,
+// pulse and lows, mids and highs). --no-peaks takes the peak caps off Spectrum and Mirrored alike.
 //
 // Prints the analysis and GPU time per frame to stderr.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -43,6 +44,7 @@ struct Options {
     var calm = false
     var cycleCover: Double?
     var frames: String?
+    var beats: String?
 }
 
 func parse() -> Options {
@@ -67,6 +69,7 @@ func parse() -> Options {
         case "--calm": o.calm = true
         case "--cycle-cover": o.cycleCover = Double(next())
         case "--frames": o.frames = next()
+        case "--beats": o.beats = next()
         case "--no-tonearm": o.settings.tonearm = false
         case "--strobe": o.settings.strobe = true; o.settings.strobeWarningAccepted = true
         case "--scope": o.settings.scopeMode = VisualizerScopeMode(rawValue: next()) ?? .goniometer
@@ -135,12 +138,7 @@ func run() -> Int32 {
         renderer.setArtwork(image)
         renderer.setAlbumPalette(AlbumArtPalette.extract(from: image), animated: false)
     }
-    var configuration = VisualizerAnalyzer.Configuration()
-    configuration.bandCount = o.settings.bandCount
-    configuration.sensitivity = Float(o.settings.sensitivity)
-    configuration.linear = !o.settings.decibelScale
-    configuration.meterReferenceDB = o.settings.meterReference.map(Float.init)
-    configuration.meterExtras = o.settings.meterExtras
+    let configuration = VisualizerAnalyzer.Configuration(o.settings)
     let analyzer = VisualizerAnalyzer(configuration: configuration)
     let n = VisualizerAnalyzer.fftSize(for: o.rate)
     let dt = 1 / o.fps
@@ -156,6 +154,8 @@ func run() -> Int32 {
     var last: [UInt8]?
     var nextCycle = o.cycleCover.map { (o.still ?? o.start) + $0 }
     var written = 0
+    var lastEnd: Int?
+    var beatLog = "time,beat,pulse,strength,bass,mid,treble,tempo\n"
     renderer.resetStats()
     while t <= until + dt / 2 {
         let end = Int(t * o.rate)
@@ -166,10 +166,15 @@ func run() -> Int32 {
             right.withUnsafeBufferPointer { r in
                 analyzer.process(left: UnsafeBufferPointer(rebasing: l[lo..<max(lo, min(end, frames))]),
                                  right: UnsafeBufferPointer(rebasing: r[lo..<max(lo, min(end, frames))]),
-                                 sampleRate: o.rate, fresh: fresh, dt: dt)
+                                 sampleRate: o.rate, fresh: fresh, dt: dt, advanced: lastEnd.map { end - $0 })
             }
         }
+        lastEnd = end
         analysisTime += Date().timeIntervalSince(clock)
+        if o.beats != nil, t >= (o.still ?? o.start) - dt / 2 {
+            beatLog += String(format: "%.4f,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%.1f\n", t, frame.beat ? 1 : 0, frame.beatPulse, frame.beatStrength,
+                              frame.bass, frame.mid, frame.treble, frame.tempo ?? 0)
+        }
         let scene = VisualizerScene(title: o.title, artist: o.artist, progress: min(1, max(0, t / total)), isPlaying: !o.paused)
         if let every = o.cycleCover, let at = nextCycle, t >= at - dt / 2 {
             renderer.settings.vinylCover = renderer.settings.vinylCover.next
@@ -189,6 +194,7 @@ func run() -> Int32 {
         t += dt
     }
     if let png = o.png, let last { writePNG(last, size: o.size, to: png) }
+    if let beats = o.beats { try? beatLog.write(toFile: beats, atomically: true, encoding: .utf8) }
     let stats = renderer.gpuStats
     FileHandle.standardError.write(String(format: "frames %d, analysis %.1f µs/frame, GPU %.3f ms/frame, CPU (motion + encode) %.1f µs/frame at %dx%d\n",
                                           rendered, analysisTime / Double(max(rendered, 1)) * 1e6, stats.averageMilliseconds,

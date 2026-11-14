@@ -198,3 +198,118 @@ struct VisualizerCoverMotion {
         if !calm && sleeve && pose.front != wantFront && !overlapsRecord { pose.front = wantFront }
     }
 }
+
+/// What the Club style and the particles do with the beat, worked out on the CPU each frame and handed to the
+/// shaders: a punch that jumps on every beat and springs back, the rings each beat sends out, the lasers' turning,
+/// the tunnel's rush, and (for Waves) the ribbons' sizes and travel and how far the fans of beams are open.
+/// Everything is stepped with the frame's own time, so it moves the same at 60 and 120 frames a second.
+struct VisualizerClubMotion {
+    /// 0 at rest. A beat throws it up (to about its strength, within a twentieth of a second) and it springs back
+    /// with one small bounce: the core, the room's zoom and the particles' burst ride it. Always 0 with Reduce Motion.
+    private(set) var punch: Double = 0
+    private var punchVelocity: Double = 0
+    /// The lasers' angle (radians, wrapped).
+    private(set) var laserAngle: Double = 0
+    /// The tunnel's rings: how far they've run, in rings (wrapped to 0…1).
+    private(set) var tunnel: Double = 0
+    /// Which colours the lasers and rings take, 0…1 round the theme's brighter half: it steps on every beat.
+    private(set) var colourTurn: Double = 0
+    /// Beats so far (which way the lasers turn, how open the fans are).
+    private(set) var beats = 0
+    /// The rings: radius, strength, width, colour (as `VisualizerUniforms.rings`).
+    private(set) var rings: [SIMD4<Float>] = []
+    /// Waves: how far the fans of beams are open against their rest (1), swinging open and shut with the beats.
+    private(set) var fanOpening = CriticalSpring(1)
+    /// Waves: the three ribbons (lows, mids, highs): how large each is, 0…1, and how far each has travelled (radians).
+    private(set) var ribbonSize = SIMD3<Double>(0, 0, 0)
+    private(set) var ribbonPhase = SIMD3<Double>(0, 0, 0)
+    /// Waves: the beams' ripples and their sway (seconds of each one's own clock).
+    private(set) var ripple: Double = 0
+    private(set) var sway: Double = 0
+
+    static let punchFrequency = 26.0   // rad/s
+    static let punchDamping = 0.42
+    static let maximumRings = 16
+
+    struct Input {
+        var bass: Double = 0, mid: Double = 0, treble: Double = 0
+        /// Sudden sounds in the lows, mids and highs (`VisualizerFrame.transients`).
+        var transients = SIMD3<Double>(0, 0, 0)
+        /// Beats that began since the last step, and how hard the newest was (0…1).
+        var beats = 0
+        var strength: Double = 0
+        /// Whether anything is playing, 0…1 (eased).
+        var signal: Double = 0
+    }
+
+    mutating func step(_ input: Input, dt: Double, calm: Bool) {
+        let dt = min(max(dt, 0), 0.25)
+        let beat = input.beats > 0
+        let strength = min(max(input.strength, 0), 1)
+
+        // The punch: a damped spring, kicked by the beat. Stepped in slices of at most 4 ms, so a slow frame doesn't
+        // change how it rings.
+        if calm {
+            punch = 0; punchVelocity = 0
+        } else {
+            if beat { punchVelocity += Self.punchFrequency * 1.55 * (0.35 + 0.65 * strength) }
+            var left = dt
+            while left > 1e-9 {
+                let h = min(left, 0.004)
+                let w = Self.punchFrequency
+                punchVelocity += (-w * w * punch - 2 * Self.punchDamping * w * punchVelocity) * h
+                punch += punchVelocity * h
+                left -= h
+            }
+            punch = min(max(punch, -0.5), 1.5)
+            if abs(punch) < 1e-4 && abs(punchVelocity) < 1e-3 { punch = 0; punchVelocity = 0 }
+        }
+
+        // Rings: out from the middle on every beat, faster and brighter the harder it was.
+        for i in rings.indices {
+            rings[i].x += Float(dt) * (0.75 + 0.6 * rings[i].y)
+            rings[i].y *= Float(exp(-dt / 0.8))
+        }
+        rings.removeAll { $0.y < 0.01 || $0.x > 2.6 }
+        if beat {
+            beats += 1
+            colourTurn = (colourTurn + 0.17).truncatingRemainder(dividingBy: 1)
+            rings.insert(SIMD4(Float(0.12 + 0.06 * input.bass), Float(0.3 + 0.7 * strength), Float(0.012 + 0.02 * strength),
+                               Float(0.5 + 0.5 * colourTurn)), at: 0)
+            if rings.count > Self.maximumRings { rings.removeLast() }
+        }
+
+        // Lasers: turning with the mids, thrown on by each beat, the other way every eight beats.
+        let direction: Double = (beats / 8) % 2 == 0 ? 1 : -1
+        let spin = calm ? 0.08 : 0.16 + 0.7 * input.mid
+        laserAngle = (laserAngle + direction * (dt * spin + (beat && !calm ? 0.10 + 0.22 * strength : 0)))
+            .truncatingRemainder(dividingBy: 2 * .pi)
+
+        // The tunnel: rings a second, more with the mids, and a surge after each beat (the punch).
+        tunnel = (tunnel + dt * (calm ? 0.12 : 0.22 + 0.5 * input.mid * input.signal + 0.9 * max(0, punch)))
+            .truncatingRemainder(dividingBy: 1)
+
+        // Waves. The fans of beams swing open on one beat and shut on the next; the ripples run faster with the mids
+        // and surge with the punch; the sway drifts on its own clock.
+        let slow = calm ? 0.35 : 1.0
+        fanOpening.step(toward: calm ? 1 : (beats % 2 == 0 ? 0.72 : 1.3), omega: 9, dt: dt)
+        ripple += dt * (1.2 + 2.6 * input.mid * input.signal + 5 * max(0, punch)) * slow
+        sway += dt * (0.35 + 0.5 * input.mid * input.signal) * slow
+        // Each ribbon is as large as its part of the music is loud, and jumps with that part's hits; it travels
+        // faster the louder that part is. The lows' ribbon is pushed on by each beat.
+        let levels = SIMD3(input.bass, input.mid, input.treble) * input.signal
+        let speeds = SIMD3(1.1, 2.3, 4.2)
+        for b in 0..<3 {
+            let target = min(1, max(0.55 * levels[b] + 0.25 * max(0, punch), calm ? 0 : input.transients[b] * input.signal))
+            let rate = target > ribbonSize[b] ? 0.03 : 0.22
+            ribbonSize[b] += (target - ribbonSize[b]) * (1 - exp(-dt / rate))
+            ribbonPhase[b] += dt * speeds[b] * (0.5 + 1.6 * levels[b]) * slow
+        }
+        if beat && !calm { ribbonPhase.x += 0.5 * strength }
+    }
+
+    /// The shader's periods for the clocks it takes wrapped: every use of each repeats within it.
+    static let ripplePeriod = 4 * Double.pi
+    static let swayPeriod = 2 * Double.pi * 30 / 0.35
+    static let ribbonPeriod = 2 * Double.pi * 10
+}

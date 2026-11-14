@@ -125,6 +125,8 @@ public final class VisualizerFeed: @unchecked Sendable {
         let read = source(&left, &right)
         var fresh = false
         var dropped = false
+        // How many frames are new, from the tap's own count of them (the beat detector hears each once).
+        var advanced: Int?
         if let read {
             if read.sampleRate > 0, VisualizerAnalyzer.fftSize(for: read.sampleRate) != n {
                 lastRate = read.sampleRate   // the next frame copies the right length
@@ -132,6 +134,9 @@ public final class VisualizerFeed: @unchecked Sendable {
                 dropped = true
             } else {
                 fresh = read.position != lastPosition
+                if lastPosition != .max, read.position > lastPosition {
+                    advanced = Int(min(read.position - lastPosition, UInt64(Int32.max)))
+                }
                 lastPosition = read.position
                 if read.sampleRate > 0 { lastRate = read.sampleRate }
             }
@@ -141,7 +146,7 @@ public final class VisualizerFeed: @unchecked Sendable {
             return
         }
         let start = DispatchTime.now().uptimeNanoseconds
-        let frame = analyzer.process(left: left, right: right, sampleRate: lastRate, fresh: fresh, dt: dt)
+        let frame = analyzer.process(left: left, right: right, sampleRate: lastRate, fresh: fresh, dt: dt, advanced: advanced)
         let took = Double(DispatchTime.now().uptimeNanoseconds - start) / 1e9
         state.withLock {
             $0.frame = frame

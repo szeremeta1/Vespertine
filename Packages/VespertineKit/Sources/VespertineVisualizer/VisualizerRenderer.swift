@@ -162,17 +162,17 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     private var recordAngle: Double = 0
     private var platterSpeed: Double = 0
     private var armAngle: Double?
-    private var laserAngle: Double = 0
     private var strobe: Float = 0
     /// Seconds since the last flash.
     private var sinceFlash: Double = 1
+    /// The analysis's count of beats as of the last frame drawn (nil before the first).
+    private var beatsSeen: UInt32?
     private var signal: Float = 0
-    private var rings: [SIMD4<Float>] = []
-    private var ringColour: Float = 0.55
-    // Club's Waves: the beams' ripples travel on one clock and sway on another, both faster with the mids.
-    private var wavePhase: Double = 0
-    private var swayClock: Double = 0
+    // What the beat moves: the Club's punch, rings, lasers and ribbons, and the particles' bursts.
+    private var club = VisualizerClubMotion()
     private var waveBeams: [SIMD4<Float>] = []
+    /// The analysis clock of the last frame drawn: a frame drawn again brings no new samples.
+    private var lastFrameTime = -1.0
     // Spectrum's Smooth mode, and the Vinyl cover between its label and its sleeve.
     private var smoother = VisualizerSpectrumSmoother()
     private var cover = VisualizerCoverMotion()
@@ -386,6 +386,9 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         guard size.width >= 1, size.height >= 1,
               let pipeline = design != nil ? designPipeline : waves ? wavesPipeline : smoothBars ? smoothBarsPipeline : pipelines[settings.style],
               let buffer = queue.makeCommandBuffer() else { return nil }
+        // The analysis runs on its own clock: the same frame may be drawn twice. Its samples are lit once.
+        let newAnalysis = frame.time != lastFrameTime
+        lastFrameTime = frame.time
         advance(frame: frame, scene: scene, dt: dt)
         updateOverlay(size: size, scale: scale, scene: scene)
         let style = settings.style
@@ -402,7 +405,8 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         u.e = SIMD4(caps ? 1 : 0, artwork != nil ? 1 : 0, strobe, signal)
         colorFade.advance(by: dt)
         let colours = colorFade.current(theme: settings.theme)
-        u.f = SIMD4(Float(laserAngle), Float(platterSpeed), colours.rampWeight, Float(min(rings.count, 16)))
+        let rings = club.rings
+        u.f = SIMD4(Float(club.laserAngle), Float(platterSpeed), colours.rampWeight, Float(min(rings.count, 16)))
         let stops = colours.stops.map { SIMD4<Float>($0, 1) }
         u.stops = (stops[0], stops[1], stops[2], stops[3])
         let ramp = colours.ramp.map { SIMD4<Float>($0, 1) }
@@ -426,9 +430,11 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
                 let s = VisualizerLayout.oscilloscope(in: points)
                 u.h = SIMD4(Float(s.minX * scale), Float(s.minY * scale), Float(s.maxX * scale), Float(s.maxY * scale))
             }
-            encodeScope(buffer, frame: frame, uniforms: &u, size: size, scale: scale, dt: dt)
+            encodeScope(buffer, frame: frame, uniforms: &u, size: size, scale: scale, dt: dt, fresh: newAnalysis)
         case .particles:
             u.g = SIMD4(Float(dt), Float(size.width / size.height), reduceMotion ? 1 : 0, Float(Self.particleCount))
+            // h: how hard the bass draws the field in, the beat's punch, the highs' hits (sparkle), unused
+            u.h = SIMD4(frame.bass * signal, Float(club.punch), frame.transients.z * signal, 0)
             encodeParticles(buffer, uniforms: &u, size: size, dt: dt)
         case .meters where design != nil:
             if let design { encodeDesign(design, buffer: buffer, frame: frame, uniforms: &u, size: size, scale: scale, dt: dt) }
@@ -453,15 +459,24 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
             u.g = SIMD4(Float(layout.centre.x), Float(layout.centre.y), Float(layout.unit), 0)
             u.h = SIMD4(Float(rest.x + CGFloat(pose.offset)), Float(pose.front), Float(pose.opacity), Float(rest.tilt))
         case .club where settings.clubMode == .waves:
-            // The ripples grow with the mids and swell a little on the beat (not with Reduce Motion, which halves them).
-            let amp = (0.02 + 0.045 * frame.mid * signal + (reduceMotion ? 0 : 0.02 * frame.beatPulse * signal)) * (reduceMotion ? 0.5 : 1)
-            u.g = SIMD4(reduceMotion ? 1 : 0, Float(wavePhase.truncatingRemainder(dividingBy: Self.ripplePeriod)),
-                        Float(swayClock.truncatingRemainder(dividingBy: Self.swayPeriod)), amp)
-            Self.waveBeams(sway: swayClock, ripple: wavePhase, fine: frame.fine, into: &waveBeams)
+            // The ripples grow with the mids and with the beat's punch; with Reduce Motion they're half the size.
+            let amp = (0.03 + 0.09 * frame.mid * signal + 0.07 * Float(max(0, club.punch))) * (reduceMotion ? 0.5 : 1)
+            u.g = SIMD4(reduceMotion ? 1 : 0, Float(club.ripple.truncatingRemainder(dividingBy: VisualizerClubMotion.ripplePeriod)),
+                        Float(club.sway.truncatingRemainder(dividingBy: VisualizerClubMotion.swayPeriod)), amp)
+            let ribbons = club.ribbonSize * (reduceMotion ? 0.5 : 1)
+            u.h = SIMD4(Float(ribbons.x), Float(ribbons.y), Float(ribbons.z), Float(club.punch))
+            let period = VisualizerClubMotion.ribbonPeriod
+            u.k = SIMD4(Float(club.ribbonPhase.x.truncatingRemainder(dividingBy: period)), Float(club.ribbonPhase.y.truncatingRemainder(dividingBy: period)),
+                        Float(club.ribbonPhase.z.truncatingRemainder(dividingBy: period)), 0)
+            Self.waveBeams(sway: club.sway, ripple: club.ripple, opening: club.fanOpening.value, fine: frame.fine, into: &waveBeams)
             withUnsafeMutableBytes(of: &u.rings) { raw in
                 let slots = raw.bindMemory(to: SIMD4<Float>.self)
                 for i in 0..<16 { slots[i] = i < waveBeams.count ? waveBeams[i] : .zero }
             }
+        case .club:
+            // g: the punch, unused, the tunnel's run (0…1), the colours' turn (0…1); h: hits in the lows, mids and highs
+            u.g = SIMD4(Float(club.punch), 0, Float(club.tunnel), Float(club.colourTurn))
+            u.h = SIMD4(frame.transients.x * signal, frame.transients.y * signal, frame.transients.z * signal, 0)
         default:
             break
         }
@@ -492,27 +507,22 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         return buffer
     }
 
-    /// The periods the Waves shader's clocks are wrapped at: every use of each there repeats within them (the sea's roll
-    /// at ripple × 0.5; the beams' colours at sway × 0.35, the haze's circular drift at sway × 0.35 / 30, the sea's
-    /// ripple at sway × 1.4).
-    static let ripplePeriod = 4 * Double.pi
-    static let swayPeriod = 2 * Double.pi * 30 / 0.35
-
     /// Club's Waves: the fans of beams, from the floor in the middle and the two top corners (count, aim, spread,
     /// seed, and the part of the spectrum, 0…1 along the fine bins, that lights them).
     static let waveFans: [(count: Int, aim: Double, spread: Double, seed: Double, from: Double, to: Double)] = [
         (7, 0, 1.7, 0, 0.04, 0.55), (4, 2.45, 0.7, 11, 0.45, 0.85), (4, -2.45, 0.7, 23, 0.45, 0.85),
     ]
 
-    /// Each beam's aim, ripple wavenumber, ripple phase and level for this frame. Each drifts on its own, as the sum of
-    /// two slow sines at unrelated rates, so the fans never turn in step like a machine.
-    static func waveBeams(sway: Double, ripple: Double, fine: [Float], into out: inout [SIMD4<Float>]) {
+    /// Each beam's aim, ripple wavenumber, ripple phase and level for this frame. Each sways on its own, as the sum of
+    /// two sines at unrelated rates, so the fans never turn in step like a machine; `opening` spreads or closes each
+    /// fan about its middle (1: at rest).
+    static func waveBeams(sway: Double, ripple: Double, opening: Double = 1, fine: [Float], into out: inout [SIMD4<Float>]) {
         out.removeAll(keepingCapacity: true)
         for fan in waveFans {
             for i in 0..<fan.count {
                 let across = fan.count > 1 ? Double(i) / Double(fan.count - 1) - 0.5 : 0
                 let s = fan.seed + Double(i) * 1.37
-                let aim = fan.aim + across * fan.spread + 0.16 * sin(sway * 0.83 + s * 3.1) + 0.09 * sin(sway * 1.37 + s * 5.3)
+                let aim = fan.aim + across * fan.spread * opening + 0.26 * sin(sway * 0.83 + s * 3.1) + 0.14 * sin(sway * 1.37 + s * 5.3)
                 let k = 3.5 + 2.0 * (s * 0.731 - (s * 0.731).rounded(.down))
                 let speed = 1 + 0.2 * (s * 0.37 - (s * 0.37).rounded(.down))
                 let phase = (s * 2 - ripple * speed).truncatingRemainder(dividingBy: 2 * .pi)
@@ -554,7 +564,19 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         return atan2(s.y - p.y, s.x - p.x)
     }
 
+    /// The beats that began since the last frame drawn. The analysis runs on its own clock, so a frame can be drawn
+    /// twice or never: its count of beats is what's compared, not its one-frame flag. None on the first frame (what
+    /// came before the window showed isn't news), nor when the count starts again.
+    private func newBeats(in frame: VisualizerFrame) -> Int {
+        defer { beatsSeen = frame.beatCount }
+        guard let seen = beatsSeen else { return 0 }
+        let new = frame.beatCount &- seen
+        return new < 64 ? Int(new) : 0
+    }
+
     private func advance(frame: VisualizerFrame, scene: VisualizerScene, dt: Double) {
+        let beats = newBeats(in: frame)
+        let beat = beats > 0
         signal += ((frame.hasSignal ? 1 : 0) - signal) * VisualizerAnalyzer.coefficient(dt, 0.25)
 
         // Spectrogram: columns at the chosen speed.
@@ -601,29 +623,17 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         }
         vinylShown = settings.style == .vinyl
 
-        // Club's Waves: the ripples run along the beams faster with the mids; the sway drifts on its own slow clock.
-        let calmWaves = reduceMotion ? 0.35 : 1
-        // (Not wrapped here: the beams use them at unrelated rates. What the shader gets is wrapped at a period of all
-        // its own uses, so nothing jumps however long the window stays open.)
-        wavePhase += dt * (0.7 + 1.5 * Double(frame.mid * signal)) * calmWaves
-        swayClock += dt * (0.22 + 0.35 * Double(frame.mid * signal)) * calmWaves
-
-        // Club: rings out on every beat, lasers turning with the mids.
-        for i in rings.indices {
-            rings[i].x += Float(dt) * (0.9 + 0.5 * rings[i].y)
-            rings[i].y *= Float(exp(-dt / 0.7))
-        }
-        rings.removeAll { $0.y < 0.01 || $0.x > 2.4 }
-        if frame.beat {
-            ringColour = ringColour >= 0.95 ? 0.55 : ringColour + 0.15
-            rings.insert(SIMD4(0.16 + 0.1 * frame.bass, 0.35 + 0.65 * frame.bass, 0.010 + 0.018 * frame.bass, ringColour), at: 0)
-            if rings.count > 16 { rings.removeLast() }
-        }
-        let spin = reduceMotion ? 0.08 : 0.22 + 0.9 * Double(frame.mid)
-        laserAngle = (laserAngle + dt * spin + (frame.beat && !reduceMotion ? 0.12 : 0)).truncatingRemainder(dividingBy: 2 * .pi)
+        // The Club and the particles: everything the beat moves.
+        var input = VisualizerClubMotion.Input()
+        input.bass = Double(frame.bass); input.mid = Double(frame.mid); input.treble = Double(frame.treble)
+        input.transients = SIMD3(Double(frame.transients.x), Double(frame.transients.y), Double(frame.transients.z))
+        input.beats = beats
+        input.strength = Double(frame.beatStrength)
+        input.signal = Double(signal)
+        club.step(input, dt: dt, calm: reduceMotion)
         sinceFlash += dt
-        if strobeAllowed && frame.beat && frame.bass > 0.8 && sinceFlash >= Self.flashInterval {
-            strobe = 0.6
+        if strobeAllowed && settings.style == .club && beat && frame.beatStrength >= Self.strobeStrength && sinceFlash >= Self.flashInterval {
+            strobe = 1
             sinceFlash = 0
         }
         strobe *= Float(exp(-dt / 0.045))
@@ -653,7 +663,11 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     /// Ofcom/Harding) allow, however fast the beats come.
     static let flashInterval = 0.4
 
-    /// The strobe's brightness this frame, 0…0.6 (tests).
+    /// How hard a beat has to be (`VisualizerFrame.beatStrength`, against the hardest of the last few seconds) to
+    /// flash: the kicks and snares that carry a song, not the notes between them.
+    static let strobeStrength: Float = 0.6
+
+    /// The strobe's brightness this frame, 0…1 (tests).
     var strobeLevel: Float { strobe }
 
     /// The strobe only flashes when it's switched on, its warning was accepted, and neither Reduce Motion nor Dim
@@ -725,14 +739,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         case .oscilloscope:
             let screen = VisualizerLayout.oscilloscope(in: points)
             let span = min(1024, samples.count / 2)
-            // The newest rising zero crossing that still leaves a full sweep after it; else free-running.
-            var start = samples.count - span
-            var i = samples.count - span
-            while i > 1 {
-                let a = samples[i - 1].x + samples[i - 1].y, b = samples[i].x + samples[i].y
-                if a < 0 && b >= 0 { start = i; break }
-                i -= 1
-            }
+            let start = scopeTrigger(samples, span: span)
             let x0 = Float(screen.minX) * s, width = Float(screen.width) * s
             let height = Float(screen.height) * s, top = Float(screen.minY) * s
             let amplitude = gain * height * 0.22
@@ -745,6 +752,50 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
                 }
             }
         }
+    }
+
+    /// Where an oscilloscope sweep of `span` samples starts: the newest rising zero crossing of the music's slow part
+    /// that leaves a full sweep after it, else the newest `span` samples (free-running). The crossing is looked for in
+    /// left + right averaged over 2 ms (which takes the hi-hats and the hiss off a bass note), and only counts after
+    /// the signal has been clearly negative (a twentieth of its peak), so the highs riding on a note can't start a
+    /// sweep at a different point of it each time, and the picture stands still.
+    static func scopeTrigger(_ samples: [SIMD2<Float>], span: Int) -> Int {
+        let free = max(0, samples.count - span)
+        let half = 48
+        guard samples.count >= span + 2 * half + 2, free > half + 1 else { return free }
+        // Running sums, for the average around each sample.
+        var sums = [Float](repeating: 0, count: samples.count + 1)
+        var loudest: Float = 0
+        for i in 0..<samples.count {
+            let v = samples[i].x + samples[i].y
+            sums[i + 1] = sums[i] + v
+            loudest = max(loudest, abs(v))
+        }
+        guard loudest > 1e-4 else { return free }
+        /// The newest armed rising crossing of the signal averaged over `reach` samples either side, and that
+        /// signal's peak.
+        func crossing(reach: Int) -> (start: Int, peak: Float) {
+            let width = Float(2 * reach + 1)
+            func value(_ i: Int) -> Float { (sums[min(i + reach + 1, samples.count)] - sums[max(i - reach, 0)]) / width }
+            var peak: Float = 0
+            for i in stride(from: half, to: samples.count - half, by: 4) { peak = max(peak, abs(value(i))) }
+            guard peak > 1e-5 else { return (-1, 0) }
+            let low = -0.05 * peak
+            var armed = false, start = -1
+            var previous = value(half)
+            for i in (half + 1)...free {
+                let now = value(i)
+                if now < low { armed = true }
+                if armed, previous < 0, now >= 0 { start = i; armed = false }
+                previous = now
+            }
+            return (start, peak)
+        }
+        // The slow part, when there is one to speak of; else (a pure high tone, which the average cancels) the signal itself.
+        let slow = crossing(reach: half)
+        if slow.start >= 0, slow.peak > 0.15 * loudest { return slow.start }
+        let plain = crossing(reach: 0)
+        return plain.start >= 0 ? plain.start : free
     }
 
     /// The peak the automatic gain follows. The oscilloscope draws each channel alone, so the louder channel's peak.
@@ -776,7 +827,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
     }
 
     private func encodeScope(_ buffer: MTLCommandBuffer, frame: VisualizerFrame, uniforms u: inout VisualizerUniforms,
-                             size: CGSize, scale: CGFloat, dt: Double) {
+                             size: CGSize, scale: CGFloat, dt: Double, fresh: Bool = true) {
         guard let trail = prepareTrail(size: size, for: .scope, buffer: buffer), let beamPipeline, !beamBuffers.isEmpty else { return }
         // Automatic gain: up at once to the newest peak, back down over a couple of seconds, at most +30 dB.
         let peak = Self.scopePeak(frame.stereo.suffix(1024), mode: settings.scopeMode)
@@ -798,7 +849,8 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         let keep = exp(-dt / (goniometer ? 0.07 : 0.05))
         var uniforms = u
         trailPass(buffer, trail: trail, keep: keep) { encoder in
-            guard count >= 2 else { return }
+            // A frame of analysis already drawn has left its light: only the fade this time.
+            guard count >= 2, fresh else { return }
             encoder.setRenderPipelineState(beamPipeline)
             encoder.setVertexBuffer(target, offset: 0, index: 0)
             encoder.setVertexBytes(&uniforms, length: MemoryLayout<VisualizerUniforms>.stride, index: 1)
