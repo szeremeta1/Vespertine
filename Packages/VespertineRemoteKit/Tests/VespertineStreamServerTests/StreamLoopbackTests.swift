@@ -116,6 +116,11 @@ struct WireRig {
         try original.write(to: flac)
         let wav = dir.appendingPathComponent("c.wav")
         try Self.writeTone(to: wav)
+        let short = dir.appendingPathComponent("d.wav")
+        try Self.writeTone(to: short, seconds: 0.5, base: 520)
+        let other = dir.appendingPathComponent("e.wav")
+        try Self.writeTone(to: other, seconds: 0.5, base: 410, rate: 48_000)
+        func size(_ url: URL) -> Int64 { Int64((try? Data(contentsOf: url).count) ?? 0) }
         let dsf = dir.appendingPathComponent("b.dsf")
         try Data(count: 1000).write(to: dsf)
         let now = Date(timeIntervalSince1970: 1)
@@ -124,6 +129,10 @@ struct WireRig {
                                  duration: 10, fileSize: Int64(original.count), modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
             3: StreamSourceFacts(id: 3, url: wav, fileExtension: "wav", codec: "WAV", isDSD: false, isLossless: true, sampleRate: 44_100, bitDepth: 16, channels: 2,
                                  duration: 1, fileSize: Int64((try? Data(contentsOf: wav).count) ?? 0), modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
+            4: StreamSourceFacts(id: 4, url: short, fileExtension: "wav", codec: "WAV", isDSD: false, isLossless: true, sampleRate: 44_100, bitDepth: 16, channels: 2,
+                                 duration: 0.5, fileSize: size(short), modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
+            5: StreamSourceFacts(id: 5, url: other, fileExtension: "wav", codec: "WAV", isDSD: false, isLossless: true, sampleRate: 48_000, bitDepth: 16, channels: 2,
+                                 duration: 0.5, fileSize: size(other), modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
             2: StreamSourceFacts(id: 2, url: dsf, fileExtension: "dsf", codec: "DSD", isDSD: true, isLossless: true, sampleRate: 2_822_400, bitDepth: 1, channels: 6,
                                  duration: 10, fileSize: 1000, modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
         ]
@@ -142,13 +151,14 @@ struct WireRig {
     enum RigError: Error { case notConnected }
 
     /// One second of two tones, 16-bit stereo WAV at 44.1 kHz (a file Core Audio opens, as on the phone).
-    static func writeTone(to url: URL) throws {
-        let settings: [String: Any] = [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: 44_100.0, AVNumberOfChannelsKey: 2,
+    static func writeTone(to url: URL, seconds: Double = 1, base: Double = 300, rate: Double = 44_100) throws {
+        let settings: [String: Any] = [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: rate, AVNumberOfChannelsKey: 2,
                                        AVLinearPCMBitDepthKey: 16, AVLinearPCMIsFloatKey: false, AVLinearPCMIsBigEndianKey: false]
         let file = try AVAudioFile(forWriting: url, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
-        let buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: 44_100)!
-        buffer.frameLength = 44_100
-        for c in 0..<2 { for i in 0..<44_100 { buffer.floatChannelData![c][i] = Float(0.25 * sin(2 * Double.pi * (300 + 150 * Double(c)) * Double(i) / 44_100)) } }
+        let frames = Int(seconds * rate)
+        let buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: AVAudioFrameCount(frames))!
+        buffer.frameLength = AVAudioFrameCount(frames)
+        for c in 0..<2 { for i in 0..<frames { buffer.floatChannelData![c][i] = Float(0.25 * sin(2 * Double.pi * (base + 150 * Double(c)) * Double(i) / rate)) } }
         try file.write(from: buffer)
     }
 }
