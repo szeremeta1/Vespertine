@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Checks Vespertine's String Catalogs (App/Resources/*.xcstrings).
+"""Checks Vespertine's String Catalogs: the Mac app's and its helper's (App/Resources, Helper/Resources) and the iPhone
+and iPad app's (RemoteApp/Resources).
 
     python3 scripts/check-localizations.py
 
 Every string is translated into every language the app ships, each translation carries the same format
 placeholders as the English text (in any order), plural variants cover the categories each language needs, and
 the catalogs hold no Russian localization. Every literal the Swift source uses as a localization key (Text("…"),
-Button("…"), String(localized: "…") and the like) is in Localizable.xcstrings. Fails with a list of what's wrong.
+Button("…"), String(localized: "…") and the like) is in the Localizable.xcstrings of the app that shows it: the Mac app's
+for App/, Helper/ and the packages, the iOS app's for RemoteApp/ and the two package targets only the phone runs. Fails with
+a list of what's wrong.
 """
 
 import json
@@ -15,7 +18,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-CATALOGS = [ROOT / "App/Resources/Localizable.xcstrings", ROOT / "App/Resources/InfoPlist.xcstrings", ROOT / "Helper/Resources/InfoPlist.xcstrings"]
+MAC_STRINGS = ROOT / "App/Resources/Localizable.xcstrings"
+IOS_STRINGS = ROOT / "RemoteApp/Resources/Localizable.xcstrings"
+CATALOGS = [MAC_STRINGS, ROOT / "App/Resources/InfoPlist.xcstrings", ROOT / "Helper/Resources/InfoPlist.xcstrings",
+            IOS_STRINGS, ROOT / "RemoteApp/Resources/InfoPlist.xcstrings"]
 
 # The languages Vespertine ships, besides English. Russian is deliberately not one of them.
 LANGUAGES = [
@@ -128,11 +134,17 @@ def check(path, problems):
 # Where a string literal in the source becomes a key of Localizable.xcstrings: the SwiftUI views and modifiers that
 # take a LocalizedStringKey, String(localized:) (the packages' too: they look their text up in the app's main bundle)
 # and the analysis package's localized(_:). The first argument may be a ternary between two literals.
-SOURCES = ["App/Sources/**/*.swift", "Helper/Sources/**/*.swift", "Packages/*/Sources/**/*.swift"]
+# The package targets only the iPhone and iPad app runs: their text is looked up in that app's bundle.
+PHONE_ONLY = ["Packages/VespertineRemoteKit/Sources/VespertinePhonePlayer/", "Packages/VespertineRemoteKit/Sources/VespertineRemoteClient/"]
+# (catalog, the sources whose keys it must hold, the folders among them that belong to another catalog)
+SOURCE_SETS = [
+    (MAC_STRINGS, ["App/Sources/**/*.swift", "Helper/Sources/**/*.swift", "Packages/*/Sources/**/*.swift"], PHONE_ONLY),
+    (IOS_STRINGS, ["RemoteApp/Sources/**/*.swift"] + [folder + "**/*.swift" for folder in PHONE_ONLY], []),
+]
 LOCALIZING = re.compile(
     r'(?:\b(?:Text|Button|Label|Toggle|Section|Picker|LabeledContent|Menu|TextField|SecureField|Link|GroupBox'
     r'|DisclosureGroup|ContentUnavailableView|Stepper|ProgressView)\(|\.(?:navigationTitle|help|accessibilityLabel'
-    r'|accessibilityValue|accessibilityHint|alert|confirmationDialog)\(|\bString\(localized:|\blocalized\()'
+    r'|accessibilityValue|accessibilityHint|alert|confirmationDialog)\(|\bString\(localized:|\bLocalizedStringKey\(|\blocalized\()'
     r'\s*(?:[^"(){},]*\s\?\s*)?(?=")'
 )
 # Literals in those places that are deliberately not localized.
@@ -175,13 +187,15 @@ def literal(source, start):
     return text, i + len(end)
 
 
-def check_sources(problems):
-    """Every literal the source uses as a localization key is in Localizable.xcstrings."""
-    catalog = json.loads(CATALOGS[0].read_text(encoding="utf-8"))["strings"]
+def check_sources(strings, patterns, elsewhere, problems):
+    """Every literal the sources matching `patterns` use as a localization key is in the catalog at `strings`."""
+    catalog = json.loads(strings.read_text(encoding="utf-8"))["strings"]
     # Interpolations become %@, %lld… by the value's type, which a scan can't know: compare with every argument as \0.
     keys = {PLACEHOLDER.sub("\0", key.replace("%%", "\1")).replace("\1", "%") for key in catalog}
-    for pattern in SOURCES:
+    for pattern in patterns:
         for path in sorted(ROOT.glob(pattern)):
+            if any(path.relative_to(ROOT).as_posix().startswith(folder) for folder in elsewhere):
+                continue
             source = path.read_text(encoding="utf-8")
             for match in LOCALIZING.finditer(source):
                 found = [literal(source, match.end())]
@@ -193,7 +207,7 @@ def check_sources(problems):
                     if key and key not in keys and key not in NOT_LOCALIZED:
                         line = source.count("\n", 0, match.start()) + 1
                         shown = key.replace("\0", "%@")
-                        problems.append(f"{path.relative_to(ROOT)}:{line}: {shown!r} is not in Localizable.xcstrings")
+                        problems.append(f"{path.relative_to(ROOT)}:{line}: {shown!r} is not in {strings.relative_to(ROOT)}")
 
 
 def main():
@@ -203,10 +217,11 @@ def main():
             problems.append(f"{path.relative_to(ROOT)} is missing")
             continue
         check(path, problems)
-    if CATALOGS[0].exists():
-        check_sources(problems)
-    if any((ROOT / "App").rglob("ru.lproj")):
-        problems.append("App/ contains a ru.lproj")
+    for strings, patterns, elsewhere in SOURCE_SETS:
+        if strings.exists():
+            check_sources(strings, patterns, elsewhere, problems)
+    if any((ROOT / "App").rglob("ru.lproj")) or any((ROOT / "RemoteApp").rglob("ru.lproj")):
+        problems.append("App/ or RemoteApp/ contains a ru.lproj")
     for problem in problems:
         print(problem)
     if problems:

@@ -149,7 +149,7 @@ struct MacsView: View {
             Text(verbatim: "vespertine")
                 .font(.system(size: 30, weight: .light, design: .serif))
                 .foregroundStyle(Palette.text)
-            Text("The remote for Vespertine on your Mac")
+            Text("The companion to Vespertine on your Mac")
                 .font(.footnote).foregroundStyle(Palette.text2)
         }
         .frame(maxWidth: .infinity)

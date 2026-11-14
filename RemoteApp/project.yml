@@ -1,4 +1,4 @@
-# Vespertine Remote: the iPhone and iPad app that controls Vespertine on a Mac (Settings › Remote on the Mac).
+# Vespertine for iPhone and iPad: controls Vespertine on a Mac (Settings › Remote on the Mac) and plays the Mac's music itself.
 # Generate with `xcodegen generate --spec RemoteApp/project.yml` from the repository root.
 # SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 name: VespertineRemote
@@ -13,8 +13,8 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "1.0"
-    CURRENT_PROJECT_VERSION: "5"
+    MARKETING_VERSION: "1.1"
+    CURRENT_PROJECT_VERSION: "6"
 targets:
   VespertineRemote:
     type: application
