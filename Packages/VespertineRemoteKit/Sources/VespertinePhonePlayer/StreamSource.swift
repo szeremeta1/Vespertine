@@ -160,7 +160,7 @@ public final class StreamSource: ByteSource, @unchecked Sendable {
             let mine = generation
             pump = Task.detached(priority: .userInitiated) { [weak self] in
                 await withTaskGroup(of: Void.self) { group in
-                    for _ in 0..<workers { group.addTask { await self?.work(mine) } }
+                    for _ in 0..<workers { group.addTask { [weak self] in await self?.work(mine) } }
                 }
                 self?.pumpEnded(mine)
             }
