@@ -13,7 +13,7 @@ npm run build      # dist/, then scripts/check-dist.mjs
 npm run preview    # serve dist/
 ```
 
-Needs Node 22.12 or later (`.node-version` pins what CI uses).
+Needs Node 22.23.4 or later (`.node-version` pins what CI uses).
 
 ## Where things live
 
