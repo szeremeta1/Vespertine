@@ -739,14 +739,7 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
         case .oscilloscope:
             let screen = VisualizerLayout.oscilloscope(in: points)
             let span = min(1024, samples.count / 2)
-            // The newest rising zero crossing that still leaves a full sweep after it; else free-running.
-            var start = samples.count - span
-            var i = samples.count - span
-            while i > 1 {
-                let a = samples[i - 1].x + samples[i - 1].y, b = samples[i].x + samples[i].y
-                if a < 0 && b >= 0 { start = i; break }
-                i -= 1
-            }
+            let start = scopeTrigger(samples, span: span)
             let x0 = Float(screen.minX) * s, width = Float(screen.width) * s
             let height = Float(screen.height) * s, top = Float(screen.minY) * s
             let amplitude = gain * height * 0.22
@@ -759,6 +752,50 @@ public final class VisualizerRenderer: NSObject, MTKViewDelegate {
                 }
             }
         }
+    }
+
+    /// Where an oscilloscope sweep of `span` samples starts: the newest rising zero crossing of the music's slow part
+    /// that leaves a full sweep after it, else the newest `span` samples (free-running). The crossing is looked for in
+    /// left + right averaged over 2 ms (which takes the hi-hats and the hiss off a bass note), and only counts after
+    /// the signal has been clearly negative (a twentieth of its peak), so the highs riding on a note can't start a
+    /// sweep at a different point of it each time, and the picture stands still.
+    static func scopeTrigger(_ samples: [SIMD2<Float>], span: Int) -> Int {
+        let free = max(0, samples.count - span)
+        let half = 48
+        guard samples.count >= span + 2 * half + 2, free > half + 1 else { return free }
+        // Running sums, for the average around each sample.
+        var sums = [Float](repeating: 0, count: samples.count + 1)
+        var loudest: Float = 0
+        for i in 0..<samples.count {
+            let v = samples[i].x + samples[i].y
+            sums[i + 1] = sums[i] + v
+            loudest = max(loudest, abs(v))
+        }
+        guard loudest > 1e-4 else { return free }
+        /// The newest armed rising crossing of the signal averaged over `reach` samples either side, and that
+        /// signal's peak.
+        func crossing(reach: Int) -> (start: Int, peak: Float) {
+            let width = Float(2 * reach + 1)
+            func value(_ i: Int) -> Float { (sums[min(i + reach + 1, samples.count)] - sums[max(i - reach, 0)]) / width }
+            var peak: Float = 0
+            for i in stride(from: half, to: samples.count - half, by: 4) { peak = max(peak, abs(value(i))) }
+            guard peak > 1e-5 else { return (-1, 0) }
+            let low = -0.05 * peak
+            var armed = false, start = -1
+            var previous = value(half)
+            for i in (half + 1)...free {
+                let now = value(i)
+                if now < low { armed = true }
+                if armed, previous < 0, now >= 0 { start = i; armed = false }
+                previous = now
+            }
+            return (start, peak)
+        }
+        // The slow part, when there is one to speak of; else (a pure high tone, which the average cancels) the signal itself.
+        let slow = crossing(reach: half)
+        if slow.start >= 0, slow.peak > 0.15 * loudest { return slow.start }
+        let plain = crossing(reach: 0)
+        return plain.start >= 0 ? plain.start : free
     }
 
     /// The peak the automatic gain follows. The oscilloscope draws each channel alone, so the louder channel's peak.

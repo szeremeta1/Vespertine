@@ -50,13 +50,6 @@ final class VisualizerModel {
     }
 
     func apply(_ settings: VisualizerSettings) {
-        var c = VisualizerAnalyzer.Configuration()
-        c.bandCount = settings.bandCount
-        c.sensitivity = Float(settings.sensitivity)
-        c.linear = !settings.decibelScale
-        c.meterReferenceDB = settings.meterReference.map(Float.init)
-        c.meters = settings.style == .meters
-        c.meterExtras = settings.meterExtras
-        feed.update(configuration: c)
+        feed.update(configuration: VisualizerAnalyzer.Configuration(settings))
     }
 }

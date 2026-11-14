@@ -162,10 +162,14 @@ fragment float4 vz_bars(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
 // MARK: Spectrogram
 
 static float3 colourMap(constant U &u, float v) {
-    // Black for silence, then the theme from dark to bright, then a touch of white at the very top.
-    float3 c = ramp(u, smoothstep(0.0, 1.0, v));
-    c *= smoothstep(0.02, 0.25, v);
-    return mix(c, float3(1), smoothstep(0.88, 1.0, v) * 0.35);
+    // Level is brightness first (black for silence, rising all the way up), and colour second: the theme from its
+    // mid colours to its brightest, then a touch of white at the very top. A map that only ran along the theme's
+    // gradient was one flat colour wherever the theme's colours are equally bright.
+    float t = smoothstep(0.04, 1.0, v);
+    float3 c = ramp(u, 0.3 + 0.7 * t);
+    float peak = max(max(c.r, c.g), max(c.b, 1e-3));
+    c = c / peak * pow(t, 1.3) * 0.92;
+    return mix(c, float3(1), smoothstep(0.85, 1.0, v) * 0.45);
 }
 
 fragment float4 vz_spectrogram(VOut in [[stage_in]], constant U &u [[buffer(0)]], texture2d<float> history [[texture(1)]],
@@ -179,8 +183,9 @@ fragment float4 vz_spectrogram(VOut in [[stage_in]], constant U &u [[buffer(0)]]
     if (all(px >= lo) && all(px < hi)) {
         float2 t = (px - lo) / (hi - lo);
         float width = u.d.z;
-        // Newest at the right; the head's fraction scrolls the picture smoothly between columns.
-        float column = u.d.w - (1 - t.x) * (width - 2);
+        // Newest at the right; the head's fraction scrolls the picture smoothly between columns. The right edge runs
+        // from the column before the newest up to the newest, never past it: the one after it in the ring is the oldest.
+        float column = u.d.w - 1 - (1 - t.x) * (width - 3);
         float x = (column + 0.5) / width;
         float v = history.sample(linearRepeatX, float2(x, 1 - t.y)).r;
         col = colourMap(u, v);

@@ -381,3 +381,17 @@ public struct VisualizerWindowState: Codable, Sendable, Equatable {
         defaults.set(try? JSONEncoder().encode(self), forKey: Self.defaultsKey)
     }
 }
+
+extension VisualizerAnalyzer.Configuration {
+    /// The analysis these settings ask for (the window and the offline renderer both use it, so they can't drift apart).
+    public init(_ settings: VisualizerSettings) {
+        self.init()
+        bandCount = settings.bandCount
+        sensitivity = Float(settings.sensitivity)
+        linear = !settings.decibelScale
+        meterReferenceDB = settings.meterReference.map(Float.init)
+        meters = settings.style == .meters
+        meterExtras = settings.meterExtras
+    }
+}
+

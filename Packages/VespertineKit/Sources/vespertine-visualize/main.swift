@@ -138,12 +138,7 @@ func run() -> Int32 {
         renderer.setArtwork(image)
         renderer.setAlbumPalette(AlbumArtPalette.extract(from: image), animated: false)
     }
-    var configuration = VisualizerAnalyzer.Configuration()
-    configuration.bandCount = o.settings.bandCount
-    configuration.sensitivity = Float(o.settings.sensitivity)
-    configuration.linear = !o.settings.decibelScale
-    configuration.meterReferenceDB = o.settings.meterReference.map(Float.init)
-    configuration.meterExtras = o.settings.meterExtras
+    let configuration = VisualizerAnalyzer.Configuration(o.settings)
     let analyzer = VisualizerAnalyzer(configuration: configuration)
     let n = VisualizerAnalyzer.fftSize(for: o.rate)
     let dt = 1 / o.fps
