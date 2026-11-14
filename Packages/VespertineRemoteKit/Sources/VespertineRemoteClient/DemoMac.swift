@@ -34,6 +34,7 @@ public struct DemoWords: Sendable, Equatable {
 
     /// In the language the app shows.
     public static var localized: DemoWords {
+        #if canImport(Darwin)
         DemoWords(systemDefault: String(localized: "System Default", comment: "Demo: the name of the Mac's default sound output."),
                   builtInSpeakers: String(localized: "MacBook Pro Speakers", comment: "Demo: what the Mac's default output is right now."),
                   dac: String(localized: "USB DAC · 44.1–768 kHz · DSD512", comment: "Demo: a USB DAC's description in the outputs list: kind, sample rates, highest DSD rate."),
@@ -42,7 +43,16 @@ public struct DemoWords: Sendable, Equatable {
                   bitPerfect: String(localized: "BIT-PERFECT", comment: "Demo: the Mac's badge when the output gets the song's samples unchanged. Keep it short, in capitals where the script has them."),
                   sourceOnline: String(localized: "REFERENCED IN PLACE · ONLINE · SCANNED 2 HOURS AGO", comment: "Demo: a music folder's state on the Mac. Capitals where the script has them."),
                   sourceOffline: String(localized: "REFERENCED IN PLACE · OFFLINE · SCANNED LAST WEEK", comment: "Demo: a disconnected music folder's state on the Mac. Capitals where the script has them."))
+        #else
+        english
+        #endif
     }
+
+    /// As the demo was written (and what it says where there is no catalog to ask: Linux).
+    public static let english = DemoWords(systemDefault: "System Default", builtInSpeakers: "MacBook Pro Speakers", dac: "USB DAC · 44.1–768 kHz · DSD512",
+                                          receiver: "HDMI · 8 channels · 32–192 kHz", speakerGroup: "Speaker group · 2 outputs", bitPerfect: "BIT-PERFECT",
+                                          sourceOnline: "REFERENCED IN PLACE · ONLINE · SCANNED 2 HOURS AGO",
+                                          sourceOffline: "REFERENCED IN PLACE · OFFLINE · SCANNED LAST WEEK")
 }
 
 @MainActor
