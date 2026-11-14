@@ -64,6 +64,22 @@ public struct PhoneQueue: Sendable, Equatable {
         return repeatMode == .all ? entries.first : nil
     }
 
+    /// What plays after the entry `id` ends by itself: the player schedules a song ahead of the one being heard, so it asks
+    /// about an entry that isn't `current` yet.
+    public func following(after id: String) -> Entry? {
+        guard let i = entries.firstIndex(where: { $0.id == id }) else { return nil }
+        if repeatMode == .one { return entries[i] }
+        if i + 1 < entries.count { return entries[i + 1] }
+        return repeatMode == .all ? entries.first : nil
+    }
+
+    /// The song ended by itself and the one after it is already sounding (gapless): makes `id` current without a step.
+    public mutating func arrive(at id: String) {
+        guard let i = entries.firstIndex(where: { $0.id == id }), i != currentIndex else { return }
+        currentIndex = i
+        revision += 1
+    }
+
     // MARK: Starting
 
     /// Replaces the queue with `tracks` and returns the entry to start. `shuffled` turns shuffle on (starting at a random

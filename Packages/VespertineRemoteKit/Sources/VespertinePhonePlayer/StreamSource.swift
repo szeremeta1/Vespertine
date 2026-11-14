@@ -8,12 +8,50 @@
 import Foundation
 import VespertineRemoteProtocol
 
-public final class StreamSource: @unchecked Sendable {
+/// Where a decoder reads a song's bytes from: a stream still arriving, or a file already on the phone.
+public protocol ByteSource: AnyObject, Sendable {
+    var byteSize: Int64 { get }
+    /// Every byte is on the phone: reads never wait.
+    var isComplete: Bool { get }
+    /// Up to `length` bytes from `offset`; fewer only at the end. May block the calling thread while bytes arrive.
+    func read(at offset: Int64, length: Int) throws -> Data
+    /// Makes reads that are waiting right now give up (a seek or a stop shouldn't wait for them).
+    func interruptReads()
+}
+
+/// A whole file on the phone.
+public final class FileByteSource: ByteSource, @unchecked Sendable {
+    public let byteSize: Int64
+    public var isComplete: Bool { true }
+    private let lock = NSLock()
+    private let handle: FileHandle
+
+    public init(url: URL) throws {
+        handle = try FileHandle(forReadingFrom: url)
+        byteSize = Int64(try handle.seekToEnd())
+    }
+
+    deinit { try? handle.close() }
+
+    public func read(at offset: Int64, length: Int) throws -> Data {
+        guard offset >= 0, offset < byteSize, length > 0 else { return Data() }
+        return try lock.withLock {
+            try handle.seek(toOffset: UInt64(offset))
+            return try handle.read(upToCount: length) ?? Data()
+        }
+    }
+
+    public func interruptReads() {}
+}
+
+public final class StreamSource: ByteSource, @unchecked Sendable {
     public enum Failure: Error, Equatable {
         /// The bytes did not arrive in the time the reader allowed.
         case timedOut
         /// The source was closed while the read waited.
         case closed
+        /// `interruptReads()` was called while the read waited.
+        case interrupted
         /// The Mac stopped answering reads, after every retry. The text is the last error, for showing.
         case unreachable(String)
         /// The Mac answered with bytes for another range, or the stream ended before its size.
@@ -43,6 +81,9 @@ public final class StreamSource: @unchecked Sendable {
     private var readHead: Int64 = 0
     private var _failure: Failure?
     private var closed = false
+    private var interruptions = 0
+    /// How long a decoder's read waits for its bytes before it gives up.
+    public var readTimeout: TimeInterval = 30
     private var pump: Task<Void, Never>?
     /// Counts restarts, so the workers of a pump that failed stop instead of working beside the new one.
     private var generation = 0
@@ -84,7 +125,17 @@ public final class StreamSource: @unchecked Sendable {
 
     // MARK: State
 
+    public var byteSize: Int64 { size }
     public var isComplete: Bool { condition.withLock { coveredBytes >= size } }
+
+    public func read(at offset: Int64, length: Int) throws -> Data { try read(at: offset, length: length, timeout: readTimeout) }
+
+    public func interruptReads() {
+        condition.withLock {
+            interruptions += 1
+            condition.broadcast()
+        }
+    }
     public var bufferedBytes: Int64 { condition.withLock { coveredBytes } }
     public var failure: Failure? { condition.withLock { _failure } }
 
@@ -237,7 +288,7 @@ public final class StreamSource: @unchecked Sendable {
 
     /// Up to `length` bytes from `offset` (fewer only at the end of the stream), waiting for them to arrive. Blocks the calling
     /// thread, so it is for the decoder's thread, never the main one.
-    public func read(at offset: Int64, length: Int, timeout: TimeInterval = 30) throws -> Data {
+    public func read(at offset: Int64, length: Int, timeout: TimeInterval) throws -> Data {
         guard offset >= 0, offset < size, length > 0 else { return Data() }
         let end = min(size, offset + Int64(length))
         let first = Int(offset / chunk)
@@ -245,8 +296,10 @@ public final class StreamSource: @unchecked Sendable {
         let deadline = Date().addingTimeInterval(timeout)
         condition.lock()
         readHead = end
+        let interruptionsAtEntry = interruptions
         while true {
             if closed { condition.unlock(); throw Failure.closed }
+            if interruptions != interruptionsAtEntry { condition.unlock(); throw Failure.interrupted }
             guard let missing = (first...last).first(where: { !covered[$0] }) else { break }
             if let failure = _failure { condition.unlock(); throw failure }
             // Fetch from here on: a seek into what isn't on the phone yet doesn't wait for the gap behind it.
