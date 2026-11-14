@@ -40,6 +40,21 @@ import Testing
         #expect(!RouteChangePolicy.pauses(reason: .other))
     }
 
+    @Test func surroundIsRenderedForHeadphonesAndFoldedForEverythingElse() {
+        let pods = PhoneRoute(name: "AirPods Max", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true)
+        let plain = PhoneRoute(name: "Headphones", portType: "Headphones", sampleRate: 48_000, channels: 2, spatial: false)
+        let speaker = PhoneRoute(name: "Speaker", portType: "Speaker", sampleRate: 48_000, channels: 2, spatial: false)
+        let tv = PhoneRoute(name: "Living Room", portType: "AirPlay", sampleRate: 48_000, channels: 2, spatial: false)
+        #expect(pods.surroundMode(wanted: .headTracked) == .headTracked)
+        #expect(pods.surroundMode(wanted: .fixed) == .fixed)
+        #expect(pods.surroundMode(wanted: .off) == .off)
+        // Headphones that don't follow your head get the fixed rendering, and say so.
+        #expect(plain.surroundMode(wanted: .headTracked) == .fixed)
+        // Speakers get the plain fold: a binaural rendering is made for ears, not for a room.
+        #expect(speaker.surroundMode(wanted: .headTracked) == .off)
+        #expect(tv.surroundMode(wanted: .fixed) == .off)
+    }
+
     @Test func onlyADACIsAskedForTheSongsRate() {
         let dac = PhoneRoute(name: "K11", portType: "USBAudio", sampleRate: 48_000, channels: 2, spatial: false)
         let wired = PhoneRoute(name: "Headphones", portType: "Headphones", sampleRate: 48_000, channels: 2, spatial: false)
