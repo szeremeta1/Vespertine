@@ -87,6 +87,9 @@ final class PlayerController {
     private(set) var buffering = false
     /// While the song is copied from a share before it plays: how much is local (0…1).
     private(set) var bufferingFraction: Double?
+    /// While the song waits on a share that has sent nothing for 10 s or more: "“Share” isn’t answering. Still trying…" (the Inspector
+    /// shows it under "Buffering from the network…", and the banner says it once). nil when the share is answering or not waited on.
+    private(set) var shareNotice: String?
     /// Live level (0…1, linear peak with decay) of every channel Vespertine sends, for multichannel meters.
     private(set) var channelLevels: [Float] = []
     private(set) var lastError: String?
@@ -701,6 +704,33 @@ final class PlayerController {
         if cache.yieldsToPlayback != yielding { cache.yieldsToPlayback = yielding }
     }
 
+    /// The share's silence is a notice, not a failure: it says so once in the banner when it starts, takes that banner down when
+    /// the share answers (unless the message has since become another), and leaves the song to the engine to give up on.
+    private func updateShareNotice(_ stalled: Bool) {
+        guard stalled else {
+            if let notice = shareNotice {
+                shareNotice = nil
+                if lastError == notice { lastError = nil }
+            }
+            return
+        }
+        guard shareNotice == nil else { return }
+        let name = current.map { shareName(for: $0.track) } ?? ""
+        let notice = String(localized: "“\(name)” isn’t answering. Still trying…", comment: "%@ is the name of a network share. A song is waiting for it; the app keeps trying for a while.")
+        shareNotice = notice
+        lastError = notice
+    }
+
+    /// What the listener calls the share a song is on: its name in Sources, else the folder's, else the volume's in its path.
+    private func shareName(for track: Track) -> String {
+        if let source = library.sources.first(where: { $0.id == track.sourceId }) {
+            return source.name ?? URL(fileURLWithPath: source.path).lastPathComponent
+        }
+        let parts = track.filePath.split(separator: "/")
+        if parts.count > 1, parts[0] == "Volumes" { return String(parts[1]) }
+        return URL(fileURLWithPath: track.filePath).deletingLastPathComponent().lastPathComponent
+    }
+
     func poll(_ snapshot: EngineSnapshot? = nil) {
         let snap = snapshot ?? engine.snapshot
         if let requestedState, snap.state != requestedState.from
@@ -744,6 +774,7 @@ final class PlayerController {
         if underruns != snap.underruns { underruns = snap.underruns }
         if buffering != snap.isBuffering { buffering = snap.isBuffering }
         if bufferingFraction != snap.bufferingFraction { bufferingFraction = snap.bufferingFraction }
+        updateShareNotice(snap.shareStalledSeconds != nil)
         if settings.networkCache, let current, current.id == snap.item?.id, adoptedSource != current.id,
            shares.isNetwork(current.track), !current.track.isDVDFolderTrack, let local = snap.localSourceURL,
            shares.cache.adopt(current.track, from: local) {

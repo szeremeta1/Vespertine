@@ -110,6 +110,9 @@ struct NowPlayingPanel: View {
                             }
                         }
                         .padding(.top, 8)
+                        if let notice = player.shareNotice {
+                            Text(notice).font(Typeface.mono(10)).foregroundStyle(Palette.copper).padding(.top, 4)
+                        }
                     }
                     if player.underruns > 0 {
                         Text("\(player.underruns) buffer underruns this session")

@@ -570455,6 +570455,282 @@
           }
         }
       }
+    },
+    "“%@” isn’t answering. Still trying…": {
+      "comment": "%@ is the name of a network share. A song is waiting for it; the app keeps trying for a while.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» ምላሽ እየሰጠ አይደለም። አሁንም እየሞከረ ነው…"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» لا يستجيب. ما زالت المحاولة جارية…"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” সাড়া দিচ্ছে না। এখনও চেষ্টা চলছে…"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ neodpovídá. Stále se to zkouší…"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” svarer ikke. Prøver stadig…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“ antwortet nicht. Es wird weiter versucht …"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ο «%@» δεν αποκρίνεται. Γίνεται ακόμη προσπάθεια…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” isn’t answering. Still trying…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» no responde. Sigue intentándolo…"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» پاسخ نمی‌دهد. هنوز در حال تلاش است…"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”%@” ei vastaa. Yritetään yhä…"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi sumasagot ang “%@”. Sinusubukan pa rin…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » ne répond pas. Nouvelle tentative en cours…"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” જવાબ આપતું નથી. હજી પ્રયત્ન ચાલુ છે…"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ba ya amsawa. Ana ci gaba da ƙoƙari…"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "״%@״ אינו מגיב. עדיין מנסה…"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” जवाब नहीं दे रहा। अब भी कोशिश जारी है…"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A(z) „%@” nem válaszol. Még próbálkozik…"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” tidak merespons. Masih mencoba…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” non risponde. Sto ancora provando…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」が応答していません。再試行しています…"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ಪ್ರತಿಕ್ರಿಯಿಸುತ್ತಿಲ್ಲ. ಇನ್ನೂ ಪ್ರಯತ್ನಿಸಲಾಗುತ್ತಿದೆ…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” 응답이 없습니다. 계속 시도하는 중…"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” പ്രതികരിക്കുന്നില്ല. ഇപ്പോഴും ശ്രമിച്ചുകൊണ്ടിരിക്കുന്നു…"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” प्रतिसाद देत नाही. अजूनही प्रयत्न सुरू आहे…"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” tidak menjawab. Masih mencuba…"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» svarer ikke. Prøver fortsatt…"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "‘%@’ reageert niet. Er wordt nog steeds geprobeerd…"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ਜਵਾਬ ਨਹੀਂ ਦੇ ਰਿਹਾ। ਹਾਲੇ ਵੀ ਕੋਸ਼ਿਸ਼ ਜਾਰੀ ਹੈ…"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@” nie odpowiada. Nadal próbuję…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” não está respondendo. Ainda tentando…"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” não está a responder. Ainda a tentar…"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@” nu răspunde. Se mai încearcă…"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”%@” svarar inte. Försöker fortfarande…"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” haijibu. Bado inajaribu…"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” பதிலளிக்கவில்லை. இன்னும் முயற்சி செய்யப்படுகிறது…"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” స్పందించడం లేదు. ఇంకా ప్రయత్నిస్తోంది…"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ไม่ตอบสนอง กำลังลองต่อไป…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” yanıt vermiyor. Hâlâ deneniyor…"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» не відповідає. Спроби тривають…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” جواب نہیں دے رہا۔ اب بھی کوشش جاری ہے…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” không phản hồi. Vẫn đang thử…"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」沒有回應。仍在嘗試…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”没有响应。仍在尝试…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」沒有回應。仍在嘗試…"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

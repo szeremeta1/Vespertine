@@ -77,6 +77,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     /// reconnects (SMB does so within seconds) carries on well inside it; one that is gone for good no longer leaves the song
     /// buffering for ever with the scans of every share held back.
     static let defaultNoProgressLimit: TimeInterval = 120
+    /// How long a song the listener is waiting for may have had nothing from its share before `shareSilence` reports it (the notice
+    /// "isn't answering. Still trying…", well before `defaultNoProgressLimit` gives the song up). Not a slow share: one that keeps
+    /// delivering restarts the count with every byte.
+    static let defaultNoticeAfter: TimeInterval = 10
     /// Reads of one file's copy outstanding on the share at once. One read at a time brings one chunk per round trip: on SMB over a
     /// VPN 100 ms away that was about 6.7 MB/s, so a 5.1 DSD song took a minute to copy ahead of its start and its next song's
     /// copy could not keep up. Several in flight fill the link instead; on a near share they cost nothing.
@@ -150,6 +154,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     private let chunk: Int
     private let lanes: Int
     private let noProgressLimit: TimeInterval
+    private let noticeAfter: TimeInterval
     private let clock: @Sendable () -> TimeInterval
     /// Library scans of network shares wait on this while a song is being read from one.
     let gate: ShareIOGate
@@ -165,10 +170,12 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     init(directory: URL, budget: Int64 = 8 << 30, chunk: Int = 1 << 20, readsInFlight: Int = NetworkPlaybackCache.readsInFlight,
          gate: ShareIOGate = .shared,
          noProgressLimit: TimeInterval = NetworkPlaybackCache.defaultNoProgressLimit,
+         noticeAfter: TimeInterval = NetworkPlaybackCache.defaultNoticeAfter,
          clock: @escaping @Sendable () -> TimeInterval = NetworkPlaybackCache.awakeSeconds) {
         self.clock = clock
         self.gate = gate
         self.noProgressLimit = noProgressLimit
+        self.noticeAfter = noticeAfter
         session = try? Session(root: directory)
         self.directory = session?.url ?? directory; self.budget = budget; self.chunk = max(1, chunk); lanes = max(1, readsInFlight)
     }
@@ -200,7 +207,7 @@ final class NetworkPlaybackCache: @unchecked Sendable {
             if foreground { existing.promote() }
             return existing
         }
-        var source: (any PlaybackCacheReader)? = try reader ?? readerFactory?(url) ?? openShare(key: key, url: url, cancelled: cancelled)
+        var source: (any PlaybackCacheReader)? = try reader ?? readerFactory?(url) ?? openShare(key: key, url: url, foreground: foreground, cancelled: cancelled)
         // A handle can die under the copy (the share was mounted again after the link dropped): the file is opened again by
         // its path, the way it was opened first. A reader handed in by the caller has no path to open again.
         let reopen: Reopen? = reader != nil ? nil : Self.reopener(url: url, factory: readerFactory)
@@ -267,7 +274,10 @@ final class NetworkPlaybackCache: @unchecked Sendable {
     private let openings = Locked([String: Opening]())
     private static let openQueue = DispatchQueue(label: "org.szeremeta.vespertine.network-open", qos: .userInitiated, attributes: .concurrent)
 
-    private func openShare(key: String, url: URL, cancelled: () -> Bool) throws -> ShareFileReader {
+    /// When (on `clock`) each caller that is waiting for the listener's song to open began to wait.
+    private let openWaits = Locked([UUID: TimeInterval]())
+
+    private func openShare(key: String, url: URL, foreground: Bool, cancelled: () -> Bool) throws -> ShareFileReader {
         let (job, starts) = openings.withLock { table -> (Opening, Bool) in
             if let running = table[key] { return (running, false) }
             let job = Opening(); table[key] = job
@@ -284,7 +294,32 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         // `noProgressLimit` with that reason, instead of buffering for as long as the share stays quiet. Each caller counts from
         // when it began to wait; the open itself finishes, or fails, in the background (and is closed there).
         let began = clock()
+        let token = UUID()
+        if foreground { openWaits.withLock { $0[token] = began } }
+        defer { if foreground { openWaits.withLock { $0[token] = nil } } }
         return try job.wait(cancelled: cancelled, silent: { [clock, noProgressLimit] in clock() - began >= noProgressLimit })
+    }
+
+    /// How long (whole seconds on `clock`) the listener's song has been waiting for its share with nothing from it, once that is
+    /// `noticeAfter` or more; nil otherwise. Counted from the last byte that arrived or the start of the wait, whichever is later, and
+    /// only while something is actually waiting: the file's open, the start of the copy, or a decoder's read of bytes not on disk yet.
+    /// A stall inside the local lead (the decoder reads what is already there) and a prefetched next song are nobody's wait.
+    var shareSilence: Int? {
+        let silence = max(openingSilence ?? 0, copyingSilence ?? 0)
+        return silence >= noticeAfter && (openingSilence != nil || copyingSilence != nil) ? Int(silence) : nil
+    }
+
+    /// The longest a caller has waited, so far, for a song's file on a share to open (nil: none is waiting).
+    var openingSilence: TimeInterval? {
+        let now = clock()
+        return openWaits.withLock { $0.values.map { max(0, now - $0) }.max() }
+    }
+
+    /// The longest the copy of a song someone waits on has gone without a byte (nil: none is waiting on a copy).
+    private var copyingSilence: TimeInterval? {
+        // The copies are asked after the cache's lock is let go: each answers under its own.
+        let live = lock.withLock { entries.values.compactMap(\.value) }
+        return live.compactMap(\.silence).max()
     }
 
     /// Prefetches waiting for their file on the share to open (for tests).
@@ -426,6 +461,9 @@ final class NetworkPlaybackCache: @unchecked Sendable {
         var size: Int64 { storage.size }
         var isComplete: Bool { storage.condition.withLock { storage.ready.count == storage.blocks } }
         var isWaiting: Bool { storage.condition.withLock { storage.starting || storage.waiters > 0 } }
+        /// Seconds since a byte last arrived while the listener waits on this copy (its start, or a read of bytes not on disk yet);
+        /// nil when nobody does: a prefetched next song, a copy that is finished, failed or cancelled, a lead being read from disk.
+        var silence: TimeInterval? { storage.condition.withLock { storage.silence() } }
         var lastRead: Int64 { storage.condition.withLock { storage.cursor } }
         /// Bytes on disk so far.
         var copiedBytes: Int64 { storage.condition.withLock { min(storage.size, Int64(storage.ready.count) * Int64(storage.chunk)) } }
@@ -575,6 +613,12 @@ final class NetworkPlaybackCache: @unchecked Sendable {
                 let demanding = condition.withLock { demandsLink() }
                 gate.setPlaybackDemand(demanding, from: owner)
             }
+        }
+
+        /// Called with the condition lock held. See `Entry.silence`.
+        func silence() -> TimeInterval? {
+            guard foreground, !cancelled, error == nil, ready.count < blocks, starting || waiters > 0 else { return nil }
+            return max(0, clock() - lastProgress)
         }
 
         /// Nothing has arrived for `noProgressLimit`: the song fails (every waiting read with it) and stops holding scans back.
