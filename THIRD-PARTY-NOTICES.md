@@ -23,6 +23,8 @@ Vespertine is free software under the GPL-3.0-or-later (see [LICENSE](LICENSE)).
 | DUMB (CDUMB 2.0.3) | DUMB license (zlib-like) | Tracker formats | https://github.com/kode54/dumb |
 | FFmpeg 9.0.2 (a subset) | LGPL-2.1-or-later | DTS, DTS-HD, TrueHD/MLP, Dolby Digital modes macOS gets wrong, TAK, Matroska/WebM audio (FLAC, ALAC, AAC, MP3, Vorbis, Opus, WavPack, TTA, APE, PCM), DSD | https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz |
 | DST decoder, from FFmpeg's `libavcodec/dstdec.c` (Copyright (c) 2014 Peter Ross) | LGPL-2.1-or-later | DST-compressed SACD audio | [`Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c`](Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c) |
+| python-tidal (Copyright (C) The Tidalapi Developers), ported to Swift | LGPL-3.0 | TIDAL sign-in, catalog, playback info and rate-limit rules (`VespertineTidal`) | https://github.com/tamland/python-tidal |
+| TidalSwiftLib, parts ported to Swift | GPL-3.0 | TIDAL new releases and download retry timing (`VespertineTidal`) | https://github.com/melgu/TidalSwiftLib |
 
 Versions are the ones in the app's lockfile, [`App/Package.resolved`](App/Package.resolved), which release builds are held to. The full license and copyright text of every component ships inside the app, in `Contents/Resources/Licenses` (from [`App/Licenses`](App/Licenses), including SFBAudioEngine's `ACKNOWLEDGMENTS.md` at the shipped version). The FFmpeg source the decoders are built from is attached to every GitHub release; the other LGPL libraries' sources are linked above, and the prebuilt ones come from SFBAudioEngine's `*-binary-xcframework` packages, whose repositories hold the build scripts.
 
