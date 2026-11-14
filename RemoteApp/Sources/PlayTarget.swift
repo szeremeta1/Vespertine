@@ -98,6 +98,9 @@ final class PlayTarget {
 
     /// The badge: whether the song arrives as the file it is, or as a copy the Mac made in a format this device can open.
     static func badge(_ signal: PhoneSignal) -> String {
+        if let outputs = signal.discreteOutputs {
+            return String(localized: "SURROUND ON \(String(outputs)) OUTPUTS", comment: "Signal badge on the iPhone: a surround song played on an audio interface, each channel on an output of its own. %@ is the number of outputs, e.g. 6.")
+        }
         switch signal.surround {
         case .headTracked?: return String(localized: "SPATIAL AUDIO · HEAD TRACKED", comment: "Signal badge on the iPhone: a surround song rendered for headphones, following the head.")
         case .fixed?: return String(localized: "SPATIAL AUDIO · FIXED", comment: "Signal badge on the iPhone: a surround song rendered for headphones, not following the head.")
@@ -115,8 +118,42 @@ final class PlayTarget {
     static func output(_ signal: PhoneSignal) -> String {
         guard let rate = signal.outputRate, rate > 0 else { return "" }
         let kilohertz = PhoneSignal.kilohertz(rate)
-        return signal.resampled ? String(localized: "\(kilohertz) kHz, resampled by iOS", comment: "Signal chip on the iPhone: the output's sample rate, which differs from the song's.")
-                                : String(localized: "\(kilohertz) kHz", comment: "Signal chip: a sample rate.")
+        var text = signal.resampled ? String(localized: "\(kilohertz) kHz, resampled by iOS", comment: "Signal chip on the iPhone: the output's sample rate, which differs from the song's.")
+                                    : String(localized: "\(kilohertz) kHz", comment: "Signal chip: a sample rate.")
+        // On a DAC, a volume below the top means it isn't getting the song's own samples: said, not hidden.
+        if signal.onDAC, signal.volumeReduced, let volume = signal.volume {
+            text += " · " + String(localized: "volume \(percent(volume))", comment: "Signal chip on the iPhone, after the sample rate: the device's volume when it is not at 100%, lowercase. %@ is a percentage such as 80%.")
+        }
+        return text
+    }
+
+    static func percent(_ level: Double) -> String {
+        min(max(level, 0), 1).formatted(.percent.precision(.fractionLength(0)))
+    }
+
+    /// The Output screen's read-back: what the song is and what iOS says the output is doing with it. Facts only.
+    static func report(_ signal: PhoneSignal, route: PhoneRoute?) -> [(label: String, value: String)] {
+        var rows: [(String, String)] = [
+            (String(localized: "Song", comment: "Row label on the iPhone's Output screen: the playing song's format, e.g. 24/192."), signal.streamFormat),
+            (String(localized: "Song’s channels", comment: "Row label on the iPhone's Output screen: how many channels the playing song has."), String(signal.channels)),
+        ]
+        if let route {
+            rows.append((String(localized: "Output"), route.name))
+            if route.sampleRate > 0 {
+                rows.append((String(localized: "Output runs at", comment: "Row label on the iPhone's Output screen: the sample rate the output device runs at now."),
+                             String(localized: "\(PhoneSignal.kilohertz(route.sampleRate)) kHz", comment: "Signal chip: a sample rate.")))
+            }
+            if route.channels > 0 {
+                rows.append((String(localized: "Output’s channels", comment: "Row label on the iPhone's Output screen: how many channels the output device runs with now."), String(route.channels)))
+            }
+            rows.append((String(localized: "Resampled by iOS", comment: "Row label on the iPhone's Output screen: whether iOS changes the song's sample rate on the way to the output. The value is Yes or No."),
+                         signal.resampled ? String(localized: "Yes") : String(localized: "No")))
+        }
+        if signal.discreteOutputs != nil {
+            rows.append((String(localized: "Surround"), String(localized: "A channel to each output", comment: "Value on the iPhone's Output screen, for the row Surround: each channel of a surround song goes to its own output of an audio interface, unmixed.")))
+        }
+        if let volume = signal.volume { rows.append((String(localized: "Volume"), percent(volume))) }
+        return rows
     }
 }
 

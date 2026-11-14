@@ -204,6 +204,21 @@ public enum ChannelLayouts {
         return map
     }
 
+    /// The speaker taken to be on each output of an interface with `channels` outputs (a phone has no speaker setup to ask).
+    /// What the output says, when it names every one. Otherwise the order USB Audio and WAVE use: L R C LFE, the back pair,
+    /// the side pair, on the first eight; outputs past those get nothing. In one convention (the side or only pair is
+    /// Ls/Rs, the back pair Rls/Rrs), as `BedRouter` wants its bed. nil for one or two outputs.
+    public static func outputSpeakers(channels: Int, described: [AudioChannelLabel]? = nil) -> [AudioChannelLabel]? {
+        guard channels > 2 else { return nil }
+        if let described, described.count == channels, let named = speakerLabels(described),
+           !named.enumerated().allSatisfy({ $0.element == AudioChannelLabel($0.offset + 1) }) {
+            return normalizedSurrounds(named)
+        }
+        let used = min(channels, 8)
+        guard let known = wavOrderLabels(channels: used) else { return nil }
+        return normalizedSurrounds(known) + [AudioChannelLabel](repeating: kAudioChannelLabel_Unused, count: channels - used)
+    }
+
     /// A driver's stand-in for "no speaker setup": channel n named with label n (L R C LFE Ls Rs Lc Rc Cs Lsd Rsd Top …), as
     /// BlackHole and other drivers report before anyone configures speakers. Taken at its word it made an unconfigured 8-channel
     /// output a front-centres 7.1 room (a 7.1's back pair folded onto its sides, two outputs silent) and a 4-channel one a 3.1.

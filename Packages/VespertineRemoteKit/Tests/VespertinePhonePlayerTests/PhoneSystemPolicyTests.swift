@@ -69,6 +69,102 @@ import Testing
         #expect(pods.rateToAsk(for: 96_000) == nil)
         #expect(speaker.rateToAsk(for: 96_000) == nil)
     }
+
+    // MARK: DACs
+
+    private func dac(_ rate: Double, channels: Int = 2, most: Int? = nil, name: String = "K11") -> PhoneRoute {
+        PhoneRoute(name: name, portType: "USBAudio", sampleRate: rate, channels: channels, spatial: false, maximumChannels: most)
+    }
+
+    @Test func theLadderIsTheSongsRateThenItsHalves() {
+        #expect(RateLadder.rungs(for: 192_000) == [192_000, 96_000, 48_000])
+        #expect(RateLadder.rungs(for: 352_800) == [352_800, 176_400, 88_200, 44_100])
+        #expect(RateLadder.rungs(for: 44_100) == [44_100])
+        #expect(RateLadder.rungs(for: 0).isEmpty)
+    }
+
+    @Test func aDACThatTakesTheSongsRateIsAskedOnce() {
+        var ladder = RateLadder()
+        #expect(ladder.begin(route: dac(48_000), songRate: 192_000) == 192_000)
+        // The same song, the same output: not asked again while iOS thinks about it.
+        #expect(ladder.begin(route: dac(48_000), songRate: 192_000) == nil)
+        #expect(ladder.declined(route: dac(192_000)) == nil)
+    }
+
+    @Test func aDACThatDeclinesIsAskedForTheNextRungDown() {
+        var ladder = RateLadder()
+        #expect(ladder.begin(route: dac(48_000), songRate: 352_800) == 352_800)
+        // Still at 48 kHz a moment later: 352.8 was declined.
+        #expect(ladder.declined(route: dac(48_000)) == 176_400)
+        #expect(ladder.declined(route: dac(176_400)) == nil)
+    }
+
+    @Test func theLadderEndsRatherThanAskingForever() {
+        var ladder = RateLadder()
+        #expect(ladder.begin(route: dac(48_000), songRate: 88_200) == 88_200)
+        #expect(ladder.declined(route: dac(48_000)) == 44_100)
+        #expect(ladder.declined(route: dac(48_000)) == nil)
+        #expect(ladder.declined(route: dac(48_000)) == nil)
+    }
+
+    @Test func aRungTheOutputIsAlreadyAtIsNotAskedFor() {
+        var ladder = RateLadder()
+        #expect(ladder.begin(route: dac(96_000), songRate: 192_000) == 192_000)
+        // Declined, and the DAC already sits at the next rung.
+        #expect(ladder.declined(route: dac(96_000)) == nil)
+    }
+
+    @Test func aNewSongOrAnotherOutputStartsFromTheTop() {
+        var ladder = RateLadder()
+        _ = ladder.begin(route: dac(48_000), songRate: 192_000)
+        _ = ladder.declined(route: dac(48_000))
+        #expect(ladder.begin(route: dac(48_000), songRate: 44_100) == 44_100)
+        #expect(ladder.begin(route: dac(48_000, name: "Other"), songRate: 44_100) == 44_100)
+        // A song already at the output's rate asks for nothing.
+        #expect(ladder.begin(route: dac(96_000), songRate: 96_000) == nil)
+    }
+
+    @Test func bluetoothAndTheSpeakerAreNeverOnTheLadder() {
+        var ladder = RateLadder()
+        let pods = PhoneRoute(name: "AirPods", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true)
+        #expect(ladder.begin(route: pods, songRate: 96_000) == nil)
+        #expect(ladder.declined(route: pods) == nil)
+    }
+
+    @Test func aSurroundSongAsksAnInterfaceForChannelsOfItsOwn() {
+        // A 5.1 interface running with two channels: ask for six.
+        #expect(dac(48_000, channels: 2, most: 6).channelsToAsk(for: 6) == 6)
+        // 7.1 on a 5.1 interface: all it has.
+        #expect(dac(48_000, channels: 2, most: 6).channelsToAsk(for: 8) == 6)
+        // Already there, a stereo song, or a stereo DAC: nothing to ask.
+        #expect(dac(48_000, channels: 6, most: 6).channelsToAsk(for: 6) == nil)
+        #expect(dac(48_000, channels: 2, most: 6).channelsToAsk(for: 2) == nil)
+        #expect(dac(48_000).channelsToAsk(for: 6) == nil)
+        let pods = PhoneRoute(name: "AirPods", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true, maximumChannels: 8)
+        #expect(pods.channelsToAsk(for: 6) == nil)
+    }
+
+    @Test func aMultichannelInterfaceGetsTheChannelsNotABinauralRendering() {
+        let interface = dac(48_000, channels: 6, most: 6)
+        #expect(interface.isMultichannel)
+        #expect(!interface.isHeadphones)
+        #expect(interface.surroundMode(wanted: .headTracked) == .off)
+        // A stereo DAC usually feeds headphones.
+        #expect(dac(48_000).surroundMode(wanted: .fixed) == .fixed)
+    }
+
+    @Test func aDACGivingWayToTheSpeakerPausesHoweverIOSTellsIt() {
+        let speaker = PhoneRoute(name: "Speaker", portType: "Speaker", sampleRate: 48_000, channels: 2, spatial: false)
+        let pods = PhoneRoute(name: "AirPods", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true)
+        #expect(RouteChangePolicy.pauses(from: dac(96_000), to: speaker))
+        #expect(RouteChangePolicy.pauses(from: pods, to: speaker))
+        #expect(RouteChangePolicy.pauses(from: dac(96_000), to: nil))
+        // The DAC changing its rate, or headphones taking over from the speaker, is not an unplugging.
+        #expect(!RouteChangePolicy.pauses(from: dac(48_000), to: dac(96_000)))
+        #expect(!RouteChangePolicy.pauses(from: speaker, to: pods))
+        #expect(!RouteChangePolicy.pauses(from: dac(96_000), to: pods))
+        #expect(!RouteChangePolicy.pauses(from: nil, to: speaker))
+    }
 }
 
 @Suite struct PositionAnchorTests {

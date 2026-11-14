@@ -79,7 +79,13 @@ MAC**, all six channels placed as in B4. Play it again: it should start at once 
 2. Play 16/44.1, then 24/96, then 24/192. For each, note the rate the DAC's own display shows and the rate the app shows.
 3. Expect the app to ask iOS for the song's rate. If the DAC's display doesn't follow, the app must say **resampled by iOS**; if the
    app says the rates match while the DAC shows another, that is a bug.
-4. Unplug the DAC mid-song: expect a pause.
+4. Open Output while each plays. "What Reaches the Output" must agree with the DAC's display: the rate, the channel count, and
+   Resampled by iOS (No when the rates match). Note any row that disagrees.
+5. Play 24/352.8 or DSD-converted material on a DAC that stops at 192: expect the output at 176.4, not 48.
+6. Turn the phone's volume down: the signal chip must add "volume 80%" (or whatever it is). At 100% it says nothing.
+7. Multichannel interface or HDMI receiver, if there is one: play a 5.1 song. Expect **SURROUND ON 6 OUTPUTS** and each channel on
+   its own output (L, R, C, LFE, then the back pair). On a stereo DAC the same song is folded to stereo.
+8. Unplug the DAC mid-song: expect a pause, and silence from the phone's speaker. Plug it back in: still paused until Play.
 
 ## B8. Bit-exactness (when a way to measure exists)
 

@@ -51,6 +51,12 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         return (PhoneRemote(playback: playback, library: { await library.answer($0) }), library)
     }
 
+    /// Waits for something the phone must get round to. The five seconds end a run where it never does; they decide nothing.
+    private func until(_ condition: () -> Bool) async throws {
+        let deadline = ContinuousClock.now + .seconds(5)
+        while !condition(), ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(10)) }
+    }
+
     @Test func whichCommandsThePhoneTakesAndWhichStayWithTheMac() {
         for command: RemoteCommand in [.playPause, .next, .seek(seconds: 3), .playAlbum(key: "a", startAt: 0, shuffled: nil), .playNext(ids: [1]),
                                        .jump(entry: "x"), .clearUpcoming, .setShuffle(on: true), .volume(action: .up), .stop] {
@@ -152,14 +158,15 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         let (remote, _) = try made()
         remote.playback.holdReason = { "Playing over cellular data is off." }
         _ = await remote.run(.playAlbum(key: "a", startAt: 0, shuffled: nil))
-        try await Task.sleep(for: .milliseconds(60))
+        // The phone says why when it gets to the song: waited for, not guessed at (a busy machine takes its time).
+        try await until { remote.playerState.error != nil }
         #expect(remote.playerState.error == "Playing over cellular data is off.")
         #expect(remote.queueState.current?.track.id == 1)
         #expect(remote.playerState.playback != .playing && remote.playback.preparing == nil)
         // Allowed again: Play starts the same song.
         remote.playback.holdReason = { nil }
         _ = await remote.run(.playPause)
-        try await Task.sleep(for: .milliseconds(60))
+        try await until { remote.playback.preparing != nil }
         #expect(remote.playback.preparing?.progress == 0.25 && remote.queueState.current?.track.id == 1)
         remote.playback.stop()
     }
@@ -173,6 +180,32 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         #expect(state.signal?.bitPerfect != true)
         #expect(state.volume.route == .fixed)
         remote.playback.stop()
+    }
+
+    @Test func anInterfaceWithMoreThanTwoOutputsGetsChannelsOfTheirOwnAndAStereoDACDoesNot() throws {
+        let (remote, _) = try made()
+        remote.route = PhoneRoute(name: "Interface", portType: "USBAudio", sampleRate: 48_000, channels: 6, spatial: false, maximumChannels: 6)
+        #expect(remote.playback.player.outputSpeakers?.count == 6)
+        #expect(remote.playback.player.spatialMode == .off)
+        remote.route = PhoneRoute(name: "K11", portType: "USBAudio", sampleRate: 48_000, channels: 2, spatial: false, maximumChannels: 2)
+        #expect(remote.playback.player.outputSpeakers == nil)
+        remote.route = PhoneRoute(name: "AirPods Max", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true)
+        #expect(remote.playback.player.outputSpeakers == nil)
+    }
+
+    @Test func theSignalSaysWhatTheOutputGaveAndWhetherTheVolumeIsAtItsTop() {
+        let descriptor = StreamDescriptor(stream: 1, kind: .original, byteSize: 10,
+                                          format: StreamFormat(codec: "FLAC", container: "flac", sampleRate: 192_000, bitDepth: 24, channels: 2, channelLabels: nil, lossless: true),
+                                          frames: 10, tag: "t", chunkSize: 1)
+        var signal = PhoneSignal(stream: descriptor, route: PhoneRoute(name: "K11", portType: "USBAudio", sampleRate: 96_000, channels: 2, spatial: false))
+        #expect(signal.resampled && signal.onDAC && signal.outputChannels == 2)
+        #expect(!signal.volumeReduced, "unknown volume is not called reduced")
+        signal.volume = 0.8
+        #expect(signal.volumeReduced)
+        signal.volume = 1
+        #expect(!signal.volumeReduced)
+        let pods = PhoneSignal(stream: descriptor, route: PhoneRoute(name: "AirPods", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true))
+        #expect(!pods.onDAC)
     }
 }
 #endif

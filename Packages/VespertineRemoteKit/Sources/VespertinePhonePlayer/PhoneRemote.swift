@@ -18,13 +18,19 @@ public struct PhoneRoute: Equatable, Sendable {
     public var channels: Int
     /// iOS can spatialize on this route (AirPods with Spatial Audio).
     public var spatial: Bool
+    /// The most output channels iOS says this route can run with (a 5.1 interface says 6 while it runs with 2).
+    public var maximumChannels: Int
+    /// The speaker each output channel is, when the output says (`AudioChannelLabel` values). Most interfaces don't.
+    public var channelLabels: [UInt32]?
 
-    public init(name: String, portType: String, sampleRate: Double, channels: Int, spatial: Bool) {
+    public init(name: String, portType: String, sampleRate: Double, channels: Int, spatial: Bool, maximumChannels: Int? = nil, channelLabels: [UInt32]? = nil) {
         self.name = name
         self.portType = portType
         self.sampleRate = sampleRate
         self.channels = channels
         self.spatial = spatial
+        self.maximumChannels = max(maximumChannels ?? channels, channels)
+        self.channelLabels = channelLabels
     }
 
     public var isBluetooth: Bool { portType.hasPrefix("Bluetooth") }
@@ -55,6 +61,17 @@ public struct PhoneSignal: Equatable, Sendable {
     public var resampled: Bool { outputRate.map { $0 > 0 && abs($0 - streamRate) > 0.5 } ?? false }
     /// For a surround song: how it is being played (`.off` is the fold to stereo). nil for stereo and mono.
     public var surround: SpatialModeChoice?
+    /// For a surround song on an interface with more than two outputs: how many outputs it plays on, a channel each.
+    public var discreteOutputs: Int?
+    /// The channels the output runs with, when known.
+    public var outputChannels: Int?
+    /// The device's own volume, 0…1, when known.
+    public var volume: Double?
+    /// The volume isn't at its top: what reaches a DAC is not the song's own samples.
+    public var volumeReduced: Bool { volume.map { $0 < 0.995 } ?? false }
+    /// The output is one that can run at a song's own rate (a DAC, the headphone adapter), where the volume and the rate
+    /// decide whether it gets the song's samples as they are.
+    public var onDAC = false
 
     public init(stream: StreamDescriptor, route: PhoneRoute?) {
         converted = stream.kind != .original
@@ -64,6 +81,8 @@ public struct PhoneSignal: Equatable, Sendable {
         bitDepth = stream.format.bitDepth
         channels = stream.format.channels
         outputRate = route.map(\.sampleRate)
+        outputChannels = route.map(\.channels)
+        onDAC = route.map { !$0.hasFixedRate } ?? false
     }
 
     /// "24/96", "16/44.1", or "48 kHz" for lossy audio.
@@ -103,6 +122,9 @@ public final class PhoneRemote {
         case .headTracked: .headTracked
         }
         if playback.player.spatialMode != wanted { playback.player.spatialMode = wanted }
+        // An interface with more than two outputs gets a surround song's channels on outputs of their own.
+        let speakers = route.flatMap { $0.isMultichannel ? ChannelLayouts.outputSpeakers(channels: $0.channels, described: $0.channelLabels) : nil }
+        if playback.player.outputSpeakers != speakers { playback.player.outputSpeakers = speakers }
     }
     /// A signal in the app's language: the badge ("ORIGINAL FILE", "CONVERTED ON THE MAC"…) and what the output runs at
     /// ("48 kHz", or that iOS resampled to it).
@@ -211,7 +233,11 @@ public final class PhoneRemote {
             case .untouched: signal.surround = nil
             case .downmix: signal.surround = .off
             case .spatial(let tracked): signal.surround = tracked ? .headTracked : .fixed
+            case .discrete(let outputs):
+                signal.surround = nil
+                signal.discreteOutputs = outputs
             }
+            signal.volume = outputVolume
             return signal
         }
     }

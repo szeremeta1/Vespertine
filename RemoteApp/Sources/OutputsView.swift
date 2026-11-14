@@ -46,6 +46,17 @@ struct OutputsView: View {
                 } footer: {
                     Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
                 }
+                if playsHere, let phone = session.phone, let signal = phone.signal {
+                    Section {
+                        ForEach(PlayTarget.report(signal, route: phone.route), id: \.label) { row in
+                            LabeledContent(row.label, value: row.value)
+                        }
+                    } header: {
+                        Text("What Reaches the Output")
+                    } footer: {
+                        Text("Read back from iOS while the song plays, not assumed. Vespertine asks a DAC for each song’s own rate and, for surround, an interface for a channel per output (in the order L, R, C, LFE, back pair, side pair). iOS doesn’t tell apps an output’s bit depth. With the volume below 100%, a DAC doesn’t receive the song’s samples unchanged.")
+                    }
+                }
                 Section {
                     ForEach(Array((session.outputs?.outputs ?? []).enumerated()), id: \.offset) { _, output in
                         Button {

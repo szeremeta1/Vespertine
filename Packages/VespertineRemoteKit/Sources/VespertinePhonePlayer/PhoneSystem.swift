@@ -37,8 +37,11 @@ public final class PhoneSystem {
     private var cover: (key: String, art: MPMediaItemArtwork)?
     private var coverTask: Task<Void, Never>?
     private var coverTried: String?
-    /// The rate last asked of an output, so iOS declining it isn't asked again for every song.
-    private var asked: (route: String, rate: Double)?
+    /// What a DAC has been asked for, and what to ask next when it declines.
+    private var ladder = RateLadder()
+    private var settling: Task<Void, Never>?
+    /// The channel count last asked of an output, so it isn't asked again for every song.
+    private var askedChannels: (route: String, channels: Int)?
     private var volumeWatch: NSKeyValueObservation?
 
     /// `artwork`: a cover's image data for its key (the app's cover cache).
@@ -88,6 +91,7 @@ public final class PhoneSystem {
         for (command, target) in commands { command.removeTarget(target) }
         commands = []
         coverTask?.cancel()
+        settling?.cancel()
         volumeWatch = nil
         remote.onTransport = nil
         shown = nil
@@ -106,32 +110,63 @@ public final class PhoneSystem {
     }
 
     private func routeChanged(_ reason: RouteChangePolicy.Reason) {
-        if RouteChangePolicy.pauses(reason: reason), remote.playback.isPlaying { remote.playback.pause() }
+        let old = remote.route
         refreshRoute()
-        askForRate()
+        if RouteChangePolicy.pauses(reason: reason) || RouteChangePolicy.pauses(from: old, to: remote.route), remote.playback.isPlaying {
+            remote.playback.pause()
+        }
+        askOutput()
     }
 
     /// The engine stopped because its output changed (another device, another rate, or iOS restarted its audio services).
+    /// iOS may say this before it says a DAC was unplugged: the music is paused first, so it is never started on the speaker.
     private func outputChanged() {
+        let old = remote.route
         refreshRoute()
+        if RouteChangePolicy.pauses(from: old, to: remote.route), remote.playback.isPlaying { remote.playback.pause() }
         remote.playback.player.recoverFromConfigurationChange()
     }
 
     private func refreshRoute() {
         let route = PhoneAudioSession.currentRoute().map {
-            PhoneRoute(name: $0.outputName, portType: $0.portType, sampleRate: $0.sampleRate, channels: $0.outputChannels, spatial: $0.isSpatialAudioEnabled)
+            PhoneRoute(name: $0.outputName, portType: $0.portType, sampleRate: $0.sampleRate, channels: $0.outputChannels, spatial: $0.isSpatialAudioEnabled,
+                       maximumChannels: $0.maximumChannels, channelLabels: $0.channelLabels)
         }
         if remote.route != route { remote.route = route }
     }
 
-    /// A DAC (or the headphone adapter) is asked to run at the song's rate, once per rate; Bluetooth and the speaker never
-    /// are. iOS answers by changing the route's rate, which comes back as an output change.
-    private func askForRate() {
-        guard let route = remote.route, let rate = remote.playback.stream?.format.sampleRate,
-              let wanted = route.rateToAsk(for: rate) else { return }
-        if let asked, asked.route == route.name, asked.rate == wanted { return }
-        asked = (route.name, wanted)
-        try? AVAudioSession.sharedInstance().setPreferredSampleRate(wanted)
+    /// A DAC (or the headphone adapter) is asked to run at the song's rate, and an interface with more than two outputs
+    /// to run with enough of them for a surround song; Bluetooth and the speaker are never asked for anything. iOS
+    /// answers by changing the route, which comes back as an output change. What it gave is read back and shown.
+    private func askOutput() {
+        guard let route = remote.route, let format = remote.playback.stream?.format else { return }
+        let session = AVAudioSession.sharedInstance()
+        if let channels = route.channelsToAsk(for: format.channels),
+           askedChannels?.route != route.name || askedChannels?.channels != channels {
+            askedChannels = (route.name, channels)
+            try? session.setPreferredOutputNumberOfChannels(channels)
+        }
+        if let rate = ladder.begin(route: route, songRate: format.sampleRate) { ask(rate) }
+    }
+
+    /// Asks for `rate`, then looks at what the output runs at once the song is playing: declined, the next rate down the
+    /// ladder is asked for (`RateLadder`).
+    private func ask(_ rate: Double) {
+        try? AVAudioSession.sharedInstance().setPreferredSampleRate(rate)
+        settling?.cancel()
+        settling = Task { [weak self] in
+            // A preferred rate takes effect while the session is active: wait for the song to be playing.
+            for _ in 0..<20 {
+                try? await Task.sleep(for: .milliseconds(700))
+                guard let self, !Task.isCancelled else { return }
+                guard self.remote.playback.player.state == .playing else { continue }
+                self.refreshRoute()
+                if let route = self.remote.route, let next = self.ladder.declined(route: route) { self.ask(next) }
+                return
+            }
+            // Never played: the next song asks afresh.
+            self?.ladder.forget()
+        }
     }
 
     private func transport(_ command: RemoteCommand) {
@@ -210,7 +245,7 @@ public final class PhoneSystem {
         _ = playback.stream
         // Read so a seek or a stall brings this back; the lock screen is told where the song is this instant.
         _ = playback.anchor
-        askForRate()
+        askOutput()
         guard let entry = playback.nowPlaying else {
             if shown != nil {
                 shown = nil

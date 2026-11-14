@@ -99,6 +99,12 @@ with a small metadata file beside each). One conversion runs at a time. The libr
 - **Keep on This Device** (`KeptStore`, `Keeper`): an album or playlist is fetched whole, one song at a time, into Application Support (not backed
   up), listed and played with the Mac off. Lists are refreshed from the Mac at each connection. "Smaller copies" asks with `smaller: true`.
 - The demo (`DemoSound`) serves generated sound through the same channel, so the app can be heard without a Mac.
+- **An external DAC** (`RateLadder`, `PhoneRoute`): the phone asks iOS to run the output at the song's rate, reads back what it got a moment
+  later, and if iOS declined asks for half, and half again (352.8 → 176.4 → 88.2 → 44.1), so any conversion left to iOS is the simplest one.
+  A surround song on an interface or HDMI receiver with more than two outputs asks for that many channels and sends each channel to an output
+  of its own, unmixed; on a stereo output it is folded. The Output screen's "What Reaches the Output" lists what was read back: the song,
+  the output's rate and channels, whether iOS resamples, and the volume. The engine applies no gain. A DAC, headphones or AirPlay giving way
+  to the phone's speaker pauses; playback is never carried on from the speaker.
 
 ## The listener's safety
 
