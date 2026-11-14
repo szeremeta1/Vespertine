@@ -647,7 +647,20 @@ final class AppModel {
         let rows = Dictionary(library.tidalRecords.values.map { ($0.tidalId, $0.trackId) }, uniquingKeysWith: { a, _ in a })
         let known = Dictionary(library.tracks(ids: tidalTracks.compactMap { rows[$0.id] }).compactMap { t in t.id.map { ($0, t) } },
                                uniquingKeysWith: { a, _ in a })
-        return tidalTracks.map { tidal in rows[tidal.id].flatMap { known[$0] } ?? Track.tidal(TidalTrackInput(tidal), sourceId: nil) }
+        return tidalTracks.map { tidal in
+            if let row = rows[tidal.id].flatMap({ known[$0] }) { return row }
+            var track = Track.tidal(TidalTrackInput(tidal), sourceId: nil)
+            if let probed = player.catalogFormats[tidal.id] {
+                track.applyProbedFormat(codec: probed.codec, sampleRate: probed.sampleRate, bitDepth: probed.bitDepth, channels: probed.channels)
+            }
+            return track
+        }
+    }
+
+    /// The Format column of a row: "≈" while a TIDAL song's format is only what TIDAL lists.
+    func formatLabel(of track: Track) -> (text: String, help: String?) {
+        let probed = URL(string: track.location).flatMap(TidalPlayback.trackId(from:)).map { player.catalogFormats[$0] != nil } ?? false
+        return track.formatLabel(tidal: track.id.flatMap { library.tidalRecords[$0] }, probed: probed)
     }
 
     /// The catalog tracks the TIDAL pages listed, by TIDAL id, for the menus of their rows (Add to Library, Download).

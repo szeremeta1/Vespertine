@@ -120,6 +120,9 @@ final class PlayerController {
     /// Set while the user drags the scrubber.
     var scrubbing: Double?
 
+    /// The real format of TIDAL catalog songs (no library row to record it in) played this run, by TIDAL id.
+    private(set) var catalogFormats: [Int: SourceFormat] = [:]
+
     /// Stores a streamed TIDAL song's real format once the engine has opened it (`recordProbedFormat`).
     @ObservationIgnored private lazy var probedFormats = ProbedFormatRecorder { [library] id, format in
         try? library.database.recordProbedFormat(trackId: id, codec: format.codec, sampleRate: format.sampleRate,
@@ -942,6 +945,10 @@ final class PlayerController {
                 if let item = snap.item, let id = item.trackID {
                     probedFormats.observe(url: item.url, trackID: id, source: snap.signalPath?.source,
                                           alreadyProbed: library.tidalRecords[id]?.formatIsProbed ?? true)
+                } else if let item = snap.item, let source = snap.signalPath?.source, let tidalId = TidalPlayback.trackId(from: item.url),
+                          catalogFormats[tidalId] != source {
+                    // A catalog song (no library row): its lists show what was read instead of what TIDAL listed.
+                    catalogFormats[tidalId] = source
                 }
             }
             if systemRendering != snap.systemRendering { systemRendering = snap.systemRendering }

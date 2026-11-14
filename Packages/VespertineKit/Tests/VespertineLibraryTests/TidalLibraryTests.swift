@@ -12,10 +12,10 @@ import Testing
 @testable import VespertineLibrary
 
 private func input(_ id: Int, title: String = "Song", album: String = "Album", artist: String = "Artist",
-                   quality: String = "LOSSLESS", cover: String? = "ab-cd") -> TidalTrackInput {
+                   quality: String = "LOSSLESS", tags: [String] = ["LOSSLESS"], cover: String? = "ab-cd") -> TidalTrackInput {
     TidalTrackInput(tidalId: id, title: title, artist: artist, album: album, albumArtist: artist, trackNumber: id, discNumber: 1,
                     trackTotal: 10, discTotal: 1, duration: 200, isrc: "XX0000000\(id)", releaseDate: "2020-05-01", year: 2020,
-                    copyright: "(c) Nobody", explicit: id % 2 == 0, popularity: 40, listedQuality: quality, mediaTags: ["LOSSLESS"],
+                    copyright: "(c) Nobody", explicit: id % 2 == 0, popularity: 40, listedQuality: quality, mediaTags: tags,
                     replayGain: TidalReplayGain(trackGain: -7.5, trackPeak: 0.97, albumGain: -8.25, albumPeak: 0.99),
                     albumId: 9000 + id, artistIds: [7, 8], coverUUID: cover)
 }
@@ -87,22 +87,37 @@ struct TidalLibraryTests {
     func listedFormat(quality: String, codec: String, rate: Double, depth: Int?) throws {
         let db = try LibraryDatabase.inMemory()
         let source = try #require(try db.tidalSource(userId: 1).id)
-        let ids = try db.upsertTidalTracks([input(1, quality: quality)], sourceId: source)
+        let ids = try db.upsertTidalTracks([input(1, quality: quality, tags: [])], sourceId: source)
         let track = try #require(try db.allTracks().first { $0.id == ids[1] })
         #expect(track.codec == codec && track.sampleRate == rate && track.bitDepth == depth)
         #expect(track.isLossless == (codec == "FLAC"))
+    }
+
+    /// TIDAL lists a hi-res track as `audioQuality` LOSSLESS (or even LOW, in search results); only `mediaMetadata.tags` says what
+    /// the stream can be.
+    @Test("The media tags, when there are any, give the format over the listed quality", arguments: [
+        ("LOSSLESS", ["LOSSLESS", "HIRES_LOSSLESS"], "FLAC", 96_000.0, 24 as Int?), ("LOW", ["LOSSLESS"], "FLAC", 44_100.0, 16),
+        ("LOW", ["LOSSLESS", "HIRES_LOSSLESS", "DOLBY_ATMOS"], "FLAC", 96_000.0, 24), ("LOW", ["DOLBY_ATMOS"], "AAC", 44_100.0, nil),
+        ("HIGH", [], "AAC", 44_100.0, nil),
+    ])
+    func taggedFormat(quality: String, tags: [String], codec: String, rate: Double, depth: Int?) throws {
+        let db = try LibraryDatabase.inMemory()
+        let source = try #require(try db.tidalSource(userId: 1).id)
+        let ids = try db.upsertTidalTracks([input(1, quality: quality, tags: tags)], sourceId: source)
+        let track = try #require(try db.allTracks().first { $0.id == ids[1] })
+        #expect(track.codec == codec && track.sampleRate == rate && track.bitDepth == depth)
     }
 
     @Test("A probed format replaces the listed one and a later sync does not overwrite it")
     func probedFormatSticks() throws {
         let db = try LibraryDatabase.inMemory()
         let source = try #require(try db.tidalSource(userId: 1).id)
-        let id = try #require(try db.upsertTidalTracks([input(1, quality: "HI_RES_LOSSLESS")], sourceId: source)[1])
+        let id = try #require(try db.upsertTidalTracks([input(1, quality: "LOSSLESS", tags: ["LOSSLESS", "HIRES_LOSSLESS"])], sourceId: source)[1])
         var track = try #require(try db.allTracks().first)
         #expect(track.codec == "FLAC" && track.sampleRate == 96_000 && track.bitDepth == 24)
         try db.recordProbedFormat(trackId: id, codec: "flac", sampleRate: 192_000, bitDepth: 24, channels: 2)
         #expect(try db.tidalRecord(trackId: id)?.formatIsProbed == true)
-        try db.upsertTidalTracks([input(1, title: "Later", quality: "HI_RES_LOSSLESS")], sourceId: source)
+        try db.upsertTidalTracks([input(1, title: "Later", quality: "LOSSLESS", tags: ["LOSSLESS", "HIRES_LOSSLESS"])], sourceId: source)
         track = try #require(try db.allTracks().first)
         #expect(track.title == "Later")
         #expect(track.codec == "FLAC" && track.sampleRate == 192_000 && track.bitDepth == 24 && track.isLossless)

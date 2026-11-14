@@ -146,7 +146,7 @@ struct TrackTable: View {
             }
 
             TableColumn("Format", value: \.track.sampleRate) { row in
-                let format = row.track.formatLabel(tidal: row.track.id.flatMap { model.library.tidalRecords[$0] })
+                let format = model.formatLabel(of: row.track)
                 HStack(spacing: 8) {
                     Text(format.text).font(Typeface.mono(11)).rowForeground(Palette.text2)
                         .lineLimit(1).fixedSize()

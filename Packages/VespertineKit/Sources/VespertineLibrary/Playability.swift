@@ -84,9 +84,11 @@ public extension Track {
     }
 
     /// The Format column's text and tooltip. A TIDAL song whose stream hasn't been read yet shows what TIDAL lists for it, marked "≈",
-    /// so the app never claims a format it hasn't seen (decision 204).
-    func formatLabel(tidal: TidalTrackRecord?) -> (text: String, help: String?) {
-        guard let tidal, !tidal.formatIsProbed else { return (formatSummary, nil) }
+    /// so the app never claims a format it hasn't seen (decision 204). That covers catalog rows (a TIDAL song with no library row,
+    /// so no `tidal` record): `probed` says their stream has been read this run.
+    func formatLabel(tidal: TidalTrackRecord?, probed: Bool = false) -> (text: String, help: String?) {
+        let listed = tidal.map { !$0.formatIsProbed } ?? (isTidalTrack && id == nil && !probed)
+        guard listed else { return (formatSummary, nil) }
         return (formatSummary + " ≈", String(localized: "Listed by TIDAL; confirmed when played", comment: "Tooltip of a TIDAL song's format before it has been played."))
     }
 }

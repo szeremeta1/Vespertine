@@ -89,10 +89,14 @@ public struct TidalTrackInput: Sendable {
         self.streamable = streamable; self.unavailableReason = unavailableReason
     }
 
-    /// The format a track starts with, from the quality TIDAL lists (the stream's own replaces it once read; see `recordProbedFormat`).
-    /// HI_RES_LOSSLESS is a placeholder: it may arrive as 24/44.1 up to 24/192.
+    /// The format a track starts with, from what TIDAL lists (the stream's own replaces it once read; see `recordProbedFormat`).
+    /// The media tags come first: TIDAL lists a hi-res track's `audioQuality` as LOSSLESS (and search results often say LOW for a
+    /// track that streams as FLAC), and only the tags say what the stream can be. `audioQuality` decides when there is no
+    /// HIRES_LOSSLESS or LOSSLESS tag. The hi-res format is a placeholder: it may arrive as 24/44.1 up to 24/192.
     var listedFormat: (codec: String, lossless: Bool, sampleRate: Double, bitDepth: Int?, bitrate: Double?) {
-        switch listedQuality {
+        if mediaTags.contains("HIRES_LOSSLESS") { return ("FLAC", true, 96_000, 24, nil) }
+        if mediaTags.contains("LOSSLESS") { return ("FLAC", true, 44_100, 16, nil) }
+        return switch listedQuality {
         case "HI_RES_LOSSLESS": ("FLAC", true, 96_000, 24, nil)
         case "HI_RES": ("FLAC", true, 48_000, 24, nil)    // MQA: a 24-bit FLAC that unfolds above 48 kHz
         case "HIGH": ("AAC", false, 44_100, nil, 320)
@@ -446,23 +450,13 @@ extension LibraryDatabase {
     /// The format the stream (or the downloaded file) turned out to have: it replaces what TIDAL listed, and later syncs leave it be.
     public func recordProbedFormat(trackId: Int64, codec: String, sampleRate: Double, bitDepth: Int?, channels: Int) throws {
         try writer.write { db in
-            let name = Self.libraryCodecName(codec)
+            let name = Track.libraryCodecName(codec)
             let lossy = MetadataReader.lossyCodecs.contains(name)
             try db.execute(sql: """
                 UPDATE track SET codec = ?, isLossless = ?, sampleRate = ?, bitDepth = ?, channels = ?, bitrate = CASE WHEN ? THEN bitrate ELSE NULL END
                 WHERE id = ?
                 """, arguments: [name, !lossy, sampleRate, bitDepth, channels, lossy, trackId])
             try db.execute(sql: "UPDATE tidalTrack SET formatIsProbed = 1 WHERE trackId = ?", arguments: [trackId])
-        }
-    }
-
-    /// The names the library shows for a codec ("FLAC", not "flac"): its filters and format marks compare them.
-    static func libraryCodecName(_ codec: String) -> String {
-        switch codec.lowercased() {
-        case "flac": "FLAC"
-        case "aac": "AAC"
-        case "alac": "ALAC"
-        default: codec
         }
     }
 
@@ -602,5 +596,30 @@ extension LibraryDatabase {
                 try db.execute(sql: "DELETE FROM tidalFavorite WHERE list = ? AND itemId = ?", arguments: [list, id])
             }
         }
+    }
+}
+
+extension Track {
+    /// The names the library shows for a codec ("FLAC", not "flac"): its filters and format marks compare them.
+    static func libraryCodecName(_ codec: String) -> String {
+        switch codec.lowercased() {
+        case "flac": "FLAC"
+        case "aac": "AAC"
+        case "alac": "ALAC"
+        default: codec
+        }
+    }
+
+    /// The format a TIDAL stream turned out to have, in place of the listed one (what `recordProbedFormat` writes to a row, for a
+    /// catalog track that has none).
+    public mutating func applyProbedFormat(codec: String, sampleRate: Double, bitDepth: Int?, channels: Int) {
+        let name = Self.libraryCodecName(codec)
+        let lossy = MetadataReader.lossyCodecs.contains(name)
+        self.codec = name
+        isLossless = !lossy
+        self.sampleRate = sampleRate
+        self.bitDepth = bitDepth
+        self.channels = channels
+        if !lossy { bitrate = nil }
     }
 }

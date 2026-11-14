@@ -142,4 +142,22 @@ struct PlayabilityTests {
         let local = track().formatLabel(tidal: nil)
         #expect(local.text == track().formatSummary && local.help == nil)
     }
+
+    @Test("A catalog row (a TIDAL song with no library row) shows ≈ too, until its stream has been read")
+    func approximateCatalogFormat() {
+        var catalog = Self.streaming
+        catalog.id = nil
+        let listed = catalog.formatLabel(tidal: nil)
+        #expect(listed.text == catalog.formatSummary + " ≈" && listed.help != nil)
+        let probed = catalog.formatLabel(tidal: nil, probed: true)
+        #expect(probed.text == catalog.formatSummary && probed.help == nil)
+    }
+
+    @Test("A probed format applied to a track replaces codec, rate, depth and channels; a lossless one drops the bitrate")
+    func applyProbedFormat() {
+        var t = Self.streaming
+        t.codec = "AAC"; t.isLossless = false; t.bitrate = 96; t.bitDepth = nil; t.sampleRate = 44_100
+        t.applyProbedFormat(codec: "flac", sampleRate: 96_000, bitDepth: 24, channels: 2)
+        #expect(t.codec == "FLAC" && t.isLossless && t.sampleRate == 96_000 && t.bitDepth == 24 && t.bitrate == nil && t.channels == 2)
+    }
 }
