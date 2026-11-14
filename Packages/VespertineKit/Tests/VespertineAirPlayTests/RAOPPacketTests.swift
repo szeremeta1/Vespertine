@@ -54,11 +54,19 @@ struct RAOPPacketTests {
 
     @Test("The NTP clock runs forward at one second a second")
     func clock() async throws {
+        // Each reading sits between two readings of the uptime clock, so however long a busy machine takes over the
+        // sleep, what the NTP clock says passed has to lie between the shortest and the longest it can have been.
+        let t0 = DispatchTime.now().uptimeNanoseconds
         let a = NTPClock.now()
+        let t1 = DispatchTime.now().uptimeNanoseconds
         try await Task.sleep(for: .milliseconds(100))
+        let t2 = DispatchTime.now().uptimeNanoseconds
         let b = NTPClock.now()
+        let t3 = DispatchTime.now().uptimeNanoseconds
         let seconds = Double(b - a) / 4_294_967_296
-        #expect(seconds > 0.09 && seconds < 0.5)
+        #expect(seconds >= Double(t2 - t1) / 1e9 - 0.001)
+        #expect(seconds <= Double(t3 - t0) / 1e9 + 0.001)
+        #expect(seconds > 0.09)
         #expect(a >> 32 > 3_900_000_000)   // a date after 2023
     }
 

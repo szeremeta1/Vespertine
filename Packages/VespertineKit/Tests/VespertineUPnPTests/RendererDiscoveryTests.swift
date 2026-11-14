@@ -20,6 +20,11 @@ final class CountingSearcher: SSDPSearching, @unchecked Sendable {
     }
 }
 
+/// Waits until the search discovery makes when it starts has finished, however long the machine takes over it.
+private func firstSearchDone(_ discovery: RendererDiscovery) async {
+    while discovery.searches == 0 || discovery.isSearching { try? await Task.sleep(for: .milliseconds(5)) }
+}
+
 @Suite("Renderer discovery", .serialized)
 struct RendererDiscoveryTests {
     @Test("With the switch off (the default), discovery never starts: no search, no media server")
@@ -43,7 +48,7 @@ struct RendererDiscoveryTests {
         let searcher = CountingSearcher()
         let service = RendererService(discovery: RendererDiscovery(searcher: searcher))
         try await service.setEnabled(true)
-        try await Task.sleep(for: .milliseconds(100))
+        await firstSearchDone(service.discovery)
         #expect(searcher.searches >= 1)
         #expect(service.media.isRunning)
         try await service.setEnabled(false)
@@ -64,7 +69,7 @@ struct RendererDiscoveryTests {
         let discovery = RendererDiscovery(searcher: searcher)
         discovery.start()
         defer { discovery.stop() }
-        try await Task.sleep(for: .milliseconds(300))
+        await firstSearchDone(discovery)
         await discovery.searchOnce()
         #expect(discovery.renderers.map(\.name) == ["Fake Renderer"])
         #expect(discovery.renderers.first?.kind == .openHome)
