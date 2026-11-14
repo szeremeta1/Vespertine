@@ -73,6 +73,11 @@ private func makePreparer() throws -> (StreamPreparer, URL) {
         }
     }
 
+    @Test func onlyAPhoneThatPlaysSongsItselfIsToldTheyStopped() {
+        #expect(StreamNotice.tells(protocolVersion: RemoteProtocol.streamVersion))
+        #expect(!StreamNotice.tells(protocolVersion: 1))
+    }
+
     @Test func anUnknownSongFailsInWords() async throws {
         let (preparer, dir) = try makePreparer(); defer { try? FileManager.default.removeItem(at: dir) }
         guard case .reply(.failed(let reason))? = await preparer.handle(.streamOpen(id: 404, maxSampleRate: nil), id: 1, client: "a", protocolVersion: 2, allowed: true) else {

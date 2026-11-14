@@ -20,6 +20,8 @@ public struct DiscoveredMac: Identifiable, Hashable, Sendable {
     /// The port the Mac says it listens on (nil from a Mac that doesn't say).
     public var port: UInt16?
     public var endpoint: NWEndpoint
+    /// The Mac says it is a notebook (nil: it doesn't say).
+    public var portable: Bool?
 
     public init(name: String, serverID: String, protocolVersion: Int? = nil, appVersion: String? = nil, port: UInt16? = nil, endpoint: NWEndpoint) {
         self.name = name
@@ -38,6 +40,7 @@ public struct DiscoveredMac: Identifiable, Hashable, Sendable {
                   appVersion: txt[RemoteProtocol.TXTKey.appVersion],
                   port: RemotePort.advertised(txt: txt[RemoteProtocol.TXTKey.port].map { [RemoteProtocol.TXTKey.port: $0] } ?? [:]),
                   endpoint: endpoint)
+        if txt[RemoteProtocol.TXTKey.portable] == "1" { portable = true }
     }
 }
 

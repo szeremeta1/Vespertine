@@ -489,6 +489,10 @@ extension AlbumCopies {
         }?.element
     }
 
+    /// The album's "copies" have no song in common: they are different songs in different layouts or folders (a stereo
+    /// album with one surround bonus track), not the same album twice. Choosing one of them would leave songs out.
+    public var sharesNoSongs: Bool { copies.count > 1 && songs.allSatisfy { $0.tracks.count == 1 } }
+
     /// The copy `choice` names, if the album still has it, else the best one for the output; nil when bundled.
     public func selected(_ choice: AlbumCopyChoice, multichannel: Bool, isLocal: (AlbumCopy) -> Bool = { _ in true }) -> AlbumCopy? {
         switch choice {

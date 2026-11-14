@@ -27,6 +27,8 @@ final class RemoteAppModel {
     private(set) var isOnline = true
     /// The network in use is cellular data (not Wi-Fi or a cable).
     private(set) var onCellular = false
+    /// Tailscale is connected on this device (it has a Tailscale address).
+    private(set) var tailscaleOn = false
     /// Which screen the remote opens on (set by a launch option in debug builds).
     var startScreen: String?
 
@@ -71,8 +73,10 @@ final class RemoteAppModel {
         let session = RemoteSession(pairing: pairing, clientName: deviceName, routes: { [weak self] in
             self?.routes(to: serverID) ?? []
         })
+        // The Mac words what it refuses in the language this app is showing.
+        session.language = Bundle.main.preferredLocalizations.first
         session.onConnected = { [weak self, weak session] _, address in
-            self?.remember(address, for: serverID)
+            self?.remember(address, told: session?.server, for: serverID)
             if let session { KeptShelf.shared.connected(session) }
         }
         self.session = session
@@ -177,11 +181,22 @@ final class RemoteAppModel {
         }
     }
 
-    /// Keeps where a Mac answered, for the next time Bonjour can't say.
-    private func remember(_ address: RemoteAddress?, for serverID: String) {
-        guard let address, let index = pairings.firstIndex(where: { $0.serverID == serverID }), pairings[index].lastKnown != address else { return }
-        pairings[index].lastKnown = address
-        save(pairings[index])
+    /// Keeps where a Mac answered and every address it said it has (at home, on Tailscale), for the next time Bonjour
+    /// can't say: that is what finds the Mac from away with nothing typed.
+    private func remember(_ address: RemoteAddress?, told server: ServerInfo?, for serverID: String) {
+        guard let index = pairings.firstIndex(where: { $0.serverID == serverID }) else { return }
+        var updated = pairings[index]
+        if let address { updated.lastKnown = address }
+        if let server { updated = updated.noting(server: server) }
+        guard updated != pairings[index] else { return }
+        pairings[index] = updated
+        save(updated)
+    }
+
+    /// Why the chosen Mac can't be reached right now, as far as this device can tell.
+    func trouble(reaching serverID: String) -> ReachTrouble {
+        guard let pairing = pairing(serverID: serverID) else { return isOnline ? .notAnswering : .offline }
+        return pairing.trouble(online: isOnline, nearby: discovery.mac(serverID: serverID) != nil, tailscaleOn: tailscaleOn)
     }
 
     private func save(_ pairing: SavedPairing) {
@@ -195,6 +210,8 @@ final class RemoteAppModel {
     private func networkChanged(online: Bool, cellular: Bool) {
         isOnline = online
         onCellular = cellular
+        let tailscale = LocalAddresses.hasTailscale(LocalAddresses.current())
+        if tailscale != tailscaleOn { tailscaleOn = tailscale }
         PlayTarget.shared.holdReason = cellular && !settings.cellularPlayback
             ? String(localized: "Playing over cellular data is off. Connect to Wi-Fi, or turn it on in Settings.") : nil
         if online { session?.networkChanged() }
@@ -262,7 +279,10 @@ final class RemoteAppModel {
         switch phase {
         case .active:
             discovery.start()
+            // A connection kept while the app was away may have died without a word: ask, and connect if there is none.
+            session?.checkLink()
             session?.connect()
+            networkChanged(online: isOnline, cellular: onCellular)
         case .background:
             // Music playing on this device needs its songs from the Mac: the connection stays while it plays.
             if !PlayTarget.shared.isBusy { session?.suspend() }

@@ -21,9 +21,18 @@ public struct SavedPairing: Codable, Sendable, Equatable, Identifiable {
     /// Where the last connection to this Mac went. The Mac's port can change when Vespertine restarts, and nothing but
     /// Bonjour announces it, so the phone remembers it from each connection.
     public var lastKnown: RemoteAddress?
+    /// Where the Mac said it can be reached, the last time it was asked (`ServerInfo.addresses`): its addresses at home and
+    /// its Tailscale or VPN address. This is what finds the Mac from away without anybody typing anything.
+    public var advertised: [RemoteAddress]?
+    /// The Mac said it is a notebook, the last time it was asked (nil: it never said).
+    public var portable: Bool?
+
+    /// The SF Symbol that pictures a Mac: a notebook when it says it is one, else the small desktop (a music Mac is
+    /// most often one, and nothing says which desktop it is).
+    public static func symbol(portable: Bool?) -> String { portable == true ? "laptopcomputer" : "macmini" }
 
     public init(serverID: String, name: String, device: String, key: Data, pairedAt: Date = .now,
-                address: RemoteAddress? = nil, lastKnown: RemoteAddress? = nil) {
+                address: RemoteAddress? = nil, lastKnown: RemoteAddress? = nil, advertised: [RemoteAddress]? = nil) {
         self.serverID = serverID
         self.name = name
         self.device = device
@@ -31,23 +40,50 @@ public struct SavedPairing: Codable, Sendable, Equatable, Identifiable {
         self.pairedAt = pairedAt
         self.address = address
         self.lastKnown = lastKnown
+        self.advertised = advertised
     }
 
+    /// The most addresses tried at once besides Bonjour.
+    public static let maximumAddresses = 10
+
     /// The addresses to try besides Bonjour, most likely first: the typed one (with the last known port if it has
-    /// none), then the last known one; then each of those hosts at the port the Mac tries first
-    /// (`RemotePort.preferred`), for a Mac that restarted on it (and for a pairing made before the port was fixed).
-    /// A host with no port known anywhere is only tried at that port.
+    /// none), the ones the Mac told (home first, then Tailscale), then the last known one; then the typed and last known
+    /// hosts at the port the Mac tries first (`RemotePort.preferred`), for a Mac that restarted on it (and for a pairing
+    /// made before the port was fixed). A host with no port known anywhere is only tried at that port.
     public var savedAddresses: [RemoteAddress] {
         var out: [RemoteAddress] = []
         func add(_ address: RemoteAddress?) {
             if let address, address.port != nil, !out.contains(address) { out.append(address) }
         }
-        add(address?.withPort(from: lastKnown))
+        add(address?.withPort(from: lastKnown ?? advertised?.first))
+        for told in advertised ?? [] { add(told) }
         add(lastKnown)
         for host in [address?.host, lastKnown?.host] {
             if let host { add(RemoteAddress(host: host, port: RemotePort.preferred)) }
         }
-        return out
+        return Array(out.prefix(Self.maximumAddresses))
+    }
+
+    /// This pairing after the Mac said hello: its name, and the addresses it can be reached at now. A Mac that tells no
+    /// addresses (an older Vespertine) leaves the ones known alone.
+    public func noting(server: ServerInfo) -> SavedPairing {
+        var copy = self
+        if !server.name.isEmpty { copy.name = server.name }
+        if let portable = server.portable { copy.portable = portable }
+        if let told = server.addresses, !told.isEmpty {
+            copy.advertised = Array(told.filter { $0.port != nil }.prefix(LocalAddresses.maximumAdvertised))
+        }
+        return copy
+    }
+
+    /// Whether any saved way to this Mac works from another network (a Tailscale or VPN address, or a typed one).
+    public var hasRouteFromAway: Bool {
+        savedAddresses.contains { $0.kind != .localNetwork }
+    }
+
+    /// Whether a Tailscale address or name is among the saved ways.
+    public var hasTailscaleRoute: Bool {
+        savedAddresses.contains { $0.kind == .tailscale }
     }
 
     /// This pairing after the Mac announced `port` (Bonjour TXT): where it was last seen moves to that port, so a typed
@@ -57,6 +93,7 @@ public struct SavedPairing: Codable, Sendable, Equatable, Identifiable {
         if let host = lastKnown?.host ?? address?.host, lastKnown?.port != port {
             copy.lastKnown = RemoteAddress(host: host, port: port)
         }
+        if let told = advertised { copy.advertised = told.map { RemoteAddress(host: $0.host, port: port) } }
         return copy
     }
 
@@ -112,6 +149,34 @@ public struct PairingKeychain: Sendable {
 
     public func remove(serverID: String) {
         save(load().filter { $0.serverID != serverID })
+    }
+}
+#endif
+
+#if canImport(Security)
+/// Why a paired Mac can't be reached right now, as far as the phone can tell.
+public enum ReachTrouble: Equatable, Sendable {
+    /// This device has no network at all.
+    case offline
+    /// The Mac isn't on this network, and it is only known by addresses that work at home.
+    case notOnThisNetwork
+    /// The Mac has a Tailscale address, but Tailscale isn't connected on this device.
+    case tailscaleOff
+    /// There is a way to the Mac and nothing answers on it: asleep, off, or Vespertine isn't open.
+    case notAnswering
+}
+
+public extension SavedPairing {
+    /// `nearby`: Bonjour lists the Mac on this network. `tailscaleOn`: this device has a Tailscale address
+    /// (`LocalAddresses.hasTailscale`).
+    func trouble(online: Bool, nearby: Bool, tailscaleOn: Bool) -> ReachTrouble {
+        if !online { return .offline }
+        if nearby { return .notAnswering }
+        if hasTailscaleRoute, !tailscaleOn {
+            // Another way from away (a typed address, another VPN) may still work: then the Mac itself isn't answering.
+            return savedAddresses.contains { $0.kind == .other } ? .notAnswering : .tailscaleOff
+        }
+        return hasRouteFromAway ? .notAnswering : .notOnThisNetwork
     }
 }
 #endif

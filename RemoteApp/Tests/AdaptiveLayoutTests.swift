@@ -50,6 +50,12 @@ final class AdaptiveLayoutTests: XCTestCase {
         // Short windows shrink the cover but never make it wider than the controls.
         XCTAssertLessThan(RemoteLayout.coverSide(width: 700, height: 600, columns: false), RemoteLayout.controlsWidth(width: 700))
     }
+    func testRowNamesWrapAtAccessibilityTextSizesAndTheMiniPlayerStopsGrowing() {
+        XCTAssertEqual(RemoteLayout.rowTitleLines(accessibilityText: false), 1)
+        XCTAssertNil(RemoteLayout.rowTitleLines(accessibilityText: true))
+        XCTAssertLessThan(RemoteLayout.miniPlayerLargestText, .accessibility3)
+    }
+
     func testAlbumGridAdaptsWithoutTinyCovers() {
         XCTAssertEqual(RemoteLayout.albumColumns(width: 320, accessibilityText: false), 1)
         XCTAssertEqual(RemoteLayout.albumColumns(width: 440, accessibilityText: false), 2)
@@ -70,5 +76,51 @@ final class AdaptiveLayoutTests: XCTestCase {
         XCTAssertEqual(RemoteDestination.starting(at: "coverFlow"), .library)
         XCTAssertEqual(RemoteDestination.starting(at: "artists"), .artists)
         XCTAssertEqual(RemoteDestination.starting(at: nil), .nowPlaying)
+    }
+}
+
+final class FlowRowsTests: XCTestCase {
+    private let chip = CGSize(width: 100, height: 20)
+
+    func testPiecesThatFitStayOnOneLine() {
+        let placed = FlowRows.place([chip, chip, chip], width: 320, spacing: 6, lineSpacing: 6)
+        XCTAssertEqual(placed.origins, [CGPoint(x: 0, y: 0), CGPoint(x: 106, y: 0), CGPoint(x: 212, y: 0)])
+        XCTAssertEqual(placed.size, CGSize(width: 312, height: 20))
+    }
+
+    func testPiecesThatDontFitWrapInsteadOfBeingClipped() {
+        // The signal badges on a narrow phone: nothing reaches past the edge, nothing is hidden.
+        let sizes = [CGSize(width: 150, height: 20), CGSize(width: 170, height: 20), CGSize(width: 90, height: 24), CGSize(width: 120, height: 20)]
+        let placed = FlowRows.place(sizes, width: 300, spacing: 6, lineSpacing: 6)
+        XCTAssertEqual(placed.origins, [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 26), CGPoint(x: 176, y: 26), CGPoint(x: 0, y: 56)])
+        for (origin, size) in zip(placed.origins, sizes) { XCTAssertLessThanOrEqual(origin.x + size.width, 300) }
+        XCTAssertEqual(placed.size, CGSize(width: 266, height: 76))
+    }
+
+    func testAPieceWiderThanTheRowGetsItsOwnLineAtTheRowsWidth() {
+        let placed = FlowRows.place([chip, CGSize(width: 500, height: 20), chip], width: 300, spacing: 6, lineSpacing: 4)
+        XCTAssertEqual(placed.origins, [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 24), CGPoint(x: 0, y: 48)])
+        XCTAssertEqual(placed.size.width, 300)
+    }
+
+    func testCentredLinesSitInTheMiddleOfTheWidestLine() {
+        let placed = FlowRows.place([CGSize(width: 200, height: 20), CGSize(width: 80, height: 20), CGSize(width: 60, height: 20)], width: 300, spacing: 6, lineSpacing: 6, centered: true)
+        // First line: 200 + 6 + 80 = 286 wide. Second line: 60 wide, centred in 286.
+        XCTAssertEqual(placed.origins, [CGPoint(x: 0, y: 0), CGPoint(x: 206, y: 0), CGPoint(x: 113, y: 26)])
+    }
+
+    func testNothingToPlaceTakesNoRoom() {
+        XCTAssertEqual(FlowRows.place([], width: 300, spacing: 6, lineSpacing: 6).size, .zero)
+    }
+
+    func testTheProgressBarNeverGetsAWidthItCannotDraw() {
+        XCTAssertEqual(RemoteLayout.played(position: 30, duration: 120), 0.25)
+        // The Mac's clock a moment ahead of the phone's: a position just before the start.
+        XCTAssertEqual(RemoteLayout.played(position: -0.2, duration: 120), 0)
+        XCTAssertEqual(RemoteLayout.played(position: 500, duration: 120), 1)
+        // No length yet, or nonsense.
+        XCTAssertEqual(RemoteLayout.played(position: 5, duration: 0), 0)
+        XCTAssertEqual(RemoteLayout.played(position: .nan, duration: 120), 0)
+        XCTAssertEqual(RemoteLayout.played(position: 5, duration: .infinity), 0)
     }
 }

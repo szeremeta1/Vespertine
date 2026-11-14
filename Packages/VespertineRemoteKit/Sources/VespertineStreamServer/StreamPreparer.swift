@@ -86,22 +86,22 @@ public actor StreamPreparer {
     // MARK: Open
 
     public func open(client: String, id: Int64, maxSampleRate: Double?, smaller: Bool = false) async -> Opened {
-        guard let facts = await source(id) else { return .failed("That song isn’t in the Mac’s library.") }
+        guard let facts = await source(id) else { return .failed(StreamWords.say(.notInLibrary)) }
         let plan = StreamPlanner.plan(facts, maxSampleRate: maxSampleRate, smaller: smaller)
-        guard let kind = plan.kind, var delivered = plan.delivered else { return .failed(plan.macOnlyReason ?? "This can’t be streamed.") }
+        guard let kind = plan.kind, var delivered = plan.delivered else { return .failed(plan.macOnlyReason ?? StreamWords.say(.cannotStream)) }
         switch kind {
         case .original:
             let url = facts.url
-            guard let handle = StreamFile(url) else { return .failed("The Mac can’t read this file right now.") }
+            guard let handle = StreamFile(url) else { return .failed(StreamWords.say(.cannotReadNow)) }
             let size = ((try? FileManager.default.attributesOfItem(atPath: url.path)[.size]) as? NSNumber)?.int64Value ?? facts.fileSize
             if facts.channels > 2 { delivered.channelLabels = await transcoder.channelLabels(of: facts) }
             let tag = StreamCache.key(for: TranscodeRequest(source: url, sourceSize: size, sourceModified: facts.modifiedAt, regionKey: nil, sampleRate: 0, bitDepth: 0, channels: 0))
             let frames = Int64((facts.duration * facts.sampleRate).rounded())
             return .ready(register(client: client, kind: .original, size: size, format: delivered, frames: frames, tag: tag, file: handle, cacheKey: nil, song: id))
         case .flac:
-            guard let request = plan.transcode else { return .failed("This can’t be streamed.") }
+            guard let request = plan.transcode else { return .failed(StreamWords.say(.cannotStream)) }
             let key = StreamCache.key(for: request)
-            if let ready = openCached(client: client, key: key, song: id) { return .ready(ready) }
+            if let ready = openCached(client: client, key: key, song: id, cut: plan.cutOnly, reduced: plan.reduced) { return .ready(ready) }
             if var job = jobs[key] {
                 if let failure = job.failure {
                     jobs[key] = nil
@@ -140,21 +140,21 @@ public actor StreamPreparer {
         cache.evict(keeping: pinned().union([key]))
     }
 
-    private func openCached(client: String, key: String, song: Int64) -> StreamDescriptor? {
+    private func openCached(client: String, key: String, song: Int64, cut: Bool, reduced: Bool) -> StreamDescriptor? {
         let url = cache.url(for: key)
         guard let meta = (try? Data(contentsOf: cache.metadataURL(for: key))).flatMap({ try? JSONDecoder().decode(Cached.self, from: $0) }),
               let handle = StreamFile(url) else { return nil }
         let size = ((try? FileManager.default.attributesOfItem(atPath: url.path)[.size]) as? NSNumber)?.int64Value ?? 0
         cache.touch(key)
-        return register(client: client, kind: .flac, size: size, format: meta.format, frames: meta.frames, tag: key, file: handle, cacheKey: key, song: song)
+        return register(client: client, kind: .flac, size: size, format: meta.format, frames: meta.frames, tag: key, file: handle, cacheKey: key, song: song, cut: cut, reduced: reduced)
     }
 
     private func register(client: String, kind: StreamKind, size: Int64, format: StreamFormat, frames: Int64?, tag: String, file: StreamFile,
-                          cacheKey: String?, song: Int64) -> StreamDescriptor {
+                          cacheKey: String?, song: Int64, cut: Bool = false, reduced: Bool = false) -> StreamDescriptor {
         let number = (nextNumber[client] ?? 0) + 1
         nextNumber[client] = number
         let descriptor = StreamDescriptor(stream: number, kind: kind, byteSize: size, format: format, frames: frames, tag: tag,
-                                          chunkSize: RemoteProtocol.defaultChunkSize)
+                                          chunkSize: RemoteProtocol.defaultChunkSize, cut: cut ? true : nil, reduced: reduced ? true : nil)
         var mine = streams[client] ?? []
         while mine.count >= maxStreamsPerClient { mine.removeFirst() }
         mine.append(OpenStream(descriptor: descriptor, file: file, cacheKey: cacheKey, song: song))
@@ -169,8 +169,8 @@ public actor StreamPreparer {
     // MARK: Read and close
 
     public func read(client: String, request: Int, stream: Int, offset: Int64, length: Int) async -> Read {
-        guard let open = streams[client]?.first(where: { $0.descriptor.stream == stream }) else { return .failed("That stream isn’t open.") }
-        guard offset >= 0, length > 0 else { return .failed("That range isn’t valid.") }
+        guard let open = streams[client]?.first(where: { $0.descriptor.stream == stream }) else { return .failed(StreamWords.say(.streamNotOpen)) }
+        guard offset >= 0, length > 0 else { return .failed(StreamWords.say(.badRange)) }
         let size = open.descriptor.byteSize
         guard offset < size else {
             return .chunk(StreamFrame(request: request, stream: stream, offset: offset, endOfStream: true, payload: Data()))
@@ -179,6 +179,7 @@ public actor StreamPreparer {
         let file = open.file
         let song = open.song
         let hook = readHook
+        let couldNotRead = StreamWords.say(.readFailed)
         // The actor is free while the disk (or a share) answers.
         return await withCheckedContinuation { (done: CheckedContinuation<Read, Never>) in
             disk.async {
@@ -187,7 +188,7 @@ public actor StreamPreparer {
                     done.resume(returning: .chunk(StreamFrame(request: request, stream: stream, offset: offset,
                                                               endOfStream: offset + Int64(data.count) >= size, payload: data)))
                 } else {
-                    done.resume(returning: .failed("The Mac couldn’t read the file."))
+                    done.resume(returning: .failed(couldNotRead))
                 }
             }
         }

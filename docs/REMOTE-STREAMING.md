@@ -29,6 +29,40 @@ baseline (a v2 phone sends 1, so an old Mac accepts it) and the new optional `hi
 
 A phone names songs by library ID. No path ever comes from the network.
 
+Added since, all additive (no version bump; an older peer ignores or refuses them harmlessly):
+
+- `ServerInfo.addresses`: where the Mac can be reached (its local addresses, its Tailscale address and name), sent in every `welcome`. The
+  phone keeps them with the pairing (`SavedPairing.advertised`, at most 10) so it can find the Mac from another network without anything typed.
+- `ping`: answered `.ok`. The phone sends it when the network changes or nothing has arrived for a while, to learn in 3 seconds rather than
+  30 that the line is dead. An older Mac answers `.failed`, which proves the line just as well.
+- `setLanguage(code)`: sent after `welcome`. The Mac then words its refusals ("Stream to Phones is off…") in the phone's language when it
+  has it (`ReplyWords`), otherwise in its own.
+- `StreamDescriptor.cut` and `.reduced`: `cut` is true when a conversion only cut a CUE track out of a lossless file (same rate, no bits
+  dropped), so the phone says "cut on the Mac" rather than "converted". `reduced` is true when a song asked for in its smaller form was
+  really brought down; a kept album shows SMALLER COPIES only when one of its songs was.
+- `ServerMessage.streamsClosed(reason)`: sent when Stream to Phones, or this phone's own permission, is turned off. The phone stops what
+  it plays from the Mac at once, the song it had fetched ahead included, and removes its stream files; songs kept on the phone play on.
+  Only sent to a connection on protocol 2; an older phone would pass over it anyway.
+- `ServerInfo.portable` and the Bonjour TXT key `nb`: the Mac is a notebook, so the phone pictures it as one.
+- Hi-Res in the album filter means 88.2 kHz and up (`AlbumFilter.countsAsHiRes`), as the Hi-Res smart playlist does.
+- `albumTracks` lists an album whole when its "copies" have no song in common (a stereo album with one surround song is not two copies).
+
+## Finding the Mac (`RemoteSession`)
+
+If the listener is up but Bonjour has announced it nowhere after 8 seconds (`AdvertisingWatch`; macOS keeps an app off the local network
+until it is allowed under Privacy & Security › Local Network), Settings › Remote says so and the log has a line under category `remote`.
+
+Once paired, the phone tries every way it knows at once: Bonjour on this network, the address it last used, each advertised address, and a
+typed one if there is one. Nearby routes start first (others wait 150 to 350 ms, or less if everything ahead of them has failed), the first
+to finish the handshake wins and the rest are closed. The same key signs in on every route. `RemoteSession.reach` says which kind won
+(this network, Tailscale, elsewhere), which the app shows as the route. It stays on a working route until that route breaks: it does not
+move back to Wi-Fi on its own while a cellular line still answers.
+
+When the network changes, or the system says the connection is no longer viable, the phone pings; no answer in 3 seconds and it reconnects
+at once by whatever route now works. A song being played carries on from its buffer and its stream is reopened at the same byte
+(`StreamLine`). Opening a song while disconnected waits up to 20 seconds for the Mac rather than failing. When nothing answers, the phone
+says the likeliest reason (`ReachTrouble`: no network, Mac not on this network and no way from away, Tailscale off, or Mac not answering).
+
 ## The frame
 
 A message on the wire is a 4-byte big-endian length and then the message. JSON messages start with `{`; a stream frame starts with `0x01`:
@@ -49,7 +83,7 @@ to spare while a song changes; opening a fifth closes the oldest).
 
 ## Cache and safety
 
-Conversions are cached in `~/Library/Caches/Vespertine/Remote/Streams` (8 GB, least recently used out first, never a file a phone is reading, kept across restarts
+Conversions are cached in `~/Library/Caches/Vespertine/Remote/Streams` (a build with another bundle identifier uses its identifier in place of `Vespertine`, and a run with `-VespertineDataDirectory` keeps them in `Remote Streams` inside that directory, so app copies never share them; 8 GB, least recently used out first, never a file a phone is reading, kept across restarts
 with a small metadata file beside each). One conversion runs at a time. The library files are only ever read. Opened files are closed with the connection.
 
 ## The phone's side (`VespertinePhonePlayer`)
@@ -69,7 +103,8 @@ with a small metadata file beside each). One conversion runs at a time. The libr
 ## The listener's safety
 
 The listener is reachable from wherever the Mac is (a tailnet, a forwarded port). `ConnectionThrottle`: a host that fails the handshake 10 times in
-a minute is shut out for 5 minutes, and at most 16 connections may wait unsigned at once.
+a minute is shut out for 5 minutes, and at most 16 connections may wait unsigned at once. A failure within 10 seconds of the same host
+signing in is not counted, since a phone trying every route at once hangs up on the slower ones.
 
 ## Known limits
 
@@ -77,5 +112,6 @@ a minute is shut out for 5 minutes, and at most 16 connections may wait unsigned
   made until those scripts have been run.
 - More than 8 channels plays on the Mac only. DoP to a USB DAC from the phone is not built.
 - Favorites and play counts made while offline are not sent back to the Mac.
+- Finding the Mac from away and moving between networks are covered by unit tests against a fake Mac only; B9 and B10 are not run.
 - DSD→FLAC speed in a release build is unmeasured (debug: about 20 s of CPU per second of 5.1 DSD64 on a loaded machine).
 - ReplayGain values are sent; gapless delay/padding are not (`encoderDelay`/`endPadding` are always nil).

@@ -164,7 +164,7 @@ final class RemoteWebServer {
                 return respond(connection, status: 400)
             }
             switch command {
-            case .hello, .pair, .artwork, .streamInfo, .streamOpen, .streamRead, .streamClose:
+            case .hello, .pair, .artwork, .streamInfo, .streamOpen, .streamRead, .streamClose, .setLanguage:
                 respond(connection, status: 400)
             default:
                 let reply = RemoteBridge(model: model).perform(command)

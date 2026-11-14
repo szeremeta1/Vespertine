@@ -204,7 +204,9 @@ final class PlayPauseRig: @unchecked Sendable {
             if condition(engine.snapshot) { return true }
             try? await Task.sleep(for: .milliseconds(10))
         }
-        return false
+        // One last look: on a machine running every test at once this task can sleep through its whole deadline (a minute
+        // and more has been seen), and what it waited for may well have happened meanwhile.
+        return condition(engine.snapshot)
     }
 
     func sleep(ms: Int) async { try? await Task.sleep(for: .milliseconds(ms)) }

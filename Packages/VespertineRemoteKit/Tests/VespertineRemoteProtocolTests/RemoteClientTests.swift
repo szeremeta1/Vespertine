@@ -197,6 +197,25 @@ private func waitUntil(_ condition: () -> Bool, seconds: Double = 5) async -> Bo
         #expect(onlyTyped.noting(advertisedPort: 47_823).lastKnown == RemoteAddress(host: "mac.ts.net", port: 47_823))
     }
 
+    @Test func aNotebookMacIsPicturedAsOne() throws {
+        var txt = NWTXTRecord()
+        txt[RemoteProtocol.TXTKey.serverID] = "S-TEST"
+        let endpoint = NWEndpoint.service(name: "Test Mac", type: RemoteProtocol.serviceType, domain: "local.", interface: nil)
+        // A Mac that doesn't say (an older one, or a desktop) keeps the small desktop.
+        #expect(DiscoveredMac(name: "Test Mac", txt: txt, endpoint: endpoint).portable == nil)
+        #expect(SavedPairing.symbol(portable: nil) == "macmini" && SavedPairing.symbol(portable: false) == "macmini")
+        txt[RemoteProtocol.TXTKey.portable] = "1"
+        #expect(DiscoveredMac(name: "Test Mac", txt: txt, endpoint: endpoint).portable == true)
+        #expect(SavedPairing.symbol(portable: true) == "laptopcomputer")
+        // It is remembered from the Mac's welcome, and a Mac that stops saying doesn't undo it.
+        let saved = Self.saved(address: nil).noting(server: ServerInfo(name: "Test Mac", serverID: "S-TEST", appVersion: "1.2.0", portable: true))
+        #expect(saved.portable == true)
+        #expect(saved.noting(server: ServerInfo(name: "Test Mac", serverID: "S-TEST", appVersion: "1.1.4")).portable == true)
+        // An older Mac's welcome still reads, and an older phone's saved pairing too.
+        let old = #"{"name":"Test Mac","serverID":"S-TEST","appVersion":"1.1.4","protocolVersion":2}"#
+        #expect(try RemoteProtocol.decoder().decode(ServerInfo.self, from: Data(old.utf8)).portable == nil)
+    }
+
     @Test func aMacsServiceRecordCarriesItsPort() {
         var txt = NWTXTRecord()
         txt[RemoteProtocol.TXTKey.serverID] = "S-TEST"

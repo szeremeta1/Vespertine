@@ -14,6 +14,11 @@ import Testing
 
 @Suite("The next song's share is slower than the music", .serialized)
 struct SlowNextSongTests {
+    /// The wait itself must count nothing, and that is checked exactly (it used to count thousands). Once the next song plays,
+    /// the half second of it these tests listen to runs beside every other test on a shared machine, where the engine can
+    /// truly be late with a buffer or two: those are real underruns and not the wait's, so they are bounded, not forbidden.
+    static let startingUnderLoad = 50
+
     @Test("Waiting for the next song's first bytes shows as buffering and counts no underruns")
     func waitForNextSongIsBufferingNotUnderruns() async throws {
         // The song that plays: 24 s, on a quick share. The next one: 0.1 MB/s, so the prefix it starts on (4 MB) is not there when
@@ -50,10 +55,15 @@ struct SlowNextSongTests {
 
         // Give the share its speed back: the next song starts by itself, and the wait has still counted nothing.
         rig.nextShare.bytesPerSecond = 50 * 1_048_576
-        let advanced = await rig.wait(timeout: 120) { $0.item?.id == second.id && $0.state == .playing && $0.position > 0.5 }
+        var whileWaiting = 0
+        let advanced = await rig.wait(timeout: 120) {
+            if $0.item?.id != second.id || $0.isBuffering { whileWaiting = $0.underruns }
+            return $0.item?.id == second.id && $0.state == .playing && $0.position > 0.5
+        }
         let snapshot = rig.engine.snapshot
         #expect(advanced, "the next song started: \(snapshot.state) in \(snapshot.item?.url.lastPathComponent ?? "no song") at \(snapshot.position) s")
-        #expect(snapshot.underruns == 0, "\(snapshot.underruns) underruns after the wait")
+        #expect(whileWaiting == 0, "\(whileWaiting) underruns counted by the end of the wait")
+        #expect(snapshot.underruns < SlowNextSongTests.startingUnderLoad, "\(snapshot.underruns) underruns once the next song played")
         #expect(!snapshot.isBuffering, "no longer buffering once it plays")
     }
 
@@ -83,10 +93,15 @@ struct SlowNextSongTests {
         #expect(quiet, "the output went quiet while the next song was copied")
         #expect(rig.engine.snapshot.isBuffering, "the wait shows as buffering from the network")
         rig.nextShare.bytesPerSecond = 50 * 1_048_576
-        let advanced = await rig.wait(timeout: 120) { $0.item?.id == second.id && $0.state == .playing && $0.position > 0.5 }
+        var whileWaiting = 0
+        let advanced = await rig.wait(timeout: 120) {
+            if $0.item?.id != second.id || $0.isBuffering { whileWaiting = $0.underruns }
+            return $0.item?.id == second.id && $0.state == .playing && $0.position > 0.5
+        }
         let snapshot = rig.engine.snapshot
         #expect(advanced, "the next song started: \(snapshot.state) in \(snapshot.item?.url.lastPathComponent ?? "no song") at \(snapshot.position) s")
-        #expect(snapshot.underruns == 0, "\(snapshot.underruns) underruns after the wait")
+        #expect(whileWaiting == 0, "\(whileWaiting) underruns counted by the end of the wait")
+        #expect(snapshot.underruns < SlowNextSongTests.startingUnderLoad, "\(snapshot.underruns) underruns once the next song played")
         #expect(!snapshot.isBuffering, "no longer buffering once it plays")
     }
 }

@@ -208,6 +208,8 @@ public final class PhoneSystem {
     private func update() {
         let playback = remote.playback
         _ = playback.stream
+        // Read so a seek or a stall brings this back; the lock screen is told where the song is this instant.
+        _ = playback.anchor
         askForRate()
         guard let entry = playback.nowPlaying else {
             if shown != nil {
@@ -218,7 +220,7 @@ public final class PhoneSystem {
         }
         let now = Date()
         let next = Shown(entry: entry.id, playing: playback.player.state == .playing && !playback.player.isBuffering,
-                         duration: playback.duration, position: playback.position, at: now)
+                         duration: playback.duration, position: playback.livePosition, at: now)
         loadCover(entry.track.artworkKey)
         if let shown, shown.entry == next.entry, shown.playing == next.playing, shown.duration == next.duration,
            abs(shown.expected(at: now) - next.position) < 1.5 { return }

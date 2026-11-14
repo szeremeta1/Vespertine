@@ -5,6 +5,7 @@
 
 import Foundation
 import Testing
+import VespertineRemoteClient
 import VespertineRemoteProtocol
 @testable import VespertineRemote
 
@@ -105,5 +106,47 @@ import VespertineRemoteProtocol
         #expect(RemoteAppModel.showsDemoNotice(isDemo: true, screenshotRun: false))
         #expect(!RemoteAppModel.showsDemoNotice(isDemo: true, screenshotRun: true))
         #expect(!RemoteAppModel.showsDemoNotice(isDemo: false, screenshotRun: false))
+    }
+}
+
+@Suite @MainActor struct ConvertingAndReach {
+    @Test func convertingSaysHowFarAlongOnceTheMacKnows() {
+        // DSD, WavPack and Vorbis are converted on the Mac first: Now Playing says so instead of only spinning.
+        let unknown = NowPlayingView.converting(progress: nil)
+        #expect(!unknown.isEmpty)
+        #expect(!unknown.contains { $0.isNumber })
+        #expect(NowPlayingView.converting(progress: 0) == unknown)
+        #expect(NowPlayingView.converting(progress: 0.42).contains("42"))
+        // Never past the end, whatever the Mac says.
+        #expect(NowPlayingView.converting(progress: 3).contains("100"))
+    }
+
+    @Test func theRouteIsNamedAndKeptSongsSayTheyPlayFromHere() {
+        let home = NowPlayingView.source(reach: .sameNetwork, connected: true, demo: false)
+        let tailscale = NowPlayingView.source(reach: .tailscale, connected: true, demo: false)
+        let kept = NowPlayingView.source(reach: nil, connected: false, demo: false)
+        #expect(home != nil && tailscale != nil && kept != nil)
+        #expect(Set([home, tailscale, kept]).count == 3)
+        #expect(NowPlayingView.source(reach: .sameNetwork, connected: true, demo: true) == nil)
+    }
+
+    @Test func everyReasonForNotReachingTheMacHasItsOwnWordsAndNamesTheMac() {
+        let all: [ReachTrouble] = [.offline, .notOnThisNetwork, .tailscaleOff, .notAnswering]
+        let words = all.map { ConnectionBanner.words($0, mac: "Studio Mac") }
+        #expect(Set(words).count == all.count)
+        for text in words.dropFirst() { #expect(text.contains("Studio Mac")) }
+    }
+}
+
+@MainActor @Suite struct WaitingForTheMac {
+    @Test func aMacThatJustStoppedAnsweringIsWaitedForBeforeAnythingIsCalledWrong() {
+        #expect(ConnectionBanner.waitsQuietly(.notAnswering, patient: true))
+        #expect(ConnectionBanner.waitsQuietly(.notOnThisNetwork, patient: true))
+        #expect(!ConnectionBanner.waitsQuietly(.notAnswering, patient: false))
+        #expect(ConnectionBanner.patience == .seconds(10))
+    }
+
+    @Test func thisDeviceBeingOfflineIsSaidAtOnce() {
+        #expect(!ConnectionBanner.waitsQuietly(.offline, patient: true))
     }
 }

@@ -16,6 +16,11 @@ public struct StreamPlan: Sendable, Equatable {
     /// Set when `kind` is `.flac`.
     public var transcode: TranscodeRequest?
     public var macOnlyReason: String?
+    /// The FLAC is the song cut out of a longer lossless file (a CUE track) with nothing else done to it: same rate, no
+    /// bits dropped. The phone says "cut", not "converted".
+    public var cutOnly = false
+    /// Asked for the smaller form, and the rate came down for it (below what this song would otherwise be sent at).
+    public var reduced = false
 }
 
 public enum StreamPlanner {
@@ -41,7 +46,7 @@ public enum StreamPlanner {
         let source = sourceFormat(facts)
         guard facts.channels >= 1, facts.channels <= maximumChannels else {
             return StreamPlan(kind: nil, delivered: nil, transcode: nil,
-                              macOnlyReason: "This has \(facts.channels) channels; Vespertine streams up to \(maximumChannels). It plays on the Mac.")
+                              macOnlyReason: StreamWords.say(.tooManyChannels(facts.channels, most: maximumChannels)))
         }
         let ext = facts.fileExtension.lowercased()
         let nativeContainer = native[ext]
@@ -59,7 +64,7 @@ public enum StreamPlanner {
         }
         guard facts.needsMacDecoder || facts.isRegion || nativeContainer != nil || macDecodable.contains(ext) else {
             return StreamPlan(kind: nil, delivered: nil, transcode: nil,
-                              macOnlyReason: "Vespertine on the Mac can’t convert this kind of file (.\(ext)) for the phone. It plays on the Mac.")
+                              macOnlyReason: StreamWords.say(.cannotConvert(fileExtension: ext)))
         }
         let rate = targetRate(source: facts.sampleRate, isDSD: facts.isDSD, ceiling: maxSampleRate)
         let depth = (facts.bitDepth ?? 16) <= 16 && !facts.isDSD ? 16 : 24
@@ -67,7 +72,10 @@ public enum StreamPlanner {
                                        trackID: facts.id, sampleRate: rate, bitDepth: depth, channels: facts.channels)
         let delivered = StreamFormat(codec: "FLAC", container: "flac", sampleRate: rate, bitDepth: depth, channels: facts.channels,
                                      channelLabels: nil, lossless: facts.isLossless)
-        return StreamPlan(kind: .flac, delivered: delivered, transcode: request, macOnlyReason: nil)
+        let cutOnly = facts.isRegion && facts.isLossless && !facts.isDSD && abs(rate - facts.sampleRate) < 0.5 && depth >= (facts.bitDepth ?? 16)
+        let unreduced = facts.isDSD ? targetRate(source: facts.sampleRate, isDSD: true, ceiling: nil) : facts.sampleRate
+        return StreamPlan(kind: .flac, delivered: delivered, transcode: request, macOnlyReason: nil, cutOnly: cutOnly,
+                          reduced: smaller && rate < unreduced - 0.5)
     }
 
     /// The rate of a conversion: the source's own rate (DSD: a PCM rate of its family), never raised, never above the phone's

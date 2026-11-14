@@ -50,19 +50,24 @@ struct MacConnectionView: View {
                         row("On this network", systemImage: "wifi",
                             detail: model.discovery.mac(serverID: serverID) != nil ? String(localized: "Found") : String(localized: "Not found"),
                             good: model.discovery.mac(serverID: serverID) != nil, active: session?.route == .nearby)
+                        // What the Mac said it can be reached at: its addresses at home, and on Tailscale or another VPN.
+                        ForEach(pairing.advertised ?? [], id: \.self) { told in
+                            row(Self.title(told.kind), systemImage: told.kind == .localNetwork ? "house" : "point.3.connected.trianglepath.dotted",
+                                detail: told.text, good: true, active: session?.route != .nearby && session?.reached?.host == told.host)
+                        }
                         if let address = pairing.address {
                             let ready = address.withPort(from: pairing.lastKnown).port != nil
                             row(address.kind == .tailscale ? "Tailscale" : "Address", systemImage: "point.3.connected.trianglepath.dotted",
                                 detail: ready ? address.withPort(from: pairing.lastKnown).text : String(localized: "Needs the port"),
                                 good: ready, active: session?.route == .address)
                         }
-                        if let last = pairing.lastKnown {
+                        if let last = pairing.lastKnown, !(pairing.advertised ?? []).contains(where: { $0.host == last.host }) {
                             row("Last answered at", systemImage: "clock.arrow.circlepath", detail: last.text, good: true, active: session?.route == .lastKnown)
                         }
                     } header: {
                         Text("Ways to reach “\(pairing.name)”")
                     } footer: {
-                        Text("Vespertine tries these together and uses the first that answers. The connection is encrypted with this device’s own key either way.")
+                        Text("Vespertine tries these together and uses the first that answers, and switches by itself when the network changes. The Mac tells this device its addresses each time they connect, so there is nothing to type. The connection is encrypted with this device’s own key either way.")
                     }
 
                     Section {
@@ -94,7 +99,7 @@ struct MacConnectionView: View {
                     } header: {
                         Text("Address for away from home")
                     } footer: {
-                        Text("Bonjour only finds the Mac on the same network. With Tailscale (or another VPN) on both the Mac and this device, type the Mac’s Tailscale name or its 100.x address here. The Mac must be awake with Vespertine open; Settings › Remote on the Mac can keep it awake.")
+                        Text("Usually not needed: with Tailscale on both the Mac and this device, Vespertine finds the Mac by itself once they have connected at home. Type an address only for a way the Mac can’t tell on its own, such as a forwarded port. The Mac must be awake with Vespertine open; Settings › Remote on the Mac can keep it awake.")
                     }
 
                     Section {
@@ -120,6 +125,15 @@ struct MacConnectionView: View {
                 loaded = true
                 text = pairing?.address?.text ?? ""
             }
+        }
+    }
+
+    /// What kind of network one of the Mac's addresses is on.
+    static func title(_ kind: RemoteAddress.Kind) -> LocalizedStringKey {
+        switch kind {
+        case .localNetwork: "Home network"
+        case .tailscale: "Tailscale"
+        case .other: "Another network"
         }
     }
 

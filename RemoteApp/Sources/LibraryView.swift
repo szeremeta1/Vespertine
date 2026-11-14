@@ -343,6 +343,7 @@ struct AlbumsGrid: View {
                     Text(problem).font(.callout).foregroundStyle(Palette.text2).multilineTextAlignment(.center).padding(.top, 60).padding(.horizontal, 32)
                 }
             }
+            .clearsMiniPlayer()
             .accessibilityIdentifier("albums-grid")
         }
     }
@@ -383,17 +384,20 @@ struct AlbumView: View {
     var body: some View {
         List {
             Section {
-                ViewThatFits(in: .horizontal) {
+                // One layout, chosen outright: a row that measures two candidates inside a self-sizing list row is more
+                // than this header needs.
+                Group {
                     if sizeClass == .regular && !typeSize.isAccessibilitySize {
                         HStack(alignment: .bottom, spacing: 28) {
                             ArtworkView(key: album.artworkKey, size: 800, cornerRadius: 10).frame(width: 240, height: 240)
-                            albumInfo(leading: true).frame(minWidth: 260, maxWidth: 420)
+                            albumInfo(leading: true).frame(maxWidth: 420)
                             Spacer(minLength: 0)
                         }
-                    }
-                    VStack(spacing: 16) {
-                        ArtworkView(key: album.artworkKey, size: 800, cornerRadius: 10).frame(maxWidth: 280)
-                        albumInfo(leading: false)
+                    } else {
+                        VStack(spacing: 16) {
+                            ArtworkView(key: album.artworkKey, size: 800, cornerRadius: 10).frame(maxWidth: 280)
+                            albumInfo(leading: false)
+                        }
                     }
                 }
                 .frame(maxWidth: .infinity)
@@ -419,7 +423,7 @@ struct AlbumView: View {
         VStack(alignment: leading ? .leading : .center, spacing: 10) {
             Text(album.title).font(.serif(leading ? .title2 : .title3, weight: .semibold)).multilineTextAlignment(leading ? .leading : .center)
             Text(album.artist).foregroundStyle(Palette.text2)
-            HStack(spacing: 6) {
+            FlowLayout(spacing: 6, lineSpacing: 6) {
                 Chip(text: album.format, highlighted: album.hiRes || album.dsd)
                 if let year = album.year { Chip(text: String(year)) }
             }
@@ -560,7 +564,7 @@ struct TrackRows: View {
             }
         }
         .feedback(feedback)
-        .sheet(item: $adding) { AddToPlaylistSheet(session: session, addition: $0) }
+        .sheet(item: $adding) { AddToPlaylistSheet(session: session, addition: $0).withoutMiniPlayer() }
     }
 }
 

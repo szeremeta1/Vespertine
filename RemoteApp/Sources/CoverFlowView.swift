@@ -50,6 +50,7 @@ struct CoverFlowView: View {
             }
             .scrollBounceBehavior(.basedOnSize)
         }
+        .clearsMiniPlayer()
         .background(floor.ignoresSafeArea())
         .feedback(feedback)
         .sensoryFeedback(.selection, trigger: front)
@@ -58,6 +59,7 @@ struct CoverFlowView: View {
                 AlbumView(session: session, album: album)
                     .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { opened = nil } } }
             }
+            .withoutMiniPlayer()
             .presentationDetents([.medium, .large])
         }
         .onChange(of: front) { _, new in
@@ -169,15 +171,11 @@ struct CoverFlowView: View {
             VStack(spacing: 5) {
                 Text(album.title).font(.serif(.title3, weight: .semibold)).foregroundStyle(Palette.text).lineLimit(2)
                 Text(album.artist).font(.subheadline).foregroundStyle(Palette.text2).lineLimit(1)
-                // Centred under the title when they fit; scrolls sideways when they don't (large text, narrow windows).
-                let chips = HStack(spacing: 6) {
+                // Centred under the title; they wrap onto a second line when they don't fit (large text, narrow windows).
+                FlowLayout(spacing: 6, lineSpacing: 6, centered: true) {
                     Chip(text: album.format, highlighted: album.hiRes || album.dsd)
                     if let year = album.year { Chip(text: String(year)) }
                     Chip(text: String(localized: "\(album.trackCount) songs"))
-                }
-                ViewThatFits(in: .horizontal) {
-                    chips
-                    ScrollView(.horizontal, showsIndicators: false) { chips }
                 }
                 .padding(.top, 2)
                 let buttons = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 12)) : AnyLayout(HStackLayout(spacing: 12))

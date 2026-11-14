@@ -24,11 +24,17 @@ enum Palette {
     static let brassGradient = LinearGradient(colors: [Color(hex: 0xE7CD98), Color(hex: 0xC8A66A)], startPoint: .top, endPoint: .bottom)
 
     private static func adaptive(light: UInt32, dark: UInt32) -> Color {
-        Color(uiColor: UIColor { traits in
+        Color(uiColor: dynamic(light: light, dark: dark))
+    }
+
+    /// A colour for each appearance. Whoever draws asks for it, and SwiftUI draws animated transitions on a thread of its
+    /// own: the choice must not belong to the main actor (it did, by the app's default, and that stopped the app).
+    nonisolated static func dynamic(light: UInt32, dark: UInt32) -> UIColor {
+        UIColor { @Sendable traits in
             let h = traits.userInterfaceStyle == .dark ? dark : light
             return UIColor(red: CGFloat((h >> 16) & 255) / 255, green: CGFloat((h >> 8) & 255) / 255,
                            blue: CGFloat(h & 255) / 255, alpha: 1)
-        })
+        }
     }
 }
 
@@ -62,6 +68,10 @@ extension View {
     /// at the pane's edge while the readable content is centred.
     func screenTitleStyle() -> some View { modifier(ScreenTitleStyle()) }
 
+    /// Playback controls and a song's timeline read left to right in every language, as Apple's guidelines ask: in Arabic
+    /// and Hebrew "next" still points right and time still runs from the left.
+    func playbackDirection() -> some View { environment(\.layoutDirection, .leftToRight) }
+
     /// The app's background behind a screen's content.
     func obsidianBackground() -> some View {
         background(Palette.base.ignoresSafeArea())
@@ -69,7 +79,7 @@ extension View {
 
     /// A list drawn on obsidian, with surface-coloured rows.
     func obsidianList() -> some View {
-        scrollContentBackground(.hidden).background(Palette.base.ignoresSafeArea())
+        scrollContentBackground(.hidden).background(Palette.base.ignoresSafeArea()).clearsMiniPlayer()
     }
 }
 
@@ -111,6 +121,32 @@ struct Chip: View {
             .background(Capsule().fill(highlighted ? Palette.brass.opacity(0.14) : Palette.text.opacity(0.06)))
             .overlay(Capsule().strokeBorder(highlighted ? Palette.brass.opacity(0.45) : Palette.hairlineStrong, lineWidth: 0.5))
             .lineLimit(1)
+    }
+}
+
+/// Lays its pieces out left to right and wraps them onto more lines when they don't fit: the signal badges stay whole on
+/// a narrow screen and at large text sizes.
+nonisolated struct FlowLayout: Layout {
+    var spacing: CGFloat = 6
+    var lineSpacing: CGFloat = 6
+    /// Each line in the middle (under a centred title).
+    var centered = false
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? .infinity
+        return FlowRows.place(sizes(subviews, width: width), width: width, spacing: spacing, lineSpacing: lineSpacing, centered: centered).size
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        let placed = FlowRows.place(sizes(subviews, width: bounds.width), width: bounds.width, spacing: spacing, lineSpacing: lineSpacing, centered: centered)
+        for (subview, origin) in zip(subviews, placed.origins) {
+            subview.place(at: CGPoint(x: bounds.minX + origin.x, y: bounds.minY + origin.y), anchor: .topLeading,
+                          proposal: ProposedViewSize(width: bounds.width, height: nil))
+        }
+    }
+
+    private func sizes(_ subviews: Subviews, width: CGFloat) -> [CGSize] {
+        subviews.map { $0.sizeThatFits(ProposedViewSize(width: width.isFinite ? width : nil, height: nil)) }
     }
 }
 

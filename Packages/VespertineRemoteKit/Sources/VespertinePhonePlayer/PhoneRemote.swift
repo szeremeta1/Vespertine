@@ -42,6 +42,8 @@ public struct PhoneRoute: Equatable, Sendable {
 public struct PhoneSignal: Equatable, Sendable {
     /// The Mac made a FLAC of the song (a format the phone can't open), rather than sending the file as it is.
     public var converted: Bool
+    /// The Mac only cut the song out of a longer lossless file (a CUE track): its samples are the file's own.
+    public var cut: Bool
     public var lossless: Bool
     /// The rate of what the phone decodes.
     public var streamRate: Double
@@ -56,6 +58,7 @@ public struct PhoneSignal: Equatable, Sendable {
 
     public init(stream: StreamDescriptor, route: PhoneRoute?) {
         converted = stream.kind != .original
+        cut = stream.kind != .original && stream.cut == true
         lossless = stream.format.lossless
         streamRate = stream.format.sampleRate
         bitDepth = stream.format.bitDepth
@@ -223,7 +226,7 @@ public final class PhoneRemote {
             return SignalSummary(bitPerfect: false, badge: said.badge, deviceFormat: said.output, exclusive: false)
         }
         return PlayerState(playback: value, loading: waiting, nowPlaying: entry.map { NowPlaying(entry: $0.id, track: $0.track) },
-                           position: playback.position, positionAt: Date(), duration: playback.duration,
+                           position: playback.position, positionAt: playback.positionAt, duration: playback.duration,
                            shuffle: playback.queue.shuffle, repeatMode: playback.queue.repeatMode, signal: summary, output: route?.name,
                            volume: VolumeState(route: .fixed, level: outputVolume, muted: false), waitingFor: playback.waitingForMac ? macName : nil, error: playback.notice, transitions: nil)
     }

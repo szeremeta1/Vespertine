@@ -117,6 +117,23 @@ final class AdaptiveNavigationTests: XCTestCase {
         XCTAssertTrue(app.buttons["Pause"].exists)
     }
 
+    /// The last row of a list stops above the mini player, not under it, and Settings is reached from the top of Output.
+    func testOutputsLastRowClearsTheMiniPlayerAndSettingsIsAtTheTop() throws {
+        try XCTSkipIf(UIDevice.current.userInterfaceIdiom == .pad, "The phone's tab layout.")
+        launch(screen: "output")
+        XCTAssertTrue(app.navigationBars["Output"].waitForExistence(timeout: 15))
+        let mini = element("mini-player")
+        XCTAssertTrue(mini.waitForExistence(timeout: 10))
+        for _ in 0..<4 { app.swipeUp() }
+        let last = app.cells.allElementsBoundByIndex.last { $0.exists && $0.frame.height > 0 }
+        let row = try XCTUnwrap(last)
+        XCTAssertLessThanOrEqual(row.frame.maxY, mini.frame.minY + 1, "the last row is under the mini player")
+        for _ in 0..<4 { app.swipeDown() }
+        element("output-gear").tap()
+        XCTAssertTrue(app.buttons["Settings"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Choose Another Mac"].exists)
+    }
+
     func testRotationRetainsQueueAndControlsRemainReachable() {
         launch(screen: "queue")
         XCTAssertTrue(app.navigationBars["Queue"].waitForExistence(timeout: 15))

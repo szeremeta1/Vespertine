@@ -88,8 +88,9 @@ run, the phone shows no "bit-perfect" badge anywhere, and must not.
 
 ## B9. Away from home (5 min, plus a 30 min listen)
 
-1. Tailscale on both; the Mac's Tailscale name typed in the phone's Connection screen. Phone on cellular, Wi-Fi off.
-2. Play 24/96 stereo, then the DSD 5.1. Note time to first sound, and any dropout over 30 minutes.
+1. Tailscale on both. Pair at home on Wi-Fi first and type nothing: the Connection screen should list the Mac's addresses, one of them
+   Tailscale. Then phone on cellular, Wi-Fi off. Expect it to reconnect by itself and Now Playing to say "Tailscale".
+2. Play 24/192 FLAC, 24/96 stereo, then the DSD 5.1. Note time to first sound, and any dropout over 30 minutes.
 3. Settings › Play over Cellular Data off: the next song must not start, and the reason is shown. On again: it plays.
 4. Settings shows how much was fetched from the Mac.
 
@@ -98,6 +99,8 @@ run, the phone shows no "bit-perfect" badge anywhere, and must not.
 1. While a song plays on Wi-Fi (with Tailscale available), turn Wi-Fi off. Expect the song to carry on from the buffer, "Waiting for
    the Mac" if it runs dry, then the same song continuing, without starting over.
 2. Quit and reopen Vespertine on the Mac mid-song. Expect the same, with no new pairing.
+3. Note how many seconds each took to resume, and whether the route shown changed (Home network, Tailscale).
+4. Tailscale off on the phone, away from home: expect "Turn on Tailscale" wording, not a bare failure. Mac asleep: expect "not answering".
 
 ## B11. Keep on This Device (5 min)
 

@@ -9,6 +9,7 @@
 // says which speaker each is.
 //
 
+import Accelerate
 import AVFAudio
 import Foundation
 import SFBAudioEngine
@@ -94,6 +95,9 @@ public enum FLACStreamTranscoder {
         do {
             encoder = try AudioEncoder(url: destination, encoderName: .FLAC)
             try encoder.setSourceFormat(sourceFormat)
+            // Somebody is waiting to hear this: a lighter FLAC setting encodes noticeably quicker for a file a few percent
+            // bigger. Lossless either way; the samples are the same.
+            encoder.settings = [.flacCompressionLevel: 2]
             encoder.estimatedFramesToEncode = Int64((Double(decoder.length) * target / inFormat.sampleRate).rounded())
             try encoder.openReturningError()
         } catch {
@@ -112,16 +116,29 @@ public enum FLACStreamTranscoder {
             return a - b
         }
         var written: Int64 = 0
+        let scratch = UnsafeMutablePointer<Float>.allocate(capacity: Int(chunk))
+        defer { scratch.deallocate() }
         func encode(_ buffer: AVAudioPCMBuffer) throws {
             let n = Int(buffer.frameLength)
-            guard n > 0, let planes = buffer.floatChannelData, let raw = encoding.audioBufferList.pointee.mBuffers.mData else { return }
+            guard n > 0, n <= Int(chunk), let planes = buffer.floatChannelData, let raw = encoding.audioBufferList.pointee.mBuffers.mData else { return }
             let out = raw.bindMemory(to: Int32.self, capacity: n * channels)
-            for frame in 0..<n {
-                for channel in 0..<channels {
-                    var x = planes[channel][frame] * scale
-                    if dither { x += noise() }
-                    out[frame * channels + channel] = Int32(max(-scale, min(top, x.rounded()))) << shift
+            if dither {
+                for frame in 0..<n {
+                    for channel in 0..<channels {
+                        let x = planes[channel][frame] * scale + noise()
+                        out[frame * channels + channel] = Int32(max(-scale, min(top, x.rounded()))) << shift
+                    }
                 }
+            } else {
+                // Without dither each sample is scaled, limited and rounded on its own: done a whole channel at a time, which
+                // is several times quicker than one sample at a time and gives the same integers for integer sources.
+                var gain = scale, low = -scale, high = top
+                for channel in 0..<channels {
+                    vDSP_vsmul(planes[channel], 1, &gain, scratch, 1, vDSP_Length(n))
+                    vDSP_vclip(scratch, 1, &low, &high, scratch, 1, vDSP_Length(n))
+                    vDSP_vfixr32(scratch, 1, out + channel, vDSP_Stride(channels), vDSP_Length(n))
+                }
+                if shift > 0 { for index in 0..<(n * channels) { out[index] <<= shift } }
             }
             encoding.frameLength = AVAudioFrameCount(n)
             do { try encoder.encode(from: encoding, length: AVAudioFrameCount(n)) } catch { throw Failure.encoder(error.localizedDescription) }

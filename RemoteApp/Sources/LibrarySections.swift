@@ -13,14 +13,25 @@ struct CountedLabel: View {
     let title: String
     let symbol: String
     var count: Int?
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         Label {
-            HStack {
-                Text(title).lineLimit(1).minimumScaleFactor(0.8)
-                Spacer()
-                if let count, count > 0 {
-                    Text(count.formatted()).font(.signal(.caption)).foregroundStyle(Palette.text3).fixedSize()
+            if typeSize.isAccessibilitySize {
+                // At the largest sizes the name gets the whole width and wraps; the count goes under it.
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).lineLimit(RemoteLayout.rowTitleLines(accessibilityText: true))
+                    if let count, count > 0 {
+                        Text(count.formatted()).font(.signal(.caption)).foregroundStyle(Palette.text3)
+                    }
+                }
+            } else {
+                HStack {
+                    Text(title).lineLimit(RemoteLayout.rowTitleLines(accessibilityText: false)).minimumScaleFactor(0.8)
+                    Spacer()
+                    if let count, count > 0 {
+                        Text(count.formatted()).font(.signal(.caption)).foregroundStyle(Palette.text3).fixedSize()
+                    }
                 }
             }
         } icon: {
@@ -154,6 +165,7 @@ struct GenresGrid: View {
                         .multilineTextAlignment(.center).padding(.top, 60).padding(.horizontal, 32)
                 }
             }
+            .clearsMiniPlayer()
             .accessibilityIdentifier("genres-grid")
         }
         .obsidianBackground()
@@ -222,7 +234,7 @@ struct SongCopiesButton: View {
         .fixedSize()
         .accessibilityLabel(Text("\(count) COPIES"))
         .accessibilityHint(Text("Shows this song’s copies"))
-        .sheet(isPresented: $showing) { SongCopiesSheet(session: session, track: track, list: list, index: index) }
+        .sheet(isPresented: $showing) { SongCopiesSheet(session: session, track: track, list: list, index: index).withoutMiniPlayer() }
     }
 }
 
