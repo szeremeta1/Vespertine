@@ -74,12 +74,12 @@ struct LibraryView: View {
                 rootLink("genres", .genres, count: overview?.genres)
                 rootLink("recentlyAdded", .recentlyAdded)
                 rootLink("favorites", .favorites, count: overview?.favorites)
-                rootLink("playlists", .playlists, count: overview?.playlists)
+                if !session.isShare { rootLink("playlists", .playlists, count: overview?.playlists) }
             }
             if !session.isDemo {
                 Section { rootLink("kept", .kept, count: KeptShelf.shared.keeper(for: session)?.store.lists.count) }
             }
-            if let sources = overview?.sources, !sources.isEmpty {
+            if !session.isShare, let sources = overview?.sources, !sources.isEmpty {
                 Section("Sources") {
                     ForEach(sources) { source in
                         NavigationLink(value: source) { SourceLabel(source: source) }
@@ -559,7 +559,9 @@ struct TrackRows: View {
                     Button { feedback.run(session, .setFavorite(ids: [id], on: !track.favorite)) } label: {
                         Label(track.favorite ? LocalizedStringKey("Remove from Favorites") : LocalizedStringKey("Add to Favorites"), systemImage: track.favorite ? "heart.slash" : "heart")
                     }
-                    Button { adding = PlaylistAddition(id: id, title: track.title) } label: { Label("Add to a Playlist…", systemImage: "text.badge.plus") }
+                    if !session.isShare {
+                        Button { adding = PlaylistAddition(id: id, title: track.title) } label: { Label("Add to a Playlist…", systemImage: "text.badge.plus") }
+                    }
                 }
             }
         }

@@ -168,7 +168,8 @@ struct NowPlayingView: View {
             Label(name, systemImage: "hifispeaker").font(.caption2).foregroundStyle(Palette.text3).lineLimit(1)
         }
         // Where this device's songs come from right now: the Mac over the home network or Tailscale, or this device itself.
-        if output, session.phone != nil, let source = Self.source(reach: session.reach, connected: session.isConnected, demo: session.isDemo) {
+        if output, session.phone != nil, let source = Self.source(reach: session.reach, connected: session.isConnected, demo: session.isDemo,
+                                                                  share: session.isShare ? model.shareStatus?.reachable ?? true : nil) {
             Label(source, systemImage: "arrow.down.left.circle").font(.caption2).foregroundStyle(Palette.text3).lineLimit(1)
                 .accessibilityLabel(Text("Songs arrive over: \(source)"))
         }
@@ -275,9 +276,14 @@ struct NowPlayingView: View {
         return String(localized: "Converting on the Mac… \(percent)", comment: "Now Playing on the iPhone: the Mac is converting the song; %@ is how far along, e.g. “42%”.")
     }
 
-    /// The network this device's songs arrive over, in a word or two; nil for the demo.
-    static func source(reach: RemoteSession.Reach?, connected: Bool, demo: Bool) -> String? {
+    /// The network this device's songs arrive over, in a word or two; nil for the demo. `share`: the songs come from
+    /// an SMB share this device reads itself, and whether it answers (nil: they come from a Mac).
+    static func source(reach: RemoteSession.Reach?, connected: Bool, demo: Bool, share: Bool? = nil) -> String? {
         if demo { return nil }
+        if let share {
+            return share && connected ? String(localized: "SMB share", comment: "Now Playing on the iPhone: where the song's bytes come from: a network folder (SMB share) the iPhone reads itself, with no Mac. “SMB” is the file-sharing protocol; keep it.")
+                                      : String(localized: "On this device", comment: "Now Playing on the iPhone: the song plays from a copy kept on the device; the Mac isn't connected.")
+        }
         guard connected, let reach else { return String(localized: "On this device", comment: "Now Playing on the iPhone: the song plays from a copy kept on the device; the Mac isn't connected.") }
         return reachName(reach)
     }

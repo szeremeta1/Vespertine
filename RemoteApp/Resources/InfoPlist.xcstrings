@@ -286,271 +286,271 @@
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine በአውታረ መረብዎ ላይ Vespertineን የሚያሄዱ Macዎችን ይፈልጋል፣ የሚገናኘውም እርስዎ ካጣመሯቸው ጋር ብቻ ነው።"
+            "value": "Vespertine በአውታረ መረብዎ ላይ Vespertineን የሚያሄዱ Macዎችን ይፈልጋል፣ የሚገናኘውም እርስዎ ካጣመሯቸው Macዎች እና ካከሏቸው ማጋሪያዎች ጋር ብቻ ነው።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يبحث Vespertine عن أجهزة Mac التي تشغّل Vespertine على شبكتك، ولا يتصل إلا بالأجهزة التي تقرنها به."
+            "value": "يبحث Vespertine عن أجهزة Mac التي تشغّل Vespertine على شبكتك، ولا يتصل إلا بأجهزة Mac التي تقرنها به والمشاركات التي تضيفها."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine আপনার নেটওয়ার্কে Vespertine চালু থাকা Mac খোঁজে, এবং শুধু সেগুলোর সাথেই সংযোগ করে যেগুলোর সাথে আপনি পেয়ার করেন।"
+            "value": "Vespertine আপনার নেটওয়ার্কে Vespertine চালু থাকা Mac খোঁজে, এবং শুধু সেই Mac-গুলোর সাথেই সংযোগ করে যেগুলোর সাথে আপনি পেয়ার করেন এবং সেই শেয়ারগুলোর সাথে যেগুলো আপনি যোগ করেন।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine hledá ve vaší síti Macy, na kterých běží Vespertine, a připojuje se jen k těm, se kterými ho spárujete."
+            "value": "Vespertine hledá ve vaší síti Macy, na kterých běží Vespertine, a připojuje se jen k Macům, se kterými ho spárujete, a ke sdílením, která přidáte."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine søger efter Mac-computere, der kører Vespertine på dit netværk, og opretter kun forbindelse til dem, du danner par med."
+            "value": "Vespertine søger efter Mac-computere, der kører Vespertine på dit netværk, og opretter kun forbindelse til de Mac-computere, du danner par med, og de delinger, du tilføjer."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine sucht in deinem Netzwerk nach Macs, auf denen Vespertine läuft, und verbindet sich nur mit denen, mit denen du es koppelst."
+            "value": "Vespertine sucht in deinem Netzwerk nach Macs, auf denen Vespertine läuft, und verbindet sich nur mit den Macs, mit denen du es koppelst, und den Freigaben, die du hinzufügst."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Το Vespertine αναζητά στο δίκτυό σας Mac που εκτελούν το Vespertine και συνδέεται μόνο με όσα έχετε κάνει ζεύξη."
+            "value": "Το Vespertine αναζητά στο δίκτυό σας Mac που εκτελούν το Vespertine και συνδέεται μόνο με τα Mac με τα οποία έχετε κάνει ζεύξη και με τους κοινόχρηστους φακέλους που προσθέτετε."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine looks for Macs running Vespertine on your network, and connects only to the ones you pair with."
+            "value": "Vespertine looks for Macs running Vespertine on your network, and connects only to the Macs you pair with and the shares you add."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine busca en tu red ordenadores Mac que tengan Vespertine abierto y solo se conecta a los que enlaces."
+            "value": "Vespertine busca en tu red ordenadores Mac que tengan Vespertine abierto y solo se conecta a los Mac que enlaces y a los recursos compartidos que añadas."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine در شبکهٔ شما به‌دنبال Macهایی می‌گردد که Vespertine را اجرا می‌کنند و فقط به آن‌هایی وصل می‌شود که با آن‌ها جفت می‌کنید."
+            "value": "Vespertine در شبکهٔ شما به‌دنبال Macهایی می‌گردد که Vespertine را اجرا می‌کنند و فقط به Macهایی که با آن‌ها جفت می‌کنید و اشتراک‌هایی که اضافه می‌کنید وصل می‌شود."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine etsii verkostasi Maceja, joissa Vespertine on käynnissä, ja yhdistää vain niihin, joiden kanssa muodostat laiteparin."
+            "value": "Vespertine etsii verkostasi Maceja, joissa Vespertine on käynnissä, ja yhdistää vain Maceihin, joiden kanssa muodostat laiteparin, ja jakoihin, jotka lisäät."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Naghahanap ang Vespertine ng mga Mac na nagpapatakbo ng Vespertine sa network mo, at kumokonekta lang ito sa mga ipine-pair mo."
+            "value": "Naghahanap ang Vespertine ng mga Mac na nagpapatakbo ng Vespertine sa network mo, at kumokonekta lang ito sa mga Mac na ipine-pair mo at sa mga share na idinaragdag mo."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine recherche sur votre réseau les Mac qui exécutent Vespertine, et ne se connecte qu’à ceux avec lesquels vous le jumelez."
+            "value": "Vespertine recherche sur votre réseau les Mac qui exécutent Vespertine, et ne se connecte qu’aux Mac avec lesquels vous le jumelez et aux partages que vous ajoutez."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine તમારા નેટવર્ક પર Vespertine ચલાવતાં Mac શોધે છે, અને માત્ર તે જ Mac સાથે કનેક્ટ થાય છે જેની સાથે તમે પેર કરો છો."
+            "value": "Vespertine તમારા નેટવર્ક પર Vespertine ચલાવતાં Mac શોધે છે, અને માત્ર તે જ Mac સાથે કનેક્ટ થાય છે જેની સાથે તમે પેર કરો છો અને તે જ શેર સાથે જે તમે ઉમેરો છો."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine yana neman Mac-Mac masu aiki da Vespertine a kan cibiyar sadarwarku, kuma yana haɗuwa ne kawai da waɗanda kuka haɗa da su."
+            "value": "Vespertine yana neman Mac-Mac masu aiki da Vespertine a kan cibiyar sadarwarku, kuma yana haɗuwa ne kawai da Mac-Mac ɗin da kuka haɗa da su da kuma foldojin cibiyar sadarwa da kuka ƙara."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine מחפש ברשת שלך מחשבי Mac שמפעילים את Vespertine, ומתחבר רק לאלה שקישרת."
+            "value": "Vespertine מחפש ברשת שלך מחשבי Mac שמפעילים את Vespertine, ומתחבר רק למחשבי ה־Mac שקישרת ולשיתופים שהוספת."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine आपके नेटवर्क पर Vespertine चला रहे Mac खोजता है, और केवल उन्हीं से कनेक्ट होता है जिनसे आप पेयर करते हैं।"
+            "value": "Vespertine आपके नेटवर्क पर Vespertine चला रहे Mac खोजता है, और केवल उन्हीं Mac से कनेक्ट होता है जिनसे आप पेयर करते हैं और उन्हीं शेयर से जिन्हें आप जोड़ते हैं।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A Vespertine a hálózatán keresi azokat a Maceket, amelyeken fut a Vespertine, és csak azokhoz csatlakozik, amelyekkel Ön párosítja."
+            "value": "A Vespertine a hálózatán keresi azokat a Maceket, amelyeken fut a Vespertine, és csak azokhoz a Macekhez csatlakozik, amelyekkel Ön párosítja, valamint azokhoz a megosztásokhoz, amelyeket hozzáad."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine mencari Mac yang menjalankan Vespertine di jaringan Anda, dan hanya terhubung ke Mac yang Anda pasangkan."
+            "value": "Vespertine mencari Mac yang menjalankan Vespertine di jaringan Anda, dan hanya terhubung ke Mac yang Anda pasangkan dan share yang Anda tambahkan."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine cerca sulla tua rete i Mac su cui è in esecuzione Vespertine e si connette solo a quelli a cui lo abbini."
+            "value": "Vespertine cerca sulla tua rete i Mac su cui è in esecuzione Vespertine e si connette solo ai Mac a cui lo abbini e alle condivisioni che aggiungi."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertineは、ネットワーク上でVespertineを実行しているMacを探し、ペアリングしたMacにのみ接続します。"
+            "value": "Vespertineは、ネットワーク上でVespertineを実行しているMacを探し、ペアリングしたMacと追加した共有にのみ接続します。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ Vespertine ರನ್ ಆಗುತ್ತಿರುವ Mac ಗಳನ್ನು ಹುಡುಕುತ್ತದೆ, ಮತ್ತು ನೀವು ಜೋಡಿಸಿದವುಗಳಿಗೆ ಮಾತ್ರ ಸಂಪರ್ಕಿಸುತ್ತದೆ."
+            "value": "Vespertine ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ Vespertine ರನ್ ಆಗುತ್ತಿರುವ Mac ಗಳನ್ನು ಹುಡುಕುತ್ತದೆ, ಮತ್ತು ನೀವು ಜೋಡಿಸಿದ Mac ಗಳಿಗೆ ಮತ್ತು ನೀವು ಸೇರಿಸಿದ ಶೇರ್‌ಗಳಿಗೆ ಮಾತ್ರ ಸಂಪರ್ಕಿಸುತ್ತದೆ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine은 사용자의 네트워크에서 Vespertine을 실행 중인 Mac을 찾고, 페어링한 Mac에만 연결합니다."
+            "value": "Vespertine은 사용자의 네트워크에서 Vespertine을 실행 중인 Mac을 찾고, 페어링한 Mac과 추가한 공유에만 연결합니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine നിങ്ങളുടെ നെറ്റ്‌വർക്കിൽ Vespertine പ്രവർത്തിക്കുന്ന Mac-കൾ തിരയുന്നു, നിങ്ങൾ ജോടിയാക്കിയവയിലേക്ക് മാത്രം കണക്റ്റ് ചെയ്യുന്നു."
+            "value": "Vespertine നിങ്ങളുടെ നെറ്റ്‌വർക്കിൽ Vespertine പ്രവർത്തിക്കുന്ന Mac-കൾ തിരയുന്നു, നിങ്ങൾ ജോടിയാക്കിയ Mac-കളിലേക്കും നിങ്ങൾ ചേർത്ത ഷെയറുകളിലേക്കും മാത്രം കണക്റ്റ് ചെയ്യുന്നു."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine तुमच्या नेटवर्कवर Vespertine चालू असलेले Mac शोधते, आणि फक्त तुम्ही पेअर केलेल्या Mac शीच कनेक्ट होते."
+            "value": "Vespertine तुमच्या नेटवर्कवर Vespertine चालू असलेले Mac शोधते, आणि फक्त तुम्ही पेअर केलेल्या Mac शी आणि तुम्ही जोडलेल्या शेअरशीच कनेक्ट होते."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine mencari Mac yang menjalankan Vespertine pada rangkaian anda, dan hanya bersambung ke Mac yang anda pasangkan."
+            "value": "Vespertine mencari Mac yang menjalankan Vespertine pada rangkaian anda, dan hanya bersambung ke Mac yang anda pasangkan dan perkongsian yang anda tambah."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine leter etter Macer som kjører Vespertine på nettverket ditt, og kobler bare til dem du sammenkobler med."
+            "value": "Vespertine leter etter Macer som kjører Vespertine på nettverket ditt, og kobler bare til Macene du sammenkobler med, og delingene du legger til."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine zoekt op je netwerk naar Macs waarop Vespertine actief is en maakt alleen verbinding met de Macs waarmee je koppelt."
+            "value": "Vespertine zoekt op je netwerk naar Macs waarop Vespertine actief is en maakt alleen verbinding met de Macs waarmee je koppelt en de shares die je toevoegt."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ’ਤੇ Vespertine ਚਲਾ ਰਹੇ Mac ਲੱਭਦਾ ਹੈ, ਅਤੇ ਸਿਰਫ਼ ਉਹਨਾਂ ਨਾਲ ਕਨੈਕਟ ਹੁੰਦਾ ਹੈ ਜਿਨ੍ਹਾਂ ਨਾਲ ਤੁਸੀਂ ਪੇਅਰ ਕਰਦੇ ਹੋ।"
+            "value": "Vespertine ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ’ਤੇ Vespertine ਚਲਾ ਰਹੇ Mac ਲੱਭਦਾ ਹੈ, ਅਤੇ ਸਿਰਫ਼ ਉਹਨਾਂ Mac ਨਾਲ ਕਨੈਕਟ ਹੁੰਦਾ ਹੈ ਜਿਨ੍ਹਾਂ ਨਾਲ ਤੁਸੀਂ ਪੇਅਰ ਕਰਦੇ ਹੋ ਅਤੇ ਉਹਨਾਂ ਸ਼ੇਅਰਾਂ ਨਾਲ ਜੋ ਤੁਸੀਂ ਜੋੜਦੇ ਹੋ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine szuka w Twojej sieci Maców, na których działa Vespertine, i łączy się tylko z tymi, z którymi połączysz je w parę."
+            "value": "Vespertine szuka w Twojej sieci Maców, na których działa Vespertine, i łączy się tylko z Makami, z którymi połączysz je w parę, oraz z zasobami, które dodasz."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine procura na sua rede por Macs com o Vespertine em execução e só se conecta àqueles com os quais você o emparelha."
+            "value": "O Vespertine procura na sua rede por Macs com o Vespertine em execução e só se conecta aos Macs com os quais você o emparelha e aos compartilhamentos que você adiciona."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine procura na sua rede Macs com o Vespertine em execução e liga-se apenas àqueles com os quais o emparelhar."
+            "value": "O Vespertine procura na sua rede Macs com o Vespertine em execução e liga-se apenas aos Macs com os quais o emparelhar e às partilhas que adicionar."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine caută în rețeaua dvs. Mac-uri pe care rulează Vespertine și se conectează doar la cele cu care îl asociați."
+            "value": "Vespertine caută în rețeaua dvs. Mac-uri pe care rulează Vespertine și se conectează doar la Mac-urile cu care îl asociați și la partajările pe care le adăugați."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine letar efter Mac-datorer som kör Vespertine i ditt nätverk och ansluter bara till dem du parkopplar med."
+            "value": "Vespertine letar efter Mac-datorer som kör Vespertine i ditt nätverk och ansluter bara till de Mac-datorer du parkopplar med och de resurser du lägger till."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine hutafuta Mac zinazoendesha Vespertine kwenye mtandao wako, na huunganisha tu kwenye zile unazooanisha nazo."
+            "value": "Vespertine hutafuta Mac zinazoendesha Vespertine kwenye mtandao wako, na huunganisha tu kwenye Mac unazooanisha nazo na folda za mtandao unazoongeza."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine உங்கள் நெட்வொர்க்கில் Vespertine இயங்கும் Mac-களைத் தேடும்; நீங்கள் ஜோடிசேர்த்தவற்றுடன் மட்டுமே இணையும்."
+            "value": "Vespertine உங்கள் நெட்வொர்க்கில் Vespertine இயங்கும் Mac-களைத் தேடும்; நீங்கள் ஜோடிசேர்த்த Mac-களுடனும் நீங்கள் சேர்த்த பகிர்வுகளுடனும் மட்டுமே இணையும்."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine మీ నెట్‌వర్క్‌లో Vespertine నడుస్తున్న Macల కోసం వెతుకుతుంది, మీరు జత చేసిన వాటికి మాత్రమే కనెక్ట్ అవుతుంది."
+            "value": "Vespertine మీ నెట్‌వర్క్‌లో Vespertine నడుస్తున్న Macల కోసం వెతుకుతుంది, మీరు జత చేసిన Macలకు, మీరు జోడించిన షేర్‌లకు మాత్రమే కనెక్ట్ అవుతుంది."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine จะค้นหา Mac ที่ใช้งาน Vespertine อยู่บนเครือข่ายของคุณ และเชื่อมต่อกับเครื่องที่คุณจับคู่ไว้เท่านั้น"
+            "value": "Vespertine จะค้นหา Mac ที่ใช้งาน Vespertine อยู่บนเครือข่ายของคุณ และเชื่อมต่อกับ Mac ที่คุณจับคู่ไว้และแชร์ที่คุณเพิ่มเท่านั้น"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine, ağınızda Vespertine’i çalıştıran Mac’leri arar ve yalnızca eşlediklerinize bağlanır."
+            "value": "Vespertine, ağınızda Vespertine’i çalıştıran Mac’leri arar ve yalnızca eşlediğiniz Mac’lere ve eklediğiniz paylaşımlara bağlanır."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine шукає у вашій мережі комп’ютери Mac, на яких запущено Vespertine, і під’єднується лише до тих, з якими ви створили пару."
+            "value": "Vespertine шукає у вашій мережі комп’ютери Mac, на яких запущено Vespertine, і під’єднується лише до тих комп’ютерів Mac, з якими ви створили пару, і до ресурсів, які ви додали."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine آپ کے نیٹ ورک پر ایسے Macs تلاش کرتا ہے جن پر Vespertine چل رہا ہو، اور صرف ان سے منسلک ہوتا ہے جن کے ساتھ آپ پیئر کرتے ہیں۔"
+            "value": "Vespertine آپ کے نیٹ ورک پر ایسے Macs تلاش کرتا ہے جن پر Vespertine چل رہا ہو، اور صرف ان Macs سے جن کے ساتھ آپ پیئر کرتے ہیں اور ان شیئرز سے جو آپ شامل کرتے ہیں، منسلک ہوتا ہے۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine tìm các máy Mac đang chạy Vespertine trên mạng của bạn và chỉ kết nối với những máy bạn ghép đôi."
+            "value": "Vespertine tìm các máy Mac đang chạy Vespertine trên mạng của bạn và chỉ kết nối với những máy Mac bạn ghép đôi và những chia sẻ bạn thêm."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 會在你的網絡上尋找正在執行 Vespertine 的 Mac，而且只會連接你已配對的 Mac。"
+            "value": "Vespertine 會在你的網絡上尋找正在執行 Vespertine 的 Mac，而且只會連接你已配對的 Mac 和你加入的共享。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 会在你的网络上查找运行 Vespertine 的 Mac，并且只连接你已配对的 Mac。"
+            "value": "Vespertine 会在你的网络上查找运行 Vespertine 的 Mac，并且只连接你已配对的 Mac 和你添加的共享。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 會在你的網路上尋找執行 Vespertine 的 Mac，而且只會連線到你配對的 Mac。"
+            "value": "Vespertine 會在你的網路上尋找執行 Vespertine 的 Mac，而且只會連線到你配對的 Mac 和你加入的共享。"
           }
         }
       }

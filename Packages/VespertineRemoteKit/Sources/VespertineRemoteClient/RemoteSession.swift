@@ -131,6 +131,9 @@ public final class RemoteSession {
 
     /// Whether this is the built-in demo rather than a real Mac.
     public var isDemo: Bool { pairing.serverID == DemoMac.serverID }
+    /// The "Mac" is a share the phone reads itself (see VespertineShare): there is no Mac, and music plays on this device.
+    public static let sharePrefix = "share-"
+    public var isShare: Bool { pairing.serverID.hasPrefix(Self.sharePrefix) }
 
     public var isConnected: Bool { phase == .connected }
     /// Whether the Mac speaks protocol 2: it can stream songs to this phone (an older Mac only takes commands).

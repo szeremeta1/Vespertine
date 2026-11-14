@@ -35,7 +35,8 @@ final class PlayTarget {
     /// The phone's player for `session` when this device is where music plays and the Mac can send songs; nil when the
     /// Mac plays.
     func phone(for session: RemoteSession) -> PhoneRemote? {
-        guard onThisDevice else { return nil }
+        // A share has no Mac to play on: its songs always play here.
+        guard onThisDevice || session.isShare else { return nil }
         #if DEBUG
         // App Store captures use the demo and must stay silent on whatever machine takes them.
         if session.isDemo, LaunchOptions.screenshot { return nil }
