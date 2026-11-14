@@ -58,6 +58,23 @@ Added since, all additive (no version bump; an older peer ignores or refuses the
 If the listener is up but Bonjour has announced it nowhere after 8 seconds (`AdvertisingWatch`; macOS keeps an app off the local network
 until it is allowed under Privacy & Security › Local Network), Settings › Remote says so and the log has a line under category `remote`.
 
+The listener and its Bonjour service are made in one place (`RemoteTransport.listener`). `RemoteAdvertisingTests` checks what the
+listener is given, and, with `VESPERTINE_BONJOUR=1`, starts it and waits for Bonjour to take the service and for a browser made like the
+phone's to see it (CI does not set it: the test needs Bonjour and a process macOS allows on the local network). To tell "the code does not
+announce" from "this build is not allowed" on a Mac where a phone finds nothing:
+
+```
+VESPERTINE_BONJOUR=1 swift test --package-path Packages/VespertineRemoteKit --filter RemoteAdvertising
+dns-sd -B _vespertine._tcp local.
+log show --last 10m --predicate 'category == "remote"' | grep -i 'waiting\|announced'
+```
+
+If the test passes from Terminal while the app is not listed by `dns-sd`, the app's copy is being kept off the local network: every
+build with its own bundle identifier (a test build, say) is asked about and allowed separately under Privacy & Security › Local Network,
+and a copy started where nobody can answer that question (over SSH, from a script) may never be allowed. When Bonjour's refusal reaches
+the listener it is a DNS-SD error (`PolicyDenied`, -65570), and the log line "The remote listener is waiting" carries it. A refused
+build has not been observed with this log line yet; an allowed build and this test do announce.
+
 Once paired, the phone tries every way it knows at once: Bonjour on this network, the address it last used, each advertised address, and a
 typed one if there is one. Nearby routes start first (others wait 150 to 350 ms, or less if everything ahead of them has failed), the first
 to finish the handshake wins and the rest are closed. The same key signs in on every route. `RemoteSession.reach` says which kind won

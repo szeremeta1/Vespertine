@@ -36,8 +36,15 @@ struct ShareNoticeTests {
         return url
     }
 
-    private func waiting(_ entry: NetworkPlaybackCache.Entry) {
-        for _ in 0..<1000 where !entry.isWaiting { Thread.sleep(forTimeInterval: 0.002) }
+    /// Returns once the read started on another thread is parked in the copy. A read stamps the start of its wait as it parks, so
+    /// the test's clock may only move after that: moved earlier, the stamp lands at the later time and the count starts over.
+    /// (`isWaiting` is no sign of it: it is already true while the copy is starting, before any read has arrived.)
+    private func parked(_ entry: NetworkPlaybackCache.Entry) throws {
+        let deadline = Date().addingTimeInterval(60)
+        while entry.readsWaiting == 0 {
+            try #require(Date() < deadline, "the read never reached the copy")
+            Thread.sleep(forTimeInterval: 0.002)
+        }
     }
 
     @Test("A read waiting on a share: nothing at 9 s, the notice at 10 s counted from the wait, none once it is over")
@@ -52,7 +59,7 @@ struct ShareNoticeTests {
         #expect(cache.shareSilence == nil, "nothing is waiting yet")
         let done = DispatchSemaphore(value: 0)
         Thread { _ = try? entry.read(at: 0, count: 4096); done.signal() }.start()
-        waiting(entry)
+        try parked(entry)
         now.withLock { $0 += 9 }
         #expect(cache.shareSilence == nil, "9 s is not yet a notice")
         now.withLock { $0 += 1 }
@@ -75,7 +82,7 @@ struct ShareNoticeTests {
         let entry = try cache.entry(key: "slow", url: URL(fileURLWithPath: "/share/song.flac"), reader: share)
         let done = DispatchSemaphore(value: 0)
         Thread { _ = try? entry.read(at: 0, count: 4096 * 6); done.signal() }.start()
-        waiting(entry)
+        try parked(entry)
         for step in 1...5 {
             now.withLock { $0 += 9 }
             #expect(cache.shareSilence == nil, "9 s after the last byte, step \(step)")
