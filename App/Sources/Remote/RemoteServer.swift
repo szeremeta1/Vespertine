@@ -423,8 +423,18 @@ final class RemoteServer {
 
     // MARK: Connections
 
+    /// Shuts out a host that keeps failing the handshake, and caps the connections that haven't signed in.
+    @ObservationIgnored private var throttle = ConnectionThrottle()
+
+    fileprivate static func host(_ connection: NWConnection) -> String {
+        if case .hostPort(let host, _) = connection.endpoint { return ConnectionThrottle.host(of: "\(host)") }
+        return ConnectionThrottle.host(of: "\(connection.endpoint)")
+    }
+
     private func accept(_ connection: NWConnection) {
         guard let model else { connection.cancel(); return }
+        let pending = clients.values.filter { !$0.isSignedIn }.count
+        guard throttle.admits(host: Self.host(connection), pending: pending) else { connection.cancel(); return }
         let client = RemoteClient(connection: connection, server: self, bridge: RemoteBridge(model: model))
         clients[ObjectIdentifier(client)] = client
         client.start()
@@ -435,6 +445,7 @@ final class RemoteServer {
         if let device = client.device, !clients.values.contains(where: { $0.device == device }), !web.connectedDevices.contains(device) {
             connected.remove(device)
         }
+        if handshakeFailed { throttle.failed(host: client.host) }
         if handshakeFailed, pairing != nil {
             failedPairingHandshakes += 1
             if failedPairingHandshakes >= Self.pairingAttempts { endPairing() }
@@ -445,6 +456,7 @@ final class RemoteServer {
         guard let paired = store.device(device), !paired.isWeb else { return false }
         store.touch(device, name: name)
         connected.insert(device)
+        throttle.succeeded(host: client.host)
         return true
     }
 
@@ -489,6 +501,8 @@ final class RemoteClient {
     /// Its device ID once it said hello with a paired key.
     private(set) var device: String?
     private(set) var isSignedIn = false
+    /// Where it connects from, for the throttle.
+    var host: String { RemoteServer.host(connection) }
     private var becameReady = false
     private var closed = false
     private var sentPlayer: PlayerState?
