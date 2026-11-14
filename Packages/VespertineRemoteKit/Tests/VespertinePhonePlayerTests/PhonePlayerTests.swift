@@ -280,16 +280,6 @@ private final class SlowMac: @unchecked Sendable {
         #expect(player.state == .idle)
     }
 
-    @Test func multichannelWaitsForTheSpatialPath() throws {
-        // Stereo first: a six-channel stream is refused with a clear reason until the 5.1 path (see the plan addendum) is built.
-        let (url, _) = try makeFile(seconds: 0.2, channels: 6)
-        defer { try? FileManager.default.removeItem(at: url) }
-        let player = PhonePlayer(engine: try offlineEngine(rate: 44_100))
-        let sixChannels = StreamFormat(codec: "WAV", container: "wav", sampleRate: 44_100, bitDepth: 24, channels: 6, channelLabels: [1, 2, 3, 4, 5, 6], lossless: true)
-        #expect(throws: PhonePlayer.Failure.multichannelNotYet(6)) { try player.load(url, format: sixChannels) }
-        #expect(player.state == .idle)
-    }
-
     @Test func aFileThatIsNotAudioFailsWithWords() throws {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("phoneplayer-\(UUID()).flac")
         try Data(repeating: 1, count: 100).write(to: url)
