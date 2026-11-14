@@ -11,6 +11,7 @@
 import AVFAudio
 import Foundation
 import Observation
+import VespertineChannels
 import VespertineRemoteProtocol
 
 @MainActor
@@ -27,8 +28,6 @@ public final class PhonePlayer {
     }
 
     public enum Failure: Error, Equatable {
-        /// Not yet: more than two channels needs the Spatial Audio path.
-        case multichannelNotYet(Int)
         case cannotOpen(String)
         case engine(String)
     }
@@ -55,6 +54,28 @@ public final class PhonePlayer {
     public private(set) var isBuffering = false
     /// The signal goes from the file to the output through a player node and a mixer at unity gain, with nothing else.
     public private(set) var isUntouchedPath = false
+
+    /// What happens to the song's channels on the way out.
+    public enum Rendering: Equatable, Sendable {
+        /// Stereo or mono, with nothing in the path but a mixer at unity.
+        case untouched
+        /// Surround folded to the output's channels.
+        case downmix
+        /// Surround rendered for headphones by Apple's spatial mixer.
+        case spatial(headTracked: Bool)
+    }
+    public private(set) var rendering: Rendering = .untouched
+
+    /// How surround songs are played: rendered for headphones (Fixed, or Head Tracked on AirPods that follow your head),
+    /// or folded to stereo (Off). Stereo songs are never touched. Changing it while a surround song plays carries on from
+    /// the same place.
+    public var spatialMode: SpatialMode = .fixed {
+        didSet {
+            guard spatialMode != oldValue, (pump.processingFormat()?.channelCount ?? 0) > 2 else { return }
+            recoverFromConfigurationChange()
+        }
+    }
+    @ObservationIgnored private var environment: AVAudioEnvironmentNode?
 
     /// Seconds of audio decoded ahead of what is being heard.
     @ObservationIgnored public var scheduleAhead: Double = 2 { didSet { pump.setAhead(seconds: scheduleAhead) } }
@@ -103,7 +124,6 @@ public final class PhonePlayer {
     /// Opens a whole file on the phone for playing (a stream downloaded earlier). Ready when it returns.
     public func load(_ url: URL, format: StreamFormat) throws {
         halt()
-        guard format.channels <= 2 else { throw Failure.multichannelNotYet(format.channels) }
         let source: FileByteSource
         do { source = try FileByteSource(url: url) } catch { throw Failure.cannotOpen(error.localizedDescription) }
         let item = Item(id: url.absoluteString, source: source, format: format)
@@ -118,10 +138,6 @@ public final class PhonePlayer {
     /// until its first audio is decoded); a failure arrives through `onFailure`.
     public func start(_ item: Item, playing: Bool = true) {
         halt()
-        guard item.format.channels <= 2 else {
-            onFailure?(Failure.multichannelNotYet(item.format.channels))
-            return
-        }
         if item.source.isComplete {
             do {
                 try prime(item, at: 0)
@@ -152,7 +168,7 @@ public final class PhonePlayer {
     /// What plays when the current song ends by itself, or nil. With the same rate and channels it follows without a gap;
     /// otherwise the player finishes and `onFinished` starts it.
     public func setFollowing(_ item: Item?) {
-        pump.setNext(item?.format.channels ?? 0 <= 2 ? item : nil)
+        pump.setNext(item)
     }
 
     /// Opens, connects and decodes the first audio of a song whose bytes are all here.
@@ -170,11 +186,32 @@ public final class PhonePlayer {
         guard let processing = pump.processingFormat() else { return }
         duration = pump.duration(of: currentID)
         engine.disconnectNodeOutput(node)
-        engine.connect(node, to: engine.mainMixerNode, format: processing)
+        if let environment { engine.disconnectNodeOutput(environment) }
         engine.mainMixerNode.outputVolume = 1
         node.volume = 1
         node.pan = 0
-        isUntouchedPath = true
+        if processing.channelCount > 2, spatialMode != .off {
+            // Surround for headphones: the song's bed into Apple's spatial mixer, two binaural channels out.
+            let mixer = environment ?? {
+                let made = AVAudioEnvironmentNode()
+                engine.attach(made)
+                environment = made
+                return made
+            }()
+            let tracked = spatialMode == .headTracked
+            node.sourceMode = .ambienceBed
+            node.renderingAlgorithm = .auto
+            mixer.outputType = .headphones
+            mixer.outputVolume = 1
+            if #available(iOS 18.0, macOS 15.0, *) { mixer.isListenerHeadTrackingEnabled = tracked }
+            engine.connect(node, to: mixer, format: processing)
+            engine.connect(mixer, to: engine.mainMixerNode, format: AVAudioFormat(standardFormatWithSampleRate: processing.sampleRate, channels: 2))
+            rendering = .spatial(headTracked: tracked)
+        } else {
+            engine.connect(node, to: engine.mainMixerNode, format: processing)
+            rendering = processing.channelCount > 2 ? .downmix : .untouched
+        }
+        isUntouchedPath = rendering == .untouched
         pump.setAhead(seconds: scheduleAhead)
     }
 
@@ -566,8 +603,7 @@ private final class Pump: @unchecked Sendable {
         let outcome: Outcome = lock.withLock {
             guard generation == mine else { return .void }
             if let following = next, let opened = following.decoder,
-               opened.processingFormat.sampleRate == ended.processingFormat.sampleRate,
-               opened.processingFormat.channelCount == ended.processingFormat.channelCount {
+               opened.processingFormat == ended.processingFormat {
                 decoder = opened
                 item = following.item
                 next = nil

@@ -312,8 +312,6 @@ public final class PhonePlayback {
              StreamDecoder.Failure.cannotOpen(let text), StreamDecoder.Failure.cannotRead(let text), PhonePlayer.Failure.cannotOpen(let text),
              PhonePlayer.Failure.engine(let text):
             return text
-        case PhonePlayer.Failure.multichannelNotYet:
-            return String(localized: "“\(title)” has more than two channels. Surround on this device is not ready yet.", comment: "Phone player: a multichannel song before the Spatial Audio path exists.")
         default:
             return error.localizedDescription
         }

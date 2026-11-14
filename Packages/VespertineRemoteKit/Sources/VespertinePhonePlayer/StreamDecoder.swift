@@ -1,7 +1,8 @@
 //
 // Vespertine: decodes a song from a `ByteSource` with Apple's own decoders (FLAC, ALAC, AAC, WAV, AIFF, CAF, MP3), reading the
 // bytes through callbacks, so a stream decodes while it is still arriving and a seek reads only the part it lands in.
-// The phone has no decoders of its own: what Core Audio can't open, the Mac converts first.
+// The phone has no decoders of its own: what Core Audio can't open, the Mac converts first. Surround (more than two channels)
+// comes out on the bed Apple's spatial mixer takes, each channel on the speaker of its own place.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
@@ -9,6 +10,7 @@
 import AVFAudio
 import AudioToolbox
 import Foundation
+import VespertineChannels
 import VespertineRemoteProtocol
 
 /// What the C callbacks get: the source, and the error a read ended with (Core Audio only carries a status code).
@@ -50,8 +52,11 @@ public final class StreamDecoder: @unchecked Sendable {
     }
 
     public let source: any ByteSource
-    /// What `read` fills: 32-bit float, one buffer per channel, at the file's own rate and channel count.
+    /// What `read` fills: 32-bit float, one buffer per channel, at the file's own rate. Stereo and mono keep their channels;
+    /// surround has the channels of its bed (`bed`), which can be more than the file's.
     public let processingFormat: AVAudioFormat
+    /// For surround: the speakers the song's channels are, as the Mac named them (or the standard order for their count).
+    public let speakers: [AudioChannelLabel]?
     /// The file's own format, as Core Audio reports it.
     public let fileFormat: AudioStreamBasicDescription
     /// Sample frames in the song.
@@ -62,6 +67,10 @@ public final class StreamDecoder: @unchecked Sendable {
     private let box: SourceBox
     private let audioFile: AudioFileID
     private let extFile: ExtAudioFileRef
+    /// Surround only: what ExtAudioFile decodes into (the file's channels, in the file's order) and where each goes on the bed.
+    private let decodeFormat: AVAudioFormat?
+    private let router: BedRouter?
+    private var scratch: AVAudioPCMBuffer?
 
     /// Opens the song. Blocks while the first bytes arrive (and, for a file whose index is at its end, those too).
     public init(source: any ByteSource, format: StreamFormat) throws {
@@ -87,10 +96,11 @@ public final class StreamDecoder: @unchecked Sendable {
         guard status == noErr, description.mSampleRate > 0, description.mChannelsPerFrame > 0 else { throw fail(status) }
         let channels = Int(description.mChannelsPerFrame)
         let labels = format.channels == channels ? format.channelLabels : nil
-        guard let processing = Self.processingFormat(sampleRate: description.mSampleRate, channels: channels, labels: labels) else {
+        guard let plan = Self.plan(sampleRate: description.mSampleRate, channels: channels, labels: labels) else {
             throw fail(kAudioFileUnsupportedDataFormatError)
         }
-        var client = processing.streamDescription.pointee
+        let processing = plan.processing
+        var client = (plan.decode ?? processing).streamDescription.pointee
         status = ExtAudioFileSetProperty(ext, kExtAudioFileProperty_ClientDataFormat, UInt32(MemoryLayout<AudioStreamBasicDescription>.size), &client)
         guard status == noErr else { throw fail(status) }
         var frames: Int64 = 0
@@ -103,6 +113,9 @@ public final class StreamDecoder: @unchecked Sendable {
         extFile = ext
         fileFormat = description
         processingFormat = processing
+        decodeFormat = plan.decode
+        router = plan.router
+        speakers = plan.speakers
         length = frames
     }
 
@@ -114,12 +127,23 @@ public final class StreamDecoder: @unchecked Sendable {
     /// Fills `buffer` (made with `processingFormat`) and returns the frames read: zero at the end of the song.
     public func read(into buffer: AVAudioPCMBuffer) throws -> Int {
         var frames = buffer.frameCapacity
-        buffer.frameLength = frames
         box.error = nil
-        let status = ExtAudioFileRead(extFile, &frames, buffer.mutableAudioBufferList)
+        // Surround is decoded in the file's own order, then each channel is put on its bed speaker.
+        var target = buffer
+        if let decodeFormat, router != nil {
+            if scratch == nil || scratch!.frameCapacity < frames { scratch = AVAudioPCMBuffer(pcmFormat: decodeFormat, frameCapacity: frames) }
+            guard let scratch else { throw Failure.cannotRead(Self.words(kAudioFileUnspecifiedError)) }
+            target = scratch
+        }
+        target.frameLength = frames
+        let status = ExtAudioFileRead(extFile, &frames, target.mutableAudioBufferList)
         guard status == noErr else {
             buffer.frameLength = 0
             throw box.error ?? Failure.cannotRead(Self.words(status))
+        }
+        if let router, target !== buffer, let from = target.floatChannelData, let to = buffer.floatChannelData {
+            router.route(planes: (0..<Int(target.format.channelCount)).map { UnsafePointer(from[$0]) },
+                         into: (0..<Int(buffer.format.channelCount)).map { to[$0] }, frames: Int(frames))
         }
         buffer.frameLength = frames
         position += Int64(frames)
@@ -150,41 +174,34 @@ public final class StreamDecoder: @unchecked Sendable {
         }
     }
 
-    /// 32-bit float, deinterleaved. More than two channels need a layout: the speakers the Mac named, or, when it named none,
-    /// the standard order for that many channels (the order FLAC and WAVE files use).
-    public static func processingFormat(sampleRate: Double, channels: Int, labels: [UInt32]?) -> AVAudioFormat? {
-        if channels <= 2 {
-            return AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: AVAudioChannelCount(channels), interleaved: false)
-        }
-        guard let layout = channelLayout(channels: channels, labels: labels) else { return nil }
-        return AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, interleaved: false, channelLayout: layout)
+    struct Plan {
+        var processing: AVAudioFormat
+        var decode: AVAudioFormat?
+        var router: BedRouter?
+        var speakers: [AudioChannelLabel]?
     }
 
-    public static func channelLayout(channels: Int, labels: [UInt32]?) -> AVAudioChannelLayout? {
-        if let labels, labels.count == channels, channels > 0 {
-            let size = MemoryLayout<AudioChannelLayout>.size + (channels - 1) * MemoryLayout<AudioChannelDescription>.stride
-            let raw = UnsafeMutableRawPointer.allocate(byteCount: size, alignment: MemoryLayout<AudioChannelLayout>.alignment)
-            defer { raw.deallocate() }
-            raw.initializeMemory(as: UInt8.self, repeating: 0, count: size)
-            let layout = raw.assumingMemoryBound(to: AudioChannelLayout.self)
-            layout.pointee.mChannelLayoutTag = kAudioChannelLayoutTag_UseChannelDescriptions
-            layout.pointee.mNumberChannelDescriptions = UInt32(channels)
-            let descriptions = channelDescriptions(layout)
-            for (i, label) in labels.enumerated() { descriptions[i].mChannelLabel = label }
-            return AVAudioChannelLayout(layout: layout)
+    /// How a song of `channels` channels is decoded. Stereo and mono: as they are. Surround: onto the smallest bed Apple's
+    /// spatial mixer takes that has a place for every speaker, with the speakers the Mac named, or, when it named none, the
+    /// order FLAC and WAVE files use for that many channels. nil when the speakers can't be known (more than eight, unnamed).
+    static func plan(sampleRate: Double, channels: Int, labels: [UInt32]?) -> Plan? {
+        if channels <= 2 {
+            return AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: AVAudioChannelCount(channels), interleaved: false)
+                .map { Plan(processing: $0) }
         }
-        let tag: AudioChannelLayoutTag? = switch channels {
-        case 1: kAudioChannelLayoutTag_Mono
-        case 2: kAudioChannelLayoutTag_Stereo
-        case 3: kAudioChannelLayoutTag_WAVE_3_0
-        case 4: kAudioChannelLayoutTag_WAVE_4_0_A
-        case 5: kAudioChannelLayoutTag_WAVE_5_0_A
-        case 6: kAudioChannelLayoutTag_WAVE_5_1_A
-        case 7: kAudioChannelLayoutTag_WAVE_6_1
-        case 8: kAudioChannelLayoutTag_WAVE_7_1
-        default: nil
-        }
-        return tag.flatMap { AVAudioChannelLayout(layoutTag: $0) }
+        let named = labels.flatMap { $0.count == channels ? ChannelLayouts.speakerLabels($0) : nil }
+        guard let speakers = named ?? ChannelLayouts.wavOrderLabels(channels: channels), speakers.count == channels,
+              let bed = ChannelLayouts.spatialBed(for: speakers), let layout = AVAudioChannelLayout(layoutTag: bed.tag),
+              let router = BedRouter(source: speakers, bed: layout.channelLabels),
+              let discrete = AVAudioChannelLayout(layoutTag: kAudioChannelLayoutTag_DiscreteInOrder | AudioChannelLayoutTag(channels)) else { return nil }
+        let processing = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, interleaved: false, channelLayout: layout)
+        let decode = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, interleaved: false, channelLayout: discrete)
+        return Plan(processing: processing, decode: decode, router: router, speakers: speakers)
+    }
+
+    /// What `read` fills for a song like this (see `plan`).
+    public static func processingFormat(sampleRate: Double, channels: Int, labels: [UInt32]?) -> AVAudioFormat? {
+        plan(sampleRate: sampleRate, channels: channels, labels: labels)?.processing
     }
 
     private static func words(_ status: OSStatus) -> String {
@@ -196,11 +213,4 @@ public final class StreamDecoder: @unchecked Sendable {
     }
 }
 
-/// The channel descriptions that follow an `AudioChannelLayout`'s header.
-private func channelDescriptions(_ layout: UnsafeMutablePointer<AudioChannelLayout>) -> UnsafeMutableBufferPointer<AudioChannelDescription> {
-    let count = Int(layout.pointee.mNumberChannelDescriptions)
-    return withUnsafeMutablePointer(to: &layout.pointee.mChannelDescriptions) { first in
-        UnsafeMutableBufferPointer(start: first, count: count)
-    }
-}
 #endif
