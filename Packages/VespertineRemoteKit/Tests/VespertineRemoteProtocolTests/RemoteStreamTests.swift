@@ -75,6 +75,10 @@ private let fiveOne = StreamFormat(codec: "FLAC", container: "flac", sampleRate:
                 == #"{"command":{"streamOpen":{"id":42,"maxSampleRate":48000,"smaller":true}},"id":7}"#)
         let old = try RemoteProtocol.decoder().decode(ClientMessage.self, from: Data(#"{"command":{"streamOpen":{"id":42,"maxSampleRate":48000}},"id":7}"#.utf8))
         #expect(old.command == .streamOpen(id: 42, maxSampleRate: 48_000, smaller: nil))
+        // So is asking for DoP: the carrier rate the phone's DAC takes.
+        #expect(try json(ClientMessage(id: 7, command: .streamOpen(id: 42, maxSampleRate: nil, dop: 176_400)))
+                == #"{"command":{"streamOpen":{"dop":176400,"id":42}},"id":7}"#)
+        #expect(old.command == .streamOpen(id: 42, maxSampleRate: 48_000, smaller: nil, dop: nil))
         #expect(try json(ClientMessage(id: 8, command: .streamRead(stream: 3, offset: 1_048_576, length: 524_288)))
                 == #"{"command":{"streamRead":{"length":524288,"offset":1048576,"stream":3}},"id":8}"#)
         #expect(try json(ClientMessage(id: 9, command: .streamClose(stream: 3))) == #"{"command":{"streamClose":{"stream":3}},"id":9}"#)
@@ -95,6 +99,12 @@ private let fiveOne = StreamFormat(codec: "FLAC", container: "flac", sampleRate:
         let descriptor = StreamDescriptor(stream: 4, kind: .flac, byteSize: 123_456_789, format: fiveOne, frames: 9_000_000,
                                           tag: "9f2c", chunkSize: RemoteProtocol.defaultChunkSize)
         #expect(try roundTrip(ServerMessage.reply(id: 1, result: .streamOpened(descriptor))) == .reply(id: 1, result: .streamOpened(descriptor)))
+        // A stream of DoP frames says which DSD it is; every other descriptor reads as it always did.
+        #expect(try !json(ServerMessage.reply(id: 1, result: .streamOpened(descriptor))).contains("dsdRate"))
+        var dop = descriptor
+        dop.dsdRate = 2_822_400
+        #expect(try roundTrip(ServerMessage.reply(id: 1, result: .streamOpened(dop))) == .reply(id: 1, result: .streamOpened(dop)))
+        #expect(try json(ServerMessage.reply(id: 1, result: .streamOpened(dop))).contains(#""dsdRate":2822400"#))
         #expect(try roundTrip(ServerMessage.reply(id: 2, result: .streamPreparing(progress: 0.25))) == .reply(id: 2, result: .streamPreparing(progress: 0.25)))
         #expect(try roundTrip(ServerMessage.reply(id: 2, result: .streamPreparing(progress: nil))) == .reply(id: 2, result: .streamPreparing(progress: nil)))
 

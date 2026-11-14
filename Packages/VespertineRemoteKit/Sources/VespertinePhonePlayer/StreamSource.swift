@@ -82,6 +82,8 @@ public final class StreamSource: ByteSource, @unchecked Sendable {
     private var _failure: Failure?
     private var closed = false
     private var interruptions = 0
+    /// Reads parked until their bytes arrive.
+    private var waiting = 0
     /// How long a decoder's read waits for its bytes before it gives up.
     public var readTimeout: TimeInterval = 30
     private var pump: Task<Void, Never>?
@@ -137,6 +139,8 @@ public final class StreamSource: ByteSource, @unchecked Sendable {
         }
     }
     public var bufferedBytes: Int64 { condition.withLock { coveredBytes } }
+    /// How many reads are waiting for bytes right now (each has already said where the fetching should go on from).
+    var readsWaiting: Int { condition.withLock { waiting } }
     public var failure: Failure? { condition.withLock { _failure } }
 
     /// The unbroken run of bytes on the phone from `offset` on: how much can play if the Mac went away now.
@@ -304,7 +308,10 @@ public final class StreamSource: ByteSource, @unchecked Sendable {
             if let failure = _failure { condition.unlock(); throw failure }
             // Fetch from here on: a seek into what isn't on the phone yet doesn't wait for the gap behind it.
             if !claimed.contains(missing) { priority = missing }
-            if !condition.wait(until: deadline) {
+            waiting += 1
+            let woken = condition.wait(until: deadline)
+            waiting -= 1
+            if !woken {
                 condition.unlock()
                 throw Failure.timedOut
             }

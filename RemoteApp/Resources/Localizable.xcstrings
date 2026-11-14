@@ -16987,6 +16987,276 @@
         }
       }
     },
+    "Did you hear music or hiss?": {
+      "comment": "DoP test sheet, after the test sound: music means the DAC decodes DoP, hiss means it doesn't.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሙዚቃ ሰሙ ወይስ ጫጫታ?"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل سمعت موسيقى أم هسهسة؟"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনি কি মিউজিক শুনেছেন, নাকি হিস নয়েজ?"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Slyšeli jste hudbu, nebo šum?"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hørte du musik eller sus?"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hast du Musik oder Rauschen gehört?"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ακούσατε μουσική ή θόρυβο;"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Has oído música o un siseo?"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موسیقی شنیدید یا خش‌خش؟"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuulitko musiikkia vai kohinaa?"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musika ba o hiss ang narinig mo?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avez-vous entendu de la musique ou un souffle ?"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમને સંગીત સંભળાયું કે સરસરાટ?"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kun ji waƙa ko kuwa hayaniya?"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "האם שמעת מוזיקה או רחש?"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आपको संगीत सुनाई दिया या सरसराहट?"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zenét vagy sistergést hallott?"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apakah Anda mendengar musik atau desis?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hai sentito musica o un fruscio?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音楽とノイズのどちらが聞こえましたか？"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮಗೆ ಸಂಗೀತ ಕೇಳಿಸಿತೇ ಅಥವಾ ಹಿಸ್ ಶಬ್ದವೇ?"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음악이 들렸습니까, 잡음이 들렸습니까?"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങൾ കേട്ടത് സംഗീതമാണോ ഹിസ്സ് ആണോ?"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुम्हाला संगीत ऐकू आले की हिस?"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adakah anda mendengar muzik atau desis?"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hørte du musikk eller sus?"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoorde je muziek of ruis?"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕੀ ਤੁਹਾਨੂੰ ਸੰਗੀਤ ਸੁਣਿਆ ਜਾਂ ਸਰਸਰਾਹਟ?"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Czy było słychać muzykę, czy szum?"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Você ouviu música ou chiado?"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouviu música ou ruído?"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ați auzit muzică sau sâsâit?"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hörde du musik eller brus?"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulisikia muziki au mzomeo?"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "நீங்கள் கேட்டது இசையா, இரைச்சலா?"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీకు వినిపించింది సంగీతమా, లేక హిస్ శబ్దమా?"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "คุณได้ยินเสียงเพลงหรือเสียงซ่า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Müzik mi yoksa hışırtı mı duydunuz?"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ви почули музику чи шипіння?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کیا آپ نے موسیقی سنی یا سنسناہٹ؟"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bạn nghe thấy nhạc hay tiếng xì?"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你聽到的是音樂還是嘶嘶聲？"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你听到的是音乐还是嘶嘶声？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你聽到的是音樂還是嘶嘶聲？"
+          }
+        }
+      }
+    },
     "Done": {
       "localizations": {
         "am": {
@@ -17255,8 +17525,1086 @@
         }
       }
     },
+    "DoP is on for this DAC.": {
+      "comment": "DoP test result after the listener answered Music.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ለዚህ DAC DoP በርቷል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP مُفعّل لهذا الـ DAC."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই DAC-এর জন্য DoP চালু আছে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP je pro tento DAC zapnuté."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP er slået til for denne DAC."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP ist für diesen DAC aktiviert."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το DoP είναι ενεργό για αυτό το DAC."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP está activado para este DAC."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP برای این DAC روشن است."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP on käytössä tälle DAC:lle."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naka-on ang DoP para sa DAC na ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le DoP est activé pour ce DAC."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ DAC માટે DoP ચાલુ છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An kunna DoP don wannan DAC."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP מופעל עבור ה־DAC הזה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस DAC के लिए DoP चालू है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DoP be van kapcsolva ennél a DAC-nál."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP aktif untuk DAC ini."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il DoP è attivo per questo DAC."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このDACでDoPをオンにしました。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ DAC ಗೆ DoP ಆನ್ ಆಗಿದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 DAC에서 DoP가 켜졌습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ DAC-ന് DoP ഓണാണ്."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या DAC साठी DoP चालू आहे."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP aktif untuk DAC ini."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP er på for denne DAC-en."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP staat aan voor deze DAC."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ DAC ਲਈ DoP ਚਾਲੂ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP jest włączone dla tego przetwornika DAC."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O DoP está ativado para este DAC."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O DoP está ativado para este DAC."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP este activat pentru acest DAC."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP är på för den här DAC:n."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP imewashwa kwa DAC hii."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த DAC-க்கு DoP ஆன் செய்யப்பட்டுள்ளது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ DACకి DoP ఆన్ చేయబడింది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เปิด DoP สำหรับ DAC นี้แล้ว"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu DAC için DoP açık."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP увімкнено для цього ЦАП."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس DAC کے لیے DoP آن ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP đã được bật cho DAC này."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已為此 DAC 開啟 DoP。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已为此 DAC 打开 DoP。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已為此 DAC 開啟 DoP。"
+          }
+        }
+      }
+    },
+    "DoP stays off for this DAC. DSD keeps playing as PCM.": {
+      "comment": "DoP test result after the listener answered Hiss.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ለዚህ DAC DoP እንደጠፋ ይቆያል። DSD እንደ PCM መጫወቱን ይቀጥላል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يبقى DoP متوقفًا لهذا الـ DAC. يستمر تشغيل DSD بصيغة PCM."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই DAC-এর জন্য DoP বন্ধ থাকছে। DSD আগের মতোই PCM হিসেবে চলবে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP zůstává pro tento DAC vypnuté. DSD se dál přehrává jako PCM."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP forbliver slået fra for denne DAC. DSD afspilles fortsat som PCM."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP bleibt für diesen DAC deaktiviert. DSD wird weiterhin als PCM wiedergegeben."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το DoP παραμένει ανενεργό για αυτό το DAC. Το DSD συνεχίζει να αναπαράγεται ως PCM."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP sigue desactivado para este DAC. El DSD se sigue reproduciendo como PCM."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP برای این DAC خاموش می‌ماند. DSD همچنان به‌صورت PCM پخش می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP pysyy pois käytöstä tälle DAC:lle. DSD toistetaan edelleen PCM:nä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mananatiling naka-off ang DoP para sa DAC na ito. Patuloy na ipe-play ang DSD bilang PCM."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le DoP reste désactivé pour ce DAC. Le DSD continue d’être lu en PCM."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ DAC માટે DoP બંધ રહેશે. DSD પહેલાંની જેમ PCM તરીકે વાગતું રહેશે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP zai ci gaba da kasancewa a kashe don wannan DAC. DSD zai ci gaba da kunnawa a matsayin PCM."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP נשאר כבוי עבור ה־DAC הזה. DSD ממשיך להתנגן כ־PCM."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस DAC के लिए DoP बंद रहेगा। DSD पहले की तरह PCM के रूप में चलता रहेगा।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DoP kikapcsolva marad ennél a DAC-nál. A DSD továbbra is PCM-ként szól."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP tetap nonaktif untuk DAC ini. DSD tetap diputar sebagai PCM."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il DoP resta disattivato per questo DAC. Il DSD continua a essere riprodotto come PCM."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このDACではDoPはオフのままです。DSDは引き続きPCMとして再生されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ DAC ಗೆ DoP ಆಫ್ ಆಗಿಯೇ ಇರುತ್ತದೆ. DSD ಎಂದಿನಂತೆ PCM ಆಗಿ ಪ್ಲೇ ಆಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 DAC에서는 DoP가 꺼진 상태로 유지됩니다. DSD는 계속 PCM으로 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ DAC-ന് DoP ഓഫായി തുടരും. DSD, PCM ആയി തന്നെ പ്ലേ ചെയ്യുന്നത് തുടരും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या DAC साठी DoP बंदच राहील. DSD PCM म्हणूनच प्ले होत राहील."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP kekal tidak aktif untuk DAC ini. DSD terus dimainkan sebagai PCM."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP forblir av for denne DAC-en. DSD spilles fortsatt av som PCM."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP blijft uit voor deze DAC. DSD wordt nog steeds als PCM afgespeeld."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ DAC ਲਈ DoP ਬੰਦ ਰਹੇਗਾ। DSD ਪਹਿਲਾਂ ਵਾਂਗ PCM ਵਜੋਂ ਚੱਲਦਾ ਰਹੇਗਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP pozostaje wyłączone dla tego przetwornika DAC. DSD jest nadal odtwarzane jako PCM."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O DoP continua desativado para este DAC. O DSD continua sendo reproduzido como PCM."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O DoP continua desativado para este DAC. O DSD continua a ser reproduzido como PCM."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP rămâne dezactivat pentru acest DAC. DSD continuă să fie redat ca PCM."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP förblir av för den här DAC:n. DSD fortsätter att spelas som PCM."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP itabaki imezimwa kwa DAC hii. DSD itaendelea kuchezwa kama PCM."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த DAC-க்கு DoP ஆஃப் நிலையிலேயே இருக்கும். DSD தொடர்ந்து PCM-ஆக இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ DACకి DoP ఆఫ్‌లోనే ఉంటుంది. DSD, PCMగానే ప్లే అవుతూ ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP จะยังคงปิดอยู่สำหรับ DAC นี้ DSD จะยังเล่นเป็น PCM ต่อไป"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu DAC için DoP kapalı kalacak. DSD, PCM olarak çalmaya devam eder."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP для цього ЦАП залишається вимкненим. DSD і надалі відтворюється як PCM."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس DAC کے لیے DoP آف رہے گا۔ DSD بدستور PCM کے طور پر چلتا رہے گا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP vẫn tắt cho DAC này. DSD tiếp tục được phát dưới dạng PCM."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 DAC 的 DoP 保持關閉。DSD 會繼續以 PCM 播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 DAC 的 DoP 保持关闭。DSD 将继续以 PCM 播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 DAC 的 DoP 維持關閉。DSD 會繼續以 PCM 播放。"
+          }
+        }
+      }
+    },
     "DSD": {
       "shouldTranslate": false
+    },
+    "DSD is converted to PCM on the Mac unless this DAC takes DSD over PCM (DoP). A short, quiet test can tell: it plays a soft chord as DSD and asks what you heard. Music stops for the test, and the volume has to be at 100%.": {
+      "comment": "Shown on the iPhone or iPad. Output screen, footer under a section titled “Play DSD natively?” that has one button, “Test DoP”. It is shown when a USB DAC is plugged into the iPhone. “DSD” is the audio format; “PCM” is ordinary digital audio; “DoP” (DSD over PCM) is a way of sending DSD to a DAC: keep all three abbreviations as they are. “takes” means the DAC accepts/supports it. “Music stops for the test” means whatever is playing is stopped. “the volume” is the iPhone's own volume.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ DAC DSDን በPCM ላይ (DoP) ካልተቀበለ በስተቀር DSD በMac ላይ ወደ PCM ይቀየራል። አጭርና ዝግ ያለ ሙከራ ይህንን ሊያረጋግጥ ይችላል፦ ለስላሳ ኮርድ እንደ DSD ያጫውታል፣ ከዚያም ምን እንደሰሙ ይጠይቃል። ለሙከራው ሙዚቃው ይቆማል፤ የድምፅ መጠኑም 100% መሆን አለበት።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتم تحويل DSD إلى PCM على Mac ما لم يكن هذا الـ DAC يقبل DSD عبر PCM (DoP). يمكن لاختبار قصير وهادئ أن يحسم ذلك: يشغّل تآلفًا موسيقيًا خافتًا بصيغة DSD ثم يسألك عمّا سمعته. تتوقف الموسيقى من أجل الاختبار، ويجب أن يكون مستوى الصوت 100%."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই DAC PCM-এর মাধ্যমে DSD (DoP) গ্রহণ না করলে DSD-কে Mac-এ PCM-এ রূপান্তর করা হয়। একটি ছোট, মৃদু পরীক্ষায় তা জানা যাবে: এটি DSD হিসেবে একটি মৃদু কর্ড বাজায় এবং আপনি কী শুনেছেন তা জিজ্ঞাসা করে। পরীক্ষার জন্য মিউজিক থেমে যায়, আর ভলিউম 100% থাকতে হবে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD se na Macu převádí na PCM, pokud tento DAC nepřijímá DSD přes PCM (DoP). Krátký tichý test to může zjistit: přehraje jemný akord jako DSD a zeptá se, co jste slyšeli. Hudba se kvůli testu zastaví a hlasitost musí být na 100 %."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD konverteres til PCM på Mac, medmindre denne DAC kan modtage DSD via PCM (DoP). En kort, stille test kan afgøre det: Den afspiller en blød akkord som DSD og spørger, hvad du hørte. Musikken stopper under testen, og lydstyrken skal være på 100 %."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD wird auf dem Mac in PCM konvertiert, sofern dieser DAC nicht DSD over PCM (DoP) verarbeitet. Ein kurzer, leiser Test kann das klären: Er spielt einen sanften Akkord als DSD ab und fragt, was du gehört hast. Für den Test wird die Musik gestoppt, und die Lautstärke muss 100 % betragen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το DSD μετατρέπεται σε PCM στο Mac, εκτός αν αυτό το DAC δέχεται DSD μέσω PCM (DoP). Μια σύντομη, ήσυχη δοκιμή μπορεί να το διαπιστώσει: αναπαράγει μια απαλή συγχορδία ως DSD και ρωτά τι ακούσατε. Η μουσική σταματά για τη δοκιμή και η ένταση ήχου πρέπει να είναι στο 100%."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El DSD se convierte a PCM en el Mac a menos que este DAC acepte DSD sobre PCM (DoP). Una prueba breve y a bajo volumen puede averiguarlo: reproduce un acorde suave como DSD y te pregunta qué has oído. La música se detiene para la prueba y el volumen tiene que estar al 100 %."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD در Mac به PCM تبدیل می‌شود، مگر اینکه این DAC، DSD روی PCM (DoP) را بپذیرد. یک آزمایش کوتاه و آرام می‌تواند این را مشخص کند: یک آکورد ملایم را به‌صورت DSD پخش می‌کند و می‌پرسد چه شنیدید. موسیقی برای آزمایش متوقف می‌شود و بلندی صدا باید روی ۱۰۰٪ باشد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD muunnetaan Macissa PCM:ksi, ellei tämä DAC ota vastaan DSD:tä PCM:n kautta (DoP). Lyhyt, hiljainen testi voi selvittää asian: se toistaa pehmeän soinnun DSD:nä ja kysyy, mitä kuulit. Musiikki pysähtyy testin ajaksi, ja äänenvoimakkuuden on oltava 100 %."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kino-convert ang DSD sa PCM sa Mac maliban kung tumatanggap ang DAC na ito ng DSD over PCM (DoP). Malalaman ito sa isang maikli at mahinang test: magpe-play ito ng mahinang chord bilang DSD at itatanong kung ano ang narinig mo. Hihinto ang musika para sa test, at kailangang ang volume ay nasa 100%."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le DSD est converti en PCM sur le Mac, sauf si ce DAC accepte le DSD over PCM (DoP). Un test court et discret permet de le vérifier : il lit un accord doux en DSD et vous demande ce que vous avez entendu. La musique s’arrête pendant le test, et le volume doit être à 100 %."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ DAC, DSD over PCM (DoP) ને સપોર્ટ ન કરતું હોય તો DSD ને Mac પર PCM માં રૂપાંતરિત કરવામાં આવે છે. એક ટૂંકી, ધીમી ટેસ્ટથી જાણી શકાય છે: તે DSD તરીકે એક હળવો કોર્ડ વગાડે છે અને પૂછે છે કે તમને શું સંભળાયું. ટેસ્ટ માટે સંગીત બંધ થાય છે, અને વૉલ્યૂમ 100% પર હોવું જરૂરી છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana canza DSD zuwa PCM a kan Mac sai dai idan wannan DAC yana karɓar DSD ta PCM (DoP). Gajeren gwaji mai ƙaramin sauti zai iya tantancewa: yana kunna wani haɗin sautuka mai laushi a matsayin DSD, sannan ya tambayi abin da kuka ji. Waƙa za ta tsaya don gwajin, kuma dole ne ƙarar sauti ta kasance a 100%."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD מומר ל־PCM ב־Mac, אלא אם ה־DAC הזה תומך ב־DSD דרך PCM (DoP). בדיקה קצרה ושקטה יכולה לברר זאת: היא מנגנת אקורד רך כ־DSD ושואלת מה שמעת. המוזיקה נעצרת לצורך הבדיקה, ועוצמת הקול חייבת להיות 100%."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD को Mac पर PCM में बदला जाता है, जब तक कि यह DAC PCM पर DSD (DoP) का समर्थन न करता हो। एक छोटे, धीमे टेस्ट से पता चल सकता है: यह DSD के रूप में एक हल्का कॉर्ड चलाता है और पूछता है कि आपको क्या सुनाई दिया। टेस्ट के लिए संगीत रुक जाता है, और वॉल्यूम 100% पर होना चाहिए।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DSD a Macen PCM-mé alakul, kivéve, ha ez a DAC fogadja a DSD-t PCM-en keresztül (DoP). Egy rövid, halk teszttel kideríthető: a teszt lejátszik egy lágy akkordot DSD-ként, majd megkérdezi, mit hallott. A teszt idejére a zene leáll, a hangerőt pedig 100%-ra kell állítani."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD dikonversi ke PCM di Mac, kecuali jika DAC ini mendukung DSD melalui PCM (DoP). Tes singkat dengan volume pelan dapat memastikannya: tes ini memutar akor lembut sebagai DSD dan menanyakan apa yang Anda dengar. Musik berhenti selama tes, dan volume harus 100%."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il DSD viene convertito in PCM sul Mac, a meno che questo DAC non accetti il DSD over PCM (DoP). Un test breve e a basso volume può verificarlo: riproduce un accordo tenue in DSD e ti chiede cosa hai sentito. La musica si interrompe per il test, e il volume deve essere al 100%."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このDACがDSD over PCM（DoP）に対応していない場合、DSDはMacでPCMに変換されます。短い小音量のテストで確認できます。テストでは静かな和音をDSDとして再生し、何が聞こえたかをおたずねします。テスト中は音楽の再生が停止します。また、音量を100%にする必要があります。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ DAC, DSD over PCM (DoP) ಅನ್ನು ಬೆಂಬಲಿಸದಿದ್ದರೆ DSD ಅನ್ನು Mac ನಲ್ಲಿ PCM ಗೆ ಪರಿವರ್ತಿಸಲಾಗುತ್ತದೆ. ಒಂದು ಚಿಕ್ಕ, ಮೆಲುವಾದ ಪರೀಕ್ಷೆಯಿಂದ ತಿಳಿಯಬಹುದು: ಅದು DSD ಆಗಿ ಒಂದು ಮೃದುವಾದ ಸ್ವರಮೇಳವನ್ನು ಪ್ಲೇ ಮಾಡಿ, ನಿಮಗೆ ಏನು ಕೇಳಿಸಿತು ಎಂದು ಕೇಳುತ್ತದೆ. ಪರೀಕ್ಷೆಗಾಗಿ ಸಂಗೀತ ನಿಲ್ಲುತ್ತದೆ, ಮತ್ತು ವಾಲ್ಯೂಮ್ 100% ನಲ್ಲಿ ಇರಬೇಕು."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 DAC가 DSD over PCM(DoP)을 지원하지 않으면 DSD는 Mac에서 PCM으로 변환됩니다. 짧고 조용한 테스트로 확인할 수 있습니다. 테스트는 부드러운 화음을 DSD로 재생한 다음 무엇이 들렸는지 묻습니다. 테스트하는 동안 음악이 중단되며, 음량이 100%여야 합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ DAC, DSD over PCM (DoP) സ്വീകരിക്കുന്നില്ലെങ്കിൽ DSD, Mac-ൽ PCM-ലേക്ക് പരിവർത്തനം ചെയ്യുന്നു. ഒരു ചെറിയ, ശബ്ദം കുറഞ്ഞ ടെസ്റ്റിലൂടെ ഇത് അറിയാം: അത് ഒരു മൃദുവായ കോർഡ് DSD ആയി പ്ലേ ചെയ്ത്, നിങ്ങൾ എന്താണ് കേട്ടതെന്ന് ചോദിക്കും. ടെസ്റ്റിനായി സംഗീതം നിർത്തും, വോളിയം 100% ആയിരിക്കുകയും വേണം."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हा DAC DSD over PCM (DoP) स्वीकारत नसल्यास DSD चे Mac वर PCM मध्ये रूपांतर केले जाते. एक छोटी, हलक्या आवाजातील चाचणी हे सांगू शकते: ती एक सौम्य कॉर्ड DSD म्हणून प्ले करते आणि तुम्हाला काय ऐकू आले ते विचारते. चाचणीसाठी संगीत थांबते आणि व्हॉल्यूम 100% वर असणे आवश्यक आहे."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD ditukar kepada PCM pada Mac melainkan DAC ini menerima DSD melalui PCM (DoP). Ujian yang singkat dan perlahan boleh memastikannya: ujian ini memainkan kord yang lembut sebagai DSD dan bertanya apa yang anda dengar. Muzik dihentikan untuk ujian ini dan kelantangan mesti pada 100%."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD konverteres til PCM på Macen med mindre denne DAC-en tar imot DSD via PCM (DoP). En kort test med lavt volum kan avgjøre det: Den spiller av en svak akkord som DSD og spør hva du hørte. Musikken stoppes under testen, og volumet må stå på 100 %."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD wordt op de Mac omgezet naar PCM, tenzij deze DAC DSD over PCM (DoP) aanneemt. Een korte, zachte test kan dat uitwijzen: er wordt een zacht akkoord als DSD afgespeeld en je krijgt de vraag wat je hoorde. Voor de test stopt de muziek en moet het volume naar 100%."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD ਨੂੰ Mac ’ਤੇ PCM ਵਿੱਚ ਬਦਲਿਆ ਜਾਂਦਾ ਹੈ, ਜਦੋਂ ਤੱਕ ਇਹ DAC DSD over PCM (DoP) ਸਵੀਕਾਰ ਨਹੀਂ ਕਰਦਾ। ਇੱਕ ਛੋਟਾ, ਹੌਲੀ ਆਵਾਜ਼ ਵਾਲਾ ਟੈਸਟ ਇਹ ਦੱਸ ਸਕਦਾ ਹੈ: ਇਹ ਇੱਕ ਮੱਧਮ ਕੋਰਡ DSD ਵਜੋਂ ਚਲਾਉਂਦਾ ਹੈ ਅਤੇ ਪੁੱਛਦਾ ਹੈ ਕਿ ਤੁਹਾਨੂੰ ਕੀ ਸੁਣਿਆ। ਟੈਸਟ ਲਈ ਸੰਗੀਤ ਰੁਕ ਜਾਂਦਾ ਹੈ ਅਤੇ ਵੌਲਿਊਮ 100% ’ਤੇ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD jest konwertowane na PCM na Macu, chyba że ten przetwornik DAC przyjmuje DSD przez PCM (DoP). Krótki, cichy test może to rozstrzygnąć: odtwarza delikatny akord jako DSD i pyta, co było słychać. Na czas testu muzyka zostaje zatrzymana, a głośność musi być ustawiona na 100%."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O DSD é convertido em PCM no Mac, a menos que este DAC aceite DSD sobre PCM (DoP). Um teste curto e em volume baixo pode confirmar: ele toca um acorde suave como DSD e pergunta o que você ouviu. A música para durante o teste, e o volume precisa estar em 100 %."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O DSD é convertido em PCM no Mac, a não ser que este DAC aceite DSD sobre PCM (DoP). Um teste curto e com volume baixo pode esclarecer: reproduz um acorde suave como DSD e pergunta o que ouviu. A música para durante o teste e o volume tem de estar a 100%."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD este convertit în PCM pe Mac, cu excepția cazului în care acest DAC acceptă DSD prin PCM (DoP). Un test scurt, la volum redus, poate lămuri acest lucru: redă un acord discret ca DSD și vă întreabă ce ați auzit. Muzica se oprește pe durata testului, iar volumul trebuie să fie la 100%."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD konverteras till PCM på Macen om inte den här DAC:n tar emot DSD via PCM (DoP). Ett kort test på låg volym kan avgöra det: det spelar ett svagt ackord som DSD och frågar vad du hörde. Musiken stoppas under testet och volymen måste stå på 100 %."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD hugeuzwa kuwa PCM kwenye Mac isipokuwa kama DAC hii inapokea DSD kupitia PCM (DoP). Jaribio fupi la sauti ya chini linaweza kubaini: hucheza kodi laini ya muziki kama DSD na kukuuliza ulichosikia. Muziki husimama wakati wa jaribio, na kiwango cha sauti lazima kiwe 100%."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த DAC, DSD over PCM (DoP)-ஐ ஏற்காவிட்டால், DSD ஆனது Mac-இல் PCM-ஆக மாற்றப்படும். குறுகிய, மெல்லிய ஒலியிலான ஒரு சோதனை மூலம் இதைக் கண்டறியலாம்: அது மென்மையான ஒரு கார்டு ஒலியை DSD-ஆக இயக்கி, நீங்கள் என்ன கேட்டீர்கள் என்று கேட்கும். சோதனைக்காக இசை நிறுத்தப்படும், மேலும் ஒலியளவு 100%-இல் இருக்க வேண்டும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ DAC, DSD over PCM (DoP)ని స్వీకరిస్తే తప్ప, DSD Macలో PCMగా మార్చబడుతుంది. తక్కువ వాల్యూమ్‌లో చేసే ఒక చిన్న పరీక్షతో తెలుసుకోవచ్చు: అది ఒక మృదువైన కార్డ్‌ను DSDగా ప్లే చేసి, మీకు ఏమి వినిపించిందో అడుగుతుంది. పరీక్ష కోసం సంగీతం ఆగిపోతుంది, పరికరం వాల్యూమ్ 100% వద్ద ఉండాలి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD จะถูกแปลงเป็น PCM บน Mac เว้นแต่ DAC นี้จะรองรับ DSD over PCM (DoP) การทดสอบสั้นๆ ด้วยเสียงเบาๆ จะบอกได้ โดยจะเล่นคอร์ดเบาๆ เป็น DSD แล้วถามว่าคุณได้ยินอะไร เพลงจะหยุดเล่นระหว่างการทดสอบ และระดับเสียงต้องอยู่ที่ 100%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu DAC, PCM üzerinden DSD (DoP) kabul etmiyorsa DSD, Mac’te PCM’e dönüştürülür. Kısa, kısık sesli bir test bunu ortaya koyabilir: DSD olarak yumuşak bir akor çalar ve ne duyduğunuzu sorar. Test için müzik durur ve ses düzeyinin %100 olması gerekir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD перетворюється на PCM на Mac, якщо цей ЦАП не приймає DSD через PCM (DoP). Це можна з’ясувати коротким тихим тестом: він відтворює м’який акорд як DSD і запитує, що ви почули. На час тесту музика зупиняється, а гучність має бути на рівні 100%."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جب تک یہ DAC PCM پر DSD (DoP) قبول نہ کرے، DSD کو Mac پر PCM میں تبدیل کیا جاتا ہے۔ ایک مختصر، دھیمی آواز والا ٹیسٹ یہ بتا سکتا ہے: یہ DSD کے طور پر ایک نرم کورڈ چلاتا ہے اور پوچھتا ہے کہ آپ نے کیا سنا۔ ٹیسٹ کے لیے موسیقی رک جاتی ہے، اور والیوم 100% پر ہونا ضروری ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD được chuyển đổi sang PCM trên máy Mac trừ khi DAC này nhận DSD qua PCM (DoP). Một bài kiểm tra ngắn với âm lượng nhỏ có thể cho biết: bài kiểm tra phát một hợp âm nhẹ dưới dạng DSD rồi hỏi bạn đã nghe thấy gì. Nhạc sẽ dừng để kiểm tra và âm lượng của thiết bị phải ở mức 100%."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非此 DAC 支援 DSD over PCM（DoP），否則 DSD 會在 Mac 上轉換為 PCM。進行一次簡短、輕柔的測試即可確認：測試會以 DSD 播放一段柔和的和弦，然後詢問你聽到了甚麼。測試期間音樂會停止，而音量必須為 100%。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非此 DAC 支持 DSD over PCM（DoP），否则 DSD 会在 Mac 上转换为 PCM。进行一次简短、轻柔的测试即可确认：测试会以 DSD 播放一段柔和的和弦，然后询问你听到了什么。测试时音乐会停止，且音量必须为 100%。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非此 DAC 支援 DSD over PCM（DoP），否則 DSD 會在 Mac 上轉換為 PCM。進行一次簡短、輕柔的測試即可確認：測試會以 DSD 播放一段柔和的和弦，然後詢問你聽到了什麼。測試時音樂會停止，且音量必須為 100%。"
+          }
+        }
+      }
+    },
+    "DSD is sent as PCM while the volume is below 100%.": {
+      "comment": "Shown on the iPhone or iPad. Output screen, under “Play DSD natively?”, for a DAC that passed the DoP test: while the iPhone's volume is turned down, DSD songs are converted to PCM instead of being sent to the DAC as DSD. Keep “DSD” and “PCM”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የድምፅ መጠኑ ከ100% በታች ሲሆን DSD እንደ PCM ይላካል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يُرسَل DSD بصيغة PCM ما دام مستوى الصوت أقل من 100%."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ভলিউম 100%-এর নিচে থাকলে DSD-কে PCM হিসেবে পাঠানো হয়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je-li hlasitost nižší než 100 %, DSD se odesílá jako PCM."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD sendes som PCM, når lydstyrken er under 100 %."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bei einer Lautstärke unter 100 % wird DSD als PCM gesendet."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το DSD αποστέλλεται ως PCM όσο η ένταση ήχου είναι κάτω από 100%."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El DSD se envía como PCM mientras el volumen esté por debajo del 100 %."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تا وقتی بلندی صدا کمتر از ۱۰۰٪ باشد، DSD به‌صورت PCM فرستاده می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD lähetetään PCM:nä, kun äänenvoimakkuus on alle 100 %."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ipinapadala ang DSD bilang PCM habang ang volume ay mas mababa sa 100%."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le DSD est envoyé en PCM tant que le volume est inférieur à 100 %."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વૉલ્યૂમ 100%થી ઓછું હોય ત્યારે DSD ને PCM તરીકે મોકલવામાં આવે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana aika DSD a matsayin PCM idan ƙarar sauti ta gaza 100%."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD נשלח כ־PCM כל עוד עוצמת הקול נמוכה מ־100%."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वॉल्यूम 100% से कम होने पर DSD को PCM के रूप में भेजा जाता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amíg a hangerő 100%-nál kisebb, a DSD küldése PCM-ként történik."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD dikirim sebagai PCM selama volume di bawah 100%."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il DSD viene inviato come PCM finché il volume è sotto il 100%."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音量が100%未満の間、DSDはPCMとして送信されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ವಾಲ್ಯೂಮ್ 100% ಗಿಂತ ಕಡಿಮೆ ಇದ್ದಾಗ DSD ಅನ್ನು PCM ಆಗಿ ಕಳುಹಿಸಲಾಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음량이 100% 미만인 동안에는 DSD가 PCM으로 전송됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "വോളിയം 100%-ൽ താഴെയായിരിക്കുമ്പോൾ DSD, PCM ആയി അയയ്ക്കുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "व्हॉल्यूम 100% पेक्षा कमी असताना DSD PCM म्हणून पाठवले जाते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD dihantar sebagai PCM semasa kelantangan di bawah 100%."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD sendes som PCM så lenge volumet er under 100 %."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD wordt als PCM verstuurd zolang het volume lager is dan 100%."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਵੌਲਿਊਮ 100% ਤੋਂ ਘੱਟ ਹੋਣ ’ਤੇ DSD ਨੂੰ PCM ਵਜੋਂ ਭੇਜਿਆ ਜਾਂਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gdy głośność jest niższa niż 100%, DSD jest wysyłane jako PCM."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O DSD é enviado como PCM enquanto o volume está abaixo de 100 %."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O DSD é enviado como PCM enquanto o volume estiver abaixo de 100%."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD este trimis ca PCM cât timp volumul este sub 100%."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD skickas som PCM så länge volymen är under 100 %."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD hutumwa kama PCM wakati kiwango cha sauti kiko chini ya 100%."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒலியளவு 100%-க்குக் கீழ் இருக்கும்போது DSD, PCM-ஆக அனுப்பப்படும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "వాల్యూమ్ 100% కంటే తక్కువగా ఉన్నప్పుడు DSD, PCMగా పంపబడుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD จะถูกส่งเป็น PCM ขณะที่ระดับเสียงต่ำกว่า 100%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses düzeyi %100’ün altındayken DSD, PCM olarak gönderilir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поки гучність нижча за 100%, DSD надсилається як PCM."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جب تک والیوم 100% سے کم ہو، DSD کو PCM کے طور پر بھیجا جاتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD được gửi dưới dạng PCM khi âm lượng dưới 100%."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音量低於 100% 時，DSD 會以 PCM 傳送。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音量低于 100% 时，DSD 会以 PCM 发送。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音量低於 100% 時，DSD 會以 PCM 傳送。"
+          }
+        }
+      }
     },
     "Favorites": {
       "localizations": {
@@ -22101,6 +23449,276 @@
         }
       }
     },
+    "Hiss": {
+      "comment": "DoP test answer button: the test sound was heard as hiss or noise.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ጫጫታ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هسهسة"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "হিস নয়েজ"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Šum"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sus"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rauschen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Θόρυβος"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siseo"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خش‌خش"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kohina"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiss"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Souffle"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સરસરાટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hayaniya"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "רחש"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सरसराहट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sistergés"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desis"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fruscio"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ノイズ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹಿಸ್ ಶಬ್ದ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "잡음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഹിസ്സ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हिस"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desis"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sus"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruis"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਰਸਰਾਹਟ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Szum"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiado"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruído"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sâsâit"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brus"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mzomeo"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இரைச்சல்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "హిస్ శబ్దం"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เสียงซ่า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hışırtı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Шипіння"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سنسناہٹ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiếng xì"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "嘶嘶聲"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "嘶嘶声"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "嘶嘶聲"
+          }
+        }
+      }
+    },
     "Home network": {
       "comment": "Shown on the iPhone or iPad. Small label: this device reaches the Mac over the Mac's own (home) network. Short.",
       "localizations": {
@@ -26136,6 +27754,275 @@
         }
       }
     },
+    "Music": {
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሙዚቃ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الموسيقى"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "মিউজিক"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hudba"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musik"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musik"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μουσική"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Música"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موسیقی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musiikki"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musika"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musique"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સંગીત"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waƙoƙi"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מוזיקה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "संगीत"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zene"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musik"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musica"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ミュージック"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಂಗೀತ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음악"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സംഗീതം"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "संगीत"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muzik"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musikk"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muziek"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸੰਗੀਤ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muzyka"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Música"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Música"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muzică"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musik"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muziki"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இசை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "సంగీతం"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพลง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Müzik"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Музика"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موسیقی"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhạc"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音樂"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音乐"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音樂"
+          }
+        }
+      }
+    },
     "Music in a shared folder on a NAS or another computer plays on this device by itself, with no Mac running. Away from home, the share is reached over Tailscale or another VPN.": {
       "comment": "Shown on the iPhone or iPad. An “SMB share” is a shared network folder of music (on a NAS or another computer) that the iPhone reads by itself, without a Mac. Footer under the “Add an SMB Share” button on the first screen. “NAS” = network-attached storage; keep the abbreviation. “this device” is the iPhone or iPad. Tailscale and VPN stay as they are.",
       "localizations": {
@@ -26939,6 +28826,276 @@
           "stringUnit": {
             "state": "translated",
             "value": "名稱"
+          }
+        }
+      }
+    },
+    "NATIVE DSD · DoP": {
+      "comment": "Status badge (short, uppercase).",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ተፈጥሯዊ DSD · DoP"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD أصلي · DoP"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "নেটিভ DSD · DoP"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NATIVNÍ DSD · DoP"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NATIV DSD · DoP"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NATIVES DSD · DoP"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ΕΓΓΕΝΕΣ DSD · DoP"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD NATIVO · DoP"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD بومی · DoP"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NATIIVI DSD · DoP"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NATIVE DSD · DoP"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD NATIF · DoP"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "નેટિવ DSD · DoP"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD NA ASALI · DoP"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD מקורי · DoP"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "नेटिव DSD · DoP"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NATÍV DSD · DoP"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD NATIVE · DoP"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD NATIVO · DoP"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ネイティブDSD · DoP"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನೇಟಿವ್ DSD · DoP"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "네이티브 DSD · DoP"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നേറ്റീവ് DSD · DoP"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "नेटिव्ह DSD · DoP"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD ASLI · DoP"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NATIV DSD · DoP"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NATIVE DSD · DoP"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਨੇਟਿਵ DSD · DoP"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NATYWNE DSD · DoP"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD NATIVO · DoP"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD NATIVO · DoP"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD NATIV · DoP"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "INBYGGT DSD · DoP"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD ASILIA · DoP"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "நேட்டிவ் DSD · DoP"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "నేటివ్ DSD · DoP"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD เนทีฟ · DoP"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "YEREL DSD · DoP"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "НАТИВНИЙ DSD · DoP"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نیٹو DSD · DoP"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD GỐC · DoP"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原生 DSD · DoP"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原生 DSD · DoP"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原生 DSD · DoP"
           }
         }
       }
@@ -39022,6 +41179,276 @@
         }
       }
     },
+    "Play DSD natively?": {
+      "comment": "DoP test card heading, under the signal path while DSD is converted to PCM on a DAC not known to take DoP.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSDን በተፈጥሯዊ መንገድ ማጫወት ይፈልጋሉ?"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هل تريد تشغيل DSD أصليًا؟"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD নেটিভভাবে চালাবেন?"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehrávat DSD nativně?"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspil DSD nativt?"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD nativ wiedergeben?"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εγγενής αναπαραγωγή DSD;"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Reproducir DSD de forma nativa?"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD به‌صورت بومی پخش شود؟"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toistetaanko DSD natiivisti?"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I-play ang DSD nang native?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lire le DSD en natif ?"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD ને નેટિવ રીતે વગાડીએ?"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A kunna DSD na asali?"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לנגן DSD באופן מקורי?"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD को नेटिव रूप से चलाएँ?"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Natív DSD-lejátszás?"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Putar DSD secara native?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprodurre il DSD in modo nativo?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSDをネイティブ再生しますか？"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD ಅನ್ನು ನೇಟಿವ್ ಆಗಿ ಪ್ಲೇ ಮಾಡಬೇಕೆ?"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD를 네이티브로 재생하겠습니까?"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD നേറ്റീവായി പ്ലേ ചെയ്യണോ?"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD नेटिव्हली प्ले करायचे?"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mainkan DSD secara asli?"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spill av DSD nativt?"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD native afspelen?"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕੀ DSD ਨੇਟਿਵ ਤੌਰ ’ਤੇ ਚਲਾਉਣਾ ਹੈ?"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarzać DSD natywnie?"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduzir DSD nativamente?"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduzir DSD de forma nativa?"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redați DSD nativ?"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spela DSD inbyggt?"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ungependa kucheza DSD asilia?"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD-ஐ நேட்டிவ்வாக இயக்கவா?"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSDని నేటివ్‌గా ప్లే చేయాలా?"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่น DSD แบบเนทีฟหรือไม่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD yerel olarak çalınsın mı?"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворювати DSD нативно?"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD کو نیٹو طور پر چلائیں؟"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát DSD gốc?"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原生播放 DSD？"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原生播放 DSD？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "原生播放 DSD？"
+          }
+        }
+      }
+    },
     "Play Next": {
       "localizations": {
         "am": {
@@ -40628,6 +43055,276 @@
           "stringUnit": {
             "state": "translated",
             "value": "不需 Mac 即可播放"
+          }
+        }
+      }
+    },
+    "Playing a short, quiet test…": {
+      "comment": "DoP test sheet while the test sound plays.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አጭርና ዝግ ያለ ሙከራ በማጫወት ላይ…"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جارٍ تشغيل اختبار قصير وهادئ…"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "একটি ছোট, মৃদু পরীক্ষা চালানো হচ্ছে…"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehrává se krátký tichý test…"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspiller en kort, stille test…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kurzer, leiser Test wird abgespielt …"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αναπαραγωγή σύντομης, ήσυχης δοκιμής…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduciendo una prueba breve a bajo volumen…"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "در حال پخش یک آزمایش کوتاه و آرام…"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toistetaan lyhyttä, hiljaista testiä…"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nagpe-play ng maikli at mahinang test…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lecture d’un test court et discret…"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ટૂંકી, ધીમી ટેસ્ટ વાગી રહી છે…"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana kunna gajeren gwaji mai ƙaramin sauti…"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מנגן בדיקה קצרה ושקטה…"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "एक छोटा, धीमा टेस्ट चल रहा है…"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rövid, halk teszt lejátszása…"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memutar tes singkat dengan volume pelan…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riproduzione di un test breve e a basso volume…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "短い小音量のテストを再生中…"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಚಿಕ್ಕ, ಮೆಲುವಾದ ಪರೀಕ್ಷೆಯನ್ನು ಪ್ಲೇ ಮಾಡಲಾಗುತ್ತಿದೆ…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "짧고 조용한 테스트 재생 중…"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഒരു ചെറിയ, ശബ്ദം കുറഞ്ഞ ടെസ്റ്റ് പ്ലേ ചെയ്യുന്നു…"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "छोटी, हलक्या आवाजातील चाचणी प्ले होत आहे…"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memainkan ujian yang singkat dan perlahan…"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiller av en kort test med lavt volum …"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Korte, zachte test wordt afgespeeld…"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇੱਕ ਛੋਟਾ, ਹੌਲੀ ਆਵਾਜ਼ ਵਾਲਾ ਟੈਸਟ ਚੱਲ ਰਿਹਾ ਹੈ…"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarzanie krótkiego, cichego testu…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduzindo um teste curto e em volume baixo…"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A reproduzir um teste curto e com volume baixo…"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se redă un test scurt, la volum redus…"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelar ett kort test på låg volym …"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inacheza jaribio fupi la sauti ya chini…"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "குறுகிய, மெல்லிய ஒலியிலான சோதனை இயங்குகிறது…"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "తక్కువ వాల్యూమ్‌లో చిన్న పరీక్ష ప్లే అవుతోంది…"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กำลังเล่นเสียงทดสอบสั้นๆ แบบเบาๆ…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kısa, kısık sesli bir test çalınıyor…"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворюється короткий тихий тест…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایک مختصر، دھیمی آواز والا ٹیسٹ چل رہا ہے…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang phát bài kiểm tra ngắn với âm lượng nhỏ…"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在播放簡短、輕柔的測試音…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在播放简短、轻柔的测试音…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在播放簡短、輕柔的測試音…"
           }
         }
       }
@@ -58355,6 +61052,276 @@
     "Tailscale": {
       "shouldTranslate": false
     },
+    "Test DoP": {
+      "comment": "Button on the DoP test card: plays a short, quiet DSD test sound over DoP.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoPን ፈትሽ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اختبار DoP"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP পরীক্ষা করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otestovat DoP"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test DoP"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP testen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δοκιμή DoP"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Probar DoP"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آزمایش DoP"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testaa DoP"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I-test ang DoP"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tester le DoP"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP ટેસ્ટ કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gwada DoP"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בדוק DoP"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP टेस्ट करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP tesztelése"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tes DoP"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prova DoP"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoPをテスト"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP ಪರೀಕ್ಷಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP 테스트"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP ടെസ്റ്റ് ചെയ്യുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP ची चाचणी करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uji DoP"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test DoP"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test DoP"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP ਟੈਸਟ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przetestuj DoP"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testar DoP"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testar DoP"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testează DoP"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testa DoP"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jaribu DoP"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP-ஐச் சோதி"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoPని పరీక్షించు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ทดสอบ DoP"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP’yi Test Et"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перевірити DoP"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DoP ٹیسٹ کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiểm tra DoP"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "測試 DoP"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试 DoP"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "測試 DoP"
+          }
+        }
+      }
+    },
     "That code didn’t work. Check the code on the Mac, or choose Pair a Phone there again for a new one.": {
       "comment": "Web remote: the code typed in the browser is wrong.",
       "localizations": {
@@ -65887,6 +68854,815 @@
           "stringUnit": {
             "state": "translated",
             "value": "輸入伺服器的名稱或位址和共享；如果音樂不在整個共享中，還需輸入音樂所在的檔案夾。例如：smb://nas.local/music/Albums。若要在外出時播放，請使用伺服器的 Tailscale 名稱或位址。"
+          }
+        }
+      }
+    },
+    "The test couldn't play as DoP on this output, so nothing was saved.": {
+      "comment": "DoP test ended early: the engine didn't send the test sound as DoP.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሙከራው በዚህ ውፅዓት ላይ እንደ DoP መጫወት አልቻለም፤ ስለዚህ ምንም አልተቀመጠም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تعذّر تشغيل الاختبار بصيغة DoP على هذا المخرج، لذلك لم يتم حفظ أي شيء."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই আউটপুটে পরীক্ষাটি DoP হিসেবে চালানো যায়নি, তাই কিছুই সংরক্ষণ করা হয়নি।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test se na tomto výstupu nepodařilo přehrát jako DoP, takže nic nebylo uloženo."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testen kunne ikke afspilles som DoP på dette output, så intet blev gemt."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Test konnte auf dieser Ausgabe nicht als DoP wiedergegeben werden, daher wurde nichts gesichert."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η δοκιμή δεν μπόρεσε να αναπαραχθεί ως DoP σε αυτή την έξοδο, οπότε δεν αποθηκεύτηκε τίποτα."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La prueba no se ha podido reproducir como DoP en esta salida, así que no se ha guardado nada."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آزمایش نتوانست روی این خروجی به‌صورت DoP پخش شود، بنابراین چیزی ذخیره نشد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testiä ei voitu toistaa DoP:nä tässä ulostulossa, joten mitään ei tallennettu."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi ma-play ang test bilang DoP sa output na ito, kaya walang na-save."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le test n’a pas pu être lu en DoP sur cette sortie ; rien n’a donc été enregistré."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ આઉટપુટ પર ટેસ્ટ DoP તરીકે વાગી શકી નહીં, તેથી કંઈ સાચવવામાં આવ્યું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba a iya kunna gwajin a matsayin DoP a wannan fitarwa ba, don haka ba a ajiye komai ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא ניתן היה לנגן את הבדיקה כ־DoP בפלט הזה, ולכן שום דבר לא נשמר."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस आउटपुट पर टेस्ट DoP के रूप में नहीं चल सका, इसलिए कुछ भी सहेजा नहीं गया।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A tesztet nem sikerült DoP-ként lejátszani ezen a kimeneten, ezért semmi sem lett mentve."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tes tidak dapat diputar sebagai DoP di output ini, jadi tidak ada yang disimpan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato possibile riprodurre il test come DoP su questa uscita, quindi non è stato salvato nulla."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この出力ではテストをDoPとして再生できなかったため、何も保存されていません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಔಟ್‌ಪುಟ್‌ನಲ್ಲಿ ಪರೀಕ್ಷೆಯನ್ನು DoP ಆಗಿ ಪ್ಲೇ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ, ಆದ್ದರಿಂದ ಏನನ್ನೂ ಉಳಿಸಲಾಗಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 출력에서 테스트를 DoP로 재생할 수 없어 아무것도 저장되지 않았습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ ഔട്ട്‌പുട്ടിൽ ടെസ്റ്റ് DoP ആയി പ്ലേ ചെയ്യാനായില്ല, അതിനാൽ ഒന്നും സംരക്ഷിച്ചില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या आउटपुटवर चाचणी DoP म्हणून प्ले होऊ शकली नाही, त्यामुळे काहीही सेव्ह केले नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ujian tidak dapat dimainkan sebagai DoP pada output ini, jadi tiada apa-apa disimpan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testen kunne ikke spilles av som DoP på denne utgangen, så ingenting ble lagret."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De test kon op deze uitvoer niet als DoP worden afgespeeld, dus er is niets bewaard."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ ਆਉਟਪੁੱਟ ’ਤੇ ਟੈਸਟ DoP ਵਜੋਂ ਨਹੀਂ ਚੱਲ ਸਕਿਆ, ਇਸ ਲਈ ਕੁਝ ਵੀ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਕੀਤਾ ਗਿਆ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie udało się odtworzyć testu jako DoP na tym wyjściu, więc nic nie zostało zapisane."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível reproduzir o teste como DoP nesta saída, então nada foi salvo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não foi possível reproduzir o teste como DoP nesta saída, por isso nada foi guardado."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testul nu a putut fi redat ca DoP pe această ieșire, așa că nu s-a salvat nimic."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testet kunde inte spelas som DoP på den här utgången, så ingenting sparades."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jaribio halikuweza kucheza kama DoP kwenye kifaa hiki cha kutoa sauti, kwa hivyo hakuna kilichohifadhiwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த வெளியீட்டில் சோதனையை DoP-ஆக இயக்க முடியவில்லை, எனவே எதுவும் சேமிக்கப்படவில்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ అవుట్‌పుట్‌లో పరీక్ష DoPగా ప్లే కాలేకపోయింది, కాబట్టి ఏదీ సేవ్ చేయబడలేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่สามารถเล่นการทดสอบเป็น DoP บนขาออกนี้ได้ จึงไม่มีการบันทึกใดๆ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test bu çıkışta DoP olarak çalınamadı, bu nedenle hiçbir şey kaydedilmedi."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тест не вдалося відтворити як DoP на цьому виході, тому нічого не збережено."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس آؤٹ پٹ پر ٹیسٹ DoP کے طور پر نہیں چل سکا، اس لیے کچھ بھی محفوظ نہیں کیا گیا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể phát bài kiểm tra dưới dạng DoP trên đầu ra này, vì vậy không có gì được lưu."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "測試無法在此輸出裝置上以 DoP 播放，因此沒有儲存任何內容。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试无法在此输出设备上以 DoP 播放，因此未存储任何内容。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "測試無法在此輸出裝置上以 DoP 播放，因此未儲存任何內容。"
+          }
+        }
+      }
+    },
+    "The test needs the volume at 100%.": {
+      "comment": "Shown on the iPhone or iPad. Output screen, under “Play DSD natively?”, after tapping “Test DoP” while the iPhone's volume is not at its maximum: the test was not started. One short sentence.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሙከራው የድምፅ መጠኑ 100% እንዲሆን ይፈልጋል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتطلب الاختبار أن يكون مستوى الصوت 100%."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "পরীক্ষার জন্য ভলিউম 100% থাকা প্রয়োজন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test vyžaduje hlasitost na 100 %."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testen kræver, at lydstyrken er på 100 %."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Für den Test muss die Lautstärke 100 % betragen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η δοκιμή απαιτεί η ένταση ήχου να είναι στο 100%."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La prueba necesita el volumen al 100 %."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آزمایش به بلندی صدای ۱۰۰٪ نیاز دارد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testi vaatii, että äänenvoimakkuus on 100 %."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para sa test, kailangang ang volume ay nasa 100%."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le test nécessite un volume à 100 %."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ટેસ્ટ માટે વૉલ્યૂમ 100% પર હોવું જરૂરી છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gwajin yana buƙatar ƙarar sauti ta kasance a 100%."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הבדיקה דורשת עוצמת קול של 100%."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "टेस्ट के लिए वॉल्यूम 100% पर होना चाहिए।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A teszthez 100%-ra kell állítani a hangerőt."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tes memerlukan volume 100%."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il test richiede il volume al 100%."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "テストを行うには、音量を100%にする必要があります。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪರೀಕ್ಷೆಗೆ ವಾಲ್ಯೂಮ್ 100% ನಲ್ಲಿ ಇರಬೇಕು."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "테스트하려면 음량이 100%여야 합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ടെസ്റ്റിന് വോളിയം 100% ആയിരിക്കണം."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "चाचणीसाठी व्हॉल्यूम 100% वर असणे आवश्यक आहे."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ujian ini memerlukan kelantangan pada 100%."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testen krever at volumet står på 100 %."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voor de test moet het volume naar 100%."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਟੈਸਟ ਲਈ ਵੌਲਿਊਮ 100% ’ਤੇ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test wymaga głośności ustawionej na 100%."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O teste precisa do volume em 100 %."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O teste requer o volume a 100%."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testul necesită volumul la 100%."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testet kräver att volymen står på 100 %."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jaribio linahitaji kiwango cha sauti kiwe 100%."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "சோதனைக்கு ஒலியளவு 100%-இல் இருக்க வேண்டும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "పరీక్షకు వాల్యూమ్ 100% వద్ద ఉండాలి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การทดสอบต้องใช้ระดับเสียงที่ 100%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test için ses düzeyinin %100 olması gerekir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Для тесту потрібна гучність 100%."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ٹیسٹ کے لیے والیوم 100% پر ہونا ضروری ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bài kiểm tra cần âm lượng ở mức 100%."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "測試需要將音量調至 100%。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试需要将音量调到 100%。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "測試需要將音量調到 100%。"
+          }
+        }
+      }
+    },
+    "The test stopped because an audio device changed. Nothing was saved.": {
+      "comment": "DoP test ended early: an output was plugged in or out, or the default output changed.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የድምፅ መሣሪያ ስለተለወጠ ሙከራው ቆሟል። ምንም አልተቀመጠም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "توقف الاختبار بسبب تغيّر جهاز صوت. لم يتم حفظ أي شيء."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "একটি অডিও ডিভাইস পরিবর্তিত হওয়ায় পরীক্ষাটি থেমে গেছে। কিছুই সংরক্ষণ করা হয়নি।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test se zastavil, protože se změnilo zvukové zařízení. Nic nebylo uloženo."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testen stoppede, fordi en lydenhed blev ændret. Intet blev gemt."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Test wurde beendet, weil sich ein Audiogerät geändert hat. Es wurde nichts gesichert."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η δοκιμή διακόπηκε επειδή άλλαξε μια συσκευή ήχου. Δεν αποθηκεύτηκε τίποτα."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La prueba se ha detenido porque ha cambiado un dispositivo de audio. No se ha guardado nada."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آزمایش متوقف شد چون یک دستگاه صوتی تغییر کرد. چیزی ذخیره نشد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testi pysähtyi, koska äänilaite muuttui. Mitään ei tallennettu."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Huminto ang test dahil may nagbagong audio device. Walang na-save."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le test s’est arrêté, car un périphérique audio a changé. Rien n’a été enregistré."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ઑડિયો ડિવાઇસ બદલાયું હોવાથી ટેસ્ટ બંધ થઈ ગઈ. કંઈ સાચવવામાં આવ્યું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gwajin ya tsaya saboda wata na'urar sauti ta canza. Ba a ajiye komai ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הבדיקה נעצרה כי התקן שמע השתנה. שום דבר לא נשמר."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "टेस्ट रुक गया क्योंकि कोई ऑडियो डिवाइस बदल गया। कुछ भी सहेजा नहीं गया।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A teszt leállt, mert megváltozott egy hangeszköz. Semmi sem lett mentve."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tes berhenti karena perangkat audio berubah. Tidak ada yang disimpan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il test si è interrotto perché un dispositivo audio è cambiato. Non è stato salvato nulla."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "オーディオデバイスが変更されたため、テストを中止しました。何も保存されていません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಆಡಿಯೊ ಸಾಧನ ಬದಲಾದ ಕಾರಣ ಪರೀಕ್ಷೆ ನಿಂತಿತು. ಏನನ್ನೂ ಉಳಿಸಲಾಗಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오디오 기기가 변경되어 테스트가 중지되었습니다. 아무것도 저장되지 않았습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഒരു ഓഡിയോ ഉപകരണം മാറിയതിനാൽ ടെസ്റ്റ് നിർത്തി. ഒന്നും സംരക്ഷിച്ചില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ऑडिओ डिव्हाइस बदलल्यामुळे चाचणी थांबली. काहीही सेव्ह केले नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ujian dihentikan kerana peranti audio telah berubah. Tiada apa-apa disimpan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testen stoppet fordi en lydenhet ble endret. Ingenting ble lagret."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De test is gestopt omdat er een audioapparaat is gewijzigd. Er is niets bewaard."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇੱਕ ਆਡੀਓ ਡਿਵਾਈਸ ਬਦਲਣ ਕਾਰਨ ਟੈਸਟ ਰੁਕ ਗਿਆ। ਕੁਝ ਵੀ ਸੁਰੱਖਿਅਤ ਨਹੀਂ ਕੀਤਾ ਗਿਆ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test został przerwany, ponieważ zmieniło się urządzenie audio. Nic nie zostało zapisane."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O teste parou porque um dispositivo de áudio mudou. Nada foi salvo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O teste parou porque um dispositivo de áudio mudou. Nada foi guardado."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testul s-a oprit deoarece s-a schimbat un dispozitiv audio. Nu s-a salvat nimic."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Testet avbröts eftersom en ljudenhet ändrades. Ingenting sparades."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jaribio limesimama kwa sababu kifaa cha sauti kilibadilika. Hakuna kilichohifadhiwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஓர் ஆடியோ சாதனம் மாறியதால் சோதனை நிறுத்தப்பட்டது. எதுவும் சேமிக்கப்படவில்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఆడియో పరికరం మారినందున పరీక్ష ఆగిపోయింది. ఏదీ సేవ్ చేయబడలేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การทดสอบหยุดลงเนื่องจากอุปกรณ์เสียงมีการเปลี่ยนแปลง ไม่มีการบันทึกใดๆ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir ses aygıtı değiştiği için test durdu. Hiçbir şey kaydedilmedi."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Тест зупинено, бо змінився аудіопристрій. Нічого не збережено."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ٹیسٹ رک گیا کیونکہ ایک آڈیو ڈیوائس تبدیل ہو گئی۔ کچھ بھی محفوظ نہیں کیا گیا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bài kiểm tra đã dừng vì một thiết bị âm thanh đã thay đổi. Không có gì được lưu."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由於音訊裝置有所更改，測試已停止。沒有儲存任何內容。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由于音频设备发生变化，测试已停止。未存储任何内容。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由於音訊裝置有所變更，測試已停止。未儲存任何內容。"
           }
         }
       }

@@ -47,8 +47,9 @@ public final class StreamCache: @unchecked Sendable {
     }
 
     public static func key(for request: TranscodeRequest) -> String {
-        let text = ["v1", request.source.path, String(request.sourceSize), String(request.sourceModified.timeIntervalSince1970), request.regionKey ?? "",
+        let text: String = ["v1", request.source.path, String(request.sourceSize), String(request.sourceModified.timeIntervalSince1970), request.regionKey ?? "",
                     String(request.sampleRate), String(request.bitDepth), String(request.channels)].joined(separator: "|")
+            + (request.dop ? "|dop" : "")   // only when asked for, so every other conversion keeps the name it had
         // Two FNV-1a passes with different bases: 128 bits of name, not a security boundary.
         func fnv(_ seed: UInt64) -> UInt64 {
             var hash = seed

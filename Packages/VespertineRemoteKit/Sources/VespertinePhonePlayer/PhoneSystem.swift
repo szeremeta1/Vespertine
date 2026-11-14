@@ -55,6 +55,7 @@ public final class PhoneSystem {
         running = true
         refreshRoute()
         remote.onTransport = { [weak self] command in self?.transport(command) }
+        remote.playback.dop.bring = { [weak self] carrier in await self?.bring(carrier) ?? false }
         let session = AVAudioSession.sharedInstance()
         observers.append(Self.observe(AVAudioSession.interruptionNotification, session) { [weak self] type, options, _ in
             let began = type.flatMap(AVAudioSession.InterruptionType.init(rawValue:)) == .began
@@ -94,6 +95,7 @@ public final class PhoneSystem {
         settling?.cancel()
         volumeWatch = nil
         remote.onTransport = nil
+        remote.playback.dop.bring = { _ in false }
         shown = nil
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
@@ -130,7 +132,7 @@ public final class PhoneSystem {
     private func refreshRoute() {
         let route = PhoneAudioSession.currentRoute().map {
             PhoneRoute(name: $0.outputName, portType: $0.portType, sampleRate: $0.sampleRate, channels: $0.outputChannels, spatial: $0.isSpatialAudioEnabled,
-                       maximumChannels: $0.maximumChannels, channelLabels: $0.channelLabels)
+                       maximumChannels: $0.maximumChannels, channelLabels: $0.channelLabels, uid: $0.uid)
         }
         if remote.route != route { remote.route = route }
     }
@@ -167,6 +169,25 @@ public final class PhoneSystem {
             // Never played: the next song asks afresh.
             self?.ladder.forget()
         }
+    }
+
+    /// Before a song that arrives as DoP frames starts: the DAC is asked to run at their rate, and for up to two seconds
+    /// the session is read to see that it does. Only then are the frames DSD; otherwise the song is asked for as PCM.
+    private func bring(_ carrier: Double) async -> Bool {
+        func there() -> Bool {
+            refreshRoute()
+            return remote.route.map { abs($0.sampleRate - carrier) < 0.5 } ?? false
+        }
+        if there() { return true }
+        // A preferred rate is honoured only for an active session.
+        try? PhoneAudioSession.activate()
+        try? AVAudioSession.sharedInstance().setPreferredSampleRate(carrier)
+        for _ in 0..<20 {
+            try? await Task.sleep(for: .milliseconds(100))
+            if Task.isCancelled { return false }
+            if there() { return true }
+        }
+        return false
     }
 
     private func transport(_ command: RemoteCommand) {

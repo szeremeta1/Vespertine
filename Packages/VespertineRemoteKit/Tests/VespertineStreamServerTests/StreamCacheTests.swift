@@ -30,8 +30,11 @@ private func put(_ cache: StreamCache, _ key: String, bytes: Int, at age: TimeIn
         other = base; other.sourceModified = Date(timeIntervalSince1970: 2); keys.insert(StreamCache.key(for: other))
         other = base; other.regionKey = "cue:4"; keys.insert(StreamCache.key(for: other))
         other = base; other.source = URL(fileURLWithPath: "/b.dsf"); keys.insert(StreamCache.key(for: other))
-        #expect(keys.count == 8)
+        other = base; other.dop = true; keys.insert(StreamCache.key(for: other))
+        #expect(keys.count == 9, "DoP frames and a PCM conversion at the same rate are different bytes")
         #expect(StreamCache.key(for: base) == StreamCache.key(for: base), "and is stable")
+        // A conversion made before DoP existed keeps its name, so nothing already made is made again.
+        #expect(StreamCache.key(for: base) == "b150b6e7f642c82b59398f901c7e74c6")
     }
 
     @Test func leastRecentlyUsedGoesFirstUntilItFits() throws {

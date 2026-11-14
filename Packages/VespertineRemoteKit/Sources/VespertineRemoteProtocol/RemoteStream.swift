@@ -119,11 +119,17 @@ public struct StreamDescriptor: Codable, Sendable, Equatable {
     /// The phone asked for a smaller form to keep, and this is one: the Mac brought the rate down. nil from a Mac that
     /// doesn't say, and for a song that needed no reducing.
     public var reduced: Bool?
+    /// The phone asked for DoP and this is it: the FLAC's 24-bit samples are DoP frames (DoP 1.1: a marker byte, then 16
+    /// DSD bits) of a DSD song at this rate (2822400 for DSD64), and `format.sampleRate` is the carrier rate (a sixteenth
+    /// of it). They are DSD only for an output that runs at exactly the carrier rate with nothing changing the samples on
+    /// the way; played as PCM they are quiet noise. nil: ordinary audio.
+    public var dsdRate: Double?
 
     public init(stream: Int, kind: StreamKind, byteSize: Int64, format: StreamFormat, frames: Int64?, tag: String, chunkSize: Int,
-                cut: Bool? = nil, reduced: Bool? = nil) {
+                cut: Bool? = nil, reduced: Bool? = nil, dsdRate: Double? = nil) {
         self.cut = cut
         self.reduced = reduced
+        self.dsdRate = dsdRate
         self.stream = stream
         self.kind = kind
         self.byteSize = byteSize

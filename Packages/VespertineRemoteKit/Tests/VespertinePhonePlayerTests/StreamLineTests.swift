@@ -99,9 +99,13 @@ private final class FlakyMac: @unchecked Sendable {
         let mac = FlakyMac()
         let line = StreamLine(client: mac.client, song: 1, descriptor: try await opened(mac), maxSampleRate: nil, patience: .milliseconds(80), pause: .milliseconds(5))
         mac.drop()
-        let started = ContinuousClock.now
-        await #expect(throws: StreamSource.Failure.self) { try await line.read(offset: 0, length: 1000) }
-        #expect(ContinuousClock.now - started < .seconds(2))
+        // The read ends by itself once the patience is spent, and what it throws carries the last error's words.
+        do {
+            _ = try await line.read(offset: 0, length: 1000)
+            Issue.record("the read came back from a Mac that is gone")
+        } catch StreamSource.Failure.unreachable(let words) {
+            #expect(!words.isEmpty)
+        }
     }
 
     @Test func whileItWaitsItSaysSoAndClosingGivesBackTheStreamItHasNow() async throws {

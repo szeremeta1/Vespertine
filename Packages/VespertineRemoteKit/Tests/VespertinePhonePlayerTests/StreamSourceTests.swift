@@ -27,6 +27,9 @@ private final class FakeMac: @unchecked Sendable {
     private var _offsets: [Int64] = []
     private var failures: [Int64: Int]
     var delay: Duration = .zero
+    /// The offsets whose reads may be answered; nil when every read may. Any other read waits to be let through, so a test
+    /// decides what has arrived instead of the clock.
+    private var open: Set<Int64>?
     var shortReads = false
     var alwaysFail = false
 
@@ -34,12 +37,22 @@ private final class FakeMac: @unchecked Sendable {
 
     var offsets: [Int64] { lock.withLock { _offsets } }
 
+    /// Holds every read from now on until `allow` names its offset, or `allowAll`.
+    func hold() { lock.withLock { open = [] } }
+    func allow(_ offsets: Int64...) { lock.withLock { open = (open ?? []).union(offsets) } }
+    func allowAll() { lock.withLock { open = nil } }
+
+    private func pass(_ offset: Int64) async throws {
+        while !lock.withLock({ open?.contains(offset) ?? true }) { try await Task.sleep(for: .milliseconds(2)) }
+    }
+
     func read(_ offset: Int64, _ length: Int) async throws -> StreamFrame {
         let fail = lock.withLock { () -> Bool in
             _offsets.append(offset)
             if let left = failures[offset], left > 0 { failures[offset] = left - 1; return true }
             return false
         }
+        try await pass(offset)
         try await Task.sleep(for: delay)
         if fail || alwaysFail { throw RemoteLinkError.timedOut }
         let n = shortReads ? min(length, 300) : length
@@ -59,6 +72,18 @@ private func blockingRead(_ source: StreamSource, at offset: Int64, length: Int,
     }
 }
 
+/// Waits for something to become true; the clock only bounds a wait that would otherwise never end.
+private func until(_ done: () -> Bool) async throws {
+    let deadline = Date().addingTimeInterval(30)
+    while !done() {
+        guard Date() < deadline else { throw StreamSource.Failure.timedOut }
+        try await Task.sleep(for: .milliseconds(2))
+    }
+}
+
+/// Waits until a read is parked in the source: from then on the source knows where that read wants the fetching to go.
+private func untilAReadWaits(_ source: StreamSource) async throws { try await until { source.readsWaiting > 0 } }
+
 @Suite("Stream source")
 struct StreamSourceTests {
     @Test func theWholeStreamArrivesAndTheFileIsTheStream() async throws {
@@ -77,30 +102,36 @@ struct StreamSourceTests {
     @Test func aReadGetsItsBytesBeforeTheStreamIsWhole() async throws {
         let data = bytes(40_000)
         let mac = FakeMac(data: data)
-        mac.delay = .milliseconds(30)
+        mac.hold()
         let url = tmp(); defer { try? FileManager.default.removeItem(at: url) }
         let source = try StreamSource(descriptor: descriptor(size: data.count), file: url, read: mac.read, window: 2)
         source.start()
-        let head = try await blockingRead(source, at: 0, length: 1500)
-        #expect(head == data.prefix(1500))
+        let reading = Task { try await blockingRead(source, at: 0, length: 1500) }
+        try await untilAReadWaits(source)
+        // The Mac answers for the two chunks the read needs and for nothing else.
+        mac.allow(0, 1000)
+        #expect(try await reading.value == data.prefix(1500))
         #expect(!source.isComplete)
+        #expect(source.bufferedBytes == 2000)
         source.close()
     }
 
     @Test func aReadFarAheadIsFetchedBeforeTheGapBehindIt() async throws {
         let data = bytes(60_000)
         let mac = FakeMac(data: data)
-        mac.delay = .milliseconds(20)
+        mac.hold()
         let url = tmp(); defer { try? FileManager.default.removeItem(at: url) }
         let source = try StreamSource(descriptor: descriptor(size: data.count), file: url, read: mac.read, window: 2)
         source.start()
-        let far = try await blockingRead(source, at: 50_250, length: 500)
-        #expect(far == data[50_250..<50_750])
-        // It did not wait for the fifty chunks before it.
-        #expect(mac.offsets.count < 20)
-        #expect(mac.offsets.contains(50_000))
+        let reading = Task { try await blockingRead(source, at: 50_250, length: 500) }
+        // The Mac answers nothing until the read is waiting, so at most the two reads already asked for are ahead of it.
+        try await untilAReadWaits(source)
+        mac.allowAll()
+        #expect(try await reading.value == data[50_250..<50_750])
+        // It did not wait for the fifty chunks before it: its chunk is the next one asked for.
+        #expect(mac.offsets.prefix(3).contains(50_000))
         // And the gap is still filled in afterwards.
-        try await source.waitUntilComplete(timeout: 10)
+        try await source.waitUntilComplete(timeout: 30)
         source.close()
         #expect(try Data(contentsOf: url) == data)
     }
@@ -157,7 +188,7 @@ struct StreamSourceTests {
 
     @Test func aReadWithNoBytesInTimeTimesOutInsteadOfHanging() async throws {
         let mac = FakeMac(data: bytes(3_000))
-        mac.delay = .seconds(5)
+        mac.hold()
         let url = tmp()
         let source = try StreamSource(descriptor: descriptor(size: 3_000), file: url, read: mac.read)
         source.start()
@@ -167,12 +198,12 @@ struct StreamSourceTests {
 
     @Test func closingWakesAWaitingReadAndRemovesTheHalfFile() async throws {
         let mac = FakeMac(data: bytes(30_000))
-        mac.delay = .milliseconds(300)
+        mac.hold()
         let url = tmp()
         let source = try StreamSource(descriptor: descriptor(size: 30_000), file: url, read: mac.read)
         source.start()
         let waiting = Task { try await blockingRead(source, at: 20_000, length: 10) }
-        try await Task.sleep(for: .milliseconds(60))
+        try await untilAReadWaits(source)
         source.close()
         await #expect(throws: StreamSource.Failure.closed) { _ = try await waiting.value }
         #expect(!FileManager.default.fileExists(atPath: url.path))
@@ -181,14 +212,16 @@ struct StreamSourceTests {
     @Test func interruptingMakesAWaitingReadGiveUpButLaterReadsStillWork() async throws {
         let data = bytes(6_000)
         let mac = FakeMac(data: data)
-        mac.delay = .milliseconds(250)
+        mac.hold()
         let url = tmp(); defer { try? FileManager.default.removeItem(at: url) }
         let source = try StreamSource(descriptor: descriptor(size: data.count), file: url, read: mac.read)
         source.start()
         let waiting = Task { try await blockingRead(source, at: 5_000, length: 10) }
-        try await Task.sleep(for: .milliseconds(60))
+        // Nothing has arrived and the read is parked, so the interruption is what ends it.
+        try await untilAReadWaits(source)
         source.interruptReads()
         await #expect(throws: StreamSource.Failure.interrupted) { _ = try await waiting.value }
+        mac.allowAll()
         #expect(try await blockingRead(source, at: 0, length: 10) == data.prefix(10))
         source.close()
     }
@@ -210,13 +243,13 @@ struct StreamSourceTests {
         let source = try StreamSource(descriptor: descriptor(size: data.count), file: url, read: mac.read, window: 2, readAhead: 5_000)
         source.start()
         _ = try await blockingRead(source, at: 0, length: 100)
-        try await Task.sleep(for: .milliseconds(200))
+        // Everything the limit allows arrives (the six chunks up to 5,100), and then the fetching stops by itself.
+        try await until { source.bufferedBytes >= 6_000 }
         #expect(source.bufferedBytes <= 8_000)
         #expect(!source.isComplete)
         // Reading on lets it fetch on.
         _ = try await blockingRead(source, at: 10_000, length: 100)
-        try await Task.sleep(for: .milliseconds(200))
-        #expect(source.bufferedBytes >= 10_000)
+        try await until { source.bufferedBytes >= 10_000 }
         source.close()
     }
 

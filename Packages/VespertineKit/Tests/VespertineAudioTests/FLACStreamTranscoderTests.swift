@@ -131,6 +131,43 @@ struct FLACStreamTranscoderTests {
         #expect(try read(dst).rate == 176_400)
     }
 
+    @Test("Asked for DoP, a DSD song's own bits come back from the FLAC frame for frame, a whole number of marker pairs long")
+    func dopFrames() throws {
+        let src = tmp("p.dff"), dst = tmp("p.flac")
+        defer { try? FileManager.default.removeItem(at: src); try? FileManager.default.removeItem(at: dst) }
+        // An odd number of DoP frames, so the last marker pair has to be made whole.
+        let planes = DSDFiles.modulate(rate: 2_822_400, seconds: 0.5).map { Array($0.prefix(2 * 70_001)) }
+        try DSDFiles.writeDFF(planes, rate: 2_822_400, to: src)
+        let result = try FLACStreamTranscoder.transcode(PlayableItem(url: src), sampleRate: 176_400, bitDepth: 24, dop: true, to: dst)
+        #expect(result.frames == 70_002 && result.sampleRate == 176_400 && result.bitDepth == 24 && result.channels == 2)
+        let back = try read(dst)
+        #expect(back.rate == 176_400 && back.planes.count == 2 && back.planes[0].count == 70_002)
+        let expected = try DoP.pack(planes.map { $0 + [DoP.silence, DoP.silence] })
+        var wrong = 0
+        for (n, frame) in expected.enumerated() where n < back.planes[0].count {
+            for c in 0..<2 where UInt32(bitPattern: Int32((back.planes[c][n] * 8_388_608).rounded())) & 0xFF_FFFF != frame[c] { wrong += 1 }
+        }
+        #expect(wrong == 0)
+        // The markers alternate from 0x05 to the end, and the last is 0xFA: the next song's 0x05 carries on.
+        func marker(_ n: Int) -> UInt32 { (UInt32(bitPattern: Int32((back.planes[0][n] * 8_388_608).rounded())) & 0xFF_FFFF) >> 16 }
+        #expect(marker(0) == 0x05 && marker(1) == 0xFA && marker(70_000) == 0x05 && marker(70_001) == 0xFA)
+    }
+
+    @Test("DoP is refused for a song that isn't DSD, and at a rate that isn't the carrier's")
+    func dopRefusals() throws {
+        let pcm = tmp("q.wav"), dsd = tmp("q.dsf"), dst = tmp("q.flac")
+        defer { for url in [pcm, dsd, dst] { try? FileManager.default.removeItem(at: url) } }
+        try writePCM(noise(frames: 4_000, channels: 2, bits: 24, seed: 3), rate: 176_400, bits: 24, to: pcm)
+        try DSDFiles.writeDSF(DSDFiles.modulate(rate: 2_822_400, seconds: 0.2), rate: 2_822_400, to: dsd)
+        #expect(throws: FLACStreamTranscoder.Failure.self) {
+            try FLACStreamTranscoder.transcode(PlayableItem(url: pcm), sampleRate: 176_400, bitDepth: 24, dop: true, to: dst)
+        }
+        #expect(throws: FLACStreamTranscoder.Failure.self) {
+            try FLACStreamTranscoder.transcode(PlayableItem(url: dsd), sampleRate: 88_200, bitDepth: 24, dop: true, to: dst)
+        }
+        #expect(!FileManager.default.fileExists(atPath: dst.path))
+    }
+
     @Test("A missing file throws and leaves nothing behind")
     func missingFile() {
         let dst = tmp("f.flac")
