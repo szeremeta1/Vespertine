@@ -139,7 +139,9 @@ struct AtmosRouteChangeTests {
                 return entered.wait(timeout: .now() + 60) == .success ? session : nil
             } ?? nil
             guard let session else { return nil }
-            return await runBounded(patience: 10) {
+            // The read is held for 120 s: answering in well under that shows the session didn't wait for it. Not 10 s: three
+            // calls took longer than that once, on a machine that had just let every test go at the same moment.
+            return await runBounded(patience: 45) {
                 _ = session.inputExhausted
                 _ = session.finished
                 session.stop()
