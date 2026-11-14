@@ -441,10 +441,10 @@ public actor TagWriter {
         url.withUnsafeFileSystemRepresentation { $0.map { access($0, W_OK) == 0 } ?? false }
     }
 
-    /// Network shares added read-only. Their files are never rewritten, however the share is mounted: Vespertine
+    /// Network shares added read-only (the TIDAL account is no share: its downloads are local files). Their files are never rewritten, however the share is mounted: Vespertine
     /// reuses a mount that's already there (Finder's, or one shared with a writable source), which may be read-write.
     public static func readOnlyShares(_ sources: [LibrarySource]) -> Set<Int64> {
-        Set(sources.filter { $0.isNetwork && !$0.isWritable }.compactMap(\.id))
+        Set(sources.filter { $0.isNetwork && !$0.isTidal && !$0.isWritable }.compactMap(\.id))
     }
 
     /// After SFBAudioEngine's save: puts back the values of multi-valued fields it cut to one (fields the edit set
@@ -549,6 +549,40 @@ public actor TagWriter {
         TagWriter.protectDate(in: file)
         try file.writeMetadata()
         try Self.keepEveryValue(multiValued, of: target, edit: edit)
+    }
+
+    /// Tags a file that is not in the library yet (a download being finished), in place: no backup, no history, no library
+    /// update. The format is read from the content, so a name that doesn't end in its type (`song.flac.partial`) is fine.
+    /// Fields and custom keys as in `apply`; one value per field.
+    public static func writeNewFileTags(_ edit: TagEdit, at url: URL) throws {
+        let file = try AudioFile(url: url, detectContentType: true)
+        try file.readPropertiesAndMetadata()
+        for (field, value) in edit.fields { field.apply(value, to: file.metadata) }
+        var custom = edit.custom
+        // ReplayGain has fields of its own in SFBAudioEngine (a custom key of the same name would not be read back as gain).
+        func number(_ key: String) -> Double? {
+            guard let text = custom.removeValue(forKey: key) ?? nil else { return nil }
+            return Double(text.replacingOccurrences(of: "dB", with: "").trimmingCharacters(in: .whitespaces))
+        }
+        if let gain = number("REPLAYGAIN_TRACK_GAIN") { file.metadata.replayGainTrackGain = gain }
+        if let peak = number("REPLAYGAIN_TRACK_PEAK") { file.metadata.replayGainTrackPeak = peak }
+        if let gain = number("REPLAYGAIN_ALBUM_GAIN") { file.metadata.replayGainAlbumGain = gain }
+        if let peak = number("REPLAYGAIN_ALBUM_PEAK") { file.metadata.replayGainAlbumPeak = peak }
+        if !custom.isEmpty {
+            var extra = (file.metadata.additionalMetadata as? [String: Any]) ?? [:]
+            for (key, value) in custom { extra[key.uppercased()] = value }
+            file.metadata.additionalMetadata = extra
+        }
+        switch edit.artwork {
+        case .replace(let data):
+            file.metadata.removeAttachedPicturesOfType(.frontCover)
+            file.metadata.attachPicture(AttachedPicture(imageData: data, type: .frontCover))
+        case .remove:
+            file.metadata.removeAllAttachedPictures()
+        case nil:
+            break
+        }
+        try file.writeMetadata()
     }
 
     /// A copy of `url` beside it to write the tags into: a clone where the volume can make one (free), otherwise a full

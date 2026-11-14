@@ -13,6 +13,9 @@ let package = Package(
         .library(name: "VespertineAudio", targets: ["VespertineAudio"]),
         .library(name: "VespertineLibrary", targets: ["VespertineLibrary"]),
         .library(name: "VespertineVisualizer", targets: ["VespertineVisualizer"]),
+        .library(name: "VespertineTidal", targets: ["VespertineTidal"]),
+        .library(name: "VespertineUPnP", targets: ["VespertineUPnP"]),
+        .library(name: "VespertineAirPlay", targets: ["VespertineAirPlay"]),
     ],
     dependencies: [
         .package(url: "https://github.com/sbooth/SFBAudioEngine", exact: "0.14.0"),
@@ -75,6 +78,21 @@ let package = Package(
             ],
             linkerSettings: [.linkedFramework("NetFS")]
         ),
+        // TIDAL: auth, request gate, catalog, stream resolution and the fragmented-MP4-to-FLAC layout. No UI, no engine state.
+        .target(name: "VespertineTidal", dependencies: ["VespertineAudio", "VespertineLibrary"],
+                linkerSettings: [.linkedFramework("Security")]),
+        // Network renderers (UPnP AV / OpenHome): discovery, control, and the HTTP server they pull the music from.
+        .target(
+            name: "VespertineUPnP",
+            dependencies: ["VespertineAudio", .product(name: "SFBAudioEngine", package: "SFBAudioEngine")]
+        ),
+        // AirPlay 1 (RAOP) receivers: Bonjour discovery, the RTSP/RTP session, ALAC encoding and the engine-shaped playback.
+        .target(
+            name: "VespertineAirPlay",
+            dependencies: ["VespertineAudio", "VespertineUPnP"],
+            linkerSettings: [.linkedFramework("AudioToolbox"), .linkedFramework("Security"), .linkedFramework("Network"),
+                            .linkedFramework("SystemConfiguration")]
+        ),
         // The visualizer window's analysis (FFT, bands, beats) and Metal renderer. Reads a copy of the samples only.
         .target(
             name: "VespertineVisualizer",
@@ -103,6 +121,14 @@ let package = Package(
                                                                  .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
                     resources: [.copy("Fixtures")]),
         .testTarget(name: "VespertineGroupProbeTests", dependencies: ["VespertineGroupProbe", "VespertineAudio"], resources: [.copy("Fixtures")]),
+        .testTarget(name: "VespertineTidalTests",
+                    dependencies: ["VespertineTidal", "VespertineAudio", "VespertineLibrary", .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
+                    resources: [.copy("Fixtures")]),
+        .testTarget(name: "VespertineUPnPTests", dependencies: ["VespertineUPnP", "VespertineAudio",
+                                                               .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
+                    resources: [.copy("Fixtures")]),
+        .testTarget(name: "VespertineAirPlayTests", dependencies: ["VespertineAirPlay", "VespertineUPnP", "VespertineAudio",
+                                                                  .product(name: "SFBAudioEngine", package: "SFBAudioEngine")]),
         .testTarget(name: "VespertineVisualizerTests", dependencies: ["VespertineVisualizer"]),
         .testTarget(name: "VespertineLibraryTests", dependencies: ["VespertineLibrary", "CVespertineTags", "VespertineTestSupport"]),
     ],

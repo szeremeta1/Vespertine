@@ -1,0 +1,8 @@
+{"id":100001,"title":"Fabricated Song","duration":215,"replayGain":-7.9,"peak":0.98,"allowStreaming":true,"streamReady":true,
+ "streamStartDate":"2020-01-01T00:00:00.000+0000","premiumStreamingOnly":false,"trackNumber":3,"volumeNumber":2,"version":"Remastered",
+ "popularity":55,"copyright":"(c) Test Records","url":"http://www.tidal.com/track/100001","isrc":"TEST00000001","editable":false,
+ "explicit":true,"audioQuality":"HI_RES_LOSSLESS","audioModes":["STEREO"],"mediaMetadata":{"tags":["LOSSLESS","HIRES_LOSSLESS"]},
+ "artist":{"id":200001,"name":"Test Artist","type":"MAIN"},
+ "artists":[{"id":200001,"name":"Test Artist","type":"MAIN","picture":"11111111-2222-3333-4444-555555555555"},
+            {"id":200002,"name":"Guest Artist","type":"FEATURED","picture":null}],
+ "album":{"id":300001,"title":"Fabricated Album","cover":"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee","vibrantColor":"#ffffff","videoCover":null}}

@@ -12,5 +12,7 @@ for copies distributed in binary form:
   Google LLC). Taken from SFBAudioEngine's LICENSES folder at the version Vespertine ships.
 - FFmpeg-LGPL-2.1.txt: the license of the FFmpeg decoders built by scripts/build-dts-decoder.sh, and of the DST
   decoder for SACD images taken from FFmpeg's (Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c).
+- python-tidal-LGPL-3.0.txt: the license of python-tidal, which the TIDAL module is ported from. TidalSwiftLib, which
+  parts of it are also ported from, is under the GPL-3.0, Vespertine's own license (LICENSE).
 
 Sources of the LGPL components are linked from THIRD-PARTY-NOTICES.md; the FFmpeg source is attached to each GitHub release.

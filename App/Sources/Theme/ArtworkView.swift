@@ -5,6 +5,7 @@
 
 import AppKit
 import VespertineLibrary
+import VespertineTidal
 import VespertineVisualizer
 import SwiftUI
 
@@ -21,12 +22,26 @@ final class ArtworkCache {
 
     func cached(_ key: String, size: Int) -> NSImage? { cache.object(forKey: "\(key)_\(size)" as NSString) }
 
+    /// Whether TIDAL covers (`tidal:<image uuid>` keys) may be fetched: only while TIDAL is switched on.
+    var fetchesTidalCovers = false
+
     func image(_ key: String, size: Int) async -> NSImage? {
         if let hit = cached(key, size: size) { return hit }
+        if key.hasPrefix("tidal:") { return await tidalCover(String(key.dropFirst("tidal:".count)), key: key, size: size) }
         guard let store else { return nil }
         let url = store.url(for: key, minimumSize: size)
         let image = await Task.detached(priority: .userInitiated) { NSImage(contentsOf: url) }.value
         if let image { cache.setObject(image, forKey: "\(key)_\(size)" as NSString) }
+        return image
+    }
+
+    /// A TIDAL cover, from TIDAL's image server at the nearest size it serves; kept in memory only.
+    private func tidalCover(_ uuid: String, key: String, size: Int) async -> NSImage? {
+        guard fetchesTidalCovers, !uuid.isEmpty else { return nil }
+        let served = [160, 320, 640, 1280].first { $0 >= size } ?? 1280
+        guard let (data, response) = try? await TidalCDN.session.data(from: TidalCatalog.coverURL(uuid, size: served)),
+              (response as? HTTPURLResponse)?.statusCode == 200, let image = NSImage(data: data) else { return nil }
+        cache.setObject(image, forKey: "\(key)_\(size)" as NSString)
         return image
     }
 

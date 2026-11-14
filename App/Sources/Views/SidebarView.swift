@@ -38,12 +38,26 @@ struct SidebarView: View {
             }
 
             Section {
+                let tidalPlaylists = model.tidalPlaylistIDs
                 ForEach(model.library.playlists) { playlist in
                     if let id = playlist.id {
                         Label {
-                            Text(playlist.name.libraryDisplayName).lineLimit(1)
+                            if model.tidal.pendingPlaylists.contains(id) {
+                                HStack {
+                                    Text(playlist.name.libraryDisplayName).lineLimit(1)
+                                    Spacer(minLength: 4)
+                                    Image(systemName: "clock").font(.system(size: 9)).foregroundStyle(Palette.text3)
+                                        .help("Waiting to sync with TIDAL")
+                                }
+                            } else {
+                                Text(playlist.name.libraryDisplayName).lineLimit(1)
+                            }
                         } icon: {
-                            Image(systemName: playlist.isSmart ? "gearshape" : "music.note.list")
+                            if tidalPlaylists.contains(id) {
+                                TidalGlyph().help("TIDAL playlist")
+                            } else {
+                                Image(systemName: playlist.isSmart ? "gearshape" : "music.note.list")
+                            }
                         }
                         .tag(SidebarItem.playlist(id))
                         .dropDestination(for: String.self) { items, _ in
@@ -69,6 +83,9 @@ struct SidebarView: View {
                     Menu {
                         Button("New Playlist") { newPlaylist(smart: false) }
                         Button("New Smart Playlist…") { newPlaylist(smart: true) }
+                        if model.settings.tidalEnabled, model.tidal.state.isSignedIn {
+                            Button("New TIDAL Playlist…") { newTidalPlaylist() }
+                        }
                         Divider()
                         Button("Import Playlist…") { model.importPlaylistFiles() }
                         Button("Import Apple Music Library…") { model.importAppleMusicLibrary() }
@@ -81,6 +98,26 @@ struct SidebarView: View {
                     .menuIndicator(.hidden)
                     .fixedSize()
                     .help("New playlist")
+                }
+            }
+
+            if model.showsTidalSection {
+                Section("TIDAL") {
+                    row(.tidalSearch, "Search", "magnifyingglass", count: nil)
+                    if !model.tidal.mixesUnavailable {
+                        row(.tidalMixes, "My Mixes", "square.stack", count: nil)
+                    }
+                    row(.tidalNewReleases, "New Releases", "sparkles", count: nil)
+                    Label {
+                        HStack {
+                            Text("Downloads").lineLimit(1).minimumScaleFactor(0.8)
+                            Spacer()
+                            TidalDownloadsBadge(progress: TidalDownloadProgress(items: model.tidal.downloader?.items ?? []))
+                        }
+                    } icon: {
+                        Image(systemName: "arrow.down.circle")
+                    }
+                    .tag(SidebarItem.tidalDownloads)
                 }
             }
 
@@ -234,6 +271,14 @@ struct SidebarView: View {
             return "\(share.displayString)\n\(reason)"
         }
         return [share.displayString, failure].compactMap { $0 }.joined(separator: "\n")
+    }
+
+    private func newTidalPlaylist() {
+        if let p = model.newTidalPlaylist(name: String(localized: "New TIDAL Playlist (name)", defaultValue: "New Playlist",
+                                                       comment: "Name given to a newly created TIDAL playlist")), let id = p.id {
+            model.sidebar = .playlist(id)
+            newName = p.name; renaming = p
+        }
     }
 
     private func newPlaylist(smart: Bool) {

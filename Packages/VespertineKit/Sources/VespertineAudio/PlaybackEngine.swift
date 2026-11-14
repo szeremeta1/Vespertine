@@ -49,6 +49,8 @@ public struct EngineSnapshot: Sendable {
     /// The channels of the bed Vespertine decodes beside the output while macOS renders the track or a receiver gets it
     /// as a bitstream (the meters' own channels then; `takeChannelPeaks` reads their levels). nil otherwise.
     public var bedMeters: BedMeterLayout?
+
+    public init() {}
 }
 
 extension EngineSnapshot {
@@ -81,6 +83,9 @@ public enum EngineEvent: Sendable {
     case deviceNotResponding(String)
     /// DACs of a speaker group set to carry on went away (`without`, by name); the group plays on with the others.
     case speakerGroupCarriesOn(group: String, without: [String])
+    /// Something to tell the listener about the output while playback carries on as it was (a network renderer refused a
+    /// pause or seek). Not sent by the engine itself.
+    case notice(String)
 }
 
 public struct EngineSettings: Sendable, Equatable {
@@ -251,7 +256,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         // Keep current, and let the prefetched next lease survive until it is taken by entry().
         staged = [key: entry]
         // A FLAC, WAV, DSF or DSDIFF on a share starts on a prefix (see `NetworkStart`); the rest keeps copying ahead of the playhead.
-        let early = NetworkStart.startsEarly(fileExtension: resolved.pathExtension, size: entry.size,
+        let early = NetworkStart.startsEarly(fileExtension: entry.url.pathExtension, size: entry.size,
                                              isRegion: item.regionStartFrame != nil || item.regionFrameLength != nil)
         // An SACD image's area is not at the front of the file: a large one still starts on a lead from where it plays.
         let progressiveDSD = !early && item.sacdArea != nil && item.dvd == nil && entry.size > 512 << 20

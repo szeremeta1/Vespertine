@@ -102,6 +102,8 @@ struct TrackTable: View {
         let content = sorted.content(tracks: self.tracks, positions: positions, allTracks: self.allTracks, order: sortOrder)
         let rows = content.rows, tracks = content.tracks, allTracks = content.allTracks
         let discs = numbersDiscs(tracks)
+        // The Source column exists only while TIDAL is on and the library has a TIDAL account.
+        let showsSource = model.library.tidalSource != nil
         Table(rows, selection: $selection, sortOrder: $sortOrder) {
             // Ideal widths add up to about 810 pt: what's left beside the sidebar and inspector in a 1440 pt window.
             TableColumn("#", value: \.index) { row in
@@ -119,30 +121,37 @@ struct TrackTable: View {
             .width(discs ? 44 : 36)
 
             TableColumn("Title", value: \.track.title) { row in
+                let unavailable = model.playability(of: row.track).reason
                 Text(row.track.title)
                     .font(Typeface.ui(13))
                     .rowForeground(model.player.current?.track.id == row.track.id ? Palette.brassHi : Palette.text)
-                    .opacity(row.track.isMissing ? 0.45 : 1)
+                    .opacity(row.track.isMissing || unavailable != nil ? 0.45 : 1)
+                    .help(ifAny: unavailable)
             }
             .width(min: 160, ideal: 240)
 
             if showArtist {
                 TableColumn("Artist", value: \.track.displayArtist) { row in
                     Text(row.track.displayArtist.libraryDisplayName).font(Typeface.ui(12.5)).rowForeground(Palette.text2)
+                        .opacity(model.playability(of: row.track).isPlayable ? 1 : 0.45)
                 }
                 .width(min: 100, ideal: 140)
             }
             if showAlbum {
                 TableColumn("Album", value: \.track.displayAlbum) { row in
                     Text(row.track.displayAlbum.libraryDisplayName).font(Typeface.ui(12.5)).rowForeground(Palette.text2)
+                        .opacity(model.playability(of: row.track).isPlayable ? 1 : 0.45)
                 }
                 .width(min: 100, ideal: 150)
             }
 
             TableColumn("Format", value: \.track.sampleRate) { row in
+                let format = model.formatLabel(of: row.track)
                 HStack(spacing: 8) {
-                    Text(row.track.formatSummary).font(Typeface.mono(11)).rowForeground(Palette.text2)
+                    Text(format.text).font(Typeface.mono(11)).rowForeground(Palette.text2)
                         .lineLimit(1).fixedSize()
+                        .opacity(model.playability(of: row.track).isPlayable ? 1 : 0.45)
+                        .help(ifAny: format.help)
                     AnalysisTag(track: row.track).fixedSize()
                     if let copies = row.track.id.flatMap({ self.copies[$0] }) {
                         SongCopiesButton(model: model, track: row.track, copies: copies, list: tracks)
@@ -150,6 +159,13 @@ struct TrackTable: View {
                 }
             }
             .width(min: 150, ideal: 190)
+
+            if showsSource {
+                TableColumn("Source", value: \.track.sourceSortKey) { row in
+                    SourceCell(model: model, track: row.track)
+                }
+                .width(min: 44, ideal: 52, max: 64)
+            }
 
             TableColumn(Text(Image(systemName: "heart")).foregroundStyle(Palette.text3).accessibilityLabel("Favorite")) { row in
                 // Selected rows show the heart through the row's own highlight (FavoriteCell), not by reading the
@@ -171,12 +187,17 @@ struct TrackTable: View {
         .contextMenu(forSelectionType: Int64.self) { ids in
             let chosenRows = rows.filter { ids.contains($0.id) }
             let chosen = chosenRows.map(\.track)
-            if !chosen.isEmpty { TrackMenu(tracks: chosen, playlist: reorderable, all: allTracks ?? tracks, positions: Set(chosenRows.map(\.place))) }
+            if chosen.contains(where: { $0.id == nil && $0.isTidalTrack }) {
+                TidalCatalogTrackMenu(tracks: chosen)   // catalog songs with no library row
+            } else if !chosen.isEmpty {
+                TrackMenu(tracks: chosen, playlist: reorderable, all: allTracks ?? tracks, positions: Set(chosenRows.map(\.place)))
+            }
         } primaryAction: { ids in
             // Double-clicking a row of a multi-selection gets the whole selection: play the row clicked, not whichever
             // song the set happens to list first (else the first selected, in the order shown).
             let clicked = Self.clickedRow().flatMap { rows.indices.contains($0) && ids.contains(rows[$0].id) ? $0 : nil }
             guard let index = clicked ?? rows.firstIndex(where: { ids.contains($0.id) }) else { return }
+            guard model.playability(of: rows[index].track).isPlayable else { return }
             model.player.play(rows.map(\.track), startAt: index, transitions: model.library.transitions(of: reorderable))
         }
         .onAppear { mirror(Set(rows.filter { model.selectedTrackIDs.contains($0.trackID ?? -1) }.map(\.id))) }
@@ -215,6 +236,7 @@ struct TrackTable: View {
         }
         .onKeyPress(.return) {
             guard let index = rows.firstIndex(where: { selection.contains($0.id) }) else { return .ignored }
+            guard model.playability(of: rows[index].track).isPlayable else { return .handled }
             model.player.play(rows.map(\.track), startAt: index, transitions: model.library.transitions(of: reorderable))
             return .handled
         }
@@ -498,9 +520,11 @@ struct TrackMenu: View {
     var positions: Set<Int>? = nil
 
     var body: some View {
-        Button("Play") { model.player.play(tracks, shuffled: false) }
-        Button("Play Next") { model.player.playNext(tracks) }
-        Button("Add to Queue") { model.player.addToQueue(tracks) }
+        // A TIDAL song that can't play now (offline, signed out, not streamable here) can't be played or queued.
+        let canPlay = tracks.contains { model.playability(of: $0).isPlayable }
+        Button("Play") { model.player.play(tracks, shuffled: false) }.disabled(!canPlay)
+        Button("Play Next") { model.player.playNext(tracks) }.disabled(!canPlay)
+        Button("Add to Queue") { model.player.addToQueue(tracks) }.disabled(!canPlay)
         AddToPlaylistMenu(trackIDs: tracks.compactMap(\.id))
         Button(tracks.allSatisfy(model.library.isFavorite) ? String(localized: "Remove from Favorites") : String(localized: "Add to Favorites")) {
             model.toggleFavorite(tracks)
@@ -520,6 +544,7 @@ struct TrackMenu: View {
         }
         Button("Look Up on MusicBrainz…") { model.lookupTracks = tracks }
         Button("Show in Finder") { model.showInFinder(tracks) }
+        TidalRowsMenu(tracks: tracks)
         if let playlist, !playlist.isSmart {
             Divider()
             Button("Remove from Playlist", role: .destructive) {
@@ -531,6 +556,53 @@ struct TrackMenu: View {
                 model.library.setPlaylistOrder(remaining, playlist: playlist)
             }
         }
+    }
+}
+
+// MARK: - Source column
+
+extension View {
+    /// A tooltip when there is text for one; otherwise the view as it is (no empty tooltip).
+    @ViewBuilder func help(ifAny text: String?) -> some View {
+        if let text, !text.isEmpty { help(text) } else { self }
+    }
+}
+
+/// Where a song comes from: a drive, a share, or the TIDAL account (a "T" in a rounded square; a check once downloaded).
+/// Takes the model as a property, as `FavoriteCell` does: a table cell can be laid out where the environment's model isn't
+/// reachable (a filter that rebuilds the rows crashed with "No Observable object of type AppModel found").
+struct SourceCell: View {
+    let model: AppModel
+    let track: Track
+
+    var body: some View {
+        let kind = model.trackSource(of: track)
+        HStack(spacing: 3) {
+            switch kind {
+            case .local: Image(systemName: "internaldrive")
+            case .share: Image(systemName: "server.rack")
+            case .tidalStreaming: TidalGlyph()
+            case .tidalDownloaded:
+                TidalGlyph()
+                Image(systemName: "checkmark").font(.system(size: 8, weight: .semibold))
+            }
+        }
+        .font(.system(size: 11))
+        .rowForeground(Palette.text3)
+        .opacity(model.playability(of: track).isPlayable ? 1 : 0.45)
+        .help(kind.help)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(kind.help)
+    }
+}
+
+/// TIDAL's mark, drawn small: a "T" in a rounded square.
+struct TidalGlyph: View {
+    var body: some View {
+        Text("T")
+            .font(.system(size: 8, weight: .bold))
+            .frame(width: 13, height: 13)
+            .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(lineWidth: 1))
     }
 }
 

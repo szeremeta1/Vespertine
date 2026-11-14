@@ -47,11 +47,13 @@
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_vespertine._tcp</string>
+		<string>_raop._tcp</string>
+		<string>_airplay._tcp</string>
 	</array>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 2026 Vespertine contributors. Free software under the GNU GPL, version 3 or later.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Vespertine connects to the music servers and network shares you add, on your network or over a VPN. If you turn on Remote, the phones and browsers you pair can control it too.</string>
+	<string>Vespertine connects to the music servers and network shares you add, on your network or over a VPN. If you turn on Remote, the phones and browsers you pair can control it too. If you turn on Network Players or AirPlay Players, it finds the network players and AirPlay receivers on your network and sends them the music you play.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Vespertine uses audio input only for what you start: a room measurement records your measurement microphone, the loopback test records a virtual loopback device, and Mac Sound Output receives what your apps play to a speaker group you published, to play it on the group's speakers. Nothing else is recorded.</string>
 	<key>SUAllowsAutomaticUpdates</key>

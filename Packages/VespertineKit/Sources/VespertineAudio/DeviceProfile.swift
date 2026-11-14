@@ -33,6 +33,7 @@ public struct DeviceProfile: Sendable, Hashable {
         case speakerGroup        // Vespertine's own speaker group: several DACs as one output (its badge comes from the members)
         case usbDAC
         case other
+        case networkRenderer     // a UPnP AV / OpenHome renderer: Vespertine sends it a stream and can't read back its DAC
     }
 
     public var kind: Kind
@@ -66,6 +67,22 @@ public struct DeviceProfile: Sendable, Hashable {
         DeviceProfile(kind: .speakerGroup, tag: "SPEAKER GROUP",
                       note: "Several DACs played as one output. The DAC that leads the clock can be bit-perfect; the others are resampled by a few millionths to stay in step with it.",
                       canBeBitPerfect: canBeBitPerfect, symbol: "hifispeaker.2")
+    }
+
+    /// A network renderer. Never `canBeBitPerfect`: what its DAC receives can't be read back, so the badge says what was sent.
+    public static func networkRenderer(protocolName: String) -> DeviceProfile {
+        if protocolName == "AirPlay" {
+            var profile = DeviceProfile(kind: .networkRenderer, tag: "AIRPLAY",
+                                        note: String(localized: "An AirPlay receiver. Vespertine sends it ALAC 16-bit / 44.1 kHz; the receiver keeps in step with this Mac's clock by adding or dropping samples, and may apply its own volume and resampling. What reaches its DAC can't be seen from here."),
+                                        canBeBitPerfect: false, symbol: "airplay.audio")
+            profile.connection = protocolName
+            return profile
+        }
+        var profile = DeviceProfile(kind: .networkRenderer, tag: protocolName == "OpenHome" ? "OPENHOME" : "UPNP",
+                                    note: String(localized: "A network player. Vespertine sends it the music; what the player does with it (resampling, volume, ReplayGain) can't be seen from here."),
+                                    canBeBitPerfect: false, symbol: "hifireceiver")
+        profile.connection = protocolName
+        return profile
     }
 
     private static func classify(_ device: OutputDevice) -> DeviceProfile {

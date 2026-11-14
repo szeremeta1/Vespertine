@@ -36,16 +36,16 @@ struct MiniPlayerView: View {
                         if let path = player.signalPath {
                             // A filled disc or a ring beside the format, so bit-perfect or converted isn't colour alone.
                             HStack(spacing: 5) {
-                                VerdictMark(untouched: path.isBitPerfect)
+                                VerdictMark(untouched: path.isUntouched)
                                 Text(path.isResampling
                                      ? String(localized: "\(SampleRate.format(path.plan.decodedSampleRate)) → \(SampleRate.format(path.plan.deviceSampleRate)) kHz")
                                      : path.deviceFormatShort)
                                     .font(Typeface.mono(10))
-                                    .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
+                                    .foregroundStyle(path.isUntouched ? Palette.brassHi : Palette.copper)
                             }
-                            .help(path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted on the way to the device"))
+                            .help(Self.verdictText(path))
                             .accessibilityElement(children: .ignore)
-                            .accessibilityLabel(path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted", comment: "The audio is converted (not bit-perfect) on the way to the device"))
+                            .accessibilityLabel(Self.verdictLabel(path))
                             .accessibilityValue(path.deviceFormatShort)
                         }
                     }
@@ -115,9 +115,9 @@ struct MenuBarView: View {
                         .font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
                     if let path = player.signalPath {
                         HStack(alignment: .firstTextBaseline, spacing: 5) {
-                            VerdictMark(untouched: path.isBitPerfect)
+                            VerdictMark(untouched: path.isUntouched)
                             (player.buffering ? Text("BUFFERING…") : Text(verbatim: ([path.statusLine] + path.conversionBadges + [path.deviceFormatShort]).joined(separator: " · "))).font(Typeface.mono(9.5)).lineLimit(2)
-                                .foregroundStyle(path.isBitPerfect ? Palette.brassHi : Palette.copper)
+                                .foregroundStyle(path.isUntouched ? Palette.brassHi : Palette.copper)
                         }
                     }
                 }
@@ -167,7 +167,7 @@ struct DarkWindowAppearance: NSViewRepresentable {
 
 /// The Settings window's tabs; `AppModel.settingsTab` is the one showing (the setup assistant opens Settings on one).
 enum SettingsTab: Hashable {
-    case playback, library, network, online, remote, updates, about
+    case playback, library, network, online, tidal, remote, updates, about
 }
 
 struct SettingsView: View {
@@ -180,6 +180,9 @@ struct SettingsView: View {
             LibrarySettings().tabItem { Label("Library", systemImage: "books.vertical") }.tag(SettingsTab.library)
             NetworkSettings().tabItem { Label("Network", systemImage: "server.rack") }.tag(SettingsTab.network)
             OnlineSettings().tabItem { Label("Online", systemImage: "globe") }.tag(SettingsTab.online)
+            if model.settings.tidalEnabled {
+                TidalSettingsView().tabItem { Label("TIDAL", systemImage: "music.note.house") }.tag(SettingsTab.tidal)
+            }
             RemoteSettingsView().tabItem { Label("Remote", systemImage: "iphone") }.tag(SettingsTab.remote)
             UpdateSettings().tabItem { Label("Updates", systemImage: "arrow.down.circle") }.tag(SettingsTab.updates)
             AboutSettings().tabItem { Label("About", systemImage: "info.circle") }.tag(SettingsTab.about)
@@ -242,6 +245,8 @@ struct PlaybackSettings: View {
             }
             TransitionsSettingsSection()
             SpeakerGroupsSettingsSection()
+            RendererSettingsSection()
+            AirPlaySettingsSection()
             SystemOutputSettingsSection()
             Section("Surround formats") {
                 Picker("Dolby Atmos", selection: $s.atmosBySystem) {
@@ -470,6 +475,12 @@ struct OnlineSettings: View {
                 }
                 .font(.caption).foregroundStyle(.secondary)
             }
+            Section {
+                Toggle("TIDAL integration", isOn: Binding(get: { model.settings.tidalEnabled }, set: { model.setTidalEnabled($0) }))
+            } footer: {
+                Text("Stream, sync and download from your TIDAL account. Off: Vespertine shows only your own music.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
         .task { token = await ListenBrainzClient.shared.savedToken() }
@@ -541,5 +552,24 @@ struct AboutSettings: View {
         }
         .padding(30)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+extension MiniPlayerView {
+    /// The verdict beside the format, in words that match the badge: a network renderer's pass-through is "sent bit-perfect"
+    /// (what Vespertine sent), never a claim about the renderer's DAC.
+    static func verdictText(_ path: SignalPath) -> String {
+        if let renderer = path.renderer {
+            guard renderer.passesThrough && path.source.encoding != .lossy else { return path.statusLine }
+            return renderer.transport == .airPlay
+                ? String(localized: "Sent bit-perfect to \(renderer.name): the file's own samples", comment: "%@ is an AirPlay receiver's name.")
+                : String(localized: "Sent bit-perfect to \(renderer.name): the original file", comment: "%@ is a network player's name.")
+        }
+        return path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted on the way to the device")
+    }
+
+    static func verdictLabel(_ path: SignalPath) -> String {
+        if path.renderer != nil { return verdictText(path) }
+        return path.isBitPerfect ? String(localized: "Bit-perfect") : String(localized: "Converted", comment: "The audio is converted (not bit-perfect) on the way to the device")
     }
 }

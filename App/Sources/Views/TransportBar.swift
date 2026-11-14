@@ -5,6 +5,7 @@
 
 import VespertineAudio
 import VespertineLibrary
+import VespertineUPnP
 import SwiftUI
 
 struct TransportBar: View {
@@ -149,21 +150,23 @@ struct DeviceChip: View {
 
     var body: some View {
         let device = model.activeDevice
+        let renderer = model.chosenRenderer
+        let receiver = model.chosenAirPlay
         let path = model.player.signalPath
         Button { showDevices.toggle() } label: {
             HStack(spacing: 9) {
-                Image(systemName: device?.profile.symbol ?? (model.missingChosenOutput == nil ? "hifispeaker" : "cable.connector.slash"))
+                Image(systemName: receiver != nil ? "airplay.audio" : chipSymbol(device, renderer))
                     .font(.system(size: 14))
                     .foregroundStyle(Palette.brassHi)
                 VStack(alignment: .leading, spacing: 1) {
-                    Text(device?.name ?? model.missingChosenOutput ?? String(localized: "No Output")).font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1)
+                    Text(receiver?.name ?? chipName(device, renderer)).font(Typeface.ui(12)).foregroundStyle(Palette.text).lineLimit(1)
                     Text(chipDetail(device, path)).font(Typeface.mono(9.5))
-                        .foregroundStyle(device?.isInCallMode == true ? Palette.copper : path.map { $0.isBitPerfect ? Palette.brassHi : Palette.copper } ?? Palette.text3)
+                        .foregroundStyle(renderer == nil && receiver == nil && device?.isInCallMode == true ? Palette.copper : chipTint(path))
                         .lineLimit(1)
                 }
                 .frame(maxWidth: 150, alignment: .leading)
                 if let path {
-                    if path.isBitPerfect {
+                    if path.isUntouched {
                         Circle().fill(Palette.brassHi).frame(width: 6, height: 6).shadow(color: Palette.brass, radius: 4)
                     } else {
                         Circle().strokeBorder(Palette.copper, lineWidth: 1.5).frame(width: 7, height: 7)
@@ -180,9 +183,10 @@ struct DeviceChip: View {
         .help(model.bluetoothCallMode?.explanation ?? standIn.map { String(localized: "Output device: \(device?.name ?? "") plays while \($0) isn’t connected", comment: "Both are audio output device names.") }
               ?? String(localized: "Output device"))
         // Bit-perfect or converted is said in words too, not only by the colour and the dot.
-        .accessibilityLabel(device.map { String(localized: "Output device, \($0.name)") } ?? String(localized: "Output device, none"))
+        .accessibilityLabel(outputName(receiver?.name ?? renderer?.name ?? device?.name))
         .accessibilityValue(path.map {
-            $0.isBitPerfect ? String(localized: "Bit-perfect, \(chipDetail(device, $0))") : String(localized: "Converted, \(chipDetail(device, $0))")
+            $0.renderer != nil ? "\($0.statusLine), \(chipDetail(device, $0))"
+                : $0.isBitPerfect ? String(localized: "Bit-perfect, \(chipDetail(device, $0))") : String(localized: "Converted, \(chipDetail(device, $0))")
         } ?? "")
         .popover(isPresented: $showDevices, arrowEdge: .top) {
             ScrollView {
@@ -193,10 +197,45 @@ struct DeviceChip: View {
         }
     }
 
+    private func outputName(_ name: String?) -> String {
+        guard let name else { return String(localized: "Output device, none") }
+        return String(localized: "Output device, \(name)")
+    }
+
     /// The chosen output that isn't connected, while another one plays (or would play) in its place.
     private var standIn: String? { model.activeDevice == nil ? nil : model.missingChosenOutput }
 
+    private func chipSymbol(_ device: OutputDevice?, _ renderer: RendererDevice?) -> String {
+        if renderer != nil { return "hifireceiver" }
+        return device?.profile.symbol ?? (model.missingChosenOutput == nil ? "hifispeaker" : "cable.connector.slash")
+    }
+
+    private func chipName(_ device: OutputDevice?, _ renderer: RendererDevice?) -> String {
+        renderer?.name ?? device?.name ?? model.missingChosenOutput ?? String(localized: "No Output")
+    }
+
+    private func chipTint(_ path: SignalPath?) -> Color {
+        guard let path else { return Palette.text3 }
+        return path.isUntouched ? Palette.brassHi : Palette.copper
+    }
+
     private func chipDetail(_ device: OutputDevice?, _ path: SignalPath?) -> String {
+        if let path, let renderer = path.renderer, renderer.transport == .airPlay {
+            return renderer.passesThrough
+                ? String(localized: "\(renderer.sentFormatShort) · SENT", comment: "Device chip: the format sent to an AirPlay receiver with the file's own samples (short, uppercase)")
+                : String(localized: "\(renderer.sentFormatShort) · CONVERTED", comment: "Device chip: the format sent to an AirPlay receiver after conversion (short, uppercase)")
+        }
+        if let path, let renderer = path.renderer {
+            return renderer.passesThrough
+                ? String(localized: "\(path.deviceFormatShort) · SENT", comment: "Device chip: the format sent to a network player as the original file (short, uppercase)")
+                : String(localized: "\(path.deviceFormatShort) · PROCESSED", comment: "Device chip: the format sent to a network player after Vespertine's processing (short, uppercase)")
+        }
+        if model.chosenAirPlay != nil {
+            return String(localized: "AIRPLAY · IDLE", comment: "Device chip: an AirPlay receiver chosen, nothing playing (short, uppercase)")
+        }
+        if let renderer = model.chosenRenderer {
+            return String(localized: "\(renderer.kind.protocolName.localizedUppercase) · IDLE", comment: "Device chip: a network player chosen, nothing playing (short, uppercase)")
+        }
         if let path {
             return path.applied.exclusive
                 ? String(localized: "\(path.deviceFormatShort) · EXCL", comment: "Device chip: format, then EXCL = exclusive access (short, uppercase)")
@@ -226,10 +265,17 @@ struct DevicePicker: View {
             deviceRow(nil, name: String(localized: "System Default"), detail: String(localized: "FOLLOWS SOUND SETTINGS"), symbol: "gearshape", selected: model.settings.selectedDeviceUID == nil)
             if let missing = model.missingChosenOutput, let uid = model.settings.selectedDeviceUID {
                 // Still the chosen one: playback goes back to it when it's connected again.
-                deviceRow(uid, name: missing,
-                          detail: model.plannedDevice.map { String(localized: "NOT CONNECTED · USING \($0.name.localizedUppercase)", comment: "Output list: the chosen device is missing; %@ is the device playing in its place") }
-                              ?? String(localized: "NOT CONNECTED · WAITING FOR IT", comment: "Output list: the chosen device is missing and playback waits for it"),
-                          symbol: "cable.connector.slash", selected: true)
+                if model.networkOutputChosen {
+                    // A network renderer or AirPlay receiver that isn't answering: nothing plays in its place.
+                    deviceRow(uid, name: missing, detail: String(localized: "NOT RESPONDING", comment: "Output list: the chosen network player doesn't answer (short, uppercase)"),
+                              symbol: model.airPlayChosen ? "airplay.audio" : "hifireceiver", selected: true)
+                        .opacity(0.6)
+                } else {
+                    deviceRow(uid, name: missing,
+                              detail: model.plannedDevice.map { String(localized: "NOT CONNECTED · USING \($0.name.localizedUppercase)", comment: "Output list: the chosen device is missing; %@ is the device playing in its place") }
+                                  ?? String(localized: "NOT CONNECTED · WAITING FOR IT", comment: "Output list: the chosen device is missing and playback waits for it"),
+                              symbol: "cable.connector.slash", selected: true)
+                }
             }
             ForEach(model.devices.devices) { d in
                 deviceRow(d.uid, name: d.name, detail: "\(d.profile.tag) · \(d.rangeSummary)", symbol: d.profile.symbol,
@@ -242,12 +288,60 @@ struct DevicePicker: View {
                         .opacity(row.isReady ? 1 : 0.6)
                 }
             }
-            if let device = model.activeDevice {
+            // Network players (Network Players (UPnP, beta), behind their Settings switch).
+            if let renderers = model.renderers {
+                Hairline().padding(.vertical, 8)
+                SectionLabel(text: String(localized: "Network players", comment: "Header of the network renderers in the output list")).padding(.horizontal, 8).padding(.bottom, 4)
+                if renderers.renderers.isEmpty {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(renderers.searching ? String(localized: "SEARCHING…") : String(localized: "NONE FOUND ON THIS NETWORK"))
+                            .font(Typeface.mono(9.5)).foregroundStyle(Palette.text3)
+                        if !renderers.searching {
+                            Text("Check it's on and on the same network as this Mac.").font(Typeface.ui(11)).foregroundStyle(Palette.text3)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                }
+                ForEach(renderers.renderers) { r in
+                    deviceRow(r.uid, name: r.name, detail: RendererText.detail(r), symbol: "hifireceiver", selected: model.settings.selectedDeviceUID == r.uid)
+                }
+            }
+            // AirPlay receivers (AirPlay Players (beta), behind their Settings switch). Those Vespertine can't send to yet are listed,
+            // dimmed, with the reason.
+            if let airPlay = model.airPlay {
+                Hairline().padding(.vertical, 8)
+                SectionLabel(text: String(localized: "AirPlay players", comment: "Header of the AirPlay receivers in the output list")).padding(.horizontal, 8).padding(.bottom, 4)
+                if airPlay.devices.isEmpty {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(airPlay.searching ? String(localized: "SEARCHING…") : String(localized: "NONE FOUND ON THIS NETWORK"))
+                            .font(Typeface.mono(9.5)).foregroundStyle(Palette.text3)
+                        if !airPlay.searching {
+                            Text("Check it's on and on the same network as this Mac.").font(Typeface.ui(11)).foregroundStyle(Palette.text3)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .padding(.horizontal, 8)
+                }
+                ForEach(airPlay.devices) { d in
+                    deviceRow(d.uid, name: d.name, detail: AirPlayText.detail(d), symbol: "airplay.audio", selected: model.settings.selectedDeviceUID == d.uid)
+                        .disabled(!d.isSupported)
+                        .opacity(d.isSupported ? 1 : 0.5)
+                }
+            }
+            if let receiver = model.chosenAirPlay {
+                Hairline().padding(.vertical, 8)
+                AirPlayDetails(device: receiver)
+            } else if let renderer = model.chosenRenderer {
+                Hairline().padding(.vertical, 8)
+                RendererDetails(renderer: renderer)
+            } else if let device = model.activeDevice {
                 Hairline().padding(.vertical, 8)
                 DeviceSettings(device: device)
             }
         }
         .padding(12)
+        .onAppear { model.renderers?.refresh() }
     }
 
     private func deviceRow(_ uid: String?, name: String, detail: String, symbol: String, selected: Bool) -> some View {
@@ -396,7 +490,11 @@ struct VolumeControl: View {
         let settings = model.settings
         HStack(spacing: 8) {
             Image(systemName: "speaker.wave.2").font(.system(size: 12)).foregroundStyle(Palette.text2)
-            if device?.hasHardwareVolume == true, let v = model.devices.hardwareVolume {
+            if let receiver = model.chosenAirPlay {
+                AirPlayVolumeControl(device: receiver)
+            } else if let renderer = model.chosenRenderer {
+                RendererVolumeControl(renderer: renderer)
+            } else if device?.hasHardwareVolume == true, let v = model.devices.hardwareVolume {
                 BrassSlider(value: Binding(get: { Double(v) }, set: { model.devices.setHardwareVolume(Float($0)) }),
                             tint: Palette.text2, showsThumb: false, accessibilityName: String(localized: "Hardware volume"))
                     .frame(width: 72)

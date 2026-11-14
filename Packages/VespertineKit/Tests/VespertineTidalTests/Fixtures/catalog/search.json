@@ -1,0 +1,7 @@
+{"artists":{"limit":50,"offset":0,"totalNumberOfItems":1,"items":[{"id":200001,"name":"Test Artist","picture":null,"popularity":71}]},
+ "albums":{"limit":50,"offset":0,"totalNumberOfItems":1,"items":[{"id":300001,"title":"Fabricated Album","numberOfTracks":10,"releaseDate":"2019-05-17"}]},
+ "playlists":{"limit":50,"offset":0,"totalNumberOfItems":1,"items":[{"uuid":"00000000-1111-2222-3333-444444444444","title":"Fabricated Mix","numberOfTracks":3}]},
+ "tracks":{"limit":50,"offset":0,"totalNumberOfItems":1,"items":[{"id":100001,"title":"Fabricated Song","duration":215,"trackNumber":3,"volumeNumber":1,
+   "explicit":false,"audioQuality":"LOSSLESS","artists":[{"id":200001,"name":"Test Artist"}],"album":{"id":300001,"title":"Fabricated Album"}}]},
+ "videos":{"limit":50,"offset":0,"totalNumberOfItems":0,"items":[]},
+ "topHit":{"value":{"id":200001,"popularity":71},"type":"ARTISTS"}}

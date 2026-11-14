@@ -1,0 +1,5 @@
+{"limit":100,"offset":0,"totalNumberOfItems":2,"items":[
+ {"id":100001,"title":"First","duration":100,"trackNumber":1,"volumeNumber":1,"explicit":false,"audioQuality":"LOSSLESS",
+  "artists":[{"id":200001,"name":"Test Artist","type":"MAIN"}],"album":{"id":300001,"title":"Fabricated Album","cover":"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"}},
+ {"id":100002,"title":"Second","duration":120,"trackNumber":2,"volumeNumber":1,"explicit":false,"audioQuality":"LOSSLESS",
+  "artists":[{"id":200001,"name":"Test Artist","type":"MAIN"}],"album":{"id":300001,"title":"Fabricated Album","cover":"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee"}}]}

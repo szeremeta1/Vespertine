@@ -5,8 +5,11 @@
 
 import AppKit
 import CoreAudio
+import VespertineAirPlay
 import VespertineAudio
 import VespertineLibrary
+import VespertineUPnP
+import VespertineTidal
 import Observation
 import SwiftUI
 
@@ -14,6 +17,15 @@ enum SidebarItem: Hashable {
     case albums, artists, songs, genres, recentlyAdded, favorites
     case playlist(Int64)
     case source(Int64)
+    /// The TIDAL section (only while TIDAL is switched on): the catalog, the account's mixes and new releases, the downloads.
+    case tidalSearch, tidalMixes, tidalNewReleases, tidalDownloads
+
+    var isTidal: Bool {
+        switch self {
+        case .tidalSearch, .tidalMixes, .tidalNewReleases, .tidalDownloads: true
+        default: false
+        }
+    }
 }
 
 enum DetailRoute: Hashable {
@@ -183,6 +195,10 @@ final class AppModel {
     let settings: AppSettings
     /// The saved speaker groups; nil unless the Settings switch (Speaker Groups (beta)) is on.
     private(set) var speakerGroups: SpeakerGroupsModel?
+    /// Network renderers; nil unless the Settings switch (Network Players (UPnP, beta)) is on.
+    private(set) var renderers: RendererOutputModel?
+    /// AirPlay receivers; nil unless the Settings switch (AirPlay Players (beta)) is on.
+    private(set) var airPlay: AirPlayOutputModel?
     /// Mac Sound Output (beta): speaker groups published as outputs of the Mac.
     let systemOutput: SystemOutputModel
     let library: LibraryStore
@@ -196,6 +212,8 @@ final class AppModel {
     let dopSetup: DoPSetupModel
     /// The phone remote's server (off until Settings › Remote turns it on).
     let remote: RemoteServer
+    /// The TIDAL account (idle unless Settings › Online › TIDAL integration is on).
+    let tidal: TidalModel
 
     var sidebar: SidebarItem = .albums { didSet { if oldValue != sidebar { path = []; searchText = "" } } }
     var path: [DetailRoute] = [] { didSet { carryFilter(from: oldValue) } }
@@ -277,7 +295,8 @@ final class AppModel {
         filtersURL = isolated ? nil : FilterStore.url(in: settings.dataDirectory)
         systemOutput = SystemOutputModel(isolated: arguments.string(forKey: "VespertineDataDirectory") != nil)
         if let filtersURL { filters = FilterStore.load(from: filtersURL) }
-        library = try LibraryStore(dataDirectory: settings.dataDirectory, automaticScanning: { [weak settings] in settings?.watchFolders ?? false })
+        library = try LibraryStore(dataDirectory: settings.dataDirectory, automaticScanning: { [weak settings] in settings?.watchFolders ?? false },
+                                   includeTidal: settings.tidalEnabled)
         showSetup = Self.needsSetup(settings: settings, library: library, arguments: arguments)
         devices = DeviceStore()
         loopback = LoopbackTest(dataDirectory: settings.dataDirectory)
@@ -290,6 +309,8 @@ final class AppModel {
         dopSetup = DoPSetupModel(settings: settings, player: player)
         remote = RemoteServer(store: RemoteStore(dataDirectory: settings.dataDirectory))
         analysis = AnalysisQueue(library: library, settings: settings, shares: shares)
+        tidal = TidalModel(library: library, settings: settings, availability: tidalAvailability,
+                           environment: Self.tidalEnvironment(settings: settings, arguments: arguments))
         let streaming: @MainActor () -> Bool = { [weak player = self.player, weak shares = self.shares] in
             // Playing from a share, or just asked to (still loading): the network belongs to playback.
             guard let player, let shares, let track = player.current?.track, shares.isNetwork(track) else { return false }
@@ -321,12 +342,20 @@ final class AppModel {
         }
         followChosenOutput()
         player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
+        player.rendererGrace = { [weak self] in self?.renderers?.searching == true || self?.airPlay?.searching == true }
         // Which groups are published decides how long a pause keeps one from the other apps.
         systemOutput.onPublishedChanged = { [weak self] in self?.syncEngine() }
         library.bundlesCopiesByDefault = settings.bundleCopies
+        player.isPlayable = { [weak self] track in self?.playability(of: track).isPlayable ?? true }
         if settings.speakerGroupsFeature {
             speakerGroups = SpeakerGroupsSwitch.apply(true, to: settings, current: nil, onChange: groupsChanged)
             speakerGroups?.followUSBPorts(amongUIDs: devices.devices.map(\.uid))
+        }
+        if settings.upnpRenderersFeature {
+            renderers = RendererSwitch.apply(true, to: settings, current: nil, onChange: { [weak self] in self?.syncEngine() })
+        }
+        if settings.airPlayPlayersFeature {
+            airPlay = AirPlaySwitch.apply(true, to: settings, current: nil, onChange: { [weak self] in self?.syncEngine() })
         }
         syncEngine()
         dopSetup.onChoicesChanged = { [weak self] in self?.syncEngine() }
@@ -335,6 +364,9 @@ final class AppModel {
         analysis.start()
         remote.model = self
         remote.apply()
+        tidal.start()   // nothing while TIDAL is switched off
+        tidalAnalysisHook(settings.tidalEnabled)
+        routeTidal(settings.tidalEnabled)
         // Hand the DAC back when Vespertine quits: stop, release exclusive access, then restore or
         // standardize its format as chosen in Settings. Core Audio decides how long that takes (a device that won't
         // switch rate can hold it for many seconds), so it runs off the main thread and quitting waits for it only
@@ -431,6 +463,8 @@ final class AppModel {
     /// Where the next song would play: the chosen output, or while it isn't connected, the one that stands in for it
     /// (Settings → Playback; nil when set to wait for it, and while playback waits for one that dropped out mid-song).
     var plannedDevice: OutputDevice? {
+        // A network renderer or AirPlay receiver chosen: no Core Audio device plays.
+        if networkOutputChosen { return nil }
         guard let uid = settings.selectedDeviceUID else {
             // Following the Mac's sound output while it is a group published with Mac Sound Output: that group plays.
             if !devices.devices.contains(where: \.isDefault), let groups = speakerGroups?.groups,
@@ -446,9 +480,55 @@ final class AppModel {
 
     /// The chosen output's name while it isn't connected.
     var missingChosenOutput: String? {
+        if networkOutputChosen {
+            return chosenRenderer == nil && chosenAirPlay == nil ? (settings.selectedDevice?.name ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")) : nil
+        }
         if let group = chosenGroup { return groupOutput(group) == nil ? group.name : nil }
         guard let uid = settings.selectedDeviceUID, !devices.devices.contains(where: { $0.uid == uid }) else { return nil }
         return settings.selectedDevice.flatMap { $0.uid == uid ? $0.name : nil } ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
+    }
+
+    /// A network renderer is the chosen output (the feature is on), found on the network or not.
+    var rendererChosen: Bool { renderers != nil && RendererDevice.isRendererUID(settings.selectedDeviceUID) }
+
+    /// The chosen network renderer, while it is on the network.
+    var chosenRenderer: RendererDevice? { rendererChosen ? renderers?.renderer(uid: settings.selectedDeviceUID) : nil }
+
+    /// An AirPlay receiver is the chosen output (the feature is on), found on the network or not.
+    var airPlayChosen: Bool { airPlay != nil && AirPlayDevice.isAirPlayUID(settings.selectedDeviceUID) }
+
+    /// The chosen AirPlay receiver, while it is on the network (and one Vespertine can send to).
+    var chosenAirPlay: AirPlayDevice? { airPlayChosen ? airPlay?.device(uid: settings.selectedDeviceUID) : nil }
+
+    /// What the player is told is missing: a chosen network output without a playback is missing, even when it is on the
+    /// network but its playback couldn't be made, so the music never falls back to the Mac's own output.
+    nonisolated static func missingNetworkOutput(chosen: Bool, hasPlayback: Bool, missing: String?, name: String?) -> String? {
+        guard chosen, !hasPlayback else { return nil }
+        return missing ?? name ?? String(localized: "The selected output", comment: "Stands in for a device's name at the start of a sentence, e.g. “… didn’t come back.”")
+    }
+
+    /// A network output (a UPnP player or an AirPlay receiver) is the chosen output: nothing else plays in its place.
+    var networkOutputChosen: Bool { rendererChosen || airPlayChosen }
+
+    /// The AirPlay Players (beta) switch. Turning it off while a receiver is the chosen output lets go of it first.
+    func setAirPlayFeature(_ on: Bool) {
+        if !AirPlaySwitch.keepsOutput(settings.selectedDeviceUID, turningOnTo: on) {
+            settings.selectedDeviceUID = nil
+            settings.selectedDevice = nil
+        }
+        airPlay = AirPlaySwitch.apply(on, to: settings, current: airPlay, onChange: { [weak self] in self?.syncEngine() })
+        syncEngine()
+    }
+
+    /// The Network Players (UPnP, beta) switch. Turning it off while a renderer is the chosen output lets go of it first (the Mac's sound
+    /// output plays).
+    func setRenderersFeature(_ on: Bool) {
+        if !RendererSwitch.keepsOutput(settings.selectedDeviceUID, turningOnTo: on) {
+            settings.selectedDeviceUID = nil
+            settings.selectedDevice = nil
+        }
+        renderers = RendererSwitch.apply(on, to: settings, current: renderers, onChange: { [weak self] in self?.syncEngine() })
+        syncEngine()
     }
 
     /// The speaker group chosen as the output, when the feature is on and one is.
@@ -525,6 +605,241 @@ final class AppModel {
         syncEngine()
     }
 
+    /// The Settings switch that brings TIDAL into the app (Settings › Online › TIDAL integration, off by default), without a restart.
+    /// Every list, count, album and playlist is read again with the account's songs in it, or without; nothing is deleted. The TIDAL
+    /// model (when there is one) starts and stops with it: it does nothing while this is off.
+    func setTidalEnabled(_ on: Bool) {
+        guard settings.tidalEnabled != on else { return }
+        settings.tidalEnabled = on
+        library.setIncludeTidal(on)
+        if !on {
+            // What is playing or queued from TIDAL goes, and no page is left showing TIDAL content.
+            player.dropTidalTracks()
+            let sources = Set(library.sources.compactMap(\.id))
+            let playlists = Set(((try? library.database.playlists()) ?? []).compactMap(\.id))
+            let (item, route) = Self.navigation(afterTidalOff: sidebar, path: path, sourceIDs: sources, playlistIDs: playlists,
+                                                albumExists: { !library.tracks(albumKey: $0).isEmpty },
+                                                artistExists: { !library.albums(artist: $0).isEmpty })
+            if item != sidebar { sidebar = item }
+            if route != path { path = route }
+        }
+        tidalAnalysisHook(on)
+        routeTidal(on)
+        if on {
+            tidal.start()
+            // One flow (UX amendment 1): Settings › TIDAL, and the login sheet when there is an account to sign in to.
+            settingsTab = .tidal
+            if tidal.state == .signedOut { tidal.wantsLoginSheet = true }
+        } else {
+            tidal.stop()
+            if settingsTab == .tidal { settingsTab = .online }
+        }
+        tidalSwitchChanged?(on)
+    }
+
+    /// Whether the sidebar has its TIDAL section: TIDAL is on, and there is an account (synced, or signed in now).
+    var showsTidalSection: Bool { settings.tidalEnabled && (library.tidalSource != nil || tidal.state.isSignedIn) }
+
+    /// Catalog tracks as the lists show them: the library's row when the library has the track, else a track with no row (it plays
+    /// all the same, and offers Add to Library).
+    func tracks(forCatalog tidalTracks: [TidalTrack]) -> [Track] {
+        for track in tidalTracks { catalogTracks[track.id] = track }
+        let rows = Dictionary(library.tidalRecords.values.map { ($0.tidalId, $0.trackId) }, uniquingKeysWith: { a, _ in a })
+        let known = Dictionary(library.tracks(ids: tidalTracks.compactMap { rows[$0.id] }).compactMap { t in t.id.map { ($0, t) } },
+                               uniquingKeysWith: { a, _ in a })
+        return tidalTracks.map { tidal in
+            if let row = rows[tidal.id].flatMap({ known[$0] }) { return row }
+            var track = Track.tidal(TidalTrackInput(tidal), sourceId: nil)
+            if let probed = player.catalogFormats[tidal.id] {
+                track.applyProbedFormat(codec: probed.codec, sampleRate: probed.sampleRate, bitDepth: probed.bitDepth, channels: probed.channels)
+            }
+            return track
+        }
+    }
+
+    /// The Format column of a row: "≈" while a TIDAL song's format is only what TIDAL lists.
+    func formatLabel(of track: Track) -> (text: String, help: String?) {
+        let probed = URL(string: track.location).flatMap(TidalPlayback.trackId(from:)).map { player.catalogFormats[$0] != nil } ?? false
+        return track.formatLabel(tidal: track.id.flatMap { library.tidalRecords[$0] }, probed: probed)
+    }
+
+    /// The catalog tracks the TIDAL pages listed, by TIDAL id, for the menus of their rows (Add to Library, Download).
+    @ObservationIgnored private(set) var catalogTracks: [Int: TidalTrack] = [:]
+
+    /// The catalog track behind a row with no library id.
+    func catalogTrack(of track: Track) -> TidalTrack? {
+        URL(string: track.location).flatMap(TidalPlayback.trackId(from:)).flatMap { catalogTracks[$0] }
+    }
+
+    /// Downloads catalog tracks (the downloads folder joins the library first, when Settings says so).
+    func download(_ tracks: [TidalTrack]) {
+        guard let downloader = tidal.downloader, !tracks.isEmpty else { return }
+        addTidalDownloadsFolder()
+        downloader.enqueue(tracks: tracks)
+    }
+
+    /// Downloads library TIDAL rows: their tracks are read from TIDAL (one request each, at interactive priority) and queued.
+    func download(libraryTracks tracks: [Track]) {
+        let ids = tracks.filter(\.isTidalTrack).compactMap { URL(string: $0.location).flatMap(TidalPlayback.trackId(from:)) }
+        guard let catalog = tidal.catalog, !ids.isEmpty else { return }
+        Task {
+            var found: [TidalTrack] = []
+            for id in ids {
+                do { found.append(try await catalog.track(id, priority: .interactive)) } catch { tidal.note(error) }
+            }
+            download(found)
+        }
+    }
+
+    func download(album id: Int) {
+        guard let downloader = tidal.downloader else { return }
+        addTidalDownloadsFolder()
+        Task { await downloader.enqueue(album: id) }
+    }
+
+    func download(playlist uuid: String) {
+        guard let downloader = tidal.downloader else { return }
+        addTidalDownloadsFolder()
+        Task { await downloader.enqueue(playlist: uuid) }
+    }
+
+    /// Reads the songs from TIDAL again (interactive priority) and gives their rows TIDAL's current details.
+    func refreshFromTidal(_ tracks: [Track]) {
+        let ids = tracks.filter(\.isTidalTrack).compactMap { URL(string: $0.location).flatMap(TidalPlayback.trackId(from:)) }
+        guard let catalog = tidal.catalog, let userId = tidal.userId, !ids.isEmpty else { return }
+        Task {
+            var inputs: [TidalTrackInput] = []
+            for id in ids {
+                do { inputs.append(TidalTrackInput(try await catalog.track(id, priority: .interactive))) } catch { tidal.note(error) }
+            }
+            guard !inputs.isEmpty, let source = try? library.database.tidalSource(userId: userId).id else { return }
+            try? library.database.upsertTidalTracks(inputs, sourceId: source)
+        }
+    }
+
+    /// Deletes a TIDAL row's downloaded file (to the Trash): the song streams again.
+    func removeDownload(_ tracks: [Track]) {
+        for track in tracks where track.isTidalTrack {
+            guard let id = track.id, let record = library.tidalRecords[id], let path = record.downloadPath else { continue }
+            try? FileManager.default.trashItem(at: URL(fileURLWithPath: path), resultingItemURL: nil)
+            try? library.database.setTidalDownload(tidalId: record.tidalId, path: nil)
+        }
+    }
+
+    /// While TIDAL is on, hearts on TIDAL songs and edits of TIDAL playlists go to TIDAL too (two-way sync); off, everything is local.
+    private func routeTidal(_ on: Bool) {
+        library.tidalRouter = on ? self : nil
+        library.tidalFavoritesChanged = on ? { [weak self] ids, favorite in self?.tidal.favoritesChanged(ids, favorite: favorite) } : nil
+    }
+
+    /// The library playlists that are TIDAL playlists: linked, or being created there.
+    var tidalPlaylistIDs: Set<Int64> {
+        guard settings.tidalEnabled else { return [] }
+        return ((try? library.database.tidalPlaylistIds()) ?? []).union(tidal.pendingCreates)
+    }
+
+    /// Sidebar › Playlists › New TIDAL Playlist…: a playlist here at once, made on TIDAL by the sync queue.
+    func newTidalPlaylist(name: String) -> Playlist? {
+        guard let playlist = library.createPlaylist(name: name), let id = playlist.id else { return nil }
+        tidal.enqueue([.createPlaylist(localId: id, title: name, description: "")])
+        return playlist
+    }
+
+    /// Streamed TIDAL songs are analyzed from their complete staged copy (decision 206), while TIDAL is on.
+    private func tidalAnalysisHook(_ on: Bool) {
+        guard on else { NetworkPlaybackCache.setCompletionHandler(scheme: TidalPlayback.scheme, nil); return }
+        let analysis = self.analysis
+        NetworkPlaybackCache.setCompletionHandler(scheme: TidalPlayback.scheme) { url, file in analysis.analyzeStaged(file: file, url: url) }
+    }
+
+    /// Settings › TIDAL › "Add downloads folder to the library": the folder (made if needed) becomes a library folder, referenced in
+    /// place, so downloaded files are scanned and linked to their TIDAL rows. Turning the setting off leaves a folder already added.
+    func addTidalDownloadsFolder() {
+        guard settings.tidalEnabled, settings.tidalAddDownloadsToLibrary else { return }
+        let url = URL(fileURLWithPath: settings.tidalDownloadsFolder, isDirectory: true)
+        guard !library.sources.contains(where: { $0.path == url.path }) else { return }
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        let library = self.library
+        Task { await library.addFolders([url], mode: .reference, managedRoot: url) }
+    }
+
+    /// The TIDAL model's outside world. A QA run on a test library (`-VespertineDataDirectory`) keeps its credentials file in that
+    /// folder and its session in memory, so it never touches the real account; `-VespertineTidalDemoSession YES` also makes it
+    /// signed in, with every request failing at once (screenshots of the signed-in views without a network).
+    private static func tidalEnvironment(settings: AppSettings, arguments: LaunchArguments) -> TidalModel.Environment {
+        var environment = TidalModel.Environment.live
+        guard arguments.string(forKey: "VespertineDataDirectory") != nil else { return environment }
+        environment.credentialsURL = settings.dataDirectory.appendingPathComponent("tidal-client.json")
+        if arguments.bool(forKey: "VespertineTidalDemoSession") {
+            environment.tokens = MemoryTokenStore(TidalTokens(accessToken: "qa", refreshToken: "qa", expiresAt: .distantFuture,
+                                                              userId: 1, countryCode: "US"))
+            environment.transport = RefusingTransport()
+        } else {
+            environment.tokens = MemoryTokenStore()
+        }
+        return environment
+    }
+
+    /// Where the window goes when TIDAL is switched off: a source or playlist that is gone sends the sidebar to Albums, and a page
+    /// about an album or artist that is gone (TIDAL's) clears the pages above the list.
+    static func navigation(afterTidalOff sidebar: SidebarItem, path: [DetailRoute], sourceIDs: Set<Int64>, playlistIDs: Set<Int64>,
+                           albumExists: (String) -> Bool, artistExists: (String) -> Bool) -> (SidebarItem, [DetailRoute]) {
+        switch sidebar {
+        case let item where item.isTidal: return (.albums, [])
+        case .source(let id) where !sourceIDs.contains(id): return (.albums, [])
+        case .playlist(let id) where !playlistIDs.contains(id): return (.albums, [])
+        default: break
+        }
+        let gone = path.contains { route in
+            switch route {
+            case .album(let key), .albumFamily(let key): !albumExists(key)
+            case .artist(let name): !artistExists(name)
+            case .genre: false
+            }
+        }
+        return (sidebar, gone ? [] : path)
+    }
+
+    /// Told after `setTidalEnabled`, for what the switch starts and stops (the TIDAL model's reader, sync and downloads).
+    @ObservationIgnored var tidalSwitchChanged: ((Bool) -> Void)?
+
+    /// Whether TIDAL can stream now (signed in, reachable, not asked to wait), for `playability(of:)`.
+    let tidalAvailability = TidalAvailability()
+
+    /// Where a song comes from, for the Source column.
+    func trackSource(of track: Track) -> TrackSource {
+        let source = track.isTidalTrack ? library.tidalSource : library.sources.first { $0.id == track.sourceId }
+        return TrackSource.of(track: track, source: source, tidal: track.id.flatMap { library.tidalRecords[$0] })
+    }
+
+    /// Whether `track` can play right now, and if not, why. Only TIDAL songs can be unavailable here (a share has its own offline copies
+    /// and errors, which the rule can't see), and only while TIDAL is on: with it off every song is as it always was.
+    func playability(of track: Track) -> Playability {
+        guard library.includesTidal, track.isTidalTrack else { return .playable }
+        // A row asks several times (each of its cells does). What the answer depends on is read first, so views that ask are redrawn
+        // when it changes; the answer itself is kept for a few seconds (it looks at the file system for a downloaded song).
+        let stamp = PlayabilityStamp(records: library.tidalRecordsVersion, signedIn: tidalAvailability.signedIn,
+                                     reachable: tidalAvailability.reachable, backingOff: tidalAvailability.backingOff)
+        if let id = track.id, let hit = playabilityCache[id], hit.stamp == stamp, Date().timeIntervalSince(hit.at) < 5 { return hit.answer }
+        let answer = Playability.playability(track: track, source: library.tidalSource, tidal: track.id.flatMap { library.tidalRecords[$0] },
+                                             signedIn: stamp.signedIn, reachable: stamp.reachable, backingOff: stamp.backingOff,
+                                             fileExists: { FileManager.default.fileExists(atPath: $0) })
+        if let id = track.id {
+            if playabilityCache.count > 20_000 { playabilityCache.removeAll() }
+            playabilityCache[id] = (stamp, Date(), answer)
+        }
+        return answer
+    }
+
+    private struct PlayabilityStamp: Equatable { var records: Int; var signedIn: Bool; var reachable: Bool; var backingOff: Bool }
+    @ObservationIgnored private var playabilityCache: [Int64: (stamp: PlayabilityStamp, at: Date, answer: Playability)] = [:]
+
+    /// Whether every song of an album copy can play now: the album's default copy is never one that can't (a streamed TIDAL copy while
+    /// TIDAL is out of reach) when another can. Only TIDAL songs can fail, so without TIDAL every copy passes.
+    var copyCanPlay: (AlbumCopy) -> Bool {
+        { [self] copy in !library.includesTidal || copy.tracks.allSatisfy { playability(of: $0).isPlayable } }
+    }
+
     /// The transitions master switch (Controls › Transitions, ⌥⌘X, the transport bar, Up Next). It applies from the next
     /// boundary (one already mixed is taken back while it can be). The first time it's turned on, a note says what it changes.
     func setTransitions(_ on: Bool) {
@@ -570,6 +885,22 @@ final class AppModel {
 
     /// Controls › Volume Up, Volume Down, Mute. Only the output Vespertine plays to: never the Mac's sound output.
     func adjustVolume(_ action: VolumeControls.Action) {
+        if let receiver = chosenAirPlay {
+            // An AirPlay receiver: the level is its own volume, or Vespertine's digital volume when chosen so.
+            settings.applyAirPlayVolume(action, uid: receiver.uid)
+            syncEngine()
+            return
+        }
+        if let renderer = chosenRenderer {
+            // A renderer's volume moves only once unlocked (Vespertine's digital volume); locked, the note says why.
+            if settings.rendererVolumeUnlocked.contains(renderer.uid) {
+                settings.applyVolume(action, for: renderer.uid)
+                syncEngine()
+            } else {
+                volumeNoteRequests += 1
+            }
+            return
+        }
         guard let device = activeDevice else { return }
         switch volumeRoute {
         case .software:
@@ -591,6 +922,17 @@ final class AppModel {
         player.engine.update(settings: engineSettings)
         systemOutput.sync(groups: engineSettings.speakerGroups, settings: engineSettings)
         devices.watchVolume(of: device)
+        // A network renderer plays in place of the engine while one is chosen and on the network.
+        // Chosen and not on the network: nothing plays anywhere else in its place (decision 119).
+        let renderer = chosenRenderer
+        let rendererPlayback = renderers?.playback(for: renderer, settings: renderer.map { settings.rendererSettings(uid: $0.uid) } ?? RendererSettings())
+        // An AirPlay receiver likewise (decision 614): chosen and gone, nothing plays anywhere else.
+        let receiver = chosenAirPlay
+        let airPlayPlayback = airPlay?.playback(for: receiver, settings: receiver.map { settings.airPlaySettings(uid: $0.uid) } ?? RendererSettings(),
+                                                receiverVolumeDB: receiver.map { settings.airPlayReceiverVolumeDB(uid: $0.uid) } ?? 0)
+        let playback: (any NetworkPlayback)? = rendererPlayback ?? airPlayPlayback
+        player.useRenderer(playback, missing: Self.missingNetworkOutput(chosen: networkOutputChosen, hasPlayback: playback != nil, missing: missingChosenOutput,
+                                                                     name: receiver?.name ?? renderer?.name ?? settings.selectedDevice?.name))
         player.resolveVersions()
     }
 
@@ -600,7 +942,8 @@ final class AppModel {
         let copies = library.albumCopies(albumKey: albumKey)
         guard copies.copies.count > 1 else { return copies.copies.first?.tracks ?? library.tracks(albumKey: albumKey) }
         let wanted = outputWantsMultichannel() ?? true
-        if let copy = copies.selected(library.copyChoice(albumKey: albumKey), multichannel: wanted, isLocal: { [shares] in !$0.tracks.contains(where: shares.isNetwork) }) {
+        if let copy = copies.selected(library.copyChoice(albumKey: albumKey), multichannel: wanted, isLocal: { [shares] in !$0.tracks.contains(where: shares.isNetwork) },
+                           isPlayable: copyCanPlay) {
             return copy.tracks
         }
         return copies.songs.map { song in
@@ -641,6 +984,8 @@ final class AppModel {
     func selectDevice(_ uid: String?) {
         settings.selectedDeviceUID = uid
         settings.selectedDevice = uid.flatMap { uid in devices.devices.first { $0.uid == uid } }.map { OutputIdentity($0) }
+            ?? renderers?.renderer(uid: uid).map { OutputIdentity(uid: $0.uid, name: $0.name, manufacturer: $0.description.manufacturer) }
+            ?? airPlay?.device(uid: uid).map { OutputIdentity(uid: $0.uid, name: $0.name, manufacturer: $0.model ?? "") }
             ?? (uid == settings.selectedDevice?.uid ? settings.selectedDevice : nil)
         syncEngine()
     }
@@ -722,5 +1067,61 @@ final class AppModel {
         let mode = pendingImportMode
         let root = URL(fileURLWithPath: settings.managedFolderPath, isDirectory: true)
         Task { await library.addFolders(urls, mode: mode, managedRoot: root) }
+    }
+}
+
+// MARK: - TIDAL playlists
+
+extension AppModel: TidalPlaylistRouter {
+    func isTidalPlaylist(_ id: Int64) -> Bool { tidalPlaylistIDs.contains(id) }
+
+    private func tidalId(_ track: Track) -> Int? {
+        track.isTidalTrack ? URL(string: track.location).flatMap(TidalPlayback.trackId(from:)) : nil
+    }
+
+    func append(_ trackIDs: [Int64], to playlist: Int64) {
+        let byId = Dictionary(library.tracks(ids: trackIDs).compactMap { t in t.id.map { ($0, t) } }, uniquingKeysWith: { a, _ in a })
+        let tracks = trackIDs.compactMap { byId[$0] }
+        let plan = TidalRouting.additions(tracks.compactMap { t in t.id.map { ($0, tidalId(t)) } })
+        let tidalRows = tracks.filter { tidalId($0) != nil }.compactMap(\.id)
+        if !tidalRows.isEmpty {
+            try? library.database.append(trackIDs: tidalRows, to: playlist)
+            tidal.enqueue([.add(playlist: playlist, trackIds: plan.tidal)])
+        }
+        // Local songs: their TIDAL version by ISRC, added in their place; refused when there is none (decision 300).
+        let local = plan.needsLookup.compactMap { byId[$0] }
+        guard !local.isEmpty else { library.bumpRevision(); return }
+        Task {
+            for track in local {
+                guard let found = await tidal.tidalVersion(isrc: track.isrc), let userId = tidal.userId,
+                      let source = try? library.database.tidalSource(userId: userId).id,
+                      let row = (try? library.database.addTidalTracks([TidalTrackInput(found)], sourceId: source))?[found.id] else {
+                    tidal.notice = TidalISRCLookup.refusal
+                    continue
+                }
+                try? library.database.append(trackIDs: [row], to: playlist)
+                tidal.enqueue([.add(playlist: playlist, trackIds: [found.id])])
+                tidal.notice = TidalISRCLookup.addedMessage(title: track.title)
+            }
+            library.bumpRevision()
+        }
+    }
+
+    func reordered(_ playlist: Int64, from old: [Int], to new: [Int]) {
+        let ops: [TidalOp] = TidalRouting.edits(from: old, to: new).map { edit in
+            switch edit {
+            case .remove(let trackId, let index): .remove(playlist: playlist, trackId: trackId, index: index)
+            case .move(let from, let to): .move(playlist: playlist, from: from, to: to)
+            }
+        }
+        if !ops.isEmpty { tidal.enqueue(ops) }
+    }
+
+    func renamed(_ playlist: Int64, to name: String) {
+        tidal.enqueue([.edit(playlist: playlist, title: name, description: "")])
+    }
+
+    func deleted(uuid: String) {
+        tidal.enqueue([.delete(uuid: uuid)])
     }
 }
