@@ -19,13 +19,13 @@ The 1.0 description ends with "It does not play music on this device" and "The d
 
 **Subtitle (30 max)**
 
-1. `Your Mac's music, here or there` (30) — recommended
+1. `Your Mac's music, here or there` (30) (recommended)
 2. `Hi-res player and Mac remote` (28)
 3. `Remote for Vespertine on Mac` (28, the 1.0 line; undersells the player)
 
 **Promotional text (170 max)**
 
-1. `Play your Mac's hi-res library on your iPhone, or control Vespertine on the Mac from across the room. Requires Vespertine on your Mac.` (133) — recommended
+1. `Play your Mac's hi-res library on your iPhone, or control Vespertine on the Mac from across the room. Requires Vespertine on your Mac.` (133) (recommended)
 2. `Your whole Vespertine library on your iPhone and iPad: play it here, or run the Mac from the sofa. Requires Vespertine on your Mac.`
 3. Keep the 1.0 text.
 
@@ -51,7 +51,7 @@ Replace the closing lines with: `The built-in demo opens a made-up library and p
 
 **What's New**
 
-1. `Play your Mac's library on this iPhone or iPad: lossless, with the screen locked, on headphones or a USB DAC. Keep albums for when the Mac is away. Sort and filter albums, grouped search, add to playlists. Now in 44 languages.` — recommended
+1. `Play your Mac's library on this iPhone or iPad: lossless, with the screen locked, on headphones or a USB DAC. Keep albums for when the Mac is away. Sort and filter albums, grouped search, add to playlists. Now in 44 languages.` (recommended)
 2. A shorter one: `Vespertine now plays on your iPhone and iPad, not only on your Mac.`
 
 Do not say "bit-perfect", "Spatial Audio" or "gapless on a DAC" anywhere in the listing until the matching bench row has passed.
@@ -103,5 +103,7 @@ read, timestamps are not). If an upload comes back with ITMS-91053, add the API 
 
 ## Version
 
-`RemoteApp/project.yml` is at **1.1 (6)** on this branch. The remote-only 1.0 (4) on TestFlight is untouched; whether 1.0 goes to
-the store first or 1.1 is the first store release is Alex's call (open question Q1).
+`RemoteApp/project.yml` is at **1.0 (6)** on this branch: the marketing version stays 1.0 until the first store release, and each
+TestFlight upload takes the next build number. The remote-only 1.0 (4) on TestFlight is untouched; whether that goes to the store
+first, or the app with the player is the first store release (and under which version), is Alex's call (open question Q1). This
+folder is named for the release the handoff calls 1.1.
