@@ -74,17 +74,90 @@ public enum RouteChangePolicy {
 
     /// Headphones unplugged or a Bluetooth device gone: pause, so the music doesn't carry on from the speaker.
     public static func pauses(reason: Reason) -> Bool { reason == .oldDeviceUnavailable }
+
+    /// The output changed under the player (iOS can say so before it says why). A DAC, headphones or an AirPlay speaker
+    /// giving way to the device's own speaker, or to nothing, pauses: the music is never carried on from the speaker.
+    public static func pauses(from old: PhoneRoute?, to new: PhoneRoute?) -> Bool {
+        guard let old, !old.isBuiltIn else { return false }
+        return new?.isBuiltIn ?? true
+    }
+}
+
+/// Getting a DAC to the song's rate. iOS doesn't say which rates an output has: the app asks, waits a moment and reads back
+/// what it got. Declined, it asks for the next best: the song's rate halved, and halved again, so what iOS then has to do
+/// is the simplest conversion there is (352.8 kHz to 176.4, not to 48).
+public struct RateLadder: Sendable, Equatable {
+    private var route: String?
+    private var song: Double = 0
+    private var asked: [Double] = []
+
+    public init() {}
+
+    /// The song's rate, then its halves down to the CD-era rates: 192 → 96 → 48; 176.4 → 88.2 → 44.1.
+    public static func rungs(for rate: Double) -> [Double] {
+        guard rate > 0 else { return [] }
+        var rungs = [rate], next = rate / 2
+        while next >= 44_100 - 0.5 {
+            rungs.append(next)
+            next /= 2
+        }
+        return rungs
+    }
+
+    /// The rate asked for last, while iOS hasn't been seen to answer.
+    public var pending: Double? { asked.last }
+
+    /// A song is playing on `route`: the rate to ask for now, or nil when there is nothing (new) to ask. Asking again for
+    /// the same song on the same output returns nil: `declined` moves down the ladder.
+    public mutating func begin(route: PhoneRoute, songRate: Double) -> Double? {
+        guard !route.hasFixedRate, songRate > 0 else {
+            self = RateLadder()
+            return nil
+        }
+        if self.route == route.name, abs(song - songRate) < 0.5 { return nil }
+        self.route = route.name
+        song = songRate
+        asked = []
+        guard abs(route.sampleRate - songRate) > 0.5 else { return nil }
+        asked = [songRate]
+        return songRate
+    }
+
+    /// A moment after asking: what `route` runs at now. Returns the next rate to ask for, or nil when iOS gave the rate
+    /// asked for (or the song's), or there is nothing lower to try.
+    public mutating func declined(route: PhoneRoute) -> Double? {
+        guard self.route == route.name, let last = asked.last else { return nil }
+        if abs(route.sampleRate - last) < 0.5 || abs(route.sampleRate - song) < 0.5 { return nil }
+        guard let next = Self.rungs(for: song).first(where: { rung in !asked.contains { abs($0 - rung) < 0.5 } }) else { return nil }
+        // Already there, by luck: nothing to ask.
+        asked.append(next)
+        return abs(route.sampleRate - next) < 0.5 ? nil : next
+    }
+
+    /// The output changed (unplugged, another DAC): the next song starts from the top.
+    public mutating func forget() { self = RateLadder() }
 }
 
 extension PhoneRoute {
     /// Headphones of some kind: Bluetooth, the headphone jack or adapter, or a USB DAC (which usually feeds headphones from
     /// a phone).
-    public var isHeadphones: Bool { isBluetooth || isUSB || portType == "Headphones" }
+    public var isHeadphones: Bool { isBluetooth || (isUSB && !isMultichannel) || portType == "Headphones" }
+
+    /// An interface or a receiver with more than two outputs: a surround song's channels each go to an output of their own.
+    public var isMultichannel: Bool { (isUSB || portType == "HDMI") && channels > 2 }
+
+    /// The number of output channels to ask iOS for so a song of `songChannels` channels plays on outputs of its own: only
+    /// for surround, only on an output that has more channels than it runs with now.
+    public func channelsToAsk(for songChannels: Int) -> Int? {
+        guard isUSB || portType == "HDMI", songChannels > 2, maximumChannels > channels else { return nil }
+        let wanted = min(songChannels, maximumChannels)
+        return wanted > channels ? wanted : nil
+    }
 
     /// How a surround song is played on this output when you asked for `wanted`: rendered for headphones only on
     /// headphones, head tracked only where the headphones follow your head, folded to stereo everywhere else.
     public func surroundMode(wanted: SpatialModeChoice) -> SpatialModeChoice {
-        guard isHeadphones, wanted != .off else { return .off }
+        guard isHeadphones, !isMultichannel, wanted != .off else { return .off }
         return wanted == .headTracked && !spatial ? .fixed : wanted
     }
 

@@ -67,13 +67,18 @@ public final class StreamDecoder: @unchecked Sendable {
     private let box: SourceBox
     private let audioFile: AudioFileID
     private let extFile: ExtAudioFileRef
+    /// Surround going to outputs of its own (`outputs` was given), rather than onto a bed for Apple's mixer.
+    public let isDiscrete: Bool
     /// Surround only: what ExtAudioFile decodes into (the file's channels, in the file's order) and where each goes on the bed.
     private let decodeFormat: AVAudioFormat?
     private let router: BedRouter?
     private var scratch: AVAudioPCMBuffer?
 
     /// Opens the song. Blocks while the first bytes arrive (and, for a file whose index is at its end, those too).
-    public init(source: any ByteSource, format: StreamFormat) throws {
+    /// `outputs`: the speaker on each channel of a multichannel output (`ChannelLayouts.outputSpeakers`). With it, a surround
+    /// song is decoded straight onto those channels, each on its own speaker's output, and `processingFormat` has that many
+    /// channels in the output's order. Stereo and mono are never touched by it.
+    public init(source: any ByteSource, format: StreamFormat, outputs: [AudioChannelLabel]? = nil) throws {
         let box = SourceBox(source)
         var file: AudioFileID?
         let opened = AudioFileOpenWithCallbacks(Unmanaged.passUnretained(box).toOpaque(), readBytes, nil, sizeOfBytes, nil,
@@ -96,7 +101,7 @@ public final class StreamDecoder: @unchecked Sendable {
         guard status == noErr, description.mSampleRate > 0, description.mChannelsPerFrame > 0 else { throw fail(status) }
         let channels = Int(description.mChannelsPerFrame)
         let labels = format.channels == channels ? format.channelLabels : nil
-        guard let plan = Self.plan(sampleRate: description.mSampleRate, channels: channels, labels: labels) else {
+        guard let plan = Self.plan(sampleRate: description.mSampleRate, channels: channels, labels: labels, outputs: outputs) else {
             throw fail(kAudioFileUnsupportedDataFormatError)
         }
         let processing = plan.processing
@@ -116,6 +121,7 @@ public final class StreamDecoder: @unchecked Sendable {
         decodeFormat = plan.decode
         router = plan.router
         speakers = plan.speakers
+        isDiscrete = plan.discrete
         length = frames
     }
 
@@ -179,17 +185,30 @@ public final class StreamDecoder: @unchecked Sendable {
         var decode: AVAudioFormat?
         var router: BedRouter?
         var speakers: [AudioChannelLabel]?
+        var discrete = false
     }
 
     /// How a song of `channels` channels is decoded. Stereo and mono: as they are. Surround: onto the smallest bed Apple's
     /// spatial mixer takes that has a place for every speaker, with the speakers the Mac named, or, when it named none, the
     /// order FLAC and WAVE files use for that many channels. nil when the speakers can't be known (more than eight, unnamed).
-    static func plan(sampleRate: Double, channels: Int, labels: [UInt32]?) -> Plan? {
+    ///
+    /// With `outputs` (a multichannel interface's speakers), surround goes onto those channels instead: its own speaker's
+    /// output for each channel, the nearest ones for a speaker the interface lacks (7.1's back pair on a 5.1's surrounds,
+    /// at -3 dB as ITU-R BS.775 folds them).
+    static func plan(sampleRate: Double, channels: Int, labels: [UInt32]?, outputs: [AudioChannelLabel]? = nil) -> Plan? {
         if channels <= 2 {
             return AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: AVAudioChannelCount(channels), interleaved: false)
                 .map { Plan(processing: $0) }
         }
         let named = labels.flatMap { $0.count == channels ? ChannelLayouts.speakerLabels($0) : nil }
+        if let outputs, outputs.count > 2, let speakers = named ?? ChannelLayouts.wavOrderLabels(channels: channels), speakers.count == channels,
+           let router = BedRouter(source: speakers, bed: outputs, foldGain: Float(0.5.squareRoot())),
+           let out = AVAudioChannelLayout(layoutTag: kAudioChannelLayoutTag_DiscreteInOrder | AudioChannelLayoutTag(outputs.count)),
+           let discrete = AVAudioChannelLayout(layoutTag: kAudioChannelLayoutTag_DiscreteInOrder | AudioChannelLayoutTag(channels)) {
+            return Plan(processing: AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, interleaved: false, channelLayout: out),
+                        decode: AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, interleaved: false, channelLayout: discrete),
+                        router: router, speakers: speakers, discrete: true)
+        }
         guard let speakers = named ?? ChannelLayouts.wavOrderLabels(channels: channels), speakers.count == channels,
               let bed = ChannelLayouts.spatialBed(for: speakers), let layout = AVAudioChannelLayout(layoutTag: bed.tag),
               let router = BedRouter(source: speakers, bed: layout.channelLabels),

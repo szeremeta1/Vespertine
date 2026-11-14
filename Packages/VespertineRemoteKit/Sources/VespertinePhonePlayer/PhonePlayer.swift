@@ -63,6 +63,8 @@ public final class PhonePlayer {
         case downmix
         /// Surround rendered for headphones by Apple's spatial mixer.
         case spatial(headTracked: Bool)
+        /// Surround on a multichannel output, each channel on an output of its own, with no mixer in the path.
+        case discrete(outputs: Int)
     }
     public private(set) var rendering: Rendering = .untouched
 
@@ -76,6 +78,19 @@ public final class PhonePlayer {
         }
     }
     @ObservationIgnored private var environment: AVAudioEnvironmentNode?
+
+    /// The speaker on each channel of the output, when it has more than two (`ChannelLayouts.outputSpeakers`): surround
+    /// songs then go to those channels, one each, instead of being rendered for headphones or folded. nil for a stereo
+    /// output. Changing it while a surround song plays carries on from the same place.
+    public var outputSpeakers: [AudioChannelLabel]? {
+        didSet {
+            guard outputSpeakers != oldValue else { return }
+            pump.setOutputs(outputSpeakers)
+            if (format?.channels ?? 0) > 2 { reopen() }
+        }
+    }
+    /// The player node feeds the output itself (discrete surround), with the main mixer out of the path.
+    @ObservationIgnored private var direct = false
 
     /// Seconds of audio decoded ahead of what is being heard.
     @ObservationIgnored public var scheduleAhead: Double = 2 { didSet { pump.setAhead(seconds: scheduleAhead) } }
@@ -138,9 +153,28 @@ public final class PhonePlayer {
     /// until its first audio is decoded); a failure arrives through `onFailure`.
     public func start(_ item: Item, playing: Bool = true) {
         halt()
+        begin(item, playing: playing, at: 0)
+    }
+
+    /// Opens the current song again where it is: the way its channels are decoded depends on the output.
+    private func reopen() {
+        guard let item = current, state == .ready || state == .playing || state == .paused else { return }
+        let was = state, place = position, rate = pump.sampleRate()
+        node.stop()
+        held = nil
+        finished = false
+        isBuffering = false
+        begin(item, playing: was == .playing, at: Int64(place * rate))
+        if was == .paused, state == .ready {
+            state = .paused
+            held = place
+        }
+    }
+
+    private func begin(_ item: Item, playing: Bool, at frame: Int64) {
         if item.source.isComplete {
             do {
-                try prime(item, at: 0)
+                try prime(item, at: frame)
                 state = .ready
                 if playing { try play() }
             } catch {
@@ -157,7 +191,7 @@ public final class PhonePlayer {
         let generation = pump.reset(keepingNext: false)
         pump.queue.async { [pump] in
             do {
-                try pump.open(item, generation, at: 0)
+                try pump.open(item, generation, at: frame)
                 pump.send(.opened(generation))
             } catch {
                 pump.send(.failed(generation, error))
@@ -185,12 +219,23 @@ public final class PhonePlayer {
     private func connect() {
         guard let processing = pump.processingFormat() else { return }
         duration = pump.duration(of: currentID)
+        let discrete = pump.isDiscrete()
+        // The output's own connection is about to change (or the node on it): not under a running engine.
+        if discrete || direct, engine.isRunning { engine.stop() }
         engine.disconnectNodeOutput(node)
         if let environment { engine.disconnectNodeOutput(environment) }
         engine.mainMixerNode.outputVolume = 1
         node.volume = 1
         node.pan = 0
-        if processing.channelCount > 2, spatialMode != .off {
+        if discrete != direct {
+            if !discrete { engine.connect(engine.mainMixerNode, to: engine.outputNode, format: nil) }
+            direct = discrete
+        }
+        if discrete {
+            // Every channel to an output of its own: the player node feeds the output, and nothing mixes.
+            engine.connect(node, to: engine.outputNode, format: processing)
+            rendering = .discrete(outputs: Int(processing.channelCount))
+        } else if processing.channelCount > 2, spatialMode != .off {
             // Surround for headphones: the song's bed into Apple's spatial mixer, two binaural channels out.
             let mixer = environment ?? {
                 let made = AVAudioEnvironmentNode()
@@ -428,6 +473,8 @@ private final class Pump: @unchecked Sendable {
     private var next: (item: PhonePlayer.Item, decoder: StreamDecoder?)?
     private var known: [String: (item: PhonePlayer.Item, frames: Int64, rate: Double)] = [:]
     private var decoder: StreamDecoder?
+    /// The speakers of a multichannel output: surround is decoded onto them.
+    private var outputs: [AudioChannelLabel]?
 
     private let completion: AVAudioPlayerNodeCompletionCallbackType
 
@@ -456,6 +503,8 @@ private final class Pump: @unchecked Sendable {
     func setAhead(seconds: Double) { lock.withLock { aheadSeconds = max(0.25, seconds) } }
     func isStarving() -> Bool { lock.withLock { starving } }
     func processingFormat() -> AVAudioFormat? { lock.withLock { decoder?.processingFormat } }
+    func isDiscrete() -> Bool { lock.withLock { decoder?.isDiscrete ?? false } }
+    func setOutputs(_ speakers: [AudioChannelLabel]?) { lock.withLock { outputs = speakers } }
     func sampleRate() -> Double { lock.withLock { decoder?.processingFormat.sampleRate ?? 0 } }
     func item(_ id: String) -> PhonePlayer.Item? { lock.withLock { known[id]?.item } }
 
@@ -500,7 +549,8 @@ private final class Pump: @unchecked Sendable {
         guard let item else { return }
         // Opened ahead of time, off the decoding thread: its first bytes may still be on their way.
         prepare.async { [self] in
-            guard let opened = try? StreamDecoder(source: item.source, format: item.format) else { return }
+            let outputs = lock.withLock { self.outputs }
+            guard let opened = try? StreamDecoder(source: item.source, format: item.format, outputs: outputs) else { return }
             let revive: Int? = lock.withLock {
                 guard next?.item.id == item.id, next?.decoder == nil else { return nil }
                 next?.decoder = opened
@@ -538,7 +588,7 @@ private final class Pump: @unchecked Sendable {
     // MARK: On the decoding queue
 
     func open(_ item: PhonePlayer.Item, _ mine: Int, at frame: Int64) throws {
-        let opened = try StreamDecoder(source: item.source, format: item.format)
+        let opened = try StreamDecoder(source: item.source, format: item.format, outputs: lock.withLock { outputs })
         if frame > 0 { try opened.seek(to: frame) }
         lock.withLock {
             guard generation == mine else { return }
