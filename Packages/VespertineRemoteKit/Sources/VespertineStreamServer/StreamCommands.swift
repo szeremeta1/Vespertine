@@ -37,8 +37,8 @@ extension StreamPreparer {
         switch command {
         case .streamInfo(let ids, let maxSampleRate):
             return .reply(.streamInfo(items: await info(ids: ids, maxSampleRate: maxSampleRate)))
-        case .streamOpen(let song, let maxSampleRate):
-            switch await open(client: client, id: song, maxSampleRate: maxSampleRate) {
+        case .streamOpen(let song, let maxSampleRate, let smaller):
+            switch await open(client: client, id: song, maxSampleRate: maxSampleRate, smaller: smaller ?? false) {
             case .ready(let descriptor): return .reply(.streamOpened(descriptor))
             case .preparing(let progress): return .reply(.streamPreparing(progress: progress))
             case .failed(let reason): return .reply(.failed(reason: reason))

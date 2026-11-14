@@ -85,9 +85,9 @@ public actor StreamPreparer {
 
     // MARK: Open
 
-    public func open(client: String, id: Int64, maxSampleRate: Double?) async -> Opened {
+    public func open(client: String, id: Int64, maxSampleRate: Double?, smaller: Bool = false) async -> Opened {
         guard let facts = await source(id) else { return .failed("That song isn’t in the Mac’s library.") }
-        let plan = StreamPlanner.plan(facts, maxSampleRate: maxSampleRate)
+        let plan = StreamPlanner.plan(facts, maxSampleRate: maxSampleRate, smaller: smaller)
         guard let kind = plan.kind, var delivered = plan.delivered else { return .failed(plan.macOnlyReason ?? "This can’t be streamed.") }
         switch kind {
         case .original:

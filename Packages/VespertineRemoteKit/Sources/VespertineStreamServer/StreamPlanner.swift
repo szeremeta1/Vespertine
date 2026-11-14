@@ -36,7 +36,8 @@ public enum StreamPlanner {
     /// The highest rate a DSD conversion makes unless the phone allows more.
     public static let defaultDSDCeiling = 192_000.0
 
-    public static func plan(_ facts: StreamSourceFacts, maxSampleRate: Double?) -> StreamPlan {
+    /// `smaller`: the phone keeps this song and asked for less of it: a lossless file above `maxSampleRate` is converted down.
+    public static func plan(_ facts: StreamSourceFacts, maxSampleRate: Double?, smaller: Bool = false) -> StreamPlan {
         let source = sourceFormat(facts)
         guard facts.channels >= 1, facts.channels <= maximumChannels else {
             return StreamPlan(kind: nil, delivered: nil, transcode: nil,
@@ -47,9 +48,11 @@ public enum StreamPlanner {
         let insideNeedsMac = macDecodedCodecs.contains { facts.codec.uppercased().contains($0) }
         let mustConvert = facts.needsMacDecoder || facts.isRegion || facts.isDSD || nativeContainer == nil || insideNeedsMac
         let tooDeep = ext == "flac" && (facts.bitDepth ?? 0) > 24
-        let tooWide = facts.channels > 2 && maxSampleRate.map { facts.sampleRate > $0 + 0.5 } == true
+        let aboveRate = maxSampleRate.map { facts.sampleRate > $0 + 0.5 } == true
+        let tooWide = facts.channels > 2 && aboveRate
+        let tooBig = smaller && facts.isLossless && aboveRate
 
-        if !mustConvert && !tooDeep && !tooWide, let container = nativeContainer {
+        if !mustConvert && !tooDeep && !tooWide && !tooBig, let container = nativeContainer {
             let delivered = StreamFormat(codec: source.codec, container: container, sampleRate: facts.sampleRate, bitDepth: facts.bitDepth,
                                          channels: facts.channels, channelLabels: nil, lossless: facts.isLossless)
             return StreamPlan(kind: .original, delivered: delivered, transcode: nil, macOnlyReason: nil)

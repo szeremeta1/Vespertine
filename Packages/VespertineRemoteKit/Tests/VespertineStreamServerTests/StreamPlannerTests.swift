@@ -31,6 +31,23 @@ private func facts(_ ext: String, codec: String? = nil, rate: Double = 44_100, d
         #expect(plan.kind == .original)
     }
 
+    @Test func askedForTheSmallerFormALosslessFileAboveTheRateIsConvertedDown() {
+        // "Keep smaller copies": a 24/192 album kept on the phone at 24/48 takes a quarter of the room.
+        let plan = StreamPlanner.plan(facts("flac", rate: 192_000, depth: 24), maxSampleRate: 48_000, smaller: true)
+        #expect(plan.kind == .flac)
+        #expect(plan.transcode?.sampleRate == 48_000 && plan.transcode?.bitDepth == 24 && plan.transcode?.channels == 2)
+        // 88.2 kHz stays in its family.
+        #expect(StreamPlanner.plan(facts("wav", rate: 88_200, depth: 24), maxSampleRate: 48_000, smaller: true).transcode?.sampleRate == 44_100)
+    }
+
+    @Test func theSmallerFormLeavesAloneWhatIsAlreadySmall() {
+        // At or under the rate, and anything lossy (converting an MP3 to FLAC would only make it bigger).
+        #expect(StreamPlanner.plan(facts("flac", rate: 44_100), maxSampleRate: 48_000, smaller: true).kind == .original)
+        #expect(StreamPlanner.plan(facts("flac", rate: 48_000, depth: 24), maxSampleRate: 48_000, smaller: true).kind == .original)
+        #expect(StreamPlanner.plan(facts("mp3", lossless: false), maxSampleRate: 48_000, smaller: true).kind == .original)
+        #expect(StreamPlanner.plan(facts("flac", rate: 192_000, depth: 24), maxSampleRate: nil, smaller: true).kind == .original)
+    }
+
     @Test func aMultichannelFileAboveThePhonesRateIsConvertedDownOnTheMac() {
         // 7.1 at 24/192 is 36 Mbit/s raw; AirPods render at 48 kHz anyway.
         let plan = StreamPlanner.plan(facts("flac", rate: 192_000, depth: 24, channels: 8), maxSampleRate: 48_000)

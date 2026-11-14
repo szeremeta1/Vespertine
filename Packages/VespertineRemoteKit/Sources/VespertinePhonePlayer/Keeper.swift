@@ -137,7 +137,8 @@ public final class Keeper {
         let deadline = ContinuousClock.now + preparingTimeout
         while true {
             try Task.checkCancellation()
-            switch await client.open(song, rate) {
+            let reply = if let rate, let smaller = client.openSmaller { await smaller(song, rate) } else { await client.open(song, rate) }
+            switch reply {
             case .streamOpened(let descriptor): return descriptor
             case .streamPreparing:
                 guard ContinuousClock.now < deadline else { throw Refusal.refused }

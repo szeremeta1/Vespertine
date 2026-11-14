@@ -172,7 +172,9 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     /// for AirPods), which a conversion on the Mac is kept to.
     case streamInfo(ids: [Int64], maxSampleRate: Double?)
     /// Opens a song for reading (answered with `.streamOpened`, or `.streamPreparing` while the Mac converts it: ask again).
-    case streamOpen(id: Int64, maxSampleRate: Double?)
+    /// `smaller`: for a song kept on the phone, a lossless file above `maxSampleRate` is converted down to it too (a stereo
+    /// 24/192 file is otherwise sent as it is).
+    case streamOpen(id: Int64, maxSampleRate: Double?, smaller: Bool? = nil)
     /// Reads up to `length` bytes (at most `RemoteProtocol.maximumChunk`) from `offset` of an open stream. Answered with a
     /// `StreamFrame` (binary) carrying this command's `id`, or `.failed`.
     case streamRead(stream: Int, offset: Int64, length: Int)

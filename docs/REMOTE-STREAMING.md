@@ -22,7 +22,7 @@ baseline (a v2 phone sends 1, so an old Mac accepts it) and the new optional `hi
 | Command | Answer |
 |---|---|
 | `streamInfo(ids, maxSampleRate)` | `.streamInfo([StreamInfo])`: per song, original or FLAC, the format that would arrive, or why it plays on the Mac only |
-| `streamOpen(id, maxSampleRate)` | `.streamOpened(StreamDescriptor)`, or `.streamPreparing(progress)` while the Mac converts (ask again), or `.failed(reason)` |
+| `streamOpen(id, maxSampleRate, smaller?)` | `.streamOpened(StreamDescriptor)`, or `.streamPreparing(progress)` while the Mac converts (ask again), or `.failed(reason)`. `smaller: true` (a song kept on the phone in its smaller form) also converts a lossless file above `maxSampleRate` down to it |
 | `streamRead(stream, offset, length)` | a **binary `StreamFrame`** carrying the command's `id`, or `.failed(reason)` |
 | `streamClose(stream)` | `.ok` |
 

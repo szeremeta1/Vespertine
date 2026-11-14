@@ -18,6 +18,8 @@ public struct PhoneStreamClient: Sendable {
     public var read: @Sendable (_ stream: Int, _ offset: Int64, _ length: Int) async throws -> StreamFrame
     public var close: @Sendable (_ stream: Int) async -> Void
     public var isConnected: @Sendable @MainActor () -> Bool
+    /// Opens a song to keep in its smaller form (lossless files above `maxSampleRate` converted down to it). nil: as `open`.
+    public var openSmaller: (@Sendable (_ song: Int64, _ maxSampleRate: Double) async -> RemoteReply)?
 
     public init(open: @escaping @Sendable (Int64, Double?) async -> RemoteReply,
                 read: @escaping @Sendable (Int, Int64, Int) async throws -> StreamFrame,
@@ -38,6 +40,7 @@ public struct PhoneStreamClient: Sendable {
                   },
                   close: { [weak session] stream in _ = await session?.send(.streamClose(stream: stream)) },
                   isConnected: { [weak session] in session?.isConnected ?? false })
+        openSmaller = { [weak session] song, rate in await session?.send(.streamOpen(id: song, maxSampleRate: rate, smaller: true)) ?? .failed(reason: "") }
     }
 }
 

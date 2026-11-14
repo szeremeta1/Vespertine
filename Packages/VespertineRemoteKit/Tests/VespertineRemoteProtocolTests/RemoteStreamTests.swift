@@ -70,6 +70,11 @@ private let fiveOne = StreamFormat(codec: "FLAC", container: "flac", sampleRate:
     @Test func commandsKeepTheirShape() throws {
         #expect(try json(ClientMessage(id: 7, command: .streamOpen(id: 42, maxSampleRate: 48_000)))
                 == #"{"command":{"streamOpen":{"id":42,"maxSampleRate":48000}},"id":7}"#)
+        // Asking for the smaller form is an extra word an older Mac never sees unless it is asked for.
+        #expect(try json(ClientMessage(id: 7, command: .streamOpen(id: 42, maxSampleRate: 48_000, smaller: true)))
+                == #"{"command":{"streamOpen":{"id":42,"maxSampleRate":48000,"smaller":true}},"id":7}"#)
+        let old = try RemoteProtocol.decoder().decode(ClientMessage.self, from: Data(#"{"command":{"streamOpen":{"id":42,"maxSampleRate":48000}},"id":7}"#.utf8))
+        #expect(old.command == .streamOpen(id: 42, maxSampleRate: 48_000, smaller: nil))
         #expect(try json(ClientMessage(id: 8, command: .streamRead(stream: 3, offset: 1_048_576, length: 524_288)))
                 == #"{"command":{"streamRead":{"length":524288,"offset":1048576,"stream":3}},"id":8}"#)
         #expect(try json(ClientMessage(id: 9, command: .streamClose(stream: 3))) == #"{"command":{"streamClose":{"stream":3}},"id":9}"#)
