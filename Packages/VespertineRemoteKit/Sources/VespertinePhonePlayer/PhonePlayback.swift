@@ -70,6 +70,20 @@ public final class PhonePlayback {
     /// How long to wait for a conversion on the Mac, and how often to ask again.
     @ObservationIgnored public var preparingTimeout: Duration = .seconds(600)
     @ObservationIgnored public var pollInterval: Duration = .seconds(1)
+    /// How long a song waits for a Mac that stopped answering before it gives up.
+    @ObservationIgnored public var patience: Duration = .seconds(120)
+    /// A stream is waiting for the Mac to come back (the connection dropped mid-song).
+    public private(set) var waitingForMac = false
+    @ObservationIgnored private var waits = 0
+    /// Bytes fetched from the Mac for songs already let go of; `bytesReceived` adds the ones still open.
+    @ObservationIgnored private var received: Int64 = 0
+    /// How much this phone has fetched from the Mac since the player was made (the data counter).
+    public var bytesReceived: Int64 { open.values.reduce(received) { $0 + $1.source.bufferedBytes } }
+
+    private func lineWaits(_ waiting: Bool) {
+        waits = max(0, waits + (waiting ? 1 : -1))
+        if waitingForMac != (waits > 0) { waitingForMac = waits > 0 }
+    }
     /// What this phone's output can use right now (48000 for AirPods; a USB DAC's top rate): the Mac caps conversions at it.
     @ObservationIgnored public var maxSampleRate: @MainActor () -> Double? = { nil }
     /// How far past the listener to fetch (nil: the whole song, which then stays on the phone for the next play).
@@ -82,6 +96,7 @@ public final class PhonePlayback {
         let song: Int64
         let descriptor: StreamDescriptor
         let source: StreamSource
+        let line: StreamLine
     }
     /// Streams open on the Mac, by queue entry.
     @ObservationIgnored private var open: [String: Open] = [:]
@@ -194,10 +209,14 @@ public final class PhonePlayback {
             }
             try FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
             let name = "\(song)-\(descriptor.tag.prefix(16)).\(descriptor.format.container)"
+            let line = StreamLine(client: client, song: song, descriptor: descriptor, maxSampleRate: maxSampleRate(), patience: patience)
+            await line.onWaiting { [weak self] waiting in Task { @MainActor in self?.lineWaits(waiting) } }
             let source = try StreamSource(descriptor: descriptor, file: cacheDirectory.appendingPathComponent(name),
-                                          read: { offset, length in try await client.read(number, offset, length) }, readAhead: readAhead)
+                                          read: { offset, length in try await line.read(offset: offset, length: length) }, readAhead: readAhead)
+            // The decoder waits as long as the line does (and a little more, so the line's own words win).
+            source.readTimeout = Double(patience.components.seconds) + 10
             source.start()
-            return Open(song: song, descriptor: descriptor, source: source)
+            return Open(song: song, descriptor: descriptor, source: source, line: line)
         }
         opening[entry.id] = task
         defer { opening[entry.id] = nil }
@@ -257,9 +276,9 @@ public final class PhonePlayback {
         for (entry, stream) in open where !keeping.contains(entry) {
             open[entry] = nil
             stream.source.close()
-            let client = self.client
-            let number = stream.descriptor.stream
-            Task { await client.close(number) }
+            received += stream.source.bufferedBytes
+            let line = stream.line
+            Task { await line.close() }
         }
     }
 

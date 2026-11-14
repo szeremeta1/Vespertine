@@ -63,6 +63,7 @@ final class PlayTarget {
         let remote = PhoneRemote(playback: playback) { [weak session] command in await session?.send(command) ?? .failed(reason: "") }
         remote.words = { signal in (Self.badge(signal), Self.output(signal)) }
         remote.surroundChoice = surround
+        remote.macName = session.server?.name ?? session.pairing.name
         let system = PhoneSystem(remote: remote) { [weak session] key in
             guard let session, case .artwork(_, _, _, let data) = await session.send(.artwork(key: key, size: 600)) else { return nil }
             return data
