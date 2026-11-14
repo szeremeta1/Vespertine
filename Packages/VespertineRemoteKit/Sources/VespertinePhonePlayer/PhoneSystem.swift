@@ -39,6 +39,7 @@ public final class PhoneSystem {
     private var coverTried: String?
     /// The rate last asked of an output, so iOS declining it isn't asked again for every song.
     private var asked: (route: String, rate: Double)?
+    private var volumeWatch: NSKeyValueObservation?
 
     /// `artwork`: a cover's image data for its key (the app's cover cache).
     public init(remote: PhoneRemote, artwork: @escaping @MainActor (String) async -> Data?) {
@@ -71,6 +72,10 @@ public final class PhoneSystem {
         observers.append(Self.observe(.AVAudioEngineConfigurationChange, nil) { [weak self] _, _, _ in
             Task { @MainActor in self?.outputChanged() }
         })
+        remote.outputVolume = Double(session.outputVolume)
+        volumeWatch = Self.watchVolume(session) { [weak self] level in
+            Task { @MainActor in self?.remote.outputVolume = level }
+        }
         registerCommands()
         track()
     }
@@ -83,6 +88,7 @@ public final class PhoneSystem {
         for (command, target) in commands { command.removeTarget(target) }
         commands = []
         coverTask?.cancel()
+        volumeWatch = nil
         remote.onTransport = nil
         shown = nil
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
@@ -164,6 +170,13 @@ public final class PhoneSystem {
         command.addTarget { event in
             action((event as? MPChangePlaybackPositionCommandEvent)?.positionTime)
             return .success
+        }
+    }
+
+    /// The volume buttons: KVO calls on whichever thread changed it.
+    nonisolated private static func watchVolume(_ session: AVAudioSession, _ changed: @escaping @Sendable (Double) -> Void) -> NSKeyValueObservation {
+        session.observe(\.outputVolume, options: [.new]) { _, change in
+            if let level = change.newValue { changed(Double(level)) }
         }
     }
 

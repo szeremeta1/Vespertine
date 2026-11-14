@@ -85,6 +85,8 @@ public final class PhoneRemote {
     public let playback: PhonePlayback
     /// Where the sound goes (the app keeps it current from the audio session).
     public var route: PhoneRoute? { didSet { applySurround() } }
+    /// The device's own volume, 0…1, when known (the app keeps it current): shown, never changed from here.
+    public var outputVolume: Double?
     /// How you want surround songs played; the output decides what it gets (`PhoneRoute.surroundMode`).
     public var surroundChoice: SpatialModeChoice = .headTracked { didSet { applySurround() } }
 
@@ -221,7 +223,7 @@ public final class PhoneRemote {
         return PlayerState(playback: value, loading: waiting, nowPlaying: entry.map { NowPlaying(entry: $0.id, track: $0.track) },
                            position: playback.position, positionAt: Date(), duration: playback.duration,
                            shuffle: playback.queue.shuffle, repeatMode: playback.queue.repeatMode, signal: summary, output: route?.name,
-                           volume: VolumeState(route: .fixed, level: nil, muted: false), waitingFor: nil, error: playback.notice, transitions: nil)
+                           volume: VolumeState(route: .fixed, level: outputVolume, muted: false), waitingFor: nil, error: playback.notice, transitions: nil)
     }
 }
 #endif

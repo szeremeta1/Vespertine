@@ -249,6 +249,13 @@ struct NowPlayingView: View {
         .accessibilityValue(value ?? (on ? Text("On") : Text("Off")))
     }
 
+    /// The volume line when music plays on this device: its level (below 100% the samples are scaled by iOS) and how to set it.
+    static func deviceVolume(_ level: Double?) -> String {
+        guard let level else { return String(localized: "Use the volume buttons on this device.") }
+        let percent = level.formatted(.percent.precision(.fractionLength(0)))
+        return String(localized: "Volume \(percent). Use the volume buttons on this device.", comment: "Now Playing on the iPhone: %@ is the device's volume as a percentage, e.g. “62%”.")
+    }
+
     static func nextRepeat(after mode: RepeatModeValue) -> RepeatModeValue {
         switch mode {
         case .off: return .all
@@ -269,7 +276,7 @@ struct NowPlayingView: View {
         if let volume = player?.volume {
             switch volume.route {
             case .fixed where session.phone != nil:
-                Label("Use the volume buttons on this device.", systemImage: "speaker.wave.2")
+                Label(Self.deviceVolume(volume.level), systemImage: "speaker.wave.2")
                     .font(.caption).foregroundStyle(Palette.text2)
             case .fixed:
                 Label("Fixed volume: set the level on your amplifier or DAC", systemImage: "speaker.slash")
