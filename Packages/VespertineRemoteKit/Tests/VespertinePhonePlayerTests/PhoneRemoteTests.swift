@@ -138,7 +138,9 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
     @Test func whileTheMacConvertsASongThePhoneSaysItIsLoading() async throws {
         let (remote, _) = try made()
         _ = await remote.run(.playTracks(ids: [1], startAt: 0, shuffled: nil))
-        try await Task.sleep(for: .milliseconds(80))
+        // The Mac's "preparing" answer arrives when it arrives: wait for it, don't guess how long a busy machine takes.
+        let deadline = ContinuousClock.now + .seconds(5)
+        while remote.playback.preparing == nil, ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(10)) }
         #expect(remote.playback.preparing?.progress == 0.25)
         #expect(remote.playerState.loading)
         #expect(await remote.run(.stop) == .ok)
