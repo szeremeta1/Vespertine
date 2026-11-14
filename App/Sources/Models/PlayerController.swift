@@ -7,6 +7,7 @@ import AppKit
 import MediaPlayer
 import VespertineAudio
 import VespertineLibrary
+import VespertineUPnP
 import Observation
 
 struct QueueEntry: Identifiable, Hashable {
@@ -417,7 +418,101 @@ final class PlayerController {
 
     private func syncMirror(reloadCurrent: Bool = false) {
         mirror.update(queue.map(\.item), repeatMode: repeatMode)
-        engine.queueChanged(reloadCurrent: reloadCurrent)
+        if let rendererInfo {
+            let entries = queue
+            rendererInfo.withLock { map in for entry in entries where map[entry.id] == nil { map[entry.id] = Self.rendererInfo(entry.track) } }
+        }
+        if let renderer { renderer.queueChanged() } else { engine.queueChanged(reloadCurrent: reloadCurrent) }
+    }
+
+    // MARK: Network renderer (UPnP renderers, beta)
+
+    /// The network renderer playing in place of the engine, while one is the chosen output; nil: the engine plays, as always.
+    @ObservationIgnored private(set) var renderer: RendererPlayback?
+
+    /// Hands playback to `playback` (a network renderer) or back to the engine (nil). A song that was playing carries on, at
+    /// its position, on the new one.
+    func useRenderer(_ playback: RendererPlayback?, missing: String? = nil) {
+        let missing = playback == nil ? missing : nil
+        guard playback !== renderer || missing != missingRenderer else { return }
+        let wasActive = state == .playing || requested != nil
+        let carried = wasActive ? (pendingRendererStart ?? current) : pendingRendererStart
+        let at = pendingRendererStart == nil ? position : 0
+        pendingRendererStart = nil
+        let hadRenderer = renderer != nil || missingRenderer != nil
+        if let old = renderer, old !== playback { old.shutdown() } else if playback != nil || missing != nil { engine.stop() }
+        missingRenderer = missing
+        if let missing {
+            // Nothing plays in its place (not the Mac's DAC, whatever the fallback says).
+            renderer = nil
+            if wasActive, hadRenderer { lastError = Self.notAnswering(missing) }
+            requested = nil
+            requestedState = nil
+            signalPath = nil
+            return
+        }
+        renderer = playback
+        if let playback {
+            let mirror = self.mirror
+            let cache = shares.cache
+            playback.nextItemProvider = { finished in mirror.item(after: finished.id) }
+            playback.urlResolver = { @Sendable item in item.cacheKey.flatMap { cache.localURL(forKey: $0) } ?? item.url }
+            let info = Locked([UUID: RendererTrackInfo]())
+            info.withLock { map in for entry in queue { map[entry.id] = Self.rendererInfo(entry.track) } }
+            rendererInfo = info
+            playback.metadataProvider = { item in info.withLock { $0[item.id] } }
+            playback.eventHandler = { [weak self] event in self?.handle(event) }
+        }
+        signalPath = nil
+        if let carried {
+            if let playback {
+                // The renderer reaches the position once it plays (asked while it loads, it refuses).
+                start(carried, at: at > 1 ? at : 0)
+
+            } else {
+                start(carried)
+                if at > 1 { seek(to: at) }
+            }
+        }
+    }
+
+    /// The chosen output is a network renderer that isn't answering: nothing plays anywhere until it is back. Its name.
+    @ObservationIgnored private(set) var missingRenderer: String?
+    /// The first search for renderers is still running (Play then waits a little for the chosen one). Set by the app model.
+    @ObservationIgnored var rendererGrace: () -> Bool = { false }
+    /// How long Play waits for a chosen renderer during the first search.
+    @ObservationIgnored var rendererGraceSeconds: TimeInterval = 5
+    /// The song Play asked for while waiting for the renderer.
+    @ObservationIgnored private var pendingRendererStart: QueueEntry?
+
+    nonisolated static func notAnswering(_ name: String) -> String {
+        String(localized: "\(name) isn't answering.", comment: "%@ is a network player's name: it is the chosen output and doesn't answer.")
+    }
+
+    /// Play with the chosen renderer missing: wait for it during the first search, else say it isn't answering. True when handled.
+    private func holdForMissingRenderer(_ entry: QueueEntry?) -> Bool {
+        guard let missing = missingRenderer else { return false }
+        guard let entry, rendererGrace() else {
+            lastError = Self.notAnswering(missing)
+            return true
+        }
+        pendingRendererStart = entry
+        let wait = rendererGraceSeconds
+        Task { [weak self] in
+            try? await Task.sleep(for: .seconds(wait))
+            guard let self, self.pendingRendererStart?.id == entry.id, let missing = self.missingRenderer else { return }
+            self.pendingRendererStart = nil
+            self.lastError = Self.notAnswering(missing)
+        }
+        return true
+    }
+
+    /// Titles for the renderer's display, by queue entry (kept current as the queue changes).
+    @ObservationIgnored private var rendererInfo: Locked<[UUID: RendererTrackInfo]>?
+
+    nonisolated static func rendererInfo(_ track: Track) -> RendererTrackInfo {
+        RendererTrackInfo(title: track.title, artist: track.displayArtist.libraryDisplayName, album: track.displayAlbum.libraryDisplayName,
+                          duration: track.duration > 0 ? track.duration : nil)
     }
 
     /// Files in the queue were moved or renamed (found by a rescan): point their entries at the new
@@ -509,7 +604,8 @@ final class PlayerController {
     /// play as well; Play then tries that song again, as before.
     @ObservationIgnored private var failedSinceStart = false
 
-    private func start(_ entry: QueueEntry) {
+    private func start(_ entry: QueueEntry, at seconds: TimeInterval = 0) {
+        if holdForMissingRenderer(entry) { return }
         requested = entry.id
         requestedState = nil
         seekRestart = nil
@@ -524,17 +620,30 @@ final class PlayerController {
         bedMeters = nil
         channelLevels = []
         shares.skipped(to: entry.track, upcoming: upcoming.map(\.track))
-        engine.play(entry.item)
+        rendererInfo?.withLock { $0[entry.id] = Self.rendererInfo(entry.track) }
+        if let renderer {
+            if seconds > 0 {
+                position = seconds
+                requestedPosition = (seconds, .now)
+            }
+            renderer.play(entry.item, at: seconds)
+        } else {
+            engine.play(entry.item)
+        }
         updateNowPlayingInfo()
     }
 
     func togglePlayPause() {
         if canCancelLoading { stop(); return }
+        if missingRenderer != nil, state != .playing {
+            _ = holdForMissingRenderer(current ?? queue.first)
+            return
+        }
         // Waiting for the chosen output to reconnect counts as playing: pressing pause cancels it.
         if waitingForDevice != nil { engine.pause(); return }
         switch state {
         case .playing: pause()
-        case .paused: request(.playing); engine.resume()
+        case .paused: request(.playing); if let renderer { renderer.resume() } else { engine.resume() }
         case .stopped:
             // After the queue played to its end, Play starts it from the first song, as Apple Music does.
             if playedToEnd, currentIndex == queue.count - 1, let first = queue.first { currentIndex = 0; start(first) }
@@ -547,7 +656,7 @@ final class PlayerController {
         if waitingForDevice != nil { engine.pause(); return }
         guard state == .playing else { return }
         request(.paused)
-        engine.pause()
+        if let renderer { renderer.pause() } else { engine.pause() }
     }
 
     private func request(_ target: PlaybackState) {
@@ -571,12 +680,12 @@ final class PlayerController {
 
     func seek(to seconds: TimeInterval) {
         if let id = current?.id { seekRestart = id }
-        engine.seek(to: seconds)
+        if let renderer { renderer.seek(to: seconds) } else { engine.seek(to: seconds) }
         position = seconds
         requestedPosition = (seconds, .now)
     }
 
-    func stop() { requested = nil; requestedPosition = nil; seekRestart = nil; requestedState = nil; engine.stop() }
+    func stop() { requested = nil; requestedPosition = nil; seekRestart = nil; requestedState = nil; if let renderer { renderer.stop() } else { engine.stop() } }
 
     func clearError() { lastError = nil }
 
@@ -659,6 +768,8 @@ final class PlayerController {
                 : String(localized: "\(name) didn’t come back. Press play to continue on another output.", comment: "%@ is the name of an audio output device.")
         case .deviceNotResponding(let name):
             lastError = String(localized: "\(name) is connected but won’t start. Quit and reopen Vespertine, then press play.", comment: "%@ is the name of an audio output device.")
+        case .notice(let message):
+            lastError = message
         case .speakerGroupCarriesOn(let group, let without):
             guard !without.isEmpty else { break }
             let names = ListFormatter.localizedString(byJoining: without)
@@ -732,7 +843,7 @@ final class PlayerController {
     }
 
     func poll(_ snapshot: EngineSnapshot? = nil) {
-        let snap = snapshot ?? engine.snapshot
+        let snap = snapshot ?? renderer?.snapshot ?? engine.snapshot
         if let requestedState, snap.state != requestedState.from
             || requestedState.state == .playing && Date().timeIntervalSince(requestedState.at) > 30 {
             self.requestedState = nil

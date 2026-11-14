@@ -157,12 +157,16 @@ struct StatusBadges: View {
             VStack(alignment: .leading, spacing: 8) { statusBadge; notices; HStack(spacing: 8) { details } }
         }
     }
-    private var statusBadge: some View { StatusBadge(text: path.statusLine, kind: path.isBitPerfect ? .perfect : .converted) }
+    private var statusBadge: some View { StatusBadge(text: path.statusLine, kind: path.isUntouched ? .perfect : .converted) }
     // What the status leaves out: "Converted from DSD" beside SPATIAL or a downmix.
     private var notices: some View { ForEach(path.conversionBadges, id: \.self) { StatusBadge(text: $0, kind: .converted) } }
     private var status: some View { HStack(spacing: 8) { statusBadge; notices } }
     @ViewBuilder private var details: some View {
-        StatusBadge(text: path.applied.exclusive ? String(localized: "EXCLUSIVE") : String(localized: "SHARED", comment: "Badge: the output device is shared with other apps"))
+        if let renderer = path.renderer {
+            StatusBadge(text: renderer.protocolName.localizedUppercase)
+        } else {
+            StatusBadge(text: path.applied.exclusive ? String(localized: "EXCLUSIVE") : String(localized: "SHARED", comment: "Badge: the output device is shared with other apps"))
+        }
         StatusBadge(text: "\(path.applied.physicalBitDepth) / \(SampleRate.format(path.applied.sampleRate))")
     }
 }
@@ -185,6 +189,7 @@ struct SignalPathView: View {
     }
 
     var steps: [Step] {
+        if let renderer = path.renderer { return Self.rendererSteps(path, renderer) }
         var s: [Step] = []
         let src = path.source
         let srcValue: String = if let dsd = src.dsdName {

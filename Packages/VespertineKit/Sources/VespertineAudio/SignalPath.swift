@@ -46,6 +46,89 @@ public struct SignalPath: Sendable, Hashable {
     /// The fader for play, pause, stop, skip and seek is ramping the samples right now (never for words it doesn't scale:
     /// DSD, bitstream, integer, matched 16-bit). While it does, the samples are no longer the file's.
     public var faderRamping = false
+    /// A network renderer (UPnP AV / OpenHome) plays the song: what Vespertine sent it. When set it decides the badge, and the
+    /// path is never `isBitPerfect` (that is a claim about what the DAC receives, which can't be read back from a renderer).
+    public var renderer: RendererStage? = nil
+
+    /// What Vespertine sends a network renderer.
+    public struct RendererStage: Sendable, Hashable {
+        /// What changed the samples before they were encoded (none: the original file's bytes were sent).
+        public enum Processing: String, Sendable, Hashable, CaseIterable {
+            // In the order the badge names them.
+            case roomCorrection, equalizer, volume, replayGain, format
+        }
+
+        public var name: String
+        /// "OpenHome" or "UPnP AV".
+        public var protocolName: String
+        public var processing: [Processing]
+        /// The codec of the stream sent: the file's own when passed through, FLAC when processed.
+        public var sentCodec: String
+        public var sentSampleRate: Double
+        public var sentBitDepth: Int?
+        public var sentChannels: Int
+        /// The renderer joins songs itself (OpenHome, AV with SetNextAVTransportURI).
+        public var gapless: Bool
+        /// What the renderer said it can play and this song goes beyond.
+        public var warnings: [String]
+
+        public init(name: String, protocolName: String, processing: [Processing], sentCodec: String, sentSampleRate: Double,
+                    sentBitDepth: Int?, sentChannels: Int, gapless: Bool, warnings: [String] = []) {
+            self.name = name
+            self.protocolName = protocolName
+            self.processing = processing
+            self.sentCodec = sentCodec
+            self.sentSampleRate = sentSampleRate
+            self.sentBitDepth = sentBitDepth
+            self.sentChannels = sentChannels
+            self.gapless = gapless
+            self.warnings = warnings
+        }
+
+        public var passesThrough: Bool { processing.isEmpty }
+
+        /// The badge: what was sent, never a claim about the renderer's DAC.
+        public func badge(source: SourceFormat) -> String {
+            if let first = Processing.allCases.first(where: processing.contains) {
+                return switch first {
+                case .roomCorrection: String(localized: "PROCESSED · ROOM CORRECTION", comment: "Status badge (short, uppercase): a network renderer gets Vespertine's room-corrected stream.")
+                case .equalizer: String(localized: "PROCESSED · EQ", comment: "Status badge (short, uppercase): a network renderer gets Vespertine's equalized stream.")
+                case .volume: String(localized: "PROCESSED · VOLUME", comment: "Status badge (short, uppercase): a network renderer gets a stream with Vespertine's digital volume.")
+                case .replayGain: String(localized: "PROCESSED · REPLAYGAIN", comment: "Status badge (short, uppercase): a network renderer gets a stream with ReplayGain applied.")
+                case .format: String(localized: "PROCESSED · FLAC", comment: "Status badge (short, uppercase): the file was decoded and sent to a network renderer as FLAC (it doesn't take the file's own format).")
+                }
+            }
+            switch source.encoding {
+            case .lossy: return String(localized: "LOSSY SOURCE · SENT AS IS", comment: "Status badge (short, uppercase): a lossy file's own bytes were sent to a network renderer.")
+            case .dsd: return String(localized: "NATIVE DSD · \(source.dsdName ?? "DSD") SENT", comment: "Status badge (short, uppercase): a DSD file's own bytes were sent to a network renderer; %@ is DSD64 etc.")
+            case .pcm:
+                let format = sentBitDepth.map { "\($0)/\(SampleRate.format(sentSampleRate))" } ?? SampleRate.format(sentSampleRate)
+                return String(localized: "BIT-PERFECT · \(format) SENT", comment: "Status badge (short, uppercase): the file's own bytes were sent to a network renderer unchanged; %@ is e.g. 24/192. It says what was sent, not what the renderer's DAC received.")
+            }
+        }
+    }
+
+    /// The path of a song sent to a network renderer. The plan and "applied" format describe the stream sent.
+    public static func renderer(_ stage: RendererStage, source: SourceFormat, decoderName: String, volume: VolumeStage,
+                                replayGainDB: Double? = nil, equalizer: String? = nil, roomCorrection: String? = nil) -> SignalPath {
+        let plan = OutputPlan(mode: .pcm, deviceSampleRate: stage.sentSampleRate, decodedSampleRate: stage.sentSampleRate,
+                              physicalBitDepth: stage.sentBitDepth ?? 0, channels: stage.sentChannels, dsdConvertedToPCM: false,
+                              reason: "network renderer")
+        let applied = AppliedFormat(sampleRate: stage.sentSampleRate, physicalBitDepth: stage.sentBitDepth ?? 0, physicalIsInteger: true,
+                                    virtualChannels: stage.sentChannels, exclusive: false, bufferFrames: 0, physicalFormatKnown: false)
+        var path = SignalPath(source: source, decoderName: decoderName, plan: plan, applied: applied, deviceName: stage.name,
+                              deviceUID: "", deviceProfile: .networkRenderer(protocolName: stage.protocolName), volume: volume,
+                              replayGainDB: replayGainDB, equalizer: equalizer, roomCorrection: roomCorrection)
+        path.renderer = stage
+        return path
+    }
+
+    /// The samples Vespertine produced are the file's: bit-perfect at the device, or the original bytes of a lossless or DSD file
+    /// sent to a network renderer. The interface's brass styling follows this; the BIT-PERFECT claim itself is `isBitPerfect`.
+    public var isUntouched: Bool {
+        if let renderer { return renderer.passesThrough && source.encoding != .lossy }
+        return isBitPerfect
+    }
 
     /// Song transitions in the signal path: what the next boundary does, and whether a crossfade is heard right now.
     public struct TransitionStage: Sendable, Hashable {
@@ -100,6 +183,7 @@ public struct SignalPath: Sendable, Hashable {
 
     /// True only when every sample reaches the DAC unaltered.
     public var isBitPerfect: Bool {
+        if renderer != nil { return false }
         if let group { return groupIsBitPerfect(group) }
         guard transition?.audible != true, !faderRamping, foldedOnto == nil, deviceProfile.canBeBitPerfect, applied.physicalFormatKnown, applied.exclusive || !otherAppsPlaying, !modifiesSamples,
               plan.spatial == .off, concealedFrames == 0, plan.channels == source.channels, applied.virtualChannels >= source.channels
@@ -130,6 +214,7 @@ public struct SignalPath: Sendable, Hashable {
 
     /// One-line state for badges and the menu bar (in the current language; English without a string table).
     public var statusLine: String {
+        if let renderer { return renderer.badge(source: source) }
         if let transition, transition.audible { return transition.badge }
         if let group {
             if isBitPerfect { return String(localized: "BIT-PERFECT", comment: "Status badge (short, uppercase).") }
