@@ -87,7 +87,7 @@ final class PlayTarget {
         case .off?: return String(localized: "SURROUND FOLDED TO STEREO", comment: "Signal badge on the iPhone: a surround song mixed down to two channels.")
         case nil: break
         }
-        signal.converted ? String(localized: "CONVERTED ON THE MAC", comment: "Signal badge: the Mac converted this song to a format the iPhone can play.")
+        return signal.converted ? String(localized: "CONVERTED ON THE MAC", comment: "Signal badge: the Mac converted this song to a format the iPhone can play.")
                          : String(localized: "ORIGINAL FILE", comment: "Signal badge: the iPhone plays the song's own file, as it is on the Mac.")
     }
 
