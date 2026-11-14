@@ -275,13 +275,15 @@ enum SourceOpener {
                 do {
                     // A song still being copied from a share is decoded through the cache's guarded reads, not from the half-written file.
                     let raw: AudioDecoder
+                    var recovery: GuardedDecoder.Recovery?
                     if let entry = NetworkPlaybackCache.lookup(url), !entry.isComplete {
                         raw = try name.map { try AudioDecoder(inputSource: entry.inputSource(), decoderName: $0) } ?? AudioDecoder(inputSource: entry.inputSource())
+                        recovery = GuardedDecoder.Recovery(entry: entry, name: name)
                     } else {
                         raw = try name.map { try AudioDecoder(url: url, decoderName: $0) } ?? AudioDecoder(url: url)
                     }
                     // Every call into the codec libraries goes through a guard: a damaged file is an error, not a crash.
-                    let decoder = GuardedDecoder(raw)
+                    let decoder = GuardedDecoder(raw, recovery: recovery)
                     if String(describing: type(of: raw)).contains("MPEG") {
                         // mpg123's CPU-feature detection in mpg123_parnew isn't thread-safe: concurrent opens
                         // crash in wrap_getcpuflags (seen with parallel library scans). Serialize opening only.
