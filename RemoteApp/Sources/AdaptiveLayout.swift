@@ -10,7 +10,7 @@ nonisolated enum RemoteDestination: Hashable, Sendable {
     case source(Int64)
 
     /// Every destination but the sources, which the Mac lists.
-    static let fixed: [RemoteDestination] = [.nowPlaying, .library, .artists, .songs, .genres, .recentlyAdded, .favorites, .playlists, .queue, .output]
+    static let fixed: [RemoteDestination] = [.nowPlaying, .library, .artists, .songs, .genres, .recentlyAdded, .favorites, .playlists, .kept, .queue, .output]
 
     /// A name for the destination (accessibility identifiers, launch options).
     var id: String {

@@ -59,6 +59,17 @@ struct DemoMacTests {
         #expect(try await ask(mac, .pair(name: "x", protocolVersion: RemoteProtocol.version)) == .failed(reason: ""))
     }
 
+    @Test func theAlbumsPageIsSortedAndNarrowedByTheMacAcrossPages() async throws {
+        let (mac, _) = try await opened()
+        guard case .albums(let all, let total) = try await ask(mac, .albums(offset: 0, limit: 500)) else { Issue.record("no albums"); return }
+        guard case .albums(let first, let sortedTotal) = try await ask(mac, .albums(offset: 0, limit: 2, sort: .title, filter: nil)),
+              case .albums(let second, _) = try await ask(mac, .albums(offset: 2, limit: 2, sort: .title, filter: nil)) else { Issue.record("no albums"); return }
+        #expect(sortedTotal == total)
+        #expect((first + second).map(\.key) == AlbumListing.arrange(all, sort: .title, filter: nil).prefix(4).map(\.key))
+        guard case .albums(let hiRes, let hiResTotal) = try await ask(mac, .albums(offset: 0, limit: 500, sort: nil, filter: .hiRes)) else { Issue.record("no albums"); return }
+        #expect(hiRes.allSatisfy(\.hiRes) && hiResTotal == all.filter(\.hiRes).count && hiResTotal < total)
+    }
+
     @Test func playsAndEditsTheQueue() async throws {
         let (mac, pushes) = try await opened()
         guard case .albums(let albums, _) = try await ask(mac, .albums(offset: 0, limit: 10)) else { return }
