@@ -145,6 +145,23 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         #expect(remote.playerState.playback != .playing && remote.playback.preparing == nil)
     }
 
+    @Test func aSongHeldBackSaysWhyAndSkipsNothing() async throws {
+        // Cellular data with "play over cellular" off: the song isn't asked for, and the queue stays where it is.
+        let (remote, _) = try made()
+        remote.playback.holdReason = { "Playing over cellular data is off." }
+        _ = await remote.run(.playAlbum(key: "a", startAt: 0, shuffled: nil))
+        try await Task.sleep(for: .milliseconds(60))
+        #expect(remote.playerState.error == "Playing over cellular data is off.")
+        #expect(remote.queueState.current?.track.id == 1)
+        #expect(remote.playerState.playback != .playing && remote.playback.preparing == nil)
+        // Allowed again: Play starts the same song.
+        remote.playback.holdReason = { nil }
+        _ = await remote.run(.playPause)
+        try await Task.sleep(for: .milliseconds(60))
+        #expect(remote.playback.preparing?.progress == 0.25 && remote.queueState.current?.track.id == 1)
+        remote.playback.stop()
+    }
+
     @Test func thePhonesStateSaysWhereItPlaysAndNeverClaimsBitPerfect() async throws {
         let (remote, _) = try made()
         remote.route = PhoneRoute(name: "AirPods Max", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true)
