@@ -127,6 +127,10 @@ private let copied: TrackSummary = {
         #expect(try json(RemoteCommand.playCopy(ids: [1, 2], startAt: 1)) == #"{"playCopy":{"ids":[1,2],"startAt":1}}"#)
     }
 
+    @Test func songsAreLookedUpByTheirIDsForThePhonesOwnQueue() throws {
+        #expect(try json(RemoteCommand.tracks(ids: [7, 3])) == #"{"tracks":{"ids":[7,3]}}"#)
+    }
+
     @Test func aSongFromAnOlderMacHasNoCopies() throws {
         // 1.1.2 doesn't say `copies`: the song decodes, and a remote shows it as a song in one copy.
         let old = #"{"album":"Kind of Blue","albumKey":"k","artist":"Miles Davis","duration":562.3,"favorite":true,"format":"FLAC · 24/192","id":42,"title":"So What"}"#

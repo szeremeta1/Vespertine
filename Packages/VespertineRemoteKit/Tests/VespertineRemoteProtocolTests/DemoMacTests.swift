@@ -108,6 +108,14 @@ struct DemoMacTests {
         #expect(pushes.lastQueue?.current?.track.favorite == !song.favorite)
     }
 
+    @Test func looksSongsUpByIDInTheOrderAsked() async throws {
+        let (mac, _) = try await opened()
+        guard case .songs(let all, _) = try await ask(mac, .songs(offset: 0, limit: 3)), all.count == 3 else { Issue.record("no songs"); return }
+        let wanted = [all[2].id, all[0].id].compactMap { $0 }
+        guard case .tracks(let found) = try await ask(mac, .tracks(ids: wanted + [-5])) else { Issue.record("no tracks"); return }
+        #expect(found.map(\.id) == wanted)
+    }
+
     @Test func listsSongsInPages() async throws {
         let (mac, _) = try await opened()
         guard case .songs(let first, let total) = try await ask(mac, .songs(offset: 0, limit: 10)) else { Issue.record("no songs"); return }
