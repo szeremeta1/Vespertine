@@ -171,10 +171,10 @@ struct StreamSourceTests {
         let url = tmp()
         let source = try StreamSource(descriptor: descriptor(size: 30_000), file: url, read: mac.read)
         source.start()
-        async let waiting: Data = blockingRead(source, at: 20_000, length: 10)
+        let waiting = Task { try await blockingRead(source, at: 20_000, length: 10) }
         try await Task.sleep(for: .milliseconds(60))
         source.close()
-        await #expect(throws: StreamSource.Failure.closed) { _ = try await waiting }
+        await #expect(throws: StreamSource.Failure.closed) { _ = try await waiting.value }
         #expect(!FileManager.default.fileExists(atPath: url.path))
     }
 
