@@ -41,7 +41,13 @@ private final class FakeDeviceProvider: DeviceProvider, @unchecked Sendable {
 
     /// Volume and mute listeners currently installed on `device`.
     func volumeObservers(of device: AudioObjectID) -> Int {
-        state.withLock { $0.observers.values.filter { $0.device == device && $0.selectors != nil }.count }
+        let volume: Set<AudioObjectPropertySelector> = [kAudioDevicePropertyVolumeScalar, kAudioDevicePropertyMute]
+        return state.withLock { $0.observers.values.filter { $0.device == device && !($0.selectors ?? []).isDisjoint(with: volume) }.count }
+    }
+
+    /// Rate and channel listeners currently installed on `device`.
+    func formatObservers(of device: AudioObjectID) -> Int {
+        state.withLock { $0.observers.values.filter { $0.device == device && $0.selectors?.contains(kAudioDevicePropertyNominalSampleRate) == true }.count }
     }
 
     /// The device's `selector` changes (its volume from the keyboard, its mute from the DAC's own button).
@@ -249,5 +255,49 @@ struct HardwareVolumeWatchTests {
         #expect(provider.volumeObservers(of: zd3) == 0 && provider.volumeObservers(of: airPodsMax) == 1)
         monitor.watchVolume(of: nil)
         #expect(provider.volumeObservers(of: airPodsMax) == 0)
+    }
+}
+
+@Suite("The playing output's format")
+struct OutputFormatWatchTests {
+    private func monitor(_ provider: FakeDeviceProvider, formatChanges: Locked<Int>) -> DeviceMonitor {
+        DeviceMonitor(provider: provider, queue: DispatchQueue(label: "test.format"), recheckWindow: 600) { change in
+            if case .format = change { formatChanges.withLock { $0 += 1 } }
+        }
+    }
+
+    /// AirPods Max going into call mode (an app opened their microphone) stay the same device: only their rate and channels
+    /// change, which the device list never heard of, so the call-mode warning (and the rate shown) stayed as it was.
+    @Test("A rate or channel change of the watched output is reported, so the device list is read again",
+          arguments: [kAudioDevicePropertyNominalSampleRate, kAudioDevicePropertyStreamConfiguration])
+    func rateOrChannels(selector: AudioObjectPropertySelector) async {
+        let provider = FakeDeviceProvider([airPodsMax: true])
+        let changes = Locked(0)
+        let monitor = monitor(provider, formatChanges: changes)
+        monitor.watchVolume(of: airPodsMax)
+        provider.change(selector, on: airPodsMax)
+        #expect(await waitUntil { changes.withLock { $0 } == 1 })
+    }
+
+    @Test("An output with no volume of its own is watched for its format too")
+    func noVolumeStillWatched() async {
+        let provider = FakeDeviceProvider([zd3: true])   // no settable volume
+        let changes = Locked(0)
+        let monitor = monitor(provider, formatChanges: changes)
+        monitor.watchVolume(of: zd3)
+        provider.change(kAudioDevicePropertyNominalSampleRate, on: zd3)
+        #expect(await waitUntil { changes.withLock { $0 } == 1 })
+    }
+
+    @Test("Watching another output, or none, removes the format listeners from the last one")
+    func listenersGo() {
+        let provider = FakeDeviceProvider([zd3: true, airPodsMax: true])
+        let monitor = monitor(provider, formatChanges: Locked(0))
+        monitor.watchVolume(of: zd3)
+        #expect(provider.formatObservers(of: zd3) == 1)
+        monitor.watchVolume(of: airPodsMax)
+        #expect(provider.formatObservers(of: zd3) == 0 && provider.formatObservers(of: airPodsMax) == 1)
+        monitor.watchVolume(of: nil)
+        #expect(provider.formatObservers(of: airPodsMax) == 0)
     }
 }

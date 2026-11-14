@@ -73,8 +73,9 @@ public struct DeviceProfile: Sendable, Hashable {
         let isAirPodsMax = name.contains("airpods max")
 
         // macOS keeps AirPods Max on their Bluetooth device object even when audio runs over the USB-C cable
-        // (Bluetooth stays the control link). The tell is Apple's USB audio interface being attached.
-        let usbAudioActive = isAirPodsMax && USBRegistry.isConnected(productContaining: "AirPods Max USB Audio")
+        // (Bluetooth stays the control link). The tell is Apple's USB audio interface being attached, and the link not being
+        // back on the radio (`isAirPodsMaxAudioOnCable`).
+        let usbAudioActive = isAirPodsMax && device.isAirPodsMaxAudioOnCable
 
         switch device.transport {
         case .usb where isAirPodsMax, .bluetooth where usbAudioActive, .bluetoothLE where usbAudioActive:
@@ -120,7 +121,28 @@ public struct DeviceProfile: Sendable, Hashable {
     }
 }
 
+extension OutputDevice {
+    /// AirPods Max listed as Bluetooth (as macOS always lists them) whose audio macOS is sending down the USB-C cable now. The
+    /// cable being in isn't enough: as soon as an app opens their microphone, macOS moves the audio back to Bluetooth in call
+    /// mode (24 kHz, mono) with the cable still in, on the same device (2026-11-13, 16:51:43: `HFP Shim Configured … 24000
+    /// Channels 1` 34 s after the cable went in). Called lossless there, the link was held and asked for 48 kHz, which macOS
+    /// refuses while the microphone is open. So: the cable's interface is attached, the link isn't at a call-mode rate, and its
+    /// latency isn't Bluetooth's (macOS reports 7680 frames over the radio and 480 over the cable; unread, the cable is believed).
+    var isAirPodsMaxAudioOnCable: Bool {
+        guard transport == .bluetooth || transport == .bluetoothLE else { return false }
+        guard airPodsMaxCableAttached ?? USBRegistry.isConnected(productContaining: DeviceProfile.airPodsMaxUSBProduct) else { return false }
+        if nominalSampleRate > 0, nominalSampleRate < 32_000 { return false }
+        if let latency = outputLatencyFrames, latency > DeviceProfile.cableLatencyLimit { return false }
+        return true
+    }
+}
+
 extension DeviceProfile {
+    /// The USB product AirPods Max present when their cable is in.
+    static let airPodsMaxUSBProduct = "AirPods Max USB Audio"
+    /// Output latency (frames) above which AirPods Max are on the radio, not the cable: 480 on the cable, 7680 over Bluetooth.
+    static let cableLatencyLimit = 2_048
+
     /// The data sources of a built-in output: the Mac's speakers and the headphone jack.
     static let internalSpeakerSource: UInt32 = 0x6973_706B   // 'ispk'
     static let headphonesSource: UInt32 = 0x6864_706E        // 'hdpn'
