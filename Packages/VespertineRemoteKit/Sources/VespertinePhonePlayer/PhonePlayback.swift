@@ -50,6 +50,8 @@ public final class PhonePlayback {
         /// The Mac was still converting the song when the wait ran out.
         case stillPreparing
         case notConnected
+        /// The phone itself won't fetch songs right now (cellular data, with playing over it turned off); the words say why.
+        case held(String)
         /// The song isn't in the Mac's library, so the Mac can't be asked for it.
         case notInLibrary
     }
@@ -70,6 +72,8 @@ public final class PhonePlayback {
     /// How long to wait for a conversion on the Mac, and how often to ask again.
     @ObservationIgnored public var preparingTimeout: Duration = .seconds(600)
     @ObservationIgnored public var pollInterval: Duration = .seconds(1)
+    /// Asked before a song is fetched: words when the phone shouldn't fetch right now (the app's cellular setting), else nil.
+    @ObservationIgnored public var holdReason: @MainActor () -> String? = { nil }
     /// How long a song waits for a Mac that stopped answering before it gives up.
     @ObservationIgnored public var patience: Duration = .seconds(120)
     /// A stream is waiting for the Mac to come back (the connection dropped mid-song).
@@ -230,6 +234,7 @@ public final class PhonePlayback {
         defer { if preparing?.entry == entry { preparing = nil } }
         while true {
             try Task.checkCancellation()
+            if let reason = holdReason() { throw Failure.held(reason) }
             guard client.isConnected() else { throw Failure.notConnected }
             switch await client.open(song, maxSampleRate()) {
             case .streamOpened(let descriptor): return descriptor
@@ -318,6 +323,8 @@ public final class PhonePlayback {
     static func words(_ error: Error, title: String) -> String {
         switch error {
         case Failure.refused(let reason) where !reason.isEmpty:
+            return reason
+        case Failure.held(let reason):
             return reason
         case Failure.refused:
             return String(localized: "“\(title)” can’t be played on this device.", comment: "Phone player: the Mac refused to send a song and gave no reason.")

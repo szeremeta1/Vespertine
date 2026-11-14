@@ -19,7 +19,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Now Playing")
                 } footer: {
-                    Text("The cover becomes the label of a record that turns with the music. It’s a picture of the playback position, not of the sound: the music plays on the Mac.")
+                    Text("The cover becomes the label of a record that turns with the music. It’s a picture of the playback position, not of the sound.")
                 }
                 Section {
                     Picker("Albums", selection: $settings.albumsLayout) {
@@ -38,6 +38,14 @@ struct SettingsView: View {
                     } else {
                         Text("Cover Flow reads the motion sensors only while it’s on screen, to shift its perspective as you tilt the device. Nothing is recorded.")
                     }
+                }
+                Section {
+                    Toggle("Play over Cellular Data", isOn: Binding(get: { settings.cellularPlayback }, set: { settings.cellularPlayback = $0; model.cellularSettingChanged() }))
+                    LabeledContent("Fetched from the Mac", value: ByteCountFormatter.string(fromByteCount: PlayTarget.shared.bytesReceived, countStyle: .file))
+                } header: {
+                    Text("Playing on This Device")
+                } footer: {
+                    Text("When music plays on this device, its songs come from your Mac. Lossless and hi-res songs are large: an album can be several hundred megabytes. The count is since the app was opened.")
                 }
                 Section("About") {
                     LabeledContent("Version", value: Self.version)

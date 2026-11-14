@@ -25,6 +25,8 @@ final class RemoteAppModel {
     let tiltSensor = TiltSensor()
     /// This device has a network at all (Wi-Fi, cellular or a VPN).
     private(set) var isOnline = true
+    /// The network in use is cellular data (not Wi-Fi or a cable).
+    private(set) var onCellular = false
     /// Which screen the remote opens on (set by a launch option in debug builds).
     var startScreen: String?
 
@@ -43,7 +45,8 @@ final class RemoteAppModel {
         discovery.start()
         pathMonitor.pathUpdateHandler = { [weak self] path in
             let online = path.status == .satisfied
-            MainActor.assumeIsolated { self?.networkChanged(online: online) }
+            let cellular = path.usesInterfaceType(.cellular) && !path.usesInterfaceType(.wifi) && !path.usesInterfaceType(.wiredEthernet)
+            MainActor.assumeIsolated { self?.networkChanged(online: online, cellular: cellular) }
         }
         pathMonitor.start(queue: .main)
         #if DEBUG
@@ -182,8 +185,14 @@ final class RemoteAppModel {
         keychain.upsert(pairing)
     }
 
-    private func networkChanged(online: Bool) {
+    /// The cellular switch in Settings was changed: applies it to the network in use now.
+    func cellularSettingChanged() { networkChanged(online: isOnline, cellular: onCellular) }
+
+    private func networkChanged(online: Bool, cellular: Bool) {
         isOnline = online
+        onCellular = cellular
+        PlayTarget.shared.holdReason = cellular && !settings.cellularPlayback
+            ? String(localized: "Playing over cellular data is off. Connect to Wi-Fi, or turn it on in Settings.") : nil
         if online { session?.networkChanged() }
     }
 

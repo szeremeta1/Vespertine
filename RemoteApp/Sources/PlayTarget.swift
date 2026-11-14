@@ -26,6 +26,10 @@ final class PlayTarget {
         }
     }
     private static let surroundKey = "surroundOnThisDevice"
+    /// Why songs aren't fetched right now (cellular data with playing over it turned off), or nil.
+    @ObservationIgnored var holdReason: String?
+    /// How much has been fetched from the Mac for playing here since the app opened.
+    var bytesReceived: Int64 { made?.remote.playback.bytesReceived ?? 0 }
     private var made: (session: ObjectIdentifier, remote: PhoneRemote, system: PhoneSystem)?
 
     /// The phone's player for `session` when this device is where music plays and the Mac can send songs; nil when the
@@ -63,6 +67,7 @@ final class PlayTarget {
         let remote = PhoneRemote(playback: playback) { [weak session] command in await session?.send(command) ?? .failed(reason: "") }
         remote.words = { signal in (Self.badge(signal), Self.output(signal)) }
         remote.surroundChoice = surround
+        playback.holdReason = { [weak self] in self?.holdReason }
         remote.macName = session.server?.name ?? session.pairing.name
         let system = PhoneSystem(remote: remote) { [weak session] key in
             guard let session, case .artwork(_, _, _, let data) = await session.send(.artwork(key: key, size: 600)) else { return nil }
