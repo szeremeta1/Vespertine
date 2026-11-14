@@ -2811,6 +2811,275 @@
     "123 456": {
       "shouldTranslate": false
     },
+    "A channel to each output": {
+      "comment": "Shown on the iPhone or iPad. Output screen, in a small table titled “What Reaches the Output” that lists facts read back from iOS while a song plays on an external DAC or audio interface. Value for the row “Surround”: each channel of a surround song goes to its own output of the audio interface, unmixed. Short.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ለእያንዳንዱ ውፅዓት አንድ ቻናል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قناة لكل مخرج"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "প্রতিটি আউটপুটে একটি চ্যানেল"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Každý kanál na vlastní výstup"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En kanal til hver udgang"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Kanal pro Ausgang"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ένα κανάλι σε κάθε έξοδο"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un canal por salida"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هر کانال به یک خروجی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanava kullekin ulostulolle"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isang channel sa bawat output"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un canal par sortie"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "દરેક આઉટપુટને એક ચૅનલ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasha ga kowace fitarwa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ערוץ לכל פלט"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हर आउटपुट को एक चैनल"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kimenetenként egy csatorna"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Satu saluran per output"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un canale per ogni uscita"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出力ごとに1チャンネル"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪ್ರತಿ ಔಟ್‌ಪುಟ್‌ಗೆ ಒಂದು ಚಾನೆಲ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출력마다 채널 하나"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഓരോ ഔട്ട്‌പുട്ടിനും ഒരു ചാനൽ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रत्येक आउटपुटला एक चॅनेल"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Satu saluran bagi setiap output"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Én kanal til hver utgang"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eén kanaal per uitgang"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹਰ ਆਉਟਪੁੱਟ ਨੂੰ ਇੱਕ ਚੈਨਲ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osobny kanał na każde wyjście"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um canal para cada saída"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um canal para cada saída"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Câte un canal pe fiecare ieșire"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En kanal till varje utgång"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaneli moja kwa kila kifaa cha kutoa sauti"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒவ்வொரு வெளியீட்டுக்கும் ஒரு சேனல்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ప్రతి అవుట్‌పుట్‌కు ఒక ఛానెల్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "หนึ่งช่องสัญญาณต่อหนึ่งขาออก"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her çıkışa bir kanal"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Окремий канал на кожен вихід"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہر آؤٹ پٹ پر ایک چینل"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mỗi kênh một đầu ra"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每個輸出一個聲道"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每个输出一个声道"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每個輸出一個聲道"
+          }
+        }
+      }
+    },
     "About": {
       "localizations": {
         "am": {
@@ -25056,6 +25325,275 @@
         }
       }
     },
+    "No": {
+      "comment": "Shown on the iPhone or iPad. Output screen, in a small table titled “What Reaches the Output” that lists facts read back from iOS while a song plays on an external DAC or audio interface. Value for the row “Resampled by iOS”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አይ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "না"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ne"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nej"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nein"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Όχι"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خیر"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ei"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ના"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A'a"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "नहीं"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nem"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "いいえ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아니요"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "അല്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nei"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nee"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਨਹੀਂ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nej"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapana"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இல்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "లేదు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่ใช่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hayır"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ні"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نہیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "否"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "否"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "否"
+          }
+        }
+      }
+    },
     "No albums": {
       "localizations": {
         "am": {
@@ -32570,6 +33108,544 @@
         }
       }
     },
+    "Output runs at": {
+      "comment": "Shown on the iPhone or iPad. Output screen, in a small table titled “What Reaches the Output” that lists facts read back from iOS while a song plays on an external DAC or audio interface. Row label: the sample rate the output device is running at now; the value is e.g. “96 kHz”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ውፅዓቱ የሚሠራበት ፍጥነት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المخرج يعمل بمعدل"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আউটপুটের স্যাম্পল রেট"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Výstup běží na"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outputtet kører med"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgabe läuft mit"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η έξοδος λειτουργεί στα"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frecuencia de la salida"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نرخ فعلی خروجی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulostulon taajuus"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tumatakbo ang output sa"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fréquence de la sortie"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આઉટપુટનો સેમ્પલ રેટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitarwa na aiki a"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הפלט פועל בקצב"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुट का सैंपल रेट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A kimenet frekvenciája"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output berjalan pada"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frequenza dell’uscita"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出力のサンプルレート"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಔಟ್‌ಪುಟ್‌ನ ಸ್ಯಾಂಪಲ್ ರೇಟ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출력 샘플 레이트"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഔട്ട്‌പുട്ട് പ്രവർത്തിക്കുന്നത്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुटचा सॅम्पल रेट"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output berjalan pada"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utgangen kjører på"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uitvoer draait op"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਉਟਪੁੱਟ ਦਾ ਸੈਂਪਲ ਰੇਟ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Częstotliwość wyjścia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taxa da saída"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taxa da saída"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rata ieșirii"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utgången körs i"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kifaa cha kutoa sauti kinatumia"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வெளியீடு இயங்கும் வீதம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అవుట్‌పుట్ నడుస్తున్న రేట్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ขาออกทำงานที่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çıkışın çalıştığı hız"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Частота виходу"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آؤٹ پٹ کا موجودہ ریٹ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đầu ra chạy ở"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸出目前取樣率"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输出当前采样率"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸出目前取樣率"
+          }
+        }
+      }
+    },
+    "Output’s channels": {
+      "comment": "Shown on the iPhone or iPad. Output screen, in a small table titled “What Reaches the Output” that lists facts read back from iOS while a song plays on an external DAC or audio interface. Row label: how many channels the output device is running with now; the value is a number.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የውፅዓቱ ቻናሎች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قنوات المخرج"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আউটপুটের চ্যানেল"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanály výstupu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outputtets kanaler"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanäle der Ausgabe"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κανάλια εξόδου"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canales de la salida"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کانال‌های خروجی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulostulon kanavat"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga channel ng output"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canaux de la sortie"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આઉટપુટની ચૅનલો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tashoshin fitarwa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ערוצי הפלט"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुट के चैनल"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A kimenet csatornái"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saluran output"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canali dell’uscita"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出力のチャンネル数"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಔಟ್‌ಪುಟ್‌ನ ಚಾನೆಲ್‌ಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출력의 채널 수"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഔട്ട്‌പുട്ടിന്റെ ചാനലുകൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुटचे चॅनेल"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saluran output"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utgangens kanaler"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanalen van de uitvoer"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਉਟਪੁੱਟ ਦੇ ਚੈਨਲ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanały wyjścia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canais da saída"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canais da saída"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canalele ieșirii"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utgångens kanaler"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaneli za kifaa cha kutoa sauti"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வெளியீட்டின் சேனல்கள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అవుట్‌పుట్ ఛానెల్‌లు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ช่องสัญญาณของขาออก"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çıkışın kanalları"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Канали виходу"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آؤٹ پٹ کے چینلز"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Số kênh của đầu ra"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸出聲道數"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输出声道数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸出聲道數"
+          }
+        }
+      }
+    },
     "Pair": {
       "comment": "Web remote: button that pairs the browser with the code typed.",
       "localizations": {
@@ -38742,6 +39818,275 @@
         }
       }
     },
+    "Read back from iOS while the song plays, not assumed. Vespertine asks a DAC for each song’s own rate and, for surround, an interface for a channel per output (in the order L, R, C, LFE, back pair, side pair). iOS doesn’t tell apps an output’s bit depth. With the volume below 100%, a DAC doesn’t receive the song’s samples unchanged.": {
+      "comment": "Shown on the iPhone or iPad. Footer under that table. “rate” is the sample rate. “interface” is a multichannel audio interface. L, R, C, LFE are the standard speaker channel abbreviations: keep them as they are. “back pair, side pair” are the rear and side surround speaker pairs of a 7.1 layout. Keep “iOS”, “DAC”, “Vespertine”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ዘፈኑ በሚጫወትበት ጊዜ ከiOS የተነበበ እንጂ የተገመተ አይደለም። Vespertine ከDAC የእያንዳንዱን ዘፈን የራሱን የናሙና ፍጥነት ይጠይቃል፤ ለሰራውንድ ደግሞ ከኢንተርፌስ ለእያንዳንዱ ውፅዓት አንድ ቻናል ይጠይቃል (በቅደም ተከተል L, R, C, LFE፣ የኋላ ጥንድ፣ የጎን ጥንድ)። iOS የውፅዓትን የቢት ጥልቀት ለመተግበሪያዎች አይነግርም። የድምፅ መጠኑ ከ100% በታች ሲሆን DAC የዘፈኑን ናሙናዎች ሳይለወጡ አይቀበልም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مقروءة من iOS أثناء تشغيل الأغنية، وليست مفترضة. يطلب Vespertine من DAC معدل العينة الخاص بكل أغنية، ويطلب للصوت المحيطي من واجهة الصوت قناة لكل مخرج (بالترتيب L, R, C, LFE، الزوج الخلفي، الزوج الجانبي). لا يخبر iOS التطبيقات بعمق البت للمخرج. عندما يكون مستوى الصوت أقل من 100%، لا يتلقى DAC عينات الأغنية دون تغيير."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "গান চলার সময় iOS থেকে পড়া তথ্য, অনুমান নয়। Vespertine DAC-এর কাছে প্রতিটি গানের নিজস্ব স্যাম্পল রেট চায়, আর সারাউন্ডের ক্ষেত্রে ইন্টারফেসের কাছে প্রতিটি আউটপুটের জন্য একটি করে চ্যানেল চায় (এই ক্রমে: L, R, C, LFE, পেছনের জোড়া, পাশের জোড়া)। iOS অ্যাপকে আউটপুটের বিট ডেপথ জানায় না। ভলিউম 100%-এর নিচে থাকলে DAC গানের স্যাম্পল অপরিবর্তিত অবস্থায় পায় না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zjištěno ze systému iOS během přehrávání skladby, nikoli odhadnuto. Vespertine žádá DAC o vlastní vzorkovací frekvenci každé skladby a u surroundu žádá rozhraní o samostatný kanál pro každý výstup (v pořadí L, R, C, LFE, zadní pár, boční pár). iOS aplikacím nesděluje bitovou hloubku výstupu. Je-li hlasitost nižší než 100 %, DAC nedostává vzorky skladby beze změny."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aflæst fra iOS, mens sangen afspilles, ikke antaget. Vespertine beder en DAC om hver sangs egen samplingfrekvens og, ved surround, et lydinterface om en kanal pr. udgang (i rækkefølgen L, R, C, LFE, bagerste par, sidepar). iOS oplyser ikke apps om et outputs bitdybde. Når lydstyrken er under 100 %, modtager en DAC ikke sangens samples uændret."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von iOS während der Wiedergabe ausgelesen, nicht angenommen. Vespertine fordert von einem DAC die eigene Abtastrate jedes Titels an und, für Surround, von einem Audio-Interface einen Kanal pro Ausgang (in der Reihenfolge L, R, C, LFE, hinteres Paar, seitliches Paar). iOS teilt Apps die Bittiefe einer Ausgabe nicht mit. Liegt die Lautstärke unter 100 %, erhält ein DAC die Samples des Titels nicht unverändert."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τα στοιχεία διαβάζονται από το iOS όσο παίζει το τραγούδι, δεν είναι υποθέσεις. Το Vespertine ζητά από ένα DAC τον ρυθμό δειγματοληψίας του κάθε τραγουδιού και, για surround, από μια διεπαφή ήχου ένα κανάλι ανά έξοδο (με τη σειρά L, R, C, LFE, πίσω ζεύγος, πλαϊνό ζεύγος). Το iOS δεν αναφέρει στις εφαρμογές το βάθος bit μιας εξόδου. Με την ένταση ήχου κάτω από 100%, ένα DAC δεν λαμβάνει αμετάβλητα τα δείγματα του τραγουδιού."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datos leídos de iOS mientras suena la canción, no supuestos. Vespertine pide a un DAC la frecuencia propia de cada canción y, para el sonido envolvente, pide a una interfaz un canal por salida (en el orden L, R, C, LFE, par trasero, par lateral). iOS no indica a las apps la profundidad de bits de una salida. Con el volumen por debajo del 100 %, un DAC no recibe las muestras de la canción sin cambios."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هنگام پخش آهنگ از iOS خوانده می‌شود، نه بر پایهٔ فرض. Vespertine از DAC نرخ نمونه‌برداری خودِ هر آهنگ را می‌خواهد و برای صدای فراگیر، از رابط صوتی برای هر خروجی یک کانال می‌خواهد (به ترتیب L, R, C, LFE، جفت عقب، جفت کناری). iOS عمق بیت خروجی را به برنامه‌ها اعلام نمی‌کند. وقتی بلندی صدا کمتر از ۱۰۰٪ باشد، DAC نمونه‌های آهنگ را بدون تغییر دریافت نمی‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Luettu iOS:ltä kappaleen soidessa, ei oletettu. Vespertine pyytää DAC:lta kunkin kappaleen omaa näytteenottotaajuutta ja surroundia varten äänikortilta kanavaa kullekin ulostulolle (järjestyksessä L, R, C, LFE, takapari, sivupari). iOS ei kerro apeille ulostulon bittisyvyyttä. Kun äänenvoimakkuus on alle 100 %, DAC ei saa kappaleen näytteitä muuttumattomina."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Binabasa mula sa iOS habang nagpe-play ang kanta, hindi ipinagpapalagay. Hinihiling ng Vespertine sa DAC ang sariling sample rate ng bawat kanta at, para sa surround, hinihiling nito sa interface ang isang channel sa bawat output (sa pagkakasunod-sunod na L, R, C, LFE, pares sa likod, pares sa gilid). Hindi sinasabi ng iOS sa mga app ang bit depth ng output. Kapag ang volume ay mas mababa sa 100%, hindi natatanggap ng DAC ang mga sample ng kanta nang walang pagbabago."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Relevé auprès d’iOS pendant la lecture du morceau, et non supposé. Vespertine demande à un DAC la fréquence propre à chaque morceau et, pour le surround, demande à une interface un canal par sortie (dans l’ordre L, R, C, LFE, paire arrière, paire latérale). iOS n’indique pas aux apps la résolution d’une sortie. Lorsque le volume est inférieur à 100 %, un DAC ne reçoit pas les échantillons du morceau inchangés."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ગીત વાગતું હોય ત્યારે iOS પાસેથી વાંચેલું, ધારી લીધેલું નહીં. Vespertine DAC પાસે દરેક ગીતનો પોતાનો સેમ્પલ રેટ માગે છે અને સરાઉન્ડ માટે ઇન્ટરફેસ પાસે દરેક આઉટપુટ દીઠ એક ચૅનલ માગે છે (આ ક્રમમાં: L, R, C, LFE, પાછળની જોડી, બાજુની જોડી). iOS ઍપને આઉટપુટની બિટ ડેપ્થ જણાવતું નથી. વૉલ્યૂમ 100%થી ઓછું હોય ત્યારે DACને ગીતના સેમ્પલ ફેરફાર વિના મળતા નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An karanto daga iOS yayin da waƙar ke kunnawa, ba zato ba ne. Vespertine yana neman DAC ya yi amfani da ƙimar samfuri ta kowace waƙa, kuma don sautin kewaye, yana neman interface ta ba da tasha ga kowace fitarwa (a jere: L, R, C, LFE, biyun baya, biyun gefe). iOS ba ya gaya wa manhajoji zurfin bit na fitarwa. Idan ƙarar sauti ta gaza 100%, DAC ba ya karɓar samfuran waƙar ba tare da canji ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נקרא מ־iOS בזמן שהשיר מתנגן, ולא על סמך הנחה. Vespertine מבקש מה־DAC את קצב הדגימה של כל שיר, ולסראונד מבקש מממשק השמע ערוץ לכל פלט (בסדר L, R, C, LFE, זוג אחורי, זוג צדדי). iOS אינו מוסר לאפליקציות את עומק הסיביות של הפלט. כשעוצמת הקול נמוכה מ־100%, ה־DAC אינו מקבל את דגימות השיר ללא שינוי."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गीत चलते समय iOS से पढ़ा गया, माना हुआ नहीं। Vespertine DAC से हर गीत का अपना सैंपल रेट माँगता है और सराउंड के लिए इंटरफ़ेस से हर आउटपुट के लिए एक चैनल माँगता है (इस क्रम में: L, R, C, LFE, पीछे की जोड़ी, बगल की जोड़ी)। iOS ऐप को आउटपुट की बिट डेप्थ नहीं बताता। वॉल्यूम 100% से कम होने पर DAC को गीत के सैंपल बिना बदले नहीं मिलते।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lejátszás közben az iOS-ből kiolvasott, nem feltételezett adatok. A Vespertine a DAC-tól minden dalhoz a dal saját mintavételi frekvenciáját kéri, surround esetén pedig az interfésztől kimenetenként egy csatornát (L, R, C, LFE, hátsó pár, oldalsó pár sorrendben). Az iOS nem közli az appokkal a kimenet bitmélységét. 100%-nál kisebb hangerőnél a DAC nem változatlanul kapja meg a dal mintáit."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dibaca kembali dari iOS saat lagu diputar, bukan diasumsikan. Vespertine meminta DAC memakai laju sampel masing-masing lagu dan, untuk surround, meminta antarmuka audio menyediakan satu saluran per output (dengan urutan L, R, C, LFE, pasangan belakang, pasangan samping). iOS tidak memberi tahu app kedalaman bit suatu output. Dengan volume di bawah 100%, DAC tidak menerima sampel lagu tanpa perubahan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dati letti da iOS durante la riproduzione del brano, non presunti. Vespertine chiede a un DAC la frequenza propria di ogni brano e, per il surround, chiede a un’interfaccia un canale per ogni uscita (nell’ordine L, R, C, LFE, coppia posteriore, coppia laterale). iOS non comunica alle app la profondità di bit di un’uscita. Con il volume sotto il 100%, un DAC non riceve i campioni del brano inalterati."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "曲の再生中にiOSから読み戻した値で、推定ではありません。VespertineはDACに各曲本来のレートを要求し、サラウンドの場合はオーディオインターフェイスに出力ごとに1チャンネルを要求します（順番はL、R、C、LFE、リアのペア、サイドのペア）。iOSは出力のビット深度をアプリに伝えません。音量が100%未満の場合、DACは曲のサンプルをそのままの形では受け取りません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹಾಡು ಪ್ಲೇ ಆಗುತ್ತಿರುವಾಗ iOS ನಿಂದ ಓದಿದ್ದು, ಊಹಿಸಿದ್ದಲ್ಲ. Vespertine DAC ನಿಂದ ಪ್ರತಿ ಹಾಡಿನ ಸ್ವಂತ ಸ್ಯಾಂಪಲ್ ರೇಟ್ ಅನ್ನು ಕೇಳುತ್ತದೆ ಮತ್ತು ಸರೌಂಡ್‌ಗಾಗಿ ಇಂಟರ್‌ಫೇಸ್‌ನಿಂದ ಪ್ರತಿ ಔಟ್‌ಪುಟ್‌ಗೆ ಒಂದು ಚಾನೆಲ್ ಅನ್ನು ಕೇಳುತ್ತದೆ (ಈ ಕ್ರಮದಲ್ಲಿ: L, R, C, LFE, ಹಿಂದಿನ ಜೋಡಿ, ಬದಿಯ ಜೋಡಿ). iOS ಆ್ಯಪ್‌ಗಳಿಗೆ ಔಟ್‌ಪುಟ್‌ನ ಬಿಟ್ ಡೆಪ್ತ್ ತಿಳಿಸುವುದಿಲ್ಲ. ವಾಲ್ಯೂಮ್ 100% ಗಿಂತ ಕಡಿಮೆ ಇದ್ದಾಗ, DAC ಗೆ ಹಾಡಿನ ಸ್ಯಾಂಪಲ್‌ಗಳು ಬದಲಾಗದೆ ತಲುಪುವುದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "노래가 재생되는 동안 iOS에서 다시 읽어 온 값이며, 추정한 값이 아닙니다. Vespertine은 DAC에 각 노래 고유의 레이트를 요청하고, 서라운드의 경우 오디오 인터페이스에 출력마다 채널 하나씩을 요청합니다(L, R, C, LFE, 후방 쌍, 측면 쌍 순서). iOS는 출력의 비트 심도를 앱에 알려 주지 않습니다. 음량이 100% 미만이면 DAC는 노래의 샘플을 변경 없이 그대로 받지 못합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "അനുമാനിച്ചതല്ല, പാട്ട് പ്ലേ ചെയ്യുമ്പോൾ iOS-ൽ നിന്ന് വായിച്ചെടുത്തതാണ്. ഓരോ പാട്ടിനും അതിന്റെ സ്വന്തം സാമ്പിൾ റേറ്റ് Vespertine DAC-നോട് ആവശ്യപ്പെടുന്നു; സറൗണ്ടിന്, ഓരോ ഔട്ട്‌പുട്ടിനും ഒരു ചാനൽ വീതം ഇന്റർഫേസിനോട് ആവശ്യപ്പെടുന്നു (L, R, C, LFE, പിൻ ജോടി, വശങ്ങളിലെ ജോടി എന്ന ക്രമത്തിൽ). ഒരു ഔട്ട്‌പുട്ടിന്റെ ബിറ്റ് ഡെപ്ത് iOS ആപ്പുകളെ അറിയിക്കുന്നില്ല. വോളിയം 100%-ൽ താഴെയാണെങ്കിൽ, പാട്ടിന്റെ സാമ്പിളുകൾ മാറ്റമില്ലാതെ DAC-ന് ലഭിക്കില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गाणे वाजत असताना iOS कडून वाचलेले, गृहीत धरलेले नाही. Vespertine DAC कडे प्रत्येक गाण्याचा स्वतःचा सॅम्पल रेट मागते आणि सराउंडसाठी इंटरफेसकडे प्रत्येक आउटपुटसाठी एक चॅनेल मागते (या क्रमाने: L, R, C, LFE, मागची जोडी, बाजूची जोडी). iOS ॲप्सना आउटपुटची बिट डेप्थ सांगत नाही. व्हॉल्यूम 100% पेक्षा कमी असताना DAC ला गाण्याचे सॅम्पल जसेच्या तसे मिळत नाहीत."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dibaca semula daripada iOS semasa lagu dimainkan, bukan diandaikan. Vespertine meminta DAC menggunakan kadar sampel setiap lagu itu sendiri dan, untuk bunyi keliling, meminta antara muka audio menyediakan satu saluran bagi setiap output (mengikut tertib L, R, C, LFE, pasangan belakang, pasangan sisi). iOS tidak memberitahu app kedalaman bit sesuatu output. Dengan kelantangan di bawah 100%, DAC tidak menerima sampel lagu tanpa perubahan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lest av fra iOS mens sangen spilles, ikke antatt. Vespertine ber en DAC om hver sangs egen samplingsfrekvens og, for surround, et lydgrensesnitt om én kanal per utgang (i rekkefølgen L, R, C, LFE, bakre par, sidepar). iOS forteller ikke apper hvilken bitdybde en utgang har. En DAC mottar ikke sangens sampler uendret når volumet er under 100 %."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uitgelezen uit iOS terwijl het nummer speelt, niet aangenomen. Vespertine vraagt een DAC om de eigen samplefrequentie van elk nummer en, voor surround, een audio-interface om een kanaal per uitgang (in de volgorde L, R, C, LFE, achterste paar, zijpaar). iOS laat apps de bitdiepte van een uitvoer niet weten. Staat het volume lager dan 100%, dan ontvangt een DAC de samples van het nummer niet ongewijzigd."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਗੀਤ ਚੱਲਣ ਦੌਰਾਨ iOS ਤੋਂ ਪੜ੍ਹਿਆ ਗਿਆ, ਮੰਨਿਆ ਹੋਇਆ ਨਹੀਂ। Vespertine DAC ਤੋਂ ਹਰ ਗੀਤ ਦਾ ਆਪਣਾ ਸੈਂਪਲ ਰੇਟ ਮੰਗਦਾ ਹੈ ਅਤੇ ਸਰਾਊਂਡ ਲਈ ਇੰਟਰਫੇਸ ਤੋਂ ਹਰ ਆਉਟਪੁੱਟ ਲਈ ਇੱਕ ਚੈਨਲ ਮੰਗਦਾ ਹੈ (ਇਸ ਕ੍ਰਮ ਵਿੱਚ: L, R, C, LFE, ਪਿਛਲੀ ਜੋੜੀ, ਪਾਸੇ ਦੀ ਜੋੜੀ)। iOS ਐਪਾਂ ਨੂੰ ਆਉਟਪੁੱਟ ਦੀ ਬਿੱਟ ਡੈਪਥ ਨਹੀਂ ਦੱਸਦਾ। ਵੌਲਿਊਮ 100% ਤੋਂ ਘੱਟ ਹੋਣ ’ਤੇ DAC ਨੂੰ ਗੀਤ ਦੇ ਸੈਂਪਲ ਬਿਨਾਂ ਬਦਲੇ ਨਹੀਂ ਮਿਲਦੇ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odczytane z iOS podczas odtwarzania utworu, a nie założone z góry. Vespertine prosi DAC o częstotliwość próbkowania właściwą dla każdego utworu, a w przypadku surroundu prosi interfejs o osobny kanał na każde wyjście (w kolejności L, R, C, LFE, para tylna, para boczna). iOS nie podaje aplikacjom rozdzielczości bitowej wyjścia. Gdy głośność jest niższa niż 100%, DAC nie otrzymuje próbek utworu w niezmienionej postaci."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dados lidos do iOS enquanto a música toca, não presumidos. O Vespertine pede a um DAC a taxa própria de cada música e, para surround, pede a uma interface um canal por saída (na ordem L, R, C, LFE, par traseiro, par lateral). O iOS não informa aos apps a profundidade de bits de uma saída. Com o volume abaixo de 100 %, um DAC não recebe as amostras da música inalteradas."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dados lidos do iOS enquanto a música toca, não presumidos. O Vespertine pede a um DAC a taxa própria de cada música e, para surround, pede a uma interface um canal por saída (pela ordem L, R, C, LFE, par traseiro, par lateral). O iOS não indica às apps a profundidade de bits de uma saída. Com o volume abaixo de 100%, um DAC não recebe as amostras da música inalteradas."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Date citite din iOS în timp ce melodia este redată, nu presupuse. Vespertine îi cere unui DAC rata proprie a fiecărei melodii și, pentru surround, îi cere unei interfețe câte un canal pentru fiecare ieșire (în ordinea L, R, C, LFE, perechea din spate, perechea laterală). iOS nu le comunică aplicațiilor adâncimea de biți a unei ieșiri. Cu volumul sub 100%, un DAC nu primește eșantioanele melodiei nemodificate."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avläst från iOS medan låten spelas, inte antaget. Vespertine ber en DAC om varje låts egen samplingsfrekvens och, för surround, ett ljudgränssnitt om en kanal per utgång (i ordningen L, R, C, LFE, bakre par, sidopar). iOS talar inte om för appar vilket bitdjup en utgång har. En DAC får inte låtens sampel oförändrade när volymen är under 100 %."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imesomwa kutoka iOS wimbo unapocheza, haijakisiwa. Vespertine huomba DAC kiwango cha sampuli cha kila wimbo na, kwa sauti ya kuzunguka, huomba kiolesura cha sauti chaneli moja kwa kila kifaa cha kutoa sauti (kwa mpangilio L, R, C, LFE, jozi ya nyuma, jozi ya pembeni). iOS haiambii programu kina cha biti cha kifaa cha kutoa sauti. Kiwango cha sauti kikiwa chini ya 100%, DAC haipokei sampuli za wimbo bila kubadilishwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இவை ஊகிக்கப்பட்டவை அல்ல; பாடல் இயங்கும்போது iOS-இலிருந்து படிக்கப்பட்டவை. Vespertine ஒவ்வொரு பாடலுக்கும் அதன் சொந்த மாதிரி வீதத்தை DAC-இடம் கேட்கிறது; சரவுண்டுக்கு, ஒவ்வொரு வெளியீட்டுக்கும் ஒரு சேனலை இன்டர்ஃபேஸிடம் கேட்கிறது (L, R, C, LFE, பின் ஜோடி, பக்க ஜோடி என்ற வரிசையில்). ஒரு வெளியீட்டின் பிட் ஆழத்தை iOS ஆப்ஸுக்குத் தெரிவிப்பதில்லை. ஒலியளவு 100%-க்குக் கீழே இருந்தால், பாடலின் மாதிரிகள் மாற்றமின்றி DAC-ஐச் சென்றடையாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఇవి ఊహించినవి కావు; పాట ప్లే అవుతున్నప్పుడు iOS నుండి చదివినవి. Vespertine ప్రతి పాటకు దాని సొంత శాంపిల్ రేట్‌ను DACని అడుగుతుంది; సరౌండ్ కోసం, ప్రతి అవుట్‌పుట్‌కు ఒక ఛానెల్ చొప్పున ఇంటర్‌ఫేస్‌ను అడుగుతుంది (L, R, C, LFE, వెనుక జత, పక్క జత క్రమంలో). అవుట్‌పుట్ బిట్ డెప్త్‌ను iOS యాప్‌లకు తెలియజేయదు. వాల్యూమ్ 100% కంటే తక్కువగా ఉంటే, పాట శాంపిల్‌లు మారకుండా DACకు చేరవు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อ่านกลับมาจาก iOS ขณะเล่นเพลง ไม่ได้คาดเดาเอา Vespertine จะขอให้ DAC ทำงานที่อัตราสุ่มตัวอย่างของแต่ละเพลงเอง และสำหรับเสียงรอบทิศทาง จะขอให้อินเทอร์เฟซส่งหนึ่งช่องสัญญาณต่อหนึ่งขาออก (เรียงตามลำดับ L, R, C, LFE, คู่หลัง, คู่ข้าง) iOS ไม่บอกความลึกบิตของขาออกให้แอปทราบ เมื่อระดับเสียงต่ำกว่า 100% แซมเปิลของเพลงจะไม่ไปถึง DAC แบบไม่ถูกเปลี่ยนแปลง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varsayılmaz; şarkı çalarken iOS’ten okunur. Vespertine, DAC’den her şarkının kendi örnekleme hızını, surround için de ses arabiriminden her çıkışa bir kanal ister (L, R, C, LFE, arka çift, yan çift sırasıyla). iOS, bir çıkışın bit derinliğini uygulamalara bildirmez. Ses düzeyi %100’ün altındayken DAC, şarkının örneklerini değiştirilmemiş olarak almaz."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Зчитано з iOS під час відтворення пісні, а не припущено. Vespertine запитує в ЦАП власну частоту дискретизації кожної пісні, а для об’ємного звуку — в інтерфейсу окремий канал на кожен вихід (у порядку L, R, C, LFE, задня пара, бічна пара). iOS не повідомляє програмам розрядність виходу. Якщо гучність нижча за 100%, ЦАП не отримує семпли пісні без змін."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ معلومات گانا چلنے کے دوران iOS سے پڑھی جاتی ہیں، فرض نہیں کی جاتیں۔ Vespertine DAC سے ہر گانے کا اپنا سیمپل ریٹ مانگتا ہے اور سراؤنڈ کے لیے انٹرفیس سے ہر آؤٹ پٹ کے لیے ایک چینل (اس ترتیب میں: L, R, C, LFE، پچھلا جوڑا، سائیڈ جوڑا)۔ iOS ایپس کو آؤٹ پٹ کی بٹ ڈیپتھ نہیں بتاتا۔ والیوم 100% سے کم ہو تو DAC کو گانے کے سیمپلز بغیر تبدیلی کے نہیں ملتے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Được đọc lại từ iOS trong khi bài hát đang phát, không phải phỏng đoán. Vespertine yêu cầu DAC chạy ở đúng tần số lấy mẫu của từng bài hát và, với âm thanh vòm, yêu cầu giao diện âm thanh dành một kênh cho mỗi đầu ra (theo thứ tự L, R, C, LFE, cặp sau, cặp bên). iOS không cho ứng dụng biết độ sâu bit của đầu ra. Khi âm lượng dưới 100%, DAC không nhận được các mẫu của bài hát ở dạng nguyên vẹn."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以下資料是在歌曲播放時從 iOS 讀回的，並非推測。Vespertine 會要求 DAC 使用每首歌曲本身的取樣率；播放環繞聲時，會要求音訊介面為每個輸出分配一個聲道（次序為 L、R、C、LFE、後置一對、側置一對）。iOS 不會告知 App 輸出的位元深度。音量低於 100% 時，DAC 收到的不再是歌曲的原有取樣。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以下信息是在歌曲播放时从 iOS 读回的，并非推测。Vespertine 会请求 DAC 使用每首歌曲自身的采样率；播放环绕声时，会请求音频接口为每个输出分配一个声道（顺序为 L、R、C、LFE、后置一对、侧置一对）。iOS 不会告知 App 输出的位深度。音量低于 100% 时，DAC 收到的不再是歌曲的原始采样。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以下資訊是在歌曲播放時從 iOS 讀回的，並非推測。Vespertine 會要求 DAC 使用每首歌曲本身的取樣率；播放環繞聲時，會要求音訊介面為每個輸出分配一個聲道（順序為 L、R、C、LFE、後置一對、側置一對）。iOS 不會告知 App 輸出的位元深度。音量低於 100% 時，DAC 收到的不再是歌曲的原始取樣。"
+          }
+        }
+      }
+    },
     "Recently Added": {
       "localizations": {
         "am": {
@@ -41421,6 +42766,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "重複播放"
+          }
+        }
+      }
+    },
+    "Resampled by iOS": {
+      "comment": "Shown on the iPhone or iPad. Output screen, in a small table titled “What Reaches the Output” that lists facts read back from iOS while a song plays on an external DAC or audio interface. Row label: whether iOS is changing the song's sample rate on the way to the output. The value is Yes or No. Match how “resampled by iOS” was translated in “%@ kHz, resampled by iOS” (/mnt/project-files/l10n/ios/out/<lang>.json).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በiOS ዳግም ናሙና የተወሰደ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أعاد iOS أخذ العينات"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS রিস্যাম্পল করেছে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Převzorkováno systémem iOS"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resamplet af iOS"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von iOS neu abgetastet"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Επαναδειγματοληψία από το iOS"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remuestreado por iOS"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تغییر نرخ توسط iOS"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS:n uudelleennäytteistämä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ni-resample ng iOS"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rééchantillonné par iOS"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS દ્વારા રીસેમ્પલ કરેલું"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ya sake samfurinsa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נדגם מחדש על־ידי iOS"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS द्वारा रीसैंपल किया गया"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az iOS újramintavételezi"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disampel ulang oleh iOS"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricampionato da iOS"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOSがリサンプリング"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ರೀಸ್ಯಾಂಪಲ್ ಮಾಡಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS에서 리샘플링됨"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS റീസാമ്പിൾ ചെയ്തത്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS द्वारे रीसॅम्पल केलेले"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disampel semula oleh iOS"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resamplet av iOS"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geresampled door iOS"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ਵੱਲੋਂ ਰੀਸੈਂਪਲ ਕੀਤਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Przepróbkowane przez iOS"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reamostrado pelo iOS"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reamostrado pelo iOS"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reeșantionat de iOS"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omsamplat av iOS"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imebadilishwa kiwango cha sampuli na iOS"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS மறுமாதிரியாக்கியது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS రీశాంపుల్ చేసింది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แปลงอัตราโดย iOS"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS tarafından yeniden örneklendi"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Передискретизовано iOS"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS نے ری سیمپل کیا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Được iOS chuyển tần số"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由 iOS 重新取樣"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由 iOS 重采样"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由 iOS 重新取樣"
           }
         }
       }
@@ -45181,6 +46795,275 @@
         }
       }
     },
+    "Song": {
+      "comment": "Shown on the iPhone or iPad. Output screen, in a small table titled “What Reaches the Output” that lists facts read back from iOS while a song plays on an external DAC or audio interface. Row label: the playing song's format; the value beside it is e.g. “FLAC · 24/192”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ዘፈን"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الأغنية"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "গান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skladba"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sang"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Titel"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τραγούδι"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canción"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آهنگ"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kappale"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Morceau"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ગીત"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waƙa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שיר"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गीत"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dal"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagu"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brano"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "曲"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹಾಡು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "노래"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പാട്ട്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गाणे"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagu"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sang"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nummer"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਗੀਤ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utwór"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Música"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Música"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Melodie"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Låt"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wimbo"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பாடல்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "పాట"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพลง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarkı"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пісня"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گانا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bài hát"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "歌曲"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "歌曲"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "歌曲"
+          }
+        }
+      }
+    },
     "Songs": {
       "localizations": {
         "am": {
@@ -46518,6 +48401,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "歌曲：%lld/%lld"
+          }
+        }
+      }
+    },
+    "Song’s channels": {
+      "comment": "Shown on the iPhone or iPad. Output screen, in a small table titled “What Reaches the Output” that lists facts read back from iOS while a song plays on an external DAC or audio interface. Row label: how many channels the playing song has; the value is a number.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የዘፈኑ ቻናሎች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قنوات الأغنية"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "গানের চ্যানেল"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanály skladby"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sangens kanaler"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanäle des Titels"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κανάλια τραγουδιού"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canales de la canción"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کانال‌های آهنگ"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kappaleen kanavat"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga channel ng kanta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canaux du morceau"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ગીતની ચૅનલો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tashoshin waƙa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ערוצי השיר"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गीत के चैनल"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A dal csatornái"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saluran lagu"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canali del brano"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "曲のチャンネル数"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹಾಡಿನ ಚಾನೆಲ್‌ಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "노래의 채널 수"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പാട്ടിന്റെ ചാനലുകൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गाण्याचे चॅनेल"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saluran lagu"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sangens kanaler"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanalen van het nummer"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਗੀਤ ਦੇ ਚੈਨਲ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kanały utworu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canais da música"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canais da música"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canalele melodiei"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Låtens kanaler"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaneli za wimbo"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பாடலின் சேனல்கள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "పాట ఛానెల్‌లు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ช่องสัญญาณของเพลง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarkının kanalları"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Канали пісні"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گانے کے چینلز"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Số kênh của bài hát"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "歌曲聲道數"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "歌曲声道数"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "歌曲聲道數"
           }
         }
       }
@@ -49742,6 +51894,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "環繞聲降混為立體聲"
+          }
+        }
+      }
+    },
+    "SURROUND ON %@ OUTPUTS": {
+      "comment": "Shown on the iPhone or iPad. Small badge in Now Playing: a surround song plays on an audio interface with each channel on an output of its own. %@ is the number of outputs, e.g. 6. Match the style of the existing badges “SURROUND FOLDED TO STEREO” and “CONVERTED ON THE MAC” (/mnt/project-files/l10n/ios/out/<lang>.json). Capitals where the script has them.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሰራውንድ በ%@ ውፅዓቶች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صوت محيطي على %@ مخارج"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@টি আউটপুটে সারাউন্ড"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND NA %@ VÝSTUPECH"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND PÅ %@ UDGANGE"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND AUF %@ AUSGÄNGEN"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND ΣΕ %@ ΕΞΟΔΟΥΣ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ENVOLVENTE EN %@ SALIDAS"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فراگیر روی %@ خروجی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND %@ ULOSTULOSSA"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND SA %@ OUTPUT"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND SUR %@ SORTIES"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ આઉટપુટ પર સરાઉન્ડ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SAUTIN KEWAYE A FITARWA %@"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סראונד ב־%@ פלטים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ आउटपुट पर सराउंड"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND %@ KIMENETEN"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND DI %@ OUTPUT"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND SU %@ USCITE"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サラウンドを%@個の出力で再生"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ಔಟ್‌ಪುಟ್‌ಗಳಲ್ಲಿ ಸರೌಂಡ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서라운드를 출력 %@개로 재생"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ഔട്ട്‌പുട്ടുകളിൽ സറൗണ്ട്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ आउटपुटवर सराउंड"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BUNYI KELILING PADA %@ OUTPUT"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND PÅ %@ UTGANGER"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND OP %@ UITGANGEN"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਆਉਟਪੁੱਟਾਂ ’ਤੇ ਸਰਾਊਂਡ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND NA %@ WYJŚCIACH"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND EM %@ SAÍDAS"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND EM %@ SAÍDAS"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND PE %@ IEȘIRI"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND PÅ %@ UTGÅNGAR"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SAUTI YA KUZUNGUKA KWENYE VIFAA %@ VYA KUTOA SAUTI"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ வெளியீடுகளில் சரவுண்ட்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ అవుట్‌పుట్‌లలో సరౌండ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เสียงรอบทิศทางบน %@ ขาออก"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SURROUND %@ ÇIKIŞTA"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ОБ’ЄМНИЙ ЗВУК НА %@ ВИХОДАХ"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سراؤنڈ %@ آؤٹ پٹس پر"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ÂM THANH VÒM TRÊN %@ ĐẦU RA"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "環繞聲經 %@ 個輸出播放"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "环绕声经 %@ 个输出播放"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "環繞聲經 %@ 個輸出播放"
           }
         }
       }
@@ -61575,6 +63996,275 @@
         }
       }
     },
+    "volume %@": {
+      "comment": "Shown on the iPhone or iPad. Appended to the sample-rate chip in Now Playing after “ · ” when the device volume is not at 100% on a DAC, e.g. “96 kHz · volume 80%”. Lowercase. %@ is an already formatted percentage.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የድምፅ መጠን %@"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مستوى الصوت %@"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ভলিউম %@"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hlasitost %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "lydstyrke %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lautstärke %@"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ένταση ήχου %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "volumen %@"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلندی صدا %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "äänenvoimakkuus %@"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "volume %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "volume %@"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વૉલ્યૂમ %@"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ƙarar sauti %@"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עוצמת קול %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वॉल्यूम %@"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hangerő: %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "volume %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "volume %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音量%@"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ವಾಲ್ಯೂಮ್ %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음량 %@"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "വോളിയം %@"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "व्हॉल्यूम %@"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kelantangan %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "volum %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "volume %@"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਵੌਲਿਊਮ %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "głośność %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "volume %@"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "volume %@"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "volum %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "volym %@"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kiwango cha sauti %@"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒலியளவு %@"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "వాల్యూమ్ %@"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ระดับเสียง %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ses düzeyi %@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "гучність %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "والیوم %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "âm lượng %@"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音量 %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音量 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音量 %@"
+          }
+        }
+      }
+    },
     "Volume %@. Use the volume buttons on this device.": {
       "comment": "Now Playing on the iPhone: %@ is the device's volume as a percentage, e.g. “62%”.",
       "localizations": {
@@ -63185,6 +65875,275 @@
         }
       }
     },
+    "What Reaches the Output": {
+      "comment": "Shown on the iPhone or iPad. Section title on the Output screen, above a small table of facts about the playing song and the sound output (a DAC, headphones, the speaker). Title case where your language uses it.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ወደ ውፅዓቱ የሚደርሰው"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ما يصل إلى المخرج"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আউটপুটে যা পৌঁছায়"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Co se dostane na výstup"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det, der når outputtet"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Was die Ausgabe erreicht"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τι φτάνει στην έξοδο"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo que llega a la salida"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آنچه به خروجی می‌رسد"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitä ulostuloon päätyy"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang Nakakarating sa Output"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce qui arrive à la sortie"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આઉટપુટ સુધી શું પહોંચે છે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abin da Yake Kaiwa Fitarwa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מה מגיע לפלט"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुट तक क्या पहुँचता है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mi jut el a kimenetre"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yang Sampai ke Output"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cosa arriva all’uscita"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出力に届く内容"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಔಟ್‌ಪುಟ್‌ಗೆ ಏನು ತಲುಪುತ್ತದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출력에 도달하는 내용"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഔട്ട്‌പുട്ടിൽ എത്തുന്നത്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुटपर्यंत काय पोहोचते"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apa yang Sampai ke Output"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det som når utgangen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat de uitvoer bereikt"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਉਟਪੁੱਟ ਤੱਕ ਕੀ ਪਹੁੰਚਦਾ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Co trafia do wyjścia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Que Chega à Saída"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O que chega à saída"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce ajunge la ieșire"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det som når utgången"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kinachofika kwenye Kifaa cha Kutoa Sauti"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வெளியீட்டைச் சென்றடைவது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అవుట్‌పుట్‌కు చేరేది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สิ่งที่ไปถึงขาออก"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çıkışa Ulaşan"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Що надходить на вихід"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آؤٹ پٹ تک کیا پہنچتا ہے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Những gì đến được đầu ra"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "傳到輸出的內容"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "到达输出的内容"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "傳到輸出的內容"
+          }
+        }
+      }
+    },
     "When music plays on this device, its songs come from your Mac. Lossless and hi-res songs are large: an album can be several hundred megabytes. The count is since the app was opened.": {
       "localizations": {
         "am": {
@@ -63449,6 +66408,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "在此裝置上播放音樂時，歌曲來自你的 Mac。無損和高解析度歌曲的檔案很大：一張專輯可能有數百 MB。此數值從打開 App 起計算。"
+          }
+        }
+      }
+    },
+    "Yes": {
+      "comment": "Shown on the iPhone or iPad. Output screen, in a small table titled “What Reaches the Output” that lists facts read back from iOS while a song plays on an external DAC or audio interface. Value for the row “Resampled by iOS”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አዎ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نعم"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "হ্যাঁ"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ano"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ja"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ja"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ναι"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sí"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بله"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kyllä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oui"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "હા"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "E"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כן"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हाँ"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Igen"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ya"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sì"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "はい"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹೌದು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "예"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "അതെ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "होय"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ya"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ja"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ja"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹਾਂ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tak"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sim"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sim"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Da"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ja"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ndiyo"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஆம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అవును"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ใช่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evet"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Так"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہاں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Có"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "是"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "是"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "是"
           }
         }
       }

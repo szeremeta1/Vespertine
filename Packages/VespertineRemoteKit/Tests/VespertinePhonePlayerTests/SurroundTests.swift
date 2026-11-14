@@ -165,4 +165,173 @@ private func level(_ samples: [Float]) -> Float {
         #expect(heard.left > 0.01 && heard.right > 0.01)
     }
 }
+
+// MARK: - A multichannel interface
+
+/// An engine rendering offline to `channels` discrete outputs, as an interface with that many would be fed.
+@MainActor private func offline(outputs channels: Int) throws -> AVAudioEngine {
+    let engine = AVAudioEngine()
+    let layout = AVAudioChannelLayout(layoutTag: kAudioChannelLayoutTag_DiscreteInOrder | AudioChannelLayoutTag(channels))!
+    try engine.enableManualRenderingMode(.offline, format: AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: rate, interleaved: false, channelLayout: layout),
+                                         maximumFrameCount: 4096)
+    return engine
+}
+
+/// What each output carried.
+@MainActor private func outputs(_ engine: AVAudioEngine, seconds: Double = 0.3) throws -> [[Float]] {
+    let count = Int(engine.manualRenderingFormat.channelCount)
+    let buffer = AVAudioPCMBuffer(pcmFormat: engine.manualRenderingFormat, frameCapacity: 4096)!
+    var out = [[Float]](repeating: [], count: count)
+    var left = Int(seconds * rate)
+    while left > 0 {
+        guard try engine.renderOffline(AVAudioFrameCount(min(left, 4096)), to: buffer) == .success else { break }
+        for c in 0..<count { out[c].append(contentsOf: UnsafeBufferPointer(start: buffer.floatChannelData![c], count: Int(buffer.frameLength))) }
+        left -= Int(buffer.frameLength)
+    }
+    return out
+}
+
+@Suite(.serialized) @MainActor struct MultichannelOutput {
+    @Test func theOutputsOfAnInterfaceAreTakenInUSBOrder() {
+        let Rls = kAudioChannelLabel_RearSurroundLeft, Rrs = kAudioChannelLabel_RearSurroundRight
+        #expect(ChannelLayouts.outputSpeakers(channels: 2) == nil)
+        #expect(ChannelLayouts.outputSpeakers(channels: 6) == fivePointOne)
+        // Eight: the back pair fifth and sixth, the side pair last, as USB Audio and WAVE order them.
+        #expect(ChannelLayouts.outputSpeakers(channels: 8) == [L, R, C, LFE, Rls, Rrs, Ls, Rs])
+        // More than eight: 7.1 on the first eight, nothing on the rest.
+        let many = ChannelLayouts.outputSpeakers(channels: 10)
+        #expect(many?.count == 10 && Array(many?.suffix(2) ?? []) == [kAudioChannelLabel_Unused, kAudioChannelLabel_Unused])
+        // An output that names its speakers is believed; one that only numbers them isn't.
+        #expect(ChannelLayouts.outputSpeakers(channels: 6, described: [C, L, R, Ls, Rs, LFE]) == [C, L, R, Ls, Rs, LFE])
+        #expect(ChannelLayouts.outputSpeakers(channels: 6, described: [1, 2, 3, 4, 5, 6]) == fivePointOne)
+    }
+
+    @Test func eachChannelOfAFivePointOneSongGoesToItsOwnOutputUnchanged() throws {
+        // The song's channels come as C L R Ls Rs LFE; the interface is L R C LFE Ls Rs.
+        let labels = [C, L, R, Ls, Rs, LFE]
+        let home = [2, 0, 1, 4, 5, 3]
+        for channel in 0..<6 {
+            let url = try surroundFile(channels: 6, only: channel)
+            defer { try? FileManager.default.removeItem(at: url) }
+            let engine = try offline(outputs: 6)
+            let player = PhonePlayer(engine: engine)
+            player.spatialMode = .headTracked
+            player.outputSpeakers = ChannelLayouts.outputSpeakers(channels: 6)
+            try player.load(url, format: format(labels))
+            try player.play()
+            #expect(player.rendering == .discrete(outputs: 6))
+            let heard = try outputs(engine).map(level)
+            for output in 0..<6 {
+                if output == home[channel] {
+                    // A 0.4 sine: 0.283 RMS, with no gain anywhere on the way.
+                    #expect(abs(heard[output] - 0.2828) < 0.002, "song channel \(channel) on output \(output)")
+                } else {
+                    #expect(heard[output] == 0, "song channel \(channel) leaked onto output \(output)")
+                }
+            }
+            player.halt()
+        }
+    }
+
+    @Test func theSamplesReachTheOutputsBitForBit() throws {
+        let url = try surroundFile(channels: 6, only: nil, seconds: 0.3)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let file = try AVAudioFile(forReading: url)
+        let original = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: 9600)!
+        try file.read(into: original, frameCount: 9600)
+        let engine = try offline(outputs: 6)
+        let player = PhonePlayer(engine: engine)
+        player.outputSpeakers = ChannelLayouts.outputSpeakers(channels: 6)
+        try player.load(url, format: format(fivePointOne))
+        try player.play()
+        let heard = try outputs(engine, seconds: 0.2)
+        for c in 0..<6 {
+            let want = Array(UnsafeBufferPointer(start: original.floatChannelData![c], count: 9600))
+            #expect(Array(heard[c].prefix(9600)) == want, "output \(c)")
+        }
+    }
+
+    @Test func sevenPointOneOnAFivePointOneInterfaceFoldsItsBackPairOntoTheSurrounds() throws {
+        // WAVE order for eight: L R C LFE, back pair, side pair.
+        for (channel, output) in [(4, 4), (5, 5), (6, 4), (7, 5)] {
+            let url = try surroundFile(channels: 8, only: channel)
+            defer { try? FileManager.default.removeItem(at: url) }
+            let engine = try offline(outputs: 6)
+            let player = PhonePlayer(engine: engine)
+            player.outputSpeakers = ChannelLayouts.outputSpeakers(channels: 6)
+            let plain = StreamFormat(codec: "WAV", container: "wav", sampleRate: rate, bitDepth: 24, channels: 8, channelLabels: nil, lossless: true)
+            try player.load(url, format: plain)
+            try player.play()
+            #expect(player.rendering == .discrete(outputs: 6))
+            let heard = try outputs(engine).map(level)
+            #expect(heard[output] > 0.15, "song channel \(channel)")
+            for other in 0..<6 where other != output { #expect(heard[other] == 0) }
+            player.halt()
+        }
+    }
+
+    @Test func fivePointOneOnASevenPointOneInterfaceUsesItsSidePair() throws {
+        let url = try surroundFile(channels: 6, only: 4)   // Ls
+        defer { try? FileManager.default.removeItem(at: url) }
+        let engine = try offline(outputs: 8)
+        let player = PhonePlayer(engine: engine)
+        player.outputSpeakers = ChannelLayouts.outputSpeakers(channels: 8)
+        try player.load(url, format: format(fivePointOne))
+        try player.play()
+        let heard = try outputs(engine).map(level)
+        #expect(heard[6] > 0.2)
+        for other in 0..<8 where other != 6 { #expect(heard[other] == 0) }
+    }
+
+    @Test func aStereoSongOnAnInterfaceIsStillLeftAlone() throws {
+        let url = try surroundFile(channels: 2, only: nil)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let engine = try offline(outputs: 6)
+        let player = PhonePlayer(engine: engine)
+        player.outputSpeakers = ChannelLayouts.outputSpeakers(channels: 6)
+        try player.load(url, format: StreamFormat(codec: "WAV", container: "wav", sampleRate: rate, bitDepth: 24, channels: 2, channelLabels: nil, lossless: true))
+        try player.play()
+        #expect(player.rendering == .untouched && player.isUntouchedPath)
+        let heard = try outputs(engine).map(level)
+        #expect(heard[0] > 0.2 && heard[1] > 0.2, "left and right on the first two outputs")
+        for other in 2..<6 { #expect(heard[other] == 0, "output \(other)") }
+    }
+
+    @Test func stereoAfterSurroundAndSurroundAgainOnOneEngine() throws {
+        let surround = try surroundFile(channels: 6, only: 4)
+        let stereo = try surroundFile(channels: 2, only: nil)
+        defer { try? FileManager.default.removeItem(at: surround); try? FileManager.default.removeItem(at: stereo) }
+        let engine = try offline(outputs: 6)
+        let player = PhonePlayer(engine: engine)
+        player.outputSpeakers = ChannelLayouts.outputSpeakers(channels: 6)
+        try player.load(surround, format: format(fivePointOne))
+        try player.play()
+        #expect(try outputs(engine).map(level)[4] > 0.2)
+        try player.load(stereo, format: StreamFormat(codec: "WAV", container: "wav", sampleRate: rate, bitDepth: 24, channels: 2, channelLabels: nil, lossless: true))
+        try player.play()
+        #expect(player.rendering == .untouched)
+        #expect(try outputs(engine).map(level)[0] > 0.2)
+        try player.load(surround, format: format(fivePointOne))
+        try player.play()
+        #expect(player.rendering == .discrete(outputs: 6))
+        let heard = try outputs(engine).map(level)
+        #expect(heard[4] > 0.2 && heard[0] == 0)
+    }
+
+    @Test func anInterfaceAppearingWhileASurroundSongPlaysCarriesOnFromTheSamePlace() throws {
+        let url = try surroundFile(channels: 6, only: nil, seconds: 2)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let engine = try offline(outputs: 6)
+        let player = PhonePlayer(engine: engine)
+        player.spatialMode = .off
+        try player.load(url, format: format(fivePointOne))
+        try player.play()
+        _ = try outputs(engine, seconds: 0.5)
+        player.outputSpeakers = ChannelLayouts.outputSpeakers(channels: 6)
+        #expect(player.rendering == .discrete(outputs: 6) && player.state == .playing)
+        #expect(abs(player.position - 0.5) < 0.1)
+        let heard = try outputs(engine, seconds: 0.2).map(level)
+        for output in 0..<6 { #expect(heard[output] > 0.2, "output \(output)") }
+    }
+}
 #endif
