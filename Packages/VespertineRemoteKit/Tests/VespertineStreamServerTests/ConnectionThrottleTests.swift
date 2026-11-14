@@ -14,21 +14,27 @@ import Testing
     @Test func aHostThatKeepsFailingIsShutOutForAWhileThenLetBackIn() {
         var throttle = ConnectionThrottle(allowedFailures: 3, window: 60, lockout: 300, maximumPending: 8)
         for i in 0..<3 {
-            #expect(throttle.admits(host: "100.64.0.9", pending: 0, now: start.addingTimeInterval(Double(i))))
+            let admitted1 = throttle.admits(host: "100.64.0.9", pending: 0, now: start.addingTimeInterval(Double(i)))
+            #expect(admitted1)
             throttle.failed(host: "100.64.0.9", now: start.addingTimeInterval(Double(i)))
         }
-        #expect(!throttle.admits(host: "100.64.0.9", pending: 0, now: start.addingTimeInterval(5)))
-        #expect(!throttle.admits(host: "100.64.0.9", pending: 0, now: start.addingTimeInterval(299)))
+        let admitted2 = throttle.admits(host: "100.64.0.9", pending: 0, now: start.addingTimeInterval(5))
+        #expect(!admitted2)
+        let admitted3 = throttle.admits(host: "100.64.0.9", pending: 0, now: start.addingTimeInterval(299))
+        #expect(!admitted3)
         // Somebody else is not affected.
-        #expect(throttle.admits(host: "192.168.1.20", pending: 0, now: start.addingTimeInterval(5)))
-        #expect(throttle.admits(host: "100.64.0.9", pending: 0, now: start.addingTimeInterval(303)))
+        let admitted4 = throttle.admits(host: "192.168.1.20", pending: 0, now: start.addingTimeInterval(5))
+        #expect(admitted4)
+        let admitted5 = throttle.admits(host: "100.64.0.9", pending: 0, now: start.addingTimeInterval(303))
+        #expect(admitted5)
     }
 
     @Test func failuresSpreadOverALongTimeNeverAddUp() {
         var throttle = ConnectionThrottle(allowedFailures: 3, window: 60, lockout: 300, maximumPending: 8)
         for i in 0..<10 {
             let now = start.addingTimeInterval(Double(i) * 45)
-            #expect(throttle.admits(host: "h", pending: 0, now: now))
+            let admitted6 = throttle.admits(host: "h", pending: 0, now: now)
+            #expect(admitted6)
             throttle.failed(host: "h", now: now)
         }
     }
@@ -40,13 +46,16 @@ import Testing
         throttle.succeeded(host: "h")
         throttle.failed(host: "h", now: start)
         throttle.failed(host: "h", now: start)
-        #expect(throttle.admits(host: "h", pending: 0, now: start))
+        let admitted7 = throttle.admits(host: "h", pending: 0, now: start)
+        #expect(admitted7)
     }
 
     @Test func onlySoManyConnectionsMayWaitUnsignedAtOnce() {
         var throttle = ConnectionThrottle(allowedFailures: 3, window: 60, lockout: 300, maximumPending: 8)
-        #expect(throttle.admits(host: "h", pending: 7, now: start))
-        #expect(!throttle.admits(host: "h", pending: 8, now: start))
+        let admitted8 = throttle.admits(host: "h", pending: 7, now: start)
+        #expect(admitted8)
+        let admitted9 = throttle.admits(host: "h", pending: 8, now: start)
+        #expect(!admitted9)
     }
 
     @Test func theListOfHostsDoesNotGrowForEver() {
