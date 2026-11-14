@@ -366,6 +366,7 @@ public final class PhonePlayback {
     /// Stops and lets go of every stream. The queue stays.
     public func stop() {
         loading?.cancel()
+        loading = nil
         following?.cancel()
         ticker?.cancel()
         ticker = nil
