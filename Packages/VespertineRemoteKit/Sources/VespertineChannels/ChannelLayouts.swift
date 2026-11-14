@@ -1,0 +1,491 @@
+//
+// Vespertine: speaker layouts shared by the Mac player and the iPhone player: which speakers a set of channels are, the
+// bed Apple's spatial mixer takes for them, and the routing of each channel to the bed speaker of its own place.
+// SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
+//
+
+#if canImport(AudioToolbox) && canImport(AVFAudio)
+import AudioToolbox
+import AVFAudio
+import Foundation
+
+/// How multichannel music is delivered to a device.
+public enum SpatialMode: String, Codable, Sendable, CaseIterable, Identifiable {
+    /// Standard downmix to the device's channels (or every channel on multichannel outputs).
+    case off
+    /// Virtual speakers fixed in front of you.
+    case fixed
+    /// Virtual speakers stay put as you turn your head (needs head-tracking AirPods or Beats).
+    case headTracked
+
+    public var id: String { rawValue }
+    public var label: String {
+        switch self {
+        case .off: String(localized: "Off", comment: "Spatial Audio mode: off (plain downmix).")
+        case .fixed: String(localized: "Fixed", comment: "Spatial Audio mode: virtual speakers fixed in front of you.")
+        case .headTracked: String(localized: "Head Tracked", comment: "Spatial Audio mode.")
+        }
+    }
+}
+
+public enum ChannelLayouts {
+    /// The layout files of this channel count use when they don't say (WAV/FLAC/SMPTE order).
+    public static func standardTag(channels: Int) -> AudioChannelLayoutTag? {
+        switch channels {
+        case 1: kAudioChannelLayoutTag_Mono
+        case 2: kAudioChannelLayoutTag_Stereo
+        case 3: kAudioChannelLayoutTag_MPEG_3_0_A      // L R C
+        case 4: kAudioChannelLayoutTag_Quadraphonic    // L R Ls Rs
+        case 5: kAudioChannelLayoutTag_MPEG_5_0_A      // L R C Ls Rs
+        case 6: kAudioChannelLayoutTag_MPEG_5_1_A      // L R C LFE Ls Rs
+        case 7: kAudioChannelLayoutTag_MPEG_6_1_A      // L R C LFE Ls Rs Cs
+        case 8: kAudioChannelLayoutTag_MPEG_7_1_C      // L R C LFE Ls Rs Rls Rrs
+        default: nil
+        }
+    }
+
+    /// The format's own layout, else the standard one for its channel count, else discrete channels.
+    public static func layout(for format: AVAudioFormat) -> AVAudioChannelLayout? {
+        if let own = format.channelLayout { return own }
+        return layout(channels: Int(format.channelCount))
+    }
+
+    public static func layout(channels: Int) -> AVAudioChannelLayout? {
+        guard channels > 0 else { return nil }
+        let tag = standardTag(channels: channels) ?? (kAudioChannelLayoutTag_DiscreteInOrder | AudioChannelLayoutTag(channels))
+        return AVAudioChannelLayout(layoutTag: tag)
+    }
+
+    /// A layout of exactly these speakers, in this order.
+    public static func layout(labels: [AudioChannelLabel]) -> AVAudioChannelLayout? {
+        guard !labels.isEmpty else { return nil }
+        let size = MemoryLayout<AudioChannelLayout>.size + (labels.count - 1) * MemoryLayout<AudioChannelDescription>.size
+        let raw = UnsafeMutableRawPointer.allocate(byteCount: size, alignment: MemoryLayout<AudioChannelLayout>.alignment)
+        defer { raw.deallocate() }
+        let layout = raw.bindMemory(to: AudioChannelLayout.self, capacity: 1)
+        layout.pointee.mChannelLayoutTag = kAudioChannelLayoutTag_UseChannelDescriptions
+        layout.pointee.mChannelBitmap = []
+        layout.pointee.mNumberChannelDescriptions = UInt32(labels.count)
+        let descriptions = (raw + MemoryLayout<AudioChannelLayout>.offset(of: \.mChannelDescriptions)!).assumingMemoryBound(to: AudioChannelDescription.self)
+        for (i, label) in labels.enumerated() {
+            descriptions[i] = AudioChannelDescription(mChannelLabel: label, mChannelFlags: [], mCoordinates: (0, 0, 0))
+        }
+        return AVAudioChannelLayout(layout: layout)
+    }
+
+    /// Layouts Apple's spatial mixer takes for a bed: it refuses channel-by-channel descriptions, so a source's
+    /// speakers are placed on the smallest of these that holds them all. Each was checked against the mixer
+    /// (SpatialTests.bedsAccepted).
+    public static let spatialBeds: [(tag: AudioChannelLayoutTag, labels: [AudioChannelLabel])] = {
+        let tags: [AudioChannelLayoutTag] = [
+            0x0071_0003, 0x0083_0003, 0x0085_0003,              // L R C · L R Cs · L R LFE
+            0x006C_0004, 0x00B9_0004, 0x0073_0004,              // L R Ls Rs · L R Rls Rrs · L R C Cs
+            0x0088_0004, 0x0086_0004,                           // L R C LFE · L R LFE Cs
+            0x0075_0005, 0x00BA_0005, 0x0087_0005, 0x0089_0005, // L R C Ls Rs · L R C Rls Rrs · L R LFE Ls Rs · L R C LFE Cs
+            0x0079_0006, 0x00BB_0006, 0x00C6_0006,              // 5.1 · 5.1 with rear pair · L R Ls Rs Cs C
+            0x00AC_0006, 0x00AA_0006, 0x00AB_0006,              // C Cs L R Rls Rrs · Lc Rc L R Ls Rs · C L R Rls Rrs Top
+            0x007D_0007, 0x008C_0007, 0x0094_0007,              // 6.1 · 7.0 · 7.0 front (Lc Rc)
+            0x00AD_0007, 0x00AE_0007, 0x009E_0007, 0x009F_0007, // Lc Rc L R Ls Rs LFE · C L R Rls Rrs Top LFE · 5.1 + Top · 5.1 + Vhc
+            0x0080_0008, 0x007E_0008, 0x00A2_0008, 0x00A3_0008, // 7.1 · 7.1 wide (Lc Rc) · 5.1 + Lsd Rsd · 5.1 + Lw Rw
+            0x00CD_0008, 0x00C2_0008, 0x00A5_0008, 0x00A6_0008, // 5.1.2 · 5.1 + Ltm Rtm · 6.1 + Top · 6.1 + Vhc
+            0x0090_0008, 0x0070_0008, 0x006F_0008,              // octagonal · cube · L R Ls Rs C Cs Lw Rw
+            0x00B2_0008, 0x00B3_0008, 0x00B4_0009, 0x00B5_0009, // Lc Rc L R Ls Rs Rls Rrs · Lc C Rc L R Ls Cs Rs (+ LFE)
+            0x00C3_000A, 0x00C4_000A,                           // 5.1.4 · 7.1.2
+            0x00C0_000C, 0x00CB_000E, 0x00C1_0010,              // 7.1.4 · 7.1.6 · 9.1.6
+            0x0091_0010, 0x0092_0015, 0x00CC_0018,              // 16- and 21-channel sets · 22.2
+        ]
+        return tags.compactMap { tag in AVAudioChannelLayout(layoutTag: tag).map { (tag, $0.channelLabels) } }
+    }()
+
+    /// The bed for Spatial Audio: the smallest layout the mixer takes that has a speaker for every channel
+    /// (the very same layout when it is one), else the one that has the most. nil for stereo.
+    public static func spatialBed(for labels: [AudioChannelLabel]) -> (tag: AudioChannelLayoutTag, channels: Int)? {
+        guard labels.count > 2 else { return nil }
+        let wanted = normalizedSurrounds(labels)
+        // Fewest channels without a place, then fewest placed only nearby, then the smallest bed.
+        func rank(_ bed: (tag: AudioChannelLayoutTag, labels: [AudioChannelLabel])) -> (Int, Int, Int, Int) {
+            guard let router = BedRouter(source: wanted, bed: bed.labels) else { return (.max, .max, .max, .max) }
+            return (router.dropped, router.approximated, bed.labels.count, bed.labels == labels ? 0 : 1)
+        }
+        return spatialBeds.min { rank($0) < rank($1) }.map { ($0.tag, $0.labels.count) }
+    }
+
+    /// The speakers of an unlabeled multichannel stream, taken to be in the standard order for its channel count.
+    public static func standardLabels(channels: Int) -> [AudioChannelLabel]? {
+        guard channels > 2, standardTag(channels: channels) != nil else { return nil }
+        return layout(channels: channels)?.channelLabels
+    }
+
+    /// One convention for the surround pairs. WAVE speaker masks call the back pair Ls/Rs and the side pair
+    /// Lsd/Rsd; MPEG layouts (and every bed) call the side (or only) pair Ls/Rs and the back pair Rls/Rrs.
+    public static func normalizedSurrounds(_ labels: [AudioChannelLabel]) -> [AudioChannelLabel] {
+        var result = labels
+        for (surround, direct, rear) in [(kAudioChannelLabel_LeftSurround, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RearSurroundLeft),
+                                         (kAudioChannelLabel_RightSurround, kAudioChannelLabel_RightSurroundDirect, kAudioChannelLabel_RearSurroundRight)] {
+            guard labels.contains(direct), !labels.contains(rear) else { continue }
+            result = result.map { $0 == surround ? rear : $0 == direct ? surround : $0 }
+        }
+        return result
+    }
+
+    /// Core Audio names some speakers twice (the older "vertical height" and "top back" labels and the newer
+    /// ones for the same places): one name for each place.
+    public static func canonical(_ label: AudioChannelLabel) -> AudioChannelLabel {
+        switch label {
+        case kAudioChannelLabel_LeftTopFront: kAudioChannelLabel_VerticalHeightLeft
+        case kAudioChannelLabel_RightTopFront: kAudioChannelLabel_VerticalHeightRight
+        case kAudioChannelLabel_CenterTopFront: kAudioChannelLabel_VerticalHeightCenter
+        case kAudioChannelLabel_TopBackLeft: kAudioChannelLabel_LeftTopRear
+        case kAudioChannelLabel_TopBackRight: kAudioChannelLabel_RightTopRear
+        case kAudioChannelLabel_TopBackCenter: kAudioChannelLabel_CenterTopRear
+        case kAudioChannelLabel_CenterTopMiddle: kAudioChannelLabel_TopCenterSurround
+        case kAudioChannelLabel_Mono: kAudioChannelLabel_Center
+        default: label
+        }
+    }
+
+    /// Where a speaker goes when the bed doesn't have it: the nearest places, in order of preference, each a
+    /// single speaker or a pair it sits between.
+    public static func nearest(_ label: AudioChannelLabel) -> [[AudioChannelLabel]] {
+        switch canonical(label) {
+        case kAudioChannelLabel_LeftSurroundDirect: [[kAudioChannelLabel_LeftSurround], [kAudioChannelLabel_RearSurroundLeft]]
+        case kAudioChannelLabel_RightSurroundDirect: [[kAudioChannelLabel_RightSurround], [kAudioChannelLabel_RearSurroundRight]]
+        case kAudioChannelLabel_LeftSurround: [[kAudioChannelLabel_LeftSurroundDirect], [kAudioChannelLabel_RearSurroundLeft]]
+        case kAudioChannelLabel_RightSurround: [[kAudioChannelLabel_RightSurroundDirect], [kAudioChannelLabel_RearSurroundRight]]
+        case kAudioChannelLabel_RearSurroundLeft: [[kAudioChannelLabel_LeftSurround], [kAudioChannelLabel_LeftSurroundDirect]]
+        case kAudioChannelLabel_RearSurroundRight: [[kAudioChannelLabel_RightSurround], [kAudioChannelLabel_RightSurroundDirect]]
+        case kAudioChannelLabel_CenterSurround:
+            [[kAudioChannelLabel_RearSurroundLeft, kAudioChannelLabel_RearSurroundRight], [kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround]]
+        case kAudioChannelLabel_LeftCenter: [[kAudioChannelLabel_Left, kAudioChannelLabel_Center], [kAudioChannelLabel_Left]]
+        case kAudioChannelLabel_RightCenter: [[kAudioChannelLabel_Right, kAudioChannelLabel_Center], [kAudioChannelLabel_Right]]
+        case kAudioChannelLabel_LeftWide: [[kAudioChannelLabel_Left]]
+        case kAudioChannelLabel_RightWide: [[kAudioChannelLabel_Right]]
+        case kAudioChannelLabel_Center: [[kAudioChannelLabel_Left, kAudioChannelLabel_Right]]
+        case kAudioChannelLabel_LFE2, kAudioChannelLabel_LFE3: [[kAudioChannelLabel_LFEScreen]]
+        case kAudioChannelLabel_VerticalHeightLeft: [[kAudioChannelLabel_LeftTopMiddle], [kAudioChannelLabel_Left]]
+        case kAudioChannelLabel_VerticalHeightRight: [[kAudioChannelLabel_RightTopMiddle], [kAudioChannelLabel_Right]]
+        case kAudioChannelLabel_VerticalHeightCenter:
+            [[kAudioChannelLabel_VerticalHeightLeft, kAudioChannelLabel_VerticalHeightRight], [kAudioChannelLabel_Center]]
+        case kAudioChannelLabel_LeftTopMiddle: [[kAudioChannelLabel_VerticalHeightLeft], [kAudioChannelLabel_LeftTopRear], [kAudioChannelLabel_LeftSurroundDirect], [kAudioChannelLabel_LeftSurround]]
+        case kAudioChannelLabel_RightTopMiddle: [[kAudioChannelLabel_VerticalHeightRight], [kAudioChannelLabel_RightTopRear], [kAudioChannelLabel_RightSurroundDirect], [kAudioChannelLabel_RightSurround]]
+        case kAudioChannelLabel_LeftTopRear: [[kAudioChannelLabel_LeftTopMiddle], [kAudioChannelLabel_RearSurroundLeft], [kAudioChannelLabel_LeftSurround]]
+        case kAudioChannelLabel_RightTopRear: [[kAudioChannelLabel_RightTopMiddle], [kAudioChannelLabel_RearSurroundRight], [kAudioChannelLabel_RightSurround]]
+        case kAudioChannelLabel_CenterTopRear:
+            [[kAudioChannelLabel_LeftTopRear, kAudioChannelLabel_RightTopRear], [kAudioChannelLabel_CenterSurround]]
+        case kAudioChannelLabel_TopCenterSurround:
+            [[kAudioChannelLabel_LeftTopMiddle, kAudioChannelLabel_RightTopMiddle],
+             [kAudioChannelLabel_VerticalHeightLeft, kAudioChannelLabel_VerticalHeightRight, kAudioChannelLabel_LeftTopRear, kAudioChannelLabel_RightTopRear]]
+        default: []
+        }
+    }
+
+    /// A multichannel file on a device with as many outputs and no speaker setup: the source channel each output
+    /// carries (-1: none). Every channel goes to an output of its own, unmixed: its own speaker's output, else the
+    /// nearest single one free, else the first output left over. Channels without speaker names are taken to be in
+    /// WAV order for their count (`wavOrderLabels`).
+    public static func discreteMap(source: [AudioChannelLabel]?, outputs: [AudioChannelLabel]) -> [Int] {
+        guard let source = source ?? wavOrderLabels(channels: outputs.count), source.count == outputs.count else {
+            return outputs.indices.map { $0 < (source?.count ?? outputs.count) ? $0 : -1 }
+        }
+        let wanted = normalizedSurrounds(source).map(canonical), slots = outputs.map(canonical)
+        var map = [Int](repeating: -1, count: outputs.count), placed = [Bool](repeating: false, count: source.count)
+        func place(_ s: Int, _ candidates: [AudioChannelLabel]) {
+            guard !placed[s], let o = candidates.lazy.compactMap({ label in slots.indices.first { slots[$0] == label && map[$0] < 0 } }).first else { return }
+            map[o] = s
+            placed[s] = true
+        }
+        for s in source.indices { place(s, [wanted[s]]) }
+        for s in source.indices { place(s, nearest(wanted[s]).filter { $0.count == 1 }.map { canonical($0[0]) }) }
+        for s in source.indices where !placed[s] {
+            guard let o = map.firstIndex(of: -1) else { break }
+            map[o] = s
+            placed[s] = true
+        }
+        return map
+    }
+
+    /// A driver's stand-in for "no speaker setup": channel n named with label n (L R C LFE Ls Rs Lc Rc Cs Lsd Rsd Top …), as
+    /// BlackHole and other drivers report before anyone configures speakers. Taken at its word it made an unconfigured 8-channel
+    /// output a front-centres 7.1 room (a 7.1's back pair folded onto its sides, two outputs silent) and a 4-channel one a 3.1.
+    public static func isPlaceholder(_ layout: AVAudioChannelLayout) -> Bool {
+        let labels = layout.channelLabels
+        return labels.count > 2 && labels.enumerated().allSatisfy { $0.element == AudioChannelLabel($0.offset + 1) }
+    }
+
+    /// A multichannel file on a configured speaker setup (any count of either): the source channel each speaker output
+    /// carries (-1: none), when every channel has a speaker of its own, its own position or the nearest single one, and so
+    /// can go out unmixed. nil when one would have to be folded onto others (7.1 into a 5.1 room, a centre onto L and R).
+    public static func speakerMap(source: [AudioChannelLabel], outputs: [AudioChannelLabel]) -> [Int]? {
+        guard !source.isEmpty, source.count <= outputs.count else { return nil }
+        // Both in one convention: a setup that names a back pair Ls/Rs beside a side pair Lsd/Rsd (WAVE) is read like a file that does.
+        let wanted = normalizedSurrounds(source).map(canonical), slots = normalizedSurrounds(outputs).map(canonical)
+        var map = [Int](repeating: -1, count: outputs.count), placed = [Bool](repeating: false, count: source.count)
+        func place(_ s: Int, _ candidates: [AudioChannelLabel]) {
+            guard !placed[s], let o = candidates.lazy.compactMap({ label in slots.indices.first { slots[$0] == label && map[$0] < 0 } }).first else { return }
+            map[o] = s
+            placed[s] = true
+        }
+        for s in source.indices { place(s, [wanted[s]]) }
+        for s in source.indices { place(s, nearest(wanted[s]).filter { $0.count == 1 }.map { canonical($0[0]) }) }
+        return placed.allSatisfy { $0 } ? map : nil
+    }
+
+    /// The speakers of a WAV file with no channel mask, in the order of the mask's bits as FFmpeg and SMPTE use them for
+    /// the count (WAVE labels: the back pair is Ls/Rs, the side pair Lsd/Rsd). 6.1 is FL FR FC LFE BC SL SR and 7.1
+    /// FL FR FC LFE BL BR SL SR, where the standard (MPEG) layouts of those counts put the side pair first.
+    /// Above 8 channels, FFmpeg's default layout for the count (5.1.4, 7.1.4, 9.1.4; 9.1.6 for 16), in mask-bit order: with
+    /// no names, Apple's spatial mixer heard only the first two.
+    public static func wavOrderLabels(channels: Int) -> [AudioChannelLabel]? {
+        let (L, R, C, LFE, Ls, Rs) = (kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_Center,
+                                      kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround)
+        let (Lsd, Rsd) = (kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RightSurroundDirect)
+        let tops = [kAudioChannelLabel_VerticalHeightLeft, kAudioChannelLabel_VerticalHeightRight,
+                    kAudioChannelLabel_TopBackLeft, kAudioChannelLabel_TopBackRight]
+        switch channels {
+        case 7: return [L, R, C, LFE, kAudioChannelLabel_CenterSurround, Lsd, Rsd]
+        case 8: return [L, R, C, LFE, Ls, Rs, Lsd, Rsd]
+        case 10: return [L, R, C, LFE, Ls, Rs] + tops                                       // 5.1.4 (side pair)
+        case 12: return [L, R, C, LFE, Ls, Rs, Lsd, Rsd] + tops                             // 7.1.4
+        case 14: return [L, R, C, LFE, Ls, Rs, kAudioChannelLabel_LeftCenter, kAudioChannelLabel_RightCenter, Lsd, Rsd] + tops   // 9.1.4
+        case 16: return [L, R, C, LFE, Ls, Rs, kAudioChannelLabel_LeftCenter, kAudioChannelLabel_RightCenter, Lsd, Rsd] + tops
+            + [kAudioChannelLabel_LeftTopMiddle, kAudioChannelLabel_RightTopMiddle]          // 9.1.6
+        default: return standardLabels(channels: channels)
+        }
+    }
+
+    /// The names of the outputs `discreteMap` fills, in the standard order for the count: an output that took a
+    /// speaker the standard order has no place for (2.1's LFE, LCRS's centres, 7.1 wide's front centres, 5.1.2's
+    /// heights) is named after it. nil where there is no standard order (more than 8 channels) or none is needed.
+    public static func discreteLabels(source: [AudioChannelLabel]?, channels: Int) -> [AudioChannelLabel]? {
+        guard let standard = standardLabels(channels: channels) else { return nil }
+        guard let source, source.count == channels else { return standard }
+        let map = discreteMap(source: source, outputs: standard), wanted = normalizedSurrounds(source)
+        return standard.indices.map { o in
+            let s = map[o]
+            guard s >= 0 else { return standard[o] }
+            // Its own speaker, or the nearest one the standard order has (the back pair of a 5.1 on Ls/Rs).
+            let own = canonical(wanted[s]) == canonical(standard[o]) || nearest(wanted[s]).contains([standard[o]])
+            return own ? standard[o] : wanted[s]
+        }
+    }
+
+    /// The speaker of each channel when a multichannel layout names them all (nil for stereo, unlabeled
+    /// or discrete channels, and for a speaker named twice).
+    public static func speakerLabels(_ layout: AVAudioChannelLayout?) -> [AudioChannelLabel]? {
+        speakerLabels(layout?.channelLabels)
+    }
+
+    /// The same for labels already read: nil unless every channel names its own speaker (DSDIFF's discrete
+    /// channel IDs name none, and are taken in the standard order like unlabeled channels).
+    public static func speakerLabels(_ labels: [AudioChannelLabel]?) -> [AudioChannelLabel]? {
+        guard let labels, labels.count > 2, labels.allSatisfy(AVAudioChannelLayout.isSpeaker), Set(labels).count == labels.count else { return nil }
+        return labels
+    }
+
+    public static let lfeLabels: Set<AudioChannelLabel> = [kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LFE2, kAudioChannelLabel_LFE3]
+    public static let heightLabels: Set<AudioChannelLabel> = [
+        kAudioChannelLabel_TopCenterSurround, kAudioChannelLabel_VerticalHeightLeft, kAudioChannelLabel_VerticalHeightCenter,
+        kAudioChannelLabel_VerticalHeightRight, kAudioChannelLabel_TopBackLeft, kAudioChannelLabel_TopBackCenter, kAudioChannelLabel_TopBackRight,
+        kAudioChannelLabel_LeftTopFront, kAudioChannelLabel_CenterTopFront, kAudioChannelLabel_RightTopFront,
+        kAudioChannelLabel_LeftTopMiddle, kAudioChannelLabel_CenterTopMiddle, kAudioChannelLabel_RightTopMiddle,
+        kAudioChannelLabel_LeftTopRear, kAudioChannelLabel_CenterTopRear, kAudioChannelLabel_RightTopRear,
+    ]
+
+    /// "Quad", "5.1", "3.1", "7.1.4", … from the speakers themselves; by channel count when they aren't known.
+    public static func name(labels: [AudioChannelLabel]?, channels: Int) -> String {
+        guard let labels = speakerLabels(labels), labels.count == channels else { return name(channels: channels) }
+        let set = Set(labels)
+        if set == [kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_LeftSurround, kAudioChannelLabel_RightSurround]
+            || set == [kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_RearSurroundLeft, kAudioChannelLabel_RearSurroundRight]
+            || set == [kAudioChannelLabel_Left, kAudioChannelLabel_Right, kAudioChannelLabel_LeftSurroundDirect, kAudioChannelLabel_RightSurroundDirect] {
+            return String(localized: "Quad", comment: "Four-channel speaker layout.")
+        }
+        let lfe = labels.filter(lfeLabels.contains).count, height = labels.filter(heightLabels.contains).count
+        let base = "\(channels - lfe - height).\(lfe)"
+        return height > 0 ? base + ".\(height)" : base
+    }
+
+    /// "5.1", "7.1", "Stereo", …
+    public static func name(channels: Int) -> String {
+        switch channels {
+        case 1: String(localized: "Mono")
+        case 2: String(localized: "Stereo")
+        case 3: "3.0"
+        case 4: String(localized: "Quad", comment: "Four-channel speaker layout.")
+        case 5: "5.0"
+        case 6: "5.1"
+        case 7: "6.1"
+        case 8: "7.1"
+        default: String(localized: "\(channels) ch", comment: "A channel count, abbreviated (e.g. “12 ch”).")
+        }
+    }
+}
+
+/// Places a source's channels on a Spatial Audio bed, each on the bed speaker of its own place (or split
+/// between the two nearest), in interleaved Float32. Apple's converter can't be trusted with this: it turns
+/// the whole stream silent when the bed has speakers it doesn't know how to feed (heights, 16-channel sets).
+public struct BedRouter {
+    public let sourceChannels: Int
+    public let bedChannels: Int
+    /// Each source channel's bed speakers and gain.
+    public let routes: [[(bed: Int, gain: Float)]]
+
+    /// `foldGain`: extra gain for a channel placed alone on the nearest speaker of another (a speaker setup's fold, -3 dB as
+    /// ITU-R BS.775 downmixes do; 1 for Spatial Audio beds).
+    public init?(source: [AudioChannelLabel], bed: [AudioChannelLabel], foldGain: Float = 1) {
+        guard !source.isEmpty, !bed.isEmpty else { return nil }
+        let canonicalBed = bed.map(ChannelLayouts.canonical)
+        func slots(_ labels: [AudioChannelLabel]) -> [Int]? {
+            let found = labels.compactMap { l in canonicalBed.firstIndex(of: ChannelLayouts.canonical(l)) }
+            return found.count == labels.count ? found : nil
+        }
+        var approximated = 0
+        routes = ChannelLayouts.normalizedSurrounds(source).map { label in
+            var place = slots([label])
+            if place == nil {
+                place = ChannelLayouts.nearest(label).lazy.compactMap(slots).first
+                if place != nil { approximated += 1 }
+            }
+            let targets = place ?? []
+            var gain = targets.isEmpty ? 0 : Float(1 / Double(targets.count).squareRoot())    // equal power between two
+            if targets.count == 1, slots([label]) == nil { gain *= foldGain }
+            return targets.map { ($0, gain) }
+        }
+        self.approximated = approximated
+        sourceChannels = source.count
+        bedChannels = bed.count
+    }
+
+    /// Source channels no bed speaker could take (heard nowhere).
+    public var dropped: Int { routes.filter(\.isEmpty).count }
+    /// Source channels placed on the nearest speakers rather than their own.
+    public let approximated: Int
+
+    /// The same for channels held in separate buffers (as `AVAudioPCMBuffer` holds them): `planes` has one per source
+    /// channel, `output` one per bed speaker.
+    public func route(planes: [UnsafePointer<Float>], into output: [UnsafeMutablePointer<Float>], frames: Int) {
+        for plane in output.prefix(bedChannels) { plane.update(repeating: 0, count: frames) }
+        for (s, targets) in routes.enumerated() where s < planes.count {
+            let source = planes[s]
+            for (b, g) in targets where b < output.count {
+                let target = output[b]
+                for f in 0..<frames { target[f] += source[f] * g }
+            }
+        }
+    }
+
+    public func route(_ input: UnsafePointer<Float>, into output: UnsafeMutablePointer<Float>, frames: Int) {
+        output.update(repeating: 0, count: frames * bedChannels)
+        for (s, targets) in routes.enumerated() {
+            for (b, g) in targets {
+                for f in 0..<frames { output[f * bedChannels + b] += input[f * sourceChannels + s] * g }
+            }
+        }
+    }
+}
+
+// MARK: - Speaker labels
+
+extension AVAudioChannelLayout {
+    /// Bytes behind `layout`: the header and its channel descriptions. A tag-only layout is 12 bytes, so
+    /// `MemoryLayout<AudioChannelLayout>.size` (32) reads past its end.
+    public var byteSize: Int {
+        MemoryLayout<AudioChannelLayout>.offset(of: \.mChannelDescriptions)!
+            + Int(layout.pointee.mNumberChannelDescriptions) * MemoryLayout<AudioChannelDescription>.size
+    }
+
+    /// Speaker label of each channel, in order (expanding a layout tag when needed).
+    public var channelLabels: [AudioChannelLabel] {
+        let n = Int(channelCount)
+        var result: [AudioChannelLabel] = []
+        if layoutTag == kAudioChannelLayoutTag_UseChannelDescriptions {
+            result = Self.labels(in: layout)
+        } else if layoutTag == kAudioChannelLayoutTag_UseChannelBitmap {
+            // A WAVE-style speaker bitmap (CAF, AIFF and WavPack files written by FFmpeg, …).
+            var bitmap = layout.pointee.mChannelBitmap
+            var size: UInt32 = 0
+            if AudioFormatGetPropertyInfo(kAudioFormatProperty_ChannelLayoutForBitmap, UInt32(MemoryLayout<AudioChannelBitmap>.size), &bitmap, &size) == noErr,
+               size >= UInt32(MemoryLayout<AudioChannelLayout>.size) {
+                let raw = UnsafeMutableRawPointer.allocate(byteCount: Int(size), alignment: MemoryLayout<AudioChannelLayout>.alignment)
+                defer { raw.deallocate() }
+                if AudioFormatGetProperty(kAudioFormatProperty_ChannelLayoutForBitmap, UInt32(MemoryLayout<AudioChannelBitmap>.size), &bitmap, &size, raw) == noErr {
+                    let expanded = raw.assumingMemoryBound(to: AudioChannelLayout.self)
+                    result = expanded.pointee.mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions
+                        ? Self.labels(in: expanded) : AVAudioChannelLayout(layout: expanded).channelLabels
+                }
+            }
+        } else {
+            var tag = layoutTag
+            var size: UInt32 = 0
+            if AudioFormatGetPropertyInfo(kAudioFormatProperty_ChannelLayoutForTag, UInt32(MemoryLayout<AudioChannelLayoutTag>.size), &tag, &size) == noErr,
+               size >= UInt32(MemoryLayout<AudioChannelLayout>.size) {
+                let raw = UnsafeMutableRawPointer.allocate(byteCount: Int(size), alignment: MemoryLayout<AudioChannelLayout>.alignment)
+                defer { raw.deallocate() }
+                if AudioFormatGetProperty(kAudioFormatProperty_ChannelLayoutForTag, UInt32(MemoryLayout<AudioChannelLayoutTag>.size), &tag, &size, raw) == noErr {
+                    result = Self.labels(in: raw.assumingMemoryBound(to: AudioChannelLayout.self))
+                }
+            }
+        }
+        if result.count < n { result += Array(repeating: kAudioChannelLabel_Unknown, count: n - result.count) }
+        return Array(result.prefix(n))
+    }
+
+    /// Reads the variable-length description array in place (copying `pointee` keeps only the first).
+    public static func labels(in layout: UnsafePointer<AudioChannelLayout>) -> [AudioChannelLabel] {
+        let count = Int(layout.pointee.mNumberChannelDescriptions)
+        let base = UnsafeRawPointer(layout) + MemoryLayout<AudioChannelLayout>.offset(of: \.mChannelDescriptions)!
+        let d = base.assumingMemoryBound(to: AudioChannelDescription.self)
+        return (0..<count).map { d[$0].mChannelLabel }
+    }
+
+    /// True when channels carry real speaker positions (not just "channel 1, 2, …").
+    public var hasSpeakerPositions: Bool {
+        channelCount >= 2 && channelLabels.allSatisfy(Self.isSpeaker)
+    }
+
+    /// A speaker position, not "unknown", "unused" or a discrete channel number.
+    public static func isSpeaker(_ label: AudioChannelLabel) -> Bool {
+        label != kAudioChannelLabel_Unknown && label != kAudioChannelLabel_Unused
+            && !(label >= kAudioChannelLabel_Discrete && label <= kAudioChannelLabel_Discrete_65535)
+    }
+
+    /// "L R C LFE Ls Rs"
+    public var shortNames: [String] { channelLabels.map(ChannelLayouts.shortName) }
+}
+
+extension ChannelLayouts {
+    public static func shortName(_ label: AudioChannelLabel) -> String {
+        switch label {
+        case kAudioChannelLabel_Left: "L"
+        case kAudioChannelLabel_Right: "R"
+        case kAudioChannelLabel_Center: "C"
+        case kAudioChannelLabel_LFEScreen, kAudioChannelLabel_LFE2: "LFE"
+        case kAudioChannelLabel_LeftSurround: "Ls"
+        case kAudioChannelLabel_RightSurround: "Rs"
+        case kAudioChannelLabel_LeftSurroundDirect: "Lsd"
+        case kAudioChannelLabel_RightSurroundDirect: "Rsd"
+        case kAudioChannelLabel_CenterSurround: "Cs"
+        case kAudioChannelLabel_RearSurroundLeft: "Lrs"
+        case kAudioChannelLabel_RearSurroundRight: "Rrs"
+        case kAudioChannelLabel_LeftCenter: "Lc"
+        case kAudioChannelLabel_RightCenter: "Rc"
+        case kAudioChannelLabel_LeftWide: "Lw"
+        case kAudioChannelLabel_RightWide: "Rw"
+        case kAudioChannelLabel_VerticalHeightLeft, kAudioChannelLabel_LeftTopFront: "Ltf"
+        case kAudioChannelLabel_VerticalHeightRight, kAudioChannelLabel_RightTopFront: "Rtf"
+        case kAudioChannelLabel_VerticalHeightCenter, kAudioChannelLabel_CenterTopFront: "Ctf"
+        case kAudioChannelLabel_TopBackLeft, kAudioChannelLabel_LeftTopRear: "Ltr"
+        case kAudioChannelLabel_TopBackRight, kAudioChannelLabel_RightTopRear: "Rtr"
+        case kAudioChannelLabel_TopBackCenter, kAudioChannelLabel_CenterTopRear: "Ctr"
+        case kAudioChannelLabel_LeftTopMiddle: "Lts"
+        case kAudioChannelLabel_RightTopMiddle: "Rts"
+        case kAudioChannelLabel_CenterTopMiddle: "Ctm"
+        case kAudioChannelLabel_TopCenterSurround: "Top"
+        case kAudioChannelLabel_LFE3: "LFE"
+        case kAudioChannelLabel_Mono: "M"
+        default:
+            label >= kAudioChannelLabel_Discrete_0 && label <= kAudioChannelLabel_Discrete_65535 ? "\(label - kAudioChannelLabel_Discrete_0 + 1)" : "·"
+        }
+    }
+}
+#endif
