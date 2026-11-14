@@ -13,6 +13,8 @@ public enum RemoteLinkError: Error, Equatable, Sendable {
     case timedOut
     /// The connection closed before the reply came.
     case closed
+    /// The Mac refused a stream read, with its reason.
+    case readFailed(String)
 }
 
 @MainActor
@@ -25,6 +27,8 @@ public protocol RemoteChannel: AnyObject {
     func open(timeout: Duration) async throws
     /// Sends `command` and waits for the reply.
     func request(_ command: RemoteCommand, timeout: Duration) async throws -> RemoteReply
+    /// Reads a range of an open stream (protocol 2): the Mac answers with a binary frame.
+    func read(stream: Int, offset: Int64, length: Int, timeout: Duration) async throws -> StreamFrame
     func close()
     /// Where the channel ended up connected, once open (nil when that means nothing: the demo).
     var remoteAddress: RemoteAddress? { get }
@@ -32,6 +36,7 @@ public protocol RemoteChannel: AnyObject {
 
 public extension RemoteChannel {
     var remoteAddress: RemoteAddress? { nil }
+    func read(stream: Int, offset: Int64, length: Int, timeout: Duration) async throws -> StreamFrame { throw RemoteLinkError.readFailed("") }
 }
 
 #if canImport(Network)

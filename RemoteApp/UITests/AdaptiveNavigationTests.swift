@@ -96,12 +96,12 @@ final class AdaptiveNavigationTests: XCTestCase {
     /// The demo notice bar shows in a normal demo, and is gone from App Store captures (-VTScreenshot YES), which keep the demo library.
     func testDemoNoticeIsHiddenOnlyForScreenshots() {
         launch()
-        XCTAssertTrue(app.staticTexts["Demo: a made-up library. Nothing plays."].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Demo: a made-up library")).firstMatch.waitForExistence(timeout: 10))
         app.terminate()
         app.launchArguments = ["-VTDemo", "YES", "-VTPlay", "YES", "-VTVinyl", "NO", "-VTScreenshot", "YES"]
         app.launch()
         XCTAssertTrue(app.buttons["Pause"].waitForExistence(timeout: 15))
-        XCTAssertFalse(app.staticTexts["Demo: a made-up library. Nothing plays."].exists)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Demo: a made-up library")).firstMatch.exists)
         XCTAssertFalse(app.buttons["Leave Demo"].exists)
     }
 

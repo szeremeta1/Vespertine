@@ -259,7 +259,7 @@ struct RemoteBridge {
     /// Carries out a command (everything but the session ones and artwork, which the connection handles).
     func perform(_ command: RemoteCommand) -> RemoteReply {
         switch command {
-        case .hello, .pair, .artwork:
+        case .hello, .pair, .artwork, .streamInfo, .streamOpen, .streamRead, .streamClose:
             return Self.unavailable
 
         case .playPause: player.togglePlayPause()
@@ -321,11 +321,20 @@ struct RemoteBridge {
             let index = min(max(0, startAt), tracks.count - 1)
             player.play(tracks, startAt: index, exactly: [tracks[index].location])
 
-        case .albums(let offset, let limit):
+        case .albums(let offset, let limit, let sort, let filter):
             let albums = library.albums
+            // Sorted or narrowed, the whole list is arranged before a page is cut from it; plain pages skip that.
+            if (sort ?? .library) != .library || (filter ?? .all) != .all {
+                let listed = AlbumListing.arrange(albums.map(albumSummary), sort: sort, filter: filter)
+                let start = min(max(0, offset), listed.count)
+                let end = min(start + min(max(1, limit), 500), listed.count)
+                return .albums(items: Array(listed[start..<end]), total: listed.count)
+            }
             let start = min(max(0, offset), albums.count)
             let end = min(start + min(max(1, limit), 500), albums.count)
             return .albums(items: albums[start..<end].map(albumSummary), total: albums.count)
+        case .tracks(let ids):
+            return .tracks(items: ordered(ids).map(trackSummary))
         case .albumTracks(let key):
             return .tracks(items: model.playableTracks(albumKey: key).map(trackSummary))
         case .artists:

@@ -94,6 +94,8 @@ public final class RemoteSession {
     public var isDemo: Bool { pairing.serverID == DemoMac.serverID }
 
     public var isConnected: Bool { phase == .connected }
+    /// Whether the Mac speaks protocol 2: it can stream songs to this phone (an older Mac only takes commands).
+    public var canStream: Bool { (server?.protocolVersion ?? 1) >= RemoteProtocol.streamVersion }
 
     private func setPhase(_ new: Phase) {
         guard phase != new else { return }
@@ -181,7 +183,7 @@ public final class RemoteSession {
             self.lost(link, reason: reason)
         }
         do {
-            let reply = try await link.request(.hello(device: pairing.device, name: clientName, protocolVersion: RemoteProtocol.version), timeout: .seconds(15))
+            let reply = try await link.request(.hello(device: pairing.device, name: clientName, protocolVersion: RemoteProtocol.minimumVersion, highestProtocolVersion: RemoteProtocol.version), timeout: .seconds(15))
             guard self.link === link else { return }
             if case .welcome(let info) = reply {
                 server = info
@@ -295,6 +297,12 @@ public final class RemoteSession {
         }
     }
 
+    /// Reads a range of an open stream (`.streamOpen` opens one). Throws when the Mac refuses or the connection ends.
+    public func readStream(_ stream: Int, offset: Int64, length: Int) async throws -> StreamFrame {
+        guard let link, phase == .connected else { throw RemoteLinkError.closed }
+        return try await link.read(stream: stream, offset: offset, length: length, timeout: .seconds(30))
+    }
+
     // MARK: Pairing
 
     public enum PairingError: Error, Equatable, Sendable {
@@ -318,7 +326,7 @@ public final class RemoteSession {
         }
         let reply: RemoteReply
         do {
-            reply = try await link.request(.pair(name: clientName, protocolVersion: RemoteProtocol.version))
+            reply = try await link.request(.pair(name: clientName, protocolVersion: RemoteProtocol.minimumVersion, highestProtocolVersion: RemoteProtocol.version))
         } catch {
             throw .unreachable
         }

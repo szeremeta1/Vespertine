@@ -16,6 +16,9 @@ nonisolated struct PairedRemote: Codable, Equatable, Identifiable, Sendable {
     var lastSeen: Date?
     /// A web browser rather than the app: `key` is then the SHA-256 of the browser's cookie, not a TLS key.
     var web: Bool?
+    /// Settings › Remote: false once this phone was told it may not play songs itself. nil (every pairing made before the
+    /// setting existed) and true both mean it may, while Stream to Phones is on.
+    var streams: Bool?
 
     var isWeb: Bool { web == true }
 }
@@ -29,6 +32,12 @@ final class RemoteStore {
     var enabled: Bool { didSet { defaults.set(enabled, forKey: Keys.enabled) } }
     /// Web browsers on this network can use the remote too (a page served by this Mac). Off by default.
     var webEnabled: Bool { didSet { defaults.set(webEnabled, forKey: Keys.webEnabled) } }
+    /// Phones may play songs from this Mac's library themselves (Settings › Remote › Stream to Phones; the stream channel,
+    /// protocol 2). Off by default.
+    var streamEnabled: Bool { didSet { defaults.set(streamEnabled, forKey: Keys.streamEnabled) } }
+    /// How much disk the copies converted for phones may take, in gigabytes.
+    var streamCacheGigabytes: Int { didSet { defaults.set(streamCacheGigabytes, forKey: Keys.streamCache) } }
+    static let streamCacheChoices = [2, 8, 32, 128]
     /// Hold off idle sleep while the server runs, so a paused Mac stays reachable. Off by default.
     var keepAwake: Bool { didSet { defaults.set(keepAwake, forKey: Keys.keepAwake) } }
     /// Settings › Remote turned on macOS's Wake for network access (and what it was before, to put back). Off by default.
@@ -49,6 +58,8 @@ final class RemoteStore {
     private enum Keys {
         static let enabled = "remoteEnabled"
         static let webEnabled = "remoteWebEnabled"
+        static let streamEnabled = "remoteStreamEnabled"
+        static let streamCache = "remoteStreamCacheGigabytes"
         static let keepAwake = "remoteKeepAwake"
         static let wakeForNetwork = "remoteWakeForNetwork"
         static let wakeBefore = "remoteWakeForNetworkBefore"
@@ -56,9 +67,11 @@ final class RemoteStore {
 
     init(dataDirectory: URL, defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        defaults.register(defaults: [Keys.enabled: false, Keys.webEnabled: false, Keys.keepAwake: false, Keys.wakeForNetwork: false])
+        defaults.register(defaults: [Keys.enabled: false, Keys.webEnabled: false, Keys.streamEnabled: false, Keys.streamCache: 8, Keys.keepAwake: false, Keys.wakeForNetwork: false])
         enabled = defaults.bool(forKey: Keys.enabled)
         webEnabled = defaults.bool(forKey: Keys.webEnabled)
+        streamEnabled = defaults.bool(forKey: Keys.streamEnabled)
+        streamCacheGigabytes = max(1, defaults.integer(forKey: Keys.streamCache))
         keepAwake = defaults.bool(forKey: Keys.keepAwake)
         wakeForNetwork = defaults.bool(forKey: Keys.wakeForNetwork)
         wakeForNetworkBefore = defaults.object(forKey: Keys.wakeBefore) as? Bool
@@ -99,6 +112,19 @@ final class RemoteStore {
 
     func remove(_ id: String) {
         devices.removeAll { $0.id == id }
+        save()
+    }
+
+    /// Whether a paired phone may play songs itself right now: Stream to Phones is on, it's the app (a browser can't),
+    /// and it wasn't told otherwise.
+    func mayStream(_ id: String) -> Bool {
+        guard streamEnabled, let device = device(id), !device.isWeb else { return false }
+        return device.streams != false
+    }
+
+    func setMayStream(_ id: String, _ may: Bool) {
+        guard let index = devices.firstIndex(where: { $0.id == id }), (devices[index].streams != false) != may else { return }
+        devices[index].streams = may
         save()
     }
 

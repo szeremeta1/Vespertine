@@ -1,0 +1,560 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "CFBundleDisplayName": {
+      "comment": "Bundle display name",
+      "shouldTranslate": false
+    },
+    "NSCameraUsageDescription": {
+      "comment": "Privacy - NSCameraUsageDescription",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ካሜራውን የሚጠቀመው በMacዎ ላይ የVespertine መተግበሪያ የሚያሳየውን የማጣመሪያ ኮድ ለመቃኘት ብቻ ነው።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يستخدم Vespertine الكاميرا فقط لمسح رمز الإقران الذي يعرضه تطبيق Vespertine على الـ Mac الخاص بك."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ক্যামেরা ব্যবহার করে শুধু সেই পেয়ারিং কোড স্ক্যান করতে, যা আপনার Mac-এ Vespertine অ্যাপ দেখায়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine používá fotoaparát jen ke skenování párovacího kódu, který aplikace Vespertine zobrazuje na vašem Macu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine bruger kun kameraet til at scanne den kode til pardannelse, som Vespertine-appen viser på din Mac."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine verwendet die Kamera nur, um den Kopplungscode zu scannen, den die Vespertine-App auf deinem Mac anzeigt."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Vespertine χρησιμοποιεί την κάμερα μόνο για τη σάρωση του κωδικού ζεύξης που εμφανίζει η εφαρμογή Vespertine στο Mac σας."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine uses the camera only to scan the pairing code that the Vespertine app shows on your Mac."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine usa la cámara únicamente para escanear el código de enlace que la app Vespertine muestra en tu Mac."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine فقط برای اسکن کد جفت‌سازی‌ای که برنامهٔ Vespertine در Mac شما نشان می‌دهد از دوربین استفاده می‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine käyttää kameraa vain skannatakseen parinmuodostuskoodin, jonka Vespertine-appi näyttää Macillasi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ginagamit lang ng Vespertine ang camera para i-scan ang pairing code na ipinapakita ng Vespertine app sa Mac mo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine utilise l’appareil photo uniquement pour scanner le code de jumelage que l’app Vespertine affiche sur votre Mac."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine કૅમેરાનો ઉપયોગ માત્ર એ પેરિંગ કોડ સ્કૅન કરવા માટે કરે છે, જે તમારા Mac પર Vespertine ઍપ બતાવે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine yana amfani da kyamara ne kawai don duba lambar haɗawa da manhajar Vespertine ke nunawa a kan Mac ɗinku."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine משתמש במצלמה רק כדי לסרוק את קוד הקישור שהיישום Vespertine מציג ב־Mac שלך."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine कैमरे का उपयोग केवल उस पेयरिंग कोड को स्कैन करने के लिए करता है जो आपके Mac पर Vespertine ऐप दिखाता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Vespertine csak annak a párosítási kódnak a beszkenneléséhez használja a kamerát, amelyet a Vespertine app a Macen megjelenít."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine menggunakan kamera hanya untuk memindai kode pemasangan yang ditampilkan app Vespertine di Mac Anda."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine usa la fotocamera solo per scansionare il codice di abbinamento che l’app Vespertine mostra sul tuo Mac."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineは、MacのVespertineアプリに表示されるペアリングコードをスキャンするためにのみカメラを使用します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮ್ಮ Mac ನಲ್ಲಿ Vespertine ಆ್ಯಪ್ ತೋರಿಸುವ ಜೋಡಣೆ ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಲು ಮಾತ್ರ Vespertine ಕ್ಯಾಮರಾವನ್ನು ಬಳಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine은 Mac의 Vespertine 앱에 표시되는 페어링 코드를 스캔하는 용도로만 카메라를 사용합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങളുടെ Mac-ൽ Vespertine ആപ്പ് കാണിക്കുന്ന ജോടിയാക്കൽ കോഡ് സ്കാൻ ചെയ്യാൻ മാത്രമാണ് Vespertine ക്യാമറ ഉപയോഗിക്കുന്നത്."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine कॅमेऱ्याचा वापर फक्त तुमच्या Mac वरील Vespertine ॲप दाखवत असलेला पेअरिंग कोड स्कॅन करण्यासाठी करते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine menggunakan kamera hanya untuk mengimbas kod perpasangan yang ditunjukkan oleh app Vespertine pada Mac anda."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine bruker kameraet kun til å skanne sammenkoblingskoden som Vespertine-appen viser på Macen din."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine gebruikt de camera alleen om de koppelcode te scannen die de Vespertine-app op je Mac toont."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਕੈਮਰੇ ਦੀ ਵਰਤੋਂ ਸਿਰਫ਼ ਉਸ ਪੇਅਰਿੰਗ ਕੋਡ ਨੂੰ ਸਕੈਨ ਕਰਨ ਲਈ ਕਰਦਾ ਹੈ ਜੋ ਤੁਹਾਡੇ Mac ’ਤੇ Vespertine ਐਪ ਦਿਖਾਉਂਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine używa aparatu tylko do skanowania kodu łączenia w parę, który aplikacja Vespertine pokazuje na Twoim Macu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine usa a câmera apenas para escanear o código de emparelhamento que o app Vespertine mostra no seu Mac."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine usa a câmara apenas para ler o código de emparelhamento que a app Vespertine mostra no seu Mac."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine utilizează camera doar pentru a scana codul de asociere pe care aplicația Vespertine îl afișează pe Mac-ul dvs."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine använder kameran enbart för att skanna parkopplingskoden som Vespertine-appen visar på din Mac."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine hutumia kamera kuchanganua tu msimbo wa kuoanisha ambao programu ya Vespertine inaonyesha kwenye Mac yako."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "உங்கள் Mac-இல் Vespertine ஆப் காட்டும் ஜோடிசேர்க்கும் குறியீட்டை ஸ்கேன் செய்ய மட்டுமே Vespertine கேமராவைப் பயன்படுத்தும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీ Macలో Vespertine యాప్ చూపించే జత చేసే కోడ్‌ను స్కాన్ చేయడానికి మాత్రమే Vespertine కెమెరాను ఉపయోగిస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ใช้กล้องเพื่อสแกนรหัสจับคู่ที่แอป Vespertine แสดงบน Mac ของคุณเท่านั้น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine, kamerayı yalnızca Mac’inizdeki Vespertine uygulamasının gösterdiği eşleme kodunu taramak için kullanır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine використовує камеру лише для сканування коду створення пари, який програма Vespertine показує на вашому Mac."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine کیمرا صرف اس پیئرنگ کوڈ کو اسکین کرنے کے لیے استعمال کرتا ہے جو آپ کے Mac پر Vespertine ایپ دکھاتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine chỉ dùng camera để quét mã ghép đôi mà ứng dụng Vespertine hiển thị trên máy Mac của bạn."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 只會使用相機掃瞄 Mac 上的 Vespertine App 所顯示的配對碼。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 仅使用相机扫描 Mac 上的 Vespertine App 显示的配对码。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 只會使用相機來掃描 Mac 上的 Vespertine App 所顯示的配對碼。"
+          }
+        }
+      }
+    },
+    "NSLocalNetworkUsageDescription": {
+      "comment": "Privacy - NSLocalNetworkUsageDescription",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine በአውታረ መረብዎ ላይ Vespertineን የሚያሄዱ Macዎችን ይፈልጋል፣ የሚገናኘውም እርስዎ ካጣመሯቸው ጋር ብቻ ነው።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يبحث Vespertine عن أجهزة Mac التي تشغّل Vespertine على شبكتك، ولا يتصل إلا بالأجهزة التي تقرنها به."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine আপনার নেটওয়ার্কে Vespertine চালু থাকা Mac খোঁজে, এবং শুধু সেগুলোর সাথেই সংযোগ করে যেগুলোর সাথে আপনি পেয়ার করেন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine hledá ve vaší síti Macy, na kterých běží Vespertine, a připojuje se jen k těm, se kterými ho spárujete."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine søger efter Mac-computere, der kører Vespertine på dit netværk, og opretter kun forbindelse til dem, du danner par med."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine sucht in deinem Netzwerk nach Macs, auf denen Vespertine läuft, und verbindet sich nur mit denen, mit denen du es koppelst."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Vespertine αναζητά στο δίκτυό σας Mac που εκτελούν το Vespertine και συνδέεται μόνο με όσα έχετε κάνει ζεύξη."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine looks for Macs running Vespertine on your network, and connects only to the ones you pair with."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine busca en tu red ordenadores Mac que tengan Vespertine abierto y solo se conecta a los que enlaces."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine در شبکهٔ شما به‌دنبال Macهایی می‌گردد که Vespertine را اجرا می‌کنند و فقط به آن‌هایی وصل می‌شود که با آن‌ها جفت می‌کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine etsii verkostasi Maceja, joissa Vespertine on käynnissä, ja yhdistää vain niihin, joiden kanssa muodostat laiteparin."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naghahanap ang Vespertine ng mga Mac na nagpapatakbo ng Vespertine sa network mo, at kumokonekta lang ito sa mga ipine-pair mo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine recherche sur votre réseau les Mac qui exécutent Vespertine, et ne se connecte qu’à ceux avec lesquels vous le jumelez."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine તમારા નેટવર્ક પર Vespertine ચલાવતાં Mac શોધે છે, અને માત્ર તે જ Mac સાથે કનેક્ટ થાય છે જેની સાથે તમે પેર કરો છો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine yana neman Mac-Mac masu aiki da Vespertine a kan cibiyar sadarwarku, kuma yana haɗuwa ne kawai da waɗanda kuka haɗa da su."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine מחפש ברשת שלך מחשבי Mac שמפעילים את Vespertine, ומתחבר רק לאלה שקישרת."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine आपके नेटवर्क पर Vespertine चला रहे Mac खोजता है, और केवल उन्हीं से कनेक्ट होता है जिनसे आप पेयर करते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Vespertine a hálózatán keresi azokat a Maceket, amelyeken fut a Vespertine, és csak azokhoz csatlakozik, amelyekkel Ön párosítja."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine mencari Mac yang menjalankan Vespertine di jaringan Anda, dan hanya terhubung ke Mac yang Anda pasangkan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine cerca sulla tua rete i Mac su cui è in esecuzione Vespertine e si connette solo a quelli a cui lo abbini."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertineは、ネットワーク上でVespertineを実行しているMacを探し、ペアリングしたMacにのみ接続します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ Vespertine ರನ್ ಆಗುತ್ತಿರುವ Mac ಗಳನ್ನು ಹುಡುಕುತ್ತದೆ, ಮತ್ತು ನೀವು ಜೋಡಿಸಿದವುಗಳಿಗೆ ಮಾತ್ರ ಸಂಪರ್ಕಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine은 사용자의 네트워크에서 Vespertine을 실행 중인 Mac을 찾고, 페어링한 Mac에만 연결합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine നിങ്ങളുടെ നെറ്റ്‌വർക്കിൽ Vespertine പ്രവർത്തിക്കുന്ന Mac-കൾ തിരയുന്നു, നിങ്ങൾ ജോടിയാക്കിയവയിലേക്ക് മാത്രം കണക്റ്റ് ചെയ്യുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine तुमच्या नेटवर्कवर Vespertine चालू असलेले Mac शोधते, आणि फक्त तुम्ही पेअर केलेल्या Mac शीच कनेक्ट होते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine mencari Mac yang menjalankan Vespertine pada rangkaian anda, dan hanya bersambung ke Mac yang anda pasangkan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine leter etter Macer som kjører Vespertine på nettverket ditt, og kobler bare til dem du sammenkobler med."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine zoekt op je netwerk naar Macs waarop Vespertine actief is en maakt alleen verbinding met de Macs waarmee je koppelt."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ’ਤੇ Vespertine ਚਲਾ ਰਹੇ Mac ਲੱਭਦਾ ਹੈ, ਅਤੇ ਸਿਰਫ਼ ਉਹਨਾਂ ਨਾਲ ਕਨੈਕਟ ਹੁੰਦਾ ਹੈ ਜਿਨ੍ਹਾਂ ਨਾਲ ਤੁਸੀਂ ਪੇਅਰ ਕਰਦੇ ਹੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine szuka w Twojej sieci Maców, na których działa Vespertine, i łączy się tylko z tymi, z którymi połączysz je w parę."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine procura na sua rede por Macs com o Vespertine em execução e só se conecta àqueles com os quais você o emparelha."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine procura na sua rede Macs com o Vespertine em execução e liga-se apenas àqueles com os quais o emparelhar."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine caută în rețeaua dvs. Mac-uri pe care rulează Vespertine și se conectează doar la cele cu care îl asociați."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine letar efter Mac-datorer som kör Vespertine i ditt nätverk och ansluter bara till dem du parkopplar med."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine hutafuta Mac zinazoendesha Vespertine kwenye mtandao wako, na huunganisha tu kwenye zile unazooanisha nazo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine உங்கள் நெட்வொர்க்கில் Vespertine இயங்கும் Mac-களைத் தேடும்; நீங்கள் ஜோடிசேர்த்தவற்றுடன் மட்டுமே இணையும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine మీ నెట్‌వర్క్‌లో Vespertine నడుస్తున్న Macల కోసం వెతుకుతుంది, మీరు జత చేసిన వాటికి మాత్రమే కనెక్ట్ అవుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine จะค้นหา Mac ที่ใช้งาน Vespertine อยู่บนเครือข่ายของคุณ และเชื่อมต่อกับเครื่องที่คุณจับคู่ไว้เท่านั้น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine, ağınızda Vespertine’i çalıştıran Mac’leri arar ve yalnızca eşlediklerinize bağlanır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine шукає у вашій мережі комп’ютери Mac, на яких запущено Vespertine, і під’єднується лише до тих, з якими ви створили пару."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine آپ کے نیٹ ورک پر ایسے Macs تلاش کرتا ہے جن پر Vespertine چل رہا ہو، اور صرف ان سے منسلک ہوتا ہے جن کے ساتھ آپ پیئر کرتے ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine tìm các máy Mac đang chạy Vespertine trên mạng của bạn và chỉ kết nối với những máy bạn ghép đôi."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 會在你的網絡上尋找正在執行 Vespertine 的 Mac，而且只會連接你已配對的 Mac。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 会在你的网络上查找运行 Vespertine 的 Mac，并且只连接你已配对的 Mac。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 會在你的網路上尋找執行 Vespertine 的 Mac，而且只會連線到你配對的 Mac。"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

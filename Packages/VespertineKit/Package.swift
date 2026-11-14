@@ -20,6 +20,8 @@ let package = Package(
         .package(url: "https://github.com/sbooth/CXXTagLib", from: "2.3.2"),
         .package(url: "https://github.com/groue/GRDB.swift", from: "7.11.0"),
         .package(path: "../VespertineAnalysis"),
+        // Speaker layouts and Spatial Audio beds, shared with the iPhone player (VespertineChannels).
+        .package(path: "../VespertineRemoteKit"),
     ],
     targets: [
         // Real-time pieces (ring buffer, IOProc, meters) in plain C so the render
@@ -51,6 +53,7 @@ let package = Package(
                 .product(name: "SFBAudioEngine", package: "SFBAudioEngine"),
                 "CVespertineWavPack",
                 .product(name: "VespertineAnalysisCore", package: "VespertineAnalysis"),
+                .product(name: "VespertineChannels", package: "VespertineRemoteKit"),
             ],
             // The known-DoP-DAC list (dop-dacs.json), read by DoPDACList.bundled.
             resources: [.copy("Resources/dop-dacs.json")],

@@ -14,13 +14,26 @@ let package = Package(
         .library(name: "VespertineRemoteProtocol", targets: ["VespertineRemoteProtocol"]),
         // The phone's side: finding Macs, pairing, the Keychain, and a session that keeps the Mac's state.
         .library(name: "VespertineRemoteClient", targets: ["VespertineRemoteClient"]),
+        // The Mac's side of the stream channel: what to send for a song (the file or a FLAC made from it), the transcode
+        // cache, and ranged reads. Plain Foundation: the actual conversion is injected (VespertineAudio does it in the app).
+        .library(name: "VespertineStreamServer", targets: ["VespertineStreamServer"]),
+        // Speaker layouts, Spatial Audio beds and channel routing, shared by the Mac player (VespertineAudio) and the phone's.
+        .library(name: "VespertineChannels", targets: ["VespertineChannels"]),
+        // The phone's player: reads a stream's bytes as they arrive and plays them with AVAudioEngine.
+        .library(name: "VespertinePhonePlayer", targets: ["VespertinePhonePlayer"]),
         // A command-line remote for testing a Mac's remote server (pair, send commands, watch what it pushes).
         .executable(name: "vespertine-remote", targets: ["vespertine-remote"]),
     ],
     targets: [
         .target(name: "VespertineRemoteProtocol"),
         .target(name: "VespertineRemoteClient", dependencies: ["VespertineRemoteProtocol"]),
+        .target(name: "VespertineStreamServer", dependencies: ["VespertineRemoteProtocol"]),
+        .target(name: "VespertineChannels"),
+        .target(name: "VespertinePhonePlayer", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient", "VespertineChannels"]),
         .executableTarget(name: "vespertine-remote", dependencies: ["VespertineRemoteProtocol"]),
         .testTarget(name: "VespertineRemoteProtocolTests", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient"]),
+        .testTarget(name: "VespertineStreamServerTests", dependencies: ["VespertineStreamServer", "VespertineRemoteProtocol", "VespertineRemoteClient", "VespertinePhonePlayer"]),
+        .testTarget(name: "VespertineChannelsTests", dependencies: ["VespertineChannels"]),
+        .testTarget(name: "VespertinePhonePlayerTests", dependencies: ["VespertinePhonePlayer", "VespertineRemoteProtocol", "VespertineRemoteClient"]),
     ]
 )

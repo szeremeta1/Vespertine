@@ -14,7 +14,26 @@ import Foundation
 
 public enum RemoteProtocol {
     /// Bumped when a message changes in a way an older remote or Mac would misread. Both sides say theirs in the handshake.
-    public static let version = 1
+    /// Version 2 adds the stream channel (`RemoteCommand.streamOpen` and friends, answered with `StreamFrame`s); everything
+    /// else is as version 1, so a version 1 phone is still served as a remote (see `negotiate`).
+    public static let version = 2
+    /// The oldest version a Mac still serves.
+    public static let minimumVersion = 1
+    /// The first version with the stream channel.
+    public static let streamVersion = 2
+
+    /// The version a connection speaks, from what its `hello` or `pair` said: `baseline` is the version field every
+    /// version reads (a phone that can do more sends 1 there, so an old Mac accepts it), `highest` the newest the phone
+    /// speaks (absent from a version 1 phone). nil: the phone needs a newer Mac than this one.
+    public static func negotiate(baseline: Int, highest: Int?) -> Int? {
+        guard baseline >= minimumVersion, baseline <= version else { return nil }
+        return min(max(highest ?? baseline, baseline), version)
+    }
+
+    /// The most bytes one `StreamFrame` carries.
+    public static let maximumChunk = 1024 * 1024
+    /// What a phone asks for in one read unless it knows better.
+    public static let defaultChunkSize = 256 * 1024
     /// The Bonjour service a Mac running the remote server advertises.
     public static let serviceType = "_vespertine._tcp"
     /// TXT record keys of that service.
@@ -67,9 +86,11 @@ public struct ClientMessage: Codable, Sendable, Equatable {
 public enum RemoteCommand: Codable, Sendable, Equatable {
     // Session
     /// First message on a connection made with a device key. `device` is the ID the Mac gave at pairing.
-    case hello(device: String, name: String, protocolVersion: Int)
+    /// `protocolVersion` is the baseline every Mac reads (1); `highestProtocolVersion` the newest the phone speaks (nil from a
+    /// version 1 phone), which an old Mac ignores and a new one answers in `ServerInfo.protocolVersion`.
+    case hello(device: String, name: String, protocolVersion: Int, highestProtocolVersion: Int? = nil)
     /// First message on a connection made with a pairing key: asks to be paired under `name` ("Alex's iPhone").
-    case pair(name: String, protocolVersion: Int)
+    case pair(name: String, protocolVersion: Int, highestProtocolVersion: Int? = nil)
 
     // Transport
     case playPause
@@ -111,7 +132,9 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     case createPlaylist(name: String, ids: [Int64])
 
     // Library (answered with a page or a list)
-    case albums(offset: Int, limit: Int)
+    /// `sort` and `filter` (both from protocol 2; an older Mac ignores them and answers in its own order): the Mac sorts and
+    /// narrows the whole list, then pages it. `total` in the answer counts what the filter left.
+    case albums(offset: Int, limit: Int, sort: AlbumSort? = nil, filter: AlbumFilter? = nil)
     case albumTracks(key: String)
     case artists
     case artistAlbums(name: String)
@@ -131,6 +154,9 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     case recentlyAdded(limit: Int)
     /// The albums with songs in a source (`SourceSummary.id`).
     case sourceAlbums(id: Int64)
+    /// These songs by library ID, in the order asked (answered with `.tracks`; IDs the library doesn't have are left out). A
+    /// phone that plays songs itself builds its own queue from them.
+    case tracks(ids: [Int64])
     /// A cover by `artworkKey`, about `size` pixels on its long side (160 or 600 are stored; others pick the nearest).
     case artwork(key: String, size: Int)
 
@@ -141,6 +167,72 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     /// 0…1, on whatever `VolumeState.route` says moves.
     case setVolume(level: Double)
     case setTransitions(on: Bool)
+
+    // Streaming to the phone (protocol 2): the phone plays the song itself from the Mac's bytes.
+    /// What the Mac would send for these songs (answered with `.streamInfo`): the original file or a lossless FLAC it makes,
+    /// the format that arrives, and why a song can't be streamed. `maxSampleRate`: the most the phone's output can use (48000
+    /// for AirPods), which a conversion on the Mac is kept to.
+    case streamInfo(ids: [Int64], maxSampleRate: Double?)
+    /// Opens a song for reading (answered with `.streamOpened`, or `.streamPreparing` while the Mac converts it: ask again).
+    /// `smaller`: for a song kept on the phone, a lossless file above `maxSampleRate` is converted down to it too (a stereo
+    /// 24/192 file is otherwise sent as it is).
+    case streamOpen(id: Int64, maxSampleRate: Double?, smaller: Bool? = nil)
+    /// Reads up to `length` bytes (at most `RemoteProtocol.maximumChunk`) from `offset` of an open stream. Answered with a
+    /// `StreamFrame` (binary) carrying this command's `id`, or `.failed`.
+    case streamRead(stream: Int, offset: Int64, length: Int)
+    case streamClose(stream: Int)
+}
+
+/// How the Albums page is ordered.
+public enum AlbumSort: String, Codable, Sendable, Equatable, CaseIterable {
+    /// The Mac's own order (by album artist, then title).
+    case library
+    case title, artist
+    /// By year, newest first; albums without a year come last.
+    case newest
+    case oldest
+}
+
+/// Which albums the Albums page shows.
+public enum AlbumFilter: String, Codable, Sendable, Equatable, CaseIterable {
+    case all, hiRes, dsd, surround
+}
+
+public enum AlbumListing {
+    /// `albums` (in the Mac's order) narrowed by `filter`, then sorted by `sort`. Ties keep the Mac's order.
+    public static func arrange(_ albums: [AlbumSummary], sort: AlbumSort?, filter: AlbumFilter?) -> [AlbumSummary] {
+        var list = albums
+        switch filter ?? .all {
+        case .all: break
+        case .hiRes: list = list.filter(\.hiRes)
+        case .dsd: list = list.filter(\.dsd)
+        case .surround: list = list.filter(\.multichannel)
+        }
+        func before(_ a: String, _ b: String) -> Bool {
+            a.compare(b, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedAscending
+        }
+        let numbered = Array(list.enumerated())
+        func sorted(_ earlier: (AlbumSummary, AlbumSummary) -> Bool?) -> [AlbumSummary] {
+            numbered.sorted { earlier($0.element, $1.element) ?? ($0.offset < $1.offset) }.map(\.element)
+        }
+        func byYear(newestFirst: Bool) -> [AlbumSummary] {
+            sorted { a, b in
+                switch (a.year, b.year) {
+                case (nil, nil): nil
+                case (nil, _): false
+                case (_, nil): true
+                case (let x?, let y?): x == y ? nil : (newestFirst ? x > y : x < y)
+                }
+            }
+        }
+        switch sort ?? .library {
+        case .library: return list
+        case .title: return sorted { before($0.title, $1.title) ? true : (before($1.title, $0.title) ? false : nil) }
+        case .artist: return sorted { before($0.artist, $1.artist) ? true : (before($1.artist, $0.artist) ? false : nil) }
+        case .newest: return byYear(newestFirst: true)
+        case .oldest: return byYear(newestFirst: false)
+        }
+    }
 }
 
 public enum RepeatModeValue: String, Codable, Sendable, Equatable {
@@ -186,6 +278,11 @@ public enum RemoteReply: Codable, Sendable, Equatable {
     case found(SearchResults)
     case library(LibraryOverview)
     case genres(items: [GenreSummary])
+    // Protocol 2
+    case streamInfo(items: [StreamInfo])
+    case streamOpened(StreamDescriptor)
+    /// The Mac is converting this song to FLAC; ask again with `streamOpen` (`progress` 0…1 when it knows).
+    case streamPreparing(progress: Double?)
 }
 
 public struct ServerInfo: Codable, Sendable, Equatable {

@@ -12,6 +12,7 @@ struct SettingsView: View {
 
     var body: some View {
         @Bindable var settings = model.settings
+        @Bindable var shelf = KeptShelf.shared
         NavigationStack {
             Form {
                 Section {
@@ -19,7 +20,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Now Playing")
                 } footer: {
-                    Text("The cover becomes the label of a record that turns with the music. It’s a picture of the playback position, not of the sound: the music plays on the Mac.")
+                    Text("The cover becomes the label of a record that turns with the music. It’s a picture of the playback position, not of the sound.")
                 }
                 Section {
                     Picker("Albums", selection: $settings.albumsLayout) {
@@ -38,6 +39,28 @@ struct SettingsView: View {
                     } else {
                         Text("Cover Flow reads the motion sensors only while it’s on screen, to shift its perspective as you tilt the device. Nothing is recorded.")
                     }
+                }
+                Section {
+                    Toggle("Play over Cellular Data", isOn: Binding(get: { settings.cellularPlayback }, set: { settings.cellularPlayback = $0; model.cellularSettingChanged() }))
+                    LabeledContent("Fetched from the Mac", value: ByteCountFormatter.string(fromByteCount: PlayTarget.shared.bytesReceived, countStyle: .file))
+                } header: {
+                    Text("Playing on This Device")
+                } footer: {
+                    Text("When music plays on this device, its songs come from your Mac. Lossless and hi-res songs are large: an album can be several hundred megabytes. The count is since the app was opened.")
+                }
+                Section {
+                    Picker("Room for Kept Music", selection: $shelf.limitGigabytes) {
+                        ForEach(KeptShelf.limitChoices, id: \.self) { gigabytes in
+                            if gigabytes == 0 { Text("No Limit").tag(gigabytes) } else {
+                                Text(ByteCountFormatter.string(fromByteCount: Int64(gigabytes) * 1_000_000_000, countStyle: .file)).tag(gigabytes)
+                            }
+                        }
+                    }
+                    Toggle("Keep Smaller Copies", isOn: $shelf.smaller)
+                } header: {
+                    Text("Kept on This Device")
+                } footer: {
+                    Text("Albums and playlists you keep are fetched whole from your Mac and play without it. With smaller copies, lossless songs above 48 kHz are converted on the Mac to 44.1 or 48 kHz before they’re kept; everything else is kept as it is. This applies to what you keep from now on.")
                 }
                 Section("About") {
                     LabeledContent("Version", value: Self.version)

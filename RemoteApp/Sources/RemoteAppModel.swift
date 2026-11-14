@@ -25,6 +25,8 @@ final class RemoteAppModel {
     let tiltSensor = TiltSensor()
     /// This device has a network at all (Wi-Fi, cellular or a VPN).
     private(set) var isOnline = true
+    /// The network in use is cellular data (not Wi-Fi or a cable).
+    private(set) var onCellular = false
     /// Which screen the remote opens on (set by a launch option in debug builds).
     var startScreen: String?
 
@@ -43,7 +45,8 @@ final class RemoteAppModel {
         discovery.start()
         pathMonitor.pathUpdateHandler = { [weak self] path in
             let online = path.status == .satisfied
-            MainActor.assumeIsolated { self?.networkChanged(online: online) }
+            let cellular = path.usesInterfaceType(.cellular) && !path.usesInterfaceType(.wifi) && !path.usesInterfaceType(.wiredEthernet)
+            MainActor.assumeIsolated { self?.networkChanged(online: online, cellular: cellular) }
         }
         pathMonitor.start(queue: .main)
         #if DEBUG
@@ -62,12 +65,16 @@ final class RemoteAppModel {
     // MARK: Choosing a Mac
 
     func choose(_ pairing: SavedPairing) {
+        PlayTarget.shared.leave()
         session?.close()
         let serverID = pairing.serverID
         let session = RemoteSession(pairing: pairing, clientName: deviceName, routes: { [weak self] in
             self?.routes(to: serverID) ?? []
         })
-        session.onConnected = { [weak self] _, address in self?.remember(address, for: serverID) }
+        session.onConnected = { [weak self, weak session] _, address in
+            self?.remember(address, for: serverID)
+            if let session { KeptShelf.shared.connected(session) }
+        }
         self.session = session
         artwork.session = session
         UserDefaults.standard.set(pairing.serverID, forKey: Self.lastMacKey)
@@ -76,6 +83,7 @@ final class RemoteAppModel {
 
     /// Tries the remote on a pretend Mac inside the app (no network, no sound). Not saved as a pairing.
     func tryDemo() {
+        PlayTarget.shared.leave()
         session?.close()
         let pairing = SavedPairing(serverID: DemoMac.serverID, name: String(localized: "Demo Mac"), device: "demo", key: Data())
         // One pretend Mac for the whole demo, so the queue survives the app going to the background and back.
@@ -88,6 +96,7 @@ final class RemoteAppModel {
 
     /// Back to the list of Macs.
     func leave() {
+        PlayTarget.shared.leave()
         session?.close()
         session = nil
         artwork.session = nil
@@ -97,6 +106,7 @@ final class RemoteAppModel {
     func forget(_ pairing: SavedPairing) {
         if session?.pairing.serverID == pairing.serverID { leave() }
         if !transientPairings.contains(pairing.serverID) { keychain.remove(serverID: pairing.serverID) }
+        KeptShelf.shared.forget(serverID: pairing.serverID)
         pairings.removeAll { $0.serverID == pairing.serverID }
     }
 
@@ -179,9 +189,17 @@ final class RemoteAppModel {
         keychain.upsert(pairing)
     }
 
-    private func networkChanged(online: Bool) {
+    /// The cellular switch in Settings was changed: applies it to the network in use now.
+    func cellularSettingChanged() { networkChanged(online: isOnline, cellular: onCellular) }
+
+    private func networkChanged(online: Bool, cellular: Bool) {
         isOnline = online
+        onCellular = cellular
+        PlayTarget.shared.holdReason = cellular && !settings.cellularPlayback
+            ? String(localized: "Playing over cellular data is off. Connect to Wi-Fi, or turn it on in Settings.") : nil
         if online { session?.networkChanged() }
+        // Fetching to keep waits out cellular data too, and carries on when Wi-Fi is back.
+        if PlayTarget.shared.holdReason == nil, let session { KeptShelf.shared.keeper(for: session)?.resume() }
     }
 
     // MARK: Pairing
@@ -246,7 +264,8 @@ final class RemoteAppModel {
             discovery.start()
             session?.connect()
         case .background:
-            session?.suspend()
+            // Music playing on this device needs its songs from the Mac: the connection stays while it plays.
+            if !PlayTarget.shared.isBusy { session?.suspend() }
             discovery.stop()
         default:
             break

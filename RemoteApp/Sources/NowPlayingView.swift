@@ -15,7 +15,7 @@ struct NowPlayingView: View {
     @State private var feedback = CommandFeedback()
     @State private var scrubbing: Double?
 
-    private var player: PlayerState? { session.player }
+    private var player: PlayerState? { session.shownPlayer }
 
     var body: some View {
         GeometryReader { geometry in
@@ -179,7 +179,7 @@ struct NowPlayingView: View {
                     }
                 })
                 .tint(Palette.brass)
-                .disabled(duration <= 0 || !session.isConnected)
+                .disabled(duration <= 0 || !session.canControl)
                 .accessibilityLabel(Text("Position"))
                 .accessibilityValue(Text("\(formatTime(position)) of \(formatTime(duration))"))
                 HStack {
@@ -211,8 +211,8 @@ struct NowPlayingView: View {
         .font(.title)
         .foregroundStyle(Palette.text)
         .buttonStyle(.plain)
-        .disabled(!session.isConnected)
-        .opacity(session.isConnected ? 1 : 0.5)
+        .disabled(!session.canControl)
+        .opacity(session.canControl ? 1 : 0.5)
     }
 
     private var modes: some View {
@@ -234,7 +234,7 @@ struct NowPlayingView: View {
         }
         .font(.body)
         .buttonStyle(.plain)
-        .disabled(!session.isConnected)
+        .disabled(!session.canControl)
     }
 
     private func modeButton(_ symbol: String, on: Bool, label: Text, value: Text? = nil, command: @escaping () -> RemoteCommand) -> some View {
@@ -247,6 +247,13 @@ struct NowPlayingView: View {
         }
         .accessibilityLabel(label)
         .accessibilityValue(value ?? (on ? Text("On") : Text("Off")))
+    }
+
+    /// The volume line when music plays on this device: its level (below 100% the samples are scaled by iOS) and how to set it.
+    static func deviceVolume(_ level: Double?) -> String {
+        guard let level else { return String(localized: "Use the volume buttons on this device.") }
+        let percent = level.formatted(.percent.precision(.fractionLength(0)))
+        return String(localized: "Volume \(percent). Use the volume buttons on this device.", comment: "Now Playing on the iPhone: %@ is the device's volume as a percentage, e.g. “62%”.")
     }
 
     static func nextRepeat(after mode: RepeatModeValue) -> RepeatModeValue {
@@ -268,6 +275,9 @@ struct NowPlayingView: View {
     @ViewBuilder private var volume: some View {
         if let volume = player?.volume {
             switch volume.route {
+            case .fixed where session.phone != nil:
+                Label(Self.deviceVolume(volume.level), systemImage: "speaker.wave.2")
+                    .font(.caption).foregroundStyle(Palette.text2)
             case .fixed:
                 Label("Fixed volume: set the level on your amplifier or DAC", systemImage: "speaker.slash")
                     .font(.caption).foregroundStyle(Palette.text2)

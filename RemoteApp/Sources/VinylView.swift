@@ -12,7 +12,7 @@ struct VinylView: View {
     let session: RemoteSession
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    private var player: PlayerState? { session.player }
+    private var player: PlayerState? { session.shownPlayer }
     private var spinning: Bool { player?.playback == .playing && player?.loading != true && !reduceMotion }
 
     var body: some View {

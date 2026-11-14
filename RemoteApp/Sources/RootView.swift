@@ -97,7 +97,7 @@ struct MacsView: View {
                 Section {
                     Button { model.tryDemo() } label: { Label("Try the Demo", systemImage: "play.rectangle") }
                 } footer: {
-                    Text("No Mac nearby? Try the remote with a made-up library. Nothing plays.")
+                    Text("No Mac nearby? Try Vespertine with a made-up library. Choose this device in Output to hear it play.")
                 }
                 if let problem = model.discovery.problem, !problem.isEmpty {
                     Section {
@@ -149,7 +149,7 @@ struct MacsView: View {
             Text(verbatim: "vespertine")
                 .font(.system(size: 30, weight: .light, design: .serif))
                 .foregroundStyle(Palette.text)
-            Text("The remote for Vespertine on your Mac")
+            Text("The companion to Vespertine on your Mac")
                 .font(.footnote).foregroundStyle(Palette.text2)
         }
         .frame(maxWidth: .infinity)

@@ -59,6 +59,17 @@ struct DemoMacTests {
         #expect(try await ask(mac, .pair(name: "x", protocolVersion: RemoteProtocol.version)) == .failed(reason: ""))
     }
 
+    @Test func theAlbumsPageIsSortedAndNarrowedByTheMacAcrossPages() async throws {
+        let (mac, _) = try await opened()
+        guard case .albums(let all, let total) = try await ask(mac, .albums(offset: 0, limit: 500)) else { Issue.record("no albums"); return }
+        guard case .albums(let first, let sortedTotal) = try await ask(mac, .albums(offset: 0, limit: 2, sort: .title, filter: nil)),
+              case .albums(let second, _) = try await ask(mac, .albums(offset: 2, limit: 2, sort: .title, filter: nil)) else { Issue.record("no albums"); return }
+        #expect(sortedTotal == total)
+        #expect((first + second).map(\.key) == AlbumListing.arrange(all, sort: .title, filter: nil).prefix(4).map(\.key))
+        guard case .albums(let hiRes, let hiResTotal) = try await ask(mac, .albums(offset: 0, limit: 500, sort: nil, filter: .hiRes)) else { Issue.record("no albums"); return }
+        #expect(hiRes.allSatisfy(\.hiRes) && hiResTotal == all.filter(\.hiRes).count && hiResTotal < total)
+    }
+
     @Test func playsAndEditsTheQueue() async throws {
         let (mac, pushes) = try await opened()
         guard case .albums(let albums, _) = try await ask(mac, .albums(offset: 0, limit: 10)) else { return }
@@ -106,6 +117,14 @@ struct DemoMacTests {
         guard case .tracks(let after) = try await ask(mac, .favorites) else { return }
         #expect(after.count == before.count + (song.favorite ? -1 : 1))
         #expect(pushes.lastQueue?.current?.track.favorite == !song.favorite)
+    }
+
+    @Test func looksSongsUpByIDInTheOrderAsked() async throws {
+        let (mac, _) = try await opened()
+        guard case .songs(let all, _) = try await ask(mac, .songs(offset: 0, limit: 3)), all.count == 3 else { Issue.record("no songs"); return }
+        let wanted = [all[2].id, all[0].id].compactMap { $0 }
+        guard case .tracks(let found) = try await ask(mac, .tracks(ids: wanted + [-5])) else { Issue.record("no tracks"); return }
+        #expect(found.map(\.id) == wanted)
     }
 
     @Test func listsSongsInPages() async throws {

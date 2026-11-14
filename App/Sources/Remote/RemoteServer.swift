@@ -12,6 +12,7 @@ import Network
 import Observation
 import SystemConfiguration
 import VespertineRemoteProtocol
+import VespertineStreamServer
 
 @Observable
 final class RemoteServer {
@@ -83,9 +84,70 @@ final class RemoteServer {
 
     var isRunning: Bool { if case .running = status { true } else { false } }
 
-    var serverInfo: ServerInfo {
+    var serverInfo: ServerInfo { serverInfo(protocolVersion: RemoteProtocol.version) }
+
+    /// What the Mac says about itself to a phone that speaks `protocolVersion` (the one the handshake agreed on).
+    func serverInfo(protocolVersion: Int) -> ServerInfo {
         ServerInfo(name: Self.computerName, serverID: store.serverID,
-                   appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "")
+                   appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "",
+                   protocolVersion: protocolVersion)
+    }
+
+    /// The stream channel's Mac side, made the first time a phone asks to stream.
+    @ObservationIgnored private var streams: StreamPreparer?
+    /// The preparer if one was made (closing a connection must not make one).
+    var activeStreamPreparer: StreamPreparer? { streams }
+    var streamPreparer: StreamPreparer? {
+        if streams == nil, let model { streams = RemoteStreaming.makePreparer(model: model, gigabytes: store.streamCacheGigabytes) }
+        return streams
+    }
+
+    // MARK: Stream to Phones (Settings › Remote)
+
+    /// What each phone is playing from this Mac right now: its device ID and the songs' titles.
+    private(set) var streaming: [String: [String]] = [:]
+    /// How much disk the copies converted for phones take.
+    private(set) var streamCacheBytes: Int64 = 0
+
+    func setStreamEnabled(_ on: Bool) {
+        store.streamEnabled = on
+        if !on, let streams { Task { await streams.closeEverything(); await refreshStreaming() } }
+    }
+
+    /// Lets a paired phone play songs itself, or stops it (its open streams close at once).
+    func setMayStream(_ device: String, _ may: Bool) {
+        store.setMayStream(device, may)
+        if !may, let streams { Task { await streams.closeAll(clientsOf: device); await refreshStreaming() } }
+    }
+
+    func setStreamCache(gigabytes: Int) {
+        store.streamCacheGigabytes = gigabytes
+        if let streams { Task { await streams.setCacheLimit(RemoteStreaming.bytes(gigabytes: gigabytes)); await refreshStreaming() } }
+    }
+
+    func clearStreamCache() {
+        guard let preparer = streamPreparer else { return }
+        Task { await preparer.clearCache(); await refreshStreaming() }
+    }
+
+    /// Reads who plays what and the cache's size (Settings asks while it is on screen).
+    func refreshStreaming() async {
+        // The cache is looked at even before a phone has streamed in this run, so its size and Empty are there.
+        guard store.streamEnabled, let preparer = streamPreparer else {
+            if !streaming.isEmpty { streaming = [:] }
+            return
+        }
+        let activity = await preparer.activity()
+        let bytes = await preparer.cacheBytes()
+        let titles = Dictionary((model?.library.tracks(ids: Array(Set(activity.map(\.song)))) ?? []).compactMap { track in track.id.map { ($0, track.title) } },
+                                uniquingKeysWith: { first, _ in first })
+        var now: [String: [String]] = [:]
+        for item in activity {
+            let device = String(item.client.split(separator: "#").first ?? "")
+            if let title = titles[item.song], !(now[device] ?? []).contains(title) { now[device, default: []].append(title) }
+        }
+        if now != streaming { streaming = now }
+        if bytes != streamCacheBytes { streamCacheBytes = bytes }
     }
 
     /// This Mac's Bonjour host name ("Living-Room-Mac.local"), for the web remote's address.
@@ -361,8 +423,18 @@ final class RemoteServer {
 
     // MARK: Connections
 
+    /// Shuts out a host that keeps failing the handshake, and caps the connections that haven't signed in.
+    @ObservationIgnored private var throttle = ConnectionThrottle()
+
+    fileprivate static func host(_ connection: NWConnection) -> String {
+        if case .hostPort(let host, _) = connection.endpoint { return ConnectionThrottle.host(of: "\(host)") }
+        return ConnectionThrottle.host(of: "\(connection.endpoint)")
+    }
+
     private func accept(_ connection: NWConnection) {
         guard let model else { connection.cancel(); return }
+        let pending = clients.values.filter { !$0.isSignedIn }.count
+        guard throttle.admits(host: Self.host(connection), pending: pending) else { connection.cancel(); return }
         let client = RemoteClient(connection: connection, server: self, bridge: RemoteBridge(model: model))
         clients[ObjectIdentifier(client)] = client
         client.start()
@@ -373,6 +445,7 @@ final class RemoteServer {
         if let device = client.device, !clients.values.contains(where: { $0.device == device }), !web.connectedDevices.contains(device) {
             connected.remove(device)
         }
+        if handshakeFailed { throttle.failed(host: client.host) }
         if handshakeFailed, pairing != nil {
             failedPairingHandshakes += 1
             if failedPairingHandshakes >= Self.pairingAttempts { endPairing() }
@@ -383,6 +456,7 @@ final class RemoteServer {
         guard let paired = store.device(device), !paired.isWeb else { return false }
         store.touch(device, name: name)
         connected.insert(device)
+        throttle.succeeded(host: client.host)
         return true
     }
 
@@ -427,12 +501,19 @@ final class RemoteClient {
     /// Its device ID once it said hello with a paired key.
     private(set) var device: String?
     private(set) var isSignedIn = false
+    /// Where it connects from, for the throttle.
+    var host: String { RemoteServer.host(connection) }
     private var becameReady = false
     private var closed = false
     private var sentPlayer: PlayerState?
     private var sentQueueRevision: Int?
     private var sentOutputs: OutputsState?
     private var helloTimeout: Task<Void, Never>?
+    /// The protocol version the handshake agreed on (1 until a hello says more).
+    private var protocolVersion = 1
+    /// `streamRead`s being answered: a phone has a few in flight, not as many as it likes.
+    private var readsInFlight = 0
+    static let maximumReadsInFlight = 8
 
     init(connection: NWConnection, server: RemoteServer, bridge: RemoteBridge) {
         self.connection = connection
@@ -470,6 +551,7 @@ final class RemoteClient {
         closed = true
         helloTimeout?.cancel()
         connection.cancel()
+        if device != nil, let preparer = server?.activeStreamPreparer { let id = streamClient; Task { await preparer.closeAll(client: id) } }
         // A connection that never got through TLS used a wrong key: while pairing, that's a wrong code.
         server?.ended(self, handshakeFailed: !becameReady)
     }
@@ -501,23 +583,26 @@ final class RemoteClient {
             return
         }
         switch message.command {
-        case .hello(let device, let name, let version):
-            guard version == RemoteProtocol.version else { return close(saying: .protocolMismatch) }
+        case .hello(let device, let name, let version, let highest):
+            guard let negotiated = RemoteProtocol.negotiate(baseline: version, highest: highest) else { return close(saying: .protocolMismatch) }
             guard let server, server.authenticated(self, device: device, name: name) else { return close(saying: .notPaired) }
             self.device = device
+            protocolVersion = negotiated
             isSignedIn = true
             helloTimeout?.cancel()
-            reply(message.id, .welcome(server.serverInfo))
+            reply(message.id, .welcome(server.serverInfo(protocolVersion: negotiated)))
             let (player, queue, outputs) = server.snapshot(bridge)
             update(player: player, queue: queue, outputs: outputs)
-        case .pair(let name, let version):
-            guard version == RemoteProtocol.version else { return close(saying: .protocolMismatch) }
+        case .pair(let name, let version, let highest):
+            guard RemoteProtocol.negotiate(baseline: version, highest: highest) != nil else { return close(saying: .protocolMismatch) }
             guard let server else { return }
             let result = server.pair(name: name)
             // The phone connects again with its own key.
             send(.reply(id: message.id, result: result)) { [weak self] in self?.connection.cancel() }
         case _ where !isSignedIn:
             close(saying: .notPaired)
+        case _ where StreamPreparer.isStreamCommand(message.command):
+            handleStream(message)
         case .artwork(let key, let size):
             let store = ArtworkCache.shared.store
             Task { [weak self] in
@@ -537,6 +622,51 @@ final class RemoteClient {
                 update(player: player, queue: queue, outputs: outputs)
             }
         }
+    }
+
+    /// This connection's name for its streams (a phone that reconnects has two connections for a moment).
+    private var streamClient: String { "\(device ?? "")#\(ObjectIdentifier(self).hashValue)" }
+
+    /// Stream commands are answered off the main actor (reads touch the disk); the answer is a JSON reply or a binary frame.
+    private func handleStream(_ message: ClientMessage) {
+        guard let server else { return }
+        // Off (the default): answer in words, without making the preparer or its cache folder. A phone on protocol 1 never gets here.
+        guard server.store.streamEnabled else {
+            return reply(message.id, .failed(reason: String(localized: "Streaming to phones is off on this Mac. Turn on Stream to Phones in Vespertine › Settings › Remote.", comment: "Remote control: a phone asked to play a song itself while the Mac's Stream to Phones switch is off.")))
+        }
+        guard let device, server.store.mayStream(device) else {
+            return reply(message.id, .failed(reason: String(localized: "This Mac doesn’t let this device play songs itself. Allow it in Vespertine › Settings › Remote on the Mac.", comment: "Remote control: this phone was switched off under Stream to Phones on the Mac.")))
+        }
+        guard let preparer = server.streamPreparer else {
+            return reply(message.id, .failed(reason: "This Mac can’t stream right now."))
+        }
+        let isRead: Bool
+        if case .streamRead = message.command { isRead = true } else { isRead = false }
+        if isRead {
+            guard readsInFlight < Self.maximumReadsInFlight else { return reply(message.id, .failed(reason: "Too many reads at once; wait for one to finish.")) }
+            readsInFlight += 1
+        }
+        let allowed = true
+        let version = protocolVersion
+        let client = streamClient
+        Task { [weak self] in
+            let answer = await preparer.handle(message.command, id: message.id, client: client, protocolVersion: version, allowed: allowed)
+            guard let self else { return }
+            if isRead { self.readsInFlight -= 1 }
+            switch answer {
+            case .reply(let result)?: self.reply(message.id, result)
+            case .frame(let frame)?: self.send(frame: frame)
+            case nil: break
+            }
+        }
+    }
+
+    private func send(frame: StreamFrame) {
+        guard !closed else { return }
+        connection.send(content: frame.encoded(), contentContext: RemoteTransport.textContext, isComplete: true, completion: .contentProcessed { [weak self] error in
+            let failed = error != nil
+            MainActor.assumeIsolated { if failed { self?.finish() } }
+        })
     }
 
     /// Sends what changed since this phone last heard.
