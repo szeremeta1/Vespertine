@@ -122,32 +122,37 @@ struct AtmosRouteChangeTests {
 
     @Test("A read that doesn't return never stops the session from saying how far it has got, or from being stopped")
     func stuckReadDoesNotWedgeTheSession() async throws {
+        // The read is stuck until this test lets it go, however long that is. So the verdict is an order, not a time: the
+        // session answered while the read was still stuck, or it did not answer until the read was let go. `patience` only
+        // ends a run where it never answers; it is not what "soon enough" means, and a slow machine cannot fail this.
         let entered = DispatchSemaphore(value: 0), release = DispatchSemaphore(value: 0)
         defer { release.signal() }   // lets the stuck read go, whatever happened
-        let answered: Bool? = await RendererSessionGate.shared.exclusive {
-            let recorder = Recorder()
-            // The read: the feeding callback is inside the observer (under the lock it reads with) and stays there.
-            let session = await runBounded(patience: patience) { () -> SystemRendererSession? in
-                guard let session = try? makeSession(recorder) else { return nil }
+        let problem: String? = await RendererSessionGate.shared.exclusive {
+            await runBounded(patience: patience * 3) { () -> String in
+                let recorder = Recorder()
+                guard let session = try? makeSession(recorder) else { return "the session couldn't be made" }
+                // The read: the feeding callback is inside the observer (under the lock it reads with) and stays there.
                 let once = Recorder()
                 session.enqueueObserver = { _ in
                     once.add(0)
-                    if once.all.count == 1 { entered.signal(); _ = release.wait(timeout: .now() + 120) }
+                    if once.all.count == 1 { entered.signal(); release.wait() }
                 }
-                guard (try? session.prepare(at: 0)) != nil else { return nil }
+                guard (try? session.prepare(at: 0)) != nil else { return "the session couldn't be prepared" }
                 session.play()
-                return entered.wait(timeout: .now() + 60) == .success ? session : nil
-            } ?? nil
-            guard let session else { return nil }
-            // The read is held for 120 s: answering in well under that shows the session didn't wait for it. Not 10 s: three
-            // calls took longer than that once, on a machine that had just let every test go at the same moment.
-            return await runBounded(patience: 45) {
-                _ = session.inputExhausted
-                _ = session.finished
-                session.stop()
-                return true
+                guard entered.wait(timeout: .now() + patience) == .success else { return "the renderer never asked for a buffer" }
+                // What the player's engine asks of a session, on a thread of its own, with the read still stuck.
+                let answered = DispatchSemaphore(value: 0)
+                Thread.detachNewThread {
+                    _ = session.inputExhausted
+                    _ = session.finished
+                    session.stop()
+                    answered.signal()
+                }
+                if answered.wait(timeout: .now() + patience) == .success { return "" }
+                release.signal()
+                return "the session waited for a read that wasn't returning, so the player's engine would have too"
             }
         }
-        #expect(answered == true, "the session waited for a read that wasn't returning, so the player's engine would have too")
+        #expect(problem == "", "\(problem ?? "the test's own thread never came back")")
     }
 }
