@@ -9,7 +9,8 @@
 // engine has what the step will play; the next song's share is not slow but stopped, until the test lets it go. So the first
 // song is over exactly when the test has played it out, the wait lasts exactly the three seconds the test steps through, and
 // a machine that stands still for a minute changes none of it. The only clock is a patience of two minutes on each thing the
-// engine must get round to, which ends a hung run and decides nothing.
+// engine must get round to, which ends a hung run and decides nothing. The cache's own clock, by which it gives up on a share
+// that stays silent, runs a thousand times slow here (`slowCacheClock`), so a stopped share is never given up on by the time.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -69,7 +70,8 @@ struct SlowNextSongTests {
             // Three seconds of the output asking and getting nothing.
             for _ in 0..<12 { output.advance(seconds: 0.25) }
             run.buffering = rig.scriptWait(timeout: Self.patience) { $0.isBuffering }
-            guard settled() else { run.problem = "the engine stopped answering during the wait"; return run }
+            // The engine is inside its wait for the share and takes no command until it is over: what it says now is read as
+            // it stands, and what the output counted meanwhile is collected after the wait, where it is checked again.
             run.duringWait = rig.engine.snapshot.underruns
 
             // The share answers: the next song starts by itself, and the wait has still counted nothing.
@@ -79,6 +81,12 @@ struct SlowNextSongTests {
                 let now = rig.engine.snapshot
                 return now.item?.id == second.id && now.state == .playing && now.position > 0.5
             }
+            // The output holds until the next song has filled the buffer again (five seconds of it, more after stalls in a row):
+            // ten seconds buffered and a round of the engine's loop, and the hold is over before the first step.
+            guard rig.scriptWait(timeout: Self.patience, { _ in readable() >= Self.step * 40 }), settled() else {
+                run.problem = "the next song never filled the buffer: \(readable()) frames, \(rig.engine.snapshot.state)"
+                return run
+            }
             for _ in 0..<12 where !arrived() {
                 guard rig.scriptWait(timeout: Self.patience, { _ in readable() >= Self.step }) else { break }
                 output.advance(seconds: 0.25)
@@ -87,7 +95,9 @@ struct SlowNextSongTests {
             run.advanced = arrived()
             let snapshot = rig.engine.snapshot
             run.afterWait = snapshot.underruns
-            run.bufferingAfter = snapshot.isBuffering
+            // A song that starts on a prefix is still being copied while its first second plays, and says so until the copy is
+            // ahead of it: the notice has to go, whenever the share has delivered enough.
+            run.bufferingAfter = !rig.scriptWait(timeout: Self.patience) { !$0.isBuffering }
             run.end = "\(snapshot.state) in \(snapshot.item?.url.lastPathComponent ?? "no song") at \(snapshot.position) s"
             return run
         }
@@ -106,7 +116,7 @@ struct SlowNextSongTests {
     @Test("Waiting for the next song's first bytes shows as buffering and counts no underruns")
     func waitForNextSongIsBufferingNotUnderruns() async throws {
         // 24 s of 96 kHz WAV starts on a prefix (4 MB), and none of the next song's is there when the first one ends.
-        let rig = try PlayPauseRig(seconds: 24)
+        let rig = try PlayPauseRig(seconds: 24, cacheClock: PlayPauseRig.slowCacheClock())
         try #require(NetworkStart.startsEarly(fileExtension: "wav", size: rig.share.size, isRegion: false), "the songs start on a prefix")
         judge(try await run(rig, seconds: 24))
     }
@@ -115,7 +125,7 @@ struct SlowNextSongTests {
     func waitForWholeCopyCountsNoUnderruns() async throws {
         // 20 s of 96 kHz WAV is under the size that starts on a prefix: the next song plays from its whole copy (not streamed),
         // and that copy has not begun when the first song ends.
-        let rig = try PlayPauseRig(seconds: 20)
+        let rig = try PlayPauseRig(seconds: 20, cacheClock: PlayPauseRig.slowCacheClock())
         try #require(!NetworkStart.startsEarly(fileExtension: "wav", size: rig.share.size, isRegion: false), "the songs are copied whole")
         judge(try await run(rig, seconds: 20))
     }
