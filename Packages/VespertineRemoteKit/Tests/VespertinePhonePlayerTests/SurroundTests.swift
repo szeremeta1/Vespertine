@@ -109,9 +109,12 @@ private func level(_ samples: [Float]) -> Float {
             #expect(!player.isUntouchedPath)
             let heard = try rendered(player, engine)
             #expect(max(heard.left, heard.right) > 0.01, "channel \(channel) is silent in \(mode)")
-            // The surrounds stay on their own side.
-            if channel == 4 { #expect(heard.left > heard.right, "Ls") }
-            if channel == 5 { #expect(heard.right > heard.left, "Rs") }
+            // The surrounds stay on their own side. Head tracked, the side depends on where a real head is turned when
+            // head-tracking headphones are connected to the machine running this, so only the fixed scene is held to it.
+            if mode == .fixed {
+                if channel == 4 { #expect(heard.left > heard.right, "Ls") }
+                if channel == 5 { #expect(heard.right > heard.left, "Rs") }
+            }
             player.halt()
         }
     }
