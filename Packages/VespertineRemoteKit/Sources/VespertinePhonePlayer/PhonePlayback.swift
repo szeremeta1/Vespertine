@@ -82,7 +82,9 @@ public final class PhonePlayback {
     /// Bytes fetched from the Mac for songs already let go of; `bytesReceived` adds the ones still open.
     @ObservationIgnored private var received: Int64 = 0
     /// How much this phone has fetched from the Mac since the player was made (the data counter).
-    public var bytesReceived: Int64 { open.values.reduce(received) { $0 + $1.source.bufferedBytes } }
+    public var bytesReceived: Int64 { open.values.reduce(received) { $0 + ($1.stream?.bufferedBytes ?? 0) } }
+    /// A song kept on this device: its file and what the Mac sent it as. Such a song plays from the file, Mac or no Mac.
+    @ObservationIgnored public var kept: @MainActor (Int64) -> (file: URL, descriptor: StreamDescriptor)? = { _ in nil }
 
     private func lineWaits(_ waiting: Bool) {
         waits = max(0, waits + (waiting ? 1 : -1))
@@ -99,8 +101,10 @@ public final class PhonePlayback {
     private struct Open {
         let song: Int64
         let descriptor: StreamDescriptor
-        let source: StreamSource
-        let line: StreamLine
+        let source: any ByteSource
+        /// The stream from the Mac behind `source`; nil for a song kept on this device.
+        var stream: StreamSource?
+        var line: StreamLine?
     }
     /// Streams open on the Mac, by queue entry.
     @ObservationIgnored private var open: [String: Open] = [:]
@@ -201,6 +205,11 @@ public final class PhonePlayback {
         if let have = open[entry.id] { return have }
         if let running = opening[entry.id] { return try await running.value }
         guard let song = entry.track.id else { throw Failure.notInLibrary }
+        if let kept = kept(song), let file = try? FileByteSource(url: kept.file) {
+            let result = Open(song: song, descriptor: kept.descriptor, source: file)
+            open[entry.id] = result
+            return result
+        }
         let task = Task { [weak self] () throws -> Open in
             guard let self else { throw CancellationError() }
             let descriptor = try await openStream(song: song, entry: entry.id)
@@ -220,7 +229,7 @@ public final class PhonePlayback {
             // The decoder waits as long as the line does (and a little more, so the line's own words win).
             source.readTimeout = Double(patience.components.seconds) + 10
             source.start()
-            return Open(song: song, descriptor: descriptor, source: source, line: line)
+            return Open(song: song, descriptor: descriptor, source: source, stream: source, line: line)
         }
         opening[entry.id] = task
         defer { opening[entry.id] = nil }
@@ -280,10 +289,9 @@ public final class PhonePlayback {
         for (entry, task) in opening where !keeping.contains(entry) { task.cancel() }
         for (entry, stream) in open where !keeping.contains(entry) {
             open[entry] = nil
-            stream.source.close()
-            received += stream.source.bufferedBytes
-            let line = stream.line
-            Task { await line.close() }
+            stream.stream?.close()
+            received += stream.stream?.bufferedBytes ?? 0
+            if let line = stream.line { Task { await line.close() } }
         }
     }
 

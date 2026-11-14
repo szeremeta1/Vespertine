@@ -62,10 +62,10 @@ public actor StreamPreparer {
     /// For tests: called with the song's ID on the reading thread, before each read.
     func setReadHook(_ hook: (@Sendable (Int64) -> Void)?) { readHook = hook }
 
-    /// `source` finds a library song by its ID. A phone has `maxStreamsPerClient` streams at once (the one it plays and the
-    /// next one it prefetches); opening another closes its oldest.
+    /// `source` finds a library song by its ID. A phone has `maxStreamsPerClient` streams at once (the one it plays, the next one
+    /// it prefetches, one it fetches to keep, and one to spare while a song changes); opening another closes its oldest.
     public init(cache: StreamCache, transcoder: any StreamTranscoding, source: @escaping @Sendable (Int64) async -> StreamSourceFacts?,
-                maxStreamsPerClient: Int = 2) {
+                maxStreamsPerClient: Int = 4) {
         self.cache = cache
         self.transcoder = transcoder
         self.source = source

@@ -71,14 +71,15 @@ private struct Rig {
         func set(_ id: Int64, _ s: StreamSourceFacts) { lock.withLock { songs[id] = s } }
     }
 
-    static func make(limit: Int64 = 1_000_000, streamsPerClient: Int = 2) throws -> Rig {
+    static func make(limit: Int64 = 1_000_000, streamsPerClient: Int? = nil) throws -> Rig {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("stream-prep-\(UUID().uuidString)", isDirectory: true)
         let originals = dir.appendingPathComponent("music", isDirectory: true)
         try FileManager.default.createDirectory(at: originals, withIntermediateDirectories: true)
         let box = LibraryBox()
         let transcoder = FakeTranscoder()
-        let preparer = StreamPreparer(cache: try StreamCache(directory: dir.appendingPathComponent("cache"), limitBytes: limit), transcoder: transcoder,
-                                      source: { box.get($0) }, maxStreamsPerClient: streamsPerClient)
+        let cache = try StreamCache(directory: dir.appendingPathComponent("cache"), limitBytes: limit)
+        let preparer = streamsPerClient.map { StreamPreparer(cache: cache, transcoder: transcoder, source: { box.get($0) }, maxStreamsPerClient: $0) }
+            ?? StreamPreparer(cache: cache, transcoder: transcoder, source: { box.get($0) })
         return Rig(dir: dir, originals: originals, preparer: preparer, transcoder: transcoder, library: box)
     }
 
@@ -275,6 +276,22 @@ private func chunk(_ result: StreamPreparer.Read) -> StreamFrame? {
 }
 
 @Suite struct StreamLimits {
+    /// A phone that plays a song, has the next one ready and fetches one to keep has all three open, with one to spare for
+    /// the moment a song changes.
+    @Test func aPhoneCanPlayPrefetchAndKeepASongAtOnce() async throws {
+        let rig = try Rig.make(); defer { rig.cleanup() }
+        for id in 1...5 { try rig.addFile(Int64(id), ext: "flac", bytes: 100) }
+        var all: [StreamDescriptor] = []
+        for id in 1...4 { all.append(try #require(opened(await rig.preparer.open(client: "a", id: Int64(id), maxSampleRate: nil)))) }
+        for stream in all {
+            guard case .chunk = await rig.preparer.read(client: "a", request: 1, stream: stream.stream, offset: 0, length: 10) else {
+                Issue.record("stream \(stream.stream) was closed"); continue
+            }
+        }
+        _ = try #require(opened(await rig.preparer.open(client: "a", id: 5, maxSampleRate: nil)))
+        if case .chunk = await rig.preparer.read(client: "a", request: 1, stream: all[0].stream, offset: 0, length: 10) { Issue.record("a fifth stream fit") }
+    }
+
     @Test func aPhoneHasOneStreamAndOnePrefetch() async throws {
         let rig = try Rig.make(streamsPerClient: 2); defer { rig.cleanup() }
         for id in 1...3 { try rig.addFile(Int64(id), ext: "flac", bytes: 100) }
