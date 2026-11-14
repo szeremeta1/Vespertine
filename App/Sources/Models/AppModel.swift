@@ -677,13 +677,13 @@ final class AppModel {
         systemOutput.sync(groups: engineSettings.speakerGroups, settings: engineSettings)
         devices.watchVolume(of: device)
         // A network renderer plays in place of the engine while one is chosen and on the network.
-        // Chosen and not on the network: nothing plays anywhere else in its place (decision 119).
+        // Chosen and not on the network: nothing plays anywhere else in its place.
         // One that a search doesn't find but that is playing and answering is still there (`chosenUID`).
         let renderer = chosenRenderer
         let rendererUID = rendererChosen ? settings.selectedDeviceUID : nil
         let rendererPlayback = renderers?.playback(for: renderer, chosenUID: rendererUID,
                                                    settings: rendererUID.map { settings.rendererSettings(uid: $0) } ?? RendererSettings())
-        // An AirPlay receiver likewise (decision 614): chosen and gone, nothing plays anywhere else.
+        // An AirPlay receiver likewise: chosen and gone, nothing plays anywhere else.
         let receiver = chosenAirPlay
         let receiverUID = airPlayChosen ? settings.selectedDeviceUID : nil
         let airPlayPlayback = airPlay?.playback(for: receiver, chosenUID: receiverUID,
