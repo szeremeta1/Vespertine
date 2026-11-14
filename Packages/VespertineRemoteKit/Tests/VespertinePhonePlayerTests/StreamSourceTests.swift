@@ -178,6 +178,31 @@ struct StreamSourceTests {
         #expect(!FileManager.default.fileExists(atPath: url.path))
     }
 
+    @Test func interruptingMakesAWaitingReadGiveUpButLaterReadsStillWork() async throws {
+        let data = bytes(6_000)
+        let mac = FakeMac(data: data)
+        mac.delay = .milliseconds(250)
+        let url = tmp(); defer { try? FileManager.default.removeItem(at: url) }
+        let source = try StreamSource(descriptor: descriptor(size: data.count), file: url, read: mac.read)
+        source.start()
+        let waiting = Task { try await blockingRead(source, at: 5_000, length: 10) }
+        try await Task.sleep(for: .milliseconds(60))
+        source.interruptReads()
+        await #expect(throws: StreamSource.Failure.interrupted) { _ = try await waiting.value }
+        #expect(try await blockingRead(source, at: 0, length: 10) == data.prefix(10))
+        source.close()
+    }
+
+    @Test func aFileOnThePhoneIsASourceToo() throws {
+        let data = bytes(900)
+        let url = tmp(); defer { try? FileManager.default.removeItem(at: url) }
+        try data.write(to: url)
+        let source = try FileByteSource(url: url)
+        #expect(source.byteSize == 900 && source.isComplete)
+        #expect(try source.read(at: 800, length: 500) == data[800...])
+        #expect(try source.read(at: 900, length: 1).isEmpty)
+    }
+
     @Test func aReadAheadLimitStopsFetchingFarPastWhatIsBeingRead() async throws {
         let data = bytes(50_000)
         let mac = FakeMac(data: data)

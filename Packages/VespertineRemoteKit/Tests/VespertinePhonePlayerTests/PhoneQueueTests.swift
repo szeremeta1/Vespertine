@@ -192,6 +192,28 @@ struct PhoneQueueTests {
         #expect(ids(queue.continuing) == [2, 3, 10])
     }
 
+    @Test func theSongAfterAnEntryThatIsNotCurrentYetFollowsTheSameRules() {
+        var queue = PhoneQueue()
+        queue.play((1...3).map(song))
+        let second = queue.entries[1].id, third = queue.entries[2].id
+        #expect(queue.following(after: second)?.track.id == 3)
+        #expect(queue.following(after: third) == nil)
+        queue.repeatMode = .all
+        #expect(queue.following(after: third)?.track.id == 1)
+        queue.repeatMode = .one
+        #expect(queue.following(after: second)?.track.id == 2)
+    }
+
+    @Test func arrivingAtTheNextSongMovesTheQueueWithoutAStep() {
+        var queue = PhoneQueue()
+        queue.play((1...3).map(song))
+        let before = queue.revision
+        queue.arrive(at: queue.entries[1].id)
+        #expect(queue.current?.track.id == 2)
+        #expect(queue.revision > before)
+        #expect(ids(queue.upcoming) == [3])
+    }
+
     @Test func theStateForTheQueueScreenMatchesTheMacsShape() {
         var queue = PhoneQueue()
         queue.play((1...3).map(song))

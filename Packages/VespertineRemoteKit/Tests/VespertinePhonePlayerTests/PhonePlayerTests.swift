@@ -55,6 +55,39 @@ private func makeFile(seconds: Double, rate: Double = 44_100, channels: Int = 2)
     return out
 }
 
+/// Waits (on the main actor, letting its tasks run) until `condition` holds.
+@MainActor private func wait(_ seconds: Double = 5, until condition: () -> Bool) async throws {
+    let deadline = Date().addingTimeInterval(seconds)
+    while !condition() {
+        if Date() > deadline { Issue.record("the condition never held"); return }
+        try await Task.sleep(for: .milliseconds(10))
+    }
+}
+
+/// A Mac in memory that answers slowly, a range at a time, and can stop answering.
+private final class SlowMac: @unchecked Sendable {
+    let data: Data
+    let delay: Duration
+    private let lock = NSLock()
+    private var _offsets: [Int64] = []
+    var failAfter = Int.max
+
+    init(data: Data, delay: Duration) { self.data = data; self.delay = delay }
+
+    var offsets: [Int64] { lock.withLock { _offsets } }
+    var descriptor: StreamDescriptor {
+        StreamDescriptor(stream: 1, kind: .original, byteSize: Int64(data.count), format: stereo(), frames: nil, tag: "t", chunkSize: 8_192)
+    }
+
+    func read(_ offset: Int64, _ length: Int) async throws -> StreamFrame {
+        let count = lock.withLock { () -> Int in _offsets.append(offset); return _offsets.count }
+        try await Task.sleep(for: delay)
+        if count > failAfter { throw CocoaError(.fileReadUnknown) }
+        let end = min(Int(offset) + length, data.count)
+        return StreamFrame(request: 1, stream: 1, offset: offset, endOfStream: end >= data.count, payload: Data(data[Int(offset)..<end]))
+    }
+}
+
 @Suite(.serialized) @MainActor struct Player {
     @Test func theSamplesOutAreTheSamplesInUntouched() async throws {
         let (url, planes) = try makeFile(seconds: 1)
@@ -124,6 +157,118 @@ private func makeFile(seconds: Double, rate: Double = 44_100, channels: Int = 2)
         try player.play()
         player.stop()
         #expect(player.state == .ready && player.position == 0)
+    }
+
+    @Test func theNextSongFollowsWithoutAGapSampleForSample() async throws {
+        let (first, a) = try makeFile(seconds: 0.5)
+        let (second, b) = try makeFile(seconds: 0.25)
+        defer { try? FileManager.default.removeItem(at: first); try? FileManager.default.removeItem(at: second) }
+        let engine = try offlineEngine(rate: 44_100)
+        let player = PhonePlayer(engine: engine)
+        player.scheduleAhead = 30
+        var scheduled: [String] = [], advanced: [String] = []
+        player.onScheduledNext = { scheduled.append($0) }
+        player.onAdvance = { advanced.append($0) }
+        player.start(.init(id: "a", source: try FileByteSource(url: first), format: stereo()), playing: true)
+        player.setFollowing(.init(id: "b", source: try FileByteSource(url: second), format: stereo()))
+        try await wait { scheduled == ["b"] }
+        #expect(player.currentID == "a")
+        let out = try render(engine, frames: a[0].count + b[0].count)
+        #expect(out[0] == a[0] + b[0], "the second song's first sample comes right after the first song's last")
+        #expect(out[1] == a[1] + b[1])
+        player.tick()
+        #expect(advanced == ["b"] && player.currentID == "b")
+        #expect(abs(player.duration - 0.25) < 0.001)
+    }
+
+    @Test func aSongAtAnotherRateFinishesInsteadOfJoining() async throws {
+        let (first, a) = try makeFile(seconds: 0.2)
+        let (second, _) = try makeFile(seconds: 0.2, rate: 48_000)
+        defer { try? FileManager.default.removeItem(at: first); try? FileManager.default.removeItem(at: second) }
+        let engine = try offlineEngine(rate: 44_100)
+        let player = PhonePlayer(engine: engine)
+        var scheduled: [String] = [], finished = 0
+        player.onScheduledNext = { scheduled.append($0) }
+        player.onFinished = { finished += 1 }
+        player.start(.init(id: "a", source: try FileByteSource(url: first), format: stereo()), playing: true)
+        player.setFollowing(.init(id: "b", source: try FileByteSource(url: second), format: stereo(rate: 48_000)))
+        try await Task.sleep(for: .milliseconds(150))
+        _ = try render(engine, frames: a[0].count + 4_096)
+        try await wait { finished == 1 }
+        #expect(scheduled.isEmpty)
+        #expect(player.state == .ready)
+    }
+
+    @Test func aSongPlayedToItsEndStartsOverOnPlay() async throws {
+        let (url, planes) = try makeFile(seconds: 0.2)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let engine = try offlineEngine(rate: 44_100)
+        let player = PhonePlayer(engine: engine)
+        var finished = 0
+        player.onFinished = { finished += 1 }
+        try player.load(url, format: stereo())
+        try player.play()
+        _ = try render(engine, frames: planes[0].count + 4_096)
+        try await wait { finished == 1 }
+        #expect(player.state == .ready)
+        try player.play()
+        #expect(player.state == .playing)
+        let again = try render(engine, frames: 1_000)
+        #expect(again[0] == Array(planes[0].prefix(1_000)))
+    }
+
+    @Test func aStreamStartsPlayingBeforeItHasAllArrived() async throws {
+        let (url, _) = try makeFile(seconds: 2)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let mac = SlowMac(data: try Data(contentsOf: url), delay: .milliseconds(25))
+        let cache = FileManager.default.temporaryDirectory.appendingPathComponent("phoneplayer-\(UUID()).wav")
+        let source = try StreamSource(descriptor: mac.descriptor, file: cache, read: mac.read, window: 2)
+        defer { source.close(); try? FileManager.default.removeItem(at: cache) }
+        source.start()
+        let player = PhonePlayer(engine: try offlineEngine(rate: 44_100))
+        player.start(.init(id: "s", source: source, format: stereo()), playing: true)
+        #expect(player.state == .loading)
+        try await wait { player.state == .playing }
+        #expect(!source.isComplete, "playing while most of the song is still on the Mac")
+        #expect(abs(player.duration - 2) < 0.001)
+    }
+
+    @Test func seekingIntoWhatHasNotArrivedFetchesThatPartFirst() async throws {
+        let (url, _) = try makeFile(seconds: 2)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let data = try Data(contentsOf: url)
+        let mac = SlowMac(data: data, delay: .milliseconds(25))
+        let cache = FileManager.default.temporaryDirectory.appendingPathComponent("phoneplayer-\(UUID()).wav")
+        let source = try StreamSource(descriptor: mac.descriptor, file: cache, read: mac.read, window: 1)
+        defer { source.close(); try? FileManager.default.removeItem(at: cache) }
+        source.start()
+        let player = PhonePlayer(engine: try offlineEngine(rate: 44_100))
+        player.scheduleAhead = 0.25
+        player.start(.init(id: "s", source: source, format: stereo()), playing: false)
+        try await wait { player.state == .ready }
+        try player.seek(to: 1.8)
+        #expect(abs(player.position - 1.8) < 0.01)
+        let far = Int64(Double(data.count) * 0.85)
+        try await wait { mac.offsets.contains { $0 >= far } }
+        #expect(!source.isComplete, "the part asked for came before the gap behind it")
+    }
+
+    @Test func aStreamThatStopsArrivingIsReportedNotSilentlyStuck() async throws {
+        let (url, _) = try makeFile(seconds: 1)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let mac = SlowMac(data: try Data(contentsOf: url), delay: .zero)
+        mac.failAfter = 3
+        let cache = FileManager.default.temporaryDirectory.appendingPathComponent("phoneplayer-\(UUID()).wav")
+        let source = try StreamSource(descriptor: mac.descriptor, file: cache, read: mac.read, window: 1, attempts: 1)
+        defer { source.close() }
+        source.start()
+        let player = PhonePlayer(engine: try offlineEngine(rate: 44_100))
+        var failures: [Error] = []
+        player.onFailure = { failures.append($0) }
+        player.start(.init(id: "s", source: source, format: stereo()), playing: true)
+        try await wait { !failures.isEmpty }
+        #expect(failures.first is StreamSource.Failure)
+        #expect(player.state == .idle)
     }
 
     @Test func multichannelWaitsForTheSpatialPath() throws {
