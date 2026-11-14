@@ -175,14 +175,6 @@ struct VisualizerAnalyzerTests {
         #expect(beats == 0)
     }
 
-    @Test("Tempo needs regular beats, and folds into 70–180 BPM")
-    func tempo() {
-        #expect(VisualizerAnalyzer.tempo([0, 1, 2]) == nil)
-        #expect(abs((VisualizerAnalyzer.tempo(stride(from: 0, to: 10, by: 0.25).map { $0 }) ?? 0) - 120) < 0.01)   // 240 → 120
-        #expect(abs((VisualizerAnalyzer.tempo(stride(from: 0, to: 20, by: 1.2).map { $0 }) ?? 0) - 100) < 0.01)    // 50 → 100
-        #expect(VisualizerAnalyzer.tempo([0, 0.3, 1.4, 1.6, 3.5, 3.7, 5.9]) == nil)
-    }
-
     @Test("FFT sizes keep about 85 ms at every rate")
     func sizes() {
         #expect(VisualizerAnalyzer.fftSize(for: 44_100) == 4096)

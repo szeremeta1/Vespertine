@@ -24,11 +24,13 @@ public struct VisualizerFrame: Sendable, Equatable {
     public var bass: Float
     public var mid: Float
     public var treble: Float
-    /// A beat started in this frame (an onset in the lows well above their recent average).
+    /// A beat started since the last frame (see `VisualizerBeatDetector`). A reader that may not see every frame
+    /// (the window, which draws on its own clock) follows `beatCount` instead.
     public var beat: Bool
-    /// 1 at a beat, falling to 0 over about a quarter second: drives pulses.
+    /// Jumps to the beat's strength (at least 0.4) on a beat and falls to nothing in about a third of a second: drives
+    /// pulses.
     public var beatPulse: Float
-    /// Beats per minute from the recent beats, when they're regular enough to say.
+    /// Beats per minute, when the music has kept a tempo for a few seconds.
     public var tempo: Double?
     /// Anything above about -80 dBFS in the last half second.
     public var hasSignal: Bool
@@ -52,6 +54,13 @@ public struct VisualizerFrame: Sendable, Equatable {
     public var vuWide = SIMD2<Float>(0, 0)
     public var ppmTypeI = SIMD2<Float>(-40, -40)
     public var ppmMidSide = SIMD2<Float>(-40, -40)
+    /// Beats found so far: it only goes up, so comparing it with the count last seen misses no beat and doubles none.
+    public var beatCount: UInt32 = 0
+    /// How hard the newest beat was, 0…1, against the hardest of the last few seconds.
+    public var beatStrength: Float = 0
+    /// Sudden sounds in the lows, mids and highs (kicks; snares and plucked notes; hi-hats), each 0…1 against its own
+    /// recent hardest and gone in about a tenth of a second.
+    public var transients = SIMD3<Float>(0, 0, 0)
 
     public static let stereoCount = 2048
 
@@ -133,12 +142,9 @@ public final class VisualizerAnalyzer {
     private var bassRange = 0..<0
     private var midRange = 0..<0
     private var trebleRange = 0..<0
-    private var previousBassDB: Float = -100
-    private var flux: [Float] = []
-    private var fluxTimes: [Double] = []
-    private var lastBeat: Double = -.infinity
-    private var beatPulse: Float = 0
-    private var beatTimes: [Double] = []
+    private(set) var beats = VisualizerBeatDetector()
+    private var beatsSeen: UInt32 = 0
+    private var wasLive = false
     private var loudest = SIMD3<Float>(repeating: 1e-6)
     private var smoothedBands = SIMD3<Float>(repeating: 0)
 
@@ -212,9 +218,11 @@ public final class VisualizerAnalyzer {
 
     /// Analyzes the newest samples. `left` and `right` hold at least `fftSize(for: sampleRate)` frames, newest last
     /// (more are ignored). `fresh` is false when nothing new arrived since the last frame (paused, or nothing playing):
-    /// everything then falls away as from silence. `dt` is the time since the last frame, in seconds.
+    /// everything then falls away as from silence. `dt` is the time since the last frame, in seconds. `advanced` is
+    /// how many of the frames are new since the last call, when the caller knows (the feed does, from the tap's own
+    /// count); without it, `dt` worth are taken to be.
     public func process(left: UnsafeBufferPointer<Float>, right: UnsafeBufferPointer<Float>, sampleRate rate: Double,
-                        fresh: Bool, dt: Double) -> VisualizerFrame {
+                        fresh: Bool, dt: Double, advanced: Int? = nil) -> VisualizerFrame {
         let dt = min(max(dt, 1.0 / 1000), 0.25)
         time += dt
         prepare(sampleRate: rate > 0 ? rate : 48_000)
@@ -231,6 +239,21 @@ public final class VisualizerAnalyzer {
         } else {
             vDSP.fill(&mono, with: 0)
         }
+
+        // Beats: the detector hears every new sample once, in order. After a pause, or when more arrived than one
+        // call can hold (some were lost), it starts afresh, so the join isn't a beat.
+        if live {
+            let estimate = max(1, Int((dt * (rate > 0 ? rate : 48_000)).rounded()))
+            let new = advanced ?? estimate
+            let continuous = wasLive && new > 0 && new <= n
+            let count = continuous ? new : min(estimate, n)
+            mono.withUnsafeBufferPointer { m in
+                beats.process(UnsafeBufferPointer(rebasing: m[(n - count)...]), sampleRate: rate > 0 ? rate : 48_000, continuous: continuous)
+            }
+        } else {
+            beats.idle(dt)
+        }
+        wasLive = live
 
         // Levels over the newest 2048 frames.
         var rms = SIMD2<Float>(-100, -100), peak = SIMD2<Float>(-100, -100)
@@ -375,38 +398,20 @@ public final class VisualizerAnalyzer {
             smoothedBands[c] += (relative[c] - smoothedBands[c]) * k
         }
 
-        // Beats: a rise in the lows' level well above how they've been rising lately (spectral flux, adaptive
-        // threshold), at most one every 0.28 s.
-        let bassDB = 10 * log10(max(raw.x, 1e-12))
-        let rise = live ? max(0, bassDB - previousBassDB) : 0
-        previousBassDB = live ? bassDB : -100
-        flux.append(rise); fluxTimes.append(time)
-        while let first = fluxTimes.first, time - first > 1.5 { flux.removeFirst(); fluxTimes.removeFirst() }
-        var beat = false
-        if live, raw.x > 1e-7, flux.count > 8 {
-            let mean = vDSP.mean(flux)
-            let deviation = (vDSP.meanSquare(flux) - mean * mean).squareRoot()
-            // The rise is per frame: at high frame rates each frame sees a smaller part of it, so the floor scales.
-            let minimum = Float(max(dt, 1.0 / 240) * 60) * 1.5
-            if rise > mean + 1.6 * deviation, rise > minimum, time - lastBeat > 0.28 {
-                beat = true
-                lastBeat = time
-                beatTimes.append(time)
-                if beatTimes.count > 16 { beatTimes.removeFirst() }
-            }
-        }
-        beatPulse = beat ? 1 : beatPulse * Float(exp(-dt / 0.12))
-        if let last = beatTimes.last, time - last > 3 { beatTimes.removeAll() }
+        let beatState = beats.state
+        let beat = beatState.count != beatsSeen
+        beatsSeen = beatState.count
 
         return VisualizerFrame(fine: fine, bands: bands, peaks: peaks, waveform: waveform, rmsDB: rms, peakDB: peak,
                                bass: smoothedBands.x, mid: smoothedBands.y, treble: smoothedBands.z, beat: beat,
-                               beatPulse: beatPulse, tempo: Self.tempo(beatTimes), hasSignal: time - lastSignal < 0.5,
+                               beatPulse: beatState.pulse, tempo: beatState.tempo, hasSignal: time - lastSignal < 0.5,
                                time: time, stereo: stereo, stereoInterval: Double(thin) / currentRate, correlation: correlation,
                                vu: SIMD2(Float(meters.vu.x), Float(meters.vu.y)),
                                ppm: SIMD2<Float>(meters.ppm(referenceDBFS: reference)), meterReferenceDB: Float(reference),
                                vuWide: SIMD2(Float(meters.vuWide.x), Float(meters.vuWide.y)),
                                ppmTypeI: SIMD2<Float>(meters.ppmTypeI(referenceDBFS: reference)),
-                               ppmMidSide: SIMD2<Float>(meters.ppmMidSide(referenceDBFS: reference)))
+                               ppmMidSide: SIMD2<Float>(meters.ppmMidSide(referenceDBFS: reference)),
+                               beatCount: beatState.count, beatStrength: beatState.strength, transients: beatState.transients)
     }
 
     /// The meters' reference in dBFS: as set, or 1 dB over the music's recent loudness, so the needles swing around
@@ -426,23 +431,10 @@ public final class VisualizerAnalyzer {
     }
 
     /// Convenience for arrays.
-    public func process(left: [Float], right: [Float], sampleRate: Double, fresh: Bool, dt: Double) -> VisualizerFrame {
+    public func process(left: [Float], right: [Float], sampleRate: Double, fresh: Bool, dt: Double, advanced: Int? = nil) -> VisualizerFrame {
         left.withUnsafeBufferPointer { l in
-            right.withUnsafeBufferPointer { r in process(left: l, right: r, sampleRate: sampleRate, fresh: fresh, dt: dt) }
+            right.withUnsafeBufferPointer { r in process(left: l, right: r, sampleRate: sampleRate, fresh: fresh, dt: dt, advanced: advanced) }
         }
-    }
-
-    /// The median spacing of recent beats, folded into 70–180 BPM, once there are enough of them and they agree.
-    static func tempo(_ times: [Double]) -> Double? {
-        guard times.count >= 5 else { return nil }
-        let gaps = zip(times.dropFirst(), times).map { $0 - $1 }.sorted()
-        let median = gaps[gaps.count / 2]
-        let agreeing = gaps.filter { abs($0 - median) < median * 0.12 }.count
-        guard agreeing * 2 >= gaps.count, median > 0 else { return nil }
-        var bpm = 60 / median
-        while bpm < 70 { bpm *= 2 }
-        while bpm > 180 { bpm /= 2 }
-        return bpm
     }
 
     static func decibels(_ linear: Float) -> Float { linear > 1e-5 ? max(-100, 20 * log10(linear)) : -100 }
