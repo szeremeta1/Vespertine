@@ -287,20 +287,12 @@ final class RemoteServer {
         case .trying(let ports, _): wanted = ports.first
         case .system: wanted = nil
         }
-        let parameters = RemoteTransport.parameters(keys: keys)
-        parameters.allowLocalEndpointReuse = true
         let listener: NWListener
         do {
-            if let wanted, let port = NWEndpoint.Port(rawValue: wanted) {
-                listener = try NWListener(using: parameters, on: port)
-            } else {
-                listener = try NWListener(using: parameters)
-            }
+            listener = try RemoteTransport.listener(keys: keys, port: wanted, txtRecord: Self.txtRecord(info: serverInfo, port: wanted))
         } catch {
             return portUnavailable(error)
         }
-        let info = serverInfo
-        listener.service = NWListener.Service(type: RemoteProtocol.serviceType, txtRecord: Self.txtRecord(info: info, port: wanted))
         listener.stateUpdateHandler = { [weak self] state in
             MainActor.assumeIsolated { self?.listenerChanged(state, listener) }
         }
@@ -363,6 +355,9 @@ final class RemoteServer {
                 listener.cancel()
                 portUnavailable(error)
             } else {
+                // Bonjour refusing the service arrives here too (a DNS-SD error: -65570 when macOS keeps the app off the local
+                // network). The log keeps the code, so "not announced" can be told from "not allowed".
+                Self.log.error("The remote listener is waiting: \(String(describing: error), privacy: .public)")
                 status = .failed(error.localizedDescription)
             }
         default:
