@@ -571814,6 +571814,2427 @@
           }
         }
       }
+    },
+    "Streaming to phones is off on this Mac. Turn on Stream to Phones in Vespertine › Settings › Remote.": {
+      "comment": "macOS app, Settings › Remote (about letting paired iPhones play songs from this Mac).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ወደ ስልኮች ማሰራጨት በዚህ Mac ላይ ጠፍቷል። በVespertine › ቅንብሮች › ሪሞት ውስጥ «ወደ ስልኮች አሰራጭ»ን ያብሩ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "البث إلى الهواتف متوقف على هذا الـ Mac. شغّل “البث إلى الهواتف” في Vespertine › الإعدادات › التحكم عن بُعد."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই Mac-এ ফোনে স্ট্রিম করা বন্ধ আছে। Vespertine › সেটিংস › রিমোট-এ “ফোনে স্ট্রিম করুন” চালু করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streamování do telefonů je na tomto Macu vypnuté. Zapněte Streamovat do telefonů ve Vespertine › Nastavení › Dálkové ovládání."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streaming til telefoner er slået fra på denne Mac. Slå Stream til telefoner til i Vespertine › Indstillinger › Fjernbetjening."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Streamen auf Telefone ist auf diesem Mac deaktiviert. Aktiviere „Auf Telefone streamen“ unter „Vespertine › Einstellungen › Fernbedienung“."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η ροή προς τηλέφωνα είναι ανενεργή σε αυτό το Mac. Ενεργοποιήστε τη «Ροή προς τηλέφωνα» στο Vespertine › «Ρυθμίσεις» › «Τηλεχειρισμός»."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La transmisión a teléfonos está desactivada en este Mac. Activa “Transmitir a teléfonos” en Vespertine › Ajustes › Control remoto."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "استریم به تلفن‌ها در این Mac خاموش است. «استریم به تلفن‌ها» را در Vespertine › «تنظیمات» › «کنترل از راه دور» روشن کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suoratoisto puhelimiin on pois päältä tällä Macilla. Laita Suoratoista puhelimiin päälle kohdassa Vespertine › Asetukset › Kaukosäädin."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naka-off ang pag-stream sa mga phone sa Mac na ito. I-on ang Mag-stream sa Mga Phone sa Vespertine › Settings › Remote."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La diffusion vers les téléphones est désactivée sur ce Mac. Activez Diffuser vers les téléphones dans Vespertine › Réglages › Télécommande."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ Mac પર ફોન પર સ્ટ્રીમિંગ બંધ છે. Vespertine › સેટિંગ્સ › રિમોટમાં “ફોન પર સ્ટ્રીમ કરો” ચાલુ કરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aika waƙoƙi zuwa wayoyi a kashe yake a wannan Mac. Kunna Aika Waƙoƙi zuwa Wayoyi a Vespertine › Saituna › Rimot."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הזרמה לטלפונים כבויה ב־Mac זה. הפעל את ״הזרם לטלפונים״ ב־Vespertine › ״הגדרות״ › ״שלט רחוק״."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस Mac पर फ़ोन पर स्ट्रीमिंग बंद है। Vespertine › सेटिंग्ज़ › रिमोट में “फ़ोन पर स्ट्रीम करें” चालू करें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A telefonokra történő streamelés ki van kapcsolva ezen a Macen. Kapcsolja be a Streamelés telefonokra beállítást a Vespertine › Beállítások › Távirányító alatt."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streaming ke ponsel mati di Mac ini. Nyalakan Streaming ke Ponsel di Vespertine › Pengaturan › Kendali Jauh."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lo streaming sui telefoni è disattivato su questo Mac. Attiva “Streaming sui telefoni” in Vespertine › Impostazioni › Telecomando."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このMacでは、スマートフォンへのストリーミングがオフになっています。「Vespertine」›「設定」›「リモート」で「スマートフォンにストリーミング」をオンにしてください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ Mac ನಲ್ಲಿ ಫೋನ್‌ಗಳಿಗೆ ಸ್ಟ್ರೀಮ್ ಮಾಡುವುದು ಆಫ್ ಆಗಿದೆ. Vespertine › ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ರಿಮೋಟ್‌ನಲ್ಲಿ “ಫೋನ್‌ಗಳಿಗೆ ಸ್ಟ್ರೀಮ್ ಮಾಡಿ” ಆನ್ ಮಾಡಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 Mac에서 휴대폰으로 스트리밍이 꺼져 있습니다. Vespertine › 설정 › 리모트에서 ‘휴대폰으로 스트리밍’을 켜십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ Mac-ൽ ഫോണുകളിലേക്കുള്ള സ്ട്രീമിംഗ് ഓഫ് ആണ്. Vespertine › ക്രമീകരണം › റിമോട്ട് എന്നതിൽ “ഫോണുകളിലേക്ക് സ്ട്രീം ചെയ്യുക” ഓൺ ചെയ്യുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या Mac वर फोनवर स्ट्रीमिंग बंद आहे. Vespertine › सेटिंग्ज › रिमोटमध्ये “फोनवर स्ट्रीम करा” चालू करा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penstriman ke telefon dimatikan pada Mac ini. Hidupkan Strim ke Telefon dalam Vespertine › Seting › Kawalan Jauh."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strømming til telefoner er av på denne Macen. Slå på Strøm til telefoner i Vespertine › Innstillinger › Fjernkontroll."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streamen naar telefoons staat uit op deze Mac. Zet ‘Stream naar telefoons’ aan in ‘Vespertine › Instellingen › Afstandsbediening’."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ Mac ’ਤੇ ਫ਼ੋਨਾਂ ’ਤੇ ਸਟ੍ਰੀਮਿੰਗ ਬੰਦ ਹੈ। Vespertine › ਸੈਟਿੰਗਾਂ › ਰਿਮੋਟ ਵਿੱਚ “ਫ਼ੋਨਾਂ ’ਤੇ ਸਟ੍ਰੀਮ ਕਰੋ” ਚਾਲੂ ਕਰੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strumieniowanie do telefonów jest wyłączone na tym Macu. Włącz Strumieniuj do telefonów w Vespertine › Ustawienia › Pilot."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A transmissão para telefones está desativada neste Mac. Ative Transmitir para Telefones em Vespertine › Ajustes › Controle Remoto."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A transmissão para telemóveis está desativada neste Mac. Ative Transmitir para telemóveis em Vespertine › Definições › Controlo remoto."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streamingul către telefoane este dezactivat pe acest Mac. Activați Streaming către telefoane în Vespertine › Configurări › Telecomandă."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strömning till telefoner är avstängd på den här Macen. Slå på Strömma till telefoner i Vespertine › Inställningar › Fjärrkontroll."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kutiririsha kwenye simu kumezimwa kwenye Mac hii. Washa Tiririsha kwenye Simu katika Vespertine › Mipangilio › Rimoti."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த Mac-இல் ஃபோன்களுக்கு ஸ்ட்ரீம் செய்வது ஆஃப் ஆக உள்ளது. Vespertine › அமைப்புகள் › ரிமோட் என்பதில் “ஃபோன்களுக்கு ஸ்ட்ரீம் செய்” என்பதை ஆன் செய்யவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ Macలో ఫోన్‌లకు స్ట్రీమ్ చేయడం ఆఫ్‌లో ఉంది. Vespertine › సెట్టింగ్‌లు › రిమోట్‌లో “ఫోన్‌లకు స్ట్రీమ్ చేయి” ఆన్ చేయండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "การสตรีมไปยังโทรศัพท์ปิดอยู่บน Mac เครื่องนี้ ให้เปิดใช้ “สตรีมไปยังโทรศัพท์” ใน Vespertine › การตั้งค่า › รีโมต"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’te telefonlara yayın kapalı. Vespertine › Ayarlar › Uzaktan Kumanda bölümünde Telefonlara Yayınla’yı açın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Трансляцію на телефони на цьому Mac вимкнено. Увімкніть «Транслювати на телефони» у Vespertine › «Параметри» › «Пульт»."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس Mac پر فونز کو اسٹریمنگ بند ہے۔ Vespertine › سیٹنگز › ریموٹ میں “فونز کو اسٹریم کریں” آن کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tính năng truyền phát đến điện thoại đang tắt trên máy Mac này. Hãy bật Truyền phát đến điện thoại trong Vespertine › Cài đặt › Điều khiển từ xa."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這部 Mac 上的「串流至手機」已關閉。請在「Vespertine」›「設定」›「遙控」中開啟「串流至手機」。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 Mac 上的“流播放到手机”已关闭。请在“Vespertine”›“设置”›“遥控”中打开“流播放到手机”。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這部 Mac 上的「串流到手機」已關閉。請在「Vespertine」›「設定」›「遙控」中開啟「串流到手機」。"
+          }
+        }
+      }
+    },
+    "This Mac doesn’t let this device play songs itself. Allow it in Vespertine › Settings › Remote on the Mac.": {
+      "comment": "macOS app, Settings › Remote (about letting paired iPhones play songs from this Mac).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ Mac ይህ መሣሪያ ዘፈኖችን ራሱ እንዲያጫውት አይፈቅድም። በMac ላይ በVespertine › ቅንብሮች › ሪሞት ውስጥ ይፍቀዱ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يسمح هذا الـ Mac لهذا الجهاز بتشغيل الأغاني بنفسه. اسمح بذلك في Vespertine › الإعدادات › التحكم عن بُعد على الـ Mac."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই Mac এই ডিভাইসকে নিজে গান চালাতে দেয় না। Mac-এ Vespertine › সেটিংস › রিমোট-এ এর অনুমতি দিন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tento Mac nedovoluje tomuto zařízení přehrávat skladby samostatně. Povolte to na Macu ve Vespertine › Nastavení › Dálkové ovládání."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne Mac lader ikke denne enhed afspille sange selv. Tillad det i Vespertine › Indstillinger › Fjernbetjening på Mac’en."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Mac erlaubt diesem Gerät nicht, Titel selbst abzuspielen. Erlaube es auf dem Mac unter „Vespertine › Einstellungen › Fernbedienung“."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτό το Mac δεν επιτρέπει σε αυτήν τη συσκευή να αναπαράγει η ίδια τραγούδια. Επιτρέψτε το στο Vespertine › «Ρυθμίσεις» › «Τηλεχειρισμός» στο Mac."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este Mac no permite que este dispositivo reproduzca canciones por sí mismo. Permítelo en Vespertine › Ajustes › Control remoto en el Mac."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این Mac اجازه نمی‌دهد این دستگاه خودش آهنگ‌ها را پخش کند. در Vespertine › «تنظیمات» › «کنترل از راه دور» در Mac به آن اجازه دهید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tämä Mac ei anna tämän laitteen toistaa kappaleita itse. Salli se Macilla kohdassa Vespertine › Asetukset › Kaukosäädin."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi pinapayagan ng Mac na ito ang device na ito na mag-play ng mga kanta nang mag-isa. Payagan ito sa Vespertine › Settings › Remote sa Mac."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce Mac n’autorise pas cet appareil à lire lui-même des morceaux. Autorisez-le dans Vespertine › Réglages › Télécommande sur le Mac."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ Mac આ ડિવાઇસને પોતે ગીતો વગાડવા દેતું નથી. Mac પર Vespertine › સેટિંગ્સ › રિમોટમાં તેને મંજૂરી આપો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan Mac ba ta bar wannan na'ura ta kunna waƙoƙi da kanta ba. Ba da izini a Vespertine › Saituna › Rimot a kan Mac ɗin."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac זה אינו מאפשר למכשיר זה לנגן שירים בעצמו. אפשר זאת ב־Vespertine › ״הגדרות״ › ״שלט רחוק״ ב־Mac."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यह Mac इस डिवाइस को ख़ुद गीत चलाने नहीं देता। Mac पर Vespertine › सेटिंग्ज़ › रिमोट में इसकी अनुमति दें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez a Mac nem engedi, hogy ez az eszköz maga játsszon le dalokat. Engedélyezze a Macen a Vespertine › Beállítások › Távirányító alatt."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ini tidak mengizinkan perangkat ini memutar lagu sendiri. Izinkan di Vespertine › Pengaturan › Kendali Jauh di Mac."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo Mac non consente a questo dispositivo di riprodurre i brani in autonomia. Consentilo in Vespertine › Impostazioni › Telecomando sul Mac."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このMacは、このデバイス自体での曲の再生を許可していません。Macの「Vespertine」›「設定」›「リモート」で許可してください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಸಾಧನ ತಾನೇ ಹಾಡುಗಳನ್ನು ಪ್ಲೇ ಮಾಡಲು ಈ Mac ಬಿಡುತ್ತಿಲ್ಲ. Mac ನಲ್ಲಿ Vespertine › ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ರಿಮೋಟ್‌ನಲ್ಲಿ ಅದಕ್ಕೆ ಅನುಮತಿಸಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 Mac은 이 기기가 직접 노래를 재생하도록 허용하지 않습니다. Mac의 Vespertine › 설정 › 리모트에서 허용하십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ ഉപകരണം സ്വയം പാട്ടുകൾ പ്ലേ ചെയ്യാൻ ഈ Mac അനുവദിക്കുന്നില്ല. Mac-ൽ Vespertine › ക്രമീകരണം › റിമോട്ട് എന്നതിൽ അതിന് അനുമതി നൽകുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हा Mac या डिव्हाइसला स्वतः गाणी वाजवू देत नाही. Mac वर Vespertine › सेटिंग्ज › रिमोटमध्ये त्याला परवानगी द्या."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ini tidak membenarkan peranti ini memainkan lagu sendiri. Benarkannya dalam Vespertine › Seting › Kawalan Jauh pada Mac."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne Macen lar ikke denne enheten spille sanger selv. Tillat det i Vespertine › Innstillinger › Fjernkontroll på Macen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze Mac staat niet toe dat dit apparaat zelf nummers afspeelt. Sta dit toe in ‘Vespertine › Instellingen › Afstandsbediening’ op de Mac."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਹ Mac ਇਸ ਡਿਵਾਈਸ ਨੂੰ ਆਪ ਗੀਤ ਚਲਾਉਣ ਨਹੀਂ ਦਿੰਦਾ। Mac ’ਤੇ Vespertine › ਸੈਟਿੰਗਾਂ › ਰਿਮੋਟ ਵਿੱਚ ਇਸਦੀ ਇਜਾਜ਼ਤ ਦਿਓ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ten Mac nie pozwala temu urządzeniu samodzielnie odtwarzać utworów. Zezwól na to na Macu w Vespertine › Ustawienia › Pilot."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este Mac não permite que este dispositivo reproduza músicas por conta própria. Permita em Vespertine › Ajustes › Controle Remoto, no Mac."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este Mac não permite que este dispositivo reproduza músicas por si próprio. Permita-o em Vespertine › Definições › Controlo remoto, no Mac."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acest Mac nu îi permite acestui dispozitiv să redea singur melodii. Permiteți acest lucru în Vespertine › Configurări › Telecomandă pe Mac."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den här Macen låter inte den här enheten spela låtar själv. Tillåt det i Vespertine › Inställningar › Fjärrkontroll på Macen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac hii hairuhusu kifaa hiki kucheza nyimbo chenyewe. Kiruhusu katika Vespertine › Mipangilio › Rimoti kwenye Mac."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்தச் சாதனம் தானே பாடல்களை இயக்க இந்த Mac அனுமதிக்கவில்லை. Mac-இல் Vespertine › அமைப்புகள் › ரிமோட் என்பதில் அதை அனுமதிக்கவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ పరికరం తానే పాటలను ప్లే చేయడానికి ఈ Mac అనుమతించడం లేదు. Macలో Vespertine › సెట్టింగ్‌లు › రిమోట్‌లో దానికి అనుమతి ఇవ్వండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac เครื่องนี้ไม่อนุญาตให้อุปกรณ์เครื่องนี้เล่นเพลงเอง ให้อนุญาตใน Vespertine › การตั้งค่า › รีโมตบน Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac, bu aygıtın şarkıları kendisinin çalmasına izin vermiyor. Mac’te Vespertine › Ayarlar › Uzaktan Kumanda bölümünden buna izin verin."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей Mac не дозволяє цьому пристрою самостійно відтворювати пісні. Дозвольте це у Vespertine › «Параметри» › «Пульт» на Mac."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ Mac اس ڈیوائس کو خود گانے چلانے کی اجازت نہیں دیتا۔ Mac پر Vespertine › سیٹنگز › ریموٹ میں اس کی اجازت دیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy Mac này không cho phép thiết bị này tự phát bài hát. Hãy cho phép trong Vespertine › Cài đặt › Điều khiển từ xa trên máy Mac."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這部 Mac 不允許此裝置自行播放歌曲。請在 Mac 上的「Vespertine」›「設定」›「遙控」中允許。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 Mac 不允许此设备自行播放歌曲。请在 Mac 上的“Vespertine”›“设置”›“遥控”中允许。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "這部 Mac 不允許此裝置自行播放歌曲。請在 Mac 上的「Vespertine」›「設定」›「遙控」中允許。"
+          }
+        }
+      }
+    },
+    "Stream to Phones": {
+      "comment": "macOS app, Settings › Remote (about letting paired iPhones play songs from this Mac).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ወደ ስልኮች አሰራጭ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "البث إلى الهواتف"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ফোনে স্ট্রিম করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streamovat do telefonů"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stream til telefoner"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf Telefone streamen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ροή προς τηλέφωνα"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transmitir a teléfonos"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "استریم به تلفن‌ها"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suoratoista puhelimiin"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mag-stream sa Mga Phone"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diffuser vers les téléphones"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ફોન પર સ્ટ્રીમ કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aika Waƙoƙi zuwa Wayoyi"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הזרם לטלפונים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फ़ोन पर स्ट्रीम करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streamelés telefonokra"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streaming ke Ponsel"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streaming sui telefoni"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スマートフォンにストリーミング"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಫೋನ್‌ಗಳಿಗೆ ಸ್ಟ್ರೀಮ್ ಮಾಡಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "휴대폰으로 스트리밍"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഫോണുകളിലേക്ക് സ്ട്രീം ചെയ്യുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फोनवर स्ट्रीम करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strim ke Telefon"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strøm til telefoner"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stream naar telefoons"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਫ਼ੋਨਾਂ ’ਤੇ ਸਟ੍ਰੀਮ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strumieniuj do telefonów"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transmitir para Telefones"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transmitir para telemóveis"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Streaming către telefoane"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Strömma till telefoner"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiririsha kwenye Simu"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஃபோன்களுக்கு ஸ்ட்ரீம் செய்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఫోన్‌లకు స్ట్రీమ్ చేయి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สตรีมไปยังโทรศัพท์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefonlara Yayınla"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Транслювати на телефони"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فونز کو اسٹریم کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Truyền phát đến điện thoại"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "串流至手機"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "流播放到手机"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "串流到手機"
+          }
+        }
+      }
+    },
+    "Space for converted copies": {
+      "comment": "macOS app, Settings › Remote (about letting paired iPhones play songs from this Mac).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ለተቀየሩ ቅጂዎች የሚሆን ቦታ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مساحة النسخ المحوَّلة"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "রূপান্তরিত কপির জন্য জায়গা"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Místo pro převedené kopie"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plads til konverterede kopier"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speicherplatz für konvertierte Kopien"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Χώρος για αντίγραφα μετατροπής"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espacio para copias convertidas"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فضا برای نسخه‌های تبدیل‌شده"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tila muunnetuille kopioille"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espasyo para sa mga na-convert na kopya"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espace pour les copies converties"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "રૂપાંતરિત કૉપિ માટે જગ્યા"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sarari don kwafin da aka canza"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מקום לעותקים מומרים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रूपांतरित कॉपी के लिए जगह"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hely az átalakított másolatoknak"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruang untuk salinan hasil konversi"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spazio per le copie convertite"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "変換したコピー用の容量"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪರಿವರ್ತಿಸಿದ ನಕಲುಗಳಿಗೆ ಸ್ಥಳ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "변환된 사본을 위한 공간"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പരിവർത്തനം ചെയ്ത പകർപ്പുകൾക്കുള്ള ഇടം"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रूपांतरित प्रतींसाठी जागा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruang untuk salinan yang ditukar"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plass til konverterte kopier"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ruimte voor omgezette kopieën"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਬਦਲੀਆਂ ਗਈਆਂ ਕਾਪੀਆਂ ਲਈ ਥਾਂ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miejsce na przekonwertowane kopie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espaço para cópias convertidas"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espaço para cópias convertidas"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spațiu pentru copiile convertite"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utrymme för konverterade kopior"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nafasi ya nakala zilizogeuzwa"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "மாற்றப்பட்ட நகல்களுக்கான இடம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మార్చబడిన కాపీలకు స్థలం"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "พื้นที่สำหรับสำเนาที่แปลงแล้ว"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dönüştürülmüş kopyalar için alan"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Місце для перетворених копій"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تبدیل شدہ کاپیوں کے لیے جگہ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dung lượng cho bản sao đã chuyển đổi"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已轉換副本的可用空間"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已转换副本的可用空间"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已轉換拷貝的可用空間"
+          }
+        }
+      }
+    },
+    "Empty": {
+      "comment": "macOS Settings button: empties the cache of converted copies (a verb).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ባዶ አድርግ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إفراغ"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "খালি করুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyprázdnit"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tøm"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leeren"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Άδειασμα"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vaciar"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خالی کردن"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tyhjennä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alisan ng Laman"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vider"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ખાલી કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "רוקן"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ख़ाली करें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ürítés"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kosongkan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Svuota"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "空にする"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಖಾಲಿ ಮಾಡಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비우기"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ശൂന്യമാക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रिकामे करा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kosongkan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tøm"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leeg"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਖ਼ਾਲੀ ਕਰੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opróżnij"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esvaziar"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esvaziar"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Golește"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Töm"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Futa Zote"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "காலியாக்கு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఖాళీ చేయి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ล้าง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boşalt"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Спорожнити"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خالی کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dọn sạch"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "清空"
+          }
+        }
+      }
+    },
+    "In use: %@": {
+      "comment": "macOS Settings: %@ is a size on disk, e.g. \"3.2 GB\".",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በጥቅም ላይ፦ %@"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المستخدَم: %@"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ব্যবহৃত: %@"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Využito: %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I brug: %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belegt: %@"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Σε χρήση: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En uso: %@"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "استفاده‌شده: %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Käytössä: %@"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ginagamit: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utilisé : %@"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વપરાશમાં: %@"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana amfani da: %@"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בשימוש: %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "उपयोग में: %@"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Használatban: %@"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Digunakan: %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In uso: %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用中: %@"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಬಳಕೆಯಲ್ಲಿ: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사용 중: %@"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഉപയോഗത്തിൽ: %@"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वापरात: %@"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Digunakan: %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I bruk: %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In gebruik: %@"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਵਰਤੋਂ ਵਿੱਚ: %@"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "W użyciu: %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Em uso: %@"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Em uso: %@"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "În uz: %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Används: %@"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inatumika: %@"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பயன்பாட்டில்: %@"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "వాడుకలో: %@"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ใช้อยู่: %@"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kullanılan: %@"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Використано: %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "زیرِ استعمال: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang dùng: %@"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已使用：%@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已使用：%@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已使用：%@"
+          }
+        }
+      }
+    },
+    "The phones you paired can play songs from this Mac’s library themselves, through their own speaker, headphones or DAC. Songs an iPhone can’t open (DSD, disc images and a few other formats) are converted to FLAC on this Mac first, with nothing lost, and each copy is kept so it’s made once. What this Mac is playing isn’t affected.": {
+      "comment": "macOS app, Settings › Remote (about letting paired iPhones play songs from this Mac).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ያጣመሯቸው ስልኮች ከዚህ Mac ቤተ-መጻሕፍት ዘፈኖችን ራሳቸው፣ በራሳቸው ድምፅ ማጉያ፣ የጆሮ ማዳመጫ ወይም DAC ማጫወት ይችላሉ። iPhone ሊከፍታቸው የማይችላቸው ዘፈኖች (DSD፣ የዲስክ ኢሜጆችና ጥቂት ሌሎች ቅርጸቶች) በመጀመሪያ በዚህ Mac ላይ ምንም ሳይጠፋ ወደ FLAC ይቀየራሉ፣ እያንዳንዱ ቅጂም አንድ ጊዜ ብቻ እንዲሠራ ይቀመጣል። ይህ Mac እያጫወተ ያለው ነገር አይነካም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يمكن للهواتف التي أقرنتها أن تشغّل بنفسها أغاني من مكتبة هذا الـ Mac، عبر مكبر صوتها أو سماعات الرأس أو DAC الخاص بها. الأغاني التي لا يستطيع iPhone فتحها (DSD وصور الأقراص وبضعة تنسيقات أخرى) تُحوَّل أولًا إلى FLAC على هذا الـ Mac دون أي فقد، ويُحتفظ بكل نسخة حتى لا تُنشأ إلا مرة واحدة. ولا يتأثر ما يشغّله هذا الـ Mac."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনার পেয়ার করা ফোনগুলো এই Mac-এর লাইব্রেরির গান নিজেরাই চালাতে পারে, নিজেদের স্পিকার, হেডফোন বা DAC দিয়ে। iPhone যে গানগুলো খুলতে পারে না (DSD, ডিস্ক ইমেজ ও আরও কয়েকটি ফরম্যাট), সেগুলো আগে এই Mac-এ কিছু না হারিয়ে FLAC-এ রূপান্তরিত হয়, আর প্রতিটি কপি রেখে দেওয়া হয় যাতে তা একবারই তৈরি হয়। এই Mac যা চালাচ্ছে তাতে কোনো প্রভাব পড়ে না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spárované telefony mohou samy přehrávat skladby z knihovny tohoto Macu, a to vlastním reproduktorem, sluchátky nebo přes DAC. Skladby, které iPhone neumí otevřít (DSD, obrazy disků a několik dalších formátů), se nejprve na tomto Macu bezeztrátově převedou do FLAC a každá kopie se uchová, takže se vytváří jen jednou. Na to, co přehrává tento Mac, to nemá vliv."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De telefoner, du har dannet par med, kan selv afspille sange fra denne Macs bibliotek via deres egen højttaler, hovedtelefoner eller DAC. Sange, som en iPhone ikke kan åbne (DSD, diskbilleder og nogle få andre formater), konverteres først til FLAC på denne Mac, uden at noget går tabt, og hver kopi beholdes, så den kun laves én gang. Det, som denne Mac afspiller, påvirkes ikke."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die gekoppelten Telefone können Titel aus der Mediathek dieses Mac selbst abspielen, über ihren eigenen Lautsprecher, Kopfhörer oder DAC. Titel, die ein iPhone nicht öffnen kann (DSD, Disc-Images und einige andere Formate), werden zuerst auf diesem Mac verlustfrei in FLAC konvertiert, und jede Kopie wird aufbewahrt, damit sie nur einmal erstellt werden muss. Was dieser Mac gerade abspielt, bleibt davon unberührt."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τα τηλέφωνα με τα οποία κάνατε ζεύξη μπορούν να αναπαράγουν τα ίδια τραγούδια από τη βιβλιοθήκη αυτού του Mac, από το δικό τους ηχείο, ακουστικά ή DAC. Τα τραγούδια που δεν μπορεί να ανοίξει ένα iPhone (DSD, είδωλα δίσκων και μερικές ακόμη μορφές) μετατρέπονται πρώτα σε FLAC σε αυτό το Mac, χωρίς καμία απώλεια, και κάθε αντίγραφο διατηρείται ώστε να δημιουργείται μόνο μία φορά. Ό,τι παίζει αυτό το Mac δεν επηρεάζεται."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los teléfonos que has enlazado pueden reproducir por sí mismos canciones de la biblioteca de este Mac, por su propio altavoz, auriculares o DAC. Las canciones que un iPhone no puede abrir (DSD, imágenes de disco y algunos otros formatos) se convierten primero a FLAC en este Mac, sin perder nada, y cada copia se guarda para crearla una sola vez. Lo que esté reproduciendo este Mac no se ve afectado."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تلفن‌هایی که جفت کرده‌اید می‌توانند خودشان آهنگ‌های کتابخانهٔ این Mac را از بلندگو، هدفون یا DAC خود پخش کنند. آهنگ‌هایی که iPhone نمی‌تواند باز کند (DSD، ایمیج‌های دیسک و چند قالب دیگر) ابتدا در این Mac بدون هیچ اتلافی به FLAC تبدیل می‌شوند و هر نسخه نگه داشته می‌شود تا فقط یک بار ساخته شود. آنچه این Mac پخش می‌کند تغییری نمی‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puhelimet, joiden kanssa olet muodostanut laiteparin, voivat itse toistaa kappaleita tämän Macin kirjastosta omalla kaiuttimellaan, kuulokkeillaan tai DAC:llaan. Kappaleet, joita iPhone ei voi avata (DSD, levykuvat ja muutama muu muoto), muunnetaan ensin tällä Macilla FLAC-muotoon ilman, että mitään häviää, ja jokainen kopio säilytetään, jotta se tehdään vain kerran. Tämä ei vaikuta siihen, mitä tämä Mac toistaa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang mga phone na ipinair mo ay makakapag-play mismo ng mga kanta mula sa library ng Mac na ito, sa sarili nilang speaker, headphones o DAC. Ang mga kantang hindi mabuksan ng iPhone (DSD, mga disc image at ilan pang format) ay kino-convert muna sa FLAC sa Mac na ito, nang walang nawawala, at itinatabi ang bawat kopya para isang beses lang itong gawin. Hindi naaapektuhan ang pine-play ng Mac na ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les téléphones que vous avez jumelés peuvent lire eux-mêmes les morceaux de la bibliothèque de ce Mac, sur leur propre haut-parleur, casque ou DAC. Les morceaux qu’un iPhone ne peut pas ouvrir (DSD, images disque et quelques autres formats) sont d’abord convertis en FLAC sur ce Mac, sans aucune perte, et chaque copie est conservée pour n’être créée qu’une fois. Ce que ce Mac est en train de lire n’est pas affecté."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમે પેર કરેલા ફોન આ Mac ની લાઇબ્રેરીનાં ગીતો પોતે વગાડી શકે છે, પોતાના સ્પીકર, હેડફોન અથવા DAC દ્વારા. iPhone જે ગીતો ખોલી શકતો નથી (DSD, ડિસ્ક ઇમેજ અને બીજાં કેટલાંક ફૉર્મેટ) તે પહેલાં આ Mac પર કંઈ ગુમાવ્યા વિના FLAC માં રૂપાંતરિત થાય છે, અને દરેક કૉપિ રાખવામાં આવે છે જેથી તે એક જ વાર બને. આ Mac જે વગાડી રહ્યું છે તેને અસર થતી નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wayoyin da kuka haɗa za su iya kunna waƙoƙi daga laburaren wannan Mac da kansu, ta lasifikarsu, belun kunnensu ko DAC ɗinsu. Waƙoƙin da iPhone ba za ta iya buɗewa ba (DSD, kwafin faifai da wasu tsare-tsare kaɗan) ana fara canza su zuwa FLAC a wannan Mac, ba tare da an rasa komai ba, kuma ana ajiye kowane kwafi don a yi shi sau ɗaya kawai. Abin da wannan Mac take kunnawa ba ya shafuwa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הטלפונים שקישרת יכולים לנגן בעצמם שירים מהספריה של Mac זה, דרך הרמקול, האוזניות או ה־DAC שלהם. שירים ש־iPhone אינו יכול לפתוח (DSD, תמונות דיסק וכמה פורמטים נוספים) מומרים תחילה ל־FLAC ב־Mac זה, ללא כל אובדן, וכל עותק נשמר כדי שייווצר פעם אחת בלבד. מה ש־Mac זה מנגן אינו מושפע."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आपके पेयर किए गए फ़ोन इस Mac की लाइब्रेरी के गीत ख़ुद चला सकते हैं, अपने स्पीकर, हेडफ़ोन या DAC से। जिन गीतों को iPhone नहीं खोल सकता (DSD, डिस्क इमेज और कुछ अन्य फ़ॉर्मैट), उन्हें पहले इस Mac पर बिना किसी हानि के FLAC में रूपांतरित किया जाता है, और हर कॉपी रख ली जाती है ताकि वह एक ही बार बने। यह Mac जो चला रहा है, उस पर कोई असर नहीं पड़ता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A párosított telefonok maguk is lejátszhatnak dalokat ennek a Macnek a könyvtárából, a saját hangszórójukon, fejhallgatójukon vagy DAC-jukon keresztül. Azokat a dalokat, amelyeket az iPhone nem tud megnyitni (DSD, lemezképek és néhány más formátum), ez a Mac előbb veszteség nélkül FLAC-ba alakítja át, és minden másolatot megőriz, így csak egyszer készül el. Ez nem befolyásolja azt, amit ez a Mac éppen játszik."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ponsel yang Anda pasangkan dapat memutar sendiri lagu dari perpustakaan Mac ini, melalui speaker, headphone, atau DAC masing-masing. Lagu yang tidak dapat dibuka iPhone (DSD, image disk, dan beberapa format lain) dikonversi dahulu ke FLAC di Mac ini, tanpa ada yang hilang, dan setiap salinan disimpan sehingga hanya dibuat sekali. Apa yang sedang diputar Mac ini tidak terpengaruh."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I telefoni che hai abbinato possono riprodurre in autonomia i brani della libreria di questo Mac, tramite il proprio altoparlante, le cuffie o un DAC. I brani che un iPhone non può aprire (DSD, immagini disco e pochi altri formati) vengono prima convertiti in FLAC su questo Mac, senza alcuna perdita, e ogni copia viene conservata così da essere creata una sola volta. Ciò che questo Mac sta riproducendo non viene influenzato."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ペアリングしたスマートフォンは、このMacのライブラリの曲を、スマートフォン自体のスピーカー、ヘッドフォン、またはDACで再生できます。iPhoneで開けない曲（DSD、ディスクイメージ、その他いくつかのフォーマット）は、まずこのMacで音質を損なうことなくFLACに変換されます。各コピーは保持されるため、変換は1回だけです。このMacで再生中の内容には影響しません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನೀವು ಜೋಡಿಸಿದ ಫೋನ್‌ಗಳು ಈ Mac ನ ಲೈಬ್ರರಿಯ ಹಾಡುಗಳನ್ನು ತಮ್ಮದೇ ಸ್ಪೀಕರ್, ಹೆಡ್‌ಫೋನ್‌ಗಳು ಅಥವಾ DAC ಮೂಲಕ ತಾವೇ ಪ್ಲೇ ಮಾಡಬಹುದು. iPhone ತೆರೆಯಲಾಗದ ಹಾಡುಗಳನ್ನು (DSD, ಡಿಸ್ಕ್ ಇಮೇಜ್‌ಗಳು ಮತ್ತು ಇತರ ಕೆಲವು ಫಾರ್ಮ್ಯಾಟ್‌ಗಳು) ಮೊದಲು ಈ Mac ನಲ್ಲಿ ಏನನ್ನೂ ಕಳೆದುಕೊಳ್ಳದೆ FLAC ಗೆ ಪರಿವರ್ತಿಸಲಾಗುತ್ತದೆ, ಮತ್ತು ಪ್ರತಿ ನಕಲನ್ನು ಇರಿಸಿಕೊಳ್ಳುವುದರಿಂದ ಅದನ್ನು ಒಮ್ಮೆ ಮಾತ್ರ ತಯಾರಿಸಲಾಗುತ್ತದೆ. ಈ Mac ಪ್ಲೇ ಮಾಡುತ್ತಿರುವುದರ ಮೇಲೆ ಯಾವ ಪರಿಣಾಮವೂ ಇಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "페어링한 휴대폰은 이 Mac의 보관함에 있는 노래를 휴대폰 자체의 스피커, 헤드폰 또는 DAC를 통해 직접 재생할 수 있습니다. iPhone에서 열 수 없는 노래(DSD, 디스크 이미지 및 기타 일부 포맷)는 먼저 이 Mac에서 손실 없이 FLAC으로 변환되며, 각 사본은 보관되므로 변환은 한 번만 이루어집니다. 이 Mac에서 재생 중인 내용에는 영향을 주지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങൾ ജോടിയാക്കിയ ഫോണുകൾക്ക് ഈ Mac-ന്റെ ലൈബ്രറിയിലെ പാട്ടുകൾ അവയുടെ സ്വന്തം സ്പീക്കർ, ഹെഡ്‌ഫോണുകൾ അല്ലെങ്കിൽ DAC വഴി സ്വയം പ്ലേ ചെയ്യാം. iPhone-ന് തുറക്കാനാവാത്ത പാട്ടുകൾ (DSD, ഡിസ്ക് ഇമേജുകൾ, മറ്റു ചില ഫോർമാറ്റുകൾ) ആദ്യം ഈ Mac-ൽ ഒന്നും നഷ്ടപ്പെടാതെ FLAC-ലേക്ക് പരിവർത്തനം ചെയ്യും; ഓരോ പകർപ്പും സൂക്ഷിക്കുന്നതിനാൽ അത് ഒരിക്കൽ മാത്രമേ ഉണ്ടാക്കൂ. ഈ Mac പ്ലേ ചെയ്യുന്നതിനെ ഇത് ബാധിക്കില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुम्ही पेअर केलेले फोन या Mac च्या लायब्ररीतील गाणी स्वतः वाजवू शकतात, त्यांच्या स्वतःच्या स्पीकर, हेडफोन किंवा DAC द्वारे. iPhone ला उघडता न येणारी गाणी (DSD, डिस्क इमेज आणि इतर काही फॉरमॅट) आधी या Mac वर काहीही न गमावता FLAC मध्ये रूपांतरित केली जातात, आणि प्रत्येक प्रत ठेवली जाते म्हणजे ती एकदाच तयार होते. हा Mac जे वाजवत आहे त्यावर परिणाम होत नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefon yang anda pasangkan boleh memainkan sendiri lagu daripada pustaka Mac ini, melalui pembesar suara, fon kepala atau DAC masing-masing. Lagu yang tidak boleh dibuka oleh iPhone (DSD, imej cakera dan beberapa format lain) ditukar kepada FLAC pada Mac ini terlebih dahulu, tanpa sebarang kehilangan, dan setiap salinan disimpan supaya ia dibuat sekali sahaja. Apa yang sedang dimainkan oleh Mac ini tidak terjejas."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefonene du har sammenkoblet, kan selv spille sanger fra biblioteket på denne Macen, gjennom sin egen høyttaler, hodetelefoner eller DAC. Sanger en iPhone ikke kan åpne (DSD, platebilder og noen få andre formater), konverteres først til FLAC på denne Macen, uten at noe går tapt, og hver kopi beholdes, slik at den bare lages én gang. Det denne Macen spiller, påvirkes ikke."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De telefoons die je hebt gekoppeld, kunnen zelf nummers uit de bibliotheek van deze Mac afspelen, via hun eigen luidspreker, koptelefoon of DAC. Nummers die een iPhone niet kan openen (DSD, schijfkopieën en een paar andere formaten) worden eerst op deze Mac zonder verlies omgezet naar FLAC, en elke kopie wordt bewaard zodat die maar één keer wordt gemaakt. Wat deze Mac afspeelt, wordt niet beïnvloed."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਤੁਹਾਡੇ ਪੇਅਰ ਕੀਤੇ ਫ਼ੋਨ ਇਸ Mac ਦੀ ਲਾਇਬ੍ਰੇਰੀ ਦੇ ਗੀਤ ਆਪ ਚਲਾ ਸਕਦੇ ਹਨ, ਆਪਣੇ ਸਪੀਕਰ, ਹੈੱਡਫ਼ੋਨਾਂ ਜਾਂ DAC ਰਾਹੀਂ। ਜਿਹੜੇ ਗੀਤ iPhone ਨਹੀਂ ਖੋਲ੍ਹ ਸਕਦਾ (DSD, ਡਿਸਕ ਇਮੇਜ ਅਤੇ ਕੁਝ ਹੋਰ ਫ਼ਾਰਮੈਟ), ਉਹ ਪਹਿਲਾਂ ਇਸ Mac ’ਤੇ ਬਿਨਾਂ ਕੁਝ ਗੁਆਏ FLAC ਵਿੱਚ ਬਦਲੇ ਜਾਂਦੇ ਹਨ, ਅਤੇ ਹਰ ਕਾਪੀ ਰੱਖ ਲਈ ਜਾਂਦੀ ਹੈ ਤਾਂ ਜੋ ਉਹ ਇੱਕੋ ਵਾਰ ਬਣੇ। ਇਹ Mac ਜੋ ਚਲਾ ਰਿਹਾ ਹੈ, ਉਸ ’ਤੇ ਕੋਈ ਅਸਰ ਨਹੀਂ ਪੈਂਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefony połączone w parę mogą samodzielnie odtwarzać utwory z biblioteki tego Maca przez własny głośnik, słuchawki lub DAC. Utwory, których iPhone nie potrafi otworzyć (DSD, obrazy płyt i kilka innych formatów), są najpierw bezstratnie konwertowane na tym Macu do FLAC, a każda kopia jest zachowywana, więc powstaje tylko raz. Nie ma to wpływu na to, co odtwarza ten Mac."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os telefones que você emparelhou podem reproduzir por conta própria as músicas da biblioteca deste Mac, pelo próprio alto-falante, por fones de ouvido ou por um DAC. As músicas que um iPhone não consegue abrir (DSD, imagens de disco e alguns outros formatos) são primeiro convertidas para FLAC neste Mac, sem nenhuma perda, e cada cópia é guardada para ser feita uma única vez. O que este Mac está tocando não é afetado."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os telemóveis que emparelhou podem reproduzir por si próprios as músicas da biblioteca deste Mac, pelo próprio altifalante, por auscultadores ou por um DAC. As músicas que um iPhone não consegue abrir (DSD, imagens de disco e alguns outros formatos) são primeiro convertidas para FLAC neste Mac, sem qualquer perda, e cada cópia é guardada para ser criada uma única vez. O que este Mac está a reproduzir não é afetado."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefoanele pe care le-ați asociat pot reda singure melodii din biblioteca acestui Mac, prin propriul difuzor, prin căști sau printr-un DAC. Melodiile pe care un iPhone nu le poate deschide (DSD, imagini de disc și alte câteva formate) sunt mai întâi convertite în FLAC pe acest Mac, fără nicio pierdere, iar fiecare copie este păstrată, astfel încât se creează o singură dată. Ceea ce redă acest Mac nu este afectat."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De telefoner du har parkopplat kan själva spela låtar från den här datorns bibliotek, genom sin egen högtalare, hörlurar eller DAC. Låtar som en iPhone inte kan öppna (DSD, skivavbilder och några andra format) konverteras först till FLAC på den här datorn, utan att något går förlorat, och varje kopia sparas så att den bara skapas en gång. Det som den här datorn spelar påverkas inte."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Simu ulizooanisha zinaweza kucheza zenyewe nyimbo kutoka maktaba ya Mac hii, kupitia spika, vipokea sauti au DAC zake zenyewe. Nyimbo ambazo iPhone haiwezi kuzifungua (DSD, nakala za diski na fomati nyingine chache) hugeuzwa kwanza kuwa FLAC kwenye Mac hii, bila kupoteza chochote, na kila nakala huhifadhiwa ili itengenezwe mara moja tu. Kinachochezwa na Mac hii hakiathiriki."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "நீங்கள் ஜோடிசேர்த்த ஃபோன்கள் இந்த Mac-இன் லைப்ரரியிலுள்ள பாடல்களைத் தங்கள் சொந்த ஸ்பீக்கர், ஹெட்ஃபோன்கள் அல்லது DAC வழியாகத் தாமே இயக்கலாம். iPhone-ஆல் திறக்க முடியாத பாடல்கள் (DSD, டிஸ்க் இமேஜ்கள், வேறு சில வடிவங்கள்) முதலில் இந்த Mac-இல் எந்த இழப்புமின்றி FLAC-ஆக மாற்றப்படும்; ஒவ்வொரு நகலும் வைத்திருக்கப்படுவதால் அது ஒருமுறை மட்டுமே உருவாக்கப்படும். இந்த Mac இயக்கிக்கொண்டிருப்பது பாதிக்கப்படாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీరు జత చేసిన ఫోన్‌లు ఈ Mac లైబ్రరీలోని పాటలను తమ సొంత స్పీకర్, హెడ్‌ఫోన్‌లు లేదా DAC ద్వారా తామే ప్లే చేయగలవు. iPhone తెరవలేని పాటలు (DSD, డిస్క్ ఇమేజ్‌లు, మరికొన్ని ఫార్మాట్‌లు) ముందుగా ఈ Macలో ఏదీ కోల్పోకుండా FLACకు మార్చబడతాయి; ప్రతి కాపీ ఉంచబడుతుంది కాబట్టి అది ఒక్కసారే తయారవుతుంది. ఈ Mac ప్లే చేస్తున్న దానిపై ప్రభావం ఉండదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "โทรศัพท์ที่คุณจับคู่ไว้สามารถเล่นเพลงจากคลังของ Mac เครื่องนี้ได้เอง ผ่านลำโพง หูฟัง หรือ DAC ของโทรศัพท์ เพลงที่ iPhone เปิดไม่ได้ (DSD, ดิสก์อิมเมจ และรูปแบบอื่นอีกเล็กน้อย) จะถูกแปลงเป็น FLAC บน Mac เครื่องนี้ก่อนโดยไม่สูญเสียข้อมูลใดๆ และสำเนาแต่ละรายการจะถูกเก็บไว้ จึงสร้างเพียงครั้งเดียว โดยไม่กระทบสิ่งที่ Mac เครื่องนี้กำลังเล่นอยู่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşlediğiniz telefonlar, bu Mac’in arşivindeki şarkıları kendi hoparlörleri, kulaklıkları veya DAC’leri üzerinden kendileri çalabilir. iPhone’un açamadığı şarkılar (DSD, disk görüntüleri ve birkaç başka biçim) önce bu Mac’te hiçbir kayıp olmadan FLAC’e dönüştürülür ve her kopya yalnızca bir kez oluşturulsun diye saklanır. Bu Mac’in çaldıkları etkilenmez."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Телефони, з якими створено пару, можуть самостійно відтворювати пісні з медіатеки цього Mac — через власний динамік, навушники або ЦАП. Пісні, які iPhone не може відкрити (DSD, образи дисків і кілька інших форматів), спочатку перетворюються на цьому Mac у FLAC без жодних втрат, і кожна копія зберігається, щоб створювати її лише раз. На те, що відтворює цей Mac, це не впливає."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جو فونز آپ نے پیئر کیے ہیں وہ اس Mac کی لائبریری کے گانے خود اپنے اسپیکر، ہیڈ فونز یا DAC کے ذریعے چلا سکتے ہیں۔ جو گانے iPhone نہیں کھول سکتا (DSD، ڈسک امیجز اور چند دوسرے فارمیٹس) وہ پہلے اسی Mac پر کچھ کھوئے بغیر FLAC میں تبدیل کیے جاتے ہیں، اور ہر کاپی رکھ لی جاتی ہے تاکہ وہ ایک ہی بار بنے۔ یہ Mac جو کچھ چلا رہا ہے اس پر کوئی اثر نہیں پڑتا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Các điện thoại bạn đã ghép đôi có thể tự phát bài hát từ thư viện của máy Mac này, qua loa, tai nghe hoặc DAC của chính điện thoại. Những bài hát iPhone không mở được (DSD, ảnh đĩa và một vài định dạng khác) trước tiên được chuyển đổi thành FLAC trên máy Mac này mà không mất mát gì, và mỗi bản sao được giữ lại nên chỉ phải tạo một lần. Nội dung máy Mac này đang phát không bị ảnh hưởng."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你已配對的手機可透過各自的揚聲器、耳機或 DAC，自行播放這部 Mac 資料庫中的歌曲。iPhone 無法開啟的歌曲（DSD、光碟映像及其他數種格式）會先在這部 Mac 上無損轉換為 FLAC，每個副本都會保留，因此只需轉換一次。這部 Mac 正在播放的內容不受影響。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你配对的手机可以通过各自的扬声器、耳机或 DAC 自行播放这台 Mac 资料库中的歌曲。iPhone 无法打开的歌曲（DSD、光盘映像及其他几种格式）会先在这台 Mac 上无损转换为 FLAC，每个副本都会保留，因此只需转换一次。这台 Mac 正在播放的内容不受影响。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你配對的手機可以透過各自的揚聲器、耳機或 DAC，自行播放這部 Mac 資料庫中的歌曲。iPhone 無法打開的歌曲（DSD、光碟映像檔和其他幾種格式）會先在這部 Mac 上無損轉換為 FLAC，每個拷貝都會保留，因此只需轉換一次。這部 Mac 正在播放的內容不受影響。"
+          }
+        }
+      }
+    },
+    "May play songs from this Mac": {
+      "comment": "macOS app, Settings › Remote (about letting paired iPhones play songs from this Mac).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ከዚህ Mac ዘፈኖችን ማጫወት ይችላል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يُسمح له بتشغيل أغانٍ من هذا الـ Mac"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই Mac থেকে গান চালাতে পারে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smí přehrávat skladby z tohoto Macu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Må afspille sange fra denne Mac"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Darf Titel von diesem Mac abspielen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Μπορεί να αναπαράγει τραγούδια από αυτό το Mac"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puede reproducir canciones de este Mac"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اجازهٔ پخش آهنگ از این Mac را دارد"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saa toistaa kappaleita tältä Macilta"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puwedeng mag-play ng mga kanta mula sa Mac na ito"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peut lire des morceaux de ce Mac"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ Mac પરથી ગીતો વગાડી શકે છે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tana iya kunna waƙoƙi daga wannan Mac"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "רשאי לנגן שירים מ־Mac זה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस Mac से गीत चला सकता है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lejátszhat dalokat erről a Macről"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boleh memutar lagu dari Mac ini"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Può riprodurre i brani di questo Mac"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このMacの曲を再生可能"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ Mac ನಿಂದ ಹಾಡುಗಳನ್ನು ಪ್ಲೇ ಮಾಡಬಹುದು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 Mac의 노래 재생 허용"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ Mac-ൽ നിന്ന് പാട്ടുകൾ പ്ലേ ചെയ്യാം"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या Mac वरून गाणी वाजवू शकतो"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boleh memainkan lagu daripada Mac ini"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan spille sanger fra denne Macen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mag nummers van deze Mac afspelen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ Mac ਤੋਂ ਗੀਤ ਚਲਾ ਸਕਦਾ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Może odtwarzać utwory z tego Maca"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pode reproduzir músicas deste Mac"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pode reproduzir músicas deste Mac"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poate reda melodii de pe acest Mac"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Får spela låtar från den här datorn"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inaweza kucheza nyimbo kutoka Mac hii"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த Mac-இலிருந்து பாடல்களை இயக்கலாம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ Mac నుండి పాటలను ప్లే చేయవచ్చు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่นเพลงจาก Mac เครื่องนี้ได้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Mac’teki şarkıları çalabilir"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Може відтворювати пісні з цього Mac"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس Mac سے گانے چلا سکتا ہے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Được phát bài hát từ máy Mac này"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可播放這部 Mac 上的歌曲"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可播放这台 Mac 上的歌曲"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "可播放這部 Mac 上的歌曲"
+          }
+        }
+      }
+    },
+    "Playing “%@” on the phone": {
+      "comment": "macOS Settings, under a paired phone's name: %@ is a song title the phone is playing now.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@»ን በስልኩ ላይ በማጫወት ላይ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يشغّل “%@” على الهاتف"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ফোনে “%@” চলছে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehrává na telefonu „%@“"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspiller “%@” på telefonen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spielt „%@“ auf dem Telefon"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Παίζει το «%@» στο τηλέφωνο"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduciendo “%@” en el teléfono"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "در حال پخش «%@» در تلفن"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toistaa puhelimessa kappaletta ”%@”"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pine-play ang “%@” sa phone"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lecture de « %@ » sur le téléphone"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ફોન પર “%@” વાગી રહ્યું છે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana kunna “%@” a wayar"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מנגן את “%@” בטלפון"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फ़ोन पर “%@” चल रहा है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@” lejátszása a telefonon"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memutar “%@” di ponsel"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riproduzione di “%@” sul telefono"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "スマートフォンで「%@」を再生中"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಫೋನ್‌ನಲ್ಲಿ “%@” ಪ್ಲೇ ಆಗುತ್ತಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "휴대폰에서 ‘%@’ 재생 중"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഫോണിൽ “%@” പ്ലേ ചെയ്യുന്നു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फोनवर “%@” वाजत आहे"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memainkan “%@” pada telefon"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiller «%@» på telefonen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speelt ‘%@’ af op de telefoon"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਫ਼ੋਨ ’ਤੇ “%@” ਚੱਲ ਰਿਹਾ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarza „%@” na telefonie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocando “%@” no telefone"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A reproduzir “%@” no telemóvel"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redă „%@” pe telefon"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelar ”%@” på telefonen"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inacheza “%@” kwenye simu"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஃபோனில் “%@” இயங்குகிறது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఫోన్‌లో “%@” ప్లే అవుతోంది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กำลังเล่น “%@” บนโทรศัพท์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefonda “%@” çalıyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворює «%@» на телефоні"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فون پر “%@” چل رہا ہے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang phát “%@” trên điện thoại"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在手機上播放「%@」"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在手机上播放“%@”"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在手機上播放「%@」"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
