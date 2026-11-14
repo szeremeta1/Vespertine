@@ -7,7 +7,7 @@
         <argument><name>InstanceID</name><direction>in</direction><relatedStateVariable>A_ARG_TYPE_InstanceID</relatedStateVariable></argument>
       </argumentList>
     </action>
-    
+
     <action><name>Play</name></action>
     <action><name>Pause</name></action>
     <action><name>Stop</name></action>
