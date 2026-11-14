@@ -466,74 +466,119 @@ static float3 strobed(float3 col, constant U &u) {
     return mix(col, float3(1), saturate(u.e.z) * 0.85);
 }
 
+// Classic.
+// g: the beat's punch (0 at rest, about 1 on a hard beat, springing back), unused, the tunnel's run (0…1), the
+//    colours' turn (0…1, a step on every beat)
+// h: sudden sounds in the lows, mids and highs (0…1 each)
+// f.x: the lasers' angle; rings[]: the rings each beat sends out (radius, strength, width, colour)
+
+static float fbm2(float2 p) { return 0.65 * noise(p) + 0.35 * noise(p * 2.03 + float2(1.7, 9.2)); }
+
+// The spectrum round the whole circle: lows at the top, mirrored left and right, up to about 9 kHz at the bottom
+// (above that music has too little for the ring to close).
+static float circularFull(constant float *fine, int count, float angle) {
+    float m = abs(angle) / M_PI_F;                  // 0 at the top, 1 at the bottom
+    float f = (0.03 + 0.85 * m) * float(count - 1);
+    int i = int(f);
+    return mix(fine[i], fine[min(i + 1, count - 1)], f - float(i));
+}
+
+// A colour from the theme's brighter half, `t` round it (it wraps).
+static float3 clubColour(constant U &u, float t) {
+    float x = fract(t);
+    return ramp(u, 0.5 + 0.5 * (x < 0.5 ? x * 2 : 2 - x * 2));
+}
+
 fragment float4 vz_club(VOut in [[stage_in]], constant U &u [[buffer(0)]], constant float *fine [[buffer(3)]],
                         texture2d<float> overlay [[texture(0)]]) {
     float2 size = u.a.xy;
     float unit = 0.5 * min(size.x, size.y);
     float2 px = in.uv * size;
-    float2 q = (px - size * 0.5) / unit;
+    float punch = u.g.x, kick = max(punch, 0.0);
+    // The whole room comes a little nearer on a beat.
+    float2 q = (px - size * 0.5) / unit / (1 + 0.045 * punch);
     q.y = -q.y;
     float r = length(q);
-    float theta = atan2(q.x, q.y);
+    float theta = atan2(q.x, q.y);                 // 0 at the top, clockwise
     float time = u.a.z;
     float bass = u.b.x, mid = u.b.y, treble = u.b.z, pulse = u.b.w;
     float signal = u.e.w;
+    float turn = u.g.w;
+    float3 hits = u.h.xyz;
     int fineCount = int(u.d.y);
 
-    // Haze and a tunnel of rings rushing outwards, faster with the music.
-    float3 col = u.stops[0].rgb * (0.35 + 0.25 * noise(q * 2.0 + time * 0.05));
-    float tunnel = fract(log(max(r, 0.02)) * 2.2 - time * (0.25 + 0.6 * mid) - pulse * 0.15);
-    float tunnelLine = exp(-pow((tunnel - 0.5) / 0.04, 2.0)) * smoothstep(0.1, 0.6, r) * 0.18;
-    col += ramp(u, 0.5) * tunnelLine * (0.4 + 0.6 * mid) * signal;
+    // Haze, drifting, lit from the middle by the bass.
+    float fog = fbm2(q * 1.4 + float2(time * 0.03, -time * 0.02));
+    float3 col = u.stops[0].rgb * (0.30 + 0.30 * fog);
+    col += clubColour(u, turn + 0.5) * exp(-r * 1.7) * (0.05 + 0.22 * bass * signal + 0.25 * kick) * (0.6 + 0.8 * fog);
 
-    // Lasers: thin beams turning around the centre, brighter with the highs.
-    // Two fans of five beams, turning opposite ways. Only the nearest beam of each fan can light a pixel, so each
-    // fan is one evaluation rather than five.
+    // The ring of the spectrum, and where it starts: round the core, pushed out by the bass and the punch.
+    float base = 0.25 + 0.03 * bass * signal + 0.05 * punch;
+    float spec = circularFull(fine, fineCount, theta) * signal;
+    float loud = spec * spec;
+
+    // Rays: each part of the spectrum thrown out across the room as light, as far as it is loud.
+    float streak = 0.55 + 0.45 * noise(float2(theta * 28.0, 3.0 + floor(time * 0.5) * 0.0));
+    float rays = loud * exp(-max(r - base, 0.0) / (0.12 + 1.1 * spec)) * smoothstep(base - 0.02, base + 0.12, r);
+    col += ramp(u, 0.4 + 0.6 * spec) * rays * streak * 0.5;
+
+    // The tunnel: rings of light running outward, a surge after every beat.
+    float run = fract(log(max(r, 0.05)) * 1.5 - u.g.z);
+    float tunnel = exp(-pow((run - 0.5) / 0.045, 2.0)) * smoothstep(0.35, 0.9, r);
+    col += clubColour(u, turn + 0.25) * tunnel * (0.03 + 0.10 * mid * signal + 0.10 * kick);
+
+    // Lasers: two fans of six beams from the middle, turning opposite ways. Each beam is lit by its own part of the
+    // spectrum, so they flash one by one with the music, and all of them with a hit in the highs. Only the nearest
+    // beam of a fan can light a pixel, so a fan is one evaluation.
     float laserAngle = u.f.x;
-    const float spacing = 2 * M_PI_F / 5;
-    float reach = smoothstep(0.08, 0.3, r) * exp(-r * 0.6);
-    float haze = smoothstep(0.1, 0.4, r) * 0.035 * treble;
+    const float spacing = 2 * M_PI_F / 6;
+    float reach = smoothstep(base * 0.6, base + 0.15, r) * exp(-r * 0.45);
     for (int fan = 0; fan < 2; fan++) {
-        float a0 = fan == 0 ? laserAngle : -0.7 * laserAngle + spacing * 0.5;
+        float a0 = fan == 0 ? laserAngle : -0.8 * laserAngle + spacing * 0.5;
         float rel = theta - a0;
         float index = floor(rel / spacing + 0.5);
         float d = abs(rel - index * spacing) * r;
-        float width = 0.004 + 0.004 * r;
+        float which = fract((index + 6.0 + float(fan) * 0.5) * 0.381966);          // the beam's own place in the spectrum
+        int bin = clamp(int((0.25 + 0.6 * which) * float(fineCount - 1)), 0, fineCount - 1);
+        float level = fine[bin] * signal;
+        float lit = 0.10 + 1.5 * level * level + 0.9 * hits.z + 0.3 * treble * signal;
+        float width = (0.0035 + 0.005 * r) * (1 + 0.6 * kick);
         float x = d / width;
-        float flicker = 0.55 + 0.45 * sin(time * 17.0 + (index * 2 + float(fan)) * 2.1);
-        float3 c = fan == 0 ? u.stops[2].rgb : u.stops[3].rgb;
-        col += c * (exp(-x * x) * reach * (0.25 + 1.6 * treble) * flicker + exp(-d / (0.06 + 0.1 * treble)) * haze) * signal;
+        float3 c = clubColour(u, turn + which * 0.5 + float(fan) * 0.33);
+        col += c * (exp(-x * x) * lit + exp(-d / 0.05) * 0.10 * lit * (0.5 + fog)) * reach * (0.35 + 0.65 * signal);
     }
 
-    // Rings sent out by each beat.
+    // The rings each beat sends out.
     int ringCount = min(int(u.f.w), 16);
     for (int i = 0; i < ringCount; i++) {
         float4 ring = u.rings[i];
         float d = abs(r - ring.x);
         if (d > ring.z * 30) continue;      // too far for its halo to show
         float x = d / ring.z;
-        float shape = exp(-x * x);
-        float halo = exp(-d / (ring.z * 6));
-        float3 c = ramp(u, ring.w);
-        col += c * (shape * 1.1 + halo * 0.25) * ring.y;
+        col += ramp(u, ring.w) * (exp(-x * x) * 1.2 + exp(-d / (ring.z * 6)) * 0.3) * ring.y;
     }
 
-    // The circular spectrum around the core.
-    float base = 0.22 + 0.05 * bass;
-    float spec = circular(fine, fineCount, theta) * signal;
-    float barMask = smoothstep(0.35, 0.2, abs(fract(theta / (2 * M_PI_F) * 128) - 0.5));
-    float outer = base + spec * 0.42;
-    float bar = smoothstep(base - 0.004, base, r) * (1 - smoothstep(outer - 0.004, outer + 0.004, r)) * barMask;
-    col += ramp(u, 0.5 + 0.5 * spec) * bar * (0.6 + 0.8 * spec);
-    col += ramp(u, 0.7) * exp(-max(0.0, r - outer) / 0.03) * smoothstep(base, outer, r) * 0.0;
+    // The spectrum itself: 96 bars round the ring, their tips bright.
+    float cell = fract(theta / (2 * M_PI_F) * 96);
+    float barMask = smoothstep(0.42, 0.22, abs(cell - 0.5));
+    float outer = base + 0.01 + spec * 0.40;
+    float bar = smoothstep(base - 0.004, base + 0.002, r) * (1 - smoothstep(outer - 0.004, outer + 0.004, r)) * barMask;
+    float tip = exp(-abs(r - outer) / 0.012) * step(r, outer + 0.004);
+    col += (ramp(u, 0.45 + 0.55 * spec) * (0.55 + 0.75 * spec) + u.stops[3].rgb * tip * 0.5) * bar;
+    col += ramp(u, 0.75) * exp(-max(r - outer, 0.0) / 0.035) * step(outer, r) * loud * 0.28;
 
-    // The core: an orb that swells with the bass.
-    float core = 0.09 + 0.10 * bass + 0.05 * pulse;
-    float orb = 1 - smoothstep(core - 0.01, core + 0.01, r);
-    float glow = exp(-max(0.0, r - core) / (0.05 + 0.15 * bass));
-    col = mix(col, mix(u.stops[2].rgb, float3(1), 0.35 + 0.4 * pulse), orb * (0.6 + 0.4 * signal));
-    col += u.stops[2].rgb * glow * (0.25 + 0.75 * bass) * (0.4 + 0.6 * signal);
+    // The core: a speaker of light. It swells with the bass and jumps with the punch; rings run out across it.
+    float core = base - 0.045;
+    float orb = 1 - smoothstep(core - 0.006, core + 0.006, r);
+    float cone = 0.5 + 0.5 * cos((r / max(core, 0.01)) * 9.0 - time * 3.0 - 7.0 * kick);
+    float3 coreCol = mix(clubColour(u, turn), float3(1), 0.25 + 0.45 * saturate(kick) + 0.2 * hits.x);
+    coreCol *= 0.55 + 0.45 * (1 - r / max(core, 0.01)) + 0.18 * cone * (0.3 + bass * signal);
+    col = mix(col, coreCol * (0.45 + 0.55 * signal) * (0.75 + 0.5 * bass * signal + 0.4 * kick), orb);
+    float glow = exp(-max(0.0, r - core) / (0.04 + 0.10 * bass * signal + 0.10 * kick));
+    col += clubColour(u, turn) * glow * (0.12 + 0.45 * bass * signal + 0.5 * kick) * (1 - orb) * (0.4 + 0.6 * signal);
 
+    // What is lit is a little brighter on the beat (the dark stays dark: this is not the strobe).
+    col *= 1 + 0.15 * pulse * signal;
     col *= 1 - 0.3 * pow(length(in.uv - 0.5) * 1.2, 2.0);
     col = col / (1 + max(max(col.r, col.g), col.b) * 0.25);   // soft roll-off instead of clipping
     col = strobed(col, u);
@@ -541,12 +586,12 @@ fragment float4 vz_club(VOut in [[stage_in]], constant U &u [[buffer(0)]], const
     return overlayOver(col + dither(px), ov);
 }
 // MARK: Club: Waves
-// g: calm (Reduce Motion) 0/1, ripple phase (radians), sway clock (s), ripple size (record units)
+// g: calm (Reduce Motion) 0/1, ripple phase (radians), sway clock (s), ripple size (units of half the window's height)
+// h: the three ribbons' sizes (lows, mids, highs; 0…1), the beat's punch
+// k: the three ribbons' travel (radians)
 // rings[0…14]: the beams, worked out on the CPU each frame: aim (radians from straight up, clockwise), ripple
 // wavenumber, ripple phase at the emitter, level 0…1 (its part of the spectrum). Seven from the floor in the middle,
 // four from each top corner.
-
-static float fbm2(float2 p) { return 0.65 * noise(p) + 0.35 * noise(p * 2.03 + float2(1.7, 9.2)); }
 
 static float3 beamFan(float2 v, int first, int count, float amp, float haze, constant U &u) {
     float3 light = float3(0);
@@ -557,23 +602,39 @@ static float3 beamFan(float2 v, int first, int count, float amp, float haze, con
     float grow = smoothstep(0.0, 0.7, rho);
     float treble = u.b.z, sway = u.g.z;
     float glowWidth = 0.025 + 0.03 * treble;
-    float coreWidth = 0.002 + 0.0035 * rho;
+    float coreWidth = 0.0025 + 0.004 * rho;
     for (int i = first; i < first + count; i++) {
         float4 beam = u.rings[i];
         float da = theta - beam.x;
         da -= 2 * M_PI_F * floor(da / (2 * M_PI_F) + 0.5);
         if (abs(da) > 1.4) continue;                         // behind the emitter, or far round
+        // A beam ripples more the louder its own part of the spectrum is.
+        float size = amp * (0.45 + 1.1 * beam.w);
         float across = rho * sin(da);
-        if (abs(across) > amp + 7 * glowWidth) continue;     // too far for even its glow (under 0.1 %)
+        if (abs(across) > size + 7 * glowWidth) continue;    // too far for even its glow (under 0.1 %)
         float phase = beam.y * rho + beam.z;
-        float lateral = amp * sin(phase) * grow;
-        float slope = amp * beam.y * cos(phase) * grow;
+        float lateral = size * sin(phase) * grow;
+        float slope = size * beam.y * cos(phase) * grow;
         float d = abs(across - lateral) * rsqrt(1 + slope * slope);
         float x = d / coreWidth;
         float3 c = ramp(u, 0.62 + 0.36 * sin(float(i) * 2.3 + sway * 0.35));
-        light += c * (exp(-x * x) * (0.35 + 1.2 * beam.w) + exp(-d / glowWidth) * haze * (0.06 + 0.25 * beam.w));
+        light += c * (exp(-x * x) * (0.40 + 1.4 * beam.w * beam.w) + exp(-d / glowWidth) * haze * (0.05 + 0.3 * beam.w));
     }
     return light * near;
+}
+
+// A ribbon of light across the room: a wave of two sines travelling at unrelated speeds, largest in the middle of the
+// window, a bright line with a glow and a veil hanging under it.
+static float3 ribbon(float2 q, float halfW, float y0, float size, float phase, float k, float3 colour, float haze) {
+    float taper = 0.35 + 0.65 * smoothstep(halfW + 0.1, halfW * 0.15, abs(q.x));
+    float a1 = q.x * k - phase, a2 = q.x * k * 2.3 + phase * 1.7 + 1.3;
+    float y = y0 + size * taper * (0.68 * sin(a1) + 0.32 * sin(a2));
+    float slope = size * taper * k * (0.68 * cos(a1) + 0.32 * 2.3 * cos(a2));
+    float below = y - q.y;
+    float d = abs(below) * rsqrt(1 + slope * slope);
+    float line = exp(-d * d / 0.00006) * 0.9 + exp(-d / 0.035) * 0.20 * haze;
+    float veil = step(0.0, below) * exp(-below / (0.10 + 0.5 * size)) * 0.10 * haze;
+    return colour * (line + veil);
 }
 
 fragment float4 vz_club_waves(VOut in [[stage_in]], constant U &u [[buffer(0)]], texture2d<float> overlay [[texture(0)]]) {
@@ -588,6 +649,7 @@ fragment float4 vz_club_waves(VOut in [[stage_in]], constant U &u [[buffer(0)]],
     float calm = u.g.x;
     float sway = u.g.z;
     float amp = u.g.w;
+    float kick = max(u.h.w, 0.0);
 
     // Haze drifting slowly through the room (round a wide circle, so it repeats with the clock); the beams light it.
     float drift = sway * 0.35 / 30;
@@ -601,16 +663,19 @@ fragment float4 vz_club_waves(VOut in [[stage_in]], constant U &u [[buffer(0)]],
     light += beamFan(q - float2(-halfW + 0.15, halfH + 0.05), 7, 4, amp, haze, u);
     light += beamFan(q - float2(halfW - 0.15, halfH + 0.05), 11, 4, amp, haze, u);
 
-    // A sheet of light across the room above, rolling like a slow sea, swelling with the bass.
-    float sea = 0.62 * halfH + 0.06 * sin(q.x * 1.7 - u.g.y * 0.5) + 0.035 * sin(q.x * 3.9 + sway * 1.4) * (0.5 + bass);
-    float sd = q.y - sea;
-    float sheet = exp(-sd * sd / 0.00012) * 0.5 + exp(-abs(sd) / 0.05) * 0.12 * haze + step(sd, 0.0) * exp(sd / 0.25) * 0.05 * haze;
-    light += ramp(u, 0.75) * sheet * (0.3 + 0.7 * bass) * smoothstep(halfW + 0.1, halfW * 0.4, abs(q.x));
+    // Three ribbons across the room, one each for the lows, the mids and the highs: each as tall as its part of the
+    // music is loud, jumping with that part's hits and running faster the louder it is. At rest they are nearly
+    // level lines.
+    float3 sizes = (0.012 + u.h.xyz * float3(0.40, 0.25, 0.13)) * halfH;
+    float fade = 0.35 + 0.65 * signal;
+    light += ribbon(q, halfW, -0.22 * halfH, sizes.x, u.k.x, 2.1, ramp(u, 0.62), haze) * (0.45 + 0.9 * u.h.x) * fade;
+    light += ribbon(q, halfW, 0.18 * halfH, sizes.y, u.k.y, 4.4, ramp(u, 0.80), haze) * (0.40 + 0.9 * u.h.y) * fade;
+    light += ribbon(q, halfW, 0.52 * halfH, sizes.z, u.k.z, 9.0, ramp(u, 0.97), haze) * (0.35 + 0.9 * u.h.z) * fade;
 
     // Paused or silent, the beams rest faintly where they are (as Classic keeps its core), so the window isn't black.
-    col += light * (0.7 + 0.45 * bass + 0.25 * pulse * (1 - calm)) * (0.4 + 0.6 * signal);
-    // The emitter on the floor glows with the bass.
-    col += ramp(u, 0.6) * exp(-length(q - floorAt) * 2.2) * (0.15 + 0.6 * bass) * (0.35 + 0.65 * signal);
+    col += light * (0.7 + 0.45 * bass + 0.3 * pulse * (1 - calm)) * (0.4 + 0.6 * signal);
+    // The emitter on the floor glows with the bass and jumps with the beat.
+    col += ramp(u, 0.6) * exp(-length(q - floorAt) * 2.2) * (0.15 + 0.6 * bass + 0.5 * kick) * (0.35 + 0.65 * signal);
 
     col *= 1 - 0.3 * pow(length(in.uv - 0.5) * 1.2, 2.0);
     col = col / (1 + max(max(col.r, col.g), col.b) * 0.25);
@@ -851,6 +916,8 @@ fragment float4 vz_meters(VOut in [[stage_in]], constant U &u [[buffer(0)]], tex
 
 // MARK: Particles
 // g: dt, width over height, calm (Reduce Motion) 0/1, particle count
+// h: the bass (how hard the field is drawn in), the beat's punch, sudden sounds in the highs (sparkle), unused
+// rings[]: the rings each beat sends out (radius, strength, width, colour), f.w of them
 
 struct Particle {
     float4 pv;   // position (units of half the shorter side, y up), velocity
@@ -864,6 +931,18 @@ static float2 curl(float2 p) {
     return float2(dy, -dx) / (2 * e);
 }
 
+// How hard the beats' rings push at a distance `r` from the middle (each is a wave front `width` wide).
+static float shock(constant U &u, float r, float width) {
+    float k = 0;
+    int count = min(int(u.f.w), 16);
+    for (int i = 0; i < count; i++) {
+        float d = (r - u.rings[i].x) / width;
+        // A ring spends itself as it spreads.
+        k += exp(-d * d) * u.rings[i].y * exp(-u.rings[i].x * 1.3);
+    }
+    return k;
+}
+
 kernel void vz_particles_step(device Particle *particles [[buffer(0)]], constant U &u [[buffer(1)]],
                               uint id [[thread_position_in_grid]]) {
     if (id >= uint(u.g.w)) return;
@@ -872,30 +951,34 @@ kernel void vz_particles_step(device Particle *particles [[buffer(0)]], constant
     float time = u.a.z;
     float mid = u.b.y;
     float signal = u.e.w;
+    float pull = u.h.x, sparkle = u.h.z;
     float2 x = p.pv.xy, v = p.pv.zw;
     float r = length(x);
     float2 dir = r > 1e-4 ? x / r : float2(0, 1);
     // A flow that turns slowly on its own, faster with the mids. It's the curl of a noise field, so it neither
     // gathers the particles into lines nor thins them out; the whole field also swirls gently.
     float2 flow = curl(x * 0.9 + float2(time * 0.045, -time * 0.03)) + 0.5 * curl(x * 2.2 - time * 0.08);
-    float2 target = flow * (0.06 + 0.40 * mid * signal) * (1 - 0.6 * calm);
+    float2 target = flow * (0.05 + 0.34 * mid * signal) * (1 - 0.6 * calm);
     target += float2(-dir.y, dir.x) * 0.06 * min(r, 1.0);
+    // Between beats the bass draws the field back toward the middle (so it breathes, and the beats' bursts don't
+    // empty it).
+    target -= dir * min(r, 1.2) * 0.12 * pull * (1 - calm);
     // Little inertia: heavy particles would be flung out of the eddies and gather in bright seams.
     v += (target - v) * (1 - exp(-dt / 0.08));
-    // Each beat's ring makes the particles it passes flare, and stirs them a little (the ripple itself is drawn: see
-    // the sprites).
-    float heat = p.m.x * exp(-dt / 0.45);
+    // Each beat is a blast from the middle: its ring carries the particles it passes outward with it (the harder the
+    // beat, the further), and lights them. Not with Reduce Motion.
+    float heat = p.m.x * exp(-dt / 0.20);
+    float2 blast = float2(0);
     if (calm < 0.5) {
-        int count = min(int(u.f.w), 16);
-        for (int i = 0; i < count; i++) {
-            float4 ring = u.rings[i];
-            float d = (r - ring.x) / 0.07;
-            float k = exp(-d * d) * ring.y;
-            v += dir * k * 0.8 * dt;
-            heat = max(heat, k);
-        }
+        // (Well under the ring's own speed, so it leaves them behind rather than sweeping them into a bright seam.)
+        float k = min(shock(u, r, 0.10), 1.0);
+        blast = dir * k * 0.5;
+        heat = max(heat, k);
     }
-    x += v * dt;
+    // The highs' hits make a few of them flare: a different few each time.
+    float pick = hash21(float2(float(id) * 0.0173 + floor(time * 24.0) * 0.37, p.m.z));
+    if (pick > 1 - 0.035 * sparkle) heat = max(heat, 0.75);
+    x += (v + blast) * dt;
     float life = p.m.y - dt;
     // Gone past the window's edges (its half width and height in the field's units, a unit being half its shorter
     // side: so a tall window is taller than 1, not narrower).
@@ -907,7 +990,8 @@ kernel void vz_particles_step(device Particle *particles [[buffer(0)]], constant
         float h3 = hash21(float2(h1 * 91.7, h2 * 37.3));
         float a = h1 * 2 * M_PI_F;
         float2 out = float2(cos(a), sin(a));
-        x = out * 1.5 * sqrt(h2);
+        // (A little denser toward the middle, which the beats keep emptying.)
+        x = out * 1.5 * pow(h2, 0.72);
         v = float2(0);
         life = 3 + 7 * h3;
         p.m.w = life;
@@ -931,34 +1015,30 @@ vertex SpriteOut vz_sprite_vertex(uint vid [[vertex_id]], uint iid [[instance_id
     float2 size = u.a.xy;
     float pt = u.a.w;
     float unit = 0.5 * min(size.x, size.y);
-    // The bass breathes the whole field in and out (drawn only: the motion itself isn't disturbed).
-    float breath = 1 + 0.07 * u.b.x * u.e.w * (1 - 0.7 * u.g.z);
-    // Beats ripple outwards: a particle rides each ring's crest out a little and settles back as it passes.
+    float calm = u.g.z, signal = u.e.w;
+    float kick = max(u.h.y, 0.0);
+    // The whole field jumps outward with the beat's punch and settles back (drawn only: the motion itself isn't
+    // disturbed), and swells a little with the bass.
+    float breath = 1 + (0.05 * u.b.x * signal + 0.09 * u.h.y) * (1 - calm);
     float r = length(p.pv.xy);
-    float ripple = 0;
-    if (u.g.z < 0.5) {
-        int count = min(int(u.f.w), 16);
-        for (int i = 0; i < count; i++) {
-            float d = (r - u.rings[i].x) / 0.09;
-            ripple += exp(-d * d) * u.rings[i].y * 0.07;
-        }
-    }
-    float2 at = p.pv.xy * breath + (r > 1e-4 ? p.pv.xy / r : float2(0)) * ripple;
+    float2 at = p.pv.xy * breath;
     float2 px = size * 0.5 + float2(at.x, -at.y) * unit;
     float speed = length(p.pv.zw);
     float heat = p.m.x;
     float fade = smoothstep(0.0, 0.8, p.m.y) * smoothstep(0.0, 0.6, p.m.w - p.m.y);
     float seed = fract(p.m.z * 0.6180339);
-    float radius = (0.6 + 0.6 * seed + 1.8 * heat + 0.8 * u.b.z * u.e.w) * pt;
+    float radius = (0.6 + 0.6 * seed + 1.3 * heat + 0.5 * u.b.z * signal + 0.4 * kick) * pt;
     float2 corner = quadCorners[vid] * float2(2, 1) - float2(1, 0);   // -1…1 both ways
     float2 pos = px + corner * radius * 2.5;
     SpriteOut o;
     o.position = float4(pos.x / size.x * 2 - 1, 1 - pos.y / size.y * 2, 0, 1);
     o.q = corner * 2.5;
-    float t = saturate(0.2 + 0.55 * seed + speed * 0.5 + heat * 0.5);
+    float t = saturate(0.25 + 0.5 * seed + speed * 0.5 + heat * 0.45);
     // Brightest in the middle, fading out towards the edges, so the field has no rim.
-    float falloff = exp(-r * r * 0.9);
-    o.colour = ramp(u, t) * (0.05 + 1.0 * heat + 0.2 * speed) * fade * falloff * (0.4 + 0.6 * u.e.w);
+    float falloff = exp(-r * r * 0.8);
+    // Dim between the beats, so that a beat's flare is seen: the field's own light follows how loud the music is.
+    float own = 0.012 + 0.025 * u.c.x * signal + 0.07 * speed + 0.04 * kick;
+    o.colour = ramp(u, t) * (own + 0.5 * heat) * fade * falloff * (0.4 + 0.6 * signal);
     return o;
 }
 
@@ -973,8 +1053,11 @@ fragment float4 vz_particles(VOut in [[stage_in]], constant U &u [[buffer(0)]], 
     float unit = 0.5 * min(size.x, size.y);
     float2 q = (px - size * 0.5) / unit;
     float r = length(q);
+    float signal = u.e.w, kick = max(u.h.y, 0.0);
     float3 col = u.stops[0].rgb * (0.25 + 0.3 * exp(-r * 1.4));
-    col += u.stops[1].rgb * exp(-r * 2.0) * 0.12 * u.b.x * u.e.w;
+    // A glow in the middle: the bass, and the beat's burst.
+    col += u.stops[1].rgb * exp(-r * 2.0) * (0.10 * u.b.x + 0.16 * kick) * signal;
+    col += u.stops[2].rgb * exp(-r * r * 22.0) * 0.35 * kick * signal;
     col += phosphor(trail.sample(linearClamp, in.uv).rgb);
     col *= 1 - 0.3 * pow(length(in.uv - 0.5) * 1.2, 2.0);
     float4 ov = overlay.sample(linearClamp, in.uv);
