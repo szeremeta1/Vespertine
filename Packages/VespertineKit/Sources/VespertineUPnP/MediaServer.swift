@@ -124,7 +124,7 @@ public final class MediaServer: @unchecked Sendable {
 
     /// Starts listening (once; again after `stop`).
     public func start() async throws {
-        guard lock.withLock({ server == nil }) else { return }
+        guard lock.withLock({ self.server == nil }) else { return }
         let server = HTTPServer { [weak self] request in
             guard let self else { return .status(503) }
             return self.respond(to: request)
