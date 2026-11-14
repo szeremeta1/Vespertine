@@ -101,6 +101,8 @@ public final class RemoteSession {
     @ObservationIgnored private var generation = 0
     @ObservationIgnored private var retry: Task<Void, Never>?
     @ObservationIgnored private var attempts = 0
+    /// How many times a new attempt was put off behind a retry delay, since the session was made.
+    @ObservationIgnored private(set) var retriesPutOff = 0
     @ObservationIgnored private var probing = false
     /// When the connection in use signed in.
     @ObservationIgnored private var connectedAt: ContinuousClock.Instant?
@@ -328,6 +330,7 @@ public final class RemoteSession {
     private func scheduleRetry() {
         guard retry == nil, phase != .closed, phase != .unpaired, phase != .incompatible else { return }
         attempts += 1
+        retriesPutOff += 1
         let delay = min(Double(1 << min(attempts, 4)), 15)
         retry = Task { [weak self] in
             try? await Task.sleep(for: .seconds(delay))
