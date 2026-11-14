@@ -185,7 +185,11 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     /// Opens a song for reading (answered with `.streamOpened`, or `.streamPreparing` while the Mac converts it: ask again).
     /// `smaller`: for a song kept on the phone, a lossless file above `maxSampleRate` is converted down to it too (a stereo
     /// 24/192 file is otherwise sent as it is).
-    case streamOpen(id: Int64, maxSampleRate: Double?, smaller: Bool? = nil)
+    /// `dop`: the phone's output is a DAC that passed the phone's DoP test, and this is the highest rate it may be sent DoP
+    /// frames at (176400 carries DSD64). A two-channel DSD song whose carrier rate is within it then arrives as its own
+    /// DSD bits in DoP frames (`StreamDescriptor.dsdRate` says so); anything else arrives as it would without `dop`. A Mac
+    /// that doesn't know `dop` ignores it and converts DSD to PCM.
+    case streamOpen(id: Int64, maxSampleRate: Double?, smaller: Bool? = nil, dop: Double? = nil)
     /// Reads up to `length` bytes (at most `RemoteProtocol.maximumChunk`) from `offset` of an open stream. Answered with a
     /// `StreamFrame` (binary) carrying this command's `id`, or `.failed`.
     case streamRead(stream: Int, offset: Int64, length: Int)

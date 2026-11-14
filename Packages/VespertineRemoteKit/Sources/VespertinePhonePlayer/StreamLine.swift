@@ -16,6 +16,7 @@ actor StreamLine {
     private let tag: String
     private let byteSize: Int64
     private let maxSampleRate: Double?
+    private let dop: Double?
     private let patience: Duration
     private let pause: Duration
     /// The stream's number on the Mac for the connection it was last opened on.
@@ -27,8 +28,10 @@ actor StreamLine {
     private(set) var bytesRead: Int64 = 0
 
     /// `patience`: how long a read waits for the Mac to come back. `pause`: between looks at the connection.
-    init(client: PhoneStreamClient, song: Int64, descriptor: StreamDescriptor, maxSampleRate: Double?,
+    /// `dop`: the carrier ceiling the stream was asked for with, when it was (the same is asked for when it is opened again).
+    init(client: PhoneStreamClient, song: Int64, descriptor: StreamDescriptor, maxSampleRate: Double?, dop: Double? = nil,
          patience: Duration = .seconds(120), pause: Duration = .milliseconds(300)) {
+        self.dop = dop
         self.client = client
         self.song = song
         tag = descriptor.tag
@@ -84,7 +87,7 @@ actor StreamLine {
             try Task.checkCancellation()
             if closed { throw StreamSource.Failure.closed }
             if await client.isConnected() {
-                switch await client.open(song, maxSampleRate) {
+                switch await client.open(song: song, maxSampleRate: maxSampleRate, dop: dop) {
                 case .streamOpened(let descriptor):
                     guard descriptor.tag == tag, descriptor.byteSize == byteSize else {
                         Task { [client] in await client.close(descriptor.stream) }

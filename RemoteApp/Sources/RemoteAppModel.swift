@@ -9,12 +9,19 @@ import SwiftUI
 import UIKit
 import VespertineRemoteClient
 import VespertineRemoteProtocol
+import VespertineShare
 
 @Observable
 final class RemoteAppModel {
     let discovery = RemoteDiscovery()
     private(set) var pairings: [SavedPairing]
     private(set) var session: RemoteSession?
+    /// The SMB shares this device plays from by itself, without a Mac.
+    private(set) var shares: [SavedShare]
+    /// What the open share is doing (scanning, not answering), for the screens; nil when a Mac or nothing is open.
+    private(set) var shareStatus: ShareStatus?
+    /// Goes up when the open share's library changed under the screens (a scan found new or changed songs).
+    private(set) var libraryRevision = 0
     /// A pairing link opened from the Camera app or scanned, waiting for its Mac to show up on Bonjour.
     var pendingLink: PairingLink?
     /// What went wrong with the last pairing attempt, for the pairing screen.
@@ -33,16 +40,21 @@ final class RemoteAppModel {
     var startScreen: String?
 
     @ObservationIgnored private let keychain = PairingKeychain()
+    @ObservationIgnored private let shareKeychain = ShareKeychain()
+    /// The open share, answering the screens as a Mac would.
+    @ObservationIgnored private var shareMac: ShareMac?
     /// Pairings that are never saved (a made-up one for screenshots).
     @ObservationIgnored private var transientPairings: Set<String> = []
     @ObservationIgnored private var linkWatch: Task<Void, Never>?
     /// The paired Macs Bonjour listed last time, to notice one that just showed up.
     @ObservationIgnored private var listedPaired: Set<String> = []
+    @ObservationIgnored private var shareRevisionSeen = 0
     @ObservationIgnored private let pathMonitor = NWPathMonitor()
     private static let lastMacKey = "lastMac"
 
     init() {
         pairings = keychain.load().sorted { $0.pairedAt < $1.pairedAt }
+        shares = shareKeychain.load().sorted { $0.addedAt < $1.addedAt }
         discovery.onChange = { [weak self] macs in self?.discovered(macs) }
         discovery.start()
         pathMonitor.pathUpdateHandler = { [weak self] path in
@@ -56,8 +68,12 @@ final class RemoteAppModel {
         #endif
         if let last = UserDefaults.standard.string(forKey: Self.lastMacKey), let pairing = pairings.first(where: { $0.serverID == last }) {
             choose(pairing)
-        } else if pairings.count == 1 {
+        } else if let last = UserDefaults.standard.string(forKey: Self.lastMacKey), let share = shares.first(where: { $0.id == last }) {
+            choose(share)
+        } else if pairings.count == 1, shares.isEmpty {
             choose(pairings[0])
+        } else if shares.count == 1, pairings.isEmpty {
+            choose(shares[0])
         }
     }
 
@@ -69,6 +85,7 @@ final class RemoteAppModel {
     func choose(_ pairing: SavedPairing) {
         PlayTarget.shared.leave()
         session?.close()
+        closeShare()
         let serverID = pairing.serverID
         let session = RemoteSession(pairing: pairing, clientName: deviceName, routes: { [weak self] in
             self?.routes(to: serverID) ?? []
@@ -89,6 +106,7 @@ final class RemoteAppModel {
     func tryDemo() {
         PlayTarget.shared.leave()
         session?.close()
+        closeShare()
         let pairing = SavedPairing(serverID: DemoMac.serverID, name: String(localized: "Demo Mac"), device: "demo", key: Data())
         // One pretend Mac for the whole demo, so the queue survives the app going to the background and back.
         let mac = DemoMac(name: pairing.name) { key, size in DemoArtwork.png(key: key, size: size) }
@@ -102,6 +120,7 @@ final class RemoteAppModel {
     func leave() {
         PlayTarget.shared.leave()
         session?.close()
+        closeShare()
         session = nil
         artwork.session = nil
         UserDefaults.standard.removeObject(forKey: Self.lastMacKey)
@@ -112,6 +131,76 @@ final class RemoteAppModel {
         if !transientPairings.contains(pairing.serverID) { keychain.remove(serverID: pairing.serverID) }
         KeptShelf.shared.forget(serverID: pairing.serverID)
         pairings.removeAll { $0.serverID == pairing.serverID }
+    }
+
+    // MARK: Shares
+
+    /// Opens a share in place of a Mac: this device reads its songs itself and is where they play.
+    func choose(_ share: SavedShare) {
+        PlayTarget.shared.leave()
+        session?.close()
+        closeShare()
+        // Two connections: a song being played never waits behind a scan or a cover.
+        let mac = ShareMac(id: share.id, name: share.name, files: share.files(), playback: share.files(), store: share.store,
+                           sayings: ShareWording.sayings, shrink: { data, size in ShareCovers.shrink(data, to: size) })
+        mac.onChange = { [weak self, weak mac] in
+            guard let self, let mac, self.shareMac === mac else { return }
+            self.noteShare(mac)
+        }
+        // The same one each time the session connects: the app coming back to the front opens it again.
+        let pairing = SavedPairing(serverID: share.id, name: share.name, device: "share", key: Data())
+        let session = RemoteSession(pairing: pairing, clientName: deviceName) { mac }
+        session.onConnected = { [weak session] _, _ in
+            if let session { KeptShelf.shared.connected(session) }
+        }
+        shareMac = mac
+        shareStatus = ShareStatus(mac)
+        self.session = session
+        artwork.session = session
+        UserDefaults.standard.set(share.id, forKey: Self.lastMacKey)
+        session.connect()
+    }
+
+    private func closeShare() {
+        shareMac?.onChange = nil
+        shareMac = nil
+        shareRevisionSeen = 0
+        shareStatus = nil
+    }
+
+    private func noteShare(_ mac: ShareMac) {
+        let status = ShareStatus(mac)
+        if status != shareStatus { shareStatus = status }
+        if mac.revision != shareRevisionSeen {
+            shareRevisionSeen = mac.revision
+            libraryRevision += 1
+        }
+    }
+
+    /// The share that is open, if one is.
+    var openShare: SavedShare? {
+        guard let id = session?.pairing.serverID else { return nil }
+        return shares.first { $0.id == id }
+    }
+
+    /// Looks at the open share again for new, changed and removed songs.
+    func rescanShare() { shareMac?.rescan() }
+
+    /// Keeps a share that was added or changed (its password in the Keychain, on this device only) and opens it.
+    func save(_ share: SavedShare) {
+        shareKeychain.upsert(share)
+        shares.removeAll { $0.id == share.id }
+        shares.append(share)
+        shares.sort { $0.addedAt < $1.addedAt }
+        choose(share)
+    }
+
+    func forget(_ share: SavedShare) {
+        if session?.pairing.serverID == share.id { leave() }
+        shareKeychain.remove(id: share.id)
+        share.store.remove()
+        KeptShelf.shared.forget(serverID: share.id)
+        shares.removeAll { $0.id == share.id }
     }
 
     func isPaired(_ mac: DiscoveredMac) -> Bool {
@@ -214,7 +303,10 @@ final class RemoteAppModel {
         if tailscale != tailscaleOn { tailscaleOn = tailscale }
         PlayTarget.shared.holdReason = cellular && !settings.cellularPlayback
             ? String(localized: "Playing over cellular data is off. Connect to Wi-Fi, or turn it on in Settings.") : nil
-        if online { session?.networkChanged() }
+        if online {
+            session?.networkChanged()
+            shareMac?.lineChanged()
+        }
         // Fetching to keep waits out cellular data too, and carries on when Wi-Fi is back.
         if PlayTarget.shared.holdReason == nil, let session { KeptShelf.shared.keeper(for: session)?.resume() }
     }

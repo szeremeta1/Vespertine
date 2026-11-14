@@ -35,7 +35,8 @@ final class PlayTarget {
     /// The phone's player for `session` when this device is where music plays and the Mac can send songs; nil when the
     /// Mac plays.
     func phone(for session: RemoteSession) -> PhoneRemote? {
-        guard onThisDevice else { return nil }
+        // A share has no Mac to play on: its songs always play here.
+        guard onThisDevice || session.isShare else { return nil }
         #if DEBUG
         // App Store captures use the demo and must stay silent on whatever machine takes them.
         if session.isDemo, LaunchOptions.screenshot { return nil }
@@ -76,6 +77,9 @@ final class PlayTarget {
         let remote = PhoneRemote(playback: playback) { [weak session] command in await session?.send(command) ?? .failed(reason: "") }
         remote.words = { signal in (Self.badge(signal), Self.output(signal)) }
         remote.surroundChoice = surround
+        // Which DACs passed the DoP test here: kept between launches, by each DAC's own identifier.
+        remote.dopDACs = DoPDACs.load()
+        remote.onDoPDACsChanged = { $0.save() }
         playback.holdReason = { [weak self] in self?.holdReason }
         let keeper = KeptShelf.shared.keeper(for: session)
         playback.kept = { [weak keeper] song in keeper?.store.kept(song).map { ($0.file, $0.descriptor) } }
@@ -98,6 +102,10 @@ final class PlayTarget {
 
     /// The badge: whether the song arrives as the file it is, or as a copy the Mac made in a format this device can open.
     static func badge(_ signal: PhoneSignal) -> String {
+        // Only for a DAC that passed the DoP test on this device, and only while the output carries the frames as sent.
+        if signal.dsdRate != nil, !signal.dopBroken {
+            return String(localized: "NATIVE DSD · DoP", comment: "Status badge (short, uppercase).")
+        }
         if let outputs = signal.discreteOutputs {
             return String(localized: "SURROUND ON \(String(outputs)) OUTPUTS", comment: "Signal badge on the iPhone: a surround song played on an audio interface, each channel on an output of its own. %@ is the number of outputs, e.g. 6.")
         }
@@ -137,6 +145,10 @@ final class PlayTarget {
             (String(localized: "Song", comment: "Row label on the iPhone's Output screen: the playing song's format, e.g. 24/192."), signal.streamFormat),
             (String(localized: "Song’s channels", comment: "Row label on the iPhone's Output screen: how many channels the playing song has."), String(signal.channels)),
         ]
+        if signal.dsdRate != nil {
+            // The DSD bits travel in DoP frames at this rate; the output has to run at exactly it (the rows below say).
+            rows.append(("DoP", String(localized: "\(PhoneSignal.kilohertz(signal.streamRate)) kHz", comment: "Signal chip: a sample rate.")))
+        }
         if let route {
             rows.append((String(localized: "Output"), route.name))
             if route.sampleRate > 0 {

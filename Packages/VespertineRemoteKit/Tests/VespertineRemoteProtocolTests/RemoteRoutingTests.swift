@@ -7,7 +7,7 @@
 import Foundation
 import Network
 import Testing
-import VespertineRemoteClient
+@testable import VespertineRemoteClient
 @testable import VespertineRemoteProtocol
 
 /// A Mac that welcomes a phone with the addresses it can be reached at, counts what it is asked, and can stop answering pings
@@ -196,11 +196,11 @@ private func waitUntil(_ condition: () -> Bool, seconds: Double = 5) async -> Bo
 
         atHome = false
         home.answersPings = false
-        let started = ContinuousClock.now
+        let putOff = session.retriesPutOff
         session.networkChanged()
         #expect(await waitUntil { session.isConnected && session.route == .advertised })
-        // Back within a couple of seconds, with no retry delay in between.
-        #expect(ContinuousClock.now - started < .seconds(2))
+        // Back with no retry delay in between: the new attempt was made at once.
+        #expect(session.retriesPutOff == putOff)
         #expect(away.hellos == 1)
         #expect(await session.send(.next) == .ok)
         session.close()

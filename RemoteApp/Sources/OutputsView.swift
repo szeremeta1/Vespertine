@@ -7,6 +7,7 @@ import SwiftUI
 import VespertinePhonePlayer
 import VespertineRemoteClient
 import VespertineRemoteProtocol
+import VespertineShare
 
 struct OutputsView: View {
     @Environment(RemoteAppModel.self) private var model
@@ -44,7 +45,11 @@ struct OutputsView: View {
                         }
                     }
                 } footer: {
-                    Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
+                    if session.isShare {
+                        Text("This device reads the songs from the share itself and plays them, through its speaker, headphones or a DAC. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
+                    } else {
+                        Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
+                    }
                 }
                 if playsHere, let phone = session.phone, let signal = phone.signal {
                     Section {
@@ -57,47 +62,54 @@ struct OutputsView: View {
                         Text("Read back from iOS while the song plays, not assumed. Vespertine asks a DAC for each song’s own rate and, for surround, an interface for a channel per output (in the order L, R, C, LFE, back pair, side pair). iOS doesn’t tell apps an output’s bit depth. With the volume below 100%, a DAC doesn’t receive the song’s samples unchanged.")
                     }
                 }
-                Section {
-                    ForEach(Array((session.outputs?.outputs ?? []).enumerated()), id: \.offset) { _, output in
-                        Button {
-                            PlayTarget.shared.choose(thisDevice: false)
-                            feedback.run(session, .selectOutput(uid: output.uid))
-                        } label: {
-                            HStack {
-                                Image(systemName: icon(output.kind))
-                                    .frame(width: 28)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(output.name)
-                                    Text(output.detail).font(.caption.monospaced()).foregroundStyle(output.ready ? Color.secondary : Color.orange)
-                                }
-                                Spacer()
-                                if output.selected, !playsHere { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
-                            }
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                    }
-                } footer: {
-                    Text("Choose one of these and Vespertine on the Mac plays there.")
+                if playsHere, !session.isDemo, !session.isShare, let phone = session.phone, DoPGate.canTest(phone.route) {
+                    DoPSection(phone: phone)
                 }
-                Section {
-                    LabeledContent("Mac", value: session.server?.name ?? session.pairing.name)
-                    if let version = session.server?.appVersion, !version.isEmpty {
-                        LabeledContent("Vespertine", value: version)
+                if session.isShare, let share = model.openShare {
+                    shareSection(share)
+                } else {
+                    Section {
+                        ForEach(Array((session.outputs?.outputs ?? []).enumerated()), id: \.offset) { _, output in
+                            Button {
+                                PlayTarget.shared.choose(thisDevice: false)
+                                feedback.run(session, .selectOutput(uid: output.uid))
+                            } label: {
+                                HStack {
+                                    Image(systemName: icon(output.kind))
+                                        .frame(width: 28)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(output.name)
+                                        Text(output.detail).font(.caption.monospaced()).foregroundStyle(output.ready ? Color.secondary : Color.orange)
+                                    }
+                                    Spacer()
+                                    if output.selected, !playsHere { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
+                                }
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    } footer: {
+                        Text("Choose one of these and Vespertine on the Mac plays there.")
                     }
-                    if !session.isDemo {
-                        Button { editingConnection = true } label: {
-                            LabeledContent("Connection") {
-                                HStack(spacing: 6) {
-                                    Circle().fill(session.isConnected ? Palette.brass : Palette.text3).frame(width: 7, height: 7)
-                                    Text(reach)
+                    Section {
+                        LabeledContent("Mac", value: session.server?.name ?? session.pairing.name)
+                        if let version = session.server?.appVersion, !version.isEmpty {
+                            LabeledContent("Vespertine", value: version)
+                        }
+                        if !session.isDemo {
+                            Button { editingConnection = true } label: {
+                                LabeledContent("Connection") {
+                                    HStack(spacing: 6) {
+                                        Circle().fill(session.isConnected ? Palette.brass : Palette.text3).frame(width: 7, height: 7)
+                                        Text(reach)
+                                    }
                                 }
                             }
+                            .foregroundStyle(Palette.text)
                         }
-                        .foregroundStyle(Palette.text)
                     }
                 }
-            }
+                }
             .obsidianList()
             .navigationTitle("Output").screenTitleStyle()
             .toolbar {
@@ -123,6 +135,46 @@ struct OutputsView: View {
 
     private var playsHere: Bool { session.phone != nil }
 
+    /// The share the songs come from: where it is, whether it answers, what the last scan found, and scanning again.
+    @ViewBuilder private func shareSection(_ share: SavedShare) -> some View {
+        let status = model.shareStatus ?? ShareStatus()
+        Section {
+            LabeledContent("SMB Share", value: share.address.display)
+            LabeledContent("Connection") {
+                HStack(spacing: 6) {
+                    Circle().fill(status.reachable == false ? Palette.text3 : Palette.brass).frame(width: 7, height: 7)
+                    Text(status.reachable == false ? String(localized: "Not connected") : ShareWording.network(share.address))
+                }
+            }
+            LabeledContent("Songs", value: status.songs.formatted())
+            if status.needTheMac > 0 {
+                LabeledContent("Files that need the Mac", value: status.needTheMac.formatted())
+            }
+            if status.unreadable > 0 {
+                LabeledContent("Files that couldn’t be read", value: status.unreadable.formatted())
+            }
+            if let scanned = status.scanned {
+                LabeledContent("Last scanned", value: scanned.formatted(date: .abbreviated, time: .shortened))
+            }
+            Button {
+                model.rescanShare()
+            } label: {
+                HStack {
+                    Text("Scan Again")
+                    Spacer()
+                    if status.scan.isRunning { ProgressView() }
+                }
+            }
+            .disabled(status.scan.isRunning)
+            .accessibilityIdentifier("share-rescan")
+        } footer: {
+            VStack(alignment: .leading, spacing: 6) {
+                if let trouble = status.trouble { Text(trouble) }
+                Text("A scan reads only new and changed files, and runs by itself once a day when the share is opened. This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; DSD, APE, WavPack and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.")
+            }
+        }
+    }
+
     /// Under "This iPhone": where its sound goes now, or why it can't play here.
     private var hereDetail: String {
         if session.isDemo, session.phone == nil { return String(localized: "Plays the demo’s made-up songs with sound") }
@@ -142,6 +194,72 @@ struct OutputsView: View {
         case .systemDefault: "speaker.wave.2"
         case .device: "hifispeaker"
         case .speakerGroup: "hifispeaker.2"
+        }
+    }
+}
+
+/// DSD on a DAC plugged into this device: whether it is sent as DSD (DoP), and the short listening test that decides.
+/// Nothing is assumed from the DAC's name: it gets DoP only after you heard the test sound as music on it.
+private struct DoPSection: View {
+    let phone: PhoneRemote
+    @State private var probe: DoPProbe
+
+    init(phone: PhoneRemote) {
+        self.phone = phone
+        _probe = State(initialValue: DoPProbe(remote: phone))
+    }
+
+    var body: some View {
+        Section {
+            if let status { Text(status).foregroundStyle(Color.secondary) }
+            Button { probe.run() } label: {
+                HStack {
+                    Text("Test DoP")
+                    if probe.isBusy {
+                        Spacer()
+                        ProgressView()
+                    }
+                }
+            }
+            .disabled(probe.isBusy)
+            .accessibilityIdentifier("dop-test")
+            .alert("Did you hear music or hiss?", isPresented: Binding(get: { probe.phase == .asking }, set: { if !$0, probe.phase == .asking { probe.cancel() } })) {
+                Button("Music") { probe.answer(.music) }
+                Button("Hiss") { probe.answer(.hiss) }
+                Button("Cancel", role: .cancel) { probe.cancel() }
+            }
+        } header: {
+            Text("Play DSD natively?")
+        } footer: {
+            Text("DSD is converted to PCM on the Mac unless this DAC takes DSD over PCM (DoP). A short, quiet test can tell: it plays a soft chord as DSD and asks what you heard. Music stops for the test, and the volume has to be at 100%.")
+        }
+        .onDisappear { if probe.isBusy { probe.cancel() } }
+    }
+
+    /// What the test is doing, how it ended, or what this DAC's answer was.
+    private var status: String? {
+        switch probe.phase {
+        case .preparing, .playing:
+            return String(localized: "Playing a short, quiet test…", comment: "DoP test sheet while the test sound plays.")
+        case .failed(.volume):
+            return String(localized: "The test needs the volume at 100%.", comment: "DoP test on the iPhone: the test wasn't started because the device's volume isn't at its top.")
+        case .failed(.changed):
+            return String(localized: "The test stopped because an audio device changed. Nothing was saved.", comment: "DoP test ended early: an output was plugged in or out, or the default output changed.")
+        case .failed:
+            return String(localized: "The test couldn't play as DoP on this output, so nothing was saved.", comment: "DoP test ended early: the engine didn't send the test sound as DoP.")
+        case .idle, .asking, .answered:
+            break
+        }
+        switch phone.dopDACs.answer(for: phone.route?.uid) {
+        case .music?:
+            if let volume = phone.outputVolume, volume < DoPGate.fullVolume {
+                return String(localized: "DSD is sent as PCM while the volume is below 100%.", comment: "iPhone Output screen, for a DAC that passed the DoP test: with the device volume turned down, DSD songs are converted to PCM instead of being sent as DSD.")
+            }
+            return String(localized: "DoP is on for this DAC.", comment: "DoP test result after the listener answered Music.")
+        case .hiss?:
+            return String(localized: "DoP stays off for this DAC. DSD keeps playing as PCM.", comment: "DoP test result after the listener answered Hiss.")
+        case nil:
+            return nil
         }
     }
 }

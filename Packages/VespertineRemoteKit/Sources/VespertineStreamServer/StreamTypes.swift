@@ -66,9 +66,13 @@ public struct TranscodeRequest: Sendable, Equatable {
     public var sampleRate: Double
     public var bitDepth: Int
     public var channels: Int
+    /// The song is DSD and the FLAC is to hold its own bits as DoP frames (24-bit, at `sampleRate`, a sixteenth of the DSD
+    /// rate), a whole number of marker pairs long, rather than a conversion to PCM.
+    public var dop = false
 
     public init(source: URL, sourceSize: Int64, sourceModified: Date, regionKey: String?, trackID: Int64? = nil,
-                sampleRate: Double, bitDepth: Int, channels: Int) {
+                sampleRate: Double, bitDepth: Int, channels: Int, dop: Bool = false) {
+        self.dop = dop
         self.source = source
         self.sourceSize = sourceSize
         self.sourceModified = sourceModified

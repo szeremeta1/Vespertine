@@ -22,8 +22,12 @@ public struct PhoneRoute: Equatable, Sendable {
     public var maximumChannels: Int
     /// The speaker each output channel is, when the output says (`AudioChannelLabel` values). Most interfaces don't.
     public var channelLabels: [UInt32]?
+    /// iOS's own identifier for the output (`AVAudioSessionPortDescription.uid`): what a DAC's DoP test answer is kept by.
+    public var uid: String?
 
-    public init(name: String, portType: String, sampleRate: Double, channels: Int, spatial: Bool, maximumChannels: Int? = nil, channelLabels: [UInt32]? = nil) {
+    public init(name: String, portType: String, sampleRate: Double, channels: Int, spatial: Bool, maximumChannels: Int? = nil, channelLabels: [UInt32]? = nil,
+                uid: String? = nil) {
+        self.uid = uid
         self.name = name
         self.portType = portType
         self.sampleRate = sampleRate
@@ -72,8 +76,14 @@ public struct PhoneSignal: Equatable, Sendable {
     /// The output is one that can run at a song's own rate (a DAC, the headphone adapter), where the volume and the rate
     /// decide whether it gets the song's samples as they are.
     public var onDAC = false
+    /// The song is DSD and its own bits are being sent to the DAC as DoP frames: the DSD rate (2822400 for DSD64). Only
+    /// ever set for a DAC that passed the DoP test here. nil: PCM.
+    public var dsdRate: Double?
+    /// Sent as DoP, but the output isn't at the carrier rate or the volume isn't at its top: the DAC isn't getting DSD.
+    public var dopBroken: Bool { dsdRate != nil && (resampled || volumeReduced) }
 
     public init(stream: StreamDescriptor, route: PhoneRoute?) {
+        dsdRate = stream.dsdRate
         converted = stream.kind != .original
         cut = stream.kind != .original && stream.cut == true
         lossless = stream.format.lossless
@@ -87,6 +97,8 @@ public struct PhoneSignal: Equatable, Sendable {
 
     /// "24/96", "16/44.1", or "48 kHz" for lossy audio.
     public var streamFormat: String {
+        // DoP frames are 24-bit samples at the carrier rate only as packaging: the song is DSD.
+        if let dsdRate { return DoPGate.name(dsdRate: dsdRate) }
         let rate = Self.kilohertz(streamRate)
         return bitDepth.map { "\($0)/\(rate)" } ?? "\(rate) kHz"
     }
@@ -106,11 +118,16 @@ import VespertineChannels
 public final class PhoneRemote {
     public let playback: PhonePlayback
     /// Where the sound goes (the app keeps it current from the audio session).
-    public var route: PhoneRoute? { didSet { applySurround() } }
+    public var route: PhoneRoute? { didSet { applySurround(); if route != oldValue { playback.outputChanged() } } }
     /// The Mac's name, for "Waiting for … to connect" while a song waits for it.
     public var macName: String?
     /// The device's own volume, 0…1, when known (the app keeps it current): shown, never changed from here.
-    public var outputVolume: Double?
+    public var outputVolume: Double? { didSet { if outputVolume != oldValue { playback.outputChanged() } } }
+    /// The DACs whose DoP test you answered (the app keeps them between launches).
+    public var dopDACs = DoPDACs() { didSet { if dopDACs != oldValue { onDoPDACsChanged?(dopDACs); playback.outputChanged() } } }
+    @ObservationIgnored public var onDoPDACsChanged: ((DoPDACs) -> Void)?
+    /// The highest carrier rate the output takes DoP at right now, or nil (`DoPGate.ceiling`).
+    public var dopCeiling: Double? { DoPGate.ceiling(route: route, volume: outputVolume, dacs: dopDACs) }
     /// How you want surround songs played; the output decides what it gets (`PhoneRoute.surroundMode`).
     public var surroundChoice: SpatialModeChoice = .headTracked { didSet { applySurround() } }
 
@@ -140,6 +157,12 @@ public final class PhoneRemote {
         self.playback = playback
         self.library = library
         playback.maxSampleRate = { [weak self] in self?.route?.conversionCap }
+        playback.dop.ceiling = { [weak self] in self?.dopCeiling }
+        playback.dop.rate = { [weak self] in self?.route?.sampleRate }
+        playback.dop.declined = { [weak self] carrier in
+            guard let self, let uid = route?.uid else { return }
+            dopDACs.declined(carrier, uid: uid)
+        }
         applySurround()
     }
 

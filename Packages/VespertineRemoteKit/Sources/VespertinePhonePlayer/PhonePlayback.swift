@@ -20,6 +20,14 @@ public struct PhoneStreamClient: Sendable {
     public var isConnected: @Sendable @MainActor () -> Bool
     /// Opens a song to keep in its smaller form (lossless files above `maxSampleRate` converted down to it). nil: as `open`.
     public var openSmaller: (@Sendable (_ song: Int64, _ maxSampleRate: Double) async -> RemoteReply)?
+    /// Opens a song for a DAC that takes DoP up to the carrier rate `dop` (a DSD song may then arrive as DoP frames). nil: as `open`.
+    public var openDoP: (@Sendable (_ song: Int64, _ maxSampleRate: Double?, _ dop: Double) async -> RemoteReply)?
+
+    /// `open`, or `openDoP` when `dop` is given and this Mac can be asked.
+    func open(song: Int64, maxSampleRate: Double?, dop: Double?) async -> RemoteReply {
+        if let dop, let openDoP { return await openDoP(song, maxSampleRate, dop) }
+        return await open(song, maxSampleRate)
+    }
 
     public init(open: @escaping @Sendable (Int64, Double?) async -> RemoteReply,
                 read: @escaping @Sendable (Int, Int64, Int) async throws -> StreamFrame,
@@ -41,7 +49,24 @@ public struct PhoneStreamClient: Sendable {
                   close: { [weak session] stream in _ = await session?.send(.streamClose(stream: stream)) },
                   isConnected: { [weak session] in session?.isConnected ?? false })
         openSmaller = { [weak session] song, rate in await session?.send(.streamOpen(id: song, maxSampleRate: rate, smaller: true)) ?? .failed(reason: "") }
+        openDoP = { [weak session] song, rate, dop in await session?.send(.streamOpen(id: song, maxSampleRate: rate, dop: dop)) ?? .failed(reason: "") }
     }
+}
+
+/// The phone's output, as far as sending it DSD as DoP goes. Left as it is, nothing is ever asked for as DoP.
+public struct DoPOutput {
+    /// The highest carrier rate the output takes DoP at right now; nil when it takes none (`DoPGate.ceiling`).
+    public var ceiling: @MainActor () -> Double? = { nil }
+    /// The rate the output runs at now.
+    public var rate: @MainActor () -> Double? = { nil }
+    /// Asks the output to run at `carrier` before a song starts, and says whether it does.
+    public var bring: @MainActor (_ carrier: Double) async -> Bool = { _ in false }
+    /// The output wouldn't run at `carrier`: told so it isn't asked again.
+    public var declined: @MainActor (_ carrier: Double) -> Void = { _ in }
+
+    public init() {}
+
+    @MainActor func runs(at carrier: Double) -> Bool { rate().map { abs($0 - carrier) < 0.5 } ?? false }
 }
 
 @MainActor
@@ -104,6 +129,8 @@ public final class PhonePlayback {
     }
     /// What this phone's output can use right now (48000 for AirPods; a USB DAC's top rate): the Mac caps conversions at it.
     @ObservationIgnored public var maxSampleRate: @MainActor () -> Double? = { nil }
+    /// What the output takes as DoP (the app's audio session answers).
+    @ObservationIgnored public var dop = DoPOutput()
     /// How far past the listener to fetch (nil: the whole song, which then stays on the phone for the next play).
     @ObservationIgnored public var readAhead: Int64?
     /// How often the place in the song is read while playing.
@@ -178,7 +205,7 @@ public final class PhonePlayback {
         if let entry = queue.jump(to: entry) { start(entry) }
     }
 
-    private func start(_ entry: PhoneQueue.Entry, playing: Bool = true) {
+    private func start(_ entry: PhoneQueue.Entry, playing: Bool = true, at seconds: Double = 0) {
         loading?.cancel()
         following?.cancel()
         player.halt()
@@ -188,15 +215,28 @@ public final class PhonePlayback {
         followingEntry = nil
         stream = nil
         notice = nil
-        place(0)
+        place(seconds)
         release(keeping: [entry.id])
         loading = Task { [weak self] in
             guard let self else { return }
             do {
-                let opened = try await opened(entry)
+                var opened = try await opened(entry)
                 guard !Task.isCancelled, nowPlaying?.id == entry.id else { return }
+                // DoP frames are DSD only on an output that runs at their rate: it is asked first, and if it won't, the
+                // song is asked for again as PCM. Nothing of it is played in between.
+                if opened.descriptor.dsdRate != nil {
+                    let carrier = opened.descriptor.format.sampleRate
+                    let ready = dop.ceiling() != nil ? await dop.bring(carrier) : false
+                    guard !Task.isCancelled, nowPlaying?.id == entry.id else { return }
+                    if !ready {
+                        if dop.ceiling() != nil { dop.declined(carrier) }
+                        drop(entry.id)
+                        opened = try await self.opened(entry, plain: true)
+                        guard !Task.isCancelled, nowPlaying?.id == entry.id else { return }
+                    }
+                }
                 stream = opened.descriptor
-                player.start(item(entry, opened), playing: startsPlaying)
+                player.start(item(entry, opened), playing: startsPlaying, at: seconds)
                 prepareFollowing(after: entry.id)
                 startTicker()
             } catch is CancellationError {
@@ -214,7 +254,8 @@ public final class PhonePlayback {
     }
 
     /// The stream for `entry`: the one already open, or a new one (asking again while the Mac converts).
-    private func opened(_ entry: PhoneQueue.Entry) async throws -> Open {
+    /// `ahead`: the song is opened while another plays. `plain`: never as DoP.
+    private func opened(_ entry: PhoneQueue.Entry, ahead: Bool = false, plain: Bool = false) async throws -> Open {
         if let have = open[entry.id] { return have }
         if let running = opening[entry.id] { return try await running.value }
         guard let song = entry.track.id else { throw Failure.notInLibrary }
@@ -225,7 +266,8 @@ public final class PhonePlayback {
         }
         let task = Task { [weak self] () throws -> Open in
             guard let self else { throw CancellationError() }
-            let descriptor = try await openStream(song: song, entry: entry.id)
+            let ceiling = plain ? nil : (ahead ? DoPGate.aheadCeiling(ceiling: dop.ceiling(), outputRate: dop.rate()) : dop.ceiling())
+            let descriptor = try await openStream(song: song, entry: entry.id, dop: ceiling)
             let client = self.client
             let number = descriptor.stream
             // Nobody wants it any more (another song was chosen while the Mac was opening this one): give it back.
@@ -235,7 +277,8 @@ public final class PhonePlayback {
             }
             try FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
             let name = "\(song)-\(descriptor.tag.prefix(16)).\(descriptor.format.container)"
-            let line = StreamLine(client: client, song: song, descriptor: descriptor, maxSampleRate: maxSampleRate(), patience: patience)
+            let line = StreamLine(client: client, song: song, descriptor: descriptor, maxSampleRate: maxSampleRate(),
+                                  dop: descriptor.dsdRate != nil ? descriptor.format.sampleRate : nil, patience: patience)
             await line.onWaiting { [weak self] waiting in Task { @MainActor in self?.lineWaits(waiting) } }
             let source = try StreamSource(descriptor: descriptor, file: cacheDirectory.appendingPathComponent(name),
                                           read: { offset, length in try await line.read(offset: offset, length: length) }, readAhead: readAhead)
@@ -251,14 +294,14 @@ public final class PhonePlayback {
         return result
     }
 
-    private func openStream(song: Int64, entry: String) async throws -> StreamDescriptor {
+    private func openStream(song: Int64, entry: String, dop: Double? = nil) async throws -> StreamDescriptor {
         let deadline = ContinuousClock.now + preparingTimeout
         defer { if preparing?.entry == entry { preparing = nil } }
         while true {
             try Task.checkCancellation()
             if let reason = holdReason() { throw Failure.held(reason) }
             try await waitForMac()
-            switch await client.open(song, maxSampleRate()) {
+            switch await client.open(song: song, maxSampleRate: maxSampleRate(), dop: dop) {
             case .streamOpened(let descriptor): return descriptor
             case .streamPreparing(let progress):
                 if nowPlaying?.id == entry { preparing = (entry, progress) }
@@ -293,7 +336,13 @@ public final class PhonePlayback {
             return
         }
         following = Task { [weak self] in
-            guard let self, let opened = try? await opened(next), !Task.isCancelled else { return }
+            guard let self, var opened = try? await opened(next, ahead: true), !Task.isCancelled else { return }
+            // DoP frames at another rate than the output runs at would be played as noise while the rate changed: PCM then.
+            if opened.descriptor.dsdRate != nil, !dop.runs(at: opened.descriptor.format.sampleRate) || dop.ceiling() == nil {
+                drop(next.id)
+                guard let plain = try? await self.opened(next, ahead: true, plain: true), !Task.isCancelled else { return }
+                opened = plain
+            }
             guard queue.following(after: id)?.id == next.id else { return }
             followingEntry = next.id
             player.setFollowing(item(next, opened))
@@ -319,6 +368,39 @@ public final class PhonePlayback {
             stream.stream?.close()
             received += stream.stream?.bufferedBytes ?? 0
             if let line = stream.line { Task { await line.close() } }
+        }
+    }
+
+    /// Closes one entry's stream.
+    private func drop(_ entry: String) {
+        opening[entry]?.cancel()
+        guard let stream = open[entry] else { return }
+        open[entry] = nil
+        stream.stream?.close()
+        received += stream.stream?.bufferedBytes ?? 0
+        if let line = stream.line { Task { await line.close() } }
+    }
+
+    /// The output changed (another one, another rate, the volume). A song that is here as DoP frames is DSD only while the
+    /// output takes DoP and runs at its rate: when it no longer does, the song is asked for again as PCM and carries on
+    /// from where it was; one only lined up to follow is lined up again.
+    public func outputChanged() {
+        // A song being started checks for itself (`start`), and changes the output's rate while it does.
+        guard loading == nil else { return }
+        func broken(_ entry: String?) -> Bool {
+            guard let entry, let descriptor = open[entry]?.descriptor, descriptor.dsdRate != nil else { return false }
+            return dop.ceiling() == nil || !dop.runs(at: descriptor.format.sampleRate)
+        }
+        if broken(nowPlaying?.id) || (decoding != nowPlaying?.id && broken(decoding)) {
+            guard let entry = nowPlaying else { return }
+            let seconds = livePosition, playing = staysPlaying
+            for id in [entry.id, decoding, followingEntry].compactMap({ $0 }) where open[id]?.descriptor.dsdRate != nil { drop(id) }
+            start(entry, playing: playing, at: seconds)
+        } else if broken(followingEntry), let anchor = decoding ?? nowPlaying?.id {
+            player.setFollowing(nil)
+            if let entry = followingEntry { drop(entry) }
+            followingEntry = nil
+            prepareFollowing(after: anchor)
         }
     }
 

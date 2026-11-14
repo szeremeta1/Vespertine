@@ -7,6 +7,7 @@ import SwiftUI
 import UIKit
 import VespertineRemoteClient
 import VespertineRemoteProtocol
+import VespertineShare
 
 struct RootView: View {
     @Environment(RemoteAppModel.self) private var model
@@ -37,6 +38,8 @@ struct MacsView: View {
     @State private var scanning = false
     @State private var connection: SavedPairing?
     @State private var showingSettings = false
+    @State private var addingShare = false
+    @State private var editingShare: SavedShare?
 
     var body: some View {
         NavigationStack {
@@ -74,6 +77,24 @@ struct MacsView: View {
                         }
                     }
                 }
+                if !model.shares.isEmpty {
+                    Section("Your Shares") {
+                        ForEach(model.shares) { share in
+                            HStack(spacing: 4) {
+                                Button { model.choose(share) } label: { ShareRow(share: share) }
+                                    .buttonStyle(.plain)
+                                Button { editingShare = share } label: {
+                                    Image(systemName: "info.circle").font(.title3)
+                                }
+                                .buttonStyle(.borderless)
+                                .accessibilityLabel(Text("Settings for “\(share.name)”"))
+                            }
+                            .swipeActions {
+                                Button("Forget", role: .destructive) { model.forget(share) }
+                            }
+                        }
+                    }
+                }
                 Section {
                     let unpaired = model.unpairedMacs
                     if unpaired.isEmpty {
@@ -93,6 +114,14 @@ struct MacsView: View {
                 }
                 if let error = model.pairingError {
                     Section { Text(error).foregroundStyle(.red) }
+                }
+                Section {
+                    Button { addingShare = true } label: { Label("Add an SMB Share", systemImage: "externaldrive.badge.plus") }
+                        .accessibilityIdentifier("add-share")
+                } header: {
+                    Text("Play Without a Mac")
+                } footer: {
+                    Text("Music in a shared folder on a NAS or another computer plays on this device by itself, with no Mac running. Away from home, the share is reached over Tailscale or another VPN.")
                 }
                 Section {
                     Button { model.tryDemo() } label: { Label("Try the Demo", systemImage: "play.rectangle") }
@@ -126,6 +155,8 @@ struct MacsView: View {
             .sheet(item: $pairing) { mac in CodeEntryView(mac: mac) }
             .sheet(item: $connection) { saved in MacConnectionView(serverID: saved.serverID) }
             .sheet(isPresented: $showingSettings) { SettingsView() }
+            .sheet(isPresented: $addingShare) { ShareEditView() }
+            .sheet(item: $editingShare) { ShareEditView(editing: $0) }
             .sheet(isPresented: $scanning) {
                 PairingScannerSheet { link in
                     scanning = false
@@ -135,6 +166,7 @@ struct MacsView: View {
             .onAppear {
                 if model.startScreen == "connection" { connection = model.pairings.last; model.startScreen = nil }
                 if model.startScreen == "settings" { showingSettings = true; model.startScreen = nil }
+                if model.startScreen == "addShare" { addingShare = true; model.startScreen = nil }
             }
         }
     }

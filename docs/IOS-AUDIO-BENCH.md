@@ -19,7 +19,7 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B5 | Spatial double-processing check | not run | | | |
 | B6 | DSD 5.1 from the Mac | not run | | | |
 | B7 | USB DAC: rates and the label | not run | | | |
-| B8 | USB DAC: bit-exactness (needs a loopback or a DAC with a bit-perfect light) | not run | | | |
+| B8 | USB DAC: DSD as DoP, and bit-exactness | not run | | | |
 | B9 | Away from home: Tailscale on cellular | not run | | | |
 | B10 | Wi-Fi to cellular handover, Mac restart | not run | | | |
 | B11 | Keep on This Device, airplane mode | not run | | | |
@@ -87,10 +87,28 @@ MAC**, all six channels placed as in B4. Play it again: it should start at once 
    its own output (L, R, C, LFE, then the back pair). On a stereo DAC the same song is folded to stereo.
 8. Unplug the DAC mid-song: expect a pause, and silence from the phone's speaker. Plug it back in: still paused until Play.
 
-## B8. Bit-exactness (when a way to measure exists)
+## B8. DSD as DoP, and bit-exactness (10 min)
 
-Needs a DAC with a bit-perfect indicator (or a digital loopback into a recorder) and the test files in `docs/fixtures`. Until this is
-run, the phone shows no "bit-perfect" badge anywhere, and must not.
+Needs a DAC that shows what it is receiving (a DSD light or a display). Volume at 100% on the phone; turn the amplifier or the DAC's own
+knob down first.
+
+1. With the DAC never tested: play a DSD64 song. Expect **CONVERTED ON THE MAC** and PCM on the DAC's display. Nowhere "DoP".
+2. Output › Play DSD natively? › Test DoP. Expect the music to stop, about five seconds of a soft chord, then "Did you hear music or
+   hiss?". Note what the DAC's display showed during the sound (DSD64, or PCM 176.4), and what you heard.
+3. Answer what you heard. After Music: play the DSD64 song again. Expect **NATIVE DSD · DoP**, the DAC showing DSD64, Output showing
+   Song DSD64, DoP 176.4 kHz, Output runs at 176.4 kHz, Resampled by iOS No. Any hiss or noise at any point is a FAIL: note when.
+4. Let two DSD64 songs of one album play through: no click, no burst of noise and no drop out of DSD between them.
+5. Seek, pause and resume in a DSD song: note any click or noise.
+6. Turn the phone's volume down one step mid-song: expect a short gap, then the song carrying on from the same place as PCM
+   (**CONVERTED ON THE MAC**, the chip showing the volume). Never noise. Back at 100%, the next DSD song is DoP again.
+7. Play a DSD128 song on a DAC that stops at 192 kHz: expect PCM (the carrier would be 352.8), with no noise before it starts.
+8. Unplug the DAC mid-DSD-song: a pause, silence from the speaker. Plug another DAC in: it is not sent DoP until it passes its own test.
+9. On a DAC that does not take DoP: run the test, expect a quiet hiss or silence, answer Hiss. DSD stays PCM; "DoP stays off for this DAC."
+10. Test with the volume below 100%: expect "The test needs the volume at 100%." and no sound.
+
+Bit-exactness of PCM is a separate measurement (a DAC with a bit-perfect light, or a digital loopback into a recorder, and the files in
+`docs/fixtures`). A DAC playing the DoP test as music has received those frames exactly, at 176.4 kHz and 100% volume; that says
+nothing about other rates or volumes. Until PCM is measured, the phone shows no "bit-perfect" badge anywhere, and must not.
 
 ## B9. Away from home (5 min, plus a 30 min listen)
 
