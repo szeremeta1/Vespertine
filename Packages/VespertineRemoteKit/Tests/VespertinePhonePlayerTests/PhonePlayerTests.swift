@@ -55,6 +55,12 @@ private func makeFile(seconds: Double, rate: Double = 44_100, channels: Int = 2)
     return out
 }
 
+/// The largest difference between two signals (1 when their lengths differ).
+private func worst(_ a: [Float], _ b: [Float]) -> Float {
+    guard a.count == b.count else { return 1 }
+    return zip(a, b).map { abs($0 - $1) }.max() ?? 0
+}
+
 /// Waits (on the main actor, letting its tasks run) until `condition` holds.
 @MainActor private func wait(_ seconds: Double = 5, until condition: () -> Bool) async throws {
     let deadline = Date().addingTimeInterval(seconds)
@@ -174,8 +180,11 @@ private final class SlowMac: @unchecked Sendable {
         try await wait { scheduled == ["b"] && player.decodedAhead > 0.749 }
         #expect(player.currentID == "a")
         let out = try render(engine, frames: a[0].count + b[0].count)
-        #expect(out[0] == a[0] + b[0], "the second song's first sample comes right after the first song's last")
-        #expect(out[1] == a[1] + b[1])
+        // The files are 24-bit, so what comes out is the tones to within a 24-bit step; a sample too many or too few at the
+        // join would put the second tone out of place by far more than that.
+        #expect(out[0].count == a[0].count + b[0].count)
+        #expect(worst(out[0], a[0] + b[0]) < 1e-6, "the second song's first sample comes right after the first song's last")
+        #expect(worst(out[1], a[1] + b[1]) < 1e-6)
         player.tick()
         #expect(advanced == ["b"] && player.currentID == "b")
         #expect(abs(player.duration - 0.25) < 0.001)
@@ -214,7 +223,7 @@ private final class SlowMac: @unchecked Sendable {
         try player.play()
         #expect(player.state == .playing)
         let again = try render(engine, frames: 1_000)
-        #expect(again[0] == Array(planes[0].prefix(1_000)))
+        #expect(worst(again[0], Array(planes[0].prefix(1_000))) < 1e-6)
     }
 
     @Test func aStreamStartsPlayingBeforeItHasAllArrived() async throws {
