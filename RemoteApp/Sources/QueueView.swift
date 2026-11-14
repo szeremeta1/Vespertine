@@ -14,7 +14,7 @@ struct QueueView: View {
     var body: some View {
         NavigationStack {
             List {
-                if let queue = session.queue {
+                if let queue = session.shownQueue {
                     if let current = queue.current {
                         Section("Now Playing") { row(current) }
                     }
@@ -51,7 +51,7 @@ struct QueueView: View {
                 ToolbarItem(placement: .topBarLeading) { EditButton() }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Clear") { feedback.run(session, .clearUpcoming) }
-                        .disabled((session.queue?.playingNext.isEmpty ?? true) && (session.queue?.continuing.isEmpty ?? true))
+                        .disabled((session.shownQueue?.playingNext.isEmpty ?? true) && (session.shownQueue?.continuing.isEmpty ?? true))
                 }
             }
             .feedback(feedback)

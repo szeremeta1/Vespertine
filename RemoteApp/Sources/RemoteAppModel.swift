@@ -7,7 +7,6 @@ import Network
 import Observation
 import SwiftUI
 import UIKit
-import VespertinePhonePlayer
 import VespertineRemoteClient
 import VespertineRemoteProtocol
 
@@ -16,17 +15,6 @@ final class RemoteAppModel {
     let discovery = RemoteDiscovery()
     private(set) var pairings: [SavedPairing]
     private(set) var session: RemoteSession?
-    /// "Play on this phone" (M3, behind `PhonePlayerFlag`: off unless turned on, so the app stays a remote): made for the
-    /// current session when the flag is on and the Mac speaks protocol 2. Nothing in the screens uses it yet.
-    @ObservationIgnored private var phone: (session: ObjectIdentifier, playback: PhonePlayback)?
-    @MainActor var phonePlayback: PhonePlayback? {
-        guard PhonePlayerFlag.isEnabled(), let session, session.canStream else { return nil }
-        if let phone, phone.session == ObjectIdentifier(session) { return phone.playback }
-        let caches = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first ?? FileManager.default.temporaryDirectory
-        let playback = PhonePlayback(session: session, player: PhonePlayer(), cacheDirectory: caches.appendingPathComponent("Streams", isDirectory: true))
-        phone = (ObjectIdentifier(session), playback)
-        return playback
-    }
     /// A pairing link opened from the Camera app or scanned, waiting for its Mac to show up on Bonjour.
     var pendingLink: PairingLink?
     /// What went wrong with the last pairing attempt, for the pairing screen.
@@ -74,6 +62,7 @@ final class RemoteAppModel {
     // MARK: Choosing a Mac
 
     func choose(_ pairing: SavedPairing) {
+        PlayTarget.shared.leave()
         session?.close()
         let serverID = pairing.serverID
         let session = RemoteSession(pairing: pairing, clientName: deviceName, routes: { [weak self] in
@@ -88,6 +77,7 @@ final class RemoteAppModel {
 
     /// Tries the remote on a pretend Mac inside the app (no network, no sound). Not saved as a pairing.
     func tryDemo() {
+        PlayTarget.shared.leave()
         session?.close()
         let pairing = SavedPairing(serverID: DemoMac.serverID, name: String(localized: "Demo Mac"), device: "demo", key: Data())
         // One pretend Mac for the whole demo, so the queue survives the app going to the background and back.
@@ -100,6 +90,7 @@ final class RemoteAppModel {
 
     /// Back to the list of Macs.
     func leave() {
+        PlayTarget.shared.leave()
         session?.close()
         session = nil
         artwork.session = nil
@@ -258,7 +249,8 @@ final class RemoteAppModel {
             discovery.start()
             session?.connect()
         case .background:
-            session?.suspend()
+            // Music playing on this device needs its songs from the Mac: the connection stays while it plays.
+            if !PlayTarget.shared.isBusy { session?.suspend() }
             discovery.stop()
         default:
             break

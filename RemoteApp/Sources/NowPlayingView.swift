@@ -15,7 +15,7 @@ struct NowPlayingView: View {
     @State private var feedback = CommandFeedback()
     @State private var scrubbing: Double?
 
-    private var player: PlayerState? { session.player }
+    private var player: PlayerState? { session.shownPlayer }
 
     var body: some View {
         GeometryReader { geometry in
@@ -268,6 +268,9 @@ struct NowPlayingView: View {
     @ViewBuilder private var volume: some View {
         if let volume = player?.volume {
             switch volume.route {
+            case .fixed where session.phone != nil:
+                Label("Use the volume buttons on this device.", systemImage: "speaker.wave.2")
+                    .font(.caption).foregroundStyle(Palette.text2)
             case .fixed:
                 Label("Fixed volume: set the level on your amplifier or DAC", systemImage: "speaker.slash")
                     .font(.caption).foregroundStyle(Palette.text2)

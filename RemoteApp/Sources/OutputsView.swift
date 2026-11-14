@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import VespertinePhonePlayer
 import VespertineRemoteClient
 import VespertineRemoteProtocol
 
@@ -18,8 +19,31 @@ struct OutputsView: View {
         NavigationStack {
             List {
                 Section {
+                    Button { PlayTarget.shared.choose(thisDevice: true) } label: {
+                        HStack {
+                            Image(systemName: UIDevice.current.userInterfaceIdiom == .pad ? "ipad" : "iphone")
+                                .frame(width: 28)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(PlayTarget.deviceName)
+                                Text(hereDetail).font(.caption).foregroundStyle(Color.secondary)
+                            }
+                            Spacer()
+                            if playsHere { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!PlayTarget.shared.canPlayHere(session))
+                    .accessibilityAddTraits(playsHere ? .isSelected : [])
+                } footer: {
+                    Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched.")
+                }
+                Section {
                     ForEach(Array((session.outputs?.outputs ?? []).enumerated()), id: \.offset) { _, output in
-                        Button { feedback.run(session, .selectOutput(uid: output.uid)) } label: {
+                        Button {
+                            PlayTarget.shared.choose(thisDevice: false)
+                            feedback.run(session, .selectOutput(uid: output.uid))
+                        } label: {
                             HStack {
                                 Image(systemName: icon(output.kind))
                                     .frame(width: 28)
@@ -28,14 +52,14 @@ struct OutputsView: View {
                                     Text(output.detail).font(.caption.monospaced()).foregroundStyle(output.ready ? Color.secondary : Color.orange)
                                 }
                                 Spacer()
-                                if output.selected { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
+                                if output.selected, !playsHere { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
                             }
                             .contentShape(Rectangle())
                         }
                         .buttonStyle(.plain)
                     }
                 } footer: {
-                    Text("Vespertine on the Mac plays to the output you choose here.")
+                    Text("Choose one of these and Vespertine on the Mac plays there.")
                 }
                 Section {
                     LabeledContent("Mac", value: session.server?.name ?? session.pairing.name)
@@ -65,6 +89,16 @@ struct OutputsView: View {
             .sheet(isPresented: $editingConnection) { MacConnectionView(serverID: session.pairing.serverID) }
             .sheet(isPresented: $showingSettings) { SettingsView() }
         }
+    }
+
+    private var playsHere: Bool { session.phone != nil }
+
+    /// Under "This iPhone": where its sound goes now, or why it can't play here.
+    private var hereDetail: String {
+        if session.isDemo { return String(localized: "Not in the demo") }
+        guard session.canStream else { return String(localized: "Update Vespertine on the Mac to play here.") }
+        guard let route = session.phone?.route else { return String(localized: "Plays through this device") }
+        return route.sampleRate > 0 ? "\(route.name) · \(PhoneSignal.kilohertz(route.sampleRate)) kHz" : route.name
     }
 
     /// How the Mac is reached now.

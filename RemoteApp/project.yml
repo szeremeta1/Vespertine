@@ -14,7 +14,7 @@ settings:
   base:
     SWIFT_VERSION: "6.0"
     MARKETING_VERSION: "1.0"
-    CURRENT_PROJECT_VERSION: "4"
+    CURRENT_PROJECT_VERSION: "5"
 targets:
   VespertineRemote:
     type: application
@@ -38,6 +38,8 @@ targets:
         LSRequiresIPhoneOS: true
         UIRequiresFullScreen: false
         ITSAppUsesNonExemptEncryption: false
+        # "This iPhone" in Output: music keeps playing with the screen locked or another app in front.
+        UIBackgroundModes: [audio]
         UILaunchScreen:
           UIColorName: LaunchBackground
         UIApplicationSceneManifest:

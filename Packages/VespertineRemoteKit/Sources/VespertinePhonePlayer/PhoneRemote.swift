@@ -82,9 +82,14 @@ public final class PhoneRemote {
     public let playback: PhonePlayback
     /// Where the sound goes (the app keeps it current from the audio session).
     public var route: PhoneRoute?
-    /// The badge's words for a signal ("ORIGINAL FILE", "CONVERTED ON THE MAC"…), in the app's language.
-    @ObservationIgnored public var badge: (PhoneSignal) -> String = { _ in "" }
+    /// A signal in the app's language: the badge ("ORIGINAL FILE", "CONVERTED ON THE MAC"…) and what the output runs at
+    /// ("48 kHz", or that iOS resampled to it).
+    @ObservationIgnored public var words: (PhoneSignal) -> (badge: String, output: String) = { signal in
+        ("", signal.outputRate.map { PhoneSignal.kilohertz($0) + " kHz" } ?? "")
+    }
     @ObservationIgnored private let library: @MainActor (RemoteCommand) async -> RemoteReply
+    /// Called with each transport command you give (play, pause, stop…), before it acts: the system glue listens.
+    @ObservationIgnored public var onTransport: ((RemoteCommand) -> Void)?
 
     /// `library`: asks the Mac (which songs an album holds, songs by ID).
     public init(playback: PhonePlayback, library: @escaping @MainActor (RemoteCommand) async -> RemoteReply) {
@@ -107,6 +112,10 @@ public final class PhoneRemote {
     }
 
     public func run(_ command: RemoteCommand) async -> RemoteReply {
+        switch command {
+        case .playPause, .play, .pause, .stop: onTransport?(command)
+        default: break
+        }
         switch command {
         case .playPause: playback.playPause()
         case .play: playback.resume()
@@ -179,7 +188,10 @@ public final class PhoneRemote {
         let state = playback.player.state
         let waiting = state == .loading || playback.preparing != nil || playback.player.isBuffering || (playback.isPlaying && state == .idle)
         let value: PlaybackValue = entry == nil ? .stopped : (playback.isPlaying ? .playing : (state == .idle ? .stopped : .paused))
-        let summary = signal.map { SignalSummary(bitPerfect: false, badge: badge($0), deviceFormat: $0.outputRate.map { PhoneSignal.kilohertz($0) + " kHz" } ?? "", exclusive: false) }
+        let summary = signal.map { signal -> SignalSummary in
+            let said = words(signal)
+            return SignalSummary(bitPerfect: false, badge: said.badge, deviceFormat: said.output, exclusive: false)
+        }
         return PlayerState(playback: value, loading: waiting, nowPlaying: entry.map { NowPlaying(entry: $0.id, track: $0.track) },
                            position: playback.position, positionAt: Date(), duration: playback.duration,
                            shuffle: playback.queue.shuffle, repeatMode: playback.queue.repeatMode, signal: summary, output: route?.name,

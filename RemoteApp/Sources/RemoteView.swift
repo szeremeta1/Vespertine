@@ -170,7 +170,7 @@ struct MiniPlayer: View {
     @State private var feedback = CommandFeedback()
 
     var body: some View {
-        if let track = session.player?.nowPlaying?.track {
+        if let track = session.shownPlayer?.nowPlaying?.track {
             HStack(spacing: 12) {
                 Button(action: open) {
                     HStack(spacing: 12) {
@@ -187,10 +187,10 @@ struct MiniPlayer: View {
                 .accessibilityLabel(Text("Now Playing: \(track.title), \(track.artist)"))
                 .accessibilityHint(Text("Opens Now Playing"))
                 Button { feedback.run(session, .playPause) } label: {
-                    Image(systemName: session.player?.playback == .playing ? "pause.fill" : "play.fill")
+                    Image(systemName: session.shownPlayer?.playback == .playing ? "pause.fill" : "play.fill")
                         .font(.title3).frame(width: 44, height: 44).contentShape(Rectangle())
                 }
-                .accessibilityLabel(session.player?.playback == .playing ? Text("Pause") : Text("Play"))
+                .accessibilityLabel(session.shownPlayer?.playback == .playing ? Text("Pause") : Text("Play"))
                 Button { feedback.run(session, .next) } label: {
                     Image(systemName: "forward.fill").font(.body).frame(width: 44, height: 44).contentShape(Rectangle())
                 }
@@ -206,7 +206,7 @@ struct MiniPlayer: View {
             .frame(maxWidth: 760)
             .padding(.horizontal, 10).padding(.bottom, 6)
             .frame(maxWidth: .infinity)
-            .sensoryFeedback(.impact(weight: .light), trigger: session.player?.playback)
+            .sensoryFeedback(.impact(weight: .light), trigger: session.shownPlayer?.playback)
         }
     }
 }
@@ -216,8 +216,8 @@ private struct MiniProgress: View {
 
     var body: some View {
         TimelineView(.periodic(from: .now, by: 1)) { context in
-            let duration = max(session.player?.duration ?? 0, 0)
-            let position = session.player?.expectedPosition(at: context.date) ?? 0
+            let duration = max(session.shownPlayer?.duration ?? 0, 0)
+            let position = session.shownPlayer?.expectedPosition(at: context.date) ?? 0
             GeometryReader { geometry in
                 Capsule().fill(Palette.brass)
                     .frame(width: duration > 0 ? geometry.size.width * min(1, position / duration) : 0, height: 1.5)
@@ -326,7 +326,7 @@ final class CommandFeedback {
 
     func run(_ session: RemoteSession, _ command: RemoteCommand) {
         Task {
-            if case .failed(let reason) = await session.send(command), !reason.isEmpty {
+            if case .failed(let reason) = await session.run(command), !reason.isEmpty {
                 message = reason
                 try? await Task.sleep(for: .seconds(4))
                 if message == reason { message = nil }
