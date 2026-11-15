@@ -171,27 +171,26 @@ private func level(_ samples: [Float]) -> Float {
     }
 
     /// Two channels of 24-bit samples that no processing could leave alone by luck: every sample differs, the top byte
-    /// alternates the way DoP's markers do, and the rate is whatever the caller says (a DoP carrier, a CD).
+    /// alternates the way DoP's markers do, and the rate is whatever the caller says (a CD's, a DoP carrier's). The WAV is
+    /// written byte by byte: Apple's writer won't make one above 192 kHz.
     private func exactFile(rate: Double, frames: Int = 8_192) throws -> (url: URL, planes: [[Float]]) {
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent("exact-\(UUID()).wav")
-        let settings: [String: Any] = [AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: rate, AVNumberOfChannelsKey: 2,
-                                       AVLinearPCMBitDepthKey: 24, AVLinearPCMIsFloatKey: false, AVLinearPCMIsBigEndianKey: false]
-        let file = try AVAudioFile(forWriting: url, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
-        let buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: AVAudioFrameCount(frames))!
-        buffer.frameLength = AVAudioFrameCount(frames)
+        func little<T: FixedWidthInteger>(_ value: T) -> Data { withUnsafeBytes(of: value.littleEndian) { Data($0) } }
+        var samples = Data(capacity: frames * 6)
         var planes: [[Float]] = [[], []]
-        for c in 0..<2 {
-            for i in 0..<frames {
+        for i in 0..<frames {
+            for c in 0..<2 {
                 // 0x05 and 0xFA in the top byte, as DoP frames carry, over sixteen bits that change every sample.
                 let marker: Int32 = i % 2 == 0 ? 0x05 : 0xFA
                 let word = (marker << 16) | Int32((i &* 40_503 &+ c &* 977) & 0xFFFF)
-                let signed = word >= 0x80_0000 ? word - 0x100_0000 : word
-                let sample = Float(signed) / 8_388_608
-                buffer.floatChannelData![c][i] = sample
-                planes[c].append(sample)
+                samples.append(contentsOf: [UInt8(word & 0xFF), UInt8((word >> 8) & 0xFF), UInt8((word >> 16) & 0xFF)])
+                planes[c].append(Float(word >= 0x80_0000 ? word - 0x100_0000 : word) / 8_388_608)
             }
         }
-        try file.write(from: buffer)
+        var wav = Data("RIFF".utf8) + little(UInt32(36 + samples.count)) + Data("WAVEfmt ".utf8)
+        wav += little(UInt32(16)) + little(UInt16(1)) + little(UInt16(2)) + little(UInt32(rate)) + little(UInt32(rate) * 6)
+        wav += little(UInt16(6)) + little(UInt16(24)) + Data("data".utf8) + little(UInt32(samples.count)) + samples
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("exact-\(UUID()).wav")
+        try wav.write(to: url)
         return (url, planes)
     }
 
