@@ -16,7 +16,8 @@ import VespertineStreamServer
 extension Track {
     /// This song as the stream channel plans it.
     var streamFacts: StreamSourceFacts? {
-        guard let id else { return nil }
+        // A song on a music server has no file here to send on.
+        guard let id, !isStreamed else { return nil }
         let ext = (filePath as NSString).pathExtension.lowercased()
         let disc = sacdArea != nil || dvdStream != nil || audioStream != nil
         return StreamSourceFacts(id: id, url: fileURL, fileExtension: ext, codec: codec, isDSD: isDSD, isLossless: isLossless, sampleRate: sampleRate,

@@ -14,7 +14,7 @@ struct GenresView: View {
     var body: some View {
         let filter = model.filter(scope)
         let genres = model.genres(filter)
-        let total = model.library.genres.count
+        let total = model.libraryGenreCount
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 PageHeader(title: String(localized: "Genres"),

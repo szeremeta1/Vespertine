@@ -106,7 +106,8 @@ final class AnalysisQueue {
     /// Analyzes these tracks next (e.g. the one shown in the inspector), ahead of background work.
     func analyzeNow(_ tracks: [Track]) {
         var seen = Set<String>()
-        let files = tracks.filter { $0.isLossless && !$0.isDSD && seen.insert($0.filePath).inserted }
+        // A song on a music server has no file to read: only files are analyzed.
+        let files = tracks.filter { $0.isLossless && !$0.isDSD && !$0.isStreamed && seen.insert($0.filePath).inserted }
         guard !files.isEmpty else { return }
         // Those already queued move to the front; they're in the batch's count already.
         let added = files.count { !active.contains($0.filePath) && !pendingPaths.contains($0.filePath) }
@@ -123,7 +124,7 @@ final class AnalysisQueue {
     /// Analyzes the songs of a selection that have no current result, ahead of background work; a selection that is
     /// all analyzed already is analyzed again (it was asked for). A single song is always analyzed again.
     func analyze(_ tracks: [Track]) {
-        let files = tracks.filter { $0.isLossless && !$0.isDSD }
+        let files = tracks.filter { $0.isLossless && !$0.isDSD && !$0.isStreamed }
         guard files.count > 1 else { analyzeNow(files); return }
         let ids = Set(files.compactMap(\.id)), database = library.database, generation = generation
         Task { [weak self] in

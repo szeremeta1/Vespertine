@@ -53,6 +53,9 @@ public struct SignalPath: Sendable, Hashable {
     /// A network renderer (UPnP AV / OpenHome) plays the song: what Vespertine sent it. When set it decides the badge, and the
     /// path is never `isBitPerfect` (that is a claim about what the DAC receives, which can't be read back from a renderer).
     public var renderer: RendererStage? = nil
+    /// The song came from a music server that sent something other than the file it lists (it converted it on the way). What
+    /// Vespertine was handed is then not the original, so the path is never `isBitPerfect`, however cleanly it plays from here.
+    public var convertedByServer = false
 
     /// What Vespertine sends a network renderer.
     public struct RendererStage: Sendable, Hashable {
@@ -169,6 +172,7 @@ public struct SignalPath: Sendable, Hashable {
     /// The samples Vespertine produced are the file's: bit-perfect at the device, or the original bytes of a lossless or DSD file
     /// sent to a network renderer. The interface's brass styling follows this; the BIT-PERFECT claim itself is `isBitPerfect`.
     public var isUntouched: Bool {
+        if convertedByServer { return false }
         if let renderer { return renderer.passesThrough && source.encoding != .lossy }
         return isBitPerfect
     }
@@ -227,7 +231,7 @@ public struct SignalPath: Sendable, Hashable {
 
     /// True only when every sample reaches the DAC unaltered.
     public var isBitPerfect: Bool {
-        if renderer != nil { return false }
+        if renderer != nil || convertedByServer { return false }
         if let group { return groupIsBitPerfect(group) }
         guard transition?.audible != true, !faderRamping, foldedOnto == nil, deviceProfile.canBeBitPerfect, applied.physicalFormatKnown, applied.exclusive || !otherAppsPlaying, !modifiesSamples,
               plan.spatial == .off, concealedFrames == 0, plan.channels == source.channels, applied.virtualChannels >= source.channels
@@ -258,6 +262,7 @@ public struct SignalPath: Sendable, Hashable {
 
     /// One-line state for badges and the menu bar (in the current language; English without a string table).
     public var statusLine: String {
+        if convertedByServer, transition?.audible != true { return Self.convertedByServerBadge }
         if let renderer { return renderer.badge(source: source) }
         if let transition, transition.audible { return transition.badge }
         if let group {
@@ -303,6 +308,11 @@ public struct SignalPath: Sendable, Hashable {
         if modifiesSamples || faderRamping { return String(localized: "DIGITAL GAIN", comment: "Status badge (short, uppercase).") }
         if !applied.physicalFormatKnown { return String(localized: "FORMAT UNCONFIRMED", comment: "Status badge (short, uppercase).") }
         return String(localized: "CONVERTED", comment: "Status badge (short, uppercase).")
+    }
+
+    /// The badge of a song its music server converted before sending.
+    public static var convertedByServerBadge: String {
+        String(localized: "CONVERTED BY THE SERVER", comment: "Status badge (short, uppercase): the music server sent a converted (transcoded) stream, not the file it lists, so the song is not called bit-perfect.")
     }
 
     /// The notice for DSD played as PCM. "DSD" stays untranslated.

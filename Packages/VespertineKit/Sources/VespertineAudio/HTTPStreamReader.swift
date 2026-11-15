@@ -232,15 +232,20 @@ public final class HTTPStreamReader: NSObject, RemoteCacheReader, URLSessionData
         /// How long one request may go without a byte before it is made again.
         public var idleTimeout: TimeInterval
         public var notAnsweringMessage: String?
+        /// How long a listener waits with nothing from the server before the song is given up (nil: the playback cache's limit).
+        /// With it, a server that can't be reached when the song is opened is "not answering" too, so playback stops there
+        /// instead of trying each song after it.
+        public var silenceLimit: TimeInterval?
         /// The file extension to go by when the bytes don't say (from the media type a control app named).
         public var fallbackExtension: String?
 
         public init(policy: StreamAddressPolicy = .fromTheNetwork, headers: [String: String] = [:], idleTimeout: TimeInterval = 15,
-                    notAnsweringMessage: String? = nil, fallbackExtension: String? = nil) {
+                    notAnsweringMessage: String? = nil, silenceLimit: TimeInterval? = nil, fallbackExtension: String? = nil) {
             self.policy = policy
             self.headers = headers
             self.idleTimeout = idleTimeout
             self.notAnsweringMessage = notAnsweringMessage
+            self.silenceLimit = silenceLimit
             self.fallbackExtension = fallbackExtension
         }
     }
@@ -254,6 +259,16 @@ public final class HTTPStreamReader: NSObject, RemoteCacheReader, URLSessionData
     /// The media type the server gave for the stream, in lower case without parameters.
     public let mediaType: String?
     public let notAnsweringMessage: String?
+    public var silenceLimit: TimeInterval? { options.silenceLimit }
+    public var quietFor: TimeInterval? { lock.withLock { max(0, uptime() - lastByteAt) } }
+    /// When the server last sent a byte of the song (on `uptime`). An error page is not the song. Under `lock`.
+    private var lastByteAt = ProcessInfo.processInfo.systemUptime
+    /// Under `lock`.
+    private var uptime: @Sendable () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }
+    /// Tests count the server's silence on a clock of their own, from now.
+    func countSilence(on clock: @escaping @Sendable () -> TimeInterval) {
+        lock.withLock { uptime = clock; lastByteAt = clock() }
+    }
     private let options: Options
     private var session: URLSession!
     private let head: Data
@@ -284,7 +299,7 @@ public final class HTTPStreamReader: NSObject, RemoteCacheReader, URLSessionData
         configuration.urlCache = nil
         configuration.httpCookieStorage = nil
         configuration.httpShouldSetCookies = false
-        configuration.timeoutIntervalForRequest = options.idleTimeout
+        configuration.timeoutIntervalForRequest = options.silenceLimit.map { min($0, options.idleTimeout) } ?? options.idleTimeout
         configuration.httpMaximumConnectionsPerHost = 4
         configuration.waitsForConnectivity = false
         (size, fileExtension, mediaType, head) = try Probe(url: url, options: options, configuration: configuration).run()
@@ -387,7 +402,11 @@ public final class HTTPStreamReader: NSObject, RemoteCacheReader, URLSessionData
     }
 
     public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
-        guard let state = lock.withLock({ pending[dataTask.taskIdentifier] }) else { return }
+        guard let state = lock.withLock({ () -> Pending? in
+            let state = pending[dataTask.taskIdentifier]
+            if state?.response?.statusCode == 206 { lastByteAt = uptime() }
+            return state
+        }) else { return }
         state.data.append(data)
         // More than was asked for: a server that ignores the end of the range.
         if state.data.count > state.wanted { dataTask.cancel() }
@@ -433,7 +452,7 @@ public final class HTTPStreamReader: NSObject, RemoteCacheReader, URLSessionData
         func run() throws -> (Int64, String, String?, Data) {
             let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
             defer { session.invalidateAndCancel() }
-            var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: options.idleTimeout)
+            var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: configuration.timeoutIntervalForRequest)
             for (name, value) in options.headers { request.setValue(value, forHTTPHeaderField: name) }
             request.setValue("bytes=0-\(HTTPStreamReader.probeBytes - 1)", forHTTPHeaderField: "Range")
             request.setValue("identity", forHTTPHeaderField: "Accept-Encoding")
@@ -443,7 +462,13 @@ public final class HTTPStreamReader: NSObject, RemoteCacheReader, URLSessionData
             if wholeBodyTooLong {
                 throw response?.expectedContentLength ?? -1 < 0 ? StreamRefusal.unknownLength : StreamRefusal.noRanges
             }
-            if let error { throw StreamRefusal.unreachable(error.localizedDescription) }
+            if let error {
+                // A server that is not there (refused, timed out, no route) is the same silence as one that stops mid-song.
+                if options.silenceLimit != nil, let gone = error as? URLError, HTTPStreamReader.isTransient(gone) {
+                    throw NetworkPlaybackCache.Failure.notAnswering(options.notAnsweringMessage)
+                }
+                throw StreamRefusal.unreachable(error.localizedDescription)
+            }
             guard let response else { throw StreamRefusal.unreachable(URLError(.badServerResponse).localizedDescription) }
             let type = response.value(forHTTPHeaderField: "Content-Type")?.split(separator: ";").first
                 .map { $0.trimmingCharacters(in: .whitespaces).lowercased() }

@@ -159,7 +159,8 @@ struct ContentRouter: View {
         let searching = !model.searchText.trimmingCharacters(in: .whitespaces).isEmpty
         let path = model.path
         Group {
-            if model.library.stats.tracks == 0 && model.library.scanProgress == nil && model.library.sources.isEmpty && !searching {
+            if model.library.stats.tracks == 0 && model.library.scanProgress == nil && model.library.sources.isEmpty
+                && model.library.streamedAccounts.isEmpty && !searching {
                 EmptyLibraryView()
             } else {
                 ZStack {

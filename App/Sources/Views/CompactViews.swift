@@ -350,6 +350,8 @@ struct LibrarySettings: View {
                     Button("Connect to Server…") { openWindow(id: "main"); model.showConnectServer = true }
                 }
             }
+            // Music servers sit with the other places music comes from, under the folders and network shares.
+            StreamingSettingsSection()
             Section("Importing") {
                 Picker("When adding music", selection: $s.defaultImportMode) {
                     Text("Reference files in place").tag(ImportMode.reference)

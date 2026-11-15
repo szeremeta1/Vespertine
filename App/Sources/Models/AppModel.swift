@@ -8,6 +8,7 @@ import CoreAudio
 import VespertineAirPlay
 import VespertineAudio
 import VespertineLibrary
+import VespertineStreaming
 import VespertineUPnP
 import Observation
 import SwiftUI
@@ -191,6 +192,9 @@ final class AppModel {
     private(set) var airPlay: AirPlayOutputModel?
     /// This Mac as a UPnP receiver for control apps; nil unless the Settings switch (Receive from Other Apps (beta)) is on.
     private(set) var receiver: ReceiverModel?
+    /// Music servers. Always there, and does nothing while every provider's switch is off: no provider is made, nothing is
+    /// sent and no Keychain item is read (see StreamingModel).
+    let streaming: StreamingModel
     /// Mac Sound Output (beta): speaker groups published as outputs of the Mac.
     let systemOutput: SystemOutputModel
     let library: LibraryStore
@@ -285,7 +289,9 @@ final class AppModel {
         filtersURL = isolated ? nil : FilterStore.url(in: settings.dataDirectory)
         systemOutput = SystemOutputModel(isolated: arguments.string(forKey: "VespertineDataDirectory") != nil)
         if let filtersURL { filters = FilterStore.load(from: filtersURL) }
-        library = try LibraryStore(dataDirectory: settings.dataDirectory, automaticScanning: { [weak settings] in settings?.watchFolders ?? false })
+        // Which streaming providers are on is known before the library is first read: one that is off is in no list.
+        library = try LibraryStore(dataDirectory: settings.dataDirectory, automaticScanning: { [weak settings] in settings?.watchFolders ?? false },
+                                   shownProviders: StreamingModel.enabled(in: settings.store))
         showSetup = Self.needsSetup(settings: settings, library: library, arguments: arguments)
         devices = DeviceStore()
         loopback = LoopbackTest(dataDirectory: settings.dataDirectory)
@@ -294,6 +300,14 @@ final class AppModel {
         // the relay can take them as they are.
         DeviceRestore.afterCrash()
         player = PlayerController(library: library, settings: settings, shares: shares)
+        // A QA run that signs in to a test server by itself (`-VespertineStreamingDemo`) keeps its made-up sign-in in memory:
+        // the listener's Keychain is not touched.
+        let demoServer = arguments.string(forKey: "VespertineStreamingDemo") != nil
+        streaming = StreamingModel(library: library, defaults: settings.store, player: player,
+                                   credentials: demoServer ? MemoryCredentialStore() : KeychainCredentialStore())
+        player.streamedSongPlayed = { [weak streaming = self.streaming] track, date in streaming?.played(track, at: date) }
+        player.serverUnanswered = { [weak streaming = self.streaming] in streaming?.unanswered($0) }
+        player.serverAnswered = { [weak streaming = self.streaming] in streaming?.answered($0) }
         visualizer = VisualizerModel(engine: player.engine)
         dopSetup = DoPSetupModel(settings: settings, player: player)
         remote = RemoteServer(store: RemoteStore(dataDirectory: settings.dataDirectory))
@@ -849,6 +863,8 @@ final class AppModel {
 
     private func setFavorite(_ favorite: Bool, trackIDs: [Int64], undoManager: UndoManager?) {
         library.setFavorite(favorite, trackIDs: trackIDs)
+        // A song on a music server is starred there too, while its provider is on.
+        if streaming.anyOn { streaming.favoriteChanged(favorite, tracks: library.tracks(ids: trackIDs).filter(\.isStreamed)) }
         guard let undoManager else { return }
         undoManager.registerUndo(withTarget: self) { model in
             MainActor.assumeIsolated { model.setFavorite(!favorite, trackIDs: trackIDs, undoManager: undoManager) }
@@ -885,7 +901,9 @@ final class AppModel {
     }
 
     func showInFinder(_ tracks: [Track]) {
-        NSWorkspace.shared.activateFileViewerSelecting(tracks.map(\.fileURL))
+        // A song on a music server has no file to show.
+        let files = tracks.filter { !$0.isStreamed }.map(\.fileURL)
+        if !files.isEmpty { NSWorkspace.shared.activateFileViewerSelecting(files) }
     }
 
     func presentImporter(_ mode: ImportMode) {
