@@ -68,6 +68,9 @@ final class FakeRenderer: @unchecked Sendable {
     /// The next call of `action` fails with UPnP error `code`.
     func fail(_ action: String, code: Int, times: Int = 1) { lock.withLock { failures[action] = (code, times) } }
 
+    /// How many of the failures set for `action` are still to come.
+    func pendingFailures(_ action: String) -> Int { lock.withLock { failures[action]?.times ?? 0 } }
+
     /// The bytes fetched from `uri` once the fetch is complete (waits up to 10 s).
     func fetched(_ uri: String) async -> Data? {
         for _ in 0..<500 {

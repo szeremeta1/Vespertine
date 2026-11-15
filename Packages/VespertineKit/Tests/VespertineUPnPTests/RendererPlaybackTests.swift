@@ -62,14 +62,15 @@ struct Harness {
     let events: EventLog
     let queue: [PlayableItem]
 
-    static func make(kind: FakeRenderer.Kind, files: Int = 3, startTimeout: TimeInterval = 15, lostAfter: TimeInterval = 0.3) async throws -> Harness {
+    static func make(kind: FakeRenderer.Kind, files: Int = 3, startTimeout: TimeInterval = 15, lostAfter: TimeInterval = 0.3,
+                     now: @escaping @Sendable () -> Date = { Date() }) async throws -> Harness {
         let fake = try await FakeRenderer(kind: kind)
         let media = MediaServer()
         try await media.start()
         let device = try await RendererDevice.load(location: fake.location)
         let queue = try (0..<files).map { PlayableItem(url: try makeWAV(seed: $0 + 1)) }
         let playback = RendererPlayback(renderer: device, transport: try device.makeTransport(), media: media, pollInterval: 0.05,
-                                        startTimeout: startTimeout, lostAfter: lostAfter)
+                                        startTimeout: startTimeout, lostAfter: lostAfter, now: now)
         let items = Locked(queue)
         playback.nextItemProvider = { finished in
             let q = items.withLock { $0 }
@@ -180,12 +181,27 @@ struct RendererPlaybackTests {
 
     @Test("A moment without an answer isn't a lost renderer: the song is kept and plays on")
     func briefSilence() async throws {
-        let h = try await Harness.make(kind: .openHome, lostAfter: 30)
+        // Nothing here is timed. The clock the renderer is judged lost by is the test's and stands still, and the test waits
+        // for the polls themselves: all six refused ones, then answered ones after them. The only clock left is a patience
+        // that ends a run which never gets there; it decides nothing, so a slow machine cannot fail this.
+        let clock = Locked(Date(timeIntervalSince1970: 1_000_000))
+        let h = try await Harness.make(kind: .openHome, lostAfter: 30, now: { clock.withLock { $0 } })
         defer { h.close() }
         h.playback.play(h.queue[0])
         #expect(await h.events.wait(for: "started"))
         h.fake.fail("TransportState", code: 501, times: 6)
-        try await Task.sleep(for: .milliseconds(800))
+        let patience = Date().addingTimeInterval(120)
+        func wait(_ what: String, _ done: () -> Bool) async throws {
+            while !done() {
+                try #require(Date() < patience, "never saw \(what)")
+                try await Task.sleep(for: .milliseconds(5))
+            }
+        }
+        // The six refusals have all been met by polls...
+        try await wait("the six refused polls") { h.fake.pendingFailures("TransportState") == 0 }
+        // ...and, the poll that met the last of them over, two more have run (the second began after the answers came back).
+        let met = h.playback.pollsFinished
+        try await wait("polls answered after the refusals") { h.playback.pollsFinished >= met + 2 }
         #expect(!h.events.all.contains { $0.hasPrefix("lost") })
         #expect(h.playback.snapshot.state == .playing)
         #expect(h.playback.snapshot.item?.id == h.queue[0].id)

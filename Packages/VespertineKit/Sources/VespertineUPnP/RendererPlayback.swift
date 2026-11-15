@@ -109,11 +109,18 @@ public final class RendererPlayback: @unchecked Sendable {
     let startTimeout: TimeInterval
     /// Status polls failing for this long (and at least three times) mean the renderer is gone.
     let lostAfter: TimeInterval
+    /// The clock `lostAfter` is judged by (a test moves its own, so a slow machine cannot decide whether a renderer is lost).
+    let now: @Sendable () -> Date
+    /// How many polls have been run to their end, answered or not (a test waits for polls instead of for time).
+    private let pollsFinishedCount = Locked(0)
+    var pollsFinished: Int { pollsFinishedCount.withLock { $0 } }
 
     enum Command { case play(PlayableItem, at: TimeInterval, announce: Bool, generation: Int), pause, resume, seek(TimeInterval), stop, queueChanged, settings(RendererSettings), poll }
 
     public init(renderer: RendererDevice, transport: any RendererTransport, media: MediaServer, processed: (any ProcessedStreamMaking)? = nil,
-                pollInterval: TimeInterval = 0.5, startTimeout: TimeInterval = 15, lostAfter: TimeInterval = 10) {
+                pollInterval: TimeInterval = 0.5, startTimeout: TimeInterval = 15, lostAfter: TimeInterval = 10,
+                now: @escaping @Sendable () -> Date = { Date() }) {
+        self.now = now
         self.startTimeout = startTimeout
         self.lostAfter = lostAfter
         self.renderer = renderer
@@ -281,6 +288,7 @@ public final class RendererPlayback: @unchecked Sendable {
                 // Let go of (the output changed) before this poll's turn came: nothing more is asked of the renderer.
                 let skip = state.withLock { s -> Bool in s.pollQueued = false; return s.shutDown }
                 if !skip { await poll() }
+                pollsFinishedCount.withLock { $0 += 1 }
             }
         } catch {
             let item = state.withLock { $0.current?.item ?? $0.snapshot.item }
@@ -547,13 +555,13 @@ public final class RendererPlayback: @unchecked Sendable {
         do { status = try await transport.status() } catch {
             // Gone once it has failed to answer for a while, not at a moment's trouble on the network: it may well be
             // playing on, and letting go of its songs would cut them off.
-            let lostAfter = self.lostAfter
+            let lostAfter = self.lostAfter, now = self.now
             let lost = state.withLock { s -> Bool in
                 s.failedPolls += 1
                 s.anchor = nil
-                let since = s.failingSince ?? Date()
+                let since = s.failingSince ?? now()
                 s.failingSince = since
-                return s.failedPolls >= 3 && Date().timeIntervalSince(since) >= lostAfter
+                return s.failedPolls >= 3 && now().timeIntervalSince(since) >= lostAfter
             }
             if lost {
                 let old = state.withLock { s -> [Entry] in
