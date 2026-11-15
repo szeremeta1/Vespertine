@@ -54,12 +54,20 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 
 ## B4. Surround on AirPods Max (5 min)
 
+0. On a fresh install (or after deleting the app), Output › Surround on Headphones reads **Off**, and a 5.1 song shows the badge
+   **SURROUND FOLDED TO STEREO**: the spatial rendering is asked for, never the starting point. A choice made in an earlier build
+   is kept. On iOS 17 the picker offers Off and Fixed only (the mixer can't follow the head before iOS 18).
 1. AirPods Max on, Output › Surround on Headphones: **Head Tracked**. Play the channel-identification file (5.1, then 7.1).
 2. Each voice should come from its speaker's direction: left surround behind-left, and so on. LFE is heard, not placed.
 3. Turn your head: the scene should stay put. Badge: **SPATIAL AUDIO · HEAD TRACKED**.
 4. Choose **Fixed**: the scene turns with your head. Badge: **SPATIAL AUDIO · FIXED**.
 5. Choose **Off**: every voice is still heard, in plain stereo. Badge: **SURROUND FOLDED TO STEREO**.
 6. On the phone's own speaker and over AirPlay: every voice heard, folded to stereo.
+7. With Head Tracked chosen, open Control Center, long-press the volume slider and turn the AirPods' Spatial Audio off, then on.
+   Output › What Reaches the Output › **Surround on Headphones** and the badge should follow: Fixed while it is off, Head Tracked
+   again when it is on, without changing songs.
+8. A stereo album and (on a DAC that passed the DoP test) a DSD album, with Head Tracked still chosen: badges **ORIGINAL FILE** and
+   **NATIVE DSD · DoP**, never a SPATIAL AUDIO badge. Two-channel songs don't go through the spatial mixer whatever is chosen.
 
 ## B5. Double processing (3 min)
 

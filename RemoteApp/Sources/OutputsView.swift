@@ -38,10 +38,15 @@ struct OutputsView: View {
                     .disabled(!PlayTarget.shared.canPlayHere(session))
                     .accessibilityAddTraits(playsHere ? .isSelected : [])
                     if playsHere {
-                        Picker("Surround on Headphones", selection: Binding(get: { PlayTarget.shared.surround }, set: { PlayTarget.shared.surround = $0 })) {
+                        // Head Tracked chosen on a system that can't do it is shown as what plays: Fixed.
+                        Picker("Surround on Headphones", selection: Binding(get: {
+                            PlayTarget.surroundChoices.contains(PlayTarget.shared.surround) ? PlayTarget.shared.surround : .fixed
+                        }, set: { PlayTarget.shared.surround = $0 })) {
                             Text("Off").tag(SpatialModeChoice.off)
                             Text("Fixed").tag(SpatialModeChoice.fixed)
-                            Text("Head Tracked").tag(SpatialModeChoice.headTracked)
+                            if PlayTarget.surroundChoices.contains(.headTracked) {
+                                Text("Head Tracked").tag(SpatialModeChoice.headTracked)
+                            }
                         }
                     }
                 } footer: {

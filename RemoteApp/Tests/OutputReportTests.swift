@@ -56,4 +56,34 @@ import VespertineRemoteProtocol
         #expect(rows.first { $0.label == "Output’s channels" }?.value == "6")
         #expect(rows.first { $0.label == "Song’s channels" }?.value == "6")
     }
+
+    // MARK: Surround on headphones: asked for, and named as what plays
+
+    @Test func someoneWhoNeverChoseGetsNoSpatialRendering() {
+        #expect(PlayTarget.surround(stored: nil) == .off)
+        #expect(PlayTarget.surround(stored: "nonsense") == .off)
+        // A choice made before this was Off by default is kept.
+        #expect(PlayTarget.surround(stored: "headTracked") == .headTracked)
+        #expect(PlayTarget.surround(stored: "fixed") == .fixed)
+    }
+
+    @Test func theOutputScreenNamesWhatIsDoneToASurroundSongOnHeadphones() {
+        let pods = PhoneRoute(name: "AirPods Max", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true)
+        var said = signal(rate: 48_000, channels: 6, route: pods)
+        said.surround = .fixed
+        #expect(PlayTarget.badge(said) == "SPATIAL AUDIO · FIXED")
+        #expect(PlayTarget.report(said, route: pods).first { $0.label == "Surround on Headphones" }?.value == "Fixed")
+        said.surround = .headTracked
+        #expect(PlayTarget.report(said, route: pods).first { $0.label == "Surround on Headphones" }?.value == "Head Tracked")
+        said.surround = .off
+        #expect(PlayTarget.badge(said) == "SURROUND FOLDED TO STEREO")
+        #expect(PlayTarget.report(said, route: pods).first { $0.label == "Surround on Headphones" }?.value == "Off")
+        // A two-channel song has no such row: nothing is done to it.
+        #expect(!PlayTarget.report(signal(rate: 48_000, route: pods), route: pods).contains { $0.label == "Surround on Headphones" })
+        // Nor has a speaker, where surround is always folded.
+        let speaker = PhoneRoute(name: "Speaker", portType: "Speaker", sampleRate: 48_000, channels: 2, spatial: false)
+        var folded = signal(rate: 48_000, channels: 6, route: speaker)
+        folded.surround = .off
+        #expect(!PlayTarget.report(folded, route: speaker).contains { $0.label == "Surround on Headphones" })
+    }
 }

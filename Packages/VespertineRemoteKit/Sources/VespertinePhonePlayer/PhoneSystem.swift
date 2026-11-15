@@ -70,6 +70,10 @@ public final class PhoneSystem {
             }
             Task { @MainActor in self?.routeChanged(reason) }
         })
+        // Spatial Audio switched on or off for the headphones in Control Center: whether they follow your head changed.
+        observers.append(Self.observe(AVAudioSession.spatialPlaybackCapabilitiesChangedNotification, session) { [weak self] _, _, _ in
+            Task { @MainActor in self?.refreshRoute() }
+        })
         observers.append(Self.observe(AVAudioSession.mediaServicesWereResetNotification, session) { [weak self] _, _, _ in
             Task { @MainActor in self?.outputChanged() }
         })
