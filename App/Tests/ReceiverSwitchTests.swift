@@ -134,6 +134,46 @@ struct ReceiverSwitchTests {
         #expect(scratch.player.receiverEvents == nil)
     }
 
+    @Test("Turned off in Settings while a control app's song plays: the song stops, the listener's queue is back, and the port is closed")
+    func offWhileAControlAppPlays() async throws {
+        let scratch = try scratch()
+        defer { clean(scratch) }
+        let player = scratch.player
+        player.play(scratch.album, startAt: 1)
+        try report(.trackStarted(try #require(player.current).item), to: player)
+        let before = player.queue.map(\.id)
+        let wasAt = try #require(player.current?.id)
+
+        let model = try #require(ReceiverSwitch.apply(true, to: scratch.settings, current: nil, make: { self.model(scratch) }))
+        await model.settled()
+        #expect(model.status == .running)
+        let port = await model.port
+        #expect(answers(port))
+        let first = sent("Sent One")
+        player.receiverPlay(first, next: sent("Sent Two"), from: ReceiverControlApp(name: "TestControl", address: "192.0.2.7"))
+        try report(.trackStarted(first.item), to: player)
+        #expect(player.receiverSession != nil)
+        #expect(player.queue.allSatisfy { $0.received })
+
+        // The switch goes off with the song still playing: nothing of the control app's is left behind.
+        #expect(ReceiverSwitch.apply(false, to: scratch.settings, current: model, make: { self.model(scratch) }) == nil)
+        #expect(!scratch.settings.upnpReceiverFeature)
+        #expect(player.receiverSession == nil)
+        #expect(player.queue.map(\.id) == before, "the listener's queue is back, whole")
+        #expect(player.current?.id == wasAt, "at the song that was theirs")
+        #expect(player.queue.allSatisfy { !$0.received })
+        #expect(player.receiverEvents == nil)
+        await model.settled()
+        #expect(await model.port == 0)
+        // The close is asked for, then done: wait for the port to stop answering, however long that takes here.
+        var closed = false
+        for _ in 0..<3000 where !closed {
+            closed = !answers(port)
+            if !closed { try await Task.sleep(for: .milliseconds(10)) }
+        }
+        #expect(closed)
+    }
+
     @Test("The name control apps see is the listener's, or the app's and the computer's when none is given")
     func name() throws {
         let scratch = try scratch()

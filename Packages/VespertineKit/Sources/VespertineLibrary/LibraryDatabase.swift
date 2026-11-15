@@ -9,6 +9,8 @@ import VespertineAudio
 
 public final class LibraryDatabase: Sendable {
     public let writer: any DatabaseWriter
+    /// Which streaming providers' rows the queries below return (see `shownProviders`). Nil: every row, as before there were any.
+    let providersShown = Locked<Set<String>?>(nil)
 
     /// Opens (or creates) the library at `url`.
     public convenience init(url: URL) throws {
@@ -384,6 +386,28 @@ public final class LibraryDatabase: Sendable {
                   AND (lower(filePath) LIKE '%.mka' OR (json_valid(extraTags) AND json_extract(extraTags, '$.CUESHEET') IS NOT NULL))
                 """)
         }
+        m.registerMigration("v23-streamed") { db in
+            // Music servers (streaming providers). Only new, empty tables: a library with no server reads as before.
+            // A server account is a `source` row whose path is "vespertine-stream://<provider>/<account>"; its songs are `track`
+            // rows with no file (filePath empty, location "vespertine-stream://<provider>/<account>/<id>").
+            // What a server says of a song beyond its `track` row.
+            try db.create(table: "streamedTrack") { t in
+                t.primaryKey("trackId", .integer).references("track", onDelete: .cascade)
+                t.column("albumId", .text)
+                t.column("coverArt", .text)
+                t.column("suffix", .text)
+                // The song's format is only what its server lists: nobody has read the stream yet.
+                t.column("listed", .boolean).notNull().defaults(to: true)
+                // The stream last read was not the file the server lists (the server converted it). Null until one is read.
+                t.column("converted", .boolean)
+            }
+            // Which library playlist stands for which of a server's playlists.
+            try db.create(table: "streamedPlaylist") { t in
+                t.primaryKey("playlistId", .integer).references("playlist", onDelete: .cascade)
+                t.belongsTo("source", onDelete: .cascade).notNull()
+                t.column("remoteId", .text).notNull()
+            }
+        }
         return m
     }
 }
@@ -417,7 +441,7 @@ public extension LibraryDatabase {
                sum(CASE WHEN location LIKE '%#2ch-%' OR location LIKE '%#mch-%' THEN
                             CASE WHEN location = (SELECT min(image.location) FROM track AS image WHERE image.albumKey = track.albumKey
                                                   AND image.filePath = track.filePath AND image.isMissing = 0) THEN fileSize ELSE 0 END
-                        WHEN cueStartFrame IS NULL OR cueStartFrame = 0 THEN fileSize ELSE 0 END) AS totalSize, min(filePath) AS anyPath,
+                        WHEN cueStartFrame IS NULL OR cueStartFrame = 0 THEN fileSize ELSE 0 END) AS totalSize, min(nullif(filePath, '')) AS anyPath,
                vesperSort(min(albumArtistSortKey)) AS artistKey, vesperSort(min(albumSortKey)) AS titleKey,
                -- what filters look at: every value any track has (DSD counts as 1-bit; lossless PCM nobody analyzed yet as 'none')
                group_concat(DISTINCT replace(codec, ',', ' ') || ':' || isLossless || isDSD) AS kinds,
@@ -442,7 +466,9 @@ public extension LibraryDatabase {
         let bitrate: Double? = row["bitrate"]
         let maxChannels: Int = row["maxChannels"] ?? 2
         let rateText = rate.truncatingRemainder(dividingBy: 1000) == 0 ? String(Int(rate / 1000)) : String(format: "%.1f", rate / 1000)
-        let summary: String = if isDSD {
+        let summary: String = if rate <= 0 {
+            codec   // songs of a server that lists no rate
+        } else if isDSD {
             "DSD\(Int((rate / 44_100).rounded()))"
         } else if codecCount > 1 {
             // `codec` stays the "Mixed" sentinel (FormatMark checks it); the summary names it in the user's language.
@@ -489,36 +515,43 @@ public extension LibraryDatabase {
     }
 
     func albums(sort: AlbumSort = .artist) throws -> [Album] {
-        try writer.read { db in try Row.fetchAll(db, sql: Self.albumsSQL(sort: sort)).map(Self.album(from:)) }
+        try writer.read { db in try albums(db, sort: sort) }
+    }
+
+    /// The albums as one read of `db` sees them (the app's observations run this inside their own).
+    func albums(_ db: Database, sort: AlbumSort = .artist) throws -> [Album] {
+        try markingListedFormats(try Row.fetchAll(db, sql: Self.albumsSQL(sort: sort, filter: try visibleTracksClause(db))).map(Self.album(from:)), db)
     }
 
     func tracks(albumKey: String) throws -> [Track] {
         try writer.read { db in
-            Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE albumKey = ? AND isMissing = 0", arguments: [albumKey]))
+            Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE albumKey = ? AND isMissing = 0 AND \(try visibleTracksClause(db))",
+                                               arguments: [albumKey]))
         }
     }
 
     /// The tracks of one file (several when a CUE sheet splits it), in order.
     func tracks(filePath: String) throws -> [Track] {
         try writer.read { db in
-            Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE filePath = ? AND isMissing = 0", arguments: [filePath]))
+Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE filePath = ? AND isMissing = 0 AND \(try visibleTracksClause(db))",
+                                               arguments: [filePath]))
         }
     }
 
     /// The tracks of several albums in one read: album after album as given, each in its own order.
     func tracks(albumKeys: [String]) throws -> [Track] {
         guard !albumKeys.isEmpty else { return [] }
-        let found = try writer.read { db in try Self.tracks(db, albumKeys: albumKeys) }
+        let found = try writer.read { db in try tracks(db, albumKeys: albumKeys) }
         return Self.inAlbumOrder(found, albumKeys: albumKeys)
     }
 
-    private static func tracks(_ db: Database, albumKeys: [String]) throws -> [Track] {
+    private func tracks(_ db: Database, albumKeys: [String]) throws -> [Track] {
         var found: [Track] = []
         // A long list is read in parts (SQLite caps the number of arguments).
         for start in stride(from: 0, to: albumKeys.count, by: 900) {
             let part = Array(albumKeys[start..<min(start + 900, albumKeys.count)])
             let marks = Array(repeating: "?", count: part.count).joined(separator: ",")
-            found += try Track.fetchAll(db, sql: "SELECT * FROM track WHERE isMissing = 0 AND albumKey IN (\(marks))",
+            found += try Track.fetchAll(db, sql: "SELECT * FROM track WHERE isMissing = 0 AND albumKey IN (\(marks)) AND \(try visibleTracksClause(db))",
                                         arguments: StatementArguments(part))
         }
         return found
@@ -549,8 +582,8 @@ public extension LibraryDatabase {
 
     func albums(artist: String) throws -> [Album] {
         try writer.read { db in
-            try Row.fetchAll(db, sql: Self.albumsSQL(sort: .year, filter: "lower(coalesce(albumArtist, artist, 'Unknown Artist')) = lower(?)"),
-                             arguments: [artist]).map(Self.album(from:))
+            try markingListedFormats(try Row.fetchAll(db, sql: Self.albumsSQL(sort: .year, filter: "lower(coalesce(albumArtist, artist, 'Unknown Artist')) = lower(?) AND \(try visibleTracksClause(db))"),
+                                                      arguments: [artist]).map(Self.album(from:)), db)
         }
     }
 
@@ -558,21 +591,22 @@ public extension LibraryDatabase {
         let folder = URL(fileURLWithPath: path).resolvingSymlinksInPath().path
         let prefix = folder == "/" ? "/" : folder + "/"
         return try writer.read { db in
-            try Row.fetchAll(db, sql: Self.albumsSQL(sort: .artist, filter: "substr(filePath, 1, length(?)) = ?"),
+            try Row.fetchAll(db, sql: Self.albumsSQL(sort: .artist, filter: "substr(filePath, 1, length(?)) = ? AND \(try visibleTracksClause(db))"),
                              arguments: [prefix, prefix]).map(Self.album(from:))
         }
     }
 
     func allTracks() throws -> [Track] {
         try writer.read { db in
-            try Track.fetchAll(db, sql: "SELECT * FROM track WHERE isMissing = 0 ORDER BY vesperSort(albumArtistSortKey), vesperSort(albumSortKey), discNumber, trackNumber")
+            try Track.fetchAll(db, sql: "SELECT * FROM track WHERE isMissing = 0 AND \(try visibleTracksClause(db)) ORDER BY vesperSort(albumArtistSortKey), vesperSort(albumSortKey), discNumber, trackNumber")
         }
     }
 
     func tracks(ids: [Int64]) throws -> [Track] {
         try writer.read { db in
+            let hidden = try hiddenSourceIDs(db)
             let byID = Dictionary(uniqueKeysWithValues: try Track.fetchAll(db, keys: ids).compactMap { t in t.id.map { ($0, t) } })
-            return ids.compactMap { byID[$0] }
+            return ids.compactMap { byID[$0] }.filter { !hidden.contains($0.sourceId ?? -1) }
         }
     }
 
@@ -585,7 +619,7 @@ public extension LibraryDatabase {
         return try writer.read { db in
             try Track.fetchAll(db, sql: """
                 SELECT track.* FROM track JOIN trackFts ON trackFts.rowid = track.id
-                WHERE trackFts MATCH ? AND track.isMissing = 0 ORDER BY rank LIMIT ?
+                WHERE trackFts MATCH ? AND track.isMissing = 0 AND \(try visibleTracksClause(db)) ORDER BY rank LIMIT ?
                 """, arguments: [pattern, limit])
         }
     }
@@ -616,7 +650,7 @@ public extension LibraryDatabase {
         arguments += [limit]
         return try writer.read { db in
             try Track.fetchAll(db, sql: """
-                SELECT * FROM track WHERE isMissing = 0 AND \(Array(repeating: oneWord, count: words.count).joined(separator: " AND "))
+                SELECT * FROM track WHERE isMissing = 0 AND \(try visibleTracksClause(db)) AND \(Array(repeating: oneWord, count: words.count).joined(separator: " AND "))
                 ORDER BY vesperSort(albumArtistSortKey), vesperSort(albumSortKey), discNumber, trackNumber LIMIT ?
                 """, arguments: arguments)
         }
@@ -638,31 +672,39 @@ public extension LibraryDatabase {
     }
 
     func artists() throws -> [ArtistSummary] {
-        try writer.read { db in
-            try Row.fetchAll(db, sql: """
-                SELECT coalesce(albumArtist, artist, 'Unknown Artist') AS name, count(DISTINCT albumKey) AS albums,
-                       count(*) AS tracks, max(artworkKey) AS art
-                FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY vesperSort(min(albumArtistSortKey))
-                """).map { ArtistSummary(name: $0["name"], albumCount: $0["albums"], trackCount: $0["tracks"], artworkKey: $0["art"]) }
-        }
+        try writer.read { db in try artists(db) }
+    }
+
+    /// The artists as one read of `db` sees them.
+    func artists(_ db: Database) throws -> [ArtistSummary] {
+        try Row.fetchAll(db, sql: """
+            SELECT coalesce(albumArtist, artist, 'Unknown Artist') AS name, count(DISTINCT albumKey) AS albums,
+                   count(*) AS tracks, max(artworkKey) AS art
+            FROM track WHERE isMissing = 0 AND \(try visibleTracksClause(db)) GROUP BY lower(name) ORDER BY vesperSort(min(albumArtistSortKey))
+            """).map { ArtistSummary(name: $0["name"], albumCount: $0["albums"], trackCount: $0["tracks"], artworkKey: $0["art"]) }
     }
 
     func playlists() throws -> [Playlist] {
-        try writer.read { db in try Playlist.order(Column("sortIndex"), Column("name")).fetchAll(db) }
+        try writer.read { db in try playlists(db) }
+    }
+
+    /// The playlists as one read of `db` sees them: a music server's own only while its provider is on.
+    func playlists(_ db: Database) throws -> [Playlist] {
+        try Playlist.filter(sql: try visiblePlaylistsClause(db)).order(Column("sortIndex"), Column("name")).fetchAll(db)
     }
 
     func tracks(in playlist: Playlist) throws -> [Track] {
         try writer.read { db in
             if let rules = playlist.smartRules {
                 let (clause, args) = rules.sql()
-                var sql = "SELECT * FROM track WHERE isMissing = 0 AND (\(clause)) ORDER BY \(rules.orderBy)"
+                var sql = "SELECT * FROM track WHERE isMissing = 0 AND \(try visibleTracksClause(db)) AND (\(clause)) ORDER BY \(rules.orderBy)"
                 if let limit = rules.limit { sql += " LIMIT \(limit)" }
                 return try Track.fetchAll(db, sql: sql, arguments: args)
             }
             guard let id = playlist.id else { return [] }
             return try Track.fetchAll(db, sql: """
                 SELECT track.* FROM playlistItem JOIN track ON track.id = playlistItem.trackId
-                WHERE playlistItem.playlistId = ? AND track.isMissing = 0 ORDER BY playlistItem.position
+                WHERE playlistItem.playlistId = ? AND track.isMissing = 0 AND \(try visibleTracksClause(db)) ORDER BY playlistItem.position
                 """, arguments: [id])
         }
     }
@@ -692,7 +734,8 @@ public extension LibraryDatabase {
     func setPlaylistTracks(_ trackIDs: [Int64], playlistID: Int64) throws {
         try writer.write { db in
             let old = try Row.fetchAll(db, sql: """
-                SELECT playlistItem.trackId AS id, track.isMissing AS missing FROM playlistItem JOIN track ON track.id = playlistItem.trackId
+                SELECT playlistItem.trackId AS id, (track.isMissing OR NOT (\(try visibleTracksClause(db)))) AS missing
+                FROM playlistItem JOIN track ON track.id = playlistItem.trackId
                 WHERE playlistItem.playlistId = ? ORDER BY playlistItem.position
                 """, arguments: [playlistID])
             let shown = Dictionary(trackIDs.map { ($0, 1) }, uniquingKeysWith: +)
@@ -758,7 +801,7 @@ public extension LibraryDatabase {
             try Row.fetchAll(db, sql: """
                 SELECT playHistory.id AS historyId, playHistory.playedAt AS historyPlayedAt, track.*
                 FROM playHistory JOIN track ON track.id = playHistory.trackId
-                WHERE track.isMissing = 0 ORDER BY playHistory.playedAt DESC, playHistory.id DESC LIMIT ?
+                WHERE track.isMissing = 0 AND \(try visibleTracksClause(db)) ORDER BY playHistory.playedAt DESC, playHistory.id DESC LIMIT ?
                 """, arguments: [limit]).map { row in
                 HistoryEntry(id: row["historyId"], playedAt: row["historyPlayedAt"], track: try Track(row: row))
             }
@@ -785,7 +828,7 @@ public extension LibraryDatabase {
         try writer.read { db in
             try Track.fetchAll(db, sql: """
                 SELECT track.* FROM favorite JOIN track ON track.id = favorite.trackId
-                WHERE track.isMissing = 0 ORDER BY favorite.favoritedAt DESC, track.id
+                WHERE track.isMissing = 0 AND \(try visibleTracksClause(db)) ORDER BY favorite.favoritedAt DESC, track.id
                 """)
         }
     }
@@ -820,7 +863,7 @@ public extension LibraryDatabase {
         try writer.write { db in
             let rows = try Row.fetchAll(db, sql: """
                 SELECT track.albumKey AS album, favorite.trackId AS id, favorite.favoritedAt AS date, favorite.borrowed AS borrowed
-                FROM favorite JOIN track ON track.id = favorite.trackId WHERE track.isMissing = 0
+                FROM favorite JOIN track ON track.id = favorite.trackId WHERE track.isMissing = 0 AND \(try visibleTracksClause(db))
                 """)
             guard !rows.isEmpty else { return 0 }
             var dates: [Int64: Date] = [:], own: [Int64: Date] = [:], borrowed: Set<Int64> = []
@@ -831,7 +874,7 @@ public extension LibraryDatabase {
             }
             let albumKeys = Array(Set(rows.compactMap { $0["album"] as String? }))
             let choices = try Self.copyChoices(db)
-            let tracks = Self.inAlbumOrder(try Self.tracks(db, albumKeys: albumKeys), albumKeys: albumKeys)
+            let tracks = Self.inAlbumOrder(try self.tracks(db, albumKeys: albumKeys), albumKeys: albumKeys)
             var songs = 0
             for album in Dictionary(grouping: tracks, by: \.albumKey).values {
                 let bundled = (choices[album[0].albumKey] ?? (bundledByDefault ? .bundled : .automatic)) == .bundled
@@ -901,8 +944,14 @@ public extension LibraryDatabase {
         }
     }
 
+    /// The folders, drives and shares. A music server's account is none of them (see `streamedSources`).
     public func sources() throws -> [LibrarySource] {
-        try writer.read { db in try LibrarySource.order(Column("path")).fetchAll(db) }
+        try writer.read { db in try Self.sources(db) }
+    }
+
+    /// The folders, drives and shares as one read of `db` sees them.
+    static func sources(_ db: Database) throws -> [LibrarySource] {
+        try LibrarySource.filter(sql: "path NOT LIKE '\(StreamLocation.prefix)%'").order(Column("path")).fetchAll(db)
     }
 
     /// Adds a folder (or a single file) to the library, or returns the source that already covers it. A local folder
@@ -915,7 +964,8 @@ public extension LibraryDatabase {
             let canonical = source.url.resolvingSymlinksInPath().path
             let sources = try LibrarySource.fetchAll(db)
             var inside: [LibrarySource] = []
-            for existing in sources {
+            // A music server's account is no folder: nothing is inside it and it is inside nothing.
+            for existing in sources where !existing.isStreamed {
                 let path = existing.url.resolvingSymlinksInPath().path
                 if canonical == path || canonical.hasPrefix(path == "/" ? "/" : path + "/") { return existing }
                 if path.hasPrefix(canonical == "/" ? "/" : canonical + "/") {
@@ -1196,7 +1246,7 @@ public extension LibraryDatabase {
         try writer.read { db in
             let rows = try Track.fetchAll(db, sql: """
                 SELECT t.* FROM track t LEFT JOIN analysis a ON a.trackId = t.id LEFT JOIN transitionProfile p ON p.trackId = t.id
-                WHERE t.isMissing = 0 AND t.isLossless = 1 AND t.isDSD = 0
+                WHERE t.isMissing = 0 AND t.isLossless = 1 AND t.isDSD = 0 AND t.filePath != ''
                   AND (a.trackId IS NULL OR a.version < ? OR a.fileSize != t.fileSize OR a.modifiedAt != t.modifiedAt
                        OR (t.cueStartFrame IS NULL AND t.location = t.filePath
                            AND (p.trackId IS NULL OR p.version < ? OR p.fileSize != t.fileSize OR p.modifiedAt != t.modifiedAt)))
@@ -1233,14 +1283,20 @@ public extension LibraryDatabase {
         }
     }
 
-    func stats() throws -> Stats {
-        try writer.read { db in
-            let row = try Row.fetchOne(db, sql: """
-                SELECT count(DISTINCT albumKey) AS a, count(*) AS t, count(DISTINCT lower(coalesce(albumArtist, artist))) AS ar,
-                       coalesce((SELECT sum(size) FROM (SELECT max(fileSize) AS size FROM track WHERE isMissing = 0 GROUP BY filePath)), 0) AS b, coalesce(sum(duration), 0) AS d FROM track WHERE isMissing = 0
-                """)!
-            return Stats(albums: row["a"], tracks: row["t"], artists: row["ar"], bytes: row["b"], duration: row["d"])
-        }
+    func stats(filesOnly: Bool = false) throws -> Stats {
+        try writer.read { db in try stats(db, filesOnly: filesOnly)! }
+    }
+
+    /// The counts as one read of `db` sees them. The bytes are those of files: a song streamed from a server takes no room here.
+    /// `filesOnly` leaves a music server's songs out of the counts too: the Library's own lists show files, and a server's music
+    /// is under the server's entry.
+    func stats(_ db: Database, filesOnly: Bool = false) throws -> Stats? {
+        var visible = try visibleTracksClause(db)
+        if filesOnly { visible += " AND (sourceId IS NULL OR sourceId NOT IN (SELECT id FROM source WHERE path LIKE '\(StreamLocation.prefix)%'))" }
+        return try Row.fetchOne(db, sql: """
+            SELECT count(DISTINCT albumKey) AS a, count(*) AS t, count(DISTINCT lower(coalesce(albumArtist, artist))) AS ar,
+                   coalesce((SELECT sum(size) FROM (SELECT max(fileSize) AS size FROM track WHERE isMissing = 0 AND filePath != '' GROUP BY filePath)), 0) AS b, coalesce(sum(duration), 0) AS d FROM track WHERE isMissing = 0 AND \(visible)
+            """).map { Stats(albums: $0["a"], tracks: $0["t"], artists: $0["ar"], bytes: $0["b"], duration: $0["d"]) }
     }
 }
 

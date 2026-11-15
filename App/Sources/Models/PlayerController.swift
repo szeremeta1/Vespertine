@@ -7,6 +7,7 @@ import AppKit
 import MediaPlayer
 import VespertineAudio
 import VespertineLibrary
+import VespertineStreaming
 import VespertineUPnP
 import Observation
 
@@ -590,6 +591,12 @@ final class PlayerController {
     private func makeItem(_ track: Track, id: UUID = UUID(), transitions: TransitionOverride? = nil) -> PlayableItem {
         var context = Self.transitionContext(track)
         context.override = transitions
+        // A song on a music server has no file: the engine opens it by its own address, which names the provider, the account
+        // and the song and nothing else, and the streaming core hands over the bytes (see StreamingCore).
+        if let stream = track.streamRef {
+            return PlayableItem(id: id, url: stream.url, trackID: track.id, replayGainDB: replayGain(for: track),
+                                cacheKey: stream.cacheKey, context: context)
+        }
         return PlayableItem(id: id, url: track.fileURL, trackID: track.id, regionStartFrame: track.cueStartFrame,
                             regionFrameLength: track.cueFrameLength, replayGainDB: replayGain(for: track),
                             cacheKey: shares.isNetwork(track) && !track.isDVDFolderTrack ? NetworkCache.key(for: track) : nil,
@@ -989,7 +996,11 @@ final class PlayerController {
                 break
             }
             let track = failed?.track
-            if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
+            if let track, track.isStreamed {
+                // A song on a music server: there is no file to look for. The reason is the server's or the provider's. A server
+                // that stopped answering is named, the way a network player that doesn't answer is.
+                lastError = message == StreamingCore.notAnsweringMessage ? serverUnanswered?(track) ?? message : message
+            } else if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
                 lastError = String(localized: "“\(track.title)” is on a network share that isn’t connected. Vespertine reconnects automatically when the server is reachable.")
             } else if let track {
                 // Gone only when the file answers "no such file" and its source's folder still lists: a share that timed out or
@@ -1082,6 +1093,52 @@ final class PlayerController {
         lastError = notice
     }
 
+    // MARK: Songs on a music server
+
+    /// Told when a song on a music server has counted as played, with when it started. Set by the app while streaming is on.
+    @ObservationIgnored var streamedSongPlayed: ((Track, Date) -> Void)?
+    /// Told when a song stopped because its server sent nothing for too long; gives back what to say (the server by name).
+    @ObservationIgnored var serverUnanswered: ((Track) -> String?)?
+    /// Told when a song from a server plays: the server is answering.
+    @ObservationIgnored var serverAnswered: ((Track) -> Void)?
+    /// The queue entry whose stream's format was written to the library, so it is written once.
+    @ObservationIgnored private var confirmedStreamEntry: UUID?
+
+    /// A provider was turned off: a song of its that is playing stops, and its songs leave the queue.
+    func providerTurnedOff(_ id: String) { dropStreamed { $0.provider == id } }
+
+    /// An account was removed from the library: the same for its songs.
+    func accountRemoved(provider: String, account: String) { dropStreamed { $0.provider == provider && $0.account == account } }
+
+    private func dropStreamed(_ gone: (StreamLocation.Ref) -> Bool) {
+        let entries = queue.filter { $0.track.streamRef.map(gone) == true }
+        guard !entries.isEmpty else { return }
+        if current?.track.streamRef.map(gone) == true { stop() }
+        removeFromQueue(entries.map(\.id))
+    }
+
+    /// The engine's signal path with the one thing the engine can't know: that the song's server sent something other than
+    /// the file it lists. Such a song is never called bit-perfect, however cleanly it plays from here.
+    private func streamVerdict(_ path: SignalPath?) -> SignalPath? {
+        guard var path, let stream = current?.track.streamRef,
+              StreamFindings.finding(cacheKey: stream.cacheKey)?.converted == true else { return path }
+        path.convertedByServer = true
+        return path
+    }
+
+    /// Once a streamed song plays, the format that was read replaces the one its server lists, and the "≈" beside it goes.
+    private func confirmStreamedFormat() {
+        guard let entry = current, confirmedStreamEntry != entry.id, let stream = entry.track.streamRef, let path = signalPath,
+              let finding = StreamFindings.finding(cacheKey: stream.cacheKey) else { return }
+        confirmedStreamEntry = entry.id
+        serverAnswered?(entry.track)
+        let source = path.source
+        library.confirmStreamedFormat(ConfirmedStreamFormat(codec: source.codec, isLossless: source.encoding != .lossy, isDSD: source.encoding == .dsd,
+                                                            sampleRate: source.sampleRate, bitDepth: source.encoding == .pcm ? source.bitDepth : nil,
+                                                            channels: source.channels, converted: finding.converted),
+                                      location: stream.location)
+    }
+
     /// What the listener calls the share a song is on: its name in Sources, else the folder's, else the volume's in its path.
     private func shareName(for track: Track) -> String {
         if let source = library.sources.first(where: { $0.id == track.sourceId }) {
@@ -1131,7 +1188,9 @@ final class PlayerController {
         if stateChanged { updateNowPlayingInfo() }
         // Until the requested song plays, the engine's signal path is the previous song's.
         if requested == nil {
-            if signalPath != snap.signalPath { signalPath = snap.signalPath }
+            let path = streamVerdict(snap.signalPath)
+            if signalPath != path { signalPath = path }
+            confirmStreamedFormat()
             if systemRendering != snap.systemRendering { systemRendering = snap.systemRendering }
             if bedMeters != snap.bedMeters { bedMeters = snap.bedMeters }
         }
@@ -1182,6 +1241,8 @@ final class PlayerController {
            listened >= min(duration / 2, 240) {
             scrobbledEntry = entry.id
             if let id = entry.track.id { library.markPlayed(id) }
+            // Its server is told only when the listener turned that on for its provider (off by default).
+            if entry.track.isStreamed { streamedSongPlayed?(entry.track, trackStartedAt) }
             if settings.scrobble {
                 // ListenBrainz's `listened_at` is when the song started, not when it has counted as a listen.
                 let track = entry.track, startedAt = trackStartedAt

@@ -100,7 +100,7 @@ private struct CopyCard: View {
                             .font(Typeface.mono(8, weight: .semibold)).letterSpacing(0.5).foregroundStyle(Palette.brassHi).lineLimit(1)
                     }
                 }
-                Text(copy.edition ?? (copy.folder as NSString).lastPathComponent + (copy.place.map { " › " + $0 } ?? ""))
+                Text(copy.edition ?? (model.library.serverName(copy.folder) ?? (copy.folder as NSString).lastPathComponent) + (copy.place.map { " › " + $0 } ?? ""))
                     .font(Typeface.ui(12, weight: .medium)).foregroundStyle(Palette.text).lineLimit(1).truncationMode(.middle)
                 Text(detail).font(Typeface.mono(9.5)).foregroundStyle(copy.isComplete ? Palette.text3 : Palette.copper).lineLimit(1)
                     .truncationMode(.tail)
@@ -120,7 +120,7 @@ private struct CopyCard: View {
             Button("Play This Copy") { model.player.play(copy.tracks, shuffled: false, exactly: Set(copy.tracks.map(\.location))) }
             Button("Add This Copy to Queue") { model.player.addToQueue(copy.tracks, exactly: Set(copy.tracks.map(\.location))) }
             Divider()
-            Button("Show in Finder") { model.showInFinder(Array(copy.tracks.prefix(1))) }
+            if Array(copy.tracks.prefix(1)).contains(where: { !$0.isStreamed }) { Button("Show in Finder") { model.showInFinder(Array(copy.tracks.prefix(1))) } }
         }
     }
 
@@ -257,11 +257,13 @@ struct SongCopiesPopover: View {
 }
 
 extension AlbumCopy {
-    /// "FLAC · 24/96 · 5.1", as a track's format reads; a stereo copy has no layout, Dolby Atmos is its format.
+    /// "FLAC · 24/96 · 5.1", as a track's format reads; a stereo copy has no layout, Dolby Atmos is its format. A copy on a music
+    /// server whose format is only what the server lists is marked as its songs are: "FLAC · 16/44.1 ≈".
     var formatSummary: String {
+        let listed = tracks.contains(where: \.formatIsListed) ? Track.listedMark : ""
         switch layout {
-        case .stereo, .atmos: format
-        case .surround: "\(format) · \(layout.name)"
+        case .stereo, .atmos: return format + listed
+        case .surround: return "\(format) · \(layout.name)" + listed
         }
     }
 }

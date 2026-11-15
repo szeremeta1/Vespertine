@@ -60,6 +60,9 @@ public final class NetworkCache: @unchecked Sendable {
 
     /// Bytes free on the cache's volume (nil: unknown, copies go ahead). For tests: a disk that is full, or fills.
     public var freeSpace: @Sendable () -> Int64?
+    /// Whether a song's audio may be kept here at all. A song streamed from a music server may not: its provider's terms
+    /// decide that (`ProviderStoragePolicy`), and nothing streamed is kept unless they allow it. Asked before every copy.
+    public var mayKeep: @Sendable (Track) -> Bool = { !$0.isStreamed }
 
     /// Bytes free for this app's own files on the volume holding `url`: what macOS would free for it too (purgeable space,
     /// such as local snapshots and caches it can drop), which the plain free size leaves out. The plain free size when the
@@ -169,6 +172,7 @@ public final class NetworkCache: @unchecked Sendable {
     /// APFS clones share the original bytes safely; other file systems copy the local file.
     @discardableResult
     public func adopt(_ track: Track, from local: URL) -> Bool {
+        guard mayKeep(track) else { return false }
         let key = Self.key(for: track)
         lock.lock()
         if entries[key] != nil || active[key] != nil { lock.unlock(); return true }
@@ -212,7 +216,7 @@ public final class NetworkCache: @unchecked Sendable {
         lock.lock()
         problem = nil   // asked again: try again
         var seen = Set<String>()
-        for t in tracks {
+        for t in tracks where mayKeep(t) {
             let key = Self.key(for: t)
             guard seen.insert(key).inserted else { continue }
             if var e = entries[key] {

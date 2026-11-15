@@ -108,7 +108,7 @@ struct AlbumsGridView: View {
         let count = families.count
         if !filter.isEmpty { return String(localized: "\(count) of \(AlbumFamilies.group(base).count) albums") }
         guard isLibrary else { return String(localized: "\(count) albums") }
-        let s = model.library.stats
+        let s = model.library.libraryStats
         return [String(localized: "\(count) albums"), String(localized: "\(s.albums) editions"),
                 String(localized: "\(s.tracks) tracks"), s.bytes.byteString].joined(separator: " · ")
     }
@@ -390,17 +390,20 @@ struct AlbumMenu: View {
             model.showInspector = true
         }
         Button("Enrich Metadata…") { model.enrichAlbumKeys = [album.key] }
-        if tracks.contains(where: \.isMultichannel) {
+        // An export is a copy on disk: only of files, never of a song streamed from a server.
+        if tracks.contains(where: \.isMultichannel), !tracks.contains(where: \.isStreamed) {
             Button("Export for Spatial Audio…") { model.spatialExportTracks = tracks }
         }
-        Button("Analyze") {
+        if tracks.contains(where: { !$0.isStreamed }) {
+          Button("Analyze") {
             model.analysis.analyze(tracks)
             model.selectedTrackIDs = Set(tracks.prefix(1).compactMap(\.id))
             model.inspectorTab = .analysis
             model.showInspector = true
+          }
+          Button("Look Up on MusicBrainz…") { model.lookupTracks = tracks }
         }
-        Button("Look Up on MusicBrainz…") { model.lookupTracks = tracks }
-        Button("Show in Finder") { model.showInFinder(Array(tracks.prefix(1))) }
+        if Array(tracks.prefix(1)).contains(where: { !$0.isStreamed }) { Button("Show in Finder") { model.showInFinder(Array(tracks.prefix(1))) } }
         let network = tracks.filter(model.shares.isNetwork)
         if !network.isEmpty {
             Divider()
@@ -587,7 +590,7 @@ struct ArtistsView: View {
     var body: some View {
         let filter = model.filter(scope)
         let artists = model.artists(filter)
-        let total = model.library.artists.count
+        let total = model.libraryArtistCount
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 PageHeader(title: String(localized: "Artists"),
@@ -688,6 +691,9 @@ struct SourceView: View {
                 AlbumsGridView(scope: .sidebar(.source(sourceID)), title: String(localized: "Albums in this source"))
             }
             .background(Palette.window)
+        } else if let server = model.library.streamedAccounts.first(where: { $0.id == sourceID }) {
+            // An account on a music server: no folder to scan or show.
+            ServerSourceView(source: server, sourceID: sourceID)
         }
     }
 }

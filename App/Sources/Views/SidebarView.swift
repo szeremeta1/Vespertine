@@ -18,13 +18,13 @@ struct SidebarView: View {
         @Bindable var model = model
         List(selection: Binding(get: { model.sidebar }, set: { if let v = $0 { model.sidebar = v } })) {
             Section("Library") {
-                row(.albums, "Albums", "square.grid.2x2", count: model.library.stats.albums)
+                row(.albums, "Albums", "square.grid.2x2", count: model.library.libraryStats.albums)
                     .contextMenu { playMenu(.albums) }
-                row(.artists, "Artists", "person", count: model.library.stats.artists)
+                row(.artists, "Artists", "person", count: model.library.libraryStats.artists)
                     .contextMenu { playMenu(.artists, play: false) }
-                row(.songs, "Songs", "music.note", count: model.library.stats.tracks)
+                row(.songs, "Songs", "music.note", count: model.library.libraryStats.tracks)
                     .contextMenu { playMenu(.songs) }
-                row(.genres, "Genres", "guitars", count: model.library.genres.count)
+                row(.genres, "Genres", "guitars", count: model.libraryGenreCount)
                     .contextMenu { playMenu(.genres, play: false) }
                 row(.recentlyAdded, "Recently Added", "clock", count: nil)
                     .contextMenu { playMenu(.recentlyAdded) }
@@ -154,6 +154,9 @@ struct SidebarView: View {
                     .help("Add music")
                 }
             }
+
+            // The listener's music servers, while that is switched on and they have a place of their own here.
+            ServerSidebarSection()
         }
         .listStyle(.sidebar)
         .tint(Palette.brass)

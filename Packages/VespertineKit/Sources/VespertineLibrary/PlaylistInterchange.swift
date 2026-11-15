@@ -146,7 +146,7 @@ public extension LibraryDatabase {
         try writer.read { db in
             var byPath: [String: Int64] = [:]
             var byName: [String: [(id: Int64, duration: Double)]] = [:]
-            for row in try Row.fetchAll(db, sql: "SELECT id, filePath, title, artist, albumArtist, duration, cueStartFrame FROM track WHERE isMissing = 0 ORDER BY id") {
+            for row in try Row.fetchAll(db, sql: "SELECT id, filePath, title, artist, albumArtist, duration, cueStartFrame FROM track WHERE isMissing = 0 AND \(try visibleTracksClause(db)) ORDER BY id") {
                 let id: Int64 = row["id"], path: String = row["filePath"]
                 // A CUE image holds several songs: its path alone names none of them.
                 if (row["cueStartFrame"] as Int64?) == nil {

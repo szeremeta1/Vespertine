@@ -80,10 +80,12 @@ private final class KeepingMac: @unchecked Sendable {
     }
 }
 
-@MainActor private func wait(_ seconds: Double = 5, until condition: () -> Bool) async throws {
-    let deadline = Date().addingTimeInterval(seconds)
+/// The 500 looks end a run where it never does; they decide nothing. They are counted, not timed: a busy machine that holds every test still for seconds uses up a clock but not a count.
+@MainActor private func wait(looks most: Int = 500, until condition: () -> Bool) async throws {
+    var looks = 0
     while !condition() {
-        if Date() > deadline { Issue.record("the condition never held"); return }
+        if looks == most { Issue.record("the condition never held"); return }
+        looks += 1
         try await Task.sleep(for: .milliseconds(10))
     }
 }
@@ -284,7 +286,7 @@ private func bytes(_ id: Int64, count: Int = 3500) -> Data { Data((0..<count).ma
         mac.files[1] = try tone(seconds: 30)
         mac.files[2] = try tone()
         keeper.keep(album([1]))
-        try await wait(30) { keeper.isIdle }
+        try await wait(looks: 3000) { keeper.isIdle }
         let playback = try offlinePlayback(mac)
         playback.kept = { [store = keeper.store] id in store.kept(id).map { ($0.file, $0.descriptor) } }
         playback.play([song(1), song(2)])

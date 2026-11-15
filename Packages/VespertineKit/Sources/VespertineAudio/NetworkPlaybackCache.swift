@@ -32,10 +32,18 @@ public protocol RemoteCacheReader: PlaybackCacheReader {
     /// What a song says when this source sends nothing for the no-progress limit ("The server isn't answering"); nil for the
     /// share's wording.
     var notAnsweringMessage: String? { get }
+    /// How long a listener waits on this source with nothing from it before the song is given up, when that is sooner than the
+    /// cache's own limit (nil: the cache's). A server that has gone away is known in seconds; a share is waited for longer.
+    var silenceLimit: TimeInterval? { get }
+    /// How long ago this source last sent a byte, in seconds (nil: not known, the cache goes by the blocks it has written). A slow
+    /// link that is still sending is not silence: `silenceLimit` applies only once this has reached it too.
+    var quietFor: TimeInterval? { get }
 }
 
 extension RemoteCacheReader {
     public var notAnsweringMessage: String? { nil }
+    public var silenceLimit: TimeInterval? { nil }
+    public var quietFor: TimeInterval? { nil }
 }
 
 private final class ShareFileReader: PlaybackCacheReader, @unchecked Sendable {
@@ -785,10 +793,18 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         /// The reader's wording for its silence (nil: the share's). Under `condition`.
         private var silenceMessage: String? { (held as? any RemoteCacheReader)?.notAnsweringMessage }
 
-        /// Nothing has arrived for `noProgressLimit`: the song fails (every waiting read with it) and stops holding scans back.
+        /// How long this song is waited for with nothing arriving: the cache's limit, or its source's own when that is sooner and
+        /// the source has sent nothing for as long (see `RemoteCacheReader.silenceLimit`). Under `condition`.
+        private var silenceLimit: TimeInterval {
+            guard let remote = held as? any RemoteCacheReader, let own = remote.silenceLimit, own < noProgressLimit,
+                  remote.quietFor ?? .infinity >= own else { return noProgressLimit }
+            return own
+        }
+
+        /// Nothing has arrived for the silence limit: the song fails (every waiting read with it) and stops holding scans back.
         /// Called with the condition lock held; true when it gave up.
         private func giveUpIfSilent() -> Bool {
-            guard error == nil, clock() - lastProgress >= noProgressLimit else { return false }
+            guard error == nil, clock() - lastProgress >= silenceLimit else { return false }
             error = Failure.notAnswering(silenceMessage)
             condition.broadcast()
             // A remote reader may be retrying for as long as it is let: the copy is over, so its lanes should come back.

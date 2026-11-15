@@ -62,10 +62,12 @@ private func worst(_ a: [Float], _ b: [Float]) -> Float {
 }
 
 /// Waits (on the main actor, letting its tasks run) until `condition` holds.
-@MainActor private func wait(_ seconds: Double = 5, until condition: () -> Bool) async throws {
-    let deadline = Date().addingTimeInterval(seconds)
+/// The 500 looks end a run where it never does; they decide nothing. They are counted, not timed: a busy machine that holds every test still for seconds uses up a clock but not a count.
+@MainActor private func wait(until condition: () -> Bool) async throws {
+    var looks = 0
     while !condition() {
-        if Date() > deadline { Issue.record("the condition never held"); return }
+        if looks == 500 { Issue.record("the condition never held"); return }
+        looks += 1
         try await Task.sleep(for: .milliseconds(10))
     }
 }

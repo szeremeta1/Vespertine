@@ -242,15 +242,18 @@ private final class DoPMac: @unchecked Sendable {
     var whileBringing: (() -> Void)?
 
     func install(on playback: PhonePlayback) {
-        playback.dop.ceiling = { [unowned self] in ceiling }
-        playback.dop.rate = { [unowned self] in rate }
-        playback.dop.bring = { [unowned self] carrier in
+        // Weak, not unowned: a test that gives up leaves its player running a moment longer than this output, and asking a
+        // dead output must not take every other test down with it.
+        playback.dop.ceiling = { [weak self] in self?.ceiling }
+        playback.dop.rate = { [weak self] in self?.rate }
+        playback.dop.bring = { [weak self] carrier in
+            guard let self else { return false }
             brought.append(carrier)
             whileBringing?()
             if grants { rate = carrier }
             return grants
         }
-        playback.dop.declined = { [unowned self] carrier in declined.append(carrier) }
+        playback.dop.declined = { [weak self] carrier in self?.declined.append(carrier) }
     }
 }
 
@@ -271,10 +274,10 @@ private final class DoPMac: @unchecked Sendable {
         return (playback, output)
     }
 
-    /// Waits for something the phone must get round to. The five seconds end a run where it never does; they decide nothing.
+    /// Waits for something the phone must get round to. The 500 looks end a run where it never does; they decide nothing. They are counted, not timed: a busy machine that holds every test still for seconds uses up a clock but not a count.
     private func until(_ condition: () -> Bool) async throws {
-        let deadline = ContinuousClock.now + .seconds(5)
-        while !condition(), ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(10)) }
+        var looks = 0
+        while !condition(), looks < 500 { looks += 1; try await Task.sleep(for: .milliseconds(10)) }
         try #require(condition())
     }
 

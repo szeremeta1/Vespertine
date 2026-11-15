@@ -5,6 +5,7 @@
 
 import Foundation
 import Testing
+import VespertineRemoteProtocol
 @testable import VespertinePhonePlayer
 
 @Suite struct PhoneSystemPolicyTests {
@@ -212,5 +213,135 @@ import Testing
         let told7 = anchor.read(1.4, moving: true, at: start.addingTimeInterval(1))
         #expect(told7)
         #expect(anchor.position == 1.4)
+    }
+}
+
+@Suite struct LockScreenTests {
+    private func song(_ id: Int64, seconds: Double = 200) -> TrackSummary {
+        TrackSummary(id: id, title: "Song \(id)", artist: "Artist", album: "Album", albumKey: "a", duration: seconds, trackNumber: Int(id), discNumber: 2,
+                     format: "FLAC · 16/44.1", artworkKey: "art", favorite: false)
+    }
+    private func aQueue(_ count: Int, at index: Int = 0) -> PhoneQueue {
+        var queue = PhoneQueue()
+        queue.play((1...Int64(count)).map { song($0) }, startAt: index)
+        return queue
+    }
+    private func aCard(_ queue: PhoneQueue, position: Double = 0, playing: Bool = true, at: Date = Date(timeIntervalSince1970: 1_000)) -> NowPlayingCard? {
+        NowPlayingCard(queue: queue, nowPlaying: queue.current, duration: queue.current?.track.duration ?? 0, position: position, playing: playing, at: at)
+    }
+
+    // MARK: What the card says
+
+    @Test func theCardSaysTheSongAndWhereItIsInTheQueue() throws {
+        let queue = aQueue(5, at: 2)
+        let card = try #require(aCard(queue, position: 12))
+        #expect(card.title == "Song 3" && card.artist == "Artist" && card.album == "Album")
+        #expect(card.trackNumber == 3 && card.discNumber == 2 && card.artworkKey == "art")
+        #expect(card.duration == 200 && card.position == 12 && card.playing)
+        #expect(card.queueIndex == 2 && card.queueCount == 5)
+    }
+
+    @Test func withNothingPlayingThereIsNoCardAndNoButtonWorks() {
+        #expect(NowPlayingCard(queue: PhoneQueue(), nowPlaying: nil, duration: 0, position: 0, playing: false) == nil)
+        #expect(SystemControls(queue: PhoneQueue(), card: nil) == .none)
+        #expect(!SystemControls.none.playPause && !SystemControls.none.next && !SystemControls.none.previous && !SystemControls.none.seek)
+    }
+
+    @Test func atAGaplessJoinTheCardIsAboutTheSongBeingHeardNotTheOneTheQueueIsStillOn() throws {
+        // The next song already sounds; the queue hasn't been told yet.
+        let queue = aQueue(3, at: 0)
+        let heard = queue.entries[1]
+        let card = try #require(NowPlayingCard(queue: queue, nowPlaying: heard, duration: 200, position: 0, playing: true))
+        #expect(card.title == "Song 2" && card.queueIndex == 1 && card.queueCount == 3)
+    }
+
+    // MARK: When the lock screen is told again
+
+    @Test func aSongPlayingOnIsNotToldAgainButAPauseASeekAndAStallAre() throws {
+        let queue = aQueue(3)
+        let start = Date(timeIntervalSince1970: 1_000)
+        let shown = try #require(aCard(queue, position: 10, at: start))
+        #expect(shown.isNews(after: nil), "the first time is always news")
+        // Twenty seconds on, twenty seconds further: the lock screen counted that by itself.
+        #expect(try !#require(aCard(queue, position: 30, at: start + 20)).isNews(after: shown))
+        #expect(try !#require(aCard(queue, position: 31, at: start + 20)).isNews(after: shown), "a second of drift is not worth a redraw")
+        // A seek.
+        #expect(try #require(aCard(queue, position: 90, at: start + 20)).isNews(after: shown))
+        // A pause, and a stall (playing but nothing arriving) which is told the same way.
+        #expect(try #require(aCard(queue, position: 30, playing: false, at: start + 20)).isNews(after: shown))
+        // Paused, the song stays where it is however long.
+        let paused = try #require(aCard(queue, position: 30, playing: false, at: start + 20))
+        #expect(try !#require(aCard(queue, position: 30, playing: false, at: start + 500)).isNews(after: paused))
+    }
+
+    @Test func anotherSongOrAQueueThatChangedAroundItIsToldAgain() throws {
+        var queue = aQueue(3)
+        let start = Date(timeIntervalSince1970: 1_000)
+        let shown = try #require(aCard(queue, position: 10, at: start))
+        // Songs added behind it: "1 of 3" became "1 of 5".
+        queue.addToQueue([song(8), song(9)])
+        let longer = try #require(aCard(queue, position: 11, at: start + 1))
+        #expect(longer.queueCount == 5 && longer.isNews(after: shown))
+        // The next song.
+        _ = queue.next()
+        let next = try #require(aCard(queue, position: 0, at: start + 2))
+        #expect(next.queueIndex == 1 && next.isNews(after: longer))
+        // The length only becomes known once the song is open.
+        var known = next
+        known.duration = 201
+        #expect(known.isNews(after: next))
+    }
+
+    // MARK: Which buttons work
+
+    @Test func nextIsGreyedOutOnTheLastSongUnlessRepeatAllGoesRound() throws {
+        var queue = aQueue(3, at: 0)
+        #expect(SystemControls(queue: queue, card: aCard(queue)).next)
+        _ = queue.next()
+        _ = queue.next()
+        #expect(queue.upcoming.isEmpty)
+        let last = SystemControls(queue: queue, card: aCard(queue))
+        #expect(!last.next, "nothing to go to")
+        #expect(last.playPause && last.previous && last.seek, "the rest still work")
+        queue.repeatMode = .all
+        #expect(SystemControls(queue: queue, card: aCard(queue)).next, "Repeat All goes round to the first song")
+        // Repeat One repeats a song that ends by itself; the button still has nowhere to go on the last one.
+        queue.repeatMode = .one
+        #expect(!SystemControls(queue: queue, card: aCard(queue)).next)
+        // A song added behind the last one lights the button again.
+        queue.repeatMode = .off
+        queue.addToQueue([song(9)])
+        #expect(SystemControls(queue: queue, card: aCard(queue)).next)
+    }
+
+    @Test func repeatOneInTheMiddleStillLetsNextMoveOnAsInTheApp() {
+        var queue = aQueue(3, at: 1)
+        queue.repeatMode = .one
+        #expect(SystemControls(queue: queue, card: aCard(queue)).next)
+        #expect(queue.next() == .start(queue.entries[2]))
+    }
+
+    @Test func previousAlwaysWorksBecauseItRestartsTheFirstSong() {
+        var queue = aQueue(1)
+        let controls = SystemControls(queue: queue, card: aCard(queue))
+        #expect(controls.previous && !controls.next)
+        #expect(queue.previous(position: 0) == .restart)
+    }
+
+    @Test func theScrubberNeedsAKnownLength() throws {
+        var queue = PhoneQueue()
+        queue.play([song(1, seconds: 0)])
+        let unknown = try #require(aCard(queue))
+        #expect(!SystemControls(queue: queue, card: unknown).seek)
+        var known = unknown
+        known.duration = 180
+        #expect(SystemControls(queue: queue, card: known).seek)
+    }
+
+    @Test func atAJoinNextIsJudgedFromTheSongBeingHeard() throws {
+        // Two songs; the second already sounds while the queue is still on the first: there is nothing after it.
+        let queue = aQueue(2, at: 0)
+        let card = try #require(NowPlayingCard(queue: queue, nowPlaying: queue.entries[1], duration: 200, position: 0, playing: true))
+        #expect(!SystemControls(queue: queue, card: card).next)
     }
 }

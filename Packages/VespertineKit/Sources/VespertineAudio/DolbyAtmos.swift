@@ -74,16 +74,26 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
     /// Internal for tests (they post its route-change flush notice).
     let renderer = AVSampleBufferAudioRenderer()
     private let synchronizer = AVSampleBufferRenderSynchronizer()
-    private let queue = DispatchQueue(label: "org.szeremeta.vespertine.system-renderer")
-    /// Held by whoever is reading the track (the feeding callback holds it through every `copyNextSampleBuffer`, which can
-    /// block for as long as the file's source does), and by `feed`, which replaces the reader.
-    private let lock = NSLock()
+    /// One reading of the track from some time on: its reader, the output it is read through, and the queue its feeding
+    /// callback runs on. A seek or a flush starts a new one and retires the old one. Each has a queue of its own, so a read of
+    /// an old one that is stuck (it can block for as long as the file's source does) holds nothing the new one needs.
+    private final class Feeding: @unchecked Sendable {
+        let reader: AVAssetReader
+        let output: AVAssetReaderTrackOutput
+        let queue = DispatchQueue(label: "org.szeremeta.vespertine.system-renderer")
+        /// The callback is inside `copyNextSampleBuffer`. Under the session's `state`.
+        var reading = false
+        /// Retired: it reads nothing more. Under the session's `state`.
+        var retired = false
+        init(reader: AVAssetReader, output: AVAssetReaderTrackOutput) { self.reader = reader; self.output = output }
+    }
     /// Guards the small state below, and is never held across a read: asking how far the feeding has got (the engine does,
     /// every iteration; so do the tests) or stopping the session must not wait for a read that is stuck.
     private let state = NSLock()
+    private let feeds = NSLock()
     private var asset: AVURLAsset
     private var track: AVAssetTrack?
-    private var reader: AVAssetReader?      // under `state`
+    private var feeding: Feeding?      // under `state`
     private var inputDone = false      // under `state`
     private var enqueuedEnd = CMTime.zero      // under `state`
     /// The first frame's time in the file (some containers don't start at zero).
@@ -156,48 +166,81 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
     /// renderer's queue is emptied first (a seek); after macOS's own flush it already is, and flushing again would reset its time.
     /// `beforeFeeding` runs once the new reader is going, before the renderer is asked for data.
     private func feed(from target: CMTime, flushing: Bool, beforeFeeding: () -> Void = {}) throws {
-        // A stuck read in the old reader is cancelled first (that is what lets it return); then the new one is set up.
-        state.lock(); generation += 1; stopped = false; let gen = generation; state.unlock()
+        // One seek or flush at a time (the engine's thread and the flush notice's can both be here). Never held by a read.
+        feeds.lock(); defer { feeds.unlock() }
+        state.lock(); generation += 1; stopped = false; let gen = generation; let old = feeding; feeding = nil; state.unlock()
         renderer.stopRequestingMediaData()
-        state.lock(); let old = reader; state.unlock()
-        old?.cancelReading()
-        lock.lock()
+        retire(old)
+        // Nothing of the old reading is queued from here on (a buffer is queued under `state`, by the current reading only).
         if flushing { renderer.flush() }
         state.lock(); inputDone = false; enqueuedEnd = target; state.unlock()
-        guard let track else { lock.unlock(); throw SourceOpenerError.unsupported(url) }
-        let reader: AVAssetReader
-        do { reader = try AVAssetReader(asset: asset) } catch { lock.unlock(); throw error }   // never left locked
+        guard let track else { throw SourceOpenerError.unsupported(url) }
+        let reader = try AVAssetReader(asset: asset)
         reader.timeRange = CMTimeRange(start: target, duration: .positiveInfinity)
         let output = AVAssetReaderTrackOutput(track: track, outputSettings: nil)   // compressed: the renderer decodes
         output.alwaysCopiesSampleData = false
         reader.add(output)
-        guard reader.startReading() else { lock.unlock(); throw reader.error ?? SourceOpenerError.unsupported(url) }
-        state.lock(); self.reader = reader; state.unlock()
-        lock.unlock()
+        guard reader.startReading() else { throw reader.error ?? SourceOpenerError.unsupported(url) }
+        let feeding = Feeding(reader: reader, output: output)
+        state.lock()
+        // A stop or another seek came meanwhile: this reading is not the one any more.
+        guard gen == generation else { state.unlock(); reader.cancelReading(); return }
+        self.feeding = feeding
+        state.unlock()
         beforeFeeding()
-        renderer.requestMediaDataWhenReady(on: queue) { [weak self] in
+        state.lock(); defer { state.unlock() }
+        guard !feeding.retired else { return }
+        renderer.requestMediaDataWhenReady(on: feeding.queue) { [weak self] in
             guard let self else { return }
-            self.lock.lock(); defer { self.lock.unlock() }
-            /// Runs `body` under `state` if this feeding is still the current one (a cancelled one reads nothing more).
-            func ifCurrent(_ body: () -> Void) -> Bool {
-                self.state.lock(); defer { self.state.unlock() }
-                guard gen == self.generation else { return false }
-                body()
-                return true
-            }
-            guard ifCurrent({}) else { return }
             while self.renderer.isReadyForMoreMediaData {
-                guard let buffer = output.copyNextSampleBuffer() else {
-                    _ = ifCurrent { self.inputDone = true }
-                    self.renderer.stopRequestingMediaData()
+                guard self.beginRead(feeding) else { return }
+                let buffer = feeding.output.copyNextSampleBuffer()
+                guard self.endRead(feeding) else { return }
+                guard let buffer else {
+                    // Under `state`, so a seek that starts the next reading meanwhile is not the one told to stop asking.
+                    self.state.lock()
+                    if !feeding.retired {
+                        self.inputDone = true
+                        self.renderer.stopRequestingMediaData()
+                    }
+                    self.state.unlock()
                     return
                 }
                 self.enqueueObserver?(buffer)
+                // Queued under `state`, and only by the reading that is current: a seek's flush never has an old buffer after it.
+                self.state.lock()
+                guard !feeding.retired else { self.state.unlock(); return }
                 self.renderer.enqueue(buffer)
                 let end = CMTimeAdd(CMSampleBufferGetPresentationTimeStamp(buffer), CMSampleBufferGetDuration(buffer))
-                if end.isValid { _ = ifCurrent { self.enqueuedEnd = CMTimeMaximum(self.enqueuedEnd, end) } }
+                if end.isValid { self.enqueuedEnd = CMTimeMaximum(self.enqueuedEnd, end) }
+                self.state.unlock()
             }
         }
+    }
+
+    /// The callback is about to read: false when its reading was retired meanwhile (it then reads nothing).
+    private func beginRead(_ feeding: Feeding) -> Bool {
+        state.lock(); defer { state.unlock() }
+        guard !feeding.retired else { return false }
+        feeding.reading = true
+        return true
+    }
+
+    /// The read came back: false when its reading was retired while it read. The reader is cancelled here then, on the thread
+    /// that was reading, now that it no longer is.
+    private func endRead(_ feeding: Feeding) -> Bool {
+        state.lock(); feeding.reading = false; let retired = feeding.retired; state.unlock()
+        if retired { feeding.reader.cancelReading() }
+        return !retired
+    }
+
+    /// Ends a reading. Its reader is never cancelled while its callback is inside `copyNextSampleBuffer`: the system's media
+    /// framework frees what that read is waiting on, and the read then crashes (EXC_BAD_ACCESS under `FigSemaphoreWaitRelative`,
+    /// seen with the tests run side by side). A reading that is mid-read is marked, and cancels itself when the read comes back.
+    private func retire(_ feeding: Feeding?) {
+        guard let feeding else { return }
+        state.lock(); feeding.retired = true; let reading = feeding.reading; state.unlock()
+        if !reading { feeding.reader.cancelReading() }
     }
 
     func play() { synchronizer.rate = 1 }
@@ -205,13 +248,12 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
     func setVolume(_ volume: Float) { renderer.volume = volume }
 
     func stop() {
-        state.lock(); generation += 1; stopped = true; state.unlock()
+        state.lock(); generation += 1; stopped = true; let current = feeding; feeding = nil; state.unlock()
         meter?.stop()
         synchronizer.rate = 0
         renderer.stopRequestingMediaData()
         renderer.flush()
-        state.lock(); let current = reader; state.unlock()
-        current?.cancelReading()
+        retire(current)
     }
 
     // MARK: Visualizer

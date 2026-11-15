@@ -51,10 +51,10 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         return (PhoneRemote(playback: playback, library: { await library.answer($0) }), library)
     }
 
-    /// Waits for something the phone must get round to. The five seconds end a run where it never does; they decide nothing.
+    /// Waits for something the phone must get round to. The 500 looks end a run where it never does; they decide nothing. They are counted, not timed: a busy machine that holds every test still for seconds uses up a clock but not a count.
     private func until(_ condition: () -> Bool) async throws {
-        let deadline = ContinuousClock.now + .seconds(5)
-        while !condition(), ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(10)) }
+        var looks = 0
+        while !condition(), looks < 500 { looks += 1; try await Task.sleep(for: .milliseconds(10)) }
     }
 
     @Test func whichCommandsThePhoneTakesAndWhichStayWithTheMac() {
@@ -145,8 +145,7 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         let (remote, _) = try made()
         _ = await remote.run(.playTracks(ids: [1], startAt: 0, shuffled: nil))
         // The Mac's "preparing" answer arrives when it arrives: wait for it, don't guess how long a busy machine takes.
-        let deadline = ContinuousClock.now + .seconds(5)
-        while remote.playback.preparing == nil, ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(10)) }
+        try await until { remote.playback.preparing != nil }
         #expect(remote.playback.preparing?.progress == 0.25)
         #expect(remote.playerState.loading)
         #expect(await remote.run(.stop) == .ok)
