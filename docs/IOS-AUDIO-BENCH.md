@@ -24,6 +24,7 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B10 | Wi-Fi to cellular handover, Mac restart | not run | | | |
 | B11 | Keep on This Device, airplane mode | not run | | | |
 | B12 | The demo plays | not run | | | |
+| B13 | The queue comes back after the app is closed | not run | | | |
 
 ## Before any script
 
@@ -51,6 +52,11 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 1. Play the live album from its first song; jump to ten seconds before the end of song 1.
 2. Expect no silence and no click into song 2. Repeat for songs 2 to 3 with the phone locked.
 3. Repeat once on the USB DAC (B7's setup).
+4. Repeat: One Song on a song of the live album, ten seconds before its end: it goes round into its own start with no silence and
+   no click, and Now Playing stays on that song with the scrubber back at 0:00.
+5. On Tailscale over cellular (B9's setup), jump to ten seconds before the end of a song. Whether the next song joins without a
+   gap depends on it arriving in time: note which happened. If it didn't arrive, expect a short wait and then the next song from
+   its first note, never a skipped song.
 
 ## B4. Surround on AirPods Max (5 min)
 
@@ -137,3 +143,15 @@ nothing about other rates or volumes. Until PCM is measured, the phone shows no 
 ## B12. The demo (1 min)
 
 Macs › Try the Demo. Output › This iPhone. Play any album: soft generated notes play, the lock screen works, next and previous work.
+
+## B13. The queue comes back (3 min)
+
+1. Play an album from its third song, add two songs with Play Next, turn Repeat All on, seek to about 1:00 and pause.
+2. Swipe the app away in the app switcher and open it again. Expect Now Playing to show the same song, paused at about 1:00, and
+   the Queue to show the same Playing Next and Up Next, with Repeat All still on. Nothing plays by itself.
+3. Tap Play: it starts from about 1:00, not from the start of the song.
+4. Play, and swipe the app away mid-song without pausing. Reopen: the same song, paused within about ten seconds of where it was.
+5. Reopen with the Mac asleep or out of reach: the queue is shown once the Mac connects, or at once when songs from it are kept
+   on this device (those play; the others say the Mac isn't answering). Note what you see.
+6. Choose another Mac (or a share), play something there, and go back to the first: each has its own queue. The demo starts empty
+   every time. Forgetting a Mac in Macs removes its queue.
