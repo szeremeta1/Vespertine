@@ -151,6 +151,7 @@ Macs › Try the Demo. Output › This iPhone. Play any album: soft generated no
    the Queue to show the same Playing Next and Up Next, with Repeat All still on. Nothing plays by itself.
 3. Tap Play: it starts from about 1:00, not from the start of the song.
 4. Play, and swipe the app away mid-song without pausing. Reopen: the same song, paused within about ten seconds of where it was.
-5. Reopen in airplane mode: the queue is still shown. Play says the Mac can't be reached; kept songs play.
+5. Reopen with the Mac asleep or out of reach: the queue is shown once the Mac connects, or at once when songs from it are kept
+   on this device (those play; the others say the Mac isn't answering). Note what you see.
 6. Choose another Mac (or a share), play something there, and go back to the first: each has its own queue. The demo starts empty
    every time. Forgetting a Mac in Macs removes its queue.
