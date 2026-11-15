@@ -91,7 +91,7 @@ struct HTTPServerHardeningTests {
             idle.append(fd)
         }
         // The server has taken all three, however long the machine needs for it.
-        while server.connectionCount < 3 { await Task.yield() }
+        while server.connectionCount < 3 { try await Task.sleep(for: .milliseconds(5)) }
         // Over the cap: closed on arrival (or, if the close beats the connect, refused outright). Never served.
         if let refused = rawExchange(port: port, send: Data("GET / HTTP/1.1\r\n\r\n".utf8), timeout: 1.5) {
             #expect(refused.closed)
@@ -99,7 +99,7 @@ struct HTTPServerHardeningTests {
         }
         idle.forEach { close($0) }
         // The server has seen them go: there is room again.
-        while server.connectionCount > 0 { await Task.yield() }
+        while server.connectionCount > 0 { try await Task.sleep(for: .milliseconds(5)) }
         let served = try #require(rawExchange(port: port, send: Data("GET / HTTP/1.1\r\n\r\n".utf8)))
         #expect(served.response.hasPrefix("HTTP/1.1 404"))
     }

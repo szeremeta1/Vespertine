@@ -182,26 +182,36 @@ struct ProcessedHousekeepingTests {
         // Ten steps of a drag, each waiting out its pause; the test ends the pause for all of them once the last step is
         // made, so no step's pause can run out between two steps on a slow machine.
         for step in 1...10 { playback.update(settings: RendererSettings(digitalVolumeDB: -3 - Double(step))) }
-        await dragOver.open()
+        dragOver.release()
         // The last step's settings are the ones played; any restart made for an earlier step came before it, in order.
-        while playback.snapshot.signalPath?.volume != .digital(dB: -13) { await playback.settleForTests() }
+        for _ in 0..<200 where playback.snapshot.signalPath?.volume != .digital(dB: -13) { await playback.settleForTests() }
         #expect(fake.actions.filter { $0 == "DeleteAll" }.count - loadsBefore == 1)
         #expect(playback.snapshot.signalPath?.volume == .digital(dB: -13))
     }
 }
 
-/// Holds everyone who waits at it until it is opened; open, it holds no one.
-actor Gate {
-    private var isOpen = false
+/// Holds everyone who waits at it until it is released; after that it holds no one.
+final class Gate: @unchecked Sendable {
+    private let lock = NSLock()
+    private var released = false
     private var waiting: [CheckedContinuation<Void, Never>] = []
     func wait() async {
-        if isOpen { return }
-        await withCheckedContinuation { waiting.append($0) }
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            let held = lock.withLock { () -> Bool in
+                if released { return false }
+                waiting.append(continuation)
+                return true
+            }
+            if !held { continuation.resume() }
+        }
     }
-    func open() {
-        isOpen = true
-        waiting.forEach { $0.resume() }
-        waiting = []
+    func release() {
+        let held = lock.withLock { () -> [CheckedContinuation<Void, Never>] in
+            released = true
+            defer { waiting = [] }
+            return waiting
+        }
+        held.forEach { $0.resume() }
     }
 }
 
