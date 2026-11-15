@@ -1,6 +1,9 @@
 # Streaming
 
-Vespertine has no built-in client for any commercial streaming service. What it has is a receiver: other apps on your network send it music, and it plays that music through the same engine and the same signal path as a file.
+Vespertine has no built-in client for any commercial streaming service. It has two things, each off by default behind its own switch:
+
+- A receiver. Other apps on your network send it music, and it plays that music through the same engine and the same signal path as a file. See [Play to Vespertine](#play-to-vespertine-upnp-beta).
+- A client for your own music server. Servers that speak the open OpenSubsonic API (Navidrome, Gonic, Airsonic and others) can sit beside your files in the one library. See [Music servers](#music-servers-opensubsonic-beta).
 
 ## Receive from Other Apps (beta)
 
@@ -53,3 +56,68 @@ OpenHome control is not part of this version.
 - Plays on this Mac's own outputs. While the chosen output is a network player or an AirPlay receiver, a control app's song is refused with a sentence that says why.
 - The address is checked when it arrives and again on every redirect. A name that changes what it points at between the check and the fetch is not defended against beyond that.
 - UPnP has no sign-in: any device allowed by the setting above can send music or stop it. Turn the switch off on networks you don't trust.
+
+## Music servers (OpenSubsonic, beta)
+
+Off by default. The switch is "Music Servers (OpenSubsonic, beta)" in Settings.
+
+OpenSubsonic is the open API at [opensubsonic.netlify.app](https://opensubsonic.netlify.app). It is spoken by servers you run yourself, such as Navidrome, Gonic and Airsonic. It is not a commercial service, and there is no account with anyone but your own server.
+
+### What you see
+
+- Your server's albums, artists, songs, playlists and favorites beside your files. An album you hold as files and on the server is one album with two copies, and the copies list says which is which.
+- A Source column in song lists while a server is on, saying where each song comes from.
+- A song's format as the server lists it, followed by "≈", until Vespertine has played the song. Once played, the format is what was read, and the "≈" goes.
+- The signal path as for any file. Vespertine asks the server for the original file (`format=raw`). If the server sends something else anyway, the signal path says "Converted by the server" and the badge is never `BIT-PERFECT`.
+- Seeking reads from the middle of the file by HTTP range, as it does for a file on a share. Two songs in a row play without a gap when their formats allow it, as two files do.
+- Adding a server's song to Favorites stars it on the server, and the server's starred songs are favorites here.
+- "Tell the server what I play" is its own switch, off by default. On, each song that counts as played is reported to the server (`scrobble`), as the server's own apps do.
+
+### Signing in
+
+You type the server's address, your user name, and either a password or an API key (for servers with OpenSubsonic's API key extension).
+
+- With a password, Vespertine makes a token from it and a random salt, as the API describes, and keeps the token and salt. The password itself is kept only for a server that accepts nothing else.
+- What is kept is one item in your login Keychain per server, under the service `org.szeremeta.vespertine.streaming.opensubsonic`. Nothing of it is written to Vespertine's settings, its library database, a log, the phone remote, or an address on disk. Signing out deletes the item.
+- An `https` address is the default. An `http` address is accepted only when every address the server's name resolves to is on your own network (this Mac, a private range, a link-local address, or the range overlay networks such as Tailscale hand out), and the sign-in sheet warns that the sign-in then travels unencrypted. macOS itself refuses plain `http` to a full host name; an IP address, a `.local` name or a bare host name works.
+- A redirect is followed only to the same host, and never from `https` to `http`.
+
+Several servers can be added. Each is an account under the one switch.
+
+### What is not in this version
+
+- No offline copies of a server's music. Songs are streamed through the transient playback cache and removed afterwards.
+- No editing of a server's tags or playlists from Vespertine, and no analysis of a server's songs (analysis reads a file).
+- A server's songs can't be sent on to a phone by the remote's own streaming.
+- Not yet tested against a real Navidrome, Gonic or Airsonic server: the tests use Vespertine's own test server over loopback. Reports are welcome.
+
+## The rules every streaming provider is held to
+
+Music servers are built on a small core (`VespertineStreaming`) that any later provider would also have to go through. The core enforces these rules itself; they are not left to each provider.
+
+1. **Off is off.** Each provider has one switch, `streaming.<id>.enabled`, registered off. While it is off the provider is never constructed, no request leaves the Mac for it, its Keychain item is not read, and its songs are left out of every library query: the counts, albums, artists, genres, songs, playlists, smart playlists, favorites, history and search. Nothing but the switch itself shows. Turning it off deletes nothing, and turning it on brings everything back.
+2. **Credentials only in the Keychain.** One generic-password item per provider and account in the login Keychain, service `org.szeremeta.vespertine.streaming.<id>`. Never in settings, the database, a log, crash text, the remote protocol, or an address written to disk. Signing out deletes the item. No client secret of any service is in the repository; a provider that needed a build-time secret would read it from a git-ignored resource and say "Not available in this build" without it.
+3. **No audio on disk unless the terms allow it.** A stream lives in the transient playback cache and is deleted when the song is let go. A provider declares `.transientCacheOnly` or `.offlineAllowed(termsReference:)`. For the first, the cache refuses to pin, copy or export its streams. OpenSubsonic is your own server and declares the second, but no offline copy is offered yet.
+4. **An honest verdict.** A provider that hands over the bytes (`.engine`) is played by Vespertine's engine and gets the normal signal path. A provider whose own player makes the sound (`.external`; none exists) can never read `BIT-PERFECT`. A stream that is not the file the server lists is marked as converted and can't read `BIT-PERFECT` either. A format that is only listed, not yet played, is marked "≈".
+5. **One gate per provider.** Every request of a provider goes through one gate, which spaces them, lets playback go ahead of background listing, and backs off when the server answers 429 or 503 with `Retry-After` (60 seconds when the server names no time). Settings then says in a plain sentence that the server asked Vespertine to wait, and for how long.
+6. **Library rows carry a source.** A provider's songs are rows of the one library, tied to a source that names the provider and a random account id. That is what lets an album held as files and on a server be one album with two copies. The migration that made room for them adds only empty tables and columns.
+
+### The provider contract
+
+A provider implements `StreamingProvider`:
+
+| Member | What it is for |
+|---|---|
+| `id`, `account` | The provider's id (lower case, such as `opensubsonic`) and which of its accounts this instance reads. |
+| `capabilities` | What it can do: search, library, playlists, favorites, play reports, range requests, several accounts. The app shows only what is listed. |
+| `playbackMode` | `.engine` (hands over bytes) or `.external` (its own player makes the sound). |
+| `storagePolicy` | `.transientCacheOnly` or `.offlineAllowed(termsReference:)`. |
+| `session()`, `signIn(_:)`, `signOut()` | Whether there is a credential (Keychain only, no network), checking what was typed with the server and keeping the least needed, and deleting it. |
+| `search`, `library`, `tracks(of:)` | Listing. |
+| `openStream(_:)` | A song's bytes for the transient playback cache (`.engine` only). |
+| `setStarred`, `reportPlayed` | Favorites and play reports, when the capabilities list them. |
+| `waitingUntil`, `stop()` | Until when the server asked to wait, and stopping everything in flight when the switch goes off. |
+
+A provider is registered with `StreamingCore` as a `ProviderDescriptor`, which says what it is before one is made. The core makes it only while its switch is on.
+
+No provider for TIDAL, Qobuz, Apple Music, Spotify, Amazon Music or Deezer exists, and none can be added without an agreement with that service that an open-source player can honour.
