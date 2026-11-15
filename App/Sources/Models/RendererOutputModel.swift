@@ -76,15 +76,19 @@ final class RendererOutputModel {
             playback = nil
             return nil
         }
-        // The same renderer at the same address, or one that is answering as it is: its playback carries on. A renderer that
-        // came back somewhere else (a new port after a restart, a new address from DHCP) gets a new one, to its new address.
-        if let playback, playback.renderer.uid == device.uid, playback.renderer.description == device.description || playback.isEngaged {
+        // The same renderer at the same address, or one that is answering as it is: its playback carries on. So does one
+        // that is starting a song: it goes to the renderer's new address by itself. Otherwise a renderer that came back
+        // somewhere else (a new port after a restart, a new address from DHCP) gets a new one, to its new address.
+        if let playback, playback.renderer.uid == device.uid,
+           playback.renderer.description == device.description || playback.isEngaged || playback.isStarting {
             playback.update(settings: settings)
             return playback
         }
         playback?.shutdown()
         guard let transport = try? device.makeTransport() else { playback = nil; return nil }
         let made = RendererPlayback(renderer: device, transport: transport, media: service.media, processed: ProcessedStreamMaker())
+        // Not answering where it was found (it restarted, or its address changed while it sat unused): looked for again.
+        made.relocate = { [discovery = service.discovery] device in await discovery.relocate(device) }
         made.update(settings: settings)
         playback = made
         return made

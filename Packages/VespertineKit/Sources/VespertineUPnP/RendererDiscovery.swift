@@ -127,6 +127,22 @@ public final class RendererDiscovery: @unchecked Sendable {
         Task { [weak self] in await self?.searchOnce() }
     }
 
+    /// Searches now for a renderer that doesn't answer where `device` says it is, and answers it as it is on the network now
+    /// when that is somewhere else (another port after a restart, another address); nil when it is where it was, or gone.
+    public func relocate(_ device: RendererDevice) async -> RendererDevice? {
+        guard isRunning else { return nil }
+        // A search already under way was sent before this was asked (the renderer may have answered it from where it
+        // was): it is left to finish, then a search of this call's own is made.
+        while isSearching { try? await Task.sleep(for: .milliseconds(20)) }
+        await searchOnce()
+        while isSearching { try? await Task.sleep(for: .milliseconds(20)) }
+        return current(device)
+    }
+
+    private func current(_ device: RendererDevice) -> RendererDevice? {
+        lock.withLock { found[device.description.udn]?.device }.flatMap { $0.description != device.description ? $0 : nil }
+    }
+
     /// One search: new renderers are read, known ones kept, missing ones counted.
     public func searchOnce() async {
         let go = lock.withLock { () -> Bool in
