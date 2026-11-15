@@ -290,271 +290,271 @@
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine እርስዎ ካከሏቸው የሙዚቃ አገልጋዮች እና የአውታረ መረብ ማጋሪያዎች ጋር በአውታረ መረብዎ ላይ ወይም በVPN በኩል ይገናኛል። ሪሞትን ካበሩ፣ ያጣመሯቸው ስልኮች እና አሳሾችም ሊቆጣጠሩት ይችላሉ። «የአውታረ መረብ ማጫወቻዎች»ን ወይም «የAirPlay ማጫወቻዎች»ን ካበሩ፣ በአውታረ መረብዎ ላይ ያሉ የአውታረ መረብ ማጫወቻዎችን እና የAirPlay ተቀባዮችን ያገኛል፣ የሚያጫውቱትን ሙዚቃም ይልክላቸዋል።"
+            "value": "Vespertine እርስዎ ካከሏቸው የሙዚቃ አገልጋዮች እና የአውታረ መረብ ማጋሪያዎች ጋር በአውታረ መረብዎ ላይ ወይም በVPN በኩል ይገናኛል። ሪሞትን ካበሩ፣ ያጣመሯቸው ስልኮች እና አሳሾችም ሊቆጣጠሩት ይችላሉ። «የአውታረ መረብ ማጫወቻዎች»ን ወይም «የAirPlay ማጫወቻዎች»ን ካበሩ፣ በአውታረ መረብዎ ላይ ያሉ የአውታረ መረብ ማጫወቻዎችን እና የAirPlay ተቀባዮችን ያገኛል፣ የሚያጫውቱትን ሙዚቃም ይልክላቸዋል። “ከሌሎች መተግበሪያዎች ተቀበል”ን ካበሩ በአውታረ መረብዎ ላይ ያሉ መተግበሪያዎች ይህን Mac ማግኘትና እንዲያጫውት ሙዚቃ መላክ ይችላሉ።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يتصل Vespertine بخوادم الموسيقى ومشاركات الشبكة التي تضيفها، على شبكتك أو عبر VPN. وإذا شغّلت «التحكم عن بُعد»، يمكن للهواتف والمتصفحات التي تقرنها التحكم فيه أيضًا. وإذا شغّلت «مشغّلات الشبكة» أو «مشغّلات AirPlay»، فإنه يعثر على مشغّلات الشبكة ومستقبِلات AirPlay على شبكتك ويرسل إليها الموسيقى التي تشغّلها."
+            "value": "يتصل Vespertine بخوادم الموسيقى ومشاركات الشبكة التي تضيفها، على شبكتك أو عبر VPN. وإذا شغّلت «التحكم عن بُعد»، يمكن للهواتف والمتصفحات التي تقرنها التحكم فيه أيضًا. وإذا شغّلت «مشغّلات الشبكة» أو «مشغّلات AirPlay»، فإنه يعثر على مشغّلات الشبكة ومستقبِلات AirPlay على شبكتك ويرسل إليها الموسيقى التي تشغّلها. إذا فعّلت «الاستقبال من تطبيقات أخرى»، يمكن للتطبيقات الموجودة على شبكتك العثور على هذا الـ Mac وإرسال الموسيقى إليه ليشغّلها."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "আপনার যোগ করা মিউজিক সার্ভার ও নেটওয়ার্ক শেয়ারের সাথে Vespertine সংযোগ করে, আপনার নেটওয়ার্কে বা VPN-এর মাধ্যমে। রিমোট চালু করলে, আপনার পেয়ার করা ফোন ও ব্রাউজার থেকেও এটি নিয়ন্ত্রণ করা যায়। “নেটওয়ার্ক প্লেয়ার” বা “AirPlay প্লেয়ার” চালু করলে, এটি আপনার নেটওয়ার্কের নেটওয়ার্ক প্লেয়ার ও AirPlay রিসিভার খুঁজে নেয় এবং আপনি যে গান চালান তা সেগুলোতে পাঠায়।"
+            "value": "আপনার যোগ করা মিউজিক সার্ভার ও নেটওয়ার্ক শেয়ারের সাথে Vespertine সংযোগ করে, আপনার নেটওয়ার্কে বা VPN-এর মাধ্যমে। রিমোট চালু করলে, আপনার পেয়ার করা ফোন ও ব্রাউজার থেকেও এটি নিয়ন্ত্রণ করা যায়। “নেটওয়ার্ক প্লেয়ার” বা “AirPlay প্লেয়ার” চালু করলে, এটি আপনার নেটওয়ার্কের নেটওয়ার্ক প্লেয়ার ও AirPlay রিসিভার খুঁজে নেয় এবং আপনি যে গান চালান তা সেগুলোতে পাঠায়। আপনি “অন্য অ্যাপ থেকে গ্রহণ করুন” চালু করলে আপনার নেটওয়ার্কের অ্যাপগুলো এই Mac খুঁজে পেতে পারে এবং চালানোর জন্য এতে গান পাঠাতে পারে।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine se připojuje k hudebním serverům a síťovým sdílením, která přidáte, ve vaší síti nebo přes VPN. Když zapnete Dálkové ovládání, mohou ho ovládat i telefony a prohlížeče, které spárujete. Když zapnete Síťové přehrávače nebo Přehrávače AirPlay, vyhledá síťové přehrávače a přijímače AirPlay ve vaší síti a posílá jim hudbu, kterou přehráváte."
+            "value": "Vespertine se připojuje k hudebním serverům a síťovým sdílením, která přidáte, ve vaší síti nebo přes VPN. Když zapnete Dálkové ovládání, mohou ho ovládat i telefony a prohlížeče, které spárujete. Když zapnete Síťové přehrávače nebo Přehrávače AirPlay, vyhledá síťové přehrávače a přijímače AirPlay ve vaší síti a posílá jim hudbu, kterou přehráváte. Pokud zapnete volbu „Přijímat z jiných aplikací“, mohou aplikace ve vaší síti tento Mac najít a posílat mu hudbu k přehrání."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine opretter forbindelse til de musikservere og netværksdelinger, du tilføjer, på dit netværk eller via VPN. Hvis du slår Fjernbetjening til, kan de telefoner og browsere, du parrer, også styre det. Hvis du slår Netværksafspillere eller AirPlay-afspillere til, finder det netværksafspillerne og AirPlay-modtagerne på dit netværk og sender dem den musik, du afspiller."
+            "value": "Vespertine opretter forbindelse til de musikservere og netværksdelinger, du tilføjer, på dit netværk eller via VPN. Hvis du slår Fjernbetjening til, kan de telefoner og browsere, du parrer, også styre det. Hvis du slår Netværksafspillere eller AirPlay-afspillere til, finder det netværksafspillerne og AirPlay-modtagerne på dit netværk og sender dem den musik, du afspiller. Hvis du slår “Modtag fra andre apps” til, kan apps på dit netværk finde denne Mac og sende musik til den, som den afspiller."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine verbindet sich mit den Musikservern und Netzwerkfreigaben, die du hinzufügst – in deinem Netzwerk oder über ein VPN. Wenn du „Fernbedienung“ einschaltest, können es auch die Telefone und Browser steuern, die du koppelst. Wenn du „Netzwerkplayer“ oder „AirPlay-Player“ einschaltest, findet es die Netzwerkplayer und AirPlay-Empfänger in deinem Netzwerk und sendet ihnen die Musik, die du abspielst."
+            "value": "Vespertine verbindet sich mit den Musikservern und Netzwerkfreigaben, die du hinzufügst – in deinem Netzwerk oder über ein VPN. Wenn du „Fernbedienung“ einschaltest, können es auch die Telefone und Browser steuern, die du koppelst. Wenn du „Netzwerkplayer“ oder „AirPlay-Player“ einschaltest, findet es die Netzwerkplayer und AirPlay-Empfänger in deinem Netzwerk und sendet ihnen die Musik, die du abspielst. Wenn du „Von anderen Apps empfangen“ einschaltest, können Apps in deinem Netzwerk diesen Mac finden und ihm Musik zum Abspielen senden."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Το Vespertine συνδέεται στους διακομιστές μουσικής και τους κοινόχρηστους φακέλους δικτύου που προσθέτετε, στο δίκτυό σας ή μέσω VPN. Αν ενεργοποιήσετε τον Τηλεχειρισμό, μπορούν να το ελέγχουν και τα τηλέφωνα και τα προγράμματα περιήγησης που αντιστοιχίζετε. Αν ενεργοποιήσετε τους «Δικτυακούς αναπαραγωγείς» ή τους «Αναπαραγωγείς AirPlay», βρίσκει τους δικτυακούς αναπαραγωγείς και τους δέκτες AirPlay στο δίκτυό σας και τους στέλνει τη μουσική που παίζετε."
+            "value": "Το Vespertine συνδέεται στους διακομιστές μουσικής και τους κοινόχρηστους φακέλους δικτύου που προσθέτετε, στο δίκτυό σας ή μέσω VPN. Αν ενεργοποιήσετε τον Τηλεχειρισμό, μπορούν να το ελέγχουν και τα τηλέφωνα και τα προγράμματα περιήγησης που αντιστοιχίζετε. Αν ενεργοποιήσετε τους «Δικτυακούς αναπαραγωγείς» ή τους «Αναπαραγωγείς AirPlay», βρίσκει τους δικτυακούς αναπαραγωγείς και τους δέκτες AirPlay στο δίκτυό σας και τους στέλνει τη μουσική που παίζετε. Αν ενεργοποιήσετε την «Λήψη από άλλες εφαρμογές», οι εφαρμογές του δικτύου σας μπορούν να βρουν αυτό το Mac και να του στείλουν μουσική για αναπαραγωγή."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine connects to the music servers and network shares you add, on your network or over a VPN. If you turn on Remote, the phones and browsers you pair can control it too. If you turn on Network Players or AirPlay Players, it finds the network players and AirPlay receivers on your network and sends them the music you play."
+            "value": "Vespertine connects to the music servers and network shares you add, on your network or over a VPN. If you turn on Remote, the phones and browsers you pair can control it too. If you turn on Network Players or AirPlay Players, it finds the network players and AirPlay receivers on your network and sends them the music you play. If you turn on Receive from Other Apps, apps on your network can find this Mac and send it music to play."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine se conecta a los servidores de música y recursos compartidos de red que añadas, en tu red o a través de una VPN. Si activas Control remoto, los teléfonos y navegadores que enlaces también podrán controlarlo. Si activas Reproductores de red o Reproductores AirPlay, busca los reproductores de red y los receptores AirPlay de tu red y les envía la música que reproduces."
+            "value": "Vespertine se conecta a los servidores de música y recursos compartidos de red que añadas, en tu red o a través de una VPN. Si activas Control remoto, los teléfonos y navegadores que enlaces también podrán controlarlo. Si activas Reproductores de red o Reproductores AirPlay, busca los reproductores de red y los receptores AirPlay de tu red y les envía la música que reproduces. Si activas «Recibir de otras apps», las apps de tu red pueden encontrar este Mac y enviarle música para que la reproduzca."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine به سرورهای موسیقی و اشتراک‌های شبکه‌ای که اضافه می‌کنید وصل می‌شود، در شبکهٔ شما یا از طریق VPN. اگر «کنترل از راه دور» را روشن کنید، تلفن‌ها و مرورگرهایی که جفت می‌کنید هم می‌توانند آن را کنترل کنند. اگر «پخش‌کننده‌های شبکه» یا «پخش‌کننده‌های AirPlay» را روشن کنید، پخش‌کننده‌های شبکه و گیرنده‌های AirPlay را در شبکهٔ شما پیدا می‌کند و موسیقی‌ای را که پخش می‌کنید برایشان می‌فرستد."
+            "value": "Vespertine به سرورهای موسیقی و اشتراک‌های شبکه‌ای که اضافه می‌کنید وصل می‌شود، در شبکهٔ شما یا از طریق VPN. اگر «کنترل از راه دور» را روشن کنید، تلفن‌ها و مرورگرهایی که جفت می‌کنید هم می‌توانند آن را کنترل کنند. اگر «پخش‌کننده‌های شبکه» یا «پخش‌کننده‌های AirPlay» را روشن کنید، پخش‌کننده‌های شبکه و گیرنده‌های AirPlay را در شبکهٔ شما پیدا می‌کند و موسیقی‌ای را که پخش می‌کنید برایشان می‌فرستد. اگر «دریافت از برنامه‌های دیگر» را روشن کنید، برنامه‌های شبکهٔ شما می‌توانند این Mac را پیدا کنند و برای پخش به آن موسیقی بفرستند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine muodostaa yhteyden lisäämiisi musiikkipalvelimiin ja verkkojakoihin omassa verkossasi tai VPN:n kautta. Jos otat Kaukosäätimen käyttöön, myös pariliittämäsi puhelimet ja selaimet voivat ohjata sitä. Jos otat käyttöön Verkkosoittimet tai AirPlay-soittimet, se etsii verkossasi olevat verkkosoittimet ja AirPlay-vastaanottimet ja lähettää niihin toistamasi musiikin."
+            "value": "Vespertine muodostaa yhteyden lisäämiisi musiikkipalvelimiin ja verkkojakoihin omassa verkossasi tai VPN:n kautta. Jos otat Kaukosäätimen käyttöön, myös pariliittämäsi puhelimet ja selaimet voivat ohjata sitä. Jos otat käyttöön Verkkosoittimet tai AirPlay-soittimet, se etsii verkossasi olevat verkkosoittimet ja AirPlay-vastaanottimet ja lähettää niihin toistamasi musiikin. Jos otat käyttöön asetuksen ”Vastaanota muista apeista”, verkossasi olevat apit voivat löytää tämän Macin ja lähettää sille musiikkia toistettavaksi."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kumokonekta ang Vespertine sa mga music server at network share na idinagdag mo, sa network mo o sa pamamagitan ng VPN. Kapag binuksan mo ang Remote, makokontrol din ito ng mga phone at browser na ipinares mo. Kapag binuksan mo ang Mga Network Player o Mga AirPlay Player, hinahanap nito ang mga network player at AirPlay receiver sa network mo at ipinapadala sa kanila ang musikang pinatutugtog mo."
+            "value": "Kumokonekta ang Vespertine sa mga music server at network share na idinagdag mo, sa network mo o sa pamamagitan ng VPN. Kapag binuksan mo ang Remote, makokontrol din ito ng mga phone at browser na ipinares mo. Kapag binuksan mo ang Mga Network Player o Mga AirPlay Player, hinahanap nito ang mga network player at AirPlay receiver sa network mo at ipinapadala sa kanila ang musikang pinatutugtog mo. Kapag in-on mo ang “Tumanggap mula sa Ibang App”, mahahanap ng mga app sa network mo ang Mac na ito at makakapagpadala sila rito ng musikang patutugtugin."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine se connecte aux serveurs de musique et aux partages réseau que vous ajoutez, sur votre réseau ou via un VPN. Si vous activez Télécommande, les téléphones et navigateurs que vous jumelez peuvent aussi le contrôler. Si vous activez Lecteurs réseau ou Lecteurs AirPlay, il trouve les lecteurs réseau et les récepteurs AirPlay de votre réseau et leur envoie la musique que vous écoutez."
+            "value": "Vespertine se connecte aux serveurs de musique et aux partages réseau que vous ajoutez, sur votre réseau ou via un VPN. Si vous activez Télécommande, les téléphones et navigateurs que vous jumelez peuvent aussi le contrôler. Si vous activez Lecteurs réseau ou Lecteurs AirPlay, il trouve les lecteurs réseau et les récepteurs AirPlay de votre réseau et leur envoie la musique que vous écoutez. Si vous activez « Recevoir depuis d’autres apps », les apps de votre réseau peuvent trouver ce Mac et lui envoyer de la musique à lire."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine તમે ઉમેરેલા મ્યુઝિક સર્વર અને નેટવર્ક શેર સાથે તમારા નેટવર્ક પર અથવા VPN દ્વારા કનેક્ટ થાય છે. જો તમે રિમોટ ચાલુ કરો, તો તમે જોડેલા ફોન અને બ્રાઉઝર પણ તેને નિયંત્રિત કરી શકે છે. જો તમે નેટવર્ક પ્લેયર અથવા AirPlay પ્લેયર ચાલુ કરો, તો તે તમારા નેટવર્ક પરનાં નેટવર્ક પ્લેયર અને AirPlay રિસીવર શોધે છે અને તમે જે સંગીત વગાડો છો તે તેમને મોકલે છે."
+            "value": "Vespertine તમે ઉમેરેલા મ્યુઝિક સર્વર અને નેટવર્ક શેર સાથે તમારા નેટવર્ક પર અથવા VPN દ્વારા કનેક્ટ થાય છે. જો તમે રિમોટ ચાલુ કરો, તો તમે જોડેલા ફોન અને બ્રાઉઝર પણ તેને નિયંત્રિત કરી શકે છે. જો તમે નેટવર્ક પ્લેયર અથવા AirPlay પ્લેયર ચાલુ કરો, તો તે તમારા નેટવર્ક પરનાં નેટવર્ક પ્લેયર અને AirPlay રિસીવર શોધે છે અને તમે જે સંગીત વગાડો છો તે તેમને મોકલે છે. જો તમે “અન્ય ઍપમાંથી મેળવો” ચાલુ કરો, તો તમારા નેટવર્ક પરની ઍપ આ Mac ને શોધી શકે છે અને તેને વગાડવા માટે સંગીત મોકલી શકે છે."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine yana haɗuwa da sabobin kiɗa da foldojin cibiyar sadarwa da kuka ƙara, a kan cibiyar sadarwarku ko ta VPN. Idan kun kunna Rimot, wayoyi da masu bincike da kuka haɗa su ma za su iya sarrafa shi. Idan kun kunna Masu Kunnawa na Cibiyar Sadarwa ko Masu Kunnawa na AirPlay, yana nemo masu kunnawa na cibiyar sadarwa da risivocin AirPlay da ke kan cibiyar sadarwarku kuma yana aika musu kiɗan da kuke kunnawa."
+            "value": "Vespertine yana haɗuwa da sabobin kiɗa da foldojin cibiyar sadarwa da kuka ƙara, a kan cibiyar sadarwarku ko ta VPN. Idan kun kunna Rimot, wayoyi da masu bincike da kuka haɗa su ma za su iya sarrafa shi. Idan kun kunna Masu Kunnawa na Cibiyar Sadarwa ko Masu Kunnawa na AirPlay, yana nemo masu kunnawa na cibiyar sadarwa da risivocin AirPlay da ke kan cibiyar sadarwarku kuma yana aika musu kiɗan da kuke kunnawa. Idan kuka kunna “Karɓa daga wasu manhajoji”, manhajojin da ke kan cibiyar sadarwarku za su iya nemo wannan Mac su aika mata kiɗa don ta kunna."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine מתחבר לשרתי המוזיקה ולשיתופי הרשת שהוספת, ברשת שלך או דרך VPN. אם תפעיל את „שלט רחוק”, גם הטלפונים והדפדפנים שתצמיד יוכלו לשלוט בו. אם תפעיל את „נגני רשת” או את „נגני AirPlay”, הוא ימצא את נגני הרשת ואת מקלטי AirPlay ברשת שלך וישלח אליהם את המוזיקה שאתה מנגן."
+            "value": "Vespertine מתחבר לשרתי המוזיקה ולשיתופי הרשת שהוספת, ברשת שלך או דרך VPN. אם תפעיל את „שלט רחוק”, גם הטלפונים והדפדפנים שתצמיד יוכלו לשלוט בו. אם תפעיל את „נגני רשת” או את „נגני AirPlay”, הוא ימצא את נגני הרשת ואת מקלטי AirPlay ברשת שלך וישלח אליהם את המוזיקה שאתה מנגן. אם מפעילים את ״קבלה מאפליקציות אחרות״, אפליקציות ברשת שלך יכולות למצוא את ה־Mac הזה ולשלוח אליו מוזיקה לניגון."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine आपके द्वारा जोड़े गए म्यूज़िक सर्वर और नेटवर्क शेयर से आपके नेटवर्क पर या VPN के ज़रिए कनेक्ट होता है। अगर आप रिमोट चालू करते हैं, तो आपके पेयर किए गए फ़ोन और ब्राउज़र भी इसे नियंत्रित कर सकते हैं। अगर आप नेटवर्क प्लेयर या AirPlay प्लेयर चालू करते हैं, तो यह आपके नेटवर्क पर मौजूद नेटवर्क प्लेयर और AirPlay रिसीवर खोजता है और आपका चलाया संगीत उन्हें भेजता है।"
+            "value": "Vespertine आपके द्वारा जोड़े गए म्यूज़िक सर्वर और नेटवर्क शेयर से आपके नेटवर्क पर या VPN के ज़रिए कनेक्ट होता है। अगर आप रिमोट चालू करते हैं, तो आपके पेयर किए गए फ़ोन और ब्राउज़र भी इसे नियंत्रित कर सकते हैं। अगर आप नेटवर्क प्लेयर या AirPlay प्लेयर चालू करते हैं, तो यह आपके नेटवर्क पर मौजूद नेटवर्क प्लेयर और AirPlay रिसीवर खोजता है और आपका चलाया संगीत उन्हें भेजता है। अगर आप “अन्य ऐप से प्राप्त करें” चालू करते हैं, तो आपके नेटवर्क के ऐप इस Mac को खोज सकते हैं और इसे चलाने के लिए संगीत भेज सकते हैं।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A Vespertine csatlakozik az Ön által hozzáadott zeneszerverekhez és hálózati megosztásokhoz, a hálózatán vagy VPN-en keresztül. Ha bekapcsolja a Távirányítót, az Ön által párosított telefonok és böngészők is vezérelhetik. Ha bekapcsolja a Hálózati lejátszók vagy az AirPlay-lejátszók funkciót, megkeresi a hálózatán lévő hálózati lejátszókat és AirPlay-vevőket, és elküldi nekik az Ön által lejátszott zenét."
+            "value": "A Vespertine csatlakozik az Ön által hozzáadott zeneszerverekhez és hálózati megosztásokhoz, a hálózatán vagy VPN-en keresztül. Ha bekapcsolja a Távirányítót, az Ön által párosított telefonok és böngészők is vezérelhetik. Ha bekapcsolja a Hálózati lejátszók vagy az AirPlay-lejátszók funkciót, megkeresi a hálózatán lévő hálózati lejátszókat és AirPlay-vevőket, és elküldi nekik az Ön által lejátszott zenét. Ha bekapcsolja a „Fogadás más appokból” beállítást, a hálózatán lévő appok megtalálhatják ezt a Macet, és zenét küldhetnek neki lejátszásra."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine terhubung ke server musik dan share jaringan yang Anda tambahkan, di jaringan Anda atau melalui VPN. Jika Anda menyalakan Kendali Jauh, ponsel dan browser yang Anda pasangkan juga dapat mengendalikannya. Jika Anda menyalakan Pemutar Jaringan atau Pemutar AirPlay, Vespertine menemukan pemutar jaringan dan receiver AirPlay di jaringan Anda dan mengirimkan musik yang Anda putar ke perangkat tersebut."
+            "value": "Vespertine terhubung ke server musik dan share jaringan yang Anda tambahkan, di jaringan Anda atau melalui VPN. Jika Anda menyalakan Kendali Jauh, ponsel dan browser yang Anda pasangkan juga dapat mengendalikannya. Jika Anda menyalakan Pemutar Jaringan atau Pemutar AirPlay, Vespertine menemukan pemutar jaringan dan receiver AirPlay di jaringan Anda dan mengirimkan musik yang Anda putar ke perangkat tersebut. Jika Anda menyalakan “Terima dari App Lain”, app di jaringan Anda dapat menemukan Mac ini dan mengirim musik untuk diputarnya."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine si connette ai server musicali e alle condivisioni di rete che aggiungi, sulla tua rete o tramite VPN. Se attivi Telecomando, anche i telefoni e i browser che abbini possono controllarlo. Se attivi Lettori di rete o Lettori AirPlay, trova i lettori di rete e i ricevitori AirPlay sulla tua rete e invia loro la musica che riproduci."
+            "value": "Vespertine si connette ai server musicali e alle condivisioni di rete che aggiungi, sulla tua rete o tramite VPN. Se attivi Telecomando, anche i telefoni e i browser che abbini possono controllarlo. Se attivi Lettori di rete o Lettori AirPlay, trova i lettori di rete e i ricevitori AirPlay sulla tua rete e invia loro la musica che riproduci. Se attivi “Ricevi da altre app”, le app della tua rete possono trovare questo Mac e inviargli musica da riprodurre."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertineは、追加した音楽サーバやネットワーク共有に、ネットワーク上で、またはVPN経由で接続します。リモートをオンにすると、ペアリングしたスマートフォンやブラウザからも操作できます。「ネットワークプレーヤー」または「AirPlayプレーヤー」をオンにすると、ネットワーク上のネットワークプレーヤーやAirPlayレシーバーを検出し、再生する音楽をそれらに送信します。"
+            "value": "Vespertineは、追加した音楽サーバやネットワーク共有に、ネットワーク上で、またはVPN経由で接続します。リモートをオンにすると、ペアリングしたスマートフォンやブラウザからも操作できます。「ネットワークプレーヤー」または「AirPlayプレーヤー」をオンにすると、ネットワーク上のネットワークプレーヤーやAirPlayレシーバーを検出し、再生する音楽をそれらに送信します。「ほかのアプリから受信」をオンにすると、ネットワーク上のアプリがこのMacを見つけて、再生する音楽を送信できるようになります。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ನೀವು ಸೇರಿಸುವ ಮ್ಯೂಸಿಕ್ ಸರ್ವರ್‌ಗಳು ಮತ್ತು ನೆಟ್‌ವರ್ಕ್ ಶೇರ್‌ಗಳಿಗೆ Vespertine ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ ಅಥವಾ VPN ಮೂಲಕ ಸಂಪರ್ಕಿಸುತ್ತದೆ. ನೀವು ರಿಮೋಟ್ ಆನ್ ಮಾಡಿದರೆ, ನೀವು ಜೋಡಿಸಿದ ಫೋನ್‌ಗಳು ಮತ್ತು ಬ್ರೌಸರ್‌ಗಳೂ ಇದನ್ನು ನಿಯಂತ್ರಿಸಬಹುದು. ನೀವು ನೆಟ್‌ವರ್ಕ್ ಪ್ಲೇಯರ್‌ಗಳು ಅಥವಾ AirPlay ಪ್ಲೇಯರ್‌ಗಳು ಆನ್ ಮಾಡಿದರೆ, ಇದು ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿರುವ ನೆಟ್‌ವರ್ಕ್ ಪ್ಲೇಯರ್‌ಗಳು ಮತ್ತು AirPlay ರಿಸೀವರ್‌ಗಳನ್ನು ಹುಡುಕಿ, ನೀವು ಪ್ಲೇ ಮಾಡುವ ಸಂಗೀತವನ್ನು ಅವುಗಳಿಗೆ ಕಳುಹಿಸುತ್ತದೆ."
+            "value": "ನೀವು ಸೇರಿಸುವ ಮ್ಯೂಸಿಕ್ ಸರ್ವರ್‌ಗಳು ಮತ್ತು ನೆಟ್‌ವರ್ಕ್ ಶೇರ್‌ಗಳಿಗೆ Vespertine ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ ಅಥವಾ VPN ಮೂಲಕ ಸಂಪರ್ಕಿಸುತ್ತದೆ. ನೀವು ರಿಮೋಟ್ ಆನ್ ಮಾಡಿದರೆ, ನೀವು ಜೋಡಿಸಿದ ಫೋನ್‌ಗಳು ಮತ್ತು ಬ್ರೌಸರ್‌ಗಳೂ ಇದನ್ನು ನಿಯಂತ್ರಿಸಬಹುದು. ನೀವು ನೆಟ್‌ವರ್ಕ್ ಪ್ಲೇಯರ್‌ಗಳು ಅಥವಾ AirPlay ಪ್ಲೇಯರ್‌ಗಳು ಆನ್ ಮಾಡಿದರೆ, ಇದು ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿರುವ ನೆಟ್‌ವರ್ಕ್ ಪ್ಲೇಯರ್‌ಗಳು ಮತ್ತು AirPlay ರಿಸೀವರ್‌ಗಳನ್ನು ಹುಡುಕಿ, ನೀವು ಪ್ಲೇ ಮಾಡುವ ಸಂಗೀತವನ್ನು ಅವುಗಳಿಗೆ ಕಳುಹಿಸುತ್ತದೆ. ನೀವು “ಇತರ ಆ್ಯಪ್‌ಗಳಿಂದ ಸ್ವೀಕರಿಸಿ” ಆನ್ ಮಾಡಿದರೆ, ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿರುವ ಆ್ಯಪ್‌ಗಳು ಈ Mac ಅನ್ನು ಹುಡುಕಿ, ಪ್ಲೇ ಮಾಡಲು ಅದಕ್ಕೆ ಸಂಗೀತ ಕಳುಹಿಸಬಹುದು."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine은 사용자가 추가한 음악 서버 및 네트워크 공유에 사용자의 네트워크 또는 VPN을 통해 연결합니다. 리모트를 켜면 페어링한 휴대폰과 브라우저에서도 제어할 수 있습니다. 네트워크 플레이어 또는 AirPlay 플레이어를 켜면 사용자의 네트워크에 있는 네트워크 플레이어와 AirPlay 리시버를 찾아 재생하는 음악을 전송합니다."
+            "value": "Vespertine은 사용자가 추가한 음악 서버 및 네트워크 공유에 사용자의 네트워크 또는 VPN을 통해 연결합니다. 리모트를 켜면 페어링한 휴대폰과 브라우저에서도 제어할 수 있습니다. 네트워크 플레이어 또는 AirPlay 플레이어를 켜면 사용자의 네트워크에 있는 네트워크 플레이어와 AirPlay 리시버를 찾아 재생하는 음악을 전송합니다. ‘다른 앱에서 받기’을 켜면 네트워크에 있는 앱이 이 Mac을 찾아 재생할 음악을 보낼 수 있습니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "നിങ്ങൾ ചേർക്കുന്ന മ്യൂസിക് സെർവറുകളിലേക്കും നെറ്റ്‌വർക്ക് ഷെയറുകളിലേക്കും നിങ്ങളുടെ നെറ്റ്‌വർക്കിലോ VPN വഴിയോ Vespertine കണക്റ്റ് ചെയ്യുന്നു. റിമോട്ട് ഓണാക്കിയാൽ, നിങ്ങൾ ജോടിയാക്കുന്ന ഫോണുകൾക്കും ബ്രൗസറുകൾക്കും ഇതിനെ നിയന്ത്രിക്കാനാകും. നെറ്റ്‌വർക്ക് പ്ലെയറുകൾ അല്ലെങ്കിൽ AirPlay പ്ലെയറുകൾ ഓണാക്കിയാൽ, ഇത് നിങ്ങളുടെ നെറ്റ്‌വർക്കിലെ നെറ്റ്‌വർക്ക് പ്ലെയറുകളെയും AirPlay റിസീവറുകളെയും കണ്ടെത്തി നിങ്ങൾ പ്ലേ ചെയ്യുന്ന സംഗീതം അവയിലേക്ക് അയയ്ക്കുന്നു."
+            "value": "നിങ്ങൾ ചേർക്കുന്ന മ്യൂസിക് സെർവറുകളിലേക്കും നെറ്റ്‌വർക്ക് ഷെയറുകളിലേക്കും നിങ്ങളുടെ നെറ്റ്‌വർക്കിലോ VPN വഴിയോ Vespertine കണക്റ്റ് ചെയ്യുന്നു. റിമോട്ട് ഓണാക്കിയാൽ, നിങ്ങൾ ജോടിയാക്കുന്ന ഫോണുകൾക്കും ബ്രൗസറുകൾക്കും ഇതിനെ നിയന്ത്രിക്കാനാകും. നെറ്റ്‌വർക്ക് പ്ലെയറുകൾ അല്ലെങ്കിൽ AirPlay പ്ലെയറുകൾ ഓണാക്കിയാൽ, ഇത് നിങ്ങളുടെ നെറ്റ്‌വർക്കിലെ നെറ്റ്‌വർക്ക് പ്ലെയറുകളെയും AirPlay റിസീവറുകളെയും കണ്ടെത്തി നിങ്ങൾ പ്ലേ ചെയ്യുന്ന സംഗീതം അവയിലേക്ക് അയയ്ക്കുന്നു. നിങ്ങൾ “മറ്റ് ആപ്പുകളിൽ നിന്ന് സ്വീകരിക്കുക” ഓണാക്കിയാൽ, നിങ്ങളുടെ നെറ്റ്‌വർക്കിലെ ആപ്പുകൾക്ക് ഈ Mac കണ്ടെത്താനും പ്ലേ ചെയ്യാൻ അതിലേക്ക് സംഗീതം അയയ്ക്കാനും കഴിയും."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "तुम्ही जोडलेल्या म्युझिक सर्व्हर आणि नेटवर्क शेअरशी Vespertine तुमच्या नेटवर्कवर किंवा VPN द्वारे कनेक्ट होते. तुम्ही रिमोट चालू केल्यास, तुम्ही जोडलेले फोन आणि ब्राउझरही ते नियंत्रित करू शकतात. तुम्ही नेटवर्क प्लेअर किंवा AirPlay प्लेअर चालू केल्यास, ते तुमच्या नेटवर्कवरील नेटवर्क प्लेअर आणि AirPlay रिसीव्हर शोधते आणि तुम्ही प्ले करत असलेले संगीत त्यांना पाठवते."
+            "value": "तुम्ही जोडलेल्या म्युझिक सर्व्हर आणि नेटवर्क शेअरशी Vespertine तुमच्या नेटवर्कवर किंवा VPN द्वारे कनेक्ट होते. तुम्ही रिमोट चालू केल्यास, तुम्ही जोडलेले फोन आणि ब्राउझरही ते नियंत्रित करू शकतात. तुम्ही नेटवर्क प्लेअर किंवा AirPlay प्लेअर चालू केल्यास, ते तुमच्या नेटवर्कवरील नेटवर्क प्लेअर आणि AirPlay रिसीव्हर शोधते आणि तुम्ही प्ले करत असलेले संगीत त्यांना पाठवते. तुम्ही “इतर ॲप्सकडून प्राप्त करा” सुरू केल्यास, तुमच्या नेटवर्कवरील ॲप्स हा Mac शोधू शकतात आणि प्ले करण्यासाठी त्याला संगीत पाठवू शकतात."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine menyambung ke pelayan muzik dan perkongsian rangkaian yang anda tambah, pada rangkaian anda atau melalui VPN. Jika anda menghidupkan Kawalan Jauh, telefon dan pelayar yang anda gandingkan juga boleh mengawalnya. Jika anda menghidupkan Pemain Rangkaian atau Pemain AirPlay, ia mencari pemain rangkaian dan penerima AirPlay pada rangkaian anda dan menghantar muzik yang anda mainkan kepadanya."
+            "value": "Vespertine menyambung ke pelayan muzik dan perkongsian rangkaian yang anda tambah, pada rangkaian anda atau melalui VPN. Jika anda menghidupkan Kawalan Jauh, telefon dan pelayar yang anda gandingkan juga boleh mengawalnya. Jika anda menghidupkan Pemain Rangkaian atau Pemain AirPlay, ia mencari pemain rangkaian dan penerima AirPlay pada rangkaian anda dan menghantar muzik yang anda mainkan kepadanya. Jika anda menghidupkan “Terima daripada App Lain”, app dalam rangkaian anda boleh mencari Mac ini dan menghantar muzik untuk dimainkannya."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine kobler til musikktjenerne og nettverksdelingene du legger til, på nettverket ditt eller via VPN. Hvis du slår på Fjernkontroll, kan også telefonene og nettleserne du parer, styre den. Hvis du slår på Nettverksspillere eller AirPlay-spillere, finner den nettverksspillerne og AirPlay-mottakerne på nettverket ditt og sender dem musikken du spiller."
+            "value": "Vespertine kobler til musikktjenerne og nettverksdelingene du legger til, på nettverket ditt eller via VPN. Hvis du slår på Fjernkontroll, kan også telefonene og nettleserne du parer, styre den. Hvis du slår på Nettverksspillere eller AirPlay-spillere, finner den nettverksspillerne og AirPlay-mottakerne på nettverket ditt og sender dem musikken du spiller. Hvis du slår på «Motta fra andre apper», kan apper på nettverket ditt finne denne Macen og sende musikk til den for avspilling."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine maakt verbinding met de muziekservers en netwerkshares die je toevoegt, op je netwerk of via een VPN. Als je Afstandsbediening aanzet, kunnen de telefoons en browsers die je koppelt het ook bedienen. Als je Netwerkspelers of AirPlay-spelers aanzet, zoekt het de netwerkspelers en AirPlay-ontvangers op je netwerk en stuurt het ze de muziek die je afspeelt."
+            "value": "Vespertine maakt verbinding met de muziekservers en netwerkshares die je toevoegt, op je netwerk of via een VPN. Als je Afstandsbediening aanzet, kunnen de telefoons en browsers die je koppelt het ook bedienen. Als je Netwerkspelers of AirPlay-spelers aanzet, zoekt het de netwerkspelers en AirPlay-ontvangers op je netwerk en stuurt het ze de muziek die je afspeelt. Als je ‘Ontvangen van andere apps’ aanzet, kunnen apps op je netwerk deze Mac vinden en er muziek naartoe sturen om af te spelen."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ਤੁਹਾਡੇ ਵੱਲੋਂ ਸ਼ਾਮਲ ਕੀਤੇ ਮਿਊਜ਼ਿਕ ਸਰਵਰਾਂ ਅਤੇ ਨੈੱਟਵਰਕ ਸ਼ੇਅਰਾਂ ਨਾਲ ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ’ਤੇ ਜਾਂ VPN ਰਾਹੀਂ ਕਨੈਕਟ ਕਰਦਾ ਹੈ। ਜੇ ਤੁਸੀਂ ਰਿਮੋਟ ਚਾਲੂ ਕਰਦੇ ਹੋ, ਤਾਂ ਤੁਹਾਡੇ ਪੇਅਰ ਕੀਤੇ ਫ਼ੋਨ ਅਤੇ ਬ੍ਰਾਊਜ਼ਰ ਵੀ ਇਸਨੂੰ ਕੰਟਰੋਲ ਕਰ ਸਕਦੇ ਹਨ। ਜੇ ਤੁਸੀਂ ਨੈੱਟਵਰਕ ਪਲੇਅਰ ਜਾਂ AirPlay ਪਲੇਅਰ ਚਾਲੂ ਕਰਦੇ ਹੋ, ਤਾਂ ਇਹ ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ’ਤੇ ਨੈੱਟਵਰਕ ਪਲੇਅਰ ਅਤੇ AirPlay ਰਿਸੀਵਰ ਲੱਭਦਾ ਹੈ ਅਤੇ ਤੁਹਾਡਾ ਚਲਾਇਆ ਸੰਗੀਤ ਉਹਨਾਂ ਨੂੰ ਭੇਜਦਾ ਹੈ।"
+            "value": "Vespertine ਤੁਹਾਡੇ ਵੱਲੋਂ ਸ਼ਾਮਲ ਕੀਤੇ ਮਿਊਜ਼ਿਕ ਸਰਵਰਾਂ ਅਤੇ ਨੈੱਟਵਰਕ ਸ਼ੇਅਰਾਂ ਨਾਲ ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ’ਤੇ ਜਾਂ VPN ਰਾਹੀਂ ਕਨੈਕਟ ਕਰਦਾ ਹੈ। ਜੇ ਤੁਸੀਂ ਰਿਮੋਟ ਚਾਲੂ ਕਰਦੇ ਹੋ, ਤਾਂ ਤੁਹਾਡੇ ਪੇਅਰ ਕੀਤੇ ਫ਼ੋਨ ਅਤੇ ਬ੍ਰਾਊਜ਼ਰ ਵੀ ਇਸਨੂੰ ਕੰਟਰੋਲ ਕਰ ਸਕਦੇ ਹਨ। ਜੇ ਤੁਸੀਂ ਨੈੱਟਵਰਕ ਪਲੇਅਰ ਜਾਂ AirPlay ਪਲੇਅਰ ਚਾਲੂ ਕਰਦੇ ਹੋ, ਤਾਂ ਇਹ ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ’ਤੇ ਨੈੱਟਵਰਕ ਪਲੇਅਰ ਅਤੇ AirPlay ਰਿਸੀਵਰ ਲੱਭਦਾ ਹੈ ਅਤੇ ਤੁਹਾਡਾ ਚਲਾਇਆ ਸੰਗੀਤ ਉਹਨਾਂ ਨੂੰ ਭੇਜਦਾ ਹੈ। ਜੇ ਤੁਸੀਂ “ਹੋਰ ਐਪਾਂ ਤੋਂ ਪ੍ਰਾਪਤ ਕਰੋ” ਚਾਲੂ ਕਰਦੇ ਹੋ, ਤਾਂ ਤੁਹਾਡੇ ਨੈੱਟਵਰਕ ਦੀਆਂ ਐਪਾਂ ਇਸ Mac ਨੂੰ ਲੱਭ ਸਕਦੀਆਂ ਹਨ ਅਤੇ ਚਲਾਉਣ ਲਈ ਇਸਨੂੰ ਸੰਗੀਤ ਭੇਜ ਸਕਦੀਆਂ ਹਨ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine łączy się z dodanymi przez Ciebie serwerami muzyki i zasobami sieciowymi, w Twojej sieci lub przez VPN. Jeśli włączysz Pilota, sparowane przez Ciebie telefony i przeglądarki też będą mogły nim sterować. Jeśli włączysz Odtwarzacze sieciowe lub Odtwarzacze AirPlay, znajdzie odtwarzacze sieciowe i odbiorniki AirPlay w Twojej sieci i będzie wysyłać do nich odtwarzaną muzykę."
+            "value": "Vespertine łączy się z dodanymi przez Ciebie serwerami muzyki i zasobami sieciowymi, w Twojej sieci lub przez VPN. Jeśli włączysz Pilota, sparowane przez Ciebie telefony i przeglądarki też będą mogły nim sterować. Jeśli włączysz Odtwarzacze sieciowe lub Odtwarzacze AirPlay, znajdzie odtwarzacze sieciowe i odbiorniki AirPlay w Twojej sieci i będzie wysyłać do nich odtwarzaną muzykę. Jeśli włączysz „Odbieraj z innych aplikacji”, aplikacje w Twojej sieci mogą znaleźć tego Maca i wysyłać mu muzykę do odtworzenia."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine se conecta aos servidores de música e compartilhamentos de rede que você adicionar, na sua rede ou por VPN. Se você ativar o Controle Remoto, os celulares e navegadores que você parear também poderão controlá-lo. Se você ativar Reprodutores de rede ou Reprodutores AirPlay, ele encontra os reprodutores de rede e os receptores AirPlay na sua rede e envia a eles a música que você toca."
+            "value": "O Vespertine se conecta aos servidores de música e compartilhamentos de rede que você adicionar, na sua rede ou por VPN. Se você ativar o Controle Remoto, os celulares e navegadores que você parear também poderão controlá-lo. Se você ativar Reprodutores de rede ou Reprodutores AirPlay, ele encontra os reprodutores de rede e os receptores AirPlay na sua rede e envia a eles a música que você toca. Se você ativar “Receber de outros apps”, os apps na sua rede podem encontrar este Mac e enviar música para ele tocar."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine liga-se aos servidores de música e às partilhas de rede que adicionar, na sua rede ou através de uma VPN. Se ativar o Controlo remoto, os telemóveis e navegadores que emparelhar também o poderão controlar. Se ativar Leitores de rede ou Leitores AirPlay, encontra os leitores de rede e os recetores AirPlay da sua rede e envia-lhes a música que reproduzir."
+            "value": "O Vespertine liga-se aos servidores de música e às partilhas de rede que adicionar, na sua rede ou através de uma VPN. Se ativar o Controlo remoto, os telemóveis e navegadores que emparelhar também o poderão controlar. Se ativar Leitores de rede ou Leitores AirPlay, encontra os leitores de rede e os recetores AirPlay da sua rede e envia-lhes a música que reproduzir. Se ativar «Receber de outras apps», as apps da sua rede podem encontrar este Mac e enviar-lhe música para reproduzir."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine se conectează la serverele de muzică și partajările de rețea pe care le adăugați, în rețeaua dvs. sau prin VPN. Dacă activați Telecomandă, telefoanele și browserele pe care le asociați îl pot controla și ele. Dacă activați Playere de rețea sau Playere AirPlay, găsește playerele de rețea și receptoarele AirPlay din rețeaua dvs. și le trimite muzica pe care o redați."
+            "value": "Vespertine se conectează la serverele de muzică și partajările de rețea pe care le adăugați, în rețeaua dvs. sau prin VPN. Dacă activați Telecomandă, telefoanele și browserele pe care le asociați îl pot controla și ele. Dacă activați Playere de rețea sau Playere AirPlay, găsește playerele de rețea și receptoarele AirPlay din rețeaua dvs. și le trimite muzica pe care o redați. Dacă activați „Primire de la alte aplicații”, aplicațiile din rețeaua dvs. pot găsi acest Mac și îi pot trimite muzică pentru redare."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ansluter till de musikservrar och nätverksresurser du lägger till, i ditt nätverk eller via VPN. Om du slår på Fjärrkontroll kan även telefonerna och webbläsarna du parkopplar styra det. Om du slår på Nätverksspelare eller AirPlay-spelare hittar det nätverksspelarna och AirPlay-mottagarna i ditt nätverk och skickar musiken du spelar till dem."
+            "value": "Vespertine ansluter till de musikservrar och nätverksresurser du lägger till, i ditt nätverk eller via VPN. Om du slår på Fjärrkontroll kan även telefonerna och webbläsarna du parkopplar styra det. Om du slår på Nätverksspelare eller AirPlay-spelare hittar det nätverksspelarna och AirPlay-mottagarna i ditt nätverk och skickar musiken du spelar till dem. Om du slår på ”Ta emot från andra appar” kan appar i ditt nätverk hitta den här Macen och skicka musik till den för uppspelning."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine huunganisha kwenye seva za muziki na folda za mtandao unazoongeza, kwenye mtandao wako au kupitia VPN. Ukiwasha Rimoti, simu na vivinjari unavyooanisha vinaweza pia kuidhibiti. Ukiwasha Vichezaji vya Mtandao au Vichezaji vya AirPlay, hupata vichezaji vya mtandao na vipokezi vya AirPlay vilivyo kwenye mtandao wako na kuvitumia muziki unaocheza."
+            "value": "Vespertine huunganisha kwenye seva za muziki na folda za mtandao unazoongeza, kwenye mtandao wako au kupitia VPN. Ukiwasha Rimoti, simu na vivinjari unavyooanisha vinaweza pia kuidhibiti. Ukiwasha Vichezaji vya Mtandao au Vichezaji vya AirPlay, hupata vichezaji vya mtandao na vipokezi vya AirPlay vilivyo kwenye mtandao wako na kuvitumia muziki unaocheza. Ukiwasha “Pokea kutoka kwa programu nyingine”, programu zilizo kwenye mtandao wako zinaweza kuipata Mac hii na kuitumia muziki ili iucheze."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "நீங்கள் சேர்க்கும் இசை சர்வர்கள் மற்றும் நெட்வொர்க் பகிர்வுகளுடன் உங்கள் நெட்வொர்க்கில் அல்லது VPN மூலம் Vespertine இணைகிறது. ரிமோட்டை இயக்கினால், நீங்கள் இணைக்கும் ஃபோன்களும் பிரவுசர்களும் இதைக் கட்டுப்படுத்தலாம். நெட்வொர்க் பிளேயர்கள் அல்லது AirPlay பிளேயர்களை இயக்கினால், உங்கள் நெட்வொர்க்கில் உள்ள நெட்வொர்க் பிளேயர்களையும் AirPlay ரிசீவர்களையும் இது கண்டறிந்து, நீங்கள் இயக்கும் இசையை அவற்றுக்கு அனுப்பும்."
+            "value": "நீங்கள் சேர்க்கும் இசை சர்வர்கள் மற்றும் நெட்வொர்க் பகிர்வுகளுடன் உங்கள் நெட்வொர்க்கில் அல்லது VPN மூலம் Vespertine இணைகிறது. ரிமோட்டை இயக்கினால், நீங்கள் இணைக்கும் ஃபோன்களும் பிரவுசர்களும் இதைக் கட்டுப்படுத்தலாம். நெட்வொர்க் பிளேயர்கள் அல்லது AirPlay பிளேயர்களை இயக்கினால், உங்கள் நெட்வொர்க்கில் உள்ள நெட்வொர்க் பிளேயர்களையும் AirPlay ரிசீவர்களையும் இது கண்டறிந்து, நீங்கள் இயக்கும் இசையை அவற்றுக்கு அனுப்பும். “பிற ஆப்ஸிலிருந்து பெறு” என்பதை ஆன் செய்தால், உங்கள் நெட்வொர்க்கில் உள்ள ஆப்ஸ் இந்த Mac-ஐக் கண்டறிந்து, இயக்குவதற்கான இசையை அதற்கு அனுப்ப முடியும்."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "మీరు జోడించే మ్యూజిక్ సర్వర్‌లు, నెట్‌వర్క్ షేర్‌లకు Vespertine మీ నెట్‌వర్క్‌లో లేదా VPN ద్వారా కనెక్ట్ అవుతుంది. మీరు రిమోట్‌ను ఆన్ చేస్తే, మీరు జత చేసిన ఫోన్‌లు, బ్రౌజర్‌లు కూడా దీన్ని నియంత్రించగలవు. మీరు “నెట్‌వర్క్ ప్లేయర్‌లు” లేదా “AirPlay ప్లేయర్‌లు” ఆన్ చేస్తే, ఇది మీ నెట్‌వర్క్‌లోని నెట్‌వర్క్ ప్లేయర్‌లను, AirPlay రిసీవర్‌లను కనుగొని, మీరు ప్లే చేసే సంగీతాన్ని వాటికి పంపుతుంది."
+            "value": "మీరు జోడించే మ్యూజిక్ సర్వర్‌లు, నెట్‌వర్క్ షేర్‌లకు Vespertine మీ నెట్‌వర్క్‌లో లేదా VPN ద్వారా కనెక్ట్ అవుతుంది. మీరు రిమోట్‌ను ఆన్ చేస్తే, మీరు జత చేసిన ఫోన్‌లు, బ్రౌజర్‌లు కూడా దీన్ని నియంత్రించగలవు. మీరు “నెట్‌వర్క్ ప్లేయర్‌లు” లేదా “AirPlay ప్లేయర్‌లు” ఆన్ చేస్తే, ఇది మీ నెట్‌వర్క్‌లోని నెట్‌వర్క్ ప్లేయర్‌లను, AirPlay రిసీవర్‌లను కనుగొని, మీరు ప్లే చేసే సంగీతాన్ని వాటికి పంపుతుంది. మీరు “ఇతర యాప్‌ల నుండి స్వీకరించు”ని ఆన్ చేస్తే, మీ నెట్‌వర్క్‌లోని యాప్‌లు ఈ Macను కనుగొని, ప్లే చేయడానికి దానికి సంగీతాన్ని పంపగలవు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine เชื่อมต่อกับเซิร์ฟเวอร์เพลงและแชร์เครือข่ายที่คุณเพิ่ม บนเครือข่ายของคุณหรือผ่าน VPN หากคุณเปิดรีโมต โทรศัพท์และเบราว์เซอร์ที่คุณจับคู่ไว้ก็ควบคุมได้เช่นกัน หากคุณเปิด “เครื่องเล่นเครือข่าย” หรือ “เครื่องเล่น AirPlay” Vespertine จะค้นหาเครื่องเล่นเครือข่ายและตัวรับสัญญาณ AirPlay บนเครือข่ายของคุณ แล้วส่งเพลงที่คุณเล่นไปให้"
+            "value": "Vespertine เชื่อมต่อกับเซิร์ฟเวอร์เพลงและแชร์เครือข่ายที่คุณเพิ่ม บนเครือข่ายของคุณหรือผ่าน VPN หากคุณเปิดรีโมต โทรศัพท์และเบราว์เซอร์ที่คุณจับคู่ไว้ก็ควบคุมได้เช่นกัน หากคุณเปิด “เครื่องเล่นเครือข่าย” หรือ “เครื่องเล่น AirPlay” Vespertine จะค้นหาเครื่องเล่นเครือข่ายและตัวรับสัญญาณ AirPlay บนเครือข่ายของคุณ แล้วส่งเพลงที่คุณเล่นไปให้ หากคุณเปิด “รับจากแอปอื่น” แอปบนเครือข่ายของคุณจะค้นหา Mac เครื่องนี้และส่งเพลงมาให้เล่นได้"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine, eklediğiniz müzik sunucularına ve ağ paylaşımlarına ağınızda veya bir VPN üzerinden bağlanır. Uzaktan Kumanda'yı açarsanız eşlediğiniz telefonlar ve tarayıcılar da onu denetleyebilir. Ağ Oynatıcıları'nı veya AirPlay Oynatıcıları'nı açarsanız ağınızdaki ağ oynatıcılarını ve AirPlay alıcılarını bulur ve çaldığınız müziği onlara gönderir."
+            "value": "Vespertine, eklediğiniz müzik sunucularına ve ağ paylaşımlarına ağınızda veya bir VPN üzerinden bağlanır. Uzaktan Kumanda'yı açarsanız eşlediğiniz telefonlar ve tarayıcılar da onu denetleyebilir. Ağ Oynatıcıları'nı veya AirPlay Oynatıcıları'nı açarsanız ağınızdaki ağ oynatıcılarını ve AirPlay alıcılarını bulur ve çaldığınız müziği onlara gönderir. “Diğer Uygulamalardan Al” seçeneğini açarsanız ağınızdaki uygulamalar bu Mac’i bulabilir ve çalması için ona müzik gönderebilir."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine під’єднується до доданих вами музичних серверів і мережевих ресурсів у вашій мережі або через VPN. Якщо ввімкнути «Пульт», ним також зможуть керувати телефони й браузери, які ви під’єднаєте. Якщо ввімкнути «Мережеві програвачі» або «Програвачі AirPlay», він знаходить мережеві програвачі та приймачі AirPlay у вашій мережі й надсилає їм музику, яку ви відтворюєте."
+            "value": "Vespertine під’єднується до доданих вами музичних серверів і мережевих ресурсів у вашій мережі або через VPN. Якщо ввімкнути «Пульт», ним також зможуть керувати телефони й браузери, які ви під’єднаєте. Якщо ввімкнути «Мережеві програвачі» або «Програвачі AirPlay», він знаходить мережеві програвачі та приймачі AirPlay у вашій мережі й надсилає їм музику, яку ви відтворюєте. Якщо ввімкнути «Отримання з інших програм», програми у вашій мережі зможуть знайти цей Mac і надсилати йому музику для відтворення."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine آپ کے شامل کردہ میوزک سرورز اور نیٹ ورک شیئرز سے آپ کے نیٹ ورک پر یا VPN کے ذریعے منسلک ہوتا ہے۔ اگر آپ ریموٹ آن کریں تو آپ کے جوڑے گئے فون اور براؤزر بھی اسے کنٹرول کر سکتے ہیں۔ اگر آپ “نیٹ ورک پلیئرز” یا “AirPlay پلیئرز” آن کریں تو یہ آپ کے نیٹ ورک پر موجود نیٹ ورک پلیئرز اور AirPlay ریسیورز تلاش کرتا ہے اور جو موسیقی آپ چلاتے ہیں وہ انہیں بھیجتا ہے۔"
+            "value": "Vespertine آپ کے شامل کردہ میوزک سرورز اور نیٹ ورک شیئرز سے آپ کے نیٹ ورک پر یا VPN کے ذریعے منسلک ہوتا ہے۔ اگر آپ ریموٹ آن کریں تو آپ کے جوڑے گئے فون اور براؤزر بھی اسے کنٹرول کر سکتے ہیں۔ اگر آپ “نیٹ ورک پلیئرز” یا “AirPlay پلیئرز” آن کریں تو یہ آپ کے نیٹ ورک پر موجود نیٹ ورک پلیئرز اور AirPlay ریسیورز تلاش کرتا ہے اور جو موسیقی آپ چلاتے ہیں وہ انہیں بھیجتا ہے۔ اگر آپ ”دیگر ایپس سے وصول کریں“ آن کریں تو آپ کے نیٹ ورک کی ایپس اس Mac کو تلاش کر کے اسے چلانے کے لیے موسیقی بھیج سکتی ہیں۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine kết nối với các máy chủ nhạc và chia sẻ mạng mà bạn thêm vào, trên mạng của bạn hoặc qua VPN. Nếu bạn bật Điều khiển từ xa, các điện thoại và trình duyệt bạn ghép nối cũng có thể điều khiển ứng dụng. Nếu bạn bật Đầu phát mạng hoặc Đầu phát AirPlay, ứng dụng sẽ tìm các đầu phát mạng và bộ thu AirPlay trong mạng của bạn và gửi đến chúng nhạc bạn phát."
+            "value": "Vespertine kết nối với các máy chủ nhạc và chia sẻ mạng mà bạn thêm vào, trên mạng của bạn hoặc qua VPN. Nếu bạn bật Điều khiển từ xa, các điện thoại và trình duyệt bạn ghép nối cũng có thể điều khiển ứng dụng. Nếu bạn bật Đầu phát mạng hoặc Đầu phát AirPlay, ứng dụng sẽ tìm các đầu phát mạng và bộ thu AirPlay trong mạng của bạn và gửi đến chúng nhạc bạn phát. Nếu bạn bật “Nhận từ ứng dụng khác”, các ứng dụng trong mạng của bạn có thể tìm thấy máy Mac này và gửi nhạc để máy phát."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 會連接至你加入的音樂伺服器和網絡共享，無論是在你的網絡上或透過 VPN。如果你開啟「遙控」，你配對的手機和瀏覽器亦可以控制它。如果你開啟「網絡播放器」或「AirPlay 播放器」，它會尋找你網絡上的網絡播放器和 AirPlay 接收器，並將你播放的音樂傳送給它們。"
+            "value": "Vespertine 會連接至你加入的音樂伺服器和網絡共享，無論是在你的網絡上或透過 VPN。如果你開啟「遙控」，你配對的手機和瀏覽器亦可以控制它。如果你開啟「網絡播放器」或「AirPlay 播放器」，它會尋找你網絡上的網絡播放器和 AirPlay 接收器，並將你播放的音樂傳送給它們。如果你開啟「從其他 App 接收」，你網絡上的 App 可以找到這部 Mac 並向它傳送要播放的音樂。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 会连接到你添加的音乐服务器和网络共享，无论是在你的网络中还是通过 VPN。如果你打开“遥控”，你配对的手机和浏览器也可以控制它。如果你打开“网络播放器”或“AirPlay 播放器”，它会查找你网络中的网络播放器和 AirPlay 接收器，并将你播放的音乐发送给它们。"
+            "value": "Vespertine 会连接到你添加的音乐服务器和网络共享，无论是在你的网络中还是通过 VPN。如果你打开“遥控”，你配对的手机和浏览器也可以控制它。如果你打开“网络播放器”或“AirPlay 播放器”，它会查找你网络中的网络播放器和 AirPlay 接收器，并将你播放的音乐发送给它们。如果你打开“从其他 App 接收”，你网络中的 App 可以找到这台 Mac 并向它发送要播放的音乐。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 會連線至你加入的音樂伺服器和網路分享，無論是在你的網路上或透過 VPN。如果你開啟「遙控」，你配對的手機和瀏覽器也可以控制它。如果你開啟「網路播放器」或「AirPlay 播放器」，它會尋找你網路上的網路播放器和 AirPlay 接收器，並將你播放的音樂傳送給它們。"
+            "value": "Vespertine 會連線至你加入的音樂伺服器和網路分享，無論是在你的網路上或透過 VPN。如果你開啟「遙控」，你配對的手機和瀏覽器也可以控制它。如果你開啟「網路播放器」或「AirPlay 播放器」，它會尋找你網路上的網路播放器和 AirPlay 接收器，並將你播放的音樂傳送給它們。如果你開啟「從其他 App 接收」，你網路上的 App 可以找到這部 Mac 並向它傳送要播放的音樂。"
           }
         }
       }

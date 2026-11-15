@@ -155,6 +155,9 @@ public final class PhonePlayback {
     @ObservationIgnored private var decoding: String?
     /// The entry given to the player as what follows.
     @ObservationIgnored private var followingEntry: String?
+    /// Where the song starts when Play is pressed with nothing loaded: the place a queue put back from an earlier launch
+    /// was left at, or one sought to while stopped. Any other start forgets it.
+    public private(set) var resumeAt: Double?
 
     public init(client: PhoneStreamClient, player: PhonePlayer, cacheDirectory: URL) {
         self.client = client
@@ -205,7 +208,22 @@ public final class PhonePlayback {
         if let entry = queue.jump(to: entry) { start(entry) }
     }
 
+    // MARK: Between launches
+
+    /// Puts back a queue kept from an earlier launch: its song shows as paused at the place it was left, and nothing is
+    /// asked of the Mac until Play. Only into a player that has no queue of its own yet; says whether it did.
+    @discardableResult
+    public func restore(_ saved: SavedQueue) -> Bool {
+        guard queue.entries.isEmpty, nowPlaying == nil, loading == nil, player.state == .idle, let current = saved.queue.current else { return false }
+        queue = saved.queue
+        nowPlaying = current
+        resumeAt = saved.resumePosition
+        anchor.place(saved.resumePosition, moving: false)
+        return true
+    }
+
     private func start(_ entry: PhoneQueue.Entry, playing: Bool = true, at seconds: Double = 0) {
+        resumeAt = nil
         loading?.cancel()
         following?.cancel()
         player.halt()
@@ -479,7 +497,7 @@ public final class PhonePlayback {
         // Still opening the stream: it starts playing when it is here.
         if loading != nil { startsPlaying = true; return }
         if player.state == .idle {
-            if let entry = queue.current { start(entry) }
+            if let entry = queue.current { start(entry, at: resumeAt ?? 0) }
             return
         }
         do { try player.play() } catch { notice = Self.words(error, title: nowPlaying?.track.title ?? "") }
@@ -506,6 +524,14 @@ public final class PhonePlayback {
     }
 
     public func seek(to seconds: Double) {
+        // Nothing is loaded (a queue put back from an earlier launch, or stopped): Play starts from there.
+        if player.state == .idle, loading == nil, let entry = nowPlaying {
+            let length = entry.track.duration
+            let target = max(0, length > 0 ? min(seconds, length) : seconds)
+            resumeAt = target
+            anchor.place(target, moving: false)
+            return
+        }
         do {
             try player.seek(to: seconds)
             place(player.position)
@@ -526,6 +552,7 @@ public final class PhonePlayback {
         preparing = nil
         decoding = nil
         followingEntry = nil
+        resumeAt = nil
         place(0)
     }
 

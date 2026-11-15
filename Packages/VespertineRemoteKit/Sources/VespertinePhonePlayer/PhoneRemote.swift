@@ -270,7 +270,8 @@ public final class PhoneRemote {
         let entry = playback.nowPlaying
         let state = playback.player.state
         let waiting = playback.waitingForMac || state == .loading || playback.preparing != nil || playback.player.isBuffering || (playback.isPlaying && state == .idle)
-        let value: PlaybackValue = entry == nil ? .stopped : (playback.isPlaying ? .playing : (state == .idle ? .stopped : .paused))
+        // A song waiting at a place of its own (a queue put back from an earlier launch) is paused there, not stopped.
+        let value: PlaybackValue = entry == nil ? .stopped : (playback.isPlaying ? .playing : (state == .idle && playback.resumeAt == nil ? .stopped : .paused))
         let summary = signal.map { signal -> SignalSummary in
             let said = words(signal)
             return SignalSummary(bitPerfect: false, badge: said.badge, deviceFormat: said.output, exclusive: false)

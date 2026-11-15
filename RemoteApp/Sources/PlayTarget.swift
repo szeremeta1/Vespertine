@@ -37,7 +37,10 @@ final class PlayTarget {
     @ObservationIgnored var holdReason: String?
     /// How much has been fetched from the Mac for playing here since the app opened.
     var bytesReceived: Int64 { (made?.remote.playback.bytesReceived ?? 0) + KeptShelf.shared.bytesReceived }
-    private var made: (session: ObjectIdentifier, remote: PhoneRemote, system: PhoneSystem)?
+    private var made: (session: ObjectIdentifier, remote: PhoneRemote, system: PhoneSystem, keeper: QueueKeeper?)?
+    /// Where each Mac's (and each share's) queue is kept between launches.
+    static let queues = QueueShelf(directory: (FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
+                                               ?? FileManager.default.temporaryDirectory).appendingPathComponent("Queues", isDirectory: true))
 
     /// The phone's player for `session` when this device is where music plays and the Mac can send songs; nil when the
     /// Mac plays.
@@ -66,10 +69,15 @@ final class PlayTarget {
 
     /// The session is over (another Mac was chosen, or none): the phone stops and lets go of its streams.
     func leave() {
+        // The queue and the place are written as they are before the stop below puts the song back to its start.
+        made?.keeper?.stop()
         made?.system.stop()
         made?.remote.playback.stop()
         made = nil
     }
+
+    /// The app is being put away: iOS may end it without another word, so the queue and the place are written now.
+    func saveQueue() { made?.keeper?.saveNow() }
 
     /// Music is playing on this device right now: the connection to the Mac has to stay up in the background.
     var isBusy: Bool { made.map { $0.remote.playback.isPlaying } ?? false }
@@ -96,7 +104,10 @@ final class PlayTarget {
             return data
         }
         system.start()
-        made = (ObjectIdentifier(session), remote, system)
+        // The queue this Mac (or share) was left with comes back paused at its place. The demo starts afresh each time.
+        let queueKeeper = session.isDemo ? nil : QueueKeeper(playback: playback, shelf: Self.queues, owner: session.pairing.serverID)
+        queueKeeper?.start()
+        made = (ObjectIdentifier(session), remote, system, queueKeeper)
         return remote
     }
 

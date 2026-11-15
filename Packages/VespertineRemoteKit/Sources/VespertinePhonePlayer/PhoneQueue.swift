@@ -8,8 +8,8 @@
 import Foundation
 import VespertineRemoteProtocol
 
-public struct PhoneQueue: Sendable, Equatable {
-    public struct Entry: Sendable, Equatable, Identifiable {
+public struct PhoneQueue: Sendable, Equatable, Codable {
+    public struct Entry: Sendable, Equatable, Identifiable, Codable {
         /// The entry's own ID: the same song can be queued twice.
         public let id: String
         public var track: TrackSummary

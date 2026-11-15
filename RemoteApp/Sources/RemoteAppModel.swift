@@ -130,6 +130,7 @@ final class RemoteAppModel {
         if session?.pairing.serverID == pairing.serverID { leave() }
         if !transientPairings.contains(pairing.serverID) { keychain.remove(serverID: pairing.serverID) }
         KeptShelf.shared.forget(serverID: pairing.serverID)
+        PlayTarget.queues.forget(pairing.serverID)
         pairings.removeAll { $0.serverID == pairing.serverID }
     }
 
@@ -200,6 +201,7 @@ final class RemoteAppModel {
         shareKeychain.remove(id: share.id)
         share.store.remove()
         KeptShelf.shared.forget(serverID: share.id)
+        PlayTarget.queues.forget(share.id)
         shares.removeAll { $0.id == share.id }
     }
 
@@ -376,6 +378,8 @@ final class RemoteAppModel {
             session?.connect()
             networkChanged(online: isOnline, cellular: onCellular)
         case .background:
+            // iOS may end the app from here without telling it: the queue and the place in the song are written now.
+            PlayTarget.shared.saveQueue()
             // Music playing on this device needs its songs from the Mac: the connection stays while it plays.
             if !PlayTarget.shared.isBusy { session?.suspend() }
             discovery.stop()

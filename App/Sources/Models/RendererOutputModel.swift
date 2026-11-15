@@ -21,12 +21,15 @@ final class RendererOutputModel {
     @ObservationIgnored private(set) var playback: RendererPlayback?
     /// Called when the list of renderers changes.
     @ObservationIgnored var onChange: (() -> Void)?
+    /// A renderer that is never listed: this Mac's own receiver (Receive from Other Apps), which would only play to itself.
+    @ObservationIgnored var hiddenUDN: String? { didSet { if hiddenUDN != oldValue { renderers.removeAll { $0.description.udn == hiddenUDN } } } }
 
     init(service: RendererService = RendererService()) {
         self.service = service
         service.discovery.onChange = { [weak self] list in
             Task { @MainActor in
                 guard let self else { return }
+                let list = list.filter { $0.description.udn != self.hiddenUDN }
                 let changed = self.renderers != list
                 self.renderers = list
                 self.searching = false

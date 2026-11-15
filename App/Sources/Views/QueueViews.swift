@@ -49,13 +49,26 @@ struct UpNextList: View {
                 VStack(alignment: .leading, spacing: 6) {
                     SectionLabel(text: String(localized: "Now Playing"))
                     QueueRow(entry: current, isCurrent: true)
-                        .contextMenu { currentMenu(current) }
+                        .contextMenu { if !current.received { currentMenu(current) } }
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 12)
                 .padding(.bottom, 4)
             }
-            if player.upcoming.isEmpty {
+            if player.receiverSession != nil {
+                // A control app's songs are its own to order: what follows is shown, not changed here. The listener's own
+                // queue is out of sight until the control app stops or the listener plays a song of their own.
+                if let next = player.upcoming.first {
+                    VStack(alignment: .leading, spacing: 6) {
+                        SectionLabel(text: String(localized: "Up Next"))
+                        QueueRow(entry: next, isCurrent: false)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                    .padding(.bottom, 4)
+                }
+                Spacer(minLength: 0)
+            } else if player.upcoming.isEmpty {
                 empty(player)
             } else {
                 List(selection: $selection) {
@@ -135,7 +148,8 @@ struct UpNextList: View {
             TransitionsButton(size: 12)
             Button(String(localized: "Clear", comment: "Clears the upcoming queue")) { player.clearUpcoming() }
                 .buttonStyle(QuietButtonStyle(compact: true))
-                .disabled(player.upcoming.isEmpty)
+                // A control app's songs are shown read-only: there is nothing of the listener's here to clear.
+                .disabled(player.upcoming.isEmpty || player.receiverSession != nil)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
@@ -223,10 +237,10 @@ struct QueueRow: View {
                 }
             VStack(alignment: .leading, spacing: 1) {
                 Text(track.title).font(Typeface.ui(12.5)).foregroundStyle(isCurrent ? Palette.brassHi : Palette.text).lineLimit(1)
-                Text(track.displayArtist.libraryDisplayName).font(Typeface.ui(11)).foregroundStyle(Palette.text2).lineLimit(1)
+                Text(track.isTransient ? track.artist ?? "" : track.displayArtist.libraryDisplayName).font(Typeface.ui(11)).foregroundStyle(Palette.text2).lineLimit(1)
             }
             Spacer(minLength: 6)
-            if hovering, !isCurrent {
+            if hovering, !isCurrent, !entry.received {
                 Button { model.player.removeFromQueue(entry.id) } label: {
                     Image(systemName: "minus.circle").font(.system(size: 13)).foregroundStyle(Palette.text2)
                 }
@@ -256,7 +270,7 @@ private struct QueueRowActions: ViewModifier {
     let isCurrent: Bool
 
     func body(content: Content) -> some View {
-        if isCurrent {
+        if isCurrent || entry.received {
             content
         } else {
             content

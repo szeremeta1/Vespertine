@@ -22,6 +22,8 @@ final class SimulatedOutput: @unchecked Sendable {
     private let holding = Locked(false)
     private let counts = Locked((rendered: 0, audible: 0))
     private let finished = DispatchSemaphore(value: 0)
+    /// For tests that compare what came out with what went in: while not nil, every buffer rendered is kept here (interleaved).
+    private let kept = Locked<[Float]?>(nil)
 
     init(context: OpaquePointer, channels: Int, rate: Double, bufferFrames: Int = 480) {
         self.context = context
@@ -32,6 +34,15 @@ final class SimulatedOutput: @unchecked Sendable {
         thread.name = "Simulated output"
         thread.start()
     }
+
+    /// Keeps every sample rendered from now on (see `captured`).
+    var captures: Bool {
+        get { kept.withLock { $0 != nil } }
+        set { kept.withLock { $0 = newValue ? ($0 ?? []) : nil } }
+    }
+    /// The samples rendered while `captures` was on, interleaved.
+    var captured: [Float] { kept.withLock { $0 ?? [] } }
+    var channelCount: Int { channels }
 
     var held: Bool { get { holding.withLock { $0 } } set { holding.withLock { $0 = newValue } } }
 
@@ -64,6 +75,7 @@ final class SimulatedOutput: @unchecked Sendable {
                 var sound = 0
                 for frame in 0..<count where (0..<channels).contains(where: { buffer[frame * channels + $0] != 0 }) { sound += 1 }
                 counts.withLock { $0.rendered += count; $0.audible += sound }
+                kept.withLock { $0?.append(contentsOf: buffer[0..<count * channels]) }
                 remaining -= count
             }
         }
@@ -84,6 +96,7 @@ final class SimulatedOutput: @unchecked Sendable {
                     var sound = 0
                     for frame in 0..<frames where (0..<channels).contains(where: { buffer[frame * channels + $0] != 0 }) { sound += 1 }
                     counts.withLock { $0.rendered += frames; $0.audible += sound }
+                    kept.withLock { $0?.append(contentsOf: buffer) }
                 }
             }
             due = max(due.addingTimeInterval(period), Date().addingTimeInterval(-0.25))
