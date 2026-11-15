@@ -63,6 +63,54 @@ public struct SystemRendering: Sendable, Equatable {
     public var spatial: Bool           // Spatial Audio allowed for the device
 }
 
+/// What a `SystemRendererSession` asks of the renderer it feeds and of the clock that renderer plays by. The player's is
+/// macOS's own pair (`MacRendererSink`). A test gives the session one whose clock it holds, so what the session reads and
+/// queues, and what it does when the renderer is flushed under it, does not depend on the machine's audio system.
+protocol SystemRendererSink: AnyObject {
+    /// The object macOS names in `AVSampleBufferAudioRendererWasFlushedAutomatically` for this renderer.
+    var noticeObject: AnyObject { get }
+    var volume: Float { get set }
+    var rate: Float { get set }
+    /// The renderer can play nothing more, and why when it says.
+    var failed: Bool { get }
+    var error: Error? { get }
+    var isReadyForMoreMediaData: Bool { get }
+    func setRate(_ rate: Float, time: CMTime)
+    func currentTime() -> CMTime
+    func requestMediaDataWhenReady(on queue: DispatchQueue, using block: @escaping @Sendable () -> Void)
+    func stopRequestingMediaData()
+    func enqueue(_ buffer: CMSampleBuffer)
+    func flush()
+}
+
+/// macOS's renderer and the synchronizer it plays by.
+final class MacRendererSink: SystemRendererSink {
+    private let renderer = AVSampleBufferAudioRenderer()
+    private let synchronizer = AVSampleBufferRenderSynchronizer()
+
+    init(deviceUID: String?, spatial: Bool, volume: Float) {
+        renderer.audioOutputDeviceUniqueID = deviceUID
+        renderer.allowedAudioSpatializationFormats = spatial ? .monoStereoAndMultichannel : []
+        renderer.volume = volume
+        synchronizer.addRenderer(renderer)
+    }
+
+    var noticeObject: AnyObject { renderer }
+    var volume: Float { get { renderer.volume } set { renderer.volume = newValue } }
+    var rate: Float { get { synchronizer.rate } set { synchronizer.rate = newValue } }
+    var failed: Bool { renderer.status == .failed }
+    var error: Error? { renderer.error }
+    var isReadyForMoreMediaData: Bool { renderer.isReadyForMoreMediaData }
+    func setRate(_ rate: Float, time: CMTime) { synchronizer.setRate(rate, time: time) }
+    func currentTime() -> CMTime { synchronizer.currentTime() }
+    func requestMediaDataWhenReady(on queue: DispatchQueue, using block: @escaping @Sendable () -> Void) {
+        renderer.requestMediaDataWhenReady(on: queue, using: block)
+    }
+    func stopRequestingMediaData() { renderer.stopRequestingMediaData() }
+    func enqueue(_ buffer: CMSampleBuffer) { renderer.enqueue(buffer) }
+    func flush() { renderer.flush() }
+}
+
 /// Plays a Dolby Atmos file through macOS's own renderer, which turns its objects into what the device
 /// can play: head-tracked Spatial Audio on AirPods, virtualized height on Mac speakers, the channels of a
 /// multichannel device. The Dolby Digital Plus frames go to the renderer untouched.
@@ -71,9 +119,9 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
     let url: URL
     let rendering: SystemRendering
     private(set) var duration: TimeInterval = 0
-    /// Internal for tests (they post its route-change flush notice).
-    let renderer = AVSampleBufferAudioRenderer()
-    private let synchronizer = AVSampleBufferRenderSynchronizer()
+    /// The renderer and its clock: macOS's, unless a test gave its own.
+    private let renderer: SystemRendererSink
+    private var synchronizer: SystemRendererSink { renderer }
     /// One reading of the track from some time on: its reader, the output it is read through, and the queue its feeding
     /// callback runs on. A seek or a flush starts a new one and retires the old one. Each has a queue of its own, so a read of
     /// an old one that is stuck (it can block for as long as the file's source does) holds nothing the new one needs.
@@ -108,16 +156,13 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
     /// `stop()` was called: a late flush notice doesn't start reading again. Under `state`.
     private var stopped = false
 
-    init(item: PlayableItem, url: URL, deviceUID: String?, spatial: Bool, volume: Float) throws {
+    init(item: PlayableItem, url: URL, deviceUID: String?, spatial: Bool, volume: Float, sink: SystemRendererSink? = nil) throws {
         self.item = item
         self.url = url
         asset = AVURLAsset(url: url)
         let layout = DolbyAtmos.maximumLayout(url).map(DolbyAtmos.layoutName)
         rendering = SystemRendering(format: DolbyAtmos.codecName, objectLayout: layout, spatial: spatial)
-        renderer.audioOutputDeviceUniqueID = deviceUID
-        renderer.allowedAudioSpatializationFormats = spatial ? .monoStereoAndMultichannel : []
-        renderer.volume = volume
-        synchronizer.addRenderer(renderer)
+        renderer = sink ?? MacRendererSink(deviceUID: deviceUID, spatial: spatial, volume: volume)
         guard let info = LoadedAudioTrack(asset) else { throw SourceOpenerError.unsupported(url) }
         let track = info.track, total = info.duration, start = info.timeRange.start
         self.track = track
@@ -128,7 +173,7 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
         // headset reconnecting), macOS throws away what the renderer had queued and says from what time. It is fed again from
         // there; otherwise everything that was queued (about a second of the song) is skipped.
         flushObserver = NotificationCenter.default.addObserver(forName: .AVSampleBufferAudioRendererWasFlushedAutomatically,
-                                                               object: renderer, queue: nil) { [weak self] notice in
+                                                               object: renderer.noticeObject, queue: nil) { [weak self] notice in
             let time = (notice.userInfo?[AVSampleBufferAudioRendererFlushTimeKey] as? NSValue)?.timeValue
             self?.refillAfterAutomaticFlush(from: time)
         }
@@ -281,5 +326,5 @@ final class SystemRendererSession: @unchecked Sendable, SystemRenderTap {
     /// Whether every compressed frame has been handed to the renderer (tests).
     var inputExhausted: Bool { state.lock(); defer { state.unlock() }; return inputDone }
 
-    var failure: Error? { renderer.status == .failed ? (renderer.error ?? SourceOpenerError.unsupported(url)) : nil }
+    var failure: Error? { renderer.failed ? (renderer.error ?? SourceOpenerError.unsupported(url)) : nil }
 }
