@@ -462,13 +462,25 @@ struct ReceiverOffTests {
         var configuration = UPnPReceiver.Configuration(udn: "uuid:\(UUID().uuidString.lowercased())", name: "Vespertine on test-mac", version: "1.1.0")
         configuration.listenOn = ("127.0.0.1", 0)
         configuration.responseDelay = { _ in 0 }
-        // This Mac as if it were only on 192.0.2.0/24: the tests' own address, 127.0.0.1, is then a stranger's.
-        configuration.networks = { [LocalNetwork(interface: "en0", address: [192, 0, 2, 10], mask: [255, 255, 255, 0])] }
+        // This Mac as if it were on 192.0.2.0/24, at first with its loopback too: the tests' own address, 127.0.0.1, is one of
+        // its own until `loopbackIsOwn` is put out, and a stranger's from then on.
+        let ethernet = LocalNetwork(interface: "en0", address: [192, 0, 2, 10], mask: [255, 255, 255, 0])
+        let loopback = LocalNetwork(interface: "lo0", address: [127, 0, 0, 1], mask: [255, 0, 0, 0], isLoopback: true)
+        let loopbackIsOwn = Locked(true)
+        configuration.networks = { loopbackIsOwn.withLock { $0 } ? [ethernet, loopback] : [ethernet] }
         let receiver = UPnPReceiver(configuration, player: player)
         try await receiver.start()
         let port = await receiver.port
-        let reply = try #require(rawExchange(port: port, send: Data("GET \(ReceiverDescription.descriptionPath) HTTP/1.1\r\nHost: x\r\n\r\n".utf8)))
-        #expect(reply.response.isEmpty && reply.closed, "closed before a byte was read or sent")
+        let request = Data("GET \(ReceiverDescription.descriptionPath) HTTP/1.1\r\nHost: x\r\n\r\n".utf8)
+        // The receiver is there and answers its own subnet, so what follows is its refusal and not a port nobody listens on.
+        let own = try #require(rawExchange(port: port, send: request))
+        #expect(own.response.hasPrefix("HTTP/1.1 200"))
+        loopbackIsOwn.withLock { $0 = false }
+        // Closed before a byte is read or sent. The close can beat the client's connect or its write, and then the client has no
+        // connection at all (nil): that is no answer too, and which of the two it is depends on the machine, not on the receiver.
+        if let reply = rawExchange(port: port, send: request) {
+            #expect(reply.response.isEmpty && reply.closed, "closed before a byte was read or sent")
+        }
         let replies = await SSDPSearcher(host: "127.0.0.1", port: await receiver.searchPort).search(targets: ["ssdp:all"], mx: 1, wait: 0.5)
         #expect(replies.isEmpty)
         await receiver.stop()
