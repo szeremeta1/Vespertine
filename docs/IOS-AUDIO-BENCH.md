@@ -45,6 +45,12 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 2. Call the phone (or start a Siri request). Expect the music to stop, and to come back when the call ends.
 3. Pull the headphones out (or disconnect the AirPods). Expect a pause, never sound from the speaker.
 4. Background the app for five minutes with music playing. Expect no dropout and the next song to start.
+5. On the last song of the queue with Repeat off, the lock screen's Next button is greyed out; Previous still restarts the song.
+   Turn Repeat All on in the app: Next lights up and goes to the first song. Add a song with Add to Queue instead: Next lights up.
+6. With nothing playing (a fresh launch, before any song), the headphones' play button does nothing and nothing appears on the
+   lock screen.
+7. Where the system shows it (CarPlay, some Bluetooth displays): the song's number in the queue, such as 3 of 12, and it follows
+   Play Next and removals.
 
 ## B3. Gapless (3 min)
 
