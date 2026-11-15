@@ -178,4 +178,91 @@ struct StaleLinkTests {
         #expect(await discovery.relocate(known) != nil)   // still listed at its new address (one missed search doesn't drop it)
         #expect(await discovery.relocate(found) == nil)
     }
+
+/// A renderer whose own player went away while idle (upmpdcli after mpd closed its connection): the first call that needs
+/// the player is refused with UPnP 501, the same call a moment later works. The wait between the two is the test's own:
+/// it counts, and takes no time.
+@Suite("Renderer transports: UPnP 501 after a pause", .serialized)
+struct ActionFailedRetryTests {
+    private final class Pauses: @unchecked Sendable {
+        private let count = Locked(0)
+        var taken: Int { count.withLock { $0 } }
+        var pause: @Sendable () async -> Void { { [count] in count.withLock { $0 += 1 } } }
+    }
+
+    private func count(_ action: String, in fake: FakeRenderer, from start: Int) -> Int {
+        fake.actions.dropFirst(start).filter { $0 == action }.count
+    }
+
+    @Test("OpenHome, a new album: DeleteAll refused once with 501 is sent again after the pause, and the song plays")
+    func deleteAllRetried() async throws {
+        let fake = try await FakeRenderer(kind: .openHome)
+        defer { fake.stop() }
+        let device = try await RendererDevice.load(location: fake.location)
+        let pauses = Pauses()
+        let transport = try OpenHomeTransport(description: device.description, retryPause: pauses.pause)
+        let start = fake.calls.count
+        fake.fail("DeleteAll", code: 501)
+        try await transport.load(current: track("a"), next: nil)
+        #expect(pauses.taken == 1)
+        #expect(fake.actions.dropFirst(start) == ["SourceXml", "SourceIndex", "SetSourceIndex", "DeleteAll", "DeleteAll", "Insert", "SeekId", "Play"])
+        #expect(fake.playlistURIs == [track("a").uri.absoluteString])
+        #expect(try await transport.status().state == .playing)
+    }
+
+    @Test("OpenHome: DeleteAll refused twice with 501 is the error, after one second try and no more")
+    func deleteAllRefusedTwice() async throws {
+        let fake = try await FakeRenderer(kind: .openHome)
+        defer { fake.stop() }
+        let device = try await RendererDevice.load(location: fake.location)
+        let pauses = Pauses()
+        let transport = try OpenHomeTransport(description: device.description, retryPause: pauses.pause)
+        let start = fake.calls.count
+        fake.fail("DeleteAll", code: 501, times: 2)
+        let error = await #expect(throws: UPnPError.self) { try await transport.load(current: track("a"), next: nil) }
+        #expect(error?.isActionFailed == true)
+        #expect(pauses.taken == 1)
+        #expect(count("DeleteAll", in: fake, from: start) == 2)
+        #expect(count("Insert", in: fake, from: start) == 0)
+    }
+
+    @Test("Stop refused once with 501 is sent again after the pause", arguments: [true, false])
+    func stopRetried(openHome: Bool) async throws {
+        let fake = try await FakeRenderer(kind: openHome ? .openHome : .av(setNext: true))
+        defer { fake.stop() }
+        let device = try await RendererDevice.load(location: fake.location)
+        let pauses = Pauses()
+        let transport: any RendererTransport
+        if openHome {
+            transport = try OpenHomeTransport(description: device.description, retryPause: pauses.pause)
+        } else {
+            transport = try AVTransportControl(description: device.description, gapless: true, retryPause: pauses.pause)
+        }
+        try await transport.load(current: track("a"), next: nil)
+        #expect(pauses.taken == 0)
+        let start = fake.calls.count
+        fake.fail("Stop", code: 501)
+        try await transport.stop()
+        #expect(pauses.taken == 1)
+        #expect(count("Stop", in: fake, from: start) == 2)
+        #expect(fake.transportState == "Stopped")
+    }
+
+    @Test("Another refusal isn't tried again, and nor is a 501 from a call that doesn't clear the renderer")
+    func onlyActionFailedOnClearingCalls() async throws {
+        let fake = try await FakeRenderer(kind: .openHome)
+        defer { fake.stop() }
+        let device = try await RendererDevice.load(location: fake.location)
+        let pauses = Pauses()
+        let transport = try OpenHomeTransport(description: device.description, retryPause: pauses.pause)
+        var start = fake.calls.count
+        fake.fail("DeleteAll", code: 714)
+        await #expect(throws: UPnPError.fault(code: 714, description: "Fake failure")) { try await transport.load(current: track("a"), next: nil) }
+        #expect(count("DeleteAll", in: fake, from: start) == 1)
+        start = fake.calls.count
+        fake.fail("Insert", code: 501)
+        await #expect(throws: UPnPError.fault(code: 501, description: "Fake failure")) { try await transport.load(current: track("a"), next: nil) }
+        #expect(count("Insert", in: fake, from: start) == 1)
+        #expect(pauses.taken == 0)
+    }
 }

@@ -59,16 +59,31 @@ public actor OpenHomeTransport: RendererTransport {
     private let playlist: UPnPService
     private let time: UPnPService
     private let client: SOAPClient
+    private let retryPause: @Sendable () async -> Void
     /// The playlist ids Vespertine inserted, by URI.
     private var ids: [(id: Int, uri: URL)] = []
 
-    public init(description: DeviceDescription, client: SOAPClient = SOAPClient()) throws {
+    /// `retryPause`: the wait before a call refused with UPnP 501 is tried again (a test waits for nothing).
+    public init(description: DeviceDescription, client: SOAPClient = SOAPClient(), retryPause: @escaping @Sendable () async -> Void = { try? await Task.sleep(for: .milliseconds(300)) }) throws {
         guard let product = description.service(.ohProduct), let playlist = description.service(.ohPlaylist),
               let time = description.service(.ohTime) else { throw UPnPError.badResponse }
         self.product = product
         self.playlist = playlist
         self.time = time
         self.client = client
+        self.retryPause = retryPause
+    }
+
+    /// A renderer in front of a player of its own (upmpdcli in front of mpd) loses its link to that player while nothing
+    /// plays: mpd closes a connection idle for a minute. The first call that needs the player then fails with UPnP 501,
+    /// "Action Failed", and the renderer connects again, so the same call a moment later works. Starting a new album after
+    /// a pause hits exactly that. The calls that clear what the renderer holds are tried once more, after `retryPause`,
+    /// before the listener is told. A second failure, or any other error, is the error.
+    private func clearing(_ service: UPnPService, _ action: String, _ arguments: [(String, String)] = []) async throws {
+        do { _ = try await client.call(service, action, arguments) } catch let error as UPnPError where error.isActionFailed {
+            await retryPause()
+            _ = try await client.call(service, action, arguments)
+        }
     }
 
     /// Makes the Playlist source the current one (a renderer may be on its radio or a receiver source).
@@ -94,7 +109,7 @@ public actor OpenHomeTransport: RendererTransport {
 
     public func load(current: RendererTrack, next: RendererTrack?) async throws {
         try await selectPlaylistSource()
-        _ = try await client.call(playlist, "DeleteAll")
+        try await clearing(playlist, "DeleteAll")
         ids = []
         let first = try await insert(current, after: 0)
         if let next { _ = try await insert(next, after: first) }
@@ -114,7 +129,7 @@ public actor OpenHomeTransport: RendererTransport {
 
     public func play() async throws { _ = try await client.call(playlist, "Play") }
     public func pause() async throws { _ = try await client.call(playlist, "Pause") }
-    public func stop() async throws { _ = try await client.call(playlist, "Stop") }
+    public func stop() async throws { try await clearing(playlist, "Stop") }
 
     public func seek(to seconds: TimeInterval) async throws {
         _ = try await client.call(playlist, "SeekSecondAbsolute", [("Value", String(max(0, Int(seconds.rounded()))))])
@@ -171,15 +186,18 @@ public actor AVTransportControl: RendererTransport {
     nonisolated public let gapless: Bool
     private let transport: UPnPService
     private let client: SOAPClient
+    private let retryPause: @Sendable () async -> Void
     private var current: RendererTrack?
     private var next: RendererTrack?
     private static let instance = ("InstanceID", "0")
 
-    public init(description: DeviceDescription, gapless: Bool, client: SOAPClient = SOAPClient()) throws {
+    /// `retryPause`: the wait before a Stop refused with UPnP 501 is tried again (a test waits for nothing).
+    public init(description: DeviceDescription, gapless: Bool, client: SOAPClient = SOAPClient(), retryPause: @escaping @Sendable () async -> Void = { try? await Task.sleep(for: .milliseconds(300)) }) throws {
         guard let transport = description.service(.avTransport) else { throw UPnPError.badResponse }
         self.transport = transport
         self.gapless = gapless
         self.client = client
+        self.retryPause = retryPause
     }
 
     private func setCurrent(_ track: RendererTrack) async throws {
@@ -216,7 +234,11 @@ public actor AVTransportControl: RendererTransport {
     }
 
     public func stop() async throws {
-        _ = try await client.call(transport, "Stop", [Self.instance])
+        // As OpenHome's: a renderer that lost its player while idle answers 501 once, then works.
+        do { _ = try await client.call(transport, "Stop", [Self.instance]) } catch let error as UPnPError where error.isActionFailed {
+            await retryPause()
+            _ = try await client.call(transport, "Stop", [Self.instance])
+        }
     }
 
     public func seek(to seconds: TimeInterval) async throws {
