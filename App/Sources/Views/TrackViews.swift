@@ -96,6 +96,21 @@ struct TrackTable: View {
         return discs ? "\(track.discNumber ?? 1)·\(n)" : "\(n)"
     }
 
+    private var showsSource: Bool { model.streaming.anyOn && !model.library.streamedAccounts.isEmpty }
+
+    /// The widths the columns start at. They add up to what is left beside the sidebar and the inspector in a 1440 pt window,
+    /// so no column starts past the right edge: with the Source column the others give up its width between them, and a
+    /// server's name beside the format (`StreamingMark.label`) takes its room from them too.
+    private var ideal: (title: CGFloat, artist: CGFloat, album: CGFloat, format: CGFloat, source: CGFloat) {
+        guard showsSource else { return (240, 140, 150, 190, 0) }
+        return StreamingMark.current == .label ? (165, 100, 100, 205, 80) : (185, 115, 115, 165, 95)
+    }
+
+    private func sourceName(_ track: Track) -> String {
+        if track.isStreamed { return model.streaming.account(of: track)?.displayName ?? "" }
+        return model.library.sources.first { $0.id == track.sourceId }?.displayName ?? ""
+    }
+
     var body: some View {
         // What the table shows: the list in its sort order. A long list is sorted off the main thread, and until that is
         // done the table goes on showing the rows it had, with the list they were made from.
@@ -124,19 +139,19 @@ struct TrackTable: View {
                     .rowForeground(model.player.current?.track.id == row.track.id ? Palette.brassHi : Palette.text)
                     .opacity(row.track.isMissing ? 0.45 : 1)
             }
-            .width(min: 160, ideal: 240)
+            .width(min: 160, ideal: ideal.title)
 
             if showArtist {
                 TableColumn("Artist", value: \.track.displayArtist) { row in
                     Text(row.track.displayArtist.libraryDisplayName).font(Typeface.ui(12.5)).rowForeground(Palette.text2)
                 }
-                .width(min: 100, ideal: 140)
+                .width(min: 100, ideal: ideal.artist)
             }
             if showAlbum {
                 TableColumn("Album", value: \.track.displayAlbum) { row in
                     Text(row.track.displayAlbum.libraryDisplayName).font(Typeface.ui(12.5)).rowForeground(Palette.text2)
                 }
-                .width(min: 100, ideal: 150)
+                .width(min: 100, ideal: ideal.album)
             }
 
             TableColumn("Format", value: \.track.sampleRate) { row in
@@ -144,12 +159,25 @@ struct TrackTable: View {
                     Text(row.track.formatSummary).font(Typeface.mono(11)).rowForeground(Palette.text2)
                         .lineLimit(1).fixedSize()
                     AnalysisTag(track: row.track).fixedSize()
+                    if row.track.isStreamed, let account = model.streaming.account(of: row.track) {
+                        StreamMarkView(name: account.displayName).fixedSize()
+                    }
                     if let copies = row.track.id.flatMap({ self.copies[$0] }) {
                         SongCopiesButton(model: model, track: row.track, copies: copies, list: tracks)
                     }
                 }
             }
-            .width(min: 150, ideal: 190)
+            // A server's name beside the format is not cut short by the next column.
+            .width(min: showsSource && StreamingMark.current == .label ? 205 : 150, ideal: ideal.format)
+
+            // Where each song comes from. There only while a music server is on and has an account: with files alone it
+            // would say nothing.
+            if showsSource {
+                TableColumn("Source") { row in
+                    Text(sourceName(row.track)).font(Typeface.ui(12)).rowForeground(Palette.text3).lineLimit(1)
+                }
+                .width(min: 70, ideal: ideal.source)
+            }
 
             TableColumn(Text(Image(systemName: "heart")).foregroundStyle(Palette.text3).accessibilityLabel("Favorite")) { row in
                 // Selected rows show the heart through the row's own highlight (FavoriteCell), not by reading the
@@ -168,6 +196,9 @@ struct TrackTable: View {
         .tableStyle(.inset(alternatesRowBackgrounds: false))
         .scrollContentBackground(.hidden)
         .background(Palette.window)
+        // A column added to a table already on screen lands past its right edge. A table made anew fits all of them, so the
+        // table is made anew when the Source column comes or goes (a music server signed in to, or the switch turned off).
+        .id(showsSource)
         .contextMenu(forSelectionType: Int64.self) { ids in
             let chosenRows = rows.filter { ids.contains($0.id) }
             let chosen = chosenRows.map(\.track)
@@ -511,15 +542,18 @@ struct TrackMenu: View {
             model.inspectorTab = .details
             model.showInspector = true
         }
-        Button("Analyze Bit Depth & Spectrum") {
+        // Analysis reads a file and a lookup writes tags to one: a song on a music server has none.
+        if tracks.contains(where: { !$0.isStreamed }) {
+          Button("Analyze Bit Depth & Spectrum") {
             // Every chosen song, not just the first: the inspector shows the first and the batch's progress.
             model.analysis.analyze(tracks)
             model.selectedTrackIDs = Set(tracks.compactMap(\.id))
             model.inspectorTab = .analysis
             model.showInspector = true
+          }
+          Button("Look Up on MusicBrainz…") { model.lookupTracks = tracks }
         }
-        Button("Look Up on MusicBrainz…") { model.lookupTracks = tracks }
-        Button("Show in Finder") { model.showInFinder(tracks) }
+        if tracks.contains(where: { !$0.isStreamed }) { Button("Show in Finder") { model.showInFinder(tracks) } }
         if let playlist, !playlist.isSmart {
             Divider()
             Button("Remove from Playlist", role: .destructive) {
@@ -656,7 +690,12 @@ struct SongsView: View {
                 if !list.tracks.isEmpty { try? await Task.sleep(for: .milliseconds(400)) }
                 guard !Task.isCancelled else { return }
                 let database = model.library.database
-                let tracks = await Task.detached(priority: .userInitiated) { (try? database.allTracks()) ?? [] }.value
+                // Left to a music server's own page when servers are browsed from the sidebar alone.
+                let filesOnly = model.hidesServerOnly
+                let tracks = await Task.detached(priority: .userInitiated) {
+                    let all = (try? database.allTracks()) ?? []
+                    return filesOnly ? all.filter { !$0.isStreamed } : all
+                }.value
                 guard !Task.isCancelled else { return }
                 list = SongList(tracks, model: model)
             }

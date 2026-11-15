@@ -176,7 +176,7 @@ struct UpNextList: View {
         Button(model.library.isFavorite(entry.track) ? String(localized: "Remove from Favorites") : String(localized: "Add to Favorites")) {
             model.toggleFavorite([entry.track])
         }
-        Button("Show in Finder") { model.showInFinder([entry.track]) }
+        if [entry.track].contains(where: { !$0.isStreamed }) { Button("Show in Finder") { model.showInFinder([entry.track]) } }
     }
 
     @ViewBuilder private func menu(for ids: Set<UUID>) -> some View {
@@ -192,7 +192,7 @@ struct UpNextList: View {
             Button(tracks.allSatisfy(model.library.isFavorite) ? String(localized: "Remove from Favorites") : String(localized: "Add to Favorites")) {
                 model.toggleFavorite(tracks)
             }
-            Button("Show in Finder") { model.showInFinder(tracks) }
+            if tracks.contains(where: { !$0.isStreamed }) { Button("Show in Finder") { model.showInFinder(tracks) } }
             Divider()
             Button("Remove from Up Next", role: .destructive) { remove(ids) }
         }
@@ -371,7 +371,7 @@ struct HistoryList: View {
             Button(tracks.allSatisfy(model.library.isFavorite) ? String(localized: "Remove from Favorites") : String(localized: "Add to Favorites")) {
                 model.toggleFavorite(tracks)
             }
-            Button("Show in Finder") { model.showInFinder(tracks) }
+            if tracks.contains(where: { !$0.isStreamed }) { Button("Show in Finder") { model.showInFinder(tracks) } }
             Divider()
             Button("Remove from History", role: .destructive) { remove(ids) }
         }

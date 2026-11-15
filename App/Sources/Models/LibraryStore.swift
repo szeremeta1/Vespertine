@@ -42,6 +42,9 @@ final class LibraryStore {
     /// Albums with at least one favorite song (present), for the Favorites filter on album pages.
     private(set) var favoriteAlbumKeys: Set<String> = []
     private(set) var sources: [LibrarySource] = []
+    /// The accounts on music servers whose provider is switched on (none while it is off). They are not among `sources`:
+    /// an account is not a folder, and nothing scans it.
+    private(set) var streamedAccounts: [LibrarySource] = []
 
     // MARK: Copies
 
@@ -119,6 +122,7 @@ final class LibraryStore {
     /// A location as people should see it: files on a network share read "Music Share › Artist/Album"
     /// (never the mount folder, which carries the server's address); local files use ~ paths.
     func displayPath(_ path: String) -> String {
+        if let server = serverName(path) { return server }
         if let share = sources.first(where: { $0.remoteURL != nil && (path == $0.path || path.hasPrefix($0.path + "/")) }) {
             let rest = String(path.dropFirst(share.path.count)).trimmingCharacters(in: CharacterSet(charactersIn: "/"))
             let name = share.name ?? String(localized: "Network share")
@@ -152,9 +156,16 @@ final class LibraryStore {
         return songs
     }
 
+    /// The name of the music server account that `path` stands for; nil for a folder or a file.
+    func serverName(_ path: String) -> String? {
+        guard StreamLocation.account(of: path) != nil else { return nil }
+        return streamedAccounts.first { path == $0.path || path.hasPrefix($0.path + "/") }?.displayName ?? StreamingSwitch.sectionTitle
+    }
+
     /// Where an album lives, broadly: its source and the folder under it ("Music Share › Pink Floyd").
     /// A grouping folder like "_Spatial Extras" brings the next one along ("… › _Spatial Extras › Eagles").
     func albumLocation(_ path: String) -> String {
+        if let server = serverName(path) { return server }
         guard let source = sources.filter({ path == $0.path || path.hasPrefix($0.path + "/") }).max(by: { $0.path.count < $1.path.count }) else {
             return ((path as NSString).abbreviatingWithTildeInPath as NSString).lastPathComponent
         }
@@ -197,9 +208,12 @@ final class LibraryStore {
     /// How long the scan at launch waits (the window and the shares come first); tests shorten it.
     @ObservationIgnored var launchScanDelay: Duration = .seconds(3)
 
-    init(dataDirectory: URL, automaticScanning: @escaping () -> Bool = { false }) throws {
+    /// `shownProviders`: the streaming providers whose switch is on, set before anything is read so that the first frame
+    /// already leaves out the accounts of those that are off. Nil (tests, tools) leaves nothing out.
+    init(dataDirectory: URL, automaticScanning: @escaping () -> Bool = { false }, shownProviders: Set<String>? = nil) throws {
         self.automaticScanning = automaticScanning
         database = try LibraryDatabase(url: dataDirectory.appendingPathComponent("Library.sqlite"))
+        database.shownProviders = shownProviders
         artwork = ArtworkStore(directory: dataDirectory.appendingPathComponent("Artwork", isDirectory: true))
         scanner = LibraryScanner(database: database, artwork: artwork)
         tagWriter = TagWriter(database: database, scanner: scanner,
@@ -245,46 +259,45 @@ final class LibraryStore {
     /// row, and the observations' first values change nothing. Three small queries; a failure leaves them to the
     /// observations.
     private func loadSidebarState() {
+        let database = database
         guard let state = try? database.writer.read({ db in
-            (try Self.fetchSources(db), try Self.fetchPlaylists(db), try Self.fetchStats(db))
+            (try LibraryDatabase.sources(db), try database.playlists(db), try database.stats(db), try database.streamedSources(db))
         }) else { return }
         sources = state.0
         playlists = state.1
         if let stats = state.2 { self.stats = stats }
+        streamedAccounts = state.3
         loadPlaylistTransitions()
     }
 
-    private nonisolated static func fetchSources(_ db: Database) throws -> [LibrarySource] {
-        try LibrarySource.order(Column("path")).fetchAll(db)
+    /// A streaming provider's switch changed, so its accounts' songs joined or left what the library shows. The database
+    /// already answers the new way (`LibraryDatabase.shownProviders`); nothing was written, so the observations would not
+    /// hear of it by themselves and are started again.
+    func streamingVisibilityChanged() {
+        for task in tasks { task.cancel() }
+        tasks = []
+        loadSidebarState()
+        observe()
+        revision += 1
+        historyRevision += 1
     }
 
-    private nonisolated static func fetchPlaylists(_ db: Database) throws -> [Playlist] {
-        try Playlist.order(Column("sortIndex"), Column("name")).fetchAll(db)
-    }
-
-    private nonisolated static func fetchStats(_ db: Database) throws -> LibraryDatabase.Stats? {
-        try Row.fetchOne(db, sql: """
-            SELECT count(DISTINCT albumKey) AS a, count(*) AS t, count(DISTINCT lower(coalesce(albumArtist, artist))) AS ar,
-                   coalesce((SELECT sum(size) FROM (SELECT max(fileSize) AS size FROM track WHERE isMissing = 0 GROUP BY filePath)), 0) AS b, coalesce(sum(duration), 0) AS d FROM track WHERE isMissing = 0
-            """).map { LibraryDatabase.Stats(albums: $0["a"], tracks: $0["t"], artists: $0["ar"], bytes: $0["b"], duration: $0["d"]) }
-    }
-
+    // Every list below is read through the database's own queries, which leave out the songs of streaming providers that
+    // are switched off (`LibraryDatabase.shownProviders`): a provider that is off is not in the library at all.
+    // Each loop stops at once when its task is cancelled: values an observation had already fetched still wait to be handed
+    // over then, and they must not replace what the observation started in its place has shown since.
     private func observe() {
         observeAlbums()
         let writer = database.writer
+        let database = database
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking { db in
-                try Row.fetchAll(db, sql: """
-                    SELECT coalesce(albumArtist, artist, 'Unknown Artist') AS name, count(DISTINCT albumKey) AS albums,
-                           count(*) AS tracks, max(artworkKey) AS art
-                    FROM track WHERE isMissing = 0 GROUP BY lower(name) ORDER BY vesperSort(min(albumArtistSortKey))
-                    """).map { LibraryDatabase.ArtistSummary(name: $0["name"], albumCount: $0["albums"], trackCount: $0["tracks"], artworkKey: $0["art"]) }
-            }
+            let obs = ValueObservation.tracking { db in try database.artists(db) }
             // The count covers the whole track table, so every track write (an analysis saved, a play counted) wakes
             // this; only a real change reloads the views. Writes that change tracks without changing this bump
             // `revision` themselves (scans, tag edits, plays, a share relinked).
             do {
                 for try await value in obs.values(in: writer) {
+                    if Task.isCancelled { break }
                     guard let self, self.artists != value else { continue }
                     self.artists = value
                     self.revision += 1
@@ -292,21 +305,20 @@ final class LibraryStore {
             } catch {}
         })
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking(Self.fetchPlaylists)
+            let obs = ValueObservation.tracking { db in try database.playlists(db) }
             do {
                 for try await value in obs.values(in: writer) where self?.playlists != value {
+                    if Task.isCancelled { break }
                     self?.playlists = value
                     self?.loadPlaylistTransitions()     // a deleted playlist's choice goes with it
                 }
             } catch {}
         })
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking { db in
-                try Row.fetchAll(db, sql: "SELECT favorite.trackId AS id, track.isMissing AS missing, track.albumKey AS album FROM favorite JOIN track ON track.id = favorite.trackId")
-                    .map { (id: $0["id"] as Int64, missing: $0["missing"] as Bool, album: $0["album"] as String?) }
-            }
+            let obs = ValueObservation.tracking { db in try database.visibleFavorites(db) }
             do {
                 for try await value in obs.values(in: writer) {
+                    if Task.isCancelled { break }
                     self?.favoriteIDs = Set(value.map(\.id))
                     self?.favoriteAlbumKeys = Set(value.filter { !$0.missing }.compactMap(\.album))
                     self?.favoriteVersions()
@@ -317,6 +329,7 @@ final class LibraryStore {
             let obs = ValueObservation.tracking { db in (try LibraryDatabase.copyChoices(db), Set(try Int64.fetchAll(db, sql: "SELECT trackId FROM preferredCopy"))) }
             do {
                 for try await (choices, preferred) in obs.values(in: writer) {
+                    if Task.isCancelled { break }
                     guard let self else { continue }
                     let bundlingChanged = self.copyChoices.filter { $0.value == .bundled } != choices.filter { $0.value == .bundled }
                     self.copyChoices = choices
@@ -326,9 +339,10 @@ final class LibraryStore {
             } catch {}
         })
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking(Self.fetchSources)
+            let obs = ValueObservation.tracking { db in try LibraryDatabase.sources(db) }
             do {
                 for try await value in obs.values(in: writer) {
+                    if Task.isCancelled { break }
                     // A share relinked to a new mount point rewrites its tracks' paths.
                     if let self, self.sources != value {
                         if !self.sources.isEmpty { self.revision += 1 }
@@ -340,18 +354,23 @@ final class LibraryStore {
             } catch {}
         })
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking(Self.fetchStats)
-            do { for try await value in obs.values(in: writer) { if let value, self?.stats != value { self?.stats = value } } } catch {}
+            let obs = ValueObservation.tracking { db in try database.stats(db) }
+            do { for try await value in obs.values(in: writer) { if Task.isCancelled { break }; if let value, self?.stats != value { self?.stats = value } } } catch {}
+        })
+        tasks.append(Task { [weak self] in
+            let obs = ValueObservation.tracking { db in try database.streamedSources(db) }
+            do { for try await value in obs.values(in: writer) { if Task.isCancelled { break }; if self?.streamedAccounts != value { self?.streamedAccounts = value } } } catch {}
         })
     }
 
     private func observeAlbums() {
         albumTask?.cancel()
         let writer = database.writer
-        let sql = LibraryDatabase.albumsSQL(sort: albumSort)
+        let database = database
+        let sort = albumSort
         albumTask = Task { [weak self] in
-            let obs = ValueObservation.tracking { db in try Row.fetchAll(db, sql: sql).map(LibraryDatabase.album(from:)) }
-            do { for try await value in obs.values(in: writer) { self?.albums = value } } catch {}
+            let obs = ValueObservation.tracking { db in try database.albums(db, sort: sort) }
+            do { for try await value in obs.values(in: writer) { if Task.isCancelled { break }; self?.albums = value } } catch {}
         }
     }
 
@@ -779,6 +798,11 @@ final class LibraryStore {
     /// Library state only: favorites are never written into the files.
     func setFavorite(_ favorite: Bool, trackIDs: [Int64]) {
         do { try database.setFavorite(favorite, trackIDs: trackIDs) } catch { lastError = error.localizedDescription }
+    }
+
+    /// A streamed song was read: what was read replaces what its server lists. Lists reload only when something changed.
+    func confirmStreamedFormat(_ format: ConfirmedStreamFormat, location: String) {
+        if (try? database.confirmStreamedFormat(format, location: location)) == true { revision += 1 }
     }
 
     func markPlayed(_ trackID: Int64) {

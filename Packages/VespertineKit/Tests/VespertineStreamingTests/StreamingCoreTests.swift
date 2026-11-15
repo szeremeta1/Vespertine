@@ -348,6 +348,7 @@ struct StreamingCoreTests {
         _ = try await core.sync("fake", account: account)
         let album = try #require(try database.albums().first { $0.title == "Quiet Hours" })
         #expect(album.trackCount == 4)
+        #expect(!album.formatSummary.hasSuffix("≈"), "the files were read at the album's format, so it is not a guess")
         let copies = LibraryCopies.analyze(try database.tracks(albumKey: album.key))
         #expect(copies.copies.count == 2)
         #expect(copies.songs.count == 2)

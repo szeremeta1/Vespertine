@@ -267,16 +267,27 @@ extension LibraryDatabase {
         return "id NOT IN (SELECT playlistId FROM streamedPlaylist WHERE sourceId IN (\(hidden.map(String.init).joined(separator: ", "))))"
     }
 
-    /// `albums` with the format of each album that has a song whose format is only listed marked the same way ("≈").
+    /// `albums` with the format of each album marked the same way ("≈") where that format rests on what a server lists. An album
+    /// that also has files, or songs already read, at its top rate and bit depth shows a format that was read, so it is not marked.
     func markingListedFormats(_ albums: [Album], _ db: Database) throws -> [Album] {
         guard !albums.isEmpty, try db.tableExists("streamedTrack") else { return albums }
+        let visible = try visibleTracksClause(db)
         let keys = Set(try String.fetchAll(db, sql: """
             SELECT DISTINCT track.albumKey FROM streamedTrack JOIN track ON track.id = streamedTrack.trackId
-            WHERE streamedTrack.listed = 1 AND track.isMissing = 0 AND \(try visibleTracksClause(db))
+            WHERE streamedTrack.listed = 1 AND track.isMissing = 0 AND \(visible)
             """))
         guard !keys.isEmpty else { return albums }
+        var read: [String: (rate: Double, bits: Int)] = [:]
+        for row in try Row.fetchAll(db, sql: """
+            SELECT albumKey, max(sampleRate) AS rate, max(coalesce(bitDepth, 0)) AS bits FROM track
+            WHERE isMissing = 0 AND \(visible) AND id NOT IN (SELECT trackId FROM streamedTrack WHERE listed = 1)
+            GROUP BY albumKey
+            """) {
+            if let key = row["albumKey"] as String? { read[key] = (rate: row["rate"] as Double? ?? 0, bits: row["bits"] as Int? ?? 0) }
+        }
         return albums.map { album in
             guard keys.contains(album.key) else { return album }
+            if let read = read[album.key], read.rate >= album.maxSampleRate, read.bits >= album.maxBitDepth ?? 0 { return album }
             var marked = album
             marked.formatSummary += Track.listedMark
             return marked

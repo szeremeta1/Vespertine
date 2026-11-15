@@ -10,6 +10,8 @@ import AppKit
 import Foundation
 import VespertineAudio
 import VespertineLibrary
+import VespertineOpenSubsonic
+import VespertineStreaming
 import VespertineUPnP
 import SwiftUI
 
@@ -143,7 +145,10 @@ enum DeveloperHooks {
                     }
                 }
                 try? await Task.sleep(for: .seconds(3))
-                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                // The app menu's own Settings item, as a click on it does.
+                if let item = NSApp.mainMenu?.items.first?.submenu?.items.first(where: { $0.keyEquivalent == "," }), let action = item.action {
+                    NSApp.sendAction(action, to: item.target, from: item)
+                }
                 try? await Task.sleep(for: .seconds(2))
                 report("before"); shoot("before")
                 model.setTransitionsFeature(true)
@@ -151,6 +156,36 @@ enum DeveloperHooks {
                 try? await Task.sleep(for: .seconds(2))
                 report("after"); shoot("after")
                 NSApp.terminate(nil)
+            }
+        }
+        // `-VespertineStreamingDemo http://127.0.0.1:4533`: turns Music Servers on and signs in to a test server at that address
+        // (user "listener"), with the sign-in held in memory only. `-VespertineStreamingDemoName "Home Server"` names it.
+        // With `-streamingSwitchPlace tab|online|library`, `-streamingBrowse merged|sidebar|both` and
+        // `-streamingMark glyph|label|column` for each way of showing it.
+        if let address = d.string(forKey: "VespertineStreamingDemo") {
+            let id = OpenSubsonicProvider.providerID
+            model.streaming.setOn(true, id)
+            let failure = await model.streaming.signIn(id, source: model.streaming.accounts(id).first,
+                                                       name: d.string(forKey: "VespertineStreamingDemoName") ?? "Home Server",
+                                                       request: ProviderSignIn(server: address, user: "listener", secret: .password("demo")))
+            print("[qa] streaming demo: \(failure ?? "signed in")")
+        }
+        // `-VespertineOpenSettings playback|library|network|online|streaming|remote`: opens Settings on that tab.
+        if let tab = d.string(forKey: "VespertineOpenSettings") {
+            switch tab {
+            case "library": model.settingsTab = .library
+            case "network": model.settingsTab = .network
+            case "online": model.settingsTab = .online
+            case "streaming": model.settingsTab = .streaming
+            case "remote": model.settingsTab = .remote
+            default: model.settingsTab = .playback
+            }
+            Task {
+                try? await Task.sleep(for: .seconds(2))
+                // The app menu's own Settings item, as a click on it does.
+                if let item = NSApp.mainMenu?.items.first?.submenu?.items.first(where: { $0.keyEquivalent == "," }), let action = item.action {
+                    NSApp.sendAction(action, to: item.target, from: item)
+                }
             }
         }
         if let path = d.string(forKey: "VespertineSnapshot") {
@@ -179,8 +214,15 @@ enum DeveloperHooks {
             case "recent": model.sidebar = .recentlyAdded
             case "favorites": model.sidebar = .favorites
             default:
-                if let p = model.library.playlists.first(where: { $0.name == sidebar }), let id = p.id { model.sidebar = .playlist(id) }
-                else if let s = model.library.sources.first(where: { $0.displayName == sidebar }), let id = s.id { model.sidebar = .source(id) }
+                // A playlist, a folder or a music server by name. A server's page and its playlists are listed a moment after the sign-in.
+                for _ in 0..<40 {
+                    if let id = model.library.playlists.first(where: { $0.name == sidebar })?.id { model.sidebar = .playlist(id); break }
+                    if let id = (model.library.sources + model.library.streamedAccounts).first(where: { $0.displayName == sidebar })?.id {
+                        model.sidebar = .source(id)
+                        break
+                    }
+                    try? await Task.sleep(for: .milliseconds(250))
+                }
             }
         }
         if d.object(forKey: "VespertineShowInspector") != nil { model.showInspector = d.bool(forKey: "VespertineShowInspector") }

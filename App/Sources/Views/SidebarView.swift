@@ -154,6 +154,9 @@ struct SidebarView: View {
                     .help("Add music")
                 }
             }
+
+            // The listener's music servers, while that is switched on and they have a place of their own here.
+            ServerSidebarSection()
         }
         .listStyle(.sidebar)
         .tint(Palette.brass)

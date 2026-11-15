@@ -236,10 +236,10 @@ extension AppModel {
 
     /// The albums a page lists before its filter, in its order.
     func baseAlbums(_ scope: FilterScope) -> [Album] {
-        let albums = library.albums
+        let albums = withoutServerOnly(library.albums)
         switch scope {
         case .sidebar(.recentlyAdded):
-            return library.recentlyAddedAlbums(limit: Self.recentlyAddedLimit)
+            return withoutServerOnly(library.recentlyAddedAlbums(limit: Self.recentlyAddedLimit))
         case .sidebar(.genres):
             return albums.filter { !$0.facts.genres.isEmpty }
         case .sidebar(.artists):
@@ -256,10 +256,20 @@ extension AppModel {
                 (a.year ?? 0) != (b.year ?? 0) ? (a.year ?? 0) > (b.year ?? 0) : a.title.localizedStandardCompare(b.title) == .orderedAscending
             }
         case .route(.genre(let key)):
-            return library.albums(genre: key)
+            return withoutServerOnly(library.albums(genre: key))
         default:
             return albums
         }
+    }
+
+    /// Whether a music server's albums are left to its own entry in the sidebar (`StreamingBrowse.sidebar`).
+    var hidesServerOnly: Bool { !StreamingBrowse.current.showsInLibrary && !library.streamedAccounts.isEmpty }
+
+    /// `albums` without those that are on a music server only, when servers are browsed from the sidebar alone.
+    private func withoutServerOnly(_ albums: [Album]) -> [Album] {
+        guard hidesServerOnly else { return albums }
+        let servers = Set(library.streamedAccounts.compactMap(\.id))
+        return albums.filter { !$0.facts.sources.isSubset(of: servers) }
     }
 
     func filtered(_ albums: [Album], by filter: LibraryFilter) -> [Album] {
@@ -271,8 +281,8 @@ extension AppModel {
 
     /// Artists with albums through the filter, counted by those albums.
     func artists(_ filter: LibraryFilter) -> [LibraryDatabase.ArtistSummary] {
-        guard !filter.isEmpty else { return library.artists }
-        let groups = Dictionary(grouping: filtered(library.albums, by: filter), by: \.facts.artist)
+        guard !filter.isEmpty || hidesServerOnly else { return library.artists }
+        let groups = Dictionary(grouping: filtered(withoutServerOnly(library.albums), by: filter), by: \.facts.artist)
         return library.artists.compactMap { a in
             guard let albums = groups[a.name.lowercased()] else { return nil }
             return .init(name: a.name, albumCount: albums.count, trackCount: albums.reduce(0) { $0 + $1.trackCount },
@@ -340,7 +350,7 @@ extension AppModel {
     /// The songs a page of songs lists before its filter; nil for pages of albums.
     func baseTracks(_ scope: FilterScope) -> [Track]? {
         switch scope {
-        case .sidebar(.songs): library.allTracks()
+        case .sidebar(.songs): hidesServerOnly ? library.allTracks().filter { !$0.isStreamed } : library.allTracks()
         case .sidebar(.favorites): library.favoriteTracks()
         case .sidebar(.playlist(let id)): library.playlists.first { $0.id == id }.map(library.tracks(in:)) ?? []
         case .search: library.search(searchText)

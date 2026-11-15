@@ -190,7 +190,7 @@ public enum StreamingError: Error, LocalizedError, Equatable, Sendable {
         case .server(let message):
             String(localized: "The server said: \(message)", comment: "%@ is an error message from a music server, in the server's own words.")
         case .status(let code):
-            String(localized: "The server answered with HTTP status \(code).", comment: "%lld is an HTTP status code such as 404.")
+            String(localized: "The server answered with HTTP status \(String(code)).", comment: "A stream’s server answered with an error. %@ is the HTTP status code, such as 404.")
         case .notAnswering(let reason):
             String(localized: "The server didn’t answer: \(reason)", comment: "%@ is the system's reason, such as “Could not connect to the server.”")
         case .malformedAnswer:

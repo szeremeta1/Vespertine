@@ -6,6 +6,7 @@
 import Foundation
 import VespertineAudio
 import VespertineLibrary
+import VespertineStreaming
 import VespertineVisualizer
 import Observation
 
@@ -55,6 +56,8 @@ enum RateChoice: Hashable, Identifiable {
 @MainActor
 final class AppSettings {
     private let defaults: UserDefaults
+    /// Where the settings are kept, for the few that are read by key (a streaming provider's switch is `streaming.<id>.enabled`).
+    var store: UserDefaults { defaults }
 
     var exclusiveMode: Bool { didSet { defaults.set(exclusiveMode, forKey: "exclusiveMode") } }
     /// Integer mode (exclusive access only): PCM needing no processing goes to the DAC as 32-bit integers.
@@ -245,6 +248,8 @@ final class AppSettings {
             "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "airPlayPlayersFeature": false,
             "upnpReceiverFeature": false, "upnpReceiverVolume": false, "upnpReceiverOwnNetworks": true, "bundleCopies": false,
         ])
+        // Every streaming provider's switch, and its play reports, start off.
+        StreamingCore.registerDefaults(defaults, providers: StreamingModel.ids)
         Self.migrateAutomaticWorkToOff(defaults)
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
         atmosBySystem = defaults.bool(forKey: "atmosBySystem")
