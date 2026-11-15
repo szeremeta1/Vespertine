@@ -1,5 +1,5 @@
 //
-// Vespertine: "Play to Vespertine": this Mac as a UPnP AV MediaRenderer:1. A control app (on a phone, or a streaming service's
+// Vespertine: "Receive from Other Apps": this Mac as a UPnP AV MediaRenderer:1. A control app (on a phone, or a streaming service's
 // own app) finds it, sends the address of a song and presses Play; the song is fetched into the transient playback cache and
 // played by the same engine as a local file. Nothing here opens a socket until `start()`, which the app calls only while the
 // listener has the switch on.

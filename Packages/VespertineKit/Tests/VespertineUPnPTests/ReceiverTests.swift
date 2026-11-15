@@ -1,5 +1,5 @@
 //
-// Vespertine: "Play to Vespertine", end to end on 127.0.0.1: a control point finds the receiver, reads what it is, sends a song
+// Vespertine: "Receive from Other Apps", end to end on 127.0.0.1: a control point finds the receiver, reads what it is, sends a song
 // and drives it, and the real engine plays it. Each step is judged by what the receiver or the engine says happened (an event,
 // an answer), never by how long it took.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -51,7 +51,7 @@ private final class UDPInbox: @unchecked Sendable {
     func close() { lock.withLock { closed = true } }
 }
 
-@Suite("Play to Vespertine: the receiver, end to end", .serialized)
+@Suite("Receive from Other Apps: the receiver, end to end", .serialized)
 struct ReceiverEndToEndTests {
     @Test("A control point finds it, reads what it is, sends a FLAC and plays, pauses, seeks and stops it; every step is evented")
     func discoverDescribePlay() async throws {
@@ -244,7 +244,7 @@ extension ReceivedMetadata {
     static func parseOrNil(_ text: String?) -> ReceivedMetadata? { text.flatMap { try? parse($0) } }
 }
 
-@Suite("Play to Vespertine: what the receiver refuses", .serialized)
+@Suite("Receive from Other Apps: what the receiver refuses", .serialized)
 struct ReceiverRefusalTests {
     private static func said(_ refusal: StreamRefusal) -> String { refusal.localizedDescription }
 
@@ -396,7 +396,7 @@ struct ReceiverRefusalTests {
     }
 }
 
-@Suite("Play to Vespertine: off is off", .serialized)
+@Suite("Receive from Other Apps: off is off", .serialized)
 struct ReceiverOffTests {
     @Test("Until it is started the receiver has no port and no socket; stopped, it closes both and says goodbye")
     func startAndStop() async throws {
@@ -492,7 +492,7 @@ struct ReceiverOffTests {
     }
 }
 
-@Suite("Play to Vespertine: what it says it is")
+@Suite("Receive from Other Apps: what it says it is")
 struct ReceiverDescriptionTests {
     @Test("The description is one the app's own renderer client reads: a MediaRenderer with the three services")
     func description() throws {

@@ -1,5 +1,5 @@
 //
-// Vespertine: the Settings › Playback switch for Play to Vespertine (UPnP, beta), off by default. Off, nothing about it runs: no
+// Vespertine: the Settings › Playback switch for Receive from Other Apps (beta), off by default. Off, nothing about it runs: no
 // port, no announcement, nothing in the app. On, a control app's songs play in place of the listener's queue, which comes back.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -12,7 +12,7 @@ import VespertineLibrary
 import VespertineUPnP
 @testable import Vespertine
 
-@Suite("Play to Vespertine settings switch", .serialized) @MainActor
+@Suite("Receive from Other Apps settings switch", .serialized) @MainActor
 struct ReceiverSwitchTests {
     private struct Scratch {
         let root: URL

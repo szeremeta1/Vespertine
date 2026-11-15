@@ -45,10 +45,6 @@ struct UpNextList: View {
         VStack(spacing: 0) {
             header(player)
             Hairline()
-            if let session = player.receiverSession, ReceiverPresentation.current == .banner || ReceiverQueueStyle.current == .dimmed {
-                ReceiverBanner(session: session)
-                Hairline()
-            }
             if let current = player.current {
                 VStack(alignment: .leading, spacing: 6) {
                     SectionLabel(text: String(localized: "Now Playing"))
@@ -59,8 +55,9 @@ struct UpNextList: View {
                 .padding(.top, 12)
                 .padding(.bottom, 4)
             }
-            if let session = player.receiverSession {
-                // A control app's songs are its own to order: what follows is shown, not changed here.
+            if player.receiverSession != nil {
+                // A control app's songs are its own to order: what follows is shown, not changed here. The listener's own
+                // queue is out of sight until the control app stops or the listener plays a song of their own.
                 if let next = player.upcoming.first {
                     VStack(alignment: .leading, spacing: 6) {
                         SectionLabel(text: String(localized: "Up Next"))
@@ -70,12 +67,7 @@ struct UpNextList: View {
                     .padding(.top, 8)
                     .padding(.bottom, 4)
                 }
-                if ReceiverQueueStyle.current == .dimmed, session.current != nil {
-                    Hairline().padding(.top, 8)
-                    KeptQueueList(session: session)
-                } else {
-                    Spacer(minLength: 0)
-                }
+                Spacer(minLength: 0)
             } else if player.upcoming.isEmpty {
                 empty(player)
             } else {

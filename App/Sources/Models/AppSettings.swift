@@ -179,7 +179,7 @@ final class AppSettings {
     /// Network renderers whose volume the listener unlocked (Vespertine's digital volume, so the stream is processed). The
     /// others stay locked at 100%: the original file is sent and the renderer's own volume is left alone.
     var rendererVolumeUnlocked: Set<String> { didSet { defaults.set(rendererVolumeUnlocked.sorted(), forKey: "rendererVolumeUnlocked") } }
-    /// "Play to Vespertine": this Mac is a UPnP receiver that control apps can send music to, only while this is on (Settings ›
+    /// "Receive from Other Apps": this Mac is a UPnP receiver that control apps can send music to, only while this is on (Settings ›
     /// Playback, off by default). Off, no socket is open, nothing is announced, and nothing about it is shown, read or written.
     var upnpReceiverFeature: Bool { didSet { defaults.set(upnpReceiverFeature, forKey: "upnpReceiverFeature") } }
     /// The name control apps show for this Mac; empty: the app's name and the computer's (see `ReceiverSwitch.defaultName`).

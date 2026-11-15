@@ -17,7 +17,7 @@ struct QueueEntry: Identifiable, Hashable {
     var versions: [Track] = []
     /// Added with Play Next or Add to Queue: listed under Playing Next, ahead of the rest of what was playing.
     var queuedByUser = false
-    /// A song a control app sent ("Play to Vespertine"): not in the library, never kept, counted or scrobbled.
+    /// A song a control app sent ("Receive from Other Apps"): not in the library, never kept, counted or scrobbled.
     var received = false
     var id: UUID { item.id }
 
@@ -631,7 +631,7 @@ final class PlayerController {
         return db
     }
 
-    // MARK: Play to Vespertine (a control app's session)
+    // MARK: Receive from Other Apps (a control app's session)
 
     /// What a control app is playing here, and the listener's own queue kept aside meanwhile.
     struct ReceiverSession {
@@ -666,7 +666,7 @@ final class PlayerController {
 
     static var receiverNeedsThisMac: String {
         String(localized: "Vespertine is playing to a network player. Choose one of this Mac’s outputs to play what other apps send.",
-               comment: "A control app sent a song to Play to Vespertine while the chosen output is a network player or an AirPlay receiver.")
+               comment: "A control app sent a song to Receive from Other Apps while the chosen output is a network player or an AirPlay receiver.")
     }
 
     private static func entry(_ track: ReceiverTrack) -> QueueEntry {

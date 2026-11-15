@@ -87,7 +87,7 @@ struct NowPlayingPanel: View {
 
                     if let path = player.signalPath {
                         let sender = entry.received ? player.receiverSession?.app : nil
-                        StatusBadges(path: path, receivedFrom: ReceiverPresentation.current == .chip ? sender : nil).padding(.top, 16)
+                        StatusBadges(path: path, receivedFrom: sender).padding(.top, 16)
                         Hairline().padding(.top, 18)
                         SignalPathView(path: path, loopback: model.loopback.result(for: path), callMode: model.bluetoothCallMode, receivedFrom: sender).padding(.top, 14)
                         DoPSetupCard(path: path).padding(.top, 10)
@@ -189,7 +189,7 @@ struct SignalPathView: View {
     var loopback: LoopbackSavedResult? = nil
     /// The headset is in call mode: says which app holds its microphone (the path alone only knows the rate).
     var callMode: BluetoothCallMode? = nil
-    /// The control app that sent the song (Play to Vespertine): the path then begins with where the song came from. Everything
+    /// The control app that sent the song (Receive from Other Apps): the path then begins with where the song came from. Everything
     /// after that step is the path of a file, unchanged.
     var receivedFrom: ReceiverControlApp? = nil
 

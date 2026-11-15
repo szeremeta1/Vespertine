@@ -21,7 +21,7 @@ final class RendererOutputModel {
     @ObservationIgnored private(set) var playback: RendererPlayback?
     /// Called when the list of renderers changes.
     @ObservationIgnored var onChange: (() -> Void)?
-    /// A renderer that is never listed: this Mac's own receiver (Play to Vespertine), which would only play to itself.
+    /// A renderer that is never listed: this Mac's own receiver (Receive from Other Apps), which would only play to itself.
     @ObservationIgnored var hiddenUDN: String? { didSet { if hiddenUDN != oldValue { renderers.removeAll { $0.description.udn == hiddenUDN } } } }
 
     init(service: RendererService = RendererService()) {

@@ -225,9 +225,8 @@ enum DeveloperHooks {
                 model.player.engine.pause()
             }
         }
-        // `-VespertineReceiverDemo mconnect`: shows how Play to Vespertine looks while a control app of that name plays, without
+        // `-VespertineReceiverDemo mconnect`: shows how Receive from Other Apps looks while a control app of that name plays, without
         // a sound: the last album's first songs stand in for what the app sent, the first album's for the listener's own queue.
-        // With `-receiverPresentation chip|banner|path` and `-receiverQueue remote|dimmed` for each way of showing it.
         if let name = d.string(forKey: "VespertineReceiverDemo"), let sent = model.library.albums.last, let own = model.library.albums.first {
             let songs = model.library.tracks(albumKey: sent.key)
             model.player.showReceiverDemo(from: ReceiverControlApp(name: name, address: "192.0.2.7"), songs: songs,

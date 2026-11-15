@@ -119258,275 +119258,6 @@
         }
       }
     },
-    "Back to My Queue": {
-      "comment": "Button: stops the music another app is sending and returns to the listener’s own queue.",
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ወደ የእኔ ወረፋ ተመለስ"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "العودة إلى قائمة انتظاري"
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "আমার সারিতে ফিরুন"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zpět k mé frontě"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tilbage til min kø"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zurück zu meiner Warteschlange"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Επιστροφή στην ουρά μου"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volver a mi cola"
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بازگشت به صف پخش من"
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Takaisin omaan jonoon"
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bumalik sa Queue Ko"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Revenir à ma file d’attente"
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "મારી કતાર પર પાછા જાઓ"
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Koma zuwa Jerin Jirana"
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "חזרה לתור שלי"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "मेरी कतार पर वापस जाएँ"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vissza a saját soromhoz"
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kembali ke Antrean Saya"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Torna alla mia coda"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自分のキューに戻る"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ನನ್ನ ಸರದಿಗೆ ಹಿಂತಿರುಗಿ"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "내 대기열로 돌아가기"
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "എന്റെ ക്യൂവിലേക്ക് മടങ്ങുക"
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "माझ्या रांगेकडे परत जा"
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kembali ke Baris Gilir Saya"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tilbake til køen min"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Terug naar mijn wachtrij"
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਮੇਰੀ ਕਤਾਰ ’ਤੇ ਵਾਪਸ ਜਾਓ"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wróć do mojej kolejki"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Voltar para a minha fila"
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Voltar à minha fila"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Înapoi la coada mea"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tillbaka till min kö"
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rudi kwenye Foleni Yangu"
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "என் வரிசைக்குத் திரும்பு"
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "నా క్యూకు తిరిగి వెళ్ళు"
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "กลับไปที่คิวของฉัน"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sırama Dön"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Назад до моєї черги"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "میری قطار پر واپس"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quay lại hàng đợi của tôi"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "返回我的待播清單"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "返回我的待播清单"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "返回我的待播清單"
-          }
-        }
-      }
-    },
     "Band on": {
       "localizations": {
         "am": {
@@ -266761,7 +266492,7 @@
       }
     },
     "Let those apps set the volume": {
-      "comment": "Settings › Playback › Play to Vespertine: other apps may change Vespertine’s volume.",
+      "comment": "Settings › Playback › Receive from Other Apps: other apps may change Vespertine’s volume.",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -267030,7 +266761,7 @@
       }
     },
     "Lets apps on your network send music to Vespertine, which plays it on the output you chose. Off, Vespertine opens no port for them, doesn’t announce itself, and plays as before.": {
-      "comment": "Settings › Playback: the caption under the Play to Vespertine (UPnP, beta) switch.",
+      "comment": "Settings › Playback: the caption under the Receive from Other Apps (beta) switch.",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -306959,7 +306690,7 @@
       }
     },
     "Name on the network": {
-      "comment": "Settings › Playback › Play to Vespertine: the name other apps show for this Mac.",
+      "comment": "Settings › Playback › Receive from Other Apps: the name other apps show for this Mac.",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -339318,7 +339049,7 @@
       }
     },
     "Off, the volume stays where you set it. On, an output with no volume of its own uses Vespertine’s volume, which changes the samples below 100%.": {
-      "comment": "Settings › Playback › Play to Vespertine: caption under “Let those apps set the volume”.",
+      "comment": "Settings › Playback › Receive from Other Apps: caption under “Let those apps set the volume”.",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -342003,7 +341734,7 @@
       }
     },
     "On, only devices on the same network as this Mac can send music. Off, any device with a private address can, such as one reaching this Mac through a VPN.": {
-      "comment": "Settings › Playback › Play to Vespertine: caption under “Only from this Mac’s own networks”.",
+      "comment": "Settings › Playback › Receive from Other Apps: caption under “Only from this Mac’s own networks”.",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -342541,7 +342272,7 @@
       }
     },
     "On. Apps on this network see this Mac as “%@”.": {
-      "comment": "Settings › Playback › Play to Vespertine. %@ is the name shown to other apps.",
+      "comment": "Settings › Playback › Receive from Other Apps. %@ is the name shown to other apps.",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -345201,7 +344932,7 @@
       }
     },
     "Only from this Mac’s own networks": {
-      "comment": "Settings › Playback › Play to Vespertine: accept control only from devices on the same networks as this Mac.",
+      "comment": "Settings › Playback › Receive from Other Apps: accept control only from devices on the same networks as this Mac.",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -360667,275 +360398,6 @@
         }
       }
     },
-    "Play to Vespertine (UPnP, beta)": {
-      "comment": "Settings › Playback: the switch that lets other apps on the network (UPnP control apps, such as a streaming service’s own app) send music to Vespertine to play. “UPnP” and “beta” stay as they are in your language.",
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "በVespertine ላይ አጫውት (UPnP፣ ቤታ)"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "التشغيل على Vespertine (UPnP، تجريبي)"
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine-এ চালান (UPnP, বিটা)"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Přehrávat do Vespertine (UPnP, beta)"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Afspil til Vespertine (UPnP, beta)"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Auf Vespertine abspielen (UPnP, Beta)"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Αναπαραγωγή στο Vespertine (UPnP, beta)"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reproducir en Vespertine (UPnP, beta)"
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "پخش روی Vespertine (UPnP، بتا)"
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Toista Vespertineen (UPnP, beta)"
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "I-play sa Vespertine (UPnP, beta)"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lire sur Vespertine (UPnP, bêta)"
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine પર વગાડો (UPnP, બીટા)"
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kunna zuwa Vespertine (UPnP, beta)"
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ניגון ב־Vespertine (UPnP, בטא)"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine पर चलाएँ (UPnP, बीटा)"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lejátszás a Vespertine-en (UPnP, béta)"
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Putar ke Vespertine (UPnP, beta)"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Riproduci su Vespertine (UPnP, beta)"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertineで再生（UPnP、ベータ）"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine ನಲ್ಲಿ ಪ್ಲೇ ಮಾಡಿ (UPnP, ಬೀಟಾ)"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine으로 재생(UPnP, 베타)"
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine-ൽ പ്ലേ ചെയ്യുക (UPnP, ബീറ്റ)"
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine वर प्ले करा (UPnP, बीटा)"
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Main ke Vespertine (UPnP, beta)"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spill til Vespertine (UPnP, beta)"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Afspelen naar Vespertine (UPnP, bèta)"
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine ’ਤੇ ਚਲਾਓ (UPnP, ਬੀਟਾ)"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Odtwarzaj na Vespertine (UPnP, beta)"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tocar no Vespertine (UPnP, beta)"
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reproduzir no Vespertine (UPnP, beta)"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Redare pe Vespertine (UPnP, beta)"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spela på Vespertine (UPnP, beta)"
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cheza kwenye Vespertine (UPnP, beta)"
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine-இல் இயக்கு (UPnP, பீட்டா)"
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertineలో ప్లే చేయి (UPnP, బీటా)"
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "เล่นไปยัง Vespertine (UPnP, เบตา)"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine’de Çal (UPnP, beta)"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Відтворення на Vespertine (UPnP, бета)"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vespertine پر چلائیں (UPnP، بیٹا)"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Phát đến Vespertine (UPnP, beta)"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "播放至 Vespertine（UPnP，測試版）"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "播放到 Vespertine（UPnP，测试版）"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "播放到 Vespertine（UPnP，測試版）"
-          }
-        }
-      }
-    },
     "Playback": {
       "localizations": {
         "am": {
@@ -363904,7 +363366,7 @@
       }
     },
     "Playing from %@": {
-      "comment": "Above the queue while another app on the network (a UPnP control app, named by %@) is sending the music Vespertine plays.",
+      "comment": "Shown when pointing at the chip beside the song while another app on the network (a UPnP control app, named by %@) is sending the music Vespertine plays.",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -364173,7 +363635,7 @@
       }
     },
     "Playing from another app": {
-      "comment": "Above the queue while another app on the network is sending the music Vespertine plays, and the app gave no name.",
+      "comment": "Shown when pointing at the chip beside the song while another app on the network is sending the music Vespertine plays, and the app gave no name.",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -379256,6 +378718,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "可以開始量測"
+          }
+        }
+      }
+    },
+    "Receive from Other Apps (beta)": {
+      "comment": "Settings › Playback: the switch that lets other apps on the network (UPnP control apps, such as a streaming service’s own app) send music to Vespertine to play. “beta” stays as it is in your language.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ከሌሎች መተግበሪያዎች ተቀበል (ቤታ)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الاستقبال من تطبيقات أخرى (تجريبي)"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অন্য অ্যাপ থেকে গ্রহণ করুন (বিটা)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přijímat z jiných aplikací (beta)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modtag fra andre apps (beta)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von anderen Apps empfangen (Beta)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Λήψη από άλλες εφαρμογές (beta)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recibir de otras apps (beta)"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دریافت از برنامه‌های دیگر (بتا)"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vastaanota muista apeista (beta)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tumanggap mula sa Ibang App (beta)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recevoir depuis d’autres apps (bêta)"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "અન્ય ઍપમાંથી મેળવો (બીટા)"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karɓa daga wasu manhajoji (beta)"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קבלה מאפליקציות אחרות (בטא)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अन्य ऐप से प्राप्त करें (बीटा)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fogadás más appokból (béta)"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terima dari App Lain (beta)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ricevi da altre app (beta)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ほかのアプリから受信（ベータ）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇತರ ಆ್ಯಪ್‌ಗಳಿಂದ ಸ್ವೀಕರಿಸಿ (ಬೀಟಾ)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 앱에서 받기(베타)"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മറ്റ് ആപ്പുകളിൽ നിന്ന് സ്വീകരിക്കുക (ബീറ്റ)"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इतर ॲप्सकडून प्राप्त करा (बीटा)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terima daripada App Lain (beta)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Motta fra andre apper (beta)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ontvangen van andere apps (bèta)"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹੋਰ ਐਪਾਂ ਤੋਂ ਪ੍ਰਾਪਤ ਕਰੋ (ਬੀਟਾ)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odbieraj z innych aplikacji (beta)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receber de outros apps (beta)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receber de outras apps (beta)"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Primire de la alte aplicații (beta)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ta emot från andra appar (beta)"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pokea kutoka kwa programu nyingine (beta)"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பிற ஆப்ஸிலிருந்து பெறு (பீட்டா)"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఇతర యాప్‌ల నుండి స్వీకరించు (బీటా)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รับจากแอปอื่น (เบตา)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diğer Uygulamalardan Al (beta)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Отримання з інших програм (бета)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دیگر ایپس سے وصول کریں (بیٹا)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhận từ ứng dụng khác (beta)"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從其他 App 接收（測試版）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从其他 App 接收（测试版）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從其他 App 接收（測試版）"
           }
         }
       }
@@ -509783,7 +509514,7 @@
       }
     },
     "Vespertine is playing to a network player. Choose one of this Mac’s outputs to play what other apps send.": {
-      "comment": "A control app sent a song to Play to Vespertine while the chosen output is a network player or an AirPlay receiver.",
+      "comment": "A control app sent a song to Receive from Other Apps while the chosen output is a network player or an AirPlay receiver.",
       "localizations": {
         "am": {
           "stringUnit": {
@@ -513811,275 +513542,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的其他 DAC 會跟隨這個 DAC 的時脈。它的聲道可以做到位元完美；其他 DAC 會依百萬分之幾進行重新取樣以保持同步。"
-          }
-        }
-      }
-    },
-    "Your Queue, Paused": {
-      "comment": "Header over the listener’s own queue while another app’s music plays; it comes back when that app stops.",
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "የእርስዎ ወረፋ፣ ባለበት ቆሟል"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "قائمة انتظارك، متوقفة مؤقتًا"
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "আপনার সারি, বিরতিতে"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vaše fronta, pozastaveno"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Din kø, på pause"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deine Warteschlange, pausiert"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Η ουρά σας, σε παύση"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tu cola, en pausa"
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "صف پخش شما، در حالت مکث"
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Oma jonosi, tauolla"
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ang Queue Mo, Naka-pause"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Votre file d’attente, en pause"
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "તમારી કતાર, થોભાવેલી"
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jerin Jiranku, An Dakatar"
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "התור שלך, מושהה"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "आपकी कतार, रुकी हुई"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Az Ön lejátszási sora, szüneteltetve"
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Antrean Anda, Dijeda"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La tua coda, in pausa"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "あなたのキュー（一時停止中）"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ನಿಮ್ಮ ಸರದಿ, ವಿರಾಮದಲ್ಲಿದೆ"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "내 대기열, 일시 정지됨"
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "നിങ്ങളുടെ ക്യൂ, താൽക്കാലികമായി നിർത്തി"
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "तुमची रांग, थांबवलेली"
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Baris Gilir Anda, Dijeda"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Køen din, på pause"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Je wachtrij, gepauzeerd"
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਤੁਹਾਡੀ ਕਤਾਰ, ਰੁਕੀ ਹੋਈ"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Twoja kolejka, wstrzymana"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sua fila, em pausa"
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A sua fila, em pausa"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Coada dvs., în pauză"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Din kö, pausad"
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Foleni Yako, Imesitishwa"
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "உங்கள் வரிசை, இடைநிறுத்தப்பட்டது"
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "మీ క్యూ, పాజ్ చేయబడింది"
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "คิวของคุณ หยุดพักอยู่"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sıranız, duraklatıldı"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ваша черга, на паузі"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "آپ کی قطار، موقوف"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hàng đợi của bạn, đang tạm dừng"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的待播清單，已暫停"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的待播清单，已暂停"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的待播清單，已暫停"
           }
         }
       }

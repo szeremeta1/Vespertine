@@ -2,7 +2,7 @@
 
 Vespertine has no built-in client for any commercial streaming service. What it has is a receiver: other apps on your network send it music, and it plays that music through the same engine and the same signal path as a file.
 
-## Play to Vespertine (UPnP, beta)
+## Receive from Other Apps (beta)
 
 Off by default. The switch is in Settings › Playback, next to Network Players.
 
@@ -12,7 +12,9 @@ While it is off, Vespertine opens no socket for it, announces nothing, adds noth
 
 - The song's title, artist, album and cover as the control app describes them.
 - The signal path as for any file, with one more step at the top: "From *app*, over the network". Rate switching, exclusive access, the `BIT-PERFECT` badge and the rest are decided exactly as they are for a file of the same format.
-- Your own queue is kept and paused. It comes back when the control app stops, or when you play something of your own. The two never mix.
+- A chip beside the song says who is sending it, such as "FROM MCONNECT".
+- The queue shows the control app's song and the one after it. They are the app's to order, so they can't be changed here.
+- Your own queue is kept, paused and out of sight. It comes back when the control app stops, or when you play something of your own. The two never mix.
 - If a song can't be played, Vespertine says why in plain words, and the control app is told too.
 
 ### Volume

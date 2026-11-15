@@ -1,5 +1,5 @@
 //
-// Vespertine: "Play to Vespertine": this Mac as a UPnP receiver that control apps send music to, behind its Settings › Playback
+// Vespertine: "Receive from Other Apps": this Mac as a UPnP receiver that control apps send music to, behind its Settings › Playback
 // switch, off by default. The model exists only while the switch is on; until then no socket is open and nothing is announced.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -180,11 +180,11 @@ extension ReceiverModel: ReceiverPlayer {
 @MainActor
 enum ReceiverSwitch {
     static var title: String {
-        String(localized: "Play to Vespertine (UPnP, beta)", comment: "Settings › Playback: the switch that lets other apps on the network (UPnP control apps, such as a streaming service’s own app) send music to Vespertine to play. “UPnP” and “beta” stay as they are in your language.")
+        String(localized: "Receive from Other Apps (beta)", comment: "Settings › Playback: the switch that lets other apps on the network (UPnP control apps, such as a streaming service’s own app) send music to Vespertine to play. “UPnP” and “beta” stay as they are in your language.")
     }
 
     static var explanation: String {
-        String(localized: "Lets apps on your network send music to Vespertine, which plays it on the output you chose. Off, Vespertine opens no port for them, doesn’t announce itself, and plays as before.", comment: "Settings › Playback: the caption under the Play to Vespertine (UPnP, beta) switch.")
+        String(localized: "Lets apps on your network send music to Vespertine, which plays it on the output you chose. Off, Vespertine opens no port for them, doesn’t announce itself, and plays as before.", comment: "Settings › Playback: the caption under the Receive from Other Apps (beta) switch.")
     }
 
     /// The name control apps show when the listener has given none: the app's and the computer's.
@@ -211,40 +211,13 @@ enum ReceiverSwitch {
     }
 }
 
-/// How a control app's session shows while one plays. The listener doesn't choose: these are the candidates the maintainer
-/// picks from (`defaults write … receiverPresentation banner`), and the default is the one in use.
-enum ReceiverPresentation: String {
-    /// A chip beside the song ("FROM MCONNECT").
-    case chip
-    /// A line above the queue.
-    case banner
-    /// Only the first step of the signal path.
-    case path
-
-    static var current: ReceiverPresentation {
-        ReceiverPresentation(rawValue: UserDefaults.standard.string(forKey: "receiverPresentation") ?? "") ?? .chip
-    }
-}
-
-/// What the queue shows while a control app plays (`defaults write … receiverQueue remote`).
-enum ReceiverQueueStyle: String {
-    /// The control app's song and the one after it, not editable; the listener's queue is out of sight until it returns.
-    case remote
-    /// The same, with the listener's own queue under it, dimmed, under a line that says who is playing.
-    case dimmed
-
-    static var current: ReceiverQueueStyle {
-        ReceiverQueueStyle(rawValue: UserDefaults.standard.string(forKey: "receiverQueue") ?? "") ?? .dimmed
-    }
-}
-
 enum ReceiverText {
     /// "Playing from mconnect", or without a name when the control app gives none worth showing.
     static func playingFrom(_ app: ReceiverControlApp) -> String {
         if let name = app.name {
-            return String(localized: "Playing from \(name)", comment: "Above the queue while another app on the network (a UPnP control app, named by %@) is sending the music Vespertine plays.")
+            return String(localized: "Playing from \(name)", comment: "Shown when pointing at the chip beside the song while another app on the network (a UPnP control app, named by %@) is sending the music Vespertine plays.")
         }
-        return String(localized: "Playing from another app", comment: "Above the queue while another app on the network is sending the music Vespertine plays, and the app gave no name.")
+        return String(localized: "Playing from another app", comment: "Shown when pointing at the chip beside the song while another app on the network is sending the music Vespertine plays, and the app gave no name.")
     }
 
     /// The chip beside the song: "FROM MCONNECT".
@@ -269,13 +242,5 @@ enum ReceiverText {
 
     static var pathValue: String {
         String(localized: "not kept", comment: "Signal path, short: a song another app sent is played and not saved anywhere.")
-    }
-
-    static var yourQueue: String {
-        String(localized: "Your Queue, Paused", comment: "Header over the listener’s own queue while another app’s music plays; it comes back when that app stops.")
-    }
-
-    static var backToQueue: String {
-        String(localized: "Back to My Queue", comment: "Button: stops the music another app is sending and returns to the listener’s own queue.")
     }
 }

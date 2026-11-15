@@ -189,7 +189,7 @@ final class AppModel {
     private(set) var renderers: RendererOutputModel?
     /// AirPlay receivers; nil unless the Settings switch (AirPlay Players (beta)) is on.
     private(set) var airPlay: AirPlayOutputModel?
-    /// This Mac as a UPnP receiver for control apps; nil unless the Settings switch (Play to Vespertine (UPnP, beta)) is on.
+    /// This Mac as a UPnP receiver for control apps; nil unless the Settings switch (Receive from Other Apps (beta)) is on.
     private(set) var receiver: ReceiverModel?
     /// Mac Sound Output (beta): speaker groups published as outputs of the Mac.
     let systemOutput: SystemOutputModel
@@ -518,7 +518,7 @@ final class AppModel {
         syncEngine()
     }
 
-    /// The Play to Vespertine (UPnP, beta) switch. Off, a control app's song stops and the listener's queue is back.
+    /// The Receive from Other Apps (beta) switch. Off, a control app's song stops and the listener's queue is back.
     func setReceiverFeature(_ on: Bool) {
         receiver = ReceiverSwitch.apply(on, to: settings, current: receiver, make: makeReceiver)
         renderers?.hiddenUDN = on ? settings.upnpReceiverID : nil
