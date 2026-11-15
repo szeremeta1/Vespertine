@@ -23,6 +23,12 @@ public enum UPnPError: Error, Equatable, Sendable {
         }
     }
 
+    /// UPnP 501, "Action Failed": the renderer took the call and couldn't carry it out just now.
+    public var isActionFailed: Bool {
+        if case .fault(code: 501, description: _) = self { return true }
+        return false
+    }
+
     public var message: String {
         switch self {
         case .fault(let code, let description):
