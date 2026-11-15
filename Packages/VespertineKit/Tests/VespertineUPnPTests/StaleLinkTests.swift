@@ -178,6 +178,7 @@ struct StaleLinkTests {
         #expect(await discovery.relocate(known) != nil)   // still listed at its new address (one missed search doesn't drop it)
         #expect(await discovery.relocate(found) == nil)
     }
+}
 
 /// A renderer whose own player went away while idle (upmpdcli after mpd closed its connection): the first call that needs
 /// the player is refused with UPnP 501, the same call a moment later works. The wait between the two is the test's own:
