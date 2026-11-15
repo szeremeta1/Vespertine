@@ -61,12 +61,15 @@ final class SimulatedOutput: @unchecked Sendable {
 
     /// Advances a held clock explicitly. A test can inspect each quarter-second of playback even if its thread is
     /// descheduled for longer than the transition it is checking. Uses the same render context as the clock thread.
-    func advance(seconds: Double) {
+    /// False, with nothing rendered, when the output is not running (the engine stopped it, or has not started it yet):
+    /// a stopped device's clock does not move, and the engine may stop it at any moment between a test's steps.
+    @discardableResult
+    func advance(seconds: Double) -> Bool {
         precondition(held && seconds.isFinite && seconds >= 0)
         var remaining = Int((seconds * rate).rounded())
         var buffer = [Float](repeating: 0, count: frames * channels)
-        render.withLock {
-            precondition(flags.withLock { $0.running && !$0.cancelled })
+        return render.withLock {
+            guard flags.withLock({ $0.running && !$0.cancelled }) else { return false }
             while remaining > 0 {
                 let count = min(remaining, frames)
                 buffer.withUnsafeMutableBufferPointer {
@@ -78,6 +81,7 @@ final class SimulatedOutput: @unchecked Sendable {
                 kept.withLock { $0?.append(contentsOf: buffer[0..<count * channels]) }
                 remaining -= count
             }
+            return true
         }
     }
 
