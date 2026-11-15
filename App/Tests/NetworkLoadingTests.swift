@@ -45,7 +45,14 @@ struct NetworkLoadingTests {
         player.poll(snapshot)
         #expect(!player.loading && player.isPlaying && !player.canCancelLoading)
 
+        // The share is quiet and what has arrived still plays: Now Playing says buffering, the button does not spin.
         snapshot.isBuffering = true
+        snapshot.playsWhileBuffering = true
+        player.poll(snapshot)
+        #expect(player.buffering && !player.loading && player.isPlaying)
+
+        // The buffer has run out: now the song is waited for.
+        snapshot.playsWhileBuffering = false
         player.poll(snapshot)
         #expect(player.loading)
         player.togglePlayPause()

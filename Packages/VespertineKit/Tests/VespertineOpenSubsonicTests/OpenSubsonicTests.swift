@@ -569,6 +569,43 @@ struct OpenSubsonicTests {
         #expect(waited >= StreamingCore.silenceLimit && waited < 100_000, "given up at the server's limit, not the cache's: \(waited)")
     }
 
+    @Test("A wait for a server that is gone, given up and begun again, does not begin the server's limit again")
+    func waitBegunAgain() async throws {
+        let (server, provider, _) = try await rig()
+        let file = FakeSubsonic.flac(bytes: 1_000_000, seed: 4)
+        server.change { $0.songs[0].data = file }
+        try await signIn(provider, server)
+        let reader = try #require(try provider.openStream("song-0-0") as? HTTPStreamReader)
+        server.stop()
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("subsonic-again-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        // As in `serverGoneMidSong`: once the song is waited for, every look at this clock finds another second gone.
+        let clock = Locked((now: 0.0, running: false))
+        let now: @Sendable () -> TimeInterval = { clock.withLock { if $0.running { $0.now += 1 }; return $0.now } }
+        reader.countSilence(on: now)
+        let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 64 << 10, noProgressLimit: 100_000, clock: now)
+        let entry = try cache.entry(key: "again", url: URL(string: "x-subsonic-again://song")!, reader: reader)
+        clock.withLock { $0.running = true }
+        // The first wait is let go two thirds of the way to the limit (the decoder asks again, the song is opened again: the
+        // player does both while a song plays from what has arrived). Nothing waits for a moment, then the wait begins again.
+        let letGoAt = StreamingCore.silenceLimit * 2 / 3
+        #expect(throws: CancellationError.self) {
+            try entry.prepare(full: true, lead: 0, cancelled: { clock.withLock { $0.now } >= letGoAt })
+        }
+        do {
+            try entry.prepare(full: true, lead: 0, cancelled: { false })
+            Issue.record("the whole song arrived from a server that is gone")
+        } catch {
+            guard case NetworkPlaybackCache.Failure.notAnswering = error else { Issue.record("failed with \(error)"); return }
+        }
+        // Counted from when the server was first asked and sent nothing, not from when the second wait began: before the fix
+        // the second wait had the whole limit again, and the song was given up no sooner than `letGoAt` plus the limit.
+        let waited = clock.withLock { $0.now }
+        #expect(waited >= StreamingCore.silenceLimit && waited < letGoAt + StreamingCore.silenceLimit,
+                "given up \(waited) s after the server was first asked, with the wait begun again at \(letGoAt) s")
+    }
+
     @Test("A server that accepts the connection and then says nothing is given up on")
     func serverSilent() async throws {
         let (server, provider, store) = try await rig(timeout: 1)

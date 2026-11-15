@@ -35,8 +35,11 @@ public protocol RemoteCacheReader: PlaybackCacheReader {
     /// How long a listener waits on this source with nothing from it before the song is given up, when that is sooner than the
     /// cache's own limit (nil: the cache's). A server that has gone away is known in seconds; a share is waited for longer.
     var silenceLimit: TimeInterval? { get }
-    /// How long ago this source last sent a byte, in seconds (nil: not known, the cache goes by the blocks it has written). A slow
-    /// link that is still sending is not silence: `silenceLimit` applies only once this has reached it too.
+    /// How long this source has been asked for bytes and has sent none, in seconds: counted from its last byte, or from when it
+    /// was asked if nothing was being asked of it then, and zero while nothing is asked (nil: not known, the cache goes by the
+    /// blocks it has written). A slow link that is still sending is not silence, and neither is a pause. A song that is waited
+    /// for is given up once this reaches `silenceLimit`, however long the wait itself has lasted: a wait that begins again
+    /// (the decoder asks anew, the song is opened again) does not begin the count again.
     var quietFor: TimeInterval? { get }
 }
 
@@ -793,18 +796,20 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         /// The reader's wording for its silence (nil: the share's). Under `condition`.
         private var silenceMessage: String? { (held as? any RemoteCacheReader)?.notAnsweringMessage }
 
-        /// How long this song is waited for with nothing arriving: the cache's limit, or its source's own when that is sooner and
-        /// the source has sent nothing for as long (see `RemoteCacheReader.silenceLimit`). Under `condition`.
-        private var silenceLimit: TimeInterval {
-            guard let remote = held as? any RemoteCacheReader, let own = remote.silenceLimit, own < noProgressLimit,
-                  remote.quietFor ?? .infinity >= own else { return noProgressLimit }
-            return own
+        /// The song's source has a silence limit of its own, sooner than the cache's, and has been asked and sent nothing for as
+        /// long (see `RemoteCacheReader.quietFor`) while the song is waited for. A source that can't say how long it has been
+        /// quiet is judged by the blocks written, as a share is. Under `condition`.
+        private var sourceSilent: Bool {
+            guard starting || waiters > 0, let remote = held as? any RemoteCacheReader, let own = remote.silenceLimit,
+                  own < noProgressLimit else { return false }
+            guard let quiet = remote.quietFor else { return clock() - lastProgress >= own }
+            return quiet >= own
         }
 
-        /// Nothing has arrived for the silence limit: the song fails (every waiting read with it) and stops holding scans back.
-        /// Called with the condition lock held; true when it gave up.
+        /// Nothing has arrived for the silence limit (the cache's, or the source's own when that is sooner): the song fails (every
+        /// waiting read with it) and stops holding scans back. Called with the condition lock held; true when it gave up.
         private func giveUpIfSilent() -> Bool {
-            guard error == nil, clock() - lastProgress >= silenceLimit else { return false }
+            guard error == nil, clock() - lastProgress >= noProgressLimit || sourceSilent else { return false }
             error = Failure.notAnswering(silenceMessage)
             condition.broadcast()
             // A remote reader may be retrying for as long as it is let: the copy is over, so its lanes should come back.

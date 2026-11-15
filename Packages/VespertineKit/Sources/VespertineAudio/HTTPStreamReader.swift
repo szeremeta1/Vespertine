@@ -260,14 +260,21 @@ public final class HTTPStreamReader: NSObject, RemoteCacheReader, URLSessionData
     public let mediaType: String?
     public let notAnsweringMessage: String?
     public var silenceLimit: TimeInterval? { options.silenceLimit }
-    public var quietFor: TimeInterval? { lock.withLock { max(0, uptime() - lastByteAt) } }
+    /// Counted only while a read is asked of the server (its retries included): from the server's last byte, or from when the
+    /// asking began. A read that is tried again, and a new read begun while another still waits, do not begin it again.
+    public var quietFor: TimeInterval? {
+        lock.withLock { reading > 0 ? max(0, uptime() - max(lastByteAt, askedSince)) : 0 }
+    }
     /// When the server last sent a byte of the song (on `uptime`). An error page is not the song. Under `lock`.
     private var lastByteAt = ProcessInfo.processInfo.systemUptime
+    /// Reads of the server in flight, and when the first of them began (on `uptime`). Under `lock`.
+    private var reading = 0
+    private var askedSince = ProcessInfo.processInfo.systemUptime
     /// Under `lock`.
     private var uptime: @Sendable () -> TimeInterval = { ProcessInfo.processInfo.systemUptime }
     /// Tests count the server's silence on a clock of their own, from now.
     func countSilence(on clock: @escaping @Sendable () -> TimeInterval) {
-        lock.withLock { uptime = clock; lastByteAt = clock() }
+        lock.withLock { uptime = clock; lastByteAt = clock(); askedSince = lastByteAt }
     }
     private let options: Options
     private var session: URLSession!
@@ -322,6 +329,11 @@ public final class HTTPStreamReader: NSObject, RemoteCacheReader, URLSessionData
         guard offset < size, count > 0 else { return Data() }
         let end = min(size, offset + Int64(count))
         if end <= Int64(head.count) { return head.subdata(in: Int(offset)..<Int(end)) }
+        lock.withLock {
+            if reading == 0 { askedSince = uptime() }
+            reading += 1
+        }
+        defer { lock.withLock { reading -= 1 } }
         // A link that drops or a server that stalls is tried again at the same offset for as long as the copy lets it: the
         // cache gives the song up after its own limit without a byte, and cancels this reader then.
         while true {

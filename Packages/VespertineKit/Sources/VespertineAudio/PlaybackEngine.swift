@@ -28,6 +28,9 @@ public struct EngineSnapshot: Sendable {
     public var lastError: String?
     /// Output is paused while a stalled network read catches up (playback resumes by itself).
     public var isBuffering = false
+    /// Buffering, and what has already arrived is still playing: the wait for the network is not heard (yet). A control that
+    /// shows a song as waiting (a spinner over play) leaves it alone then.
+    public var playsWhileBuffering = false
     /// While the song is copied from a share before it plays: how much of it is local (0…1). nil when not copying, or when
     /// the copy is progressive (a large DSD file starts after its first reserve).
     public var bufferingFraction: Double?
@@ -2866,9 +2869,10 @@ public final class PlaybackEngine: @unchecked Sendable {
             s.snapshot.underruns = underruns
             // Buffering is said only while playing: `buffering` is updated only then, and a pause that caught the output holding
             // for data leaves it as it was.
-            s.snapshot.isBuffering = (st == .playing && buffering)
-                || (st == .playing && decoding.flatMap { staged[cacheKey($0.item)] }?.isWaiting == true)
-                || (st == .playing && lookingAhead && ringLow)
+            let waitingOnShare = st == .playing && decoding.flatMap { staged[cacheKey($0.item)] }?.isWaiting == true
+            s.snapshot.isBuffering = (st == .playing && buffering) || waitingOnShare || (st == .playing && lookingAhead && ringLow)
+            // The read-ahead waits on the share while what has arrived still plays: said in Now Playing, not yet heard.
+            s.snapshot.playsWhileBuffering = waitingOnShare && !buffering && !ringLow
             s.snapshot.waitingForDevice = waiting
             s.snapshot.standingInFor = standingInFor
             s.snapshot.readingFromShare = fromShare

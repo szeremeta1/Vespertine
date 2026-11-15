@@ -171,7 +171,9 @@ private final class WaitingReader: RemoteCacheReader, @unchecked Sendable {
     var cancelled = false
     let notAnsweringMessage: String?
     var silenceLimit: TimeInterval?
-    var quietFor: TimeInterval?
+    /// Asked each time the cache looks (nil: this source can't say).
+    var quiet: (@Sendable () -> TimeInterval?)?
+    var quietFor: TimeInterval? { condition.withLock { quiet }?() }
     /// Called once, when a read first waits: the moment a test may move the cache's clock past the limit.
     var whenWaiting: (@Sendable () -> Void)?
     var fileExtension: String { "flac" }
@@ -238,27 +240,43 @@ struct RemoteReaderCancelTests {
         }
     }
 
-    @Test("A source with a silence limit of its own is given up on after that, unless it is still sending or the cache's limit is sooner")
+    /// How long a test's source says it has been asked and has sent nothing.
+    private enum Quiet {
+        /// It can't say.
+        case unknown
+        /// Always this long (it is still sending, or it has been silent since long before the song was waited for).
+        case fixed(TimeInterval)
+        /// Since its read began to wait, on the test's clock.
+        case sinceAsked
+    }
+
+    @Test("A source with a silence limit of its own is given up on once it has sent nothing for that long, however long the wait has lasted, unless the cache's limit is sooner")
     func ownSilenceLimit() throws {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent("remote-limit-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
-        // (the source's limit, how long it says it has sent nothing, the cache's limit) and the limit that must apply.
-        let cases: [(own: TimeInterval?, quiet: TimeInterval?, cache: TimeInterval, expected: TimeInterval)] = [
-            (15, 15, 40, 15),   // a server that is gone: its own limit
-            (15, nil, 40, 15),  // a source that can't say when it last sent: its own limit, by the blocks written
-            (15, 3, 40, 40),    // still sending, slowly: the cache's
-            (nil, 50, 40, 40),  // no limit of its own: the cache's
-            (80, 500, 40, 40)   // its own is later than the cache's: the cache's
+        // (the source's limit, how long it says it has sent nothing, the cache's limit) and the seconds the song is waited for:
+        // at least `from`, less than `below`.
+        let cases: [(own: TimeInterval?, quiet: Quiet, cache: TimeInterval, from: TimeInterval, below: TimeInterval)] = [
+            (15, .sinceAsked, 40, 15, 35),   // a server that goes as the song is waited for: its own limit
+            (15, .fixed(100), 40, 0, 15),    // a server silent that long already when the wait begins: at once, not its limit again
+            (15, .unknown, 40, 15, 35),      // a source that can't say: its own limit, by the blocks written
+            (15, .fixed(3), 40, 40, 60),     // still sending, slowly: the cache's
+            (nil, .fixed(50), 40, 40, 60),   // no limit of its own: the cache's
+            (80, .fixed(500), 40, 40, 60)    // its own is later than the cache's: the cache's
         ]
         for (index, test) in cases.enumerated() {
-            // Stands still until a read waits; from then on every look finds one second gone.
+            // Stands still until a read waits; from then on every look by the cache finds one second gone.
             let clock = Locked((now: 0.0, running: false))
             let now: @Sendable () -> TimeInterval = { clock.withLock { if $0.running { $0.now += 1 }; return $0.now } }
             let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096, noProgressLimit: test.cache, clock: now)
             let reader = WaitingReader(Data(repeating: 4, count: 64 << 10), message: "Service Z isn't answering")
             reader.silenceLimit = test.own
-            reader.quietFor = test.quiet
+            switch test.quiet {
+            case .unknown: reader.quiet = nil
+            case .fixed(let seconds): reader.quiet = { seconds }
+            case .sinceAsked: reader.quiet = { clock.withLock { $0.now } }   // the clock starts when the read waits
+            }
             reader.whenWaiting = { clock.withLock { $0.running = true } }
             let entry = try cache.entry(key: "limit-\(index)", url: URL(string: "x-remote://limit-\(index)")!, reader: reader)
             do {
@@ -270,7 +288,7 @@ struct RemoteReaderCancelTests {
             }
             let waited = clock.withLock { $0.now }
             // The clock moves a second a look, from several threads: the song is given up at its limit or a few looks past it.
-            #expect(waited >= test.expected && waited < test.expected + 20, "case \(index): waited \(waited), limit \(test.expected)")
+            #expect(waited >= test.from && waited < test.below, "case \(index): waited \(waited), expected \(test.from) to \(test.below)")
             #expect(reader.wasCancelled)
         }
     }
