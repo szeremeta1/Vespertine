@@ -45,8 +45,9 @@ import VespertineRemoteProtocol
         let track = TrackSummary(id: 3, title: "Song", artist: "Artist", album: "Album", albumKey: "a", duration: 200, trackNumber: 1, discNumber: 1,
                                  format: "FLAC · 24/96", artworkKey: nil, favorite: false)
         playback.play([track])
-        let deadline = Date().addingTimeInterval(5)
-        while playback.player.state != .playing, Date() < deadline { try await Task.sleep(for: .milliseconds(10)) }
+        // Counted, not timed: a busy machine that holds every test still for seconds uses up a clock but not a count.
+        var looks = 0
+        while playback.player.state != .playing, looks < 500 { looks += 1; try await Task.sleep(for: .milliseconds(10)) }
         #expect(playback.player.state == .playing)
         #expect(playback.stream?.format.container == "wav" && playback.stream?.kind == .original)
         // The song is as long as its sound, not as long as the made-up library says.
