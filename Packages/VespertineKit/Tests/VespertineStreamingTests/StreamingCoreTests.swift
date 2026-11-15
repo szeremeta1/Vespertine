@@ -385,7 +385,10 @@ struct StreamingCoreTests {
         #expect(again.rating == 4)
         #expect(again.addedAt == first.addedAt)
         #expect(try !database.allTracks().contains { $0.title.hasPrefix("Last Light") })
-        #expect(try database.playlists().map(\.name).sorted() == ["All jazz", "Another", "Evenings"])
+        // (A new library also has the two smart playlists every library starts with.)
+        let names = Set(try database.playlists().map(\.name))
+        #expect(names.isSuperset(of: ["All jazz", "Another", "Evenings"]))
+        #expect(!names.contains("From the server"), "a playlist the server no longer has goes")
         #expect(try database.favoriteTracks().filter(\.isStreamed).map(\.title) == ["Lamplight"])
         #expect(try database.favoriteTracks().contains { !$0.isStreamed }, "a file's favorite is not the server's to remove")
     }
