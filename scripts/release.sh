@@ -62,6 +62,40 @@ check_team() {
   [[ $signed == $team ]] || { print -u2 "$1 is signed by team ${signed:-none}, expected $team (VESPERTINE_TEAM_ID)."; exit 1; }
 }
 
+# Xcode's own builds are signed with the …Local.entitlements files (project.yml), which switch library validation off so
+# an ad-hoc build can load its frameworks. A release is signed with the files beside them, which must hold exactly the
+# same keys except that one: a key added to one file only would work in development and be missing from the release.
+check_entitlements_pair() {   # check_entitlements_pair <release file> <local file>
+  /usr/bin/python3 - "$1" "$2" <<'PY' || exit 1
+import plistlib, sys
+release, local = (plistlib.load(open(path, "rb")) for path in sys.argv[1:3])
+relaxed = "com.apple.security.cs.disable-library-validation"
+if relaxed in release or "com.apple.security.get-task-allow" in release:
+    sys.exit(f"{sys.argv[1]} must not switch library validation off or allow debugging: it signs the release.")
+local.pop(relaxed, None)
+if release != local:
+    sys.exit(f"{sys.argv[1]} and {sys.argv[2]} differ in more than {relaxed}: give both the same keys.")
+PY
+}
+
+# Fails unless every piece of code in a Developer ID build is signed by the expected team with the hardened runtime,
+# and the app and the helper carry no development entitlement. `codesign --verify` passes a framework that still has
+# Xcode's ad-hoc signature, but library validation doesn't: the app would stop at launch on the first such framework.
+check_release_signatures() {
+  local code sparkle="$app/Contents/Frameworks/Sparkle.framework/Versions/B" nested=()
+  [[ ! -d $sparkle ]] || nested=("$sparkle/XPCServices/Installer.xpc" "$sparkle/XPCServices/Downloader.xpc" "$sparkle/Autoupdate" "$sparkle/Updater.app")
+  for code in "${nested[@]}" "$app"/Contents/Frameworks/*.framework "$sound_helper"/Contents/Frameworks/*.framework \
+      "$sound_driver" "$sound_helper" "$app"; do
+    check_team "$code"
+    [[ $(codesign -dv "$code" 2>&1) =~ 'flags=[^ ]*runtime' ]] || { print -u2 "$code is signed without the hardened runtime."; exit 1; }
+  done
+  for code in "$sound_helper" "$app"; do
+    if [[ $(codesign -d --entitlements - --xml "$code" 2>/dev/null) =~ 'cs\.disable-library-validation|get-task-allow' ]]; then
+      print -u2 "$code carries a development entitlement (library validation off, or get-task-allow)."; exit 1
+    fi
+  done
+}
+
 app="$out/Vespertine.app"
 
 # Designed installer window (layout in scripts/dmg-settings.py, artwork in scripts/make-dmg-background.swift).
@@ -107,6 +141,8 @@ fi
 
 if ! $resume; then
   scripts/generate-project.sh
+  check_entitlements_pair App/Vespertine.entitlements App/VespertineLocal.entitlements
+  check_entitlements_pair Helper/VespertineSoundHelper.entitlements Helper/VespertineSoundHelperLocal.entitlements
   xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -derivedDataPath "$derived" \
     -onlyUsePackageVersionsFromResolvedFile -destination 'generic/platform=macOS' ONLY_ACTIVE_ARCH=NO CODE_SIGN_IDENTITY=- \
     ${VESPERTINE_VERSION:+MARKETING_VERSION=$VESPERTINE_VERSION} ${VESPERTINE_BUILD:+CURRENT_PROJECT_VERSION=$VESPERTINE_BUILD} build > "$out".log 2>&1 \
@@ -155,7 +191,7 @@ if ! $resume; then
 
   codesign --verify --deep --strict --verbose=2 "$app"
   codesign -dv "$app" 2>&1 | grep -E "Signature|Authority=Developer ID Application|TeamIdentifier"
-  [[ $identity == "-" ]] || check_team "$app"
+  [[ $identity == "-" ]] || check_release_signatures
 fi
 
 if $notarize; then

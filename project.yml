@@ -116,12 +116,18 @@ targets:
             CFBundleTypeRole: Viewer
             LSHandlerRank: Alternate
             LSItemContentTypes: [public.audio, org.xiph.flac, com.microsoft.waveform-audio, public.aiff-audio, public.mp3, com.apple.m4a-audio]
+    # What Xcode signs a build with. Xcode signs ad-hoc ("-"), with the hardened runtime on, and ad-hoc code has no Team
+    # ID: library validation would then refuse every embedded framework and the app would die at launch, naming
+    # wavpack.framework (the first one it links). So these builds, and only these, switch library validation off.
+    # A release is signed again by scripts/release.sh with App/Vespertine.entitlements, which must hold the same keys
+    # except that one (the script checks both).
     entitlements:
-      path: App/Vespertine.entitlements
+      path: App/VespertineLocal.entitlements
       properties:
         com.apple.security.app-sandbox: false
         # Hardened runtime: the loopback self-test reads a virtual device's input.
         com.apple.security.device.audio-input: true
+        com.apple.security.cs.disable-library-validation: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.Vespertine
@@ -192,11 +198,14 @@ targets:
         NSHumanReadableCopyright: "Copyright © 2026 Vespertine contributors. Free software under the GNU GPL, version 3 or later."
         # What other apps play reaches the helper as the input of Vespertine's audio driver, which macOS counts as recording.
         NSMicrophoneUsageDescription: "Vespertine Sound Helper receives what your apps play to a speaker group you published as a Mac sound output, and plays it on the group's speakers. It never records a microphone."
+    # As for the app: Xcode's ad-hoc builds switch library validation off, a release is signed again with
+    # Helper/VespertineSoundHelper.entitlements.
     entitlements:
-      path: Helper/VespertineSoundHelper.entitlements
+      path: Helper/VespertineSoundHelperLocal.entitlements
       properties:
         com.apple.security.app-sandbox: false
         com.apple.security.device.audio-input: true
+        com.apple.security.cs.disable-library-validation: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.szeremeta.Vespertine.SoundHelper

@@ -19,6 +19,8 @@ scripts/generate-project.sh && xcodebuild -project Vespertine.xcodeproj -scheme 
   -derivedDataPath build/DD -onlyUsePackageVersionsFromResolvedFile build
 ```
 
+Either way the app is signed ad-hoc ("Sign to Run Locally") with the hardened runtime on. Ad-hoc code has no Team ID, so these builds are signed with `App/VespertineLocal.entitlements` (and the helper with `Helper/VespertineSoundHelperLocal.entitlements`), which switch library validation off; otherwise the app stops at launch with "Library not loaded: @rpath/wavpack.framework … different Team IDs". A release never carries that: `scripts/release.sh` signs every framework, the driver, the helper and the app again with the Developer ID and the entitlements files without it, and checks each one.
+
 Run the engine and library tests, and the analysis core's (it also builds on Linux):
 
 ```bash
