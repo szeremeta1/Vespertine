@@ -245,11 +245,11 @@ struct RemoteReaderCancelTests {
         defer { try? FileManager.default.removeItem(at: dir) }
         // (the source's limit, how long it says it has sent nothing, the cache's limit) and the limit that must apply.
         let cases: [(own: TimeInterval?, quiet: TimeInterval?, cache: TimeInterval, expected: TimeInterval)] = [
-            (15, 15, 100, 15),    // a server that is gone: its own limit
-            (15, nil, 100, 15),   // a source that can't say when it last sent: its own limit, by the blocks written
-            (15, 3, 100, 100),    // still sending, slowly: the cache's
-            (nil, 50, 100, 100),  // no limit of its own: the cache's
-            (200, 500, 100, 100)  // its own is later than the cache's: the cache's
+            (15, 15, 40, 15),   // a server that is gone: its own limit
+            (15, nil, 40, 15),  // a source that can't say when it last sent: its own limit, by the blocks written
+            (15, 3, 40, 40),    // still sending, slowly: the cache's
+            (nil, 50, 40, 40),  // no limit of its own: the cache's
+            (80, 500, 40, 40)   // its own is later than the cache's: the cache's
         ]
         for (index, test) in cases.enumerated() {
             // Stands still until a read waits; from then on every look finds one second gone.
@@ -270,7 +270,7 @@ struct RemoteReaderCancelTests {
             }
             let waited = clock.withLock { $0.now }
             // The clock moves a second a look, from several threads: the song is given up at its limit or a few looks past it.
-            #expect(waited >= test.expected && waited < test.expected + 40, "case \(index): waited \(waited), limit \(test.expected)")
+            #expect(waited >= test.expected && waited < test.expected + 20, "case \(index): waited \(waited), limit \(test.expected)")
             #expect(reader.wasCancelled)
         }
     }
