@@ -21,7 +21,7 @@ final class CountingSearcher: SSDPSearching, @unchecked Sendable {
 }
 
 /// Waits until the search discovery makes when it starts has finished, however long the machine takes over it.
-private func firstSearchDone(_ discovery: RendererDiscovery) async {
+func firstSearchDone(_ discovery: RendererDiscovery) async {
     while discovery.searches == 0 || discovery.isSearching { try? await Task.sleep(for: .milliseconds(5)) }
 }
 
@@ -33,8 +33,8 @@ struct RendererDiscoveryTests {
         let service = RendererService(discovery: RendererDiscovery(searcher: searcher))
         #expect(!service.isEnabled)
         service.refresh()
+        // Off, both return at once without starting anything: there is nothing to wait for.
         await service.discovery.searchOnce()
-        try await Task.sleep(for: .milliseconds(100))
         #expect(searcher.searches == 0)
         #expect(!service.discovery.isRunning)
         #expect(!service.media.isRunning)
@@ -55,8 +55,9 @@ struct RendererDiscoveryTests {
         #expect(!service.media.isRunning)
         #expect(!service.discovery.isRunning)
         let before = searcher.searches
+        // Stopped, a search asked for either way isn't made (both return at once, so there is nothing to wait for).
         service.refresh()
-        try await Task.sleep(for: .milliseconds(100))
+        await service.discovery.searchOnce()
         #expect(searcher.searches == before)
     }
 
@@ -95,8 +96,10 @@ struct RendererSwitchRaceTests {
         #expect(!service.isEnabled)
         #expect(!service.media.isRunning)
         #expect(!service.discovery.isRunning)
+        // Nothing searches once it is stopped: a search asked for now isn't made.
         let searches = searcher.searches
-        try await Task.sleep(for: .milliseconds(200))
+        service.refresh()
+        await service.discovery.searchOnce()
         #expect(searcher.searches == searches)
         // And the last word wins the other way too.
         service.want(false)

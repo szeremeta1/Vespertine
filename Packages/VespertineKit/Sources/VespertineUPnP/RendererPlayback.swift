@@ -112,6 +112,9 @@ public final class RendererPlayback: @unchecked Sendable {
     /// The time, for everything judged by how long it has been (a renderer that has stopped answering, a song that hasn't
     /// started). The tests hand in a clock they move themselves.
     private let now: @Sendable () -> Date
+    /// The wait after a change of settings while a song plays, before the song is restarted with them (300 ms: a volume
+    /// drag restarts the stream once). The tests hand in one they end themselves.
+    private let settingsPause: @Sendable () async -> Void
 
     enum Command {
         case play(PlayableItem, at: TimeInterval, announce: Bool, generation: Int), pause, resume, seek(TimeInterval), stop, queueChanged, settings(RendererSettings), poll
@@ -123,10 +126,12 @@ public final class RendererPlayback: @unchecked Sendable {
     /// polls itself).
     public init(renderer: RendererDevice, transport: any RendererTransport, media: MediaServer, processed: (any ProcessedStreamMaking)? = nil,
                 pollInterval: TimeInterval = 0.5, startTimeout: TimeInterval = 15, lostAfter: TimeInterval = 10,
-                now: @escaping @Sendable () -> Date = { Date() }) {
+                now: @escaping @Sendable () -> Date = { Date() },
+                settingsPause: @escaping @Sendable () async -> Void = { try? await Task.sleep(for: .milliseconds(300)) }) {
         self.startTimeout = startTimeout
         self.lostAfter = lostAfter
         self.now = now
+        self.settingsPause = settingsPause
         self.renderer = renderer
         self.transport = transport
         self.media = media
@@ -214,8 +219,8 @@ public final class RendererPlayback: @unchecked Sendable {
     public func update(settings: RendererSettings) {
         let g = settingsGeneration.withLock { $0 += 1; return $0 }
         guard state.withLock({ $0.current != nil }) else { enqueue.yield(.settings(settings)); return }
-        Task { [weak self] in
-            try? await Task.sleep(for: .milliseconds(300))
+        Task { [weak self, settingsPause] in
+            await settingsPause()
             guard let self, self.settingsGeneration.withLock({ $0 }) == g else { return }
             self.enqueue.yield(.settings(settings))
         }

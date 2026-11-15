@@ -58,6 +58,9 @@ public final class HTTPServer: @unchecked Sendable {
         open.forEach { $0.cancel() }
     }
 
+    /// Connections held open now (the tests wait on it, not on a guessed length of time).
+    var connectionCount: Int { state.withLock { connections.count } }
+
     private func accept(_ connection: NWConnection) {
         let id = ObjectIdentifier(connection)
         let admitted = state.withLock { () -> Bool in

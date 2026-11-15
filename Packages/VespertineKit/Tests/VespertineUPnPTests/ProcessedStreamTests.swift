@@ -166,24 +166,42 @@ struct ProcessedHousekeepingTests {
         try await media.start()
         defer { media.stop(); fake.stop() }
         let device = try await RendererDevice.load(location: fake.location)
+        let dragOver = Gate()
         let playback = RendererPlayback(renderer: device, transport: try device.makeTransport(), media: media,
                                         processed: ProcessedStreamMaker(directory: FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-upnp-\(UUID().uuidString)")),
-                                        pollInterval: 0.05)
+                                        pollInterval: 0.05, settingsPause: { await dragOver.wait() })
         defer { playback.shutdown() }
         let events = EventLog()
         playback.eventHandler = { events.add($0) }
+        // With nothing playing the settings apply at once, in their turn before the song.
         playback.update(settings: RendererSettings(digitalVolumeDB: -3))
-        try await Task.sleep(for: .milliseconds(400))
         playback.play(PlayableItem(url: try makeWAV(seconds: 2, seed: 8)))
         #expect(await events.wait(for: "started"))
+        await playback.settleForTests()
         let loadsBefore = fake.actions.filter { $0 == "DeleteAll" }.count
-        for step in 1...10 {
-            playback.update(settings: RendererSettings(digitalVolumeDB: -3 - Double(step)))
-            try await Task.sleep(for: .milliseconds(30))
-        }
-        try await Task.sleep(for: .milliseconds(900))
+        // Ten steps of a drag, each waiting out its pause; the test ends the pause for all of them once the last step is
+        // made, so no step's pause can run out between two steps on a slow machine.
+        for step in 1...10 { playback.update(settings: RendererSettings(digitalVolumeDB: -3 - Double(step))) }
+        await dragOver.open()
+        // The last step's settings are the ones played; any restart made for an earlier step came before it, in order.
+        while playback.snapshot.signalPath?.volume != .digital(dB: -13) { await playback.settleForTests() }
         #expect(fake.actions.filter { $0 == "DeleteAll" }.count - loadsBefore == 1)
         #expect(playback.snapshot.signalPath?.volume == .digital(dB: -13))
+    }
+}
+
+/// Holds everyone who waits at it until it is opened; open, it holds no one.
+actor Gate {
+    private var isOpen = false
+    private var waiting: [CheckedContinuation<Void, Never>] = []
+    func wait() async {
+        if isOpen { return }
+        await withCheckedContinuation { waiting.append($0) }
+    }
+    func open() {
+        isOpen = true
+        waiting.forEach { $0.resume() }
+        waiting = []
     }
 }
 

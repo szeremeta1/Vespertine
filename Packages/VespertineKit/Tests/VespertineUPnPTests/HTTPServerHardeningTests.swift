@@ -90,14 +90,16 @@ struct HTTPServerHardeningTests {
             _ = withUnsafePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { connect(fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) } }
             idle.append(fd)
         }
-        try await Task.sleep(for: .milliseconds(200))
+        // The server has taken all three, however long the machine needs for it.
+        while server.connectionCount < 3 { await Task.yield() }
         // Over the cap: closed on arrival (or, if the close beats the connect, refused outright). Never served.
         if let refused = rawExchange(port: port, send: Data("GET / HTTP/1.1\r\n\r\n".utf8), timeout: 1.5) {
             #expect(refused.closed)
             #expect(!refused.response.hasPrefix("HTTP/1.1 404"))
         }
         idle.forEach { close($0) }
-        try await Task.sleep(for: .milliseconds(300))
+        // The server has seen them go: there is room again.
+        while server.connectionCount > 0 { await Task.yield() }
         let served = try #require(rawExchange(port: port, send: Data("GET / HTTP/1.1\r\n\r\n".utf8)))
         #expect(served.response.hasPrefix("HTTP/1.1 404"))
     }
