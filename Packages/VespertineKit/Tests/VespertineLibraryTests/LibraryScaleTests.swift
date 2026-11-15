@@ -81,7 +81,7 @@ struct LibraryScaleTests {
         // The work is counted, not timed: ten times the songs may cost ten times the steps and the sorting that goes with
         // them, never the hundred times of a query that looks at every song for every song.
         let mediumSteps = try steps(medium) { _ = try $0.stats() }
-        let largeSteps = try steps(large) { #expect(try $0.stats().tracks == 100_000) }
+        let largeSteps = try steps(large) { let stats = try $0.stats(); #expect(stats.tracks == 100_000) }
         #expect(mediumSteps > 10_000, "the count sees the query's work: \(mediumSteps) steps for 10,000 songs")
         #expect(largeSteps < mediumSteps * 20, "stats: \(mediumSteps) steps for 10,000 songs, \(largeSteps) for 100,000")
     }
