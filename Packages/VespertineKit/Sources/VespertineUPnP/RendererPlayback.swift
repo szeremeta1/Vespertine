@@ -16,8 +16,10 @@ public protocol ProcessedStreamMaking: Sendable {
 }
 
 public final class RendererPlayback: @unchecked Sendable {
-    public let renderer: RendererDevice
-    private let transport: any RendererTransport
+    /// The renderer and the way to it. Both change together when it is found again somewhere else (see `relocate`).
+    private let link: Locked<(renderer: RendererDevice, transport: any RendererTransport)>
+    public var renderer: RendererDevice { link.withLock { $0.renderer } }
+    private var transport: any RendererTransport { link.withLock { $0.transport } }
     private let media: MediaServer
     private let processed: (any ProcessedStreamMaking)?
     private let log = Logger(subsystem: "org.szeremeta.vespertine.player", category: "renderer")
@@ -41,12 +43,21 @@ public final class RendererPlayback: @unchecked Sendable {
         get { hooks.withLock { $0.events } }
         set { hooks.withLock { $0.events = newValue } }
     }
+    /// Looks for the renderer again when it doesn't answer at the address Vespertine has for it: the renderer as it is on
+    /// the network now when that differs from `renderer` (it restarted on another port, or got a new address), else nil.
+    /// A player that sat unused for a while is often somewhere else by the time Play is pressed; without this the first
+    /// Play goes to where it was.
+    public var relocate: (@Sendable (RendererDevice) async -> RendererDevice?)? {
+        get { hooks.withLock { $0.relocate } }
+        set { hooks.withLock { $0.relocate = newValue } }
+    }
 
     private struct Hooks {
         var next: (@Sendable (PlayableItem) -> PlayableItem?)?
         var resolver: (@Sendable (PlayableItem) -> URL)?
         var metadata: (@Sendable (PlayableItem) -> RendererTrackInfo?)?
         var events: (@Sendable @MainActor (EngineEvent) -> Void)?
+        var relocate: (@Sendable (RendererDevice) async -> RendererDevice?)?
     }
     private let hooks = Locked(Hooks())
 
@@ -127,8 +138,7 @@ public final class RendererPlayback: @unchecked Sendable {
         self.startTimeout = startTimeout
         self.lostAfter = lostAfter
         self.now = now
-        self.renderer = renderer
-        self.transport = transport
+        link = Locked((renderer, transport))
         self.media = media
         self.processed = processed
         (commands, enqueue) = AsyncStream<Command>.makeStream()
@@ -238,6 +248,10 @@ public final class RendererPlayback: @unchecked Sendable {
 
     /// A song is loaded on the renderer and it is answering: the renderer is there, whatever a search on the network says.
     public var isEngaged: Bool { state.withLock { $0.current != nil && !$0.shutDown && $0.failingSince == nil } }
+
+    /// Told to play a song that isn't on the renderer yet. While it is, a renderer that turns up at another address is
+    /// followed there by this playback itself (`relocate`); the song isn't started a second time by another one.
+    public var isStarting: Bool { state.withLock { $0.wantsPlaying && $0.current == nil && !$0.shutDown } }
 
     /// The song playing started again at `seconds`, as a seek in a processed stream or a change of settings does.
     func restartForTests(at seconds: TimeInterval) {
@@ -458,15 +472,23 @@ public final class RendererPlayback: @unchecked Sendable {
         // The song is sent first, alone: the one after it is prepared (a stream is copied whole) while this one plays.
         let next: Entry? = nil
         do {
-            do { try await transport.load(current: current.track, next: nil) } catch let error where Self.isTransient(error) {
-                // A renderer still changing state refuses now and then (UPnP 701): once more after a moment.
-                try await Task.sleep(for: .milliseconds(300))
-                try await transport.load(current: current.track, next: nil)
+            do { try await load(current.track) } catch let error as UPnPError where error.isLinkFailure {
+                // It doesn't answer where Vespertine has it. Found somewhere else, the song goes there, prepared again
+                // (its address on this Mac's side and what the renderer takes may have changed with it).
+                guard generation.withLock({ $0 }) == g else { release(current); return }
+                guard await relocated() else { throw error }
+                guard generation.withLock({ $0 }) == g else { release(current); return }
+                release(current)
+                do { current = try await entry(for: item, at: seconds) } catch { fail(item, error); return }
+                current.announces = announce
+                guard generation.withLock({ $0 }) == g else { release(current); return }
+                try await load(current.track)
             }
         } catch {
             release(current)
-            // What it was playing before isn't what Vespertine shows any more.
-            try? await transport.stop()
+            // What it was playing before isn't what Vespertine shows any more. A renderer that can't be reached isn't asked:
+            // waiting for that to time out as well would only keep the listener from being told.
+            if (error as? UPnPError)?.isLinkFailure != true { try? await transport.stop() }
             throw error
         }
         let old = state.withLock { s -> [Entry] in
@@ -493,6 +515,24 @@ public final class RendererPlayback: @unchecked Sendable {
         old.forEach(release)
         if !state.withLock({ $0.wantsPlaying }) { try await transport.pause() }
         await planNextQuietly()
+    }
+
+    /// Sends `track` as the song to play, once more after a moment when the renderer is still changing state (UPnP 701).
+    private func load(_ track: RendererTrack) async throws {
+        do { try await transport.load(current: track, next: nil) } catch let error where Self.isTransient(error) {
+            try await Task.sleep(for: .milliseconds(300))
+            try await transport.load(current: track, next: nil)
+        }
+    }
+
+    /// Looks for the renderer again; true when it was found somewhere else and is talked to there from now on.
+    private func relocated() async -> Bool {
+        let known = renderer
+        guard let relocate, let found = await relocate(known), found.uid == known.uid, found.description != known.description,
+              let transport = try? found.makeTransport() else { return false }
+        link.withLock { $0 = (found, transport) }
+        log.info("Renderer \(found.name, privacy: .public) found again at \(found.host, privacy: .public)")
+        return true
     }
 
     private func seek(_ seconds: TimeInterval) async throws {

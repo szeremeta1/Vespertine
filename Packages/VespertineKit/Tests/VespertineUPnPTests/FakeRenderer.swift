@@ -38,8 +38,12 @@ final class FakeRenderer: @unchecked Sendable {
         set { lock.withLock { _ignoresPlay = newValue } }
     }
 
-    init(kind: Kind) async throws {
+    /// Its UDN; by default one of its own. Two fakes with the same one are the same renderer at two addresses.
+    private let udn: String?
+
+    init(kind: Kind, udn: String? = nil) async throws {
         self.kind = kind
+        self.udn = udn
         server = HTTPServer { [weak self] request in self?.handle(request) ?? .status(503) }
         port = try await server.start()
     }
@@ -216,7 +220,7 @@ final class FakeRenderer: @unchecked Sendable {
         }
         return "<?xml version=\"1.0\"?><root xmlns=\"urn:schemas-upnp-org:device-1-0\"><device>"
             + "<deviceType>urn:schemas-upnp-org:device:MediaRenderer:1</deviceType><friendlyName>Fake Renderer</friendlyName>"
-            + "<manufacturer>Tests</manufacturer><modelName>Fake</modelName><modelNumber>1</modelNumber><UDN>uuid:fake-\(port)</UDN>"
+            + "<manufacturer>Tests</manufacturer><modelName>Fake</modelName><modelNumber>1</modelNumber><UDN>\(udn ?? "uuid:fake-\(port)")</UDN>"
             + "<serviceList>\(services)</serviceList></device></root>"
     }
 }
