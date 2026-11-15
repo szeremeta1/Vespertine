@@ -260,6 +260,8 @@ struct StreamingSwitchTests {
         app.setOn(true, id)
         #expect(await app.signIn(id, name: "Home", request: ProviderSignIn(server: "", user: "listener", secret: .password("x"))) == nil)
         #expect(await until { scratch.library.allTracks().contains { $0.isStreamed } })
+        // The list of accounts follows the database a moment later: waited for, not assumed.
+        #expect(await until { !app.accounts(id).isEmpty })
         let account = try #require(app.accounts(id).first)
         #expect(await until { !app.state(account).syncing && app.state(account).session == .signedIn(user: "listener") })
         let track = try #require(scratch.library.allTracks().first { $0.isStreamed })
