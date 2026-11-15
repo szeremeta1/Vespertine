@@ -28,7 +28,7 @@ struct DiscoveryTrustTests {
         let discovery = RendererDiscovery(searcher: CountingSearcher(replies: [reply]))
         discovery.start()
         defer { discovery.stop() }
-        try await Task.sleep(for: .milliseconds(300))
+        await firstSearchDone(discovery)
         await discovery.searchOnce()
         #expect(discovery.renderers.isEmpty)
         #expect(!fake.calls.contains { $0.action == "GetProtocolInfo" })
@@ -36,7 +36,7 @@ struct DiscoveryTrustTests {
         let trusted = RendererDiscovery(searcher: CountingSearcher(replies: [reply]))
         trusted.start()
         defer { trusted.stop() }
-        try await Task.sleep(for: .milliseconds(300))
+        await firstSearchDone(trusted)
         await trusted.searchOnce()
         #expect(trusted.renderers.count == 1)
     }
