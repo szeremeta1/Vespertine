@@ -19,7 +19,8 @@ struct FavoriteButton: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        if let model = appModel ?? environmentModel { button(model) }
+        // A song a control app sent is not the library's to favorite.
+        if let model = appModel ?? environmentModel, track?.isTransient != true { button(model) }
     }
 
     private func button(_ model: AppModel) -> some View {

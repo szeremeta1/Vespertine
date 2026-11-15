@@ -13,6 +13,8 @@ public struct HTTPRequest: Sendable, Hashable {
     /// Header names in lower case.
     public var headers: [String: String]
     public var body: Data
+    /// The address the request came from ("192.0.2.7", "fe80::1"), set by the server; nil when it couldn't be told.
+    public var peer: String? = nil
 
     public static let maximumHeader = 64 * 1024
     /// The longest body accepted (SOAP calls in the tests' fake renderer; the media server takes none).
@@ -116,8 +118,11 @@ public struct HTTPResponse: Sendable {
         case 200: "OK"
         case 206: "Partial Content"
         case 400: "Bad Request"
+        case 403: "Forbidden"
         case 404: "Not Found"
         case 405: "Method Not Allowed"
+        case 412: "Precondition Failed"
+        case 413: "Content Too Large"
         case 416: "Range Not Satisfiable"
         case 500: "Internal Server Error"
         case 503: "Service Unavailable"

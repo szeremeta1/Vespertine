@@ -164,16 +164,16 @@ struct VespertineCommands: Commands {
                 .disabled(model.balanceBypass != nil || model.balanceDevice.map { model.settings.balance(for: $0.uid) == 0 } ?? true)
             Divider()
             Button("Go to Current Album") {
-                if let key = model.player.current?.track.albumKey {
+                if let key = model.player.currentLibraryTrack?.albumKey {
                     model.sidebar = .albums
                     model.path = []
                     model.openAlbum(key)
                 }
             }
             .keyboardShortcut("j", modifiers: [.command])
-            .disabled(model.player.current == nil)
+            .disabled(model.player.currentLibraryTrack == nil)
             Divider()
-            let current = model.player.current?.track
+            let current = model.player.currentLibraryTrack
             Button(model.library.isFavorite(current) ? String(localized: "Remove Current Song from Favorites") : String(localized: "Add Current Song to Favorites")) {
                 if let current { model.toggleFavorite([current]) }
             }

@@ -149,7 +149,7 @@ Bit-perfect playback is available in several Mac players. Vespertine focuses on 
 | SACD ISO | Yes | No | Yes | No (DSF/DFF only) | Yes | No | No | No⁴ |
 | Room correction | Measured in the app (USB mic), or REW / APO and impulse-response import | No | Via convolution (Origin: paid option) or Audio Units | Via convolution | No (by design) | Not documented | No | Not documented |
 | Convolution / audio effect plugins | Yes (room correction) / No | No / No | Yes (Origin: paid option) / Audio Units | Yes / No | No / No | Not documented / Not documented | No / No | Not documented / Audio Units |
-| Streaming services | No | Apple Music | Studio: yes; Origin: no | Yes | No (local + UPnP) | No (internet radio) | No (internet radio) | No (internet radio) |
+| Streaming services | No client of its own; plays what UPnP control apps send (beta, off by default)⁵ | Apple Music | Studio: yes; Origin: no | Yes | No (local + UPnP) | No (internet radio) | No (internet radio) | No (internet radio) |
 
 ¹ Apple Music on macOS 27 was bit-exact at 16/24-bit in [third-party loopback tests reported on ASR](https://www.audiosciencereview.com/forum/index.php?threads/music-app-on-macos-27-and-ios-27-finally-plays-bit-perfect.73373/). This is not a Vespertine measurement or a claim about every Mac configuration. Volume was at 100%; there is still no automatic rate switching, hog mode, FLAC or DSD on Mac. The original test report could not be independently rechecked for this update.
 
@@ -159,6 +159,8 @@ Bit-perfect playback is available in several Mac players. Vespertine focuses on 
 
 ⁴ Tested on foobar2000 2.26 (macOS 27.0.1), with no components: DSF, DFF and SACD ISO files fail with "Unsupported file format". DSF and DFF play only as 352.8 kHz PCM after installing FFmpeg separately and adding them to its FFmpeg Decoder Wrapper; SACD ISO still fails.
 
+⁵ Receive from Other Apps: Vespertine has no code for any streaming service. A UPnP control app that signs in to a service itself and hands over an ordinary http address can play through it; protected streams (Apple Music, Spotify, Amazon Music) can't. Tested against Vespertine's own test control point, not yet against real control apps. See [docs/STREAMING.md](docs/STREAMING.md).
+
 [Comparison sources and scope](docs/COMPARISON.md). Corrections welcome: [open an issue](https://github.com/szeremeta1/Vespertine/issues).
 
 ## Known limitations
@@ -167,7 +169,7 @@ PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and u
 
 - Channel-for-channel output has been reported on one real device, a Sony TV over HDMI (5.1 and a 7.1 to 5.1 downmix, developer report without a capture; see [Tested devices](docs/DEVICES.md)). Multichannel USB DACs and Dolby/DTS bitstream to receivers are untested on real hardware; reports wanted.
 - Intel Macs are untested (the Intel build has run under Rosetta). DoP is reported to work up to DSD256 on the Fosi Audio ZD3 and up to DSD128 on the FiiO K11 (developer reports, no capture); DSD512 over DoP is untested on hardware.
-- No audio effect plugins, streaming services or UPnP/DLNA. Convolution is only part of room correction.
+- No audio effect plugins and no client for any streaming service. Convolution is only part of room correction. Network Players and Receive from Other Apps (UPnP) are beta and off by default.
 - No DVD-Audio or DRM-protected Apple Music downloads. Dolby AC-4 and MPEG-H 3D Audio (Sony 360 Reality Audio) files are listed and named but not decoded, MQA plays as the plain FLAC it contains, and Auro-3D as ordinary surround PCM (no decoder for any of them; see [docs/FEATURES.md](docs/FEATURES.md)). TrueHD Atmos and DTS:X objects are not rendered, and TrueHD and DTS-HD MA receiver passthrough is unsupported on macOS.
 
 ## Building

@@ -76,7 +76,7 @@ struct QuietShareTests {
         rig.engine.play(songs[0])
         let stopped = await rig.wait(timeout: 60) { $0.state == .stopped && $0.lastError != nil }
         #expect(stopped, "playback stopped with a reason: \(rig.engine.snapshot.state), \(rig.engine.snapshot.lastError ?? "-")")
-        #expect(rig.engine.snapshot.lastError == NetworkPlaybackCache.Failure.notAnswering.localizedDescription)
+        #expect(rig.engine.snapshot.lastError == NetworkPlaybackCache.Failure.notAnswering().localizedDescription)
         // Give a wrong engine the time to go on to the next song (it would open it within moments of the first one's failure).
         await rig.sleep(ms: 1500)
         #expect(Set(opened.withLock { $0 }) == ["a.wav"], "only the song asked for was waited for: \(opened.withLock { $0 })")

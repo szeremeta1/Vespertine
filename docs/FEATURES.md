@@ -106,6 +106,10 @@ SMB, NFS and WebDAV shares are read-only by default, with credentials in the log
 
 For lossless PCM and DoP, a completed local copy can replace the network source mid-song at the same sample. Automated tests cover the continuity. Lossy decoding and DSD-to-PCM keep using the share for the current song because their decoders carry state across a seek.
 
+## Receive from Other Apps (beta)
+
+Off by default (Settings › Playback). Turned on, this Mac appears on your network as a UPnP media renderer: a control app such as mconnect or BubbleUPnP sends it a song's address, and Vespertine plays it through the same engine and signal path as a file, with one more step at the top that says where the song came from. Your own queue is kept, paused, and returns when the app stops. Only http and https addresses are fetched, never this Mac itself or a link-local address, and nothing is kept afterwards. Vespertine has no client for any streaming service; services whose control apps hand over an ordinary address can play this way. Tested against Vespertine's own test control point, not yet against those apps. Details: [Streaming](STREAMING.md).
+
 ## First launch
 
 A short setup assistant opens the first time Vespertine starts. It finds or adds your music (left in place, or copied and organized), picks the output to remember, and sets exclusive access, ReplayGain, volume keys, background quality checks, cover art and automatic updates. Every choice can be changed later in Settings. It shows once: libraries that already have music skip it, and Setup Assistant… in the Vespertine menu opens it again.

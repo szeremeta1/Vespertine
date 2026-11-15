@@ -5,6 +5,7 @@
 
 import AppKit
 import VespertineAudio
+import VespertineUPnP
 import VespertineLibrary
 import SwiftUI
 import UniformTypeIdentifiers
@@ -71,17 +72,24 @@ struct NowPlayingPanel: View {
                         FavoriteButton(track: track, size: 15)
                     }
                     .padding(.top, 20)
-                    Text(track.displayArtist.libraryDisplayName).font(Typeface.ui(13.5)).foregroundStyle(Palette.brassHi).padding(.top, 6)
-                    Text([track.displayAlbum.libraryDisplayName, track.year.map(String.init)].compactMap { $0 }.joined(separator: " · "))
-                        .font(Typeface.ui(12.5)).foregroundStyle(Palette.text2).padding(.top, 2)
+                    if track.isTransient {
+                        // A control app's song says what it was sent with, and no more.
+                        if let artist = track.artist { Text(verbatim: artist).font(Typeface.ui(13.5)).foregroundStyle(Palette.brassHi).padding(.top, 6) }
+                        if let album = track.album { Text(verbatim: album).font(Typeface.ui(12.5)).foregroundStyle(Palette.text2).padding(.top, 2) }
+                    } else {
+                        Text(track.displayArtist.libraryDisplayName).font(Typeface.ui(13.5)).foregroundStyle(Palette.brassHi).padding(.top, 6)
+                        Text([track.displayAlbum.libraryDisplayName, track.year.map(String.init)].compactMap { $0 }.joined(separator: " · "))
+                            .font(Typeface.ui(12.5)).foregroundStyle(Palette.text2).padding(.top, 2)
+                    }
                     if let mark = track.formatMark {
                         FormatMarkView(mark: mark).padding(.top, 14)
                     }
 
                     if let path = player.signalPath {
-                        StatusBadges(path: path).padding(.top, 16)
+                        let sender = entry.received ? player.receiverSession?.app : nil
+                        StatusBadges(path: path, receivedFrom: sender).padding(.top, 16)
                         Hairline().padding(.top, 18)
-                        SignalPathView(path: path, loopback: model.loopback.result(for: path), callMode: model.bluetoothCallMode).padding(.top, 14)
+                        SignalPathView(path: path, loopback: model.loopback.result(for: path), callMode: model.bluetoothCallMode, receivedFrom: sender).padding(.top, 14)
                         DoPSetupCard(path: path).padding(.top, 10)
                         DoPOffer(path: path).padding(.top, 10)
                         if path.plan.mode == .bitstream, let bed = player.bedMeters, bed.names.count > 2 {
@@ -149,6 +157,8 @@ struct NowPlayingPanel: View {
 
 struct StatusBadges: View {
     let path: SignalPath
+    /// The control app that sent the song, when its chip is shown here.
+    var receivedFrom: ReceiverControlApp? = nil
     var body: some View {
         // One row when it fits the inspector; a long status ("SPATIAL · HEAD TRACKED") takes a row of its own.
         ViewThatFits(in: .horizontal) {
@@ -168,6 +178,7 @@ struct StatusBadges: View {
             StatusBadge(text: path.applied.exclusive ? String(localized: "EXCLUSIVE") : String(localized: "SHARED", comment: "Badge: the output device is shared with other apps"))
         }
         StatusBadge(text: "\(path.applied.physicalBitDepth) / \(SampleRate.format(path.applied.sampleRate))")
+        if let receivedFrom { StatusBadge(text: ReceiverText.chip(receivedFrom)) }
     }
 }
 
@@ -178,6 +189,9 @@ struct SignalPathView: View {
     var loopback: LoopbackSavedResult? = nil
     /// The headset is in call mode: says which app holds its microphone (the path alone only knows the rate).
     var callMode: BluetoothCallMode? = nil
+    /// The control app that sent the song (Receive from Other Apps): the path then begins with where the song came from. Everything
+    /// after that step is the path of a file, unchanged.
+    var receivedFrom: ReceiverControlApp? = nil
 
     struct Step: Identifiable {
         let id = UUID()
@@ -189,6 +203,11 @@ struct SignalPathView: View {
     }
 
     var steps: [Step] {
+        guard let receivedFrom else { return pathSteps }
+        return [Step(title: ReceiverText.pathTitle(receivedFrom), detail: ReceiverText.pathDetail, value: ReceiverText.pathValue)] + pathSteps
+    }
+
+    private var pathSteps: [Step] {
         if let renderer = path.renderer { return renderer.transport == .airPlay ? Self.airPlaySteps(path, renderer) : Self.rendererSteps(path, renderer) }
         var s: [Step] = []
         let src = path.source

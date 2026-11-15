@@ -179,6 +179,18 @@ final class AppSettings {
     /// Network renderers whose volume the listener unlocked (Vespertine's digital volume, so the stream is processed). The
     /// others stay locked at 100%: the original file is sent and the renderer's own volume is left alone.
     var rendererVolumeUnlocked: Set<String> { didSet { defaults.set(rendererVolumeUnlocked.sorted(), forKey: "rendererVolumeUnlocked") } }
+    /// "Receive from Other Apps": this Mac is a UPnP receiver that control apps can send music to, only while this is on (Settings ›
+    /// Playback, off by default). Off, no socket is open, nothing is announced, and nothing about it is shown, read or written.
+    var upnpReceiverFeature: Bool { didSet { defaults.set(upnpReceiverFeature, forKey: "upnpReceiverFeature") } }
+    /// The name control apps show for this Mac; empty: the app's name and the computer's (see `ReceiverSwitch.defaultName`).
+    var upnpReceiverName: String { didSet { defaults.set(upnpReceiverName, forKey: "upnpReceiverName") } }
+    /// What tells this receiver from another on the network, made the first time the switch goes on and kept, so control apps
+    /// know it again. A random UUID: nothing about the Mac is in it.
+    var upnpReceiverID: String { didSet { defaults.set(upnpReceiverID, forKey: "upnpReceiverID") } }
+    /// Control apps may set Vespertine's volume. Off (the default), the volume stays where the listener put it.
+    var upnpReceiverVolume: Bool { didSet { defaults.set(upnpReceiverVolume, forKey: "upnpReceiverVolume") } }
+    /// Control is taken only from this Mac's own networks (the default). Off, from any private address.
+    var upnpReceiverOwnNetworks: Bool { didSet { defaults.set(upnpReceiverOwnNetworks, forKey: "upnpReceiverOwnNetworks") } }
     /// AirPlay receivers are in the app only while this is on (Settings › Playback › AirPlay Players (beta), off by default). Off,
     /// nothing is browsed on Bonjour, no socket is opened, and nothing about them is shown, read or written.
     var airPlayPlayersFeature: Bool { didSet { defaults.set(airPlayPlayersFeature, forKey: "airPlayPlayersFeature") } }
@@ -230,7 +242,8 @@ final class AppSettings {
             "watchFolders": false, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "dopListUpdates": true, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
-            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "airPlayPlayersFeature": false, "bundleCopies": false,
+            "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "airPlayPlayersFeature": false,
+            "upnpReceiverFeature": false, "upnpReceiverVolume": false, "upnpReceiverOwnNetworks": true, "bundleCopies": false,
         ])
         Self.migrateAutomaticWorkToOff(defaults)
         exclusiveMode = defaults.bool(forKey: "exclusiveMode")
@@ -313,6 +326,11 @@ final class AppSettings {
         upnpRenderersFeature = defaults.bool(forKey: "upnpRenderersFeature")
         rendererVolumeUnlocked = Set(defaults.stringArray(forKey: "rendererVolumeUnlocked") ?? [])
         airPlayPlayersFeature = defaults.bool(forKey: "airPlayPlayersFeature")
+        upnpReceiverFeature = defaults.bool(forKey: "upnpReceiverFeature")
+        upnpReceiverName = defaults.string(forKey: "upnpReceiverName") ?? ""
+        upnpReceiverID = defaults.string(forKey: "upnpReceiverID") ?? ""
+        upnpReceiverVolume = defaults.bool(forKey: "upnpReceiverVolume")
+        upnpReceiverOwnNetworks = defaults.bool(forKey: "upnpReceiverOwnNetworks")
         airPlayDigitalVolume = Set(defaults.stringArray(forKey: "airPlayDigitalVolume") ?? [])
         transitions = TransitionSettings.load(from: defaults)
         self.dataDirectory = resolvedDataDirectory

@@ -135,7 +135,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-14 <a id="bp-speaker-group"></a>A speaker group is BIT-PERFECT only on channels no drift correction touches
 
 - **Text:** `docs/SPEAKER-GROUPS.md:15`: "Only the leader can be bit-perfect."
-- **Text:** `docs/FEATURES.md:138`: "so only the leader's channels can be bit-perfect, and the signal path says which."
+- **Text:** `docs/FEATURES.md:142`: "so only the leader's channels can be bit-perfect, and the signal path says which."
 - **Property:** a Vespertine speaker group is labelled BIT-PERFECT only when every channel the song uses lands on a DAC that is not resampled (the clock leader, or DACs sharing a hardware clock), each used DAC passes the single-DAC format rules at the song's rate, and nothing mixes, changes the level, filters or applies a digital volume (a whole-frame delay only shifts samples). A resampled follower, a fold, a trim, a polarity flip or a lowered preamp on an output that carries music gives the badge the single-DAC rules would (ROOM CORRECTION, RESAMPLED…). A user's own aggregate stays CL-BP-08.
 - **Governed by:** vespertine-rule.
 - **Route:** inventory (`GroupSignalPath` has its own unit tests, `GroupSignalPathTests` and `GroupBitPerfectTests`, and an opt-in loopback check on virtual devices; not one of the seven groups); hardware (`hardware/SPEAKER-GROUPS.md`, the leader's samples on a real DAC).

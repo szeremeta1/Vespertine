@@ -57,17 +57,24 @@ final class GuardedDecoder: NSObject, PCMDecoding {
         var attempt = 0
         while true {
             let decoder = inner
-            do { try Self.check { nguard_decode(decoder, buffer, length, $0) }; return }
-            catch {
+            let failure: ShareReadFailure
+            do {
+                try Self.check { nguard_decode(decoder, buffer, length, $0) }
+                // Some decoders (WAV, AIFF) answer a failed read as the end of the song: no frames, no error, short of the song's
+                // length. The source knows a read failed, so the song fails with that reason instead of ending early in silence.
+                guard buffer.frameLength == 0, length > 0, good < decoder.length, let quiet = Self.readFailure(of: decoder, decodeError: nil) else { return }
+                failure = quiet
+            } catch {
                 // SFBAudioEngine drops the reason an input source's read failed and says the decoding did. If the source knows, a
                 // read of the share failed, and a share's read can often be made again.
-                guard let failure = Self.readFailure(of: decoder, decodeError: error) else { throw error }
-                log.error("Decoding stopped at frame \(good, privacy: .public) on a failed read (try \(attempt + 1, privacy: .public)): \(ShareReadFailure.describe(failure.underlying), privacy: .public)")
-                guard attempt < Self.reopenLimit, recoverRead(after: failure.underlying, at: good, delay: Self.reopenDelays[min(attempt, Self.reopenDelays.count - 1)]) else {
-                    throw failure
-                }
-                attempt += 1
+                guard let known = Self.readFailure(of: decoder, decodeError: error) else { throw error }
+                failure = known
             }
+            log.error("Decoding stopped at frame \(good, privacy: .public) on a failed read (try \(attempt + 1, privacy: .public)): \(ShareReadFailure.describe(failure.underlying), privacy: .public)")
+            guard attempt < Self.reopenLimit, recoverRead(after: failure.underlying, at: good, delay: Self.reopenDelays[min(attempt, Self.reopenDelays.count - 1)]) else {
+                throw failure
+            }
+            attempt += 1
         }
     }
     func seek(to frame: AVAudioFramePosition) throws {
@@ -77,7 +84,7 @@ final class GuardedDecoder: NSObject, PCMDecoding {
     }
 
     /// `error` as the failed read of the share it was, when `decoder`'s input source says that is what failed.
-    private static func readFailure(of decoder: PCMDecoding, decodeError error: Error) -> ShareReadFailure? {
+    private static func readFailure(of decoder: PCMDecoding, decodeError error: Error?) -> ShareReadFailure? {
         if error is ShareReadFailure { return nil }
         guard let cause = (decoder.inputSource as? VTCacheInputSource)?.lastReadError else { return nil }
         return ShareReadFailure(cause)
