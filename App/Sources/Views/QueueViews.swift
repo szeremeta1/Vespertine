@@ -148,7 +148,8 @@ struct UpNextList: View {
             TransitionsButton(size: 12)
             Button(String(localized: "Clear", comment: "Clears the upcoming queue")) { player.clearUpcoming() }
                 .buttonStyle(QuietButtonStyle(compact: true))
-                .disabled(player.upcoming.isEmpty)
+                // A control app's songs are shown read-only: there is nothing of the listener's here to clear.
+                .disabled(player.upcoming.isEmpty || player.receiverSession != nil)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
