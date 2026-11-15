@@ -83,10 +83,11 @@ private func song(_ id: Int64, seconds: Double = 1) -> TrackSummary {
         QueueShelf(directory: FileManager.default.temporaryDirectory.appendingPathComponent("queues-\(UUID())", isDirectory: true))
     }
 
-    /// Waits for something the phone must get round to. The five seconds end a run where it never does; they decide nothing.
+    /// Waits for something the phone must get round to. The 1000 looks end a run where it never does; they decide nothing. They are counted, not timed: a busy
+    /// machine that holds every test still for seconds uses up a clock but not a count.
     private func until(_ condition: () -> Bool) async throws {
-        let deadline = ContinuousClock.now + .seconds(5)
-        while !condition(), ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(5)) }
+        var looks = 0
+        while !condition(), looks < 1000 { looks += 1; try await Task.sleep(for: .milliseconds(5)) }
         try #require(condition())
     }
 
@@ -268,8 +269,8 @@ private func song(_ id: Int64, seconds: Double = 1) -> TrackSummary {
     }
 
     private func until(_ condition: () -> Bool) async throws {
-        let deadline = ContinuousClock.now + .seconds(5)
-        while !condition(), ContinuousClock.now < deadline { try await Task.sleep(for: .milliseconds(5)) }
+        var looks = 0
+        while !condition(), looks < 1000 { looks += 1; try await Task.sleep(for: .milliseconds(5)) }
         try #require(condition())
     }
 
