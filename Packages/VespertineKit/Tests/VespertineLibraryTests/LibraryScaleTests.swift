@@ -1,7 +1,7 @@
 //
 // Vespertine: a big library must open, and answer the first questions the window asks, without work that grows with
 // the number of songs where the window waits for it. Timings are compared as ratios between library sizes (best of
-// several runs), never against a clock.
+// several runs), never against a clock; the totals are compared by the work counted, not by time.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -53,17 +53,36 @@ struct LibraryScaleTests {
         #expect(largeTime.seconds < smallTime.seconds * 10 + 0.001, "open: \(smallTime) for 1,000 songs, \(largeTime) for 100,000")
     }
 
+    /// How many steps SQLite's virtual machine takes for `work` on the library at `url`: the work itself, counted, so a
+    /// machine that is busy with other things counts the same as one that is not.
+    private func steps(_ url: URL, _ work: (LibraryDatabase) throws -> Void) throws -> Int {
+        final class Counter { var steps = 0 }
+        let queue = try DatabaseQueue(path: url.path, configuration: LibraryDatabase.queueConfiguration())
+        let library = try LibraryDatabase(writer: queue)
+        let counter = Counter()
+        try queue.writeWithoutTransaction { db in
+            sqlite3_progress_handler(db.sqliteConnection, 1, { context in
+                Unmanaged<Counter>.fromOpaque(context!).takeUnretainedValue().steps += 1
+                return 0
+            }, Unmanaged.passUnretained(counter).toOpaque())
+        }
+        defer { try? queue.writeWithoutTransaction { db in sqlite3_progress_handler(db.sqliteConnection, 0, nil, nil) } }
+        try work(library)
+        return counter.steps
+    }
+
     @Test("The sidebar's totals grow in step with the library, not faster")
     func statsAreLinear() throws {
         let dir = try tempDir()
         defer { try? FileManager.default.removeItem(at: dir) }
-        let medium = try LibraryDatabase(url: try makeLibrary(songs: 10_000, in: dir))
-        let large = try LibraryDatabase(url: try makeLibrary(songs: 100_000, in: dir))
-        let mediumTime = try best { _ = try medium.stats() }
-        let largeTime = try best { _ = try large.stats() }
-        let stats = try large.stats()
-        #expect(stats.tracks == 100_000)
-        #expect(largeTime.seconds < mediumTime.seconds * 40, "stats: \(mediumTime) for 10,000 songs, \(largeTime) for 100,000")
+        let medium = try makeLibrary(songs: 10_000, in: dir)
+        let large = try makeLibrary(songs: 100_000, in: dir)
+        // The work is counted, not timed: ten times the songs may cost ten times the steps and the sorting that goes with
+        // them, never the hundred times of a query that looks at every song for every song.
+        let mediumSteps = try steps(medium) { _ = try $0.stats() }
+        let largeSteps = try steps(large) { #expect(try $0.stats().tracks == 100_000) }
+        #expect(mediumSteps > 10_000, "the count sees the query's work: \(mediumSteps) steps for 10,000 songs")
+        #expect(largeSteps < mediumSteps * 20, "stats: \(mediumSteps) steps for 10,000 songs, \(largeSteps) for 100,000")
     }
 
     @Test("Searching finds songs through the index: a hundred thousand songs cost a few times what ten thousand do")
