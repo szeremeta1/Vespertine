@@ -40,7 +40,7 @@ public enum BalanceLaw {
     /// "Center", "20% left", "35% right": shown beside the control and spoken by VoiceOver.
     public static func caption(_ balance: Double) -> String {
         let points = points(balance)
-        if points == 0 { return String(localized: "Center", comment: "Balance: the sound is centered between left and right.") }
+        if points == 0 { return String(localized: "Centered", comment: "Balance: the sound is centered between left and right.") }
         return points < 0
             ? String(localized: "\(-points)% left", comment: "Balance: how far the sound is moved to the left speaker, in percent.")
             : String(localized: "\(points)% right", comment: "Balance: how far the sound is moved to the right speaker, in percent.")
