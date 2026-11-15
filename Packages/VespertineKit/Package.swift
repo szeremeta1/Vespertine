@@ -15,6 +15,8 @@ let package = Package(
         .library(name: "VespertineVisualizer", targets: ["VespertineVisualizer"]),
         .library(name: "VespertineUPnP", targets: ["VespertineUPnP"]),
         .library(name: "VespertineAirPlay", targets: ["VespertineAirPlay"]),
+        .library(name: "VespertineStreaming", targets: ["VespertineStreaming"]),
+        .library(name: "VespertineOpenSubsonic", targets: ["VespertineOpenSubsonic"]),
     ],
     dependencies: [
         .package(url: "https://github.com/sbooth/SFBAudioEngine", exact: "0.14.0"),
@@ -89,6 +91,14 @@ let package = Package(
             linkerSettings: [.linkedFramework("AudioToolbox"), .linkedFramework("Security"), .linkedFramework("Network"),
                             .linkedFramework("SystemConfiguration")]
         ),
+        // Music servers and services: what a provider is, and the rules every one is held to (docs/STREAMING.md).
+        .target(
+            name: "VespertineStreaming",
+            dependencies: ["VespertineAudio", "VespertineLibrary"],
+            linkerSettings: [.linkedFramework("Security")]
+        ),
+        // The OpenSubsonic provider: the listener's own server (Navidrome, Gonic, Airsonic and the like).
+        .target(name: "VespertineOpenSubsonic", dependencies: ["VespertineStreaming", "VespertineAudio", "VespertineLibrary"]),
         // The visualizer window's analysis (FFT, bands, beats) and Metal renderer. Reads a copy of the samples only.
         .target(
             name: "VespertineVisualizer",
@@ -122,6 +132,10 @@ let package = Package(
                     resources: [.copy("Fixtures")]),
         .testTarget(name: "VespertineAirPlayTests", dependencies: ["VespertineAirPlay", "VespertineUPnP", "VespertineAudio",
                                                                   .product(name: "SFBAudioEngine", package: "SFBAudioEngine")]),
+        .testTarget(name: "VespertineStreamingTests", dependencies: ["VespertineStreaming", "VespertineLibrary", "VespertineAudio"]),
+        // The fake server the provider is tested against is the UPnP target's small HTTP server, on 127.0.0.1.
+        .testTarget(name: "VespertineOpenSubsonicTests", dependencies: ["VespertineOpenSubsonic", "VespertineStreaming", "VespertineLibrary",
+                                                                        "VespertineAudio", "VespertineUPnP"]),
         .testTarget(name: "VespertineVisualizerTests", dependencies: ["VespertineVisualizer"]),
         .testTarget(name: "VespertineLibraryTests", dependencies: ["VespertineLibrary", "CVespertineTags", "VespertineTestSupport"]),
     ],

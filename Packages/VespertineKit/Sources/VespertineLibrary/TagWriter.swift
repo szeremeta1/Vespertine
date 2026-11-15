@@ -213,6 +213,11 @@ public actor TagWriter {
 
         for track in tracks {
             guard let id = track.id else { continue }
+            // A music server's song has no file here, and what the library shows of it is the server's to say.
+            if track.isStreamed {
+                result.failures.append((track.title, String(localized: "This song is on a music server. Edit its tags there.", comment: "Why a tag edit was not applied to a song that is streamed from a music server (OpenSubsonic).")))
+                continue
+            }
             // CUE tracks share one file, and a read-only share can't be written: those edits live in the library
             // (and survive rescans). Checked first, so no backup is copied for a write that would fail.
             // A share added read-only is never written, even when it's mounted read-write (by Finder, say).

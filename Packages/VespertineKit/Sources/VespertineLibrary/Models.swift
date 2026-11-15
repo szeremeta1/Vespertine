@@ -56,6 +56,7 @@ public struct LibrarySource: Codable, Sendable, Hashable, Identifiable, Fetchabl
     /// imports into, the volume name for external drives, else the folder name.
     public var displayName: String {
         if let name, !name.isEmpty { return name }
+        if let streamed = streamedAccount { return streamed.provider }
         if mode == .managed { return String(localized: "Imported Music", comment: "Sidebar name of the folder Vespertine imports music into.") }
         if let remoteURL, let share = NetworkShare(string: remoteURL) { return share.defaultName }
         let components = url.pathComponents
@@ -166,11 +167,12 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
     /// A track of a VIDEO_TS folder: its file is the folder's VIDEO_TS.IFO, which can't be copied or cached on its own.
     public var isDVDFolderTrack: Bool { dvdStream != nil && (filePath as NSString).pathExtension.lowercased() == "ifo" }
 
-    public var formatSummary: String { baseFormatSummary + channelSuffix }
+    public var formatSummary: String { baseFormatSummary + channelSuffix + (formatIsListed ? Track.listedMark : "") }
 
     /// "FLAC · 24/96", "DSD128", "MP3 · 320k": the format without the layout.
     var baseFormatSummary: String {
         if isTransient { return "" }   // nothing is known of its format until it plays (the signal path says then)
+        if sampleRate <= 0 { return codec }   // a server that lists no rate: nothing is claimed until the song plays
         if isDSD { return "DSD\(Int((sampleRate / 44_100).rounded()))" }
         let rate = sampleRate.truncatingRemainder(dividingBy: 1000) == 0
             ? String(Int(sampleRate / 1000)) : String(format: "%.1f", sampleRate / 1000)

@@ -72,6 +72,9 @@ public struct AlbumCopy: Sendable, Hashable, Identifiable {
     public internal(set) var songCount: Int
     public internal(set) var albumSongCount: Int
 
+    /// The album as a music server's account has it: no files, streamed when played.
+    public var isStreamed: Bool { tracks.contains(where: \.isStreamed) }
+
     public var isComplete: Bool { songCount >= albumSongCount }
     public var isLossless: Bool { tracks.allSatisfy(\.isLossless) }
     public var isDSD: Bool { tracks.contains(where: \.isDSD) }
@@ -82,7 +85,7 @@ public struct AlbumCopy: Sendable, Hashable, Identifiable {
     public var size: Int64 {
         // A disc image's tracks are parts of one file: count it once.
         var seen = Set<String>()
-        return tracks.reduce(0) { seen.insert($1.filePath).inserted ? $0 + $1.fileSize : $0 }
+        return tracks.reduce(0) { seen.insert($1.filePath.isEmpty ? $1.location : $1.filePath).inserted ? $0 + $1.fileSize : $0 }
     }
 
     /// "Stereo · FLAC · 24/192", "5.1 · DSD64", "Dolby Atmos · Dolby Atmos" reads as "Dolby Atmos".
@@ -286,7 +289,7 @@ public enum LibraryCopies {
                     return ((x.discNumber ?? 1), x.trackNumber ?? Int.max, a.offset) < ((y.discNumber ?? 1), y.trackNumber ?? Int.max, b.offset)
                 }.map(\.element)
                 copies.append(RawCopy(id: key + part.suffix, tracks: sorted, folder: folder, layout: layout,
-                                      format: format(of: sorted), edition: edition(folder: folder),
+                                      format: format(of: sorted), edition: sorted.first?.isStreamed == true ? nil : edition(folder: folder),
                                       place: parts.count > 1 ? place(of: sorted, in: folder, suffix: part.suffix) : nil))
             }
         }
@@ -306,6 +309,10 @@ public enum LibraryCopies {
     /// The folder that holds the album: the file's folder, or the one above disc and layer folders ("CD 01",
     /// "Digital Media 02", "Stereo", "Multichannel 5.1", "VIDEO_TS"). A disc image is a copy of its own.
     public static func albumFolder(_ t: Track) -> String {
+        // A server account is one place: its copy of an album is the album as that account has it.
+        if t.isStreamed, let account = StreamLocation.account(of: t.location) {
+            return StreamLocation.sourcePath(provider: account.provider, account: account.account)
+        }
         if t.sacdArea != nil || (t.dvdStream != nil && !t.isDVDFolderTrack) { return t.filePath }
         var dir = (t.filePath as NSString).deletingLastPathComponent
         for _ in 0..<3 {
@@ -387,8 +394,10 @@ public enum LibraryCopies {
     struct MatchKey {
         let recording: String?, isrc: String?, strict: String, loose: String
         let duration: Double, disc: Int, number: Int?
+        let isStreamed: Bool
 
         init(_ t: Track) {
+            isStreamed = t.isStreamed
             recording = t.musicBrainzRecordingID.flatMap { $0.isEmpty ? nil : $0.lowercased() }
             isrc = t.isrc.flatMap { $0.isEmpty ? nil : $0.uppercased() }
             strict = LibraryCopies.strictTitle(t.title)
@@ -428,7 +437,8 @@ public enum LibraryCopies {
             } else { return 0 }
             // Lengths unknown (0) don't count against a match.
             if duration > 0, o.duration > 0 {
-                let delta = abs(duration - o.duration), tolerance = max(6, 0.04 * max(duration, o.duration))
+                // A server's song against a file: the lengths must agree within 2 s (the files' own tolerance is wider).
+                let delta = abs(duration - o.duration), tolerance = isStreamed != o.isStreamed ? 2 : max(6, 0.04 * max(duration, o.duration))
                 guard delta <= tolerance else { return 0 }
                 score += Int(50 * (1 - delta / tolerance))
             }
@@ -479,9 +489,11 @@ extension AlbumCopies {
         guard copies.count > 1 else { return copies.first }
         let most = copies.map(\.songCount).max() ?? 0
         // Copies equal in all of these: the first, which has the most songs.
+        // A streamed copy ranks below files at equal layout and losslessness: the format its server lists is unconfirmed until
+        // played, and it needs the network.
         func rank(_ c: AlbumCopy) -> (Int, Int, Int, Double, Int, Int) {
             (Double(c.songCount) >= 0.8 * Double(most) ? 1 : 0, c.layout.isMultichannel == wantsMultichannel ? 1 : 0,
-             c.isLossless ? 1 : 0, c.maxSampleRate, c.maxBitDepth, isLocal(c) ? 1 : 0)
+             (c.isLossless ? 2 : 0) + (c.isStreamed ? 0 : 1), c.maxSampleRate, c.maxBitDepth, isLocal(c) ? 1 : 0)
         }
         return copies.enumerated().max { a, b in
             let (ra, rb) = (rank(a.element), rank(b.element))
