@@ -472486,7 +472486,7 @@
       }
     },
     "The server answered with HTTP status %@.": {
-      "comment": "%lld is an HTTP status code such as 404.",
+      "comment": "A stream’s server answered with an error. %@ is the HTTP status code, such as 404.",
       "localizations": {
         "am": {
           "stringUnit": {
