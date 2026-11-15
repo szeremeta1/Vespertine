@@ -36,14 +36,15 @@ private struct Fed: Sendable {
 
 private let patience: TimeInterval = 90
 
-/// A renderer whose clock stands still, in place of macOS's. It keeps about a second queued ahead of its clock, as macOS's
-/// does, and asks for data once each time it is told to, on the queue it is given. macOS's own asked when the machine's audio
+/// A renderer whose clock stands still, in place of macOS's. It takes buffers until one starts two seconds or more past its
+/// clock, and asks for data once each time it is told to, on the queue it is given. It goes by where a buffer starts, since a
+/// compressed buffer does not always say how long it is. macOS's own asked when the machine's audio
 /// system got to it, and on a busy CI Mac that was sometimes never within the minute these tests gave it ("the renderer took
 /// only 0 buffers"). What is tested here is the session: what it reads and queues, and from where after a flush.
 private final class HeldRenderer: SystemRendererSink, @unchecked Sendable {
     private let lock = NSLock()
     private var now = CMTime.zero
-    private var queuedEnd: CMTime?
+    private var queuedTo: CMTime?
     private var asking: DispatchQueue?
     private let object = NSObject()
 
@@ -54,8 +55,8 @@ private final class HeldRenderer: SystemRendererSink, @unchecked Sendable {
     var error: Error? { nil }
     var isReadyForMoreMediaData: Bool {
         lock.lock(); defer { lock.unlock() }
-        guard let queuedEnd else { return true }
-        return CMTimeGetSeconds(CMTimeSubtract(queuedEnd, now)) < 1
+        guard let queuedTo else { return true }
+        return CMTimeGetSeconds(CMTimeSubtract(queuedTo, now)) < 2
     }
     func setRate(_ rate: Float, time: CMTime) { lock.lock(); self.rate = rate; now = time; lock.unlock() }
     func currentTime() -> CMTime { lock.lock(); defer { lock.unlock() }; return now }
@@ -65,10 +66,11 @@ private final class HeldRenderer: SystemRendererSink, @unchecked Sendable {
     }
     func stopRequestingMediaData() {}
     func enqueue(_ buffer: CMSampleBuffer) {
-        let end = CMTimeAdd(CMSampleBufferGetPresentationTimeStamp(buffer), CMSampleBufferGetDuration(buffer))
-        lock.lock(); queuedEnd = queuedEnd.map { CMTimeMaximum($0, end) } ?? end; lock.unlock()
+        let start = CMSampleBufferGetPresentationTimeStamp(buffer)
+        guard start.isValid, start.isNumeric else { return }
+        lock.lock(); queuedTo = queuedTo.map { CMTimeMaximum($0, start) } ?? start; lock.unlock()
     }
-    func flush() { lock.lock(); queuedEnd = nil; lock.unlock() }
+    func flush() { lock.lock(); queuedTo = nil; lock.unlock() }
 
     /// The session has been given all it was asked for: the request made last has run to its end. An order, not a wait.
     func settle() {
