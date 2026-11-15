@@ -250,6 +250,35 @@ struct StreamingSwitchTests {
         #expect(await until { second.accounts(id).first.map { second.state($0).session == .signedIn(user: "listener") } == true })
     }
 
+    @Test("A server that stopped answering mid-play is named in the player's words and on its own row, until a song from it plays again")
+    func serverUnanswered() async throws {
+        let scratch = try scratch()
+        defer { clean(scratch) }
+        scratch.notes.withLock { $0.songs = [song("s1", title: "From The Server")] }
+        let id = CountingProvider.providerID
+        let app = model(scratch)
+        app.setOn(true, id)
+        #expect(await app.signIn(id, name: "Home", request: ProviderSignIn(server: "", user: "listener", secret: .password("x"))) == nil)
+        #expect(await until { scratch.library.allTracks().contains { $0.isStreamed } })
+        let account = try #require(app.accounts(id).first)
+        #expect(await until { !app.state(account).syncing && app.state(account).session == .signedIn(user: "listener") })
+        let track = try #require(scratch.library.allTracks().first { $0.isStreamed })
+        let signedIn = ServerStatus.line(app.state(account), waitingUntil: nil)
+
+        let said = try #require(app.unanswered(track))
+        #expect(said == PlayerController.notAnswering("Home"))
+        #expect(ServerStatus.line(app.state(account), waitingUntil: nil) == said, "the row no longer says only who is signed in")
+        #expect(app.state(account).session == .signedIn(user: "listener"), "not answering is no reason to sign out")
+
+        app.answered(track)
+        #expect(app.state(account).problem == nil)
+        #expect(ServerStatus.line(app.state(account), waitingUntil: nil) == signedIn)
+
+        // Off: nothing is said for a provider that is not there.
+        app.setOn(false, id)
+        #expect(app.unanswered(track) == nil)
+    }
+
     @Test("On then off leaves no task running and the provider stopped")
     func onThenOffLeavesNothing() async throws {
         let scratch = try scratch()

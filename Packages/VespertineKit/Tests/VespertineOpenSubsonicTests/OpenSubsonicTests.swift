@@ -522,6 +522,53 @@ struct OpenSubsonicTests {
         #expect(await provider.session() == .signedIn(user: "listener"))
     }
 
+    @Test("A song opened while the server is gone is “not answering”, so playback stops there instead of trying each song after it")
+    func songOpenedWithServerGone() async throws {
+        let (server, provider, store) = try await rig()
+        try await signIn(provider, server)
+        server.stop()
+        do {
+            _ = try provider.openStream("song-0-0")
+            Issue.record("opened on a server that is gone")
+        } catch {
+            guard case NetworkPlaybackCache.Failure.notAnswering = error else { Issue.record("failed with \(error)"); return }
+            #expect(error.localizedDescription == StreamingCore.notAnsweringMessage)
+            #expect(!error.localizedDescription.contains("127.0.0.1") && !error.localizedDescription.contains("key-for-listener"))
+        }
+        #expect(try credential(store).canSignIn, "not answering is no reason to sign out")
+    }
+
+    @Test("A server that goes away mid-song is given up on after its own short limit, not the two minutes a share is waited for")
+    func serverGoneMidSong() async throws {
+        let (server, provider, _) = try await rig()
+        let file = FakeSubsonic.flac(bytes: 1_000_000, seed: 3)
+        server.change { $0.songs[0].data = file }
+        try await signIn(provider, server)
+        let reader = try #require(try provider.openStream("song-0-0") as? HTTPStreamReader)
+        #expect(reader.silenceLimit == StreamingCore.silenceLimit)
+        // The first bytes are here; the server goes before the rest is asked for.
+        server.stop()
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("subsonic-gone-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        // No waiting on the wall clock: once the song is waited for, every look at this clock finds another second gone.
+        let clock = Locked((now: 0.0, running: false))
+        let now: @Sendable () -> TimeInterval = { clock.withLock { if $0.running { $0.now += 1 }; return $0.now } }
+        reader.countSilence(on: now)
+        let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 64 << 10, noProgressLimit: 100_000, clock: now)
+        let entry = try cache.entry(key: "gone", url: URL(string: "x-subsonic-gone://song")!, reader: reader)
+        clock.withLock { $0.running = true }
+        do {
+            try entry.prepare(full: true, lead: 0, cancelled: { false })
+            Issue.record("the whole song arrived from a server that is gone")
+        } catch {
+            guard case NetworkPlaybackCache.Failure.notAnswering = error else { Issue.record("failed with \(error)"); return }
+            #expect(error.localizedDescription == StreamingCore.notAnsweringMessage)
+        }
+        let waited = clock.withLock { $0.now }
+        #expect(waited >= StreamingCore.silenceLimit && waited < 100_000, "given up at the server's limit, not the cache's: \(waited)")
+    }
+
     @Test("A server that accepts the connection and then says nothing is given up on")
     func serverSilent() async throws {
         let (server, provider, store) = try await rig(timeout: 1)

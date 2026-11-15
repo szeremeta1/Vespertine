@@ -342,7 +342,8 @@ public final class OpenSubsonicProvider: StreamingProvider, @unchecked Sendable 
         let url = client.url("stream", [("id", songID), ("format", "raw")])
         do {
             return try HTTPStreamReader(url: url, options: .init(policy: .listenersOwn, idleTimeout: timeout,
-                                                                 notAnsweringMessage: StreamingCore.notAnsweringMessage))
+                                                                 notAnsweringMessage: StreamingCore.notAnsweringMessage,
+                                                                 silenceLimit: StreamingCore.silenceLimit))
         } catch let refusal as StreamRefusal {
             switch refusal {
             case .status(429):

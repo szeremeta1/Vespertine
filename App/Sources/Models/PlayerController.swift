@@ -997,8 +997,9 @@ final class PlayerController {
             }
             let track = failed?.track
             if let track, track.isStreamed {
-                // A song on a music server: there is no file to look for. The reason is the server's or the provider's.
-                lastError = message
+                // A song on a music server: there is no file to look for. The reason is the server's or the provider's. A server
+                // that stopped answering is named, the way a network player that doesn't answer is.
+                lastError = message == StreamingCore.notAnsweringMessage ? serverUnanswered?(track) ?? message : message
             } else if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
                 lastError = String(localized: "“\(track.title)” is on a network share that isn’t connected. Vespertine reconnects automatically when the server is reachable.")
             } else if let track {
@@ -1096,6 +1097,10 @@ final class PlayerController {
 
     /// Told when a song on a music server has counted as played, with when it started. Set by the app while streaming is on.
     @ObservationIgnored var streamedSongPlayed: ((Track, Date) -> Void)?
+    /// Told when a song stopped because its server sent nothing for too long; gives back what to say (the server by name).
+    @ObservationIgnored var serverUnanswered: ((Track) -> String?)?
+    /// Told when a song from a server plays: the server is answering.
+    @ObservationIgnored var serverAnswered: ((Track) -> Void)?
     /// The queue entry whose stream's format was written to the library, so it is written once.
     @ObservationIgnored private var confirmedStreamEntry: UUID?
 
@@ -1126,6 +1131,7 @@ final class PlayerController {
         guard let entry = current, confirmedStreamEntry != entry.id, let stream = entry.track.streamRef, let path = signalPath,
               let finding = StreamFindings.finding(cacheKey: stream.cacheKey) else { return }
         confirmedStreamEntry = entry.id
+        serverAnswered?(entry.track)
         let source = path.source
         library.confirmStreamedFormat(ConfirmedStreamFormat(codec: source.codec, isLossless: source.encoding != .lossy, isDSD: source.encoding == .dsd,
                                                             sampleRate: source.sampleRate, bitDepth: source.encoding == .pcm ? source.bitDepth : nil,

@@ -244,6 +244,21 @@ final class StreamingModel {
         core.playReports = reporting.intersection(enabled)
     }
 
+    /// A song stopped because its server sent nothing for too long: the account says so (in Settings and on its page) until
+    /// the server answers again, and the player says the same. Nil when the song's provider is off.
+    func unanswered(_ track: Track) -> String? {
+        guard let source = account(of: track) else { return nil }
+        let message = PlayerController.notAnswering(source.displayName)
+        states[source.path, default: AccountState()].problem = message
+        return message
+    }
+
+    /// A song from the server plays: it is answering again.
+    func answered(_ track: Track) {
+        guard let source = account(of: track), states[source.path]?.problem == PlayerController.notAnswering(source.displayName) else { return }
+        states[source.path]?.problem = nil
+    }
+
     /// A streamed song counted as played. Its server hears of it only with the provider's play reports on.
     func played(_ track: Track, at date: Date) {
         guard let ref = track.streamRef, reporting.contains(ref.provider), enabled.contains(ref.provider) else { return }

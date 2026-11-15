@@ -97,6 +97,9 @@ public final class StreamingCore: @unchecked Sendable {
 
     /// What a streamed song says when its server sends nothing for too long.
     public static var notAnsweringMessage: String { StreamScheme.notAnswering }
+    /// How long a listener waits on a server that sends nothing before the song is given up and playback stops with that
+    /// message. Counted only while the song is waited for: a song that plays from what is already here is not held to it.
+    public static let silenceLimit: TimeInterval = 15
 
     public init(database: LibraryDatabase, credentials: any CredentialStore) {
         self.database = database

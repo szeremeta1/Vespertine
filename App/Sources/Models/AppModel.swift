@@ -306,6 +306,8 @@ final class AppModel {
         streaming = StreamingModel(library: library, defaults: settings.store, player: player,
                                    credentials: demoServer ? MemoryCredentialStore() : KeychainCredentialStore())
         player.streamedSongPlayed = { [weak streaming = self.streaming] track, date in streaming?.played(track, at: date) }
+        player.serverUnanswered = { [weak streaming = self.streaming] in streaming?.unanswered($0) }
+        player.serverAnswered = { [weak streaming = self.streaming] in streaming?.answered($0) }
         visualizer = VisualizerModel(engine: player.engine)
         dopSetup = DoPSetupModel(settings: settings, player: player)
         remote = RemoteServer(store: RemoteStore(dataDirectory: settings.dataDirectory))

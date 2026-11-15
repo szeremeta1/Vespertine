@@ -170,6 +170,8 @@ private final class WaitingReader: RemoteCacheReader, @unchecked Sendable {
     let condition = NSCondition()
     var cancelled = false
     let notAnsweringMessage: String?
+    var silenceLimit: TimeInterval?
+    var quietFor: TimeInterval?
     /// Called once, when a read first waits: the moment a test may move the cache's clock past the limit.
     var whenWaiting: (@Sendable () -> Void)?
     var fileExtension: String { "flac" }
@@ -233,6 +235,43 @@ struct RemoteReaderCancelTests {
                 #expect(error.localizedDescription == (message ?? NetworkPlaybackCache.Failure.notAnswering().localizedDescription))
                 #expect(message != nil || error.localizedDescription.contains("share"))
             }
+        }
+    }
+
+    @Test("A source with a silence limit of its own is given up on after that, unless it is still sending or the cache's limit is sooner")
+    func ownSilenceLimit() throws {
+        let dir = FileManager.default.temporaryDirectory.appendingPathComponent("remote-limit-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: dir) }
+        // (the source's limit, how long it says it has sent nothing, the cache's limit) and the limit that must apply.
+        let cases: [(own: TimeInterval?, quiet: TimeInterval?, cache: TimeInterval, expected: TimeInterval)] = [
+            (15, 15, 100, 15),    // a server that is gone: its own limit
+            (15, nil, 100, 15),   // a source that can't say when it last sent: its own limit, by the blocks written
+            (15, 3, 100, 100),    // still sending, slowly: the cache's
+            (nil, 50, 100, 100),  // no limit of its own: the cache's
+            (200, 500, 100, 100)  // its own is later than the cache's: the cache's
+        ]
+        for (index, test) in cases.enumerated() {
+            // Stands still until a read waits; from then on every look finds one second gone.
+            let clock = Locked((now: 0.0, running: false))
+            let now: @Sendable () -> TimeInterval = { clock.withLock { if $0.running { $0.now += 1 }; return $0.now } }
+            let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096, noProgressLimit: test.cache, clock: now)
+            let reader = WaitingReader(Data(repeating: 4, count: 64 << 10), message: "Service Z isn't answering")
+            reader.silenceLimit = test.own
+            reader.quietFor = test.quiet
+            reader.whenWaiting = { clock.withLock { $0.running = true } }
+            let entry = try cache.entry(key: "limit-\(index)", url: URL(string: "x-remote://limit-\(index)")!, reader: reader)
+            do {
+                try entry.prepare(full: true, lead: 0, cancelled: { false })
+                Issue.record("a silent copy completed")
+            } catch {
+                guard case NetworkPlaybackCache.Failure.notAnswering = error else { Issue.record("failed with \(error)"); continue }
+                #expect(error.localizedDescription == "Service Z isn't answering")
+            }
+            let waited = clock.withLock { $0.now }
+            // The clock moves a second a look, from several threads: the song is given up at its limit or a few looks past it.
+            #expect(waited >= test.expected && waited < test.expected + 40, "case \(index): waited \(waited), limit \(test.expected)")
+            #expect(reader.wasCancelled)
         }
     }
 
