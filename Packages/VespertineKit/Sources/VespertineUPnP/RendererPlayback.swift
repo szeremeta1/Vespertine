@@ -120,13 +120,24 @@ public final class RendererPlayback: @unchecked Sendable {
     let startTimeout: TimeInterval
     /// Status polls failing for this long (and at least three times) mean the renderer is gone.
     let lostAfter: TimeInterval
+    /// The time, for everything judged by how long it has been (a renderer that has stopped answering, a song that hasn't
+    /// started). The tests hand in a clock they move themselves.
+    private let now: @Sendable () -> Date
 
-    enum Command { case play(PlayableItem, at: TimeInterval, announce: Bool, generation: Int), pause, resume, seek(TimeInterval), stop, queueChanged, settings(RendererSettings), poll }
+    enum Command {
+        case play(PlayableItem, at: TimeInterval, announce: Bool, generation: Int), pause, resume, seek(TimeInterval), stop, queueChanged, settings(RendererSettings), poll
+        /// A poll a test asked for, which is told when it is done.
+        case step(CheckedContinuation<Void, Never>)
+    }
 
+    /// `pollInterval` 0: the renderer is asked for its state only when `settleForTests` says so (a test that steps the
+    /// polls itself).
     public init(renderer: RendererDevice, transport: any RendererTransport, media: MediaServer, processed: (any ProcessedStreamMaking)? = nil,
-                pollInterval: TimeInterval = 0.5, startTimeout: TimeInterval = 15, lostAfter: TimeInterval = 10) {
+                pollInterval: TimeInterval = 0.5, startTimeout: TimeInterval = 15, lostAfter: TimeInterval = 10,
+                now: @escaping @Sendable () -> Date = { Date() }) {
         self.startTimeout = startTimeout
         self.lostAfter = lostAfter
+        self.now = now
         link = Locked((renderer, transport))
         self.media = media
         self.processed = processed
@@ -139,6 +150,7 @@ public final class RendererPlayback: @unchecked Sendable {
                 await self.run(command)
             }
         }
+        guard pollInterval > 0 else { return }
         poller = Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(pollInterval))
@@ -194,7 +206,7 @@ public final class RendererPlayback: @unchecked Sendable {
         state.withLock { s in
             s.wantsPlaying = true
             if s.snapshot.state == .paused { s.snapshot.state = .playing }
-            if s.current?.announced == false { s.awaitingStartSince = Date() }
+            if s.current?.announced == false { s.awaitingStartSince = now() }
         }
         refreshActivity()
         enqueue.yield(.resume)
@@ -247,6 +259,16 @@ public final class RendererPlayback: @unchecked Sendable {
         play(item, at: seconds, announce: false)
     }
 
+    /// Returns once every command asked for before this call has been carried out (a pause with its second try, a song
+    /// loaded on the renderer) and the renderer has been asked for its state once more after them. The commands run one
+    /// at a time in the order they were asked for, so a test that waits here has seen their whole effect, however slow
+    /// the machine.
+    func settleForTests() async {
+        await withCheckedContinuation { done in
+            if case .enqueued = enqueue.yield(.step(done)) {} else { done.resume() }
+        }
+    }
+
     /// Vespertine means the player to be playing (not paused or stopped by the listener).
     var wantsPlaying: Bool { state.withLock { $0.wantsPlaying } }
 
@@ -255,7 +277,7 @@ public final class RendererPlayback: @unchecked Sendable {
         state.withLock { s in
             var snap = s.snapshot
             if snap.state == .playing, let anchor = s.anchor {
-                snap.position = anchor.position + Date().timeIntervalSince(anchor.at)
+                snap.position = anchor.position + now().timeIntervalSince(anchor.at)
                 if snap.duration > 0 { snap.position = min(snap.position, snap.duration) }
             }
             return snap
@@ -295,6 +317,9 @@ public final class RendererPlayback: @unchecked Sendable {
                 // Let go of (the output changed) before this poll's turn came: nothing more is asked of the renderer.
                 let skip = state.withLock { s -> Bool in s.pollQueued = false; return s.shutDown }
                 if !skip { await poll() }
+            case .step(let done):
+                if !state.withLock({ $0.shutDown }) { await poll() }
+                done.resume()
             }
         } catch {
             let item = state.withLock { $0.current?.item ?? $0.snapshot.item }
@@ -475,7 +500,7 @@ public final class RendererPlayback: @unchecked Sendable {
                 s.failingSince = nil
                 s.stoppedPolls = 0
                 s.reportsPosition = false; s.heard = 0; s.lastPlayingPoll = nil
-                s.awaitingStartSince = s.wantsPlaying ? Date() : nil
+                s.awaitingStartSince = s.wantsPlaying ? now() : nil
                 s.pendingSeek = current.processedFile == nil && seconds > 0 ? seconds : nil
                 s.pendingSeekTries = 0
                 s.snapshot.item = item
@@ -591,9 +616,9 @@ public final class RendererPlayback: @unchecked Sendable {
             let lost = state.withLock { s -> Bool in
                 s.failedPolls += 1
                 s.anchor = nil
-                let since = s.failingSince ?? Date()
+                let since = s.failingSince ?? now()
                 s.failingSince = since
-                return s.failedPolls >= 3 && Date().timeIntervalSince(since) >= lostAfter
+                return s.failedPolls >= 3 && now().timeIntervalSince(since) >= lostAfter
             }
             if lost {
                 let old = state.withLock { s -> [Entry] in
@@ -620,7 +645,7 @@ public final class RendererPlayback: @unchecked Sendable {
                     s.current = next; s.next = nil; s.snapshot.item = next.item; s.snapshot.signalPath = next.path
                     s.snapshot.duration = next.duration ?? 0; s.snapshot.position = 0; s.stoppedPolls = 0
                     s.reportsPosition = false; s.heard = 0; s.lastPlayingPoll = nil
-                    s.awaitingStartSince = s.wantsPlaying ? Date() : nil
+                    s.awaitingStartSince = s.wantsPlaying ? now() : nil
                 }
                 return s.current
             }
@@ -649,7 +674,7 @@ public final class RendererPlayback: @unchecked Sendable {
         }
         // Told to play and still not playing: the renderer couldn't fetch or decode the song, and says nothing about it.
         if !current.announced, let since = state.withLock({ $0.wantsPlaying ? $0.awaitingStartSince : nil }),
-           Date().timeIntervalSince(since) >= startTimeout {
+           now().timeIntervalSince(since) >= startTimeout {
             let old = state.withLock { s -> [Entry] in
                 defer { s.current = nil; s.next = nil; s.anchor = nil; s.awaitingStartSince = nil }
                 return [s.current, s.next].compactMap { $0 }
@@ -666,13 +691,13 @@ public final class RendererPlayback: @unchecked Sendable {
             switch status.state {
             case .playing:
                 s.stoppedPolls = 0
-                let now = Date()
+                let at = now()
                 if status.position >= 1 { s.reportsPosition = true }
                 // A long gap between two polls (the Mac slept, the renderer was slow to answer) isn't counted as heard.
-                if let last = s.lastPlayingPoll { s.heard += min(now.timeIntervalSince(last), 2) }
-                s.lastPlayingPoll = now
+                if let last = s.lastPlayingPoll { s.heard += min(at.timeIntervalSince(last), 2) }
+                s.lastPlayingPoll = at
                 s.snapshot.position = position
-                s.anchor = (position, Date())
+                s.anchor = (position, at)
                 if s.wantsPlaying { s.snapshot.state = .playing }
             case .paused:
                 s.stoppedPolls = 0
