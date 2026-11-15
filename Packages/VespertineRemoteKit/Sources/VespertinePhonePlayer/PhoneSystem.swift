@@ -11,6 +11,7 @@ import AVFAudio
 import Foundation
 import MediaPlayer
 import Observation
+import os
 import UIKit
 import VespertineRemoteProtocol
 
@@ -25,15 +26,10 @@ public final class PhoneSystem {
     private var running = false
 
     /// What the lock screen was last told.
-    private struct Shown: Equatable {
-        var entry: String
-        var playing: Bool
-        var duration: Double
-        var position: Double
-        var at: Date
-        func expected(at now: Date) -> Double { playing ? position + now.timeIntervalSince(at) : position }
-    }
-    private var shown: Shown?
+    private var shown: NowPlayingCard?
+    /// Which buttons work right now. Read by MediaPlayer's handlers on whatever queue they are called on, so a press that
+    /// can do nothing is answered as such at once.
+    private let controls = OSAllocatedUnfairLock(initialState: SystemControls.none)
     private var cover: (key: String, art: MPMediaItemArtwork)?
     private var coverTask: Task<Void, Never>?
     private var coverTried: String?
@@ -94,6 +90,7 @@ public final class PhoneSystem {
         coverTask?.cancel()
         settling?.cancel()
         volumeWatch = nil
+        controls.withLock { $0 = .none }
         remote.onTransport = nil
         remote.playback.dop.bring = { _ in false }
         shown = nil
@@ -202,9 +199,12 @@ public final class PhoneSystem {
 
     private func registerCommands() {
         let center = MPRemoteCommandCenter.shared()
-        func on(_ command: MPRemoteCommand, _ action: @escaping @MainActor @Sendable (PhoneSystem, Double?) -> Void) {
-            command.isEnabled = true
-            let target = Self.register(command) { [weak self] seconds in
+        let controls = controls
+        func on(_ command: MPRemoteCommand, needs: @escaping @Sendable (SystemControls) -> Bool,
+                _ action: @escaping @MainActor @Sendable (PhoneSystem, Double?) -> Void) {
+            // Greyed out until there is a song for it (`apply`).
+            command.isEnabled = false
+            let target = Self.register(command, allowed: { needs(controls.withLock { $0 }) }) { [weak self] seconds in
                 Task { @MainActor in
                     guard let self, self.remote.playback.nowPlaying != nil else { return }
                     self.policy.userActed()
@@ -213,17 +213,33 @@ public final class PhoneSystem {
             }
             commands.append((command, target))
         }
-        on(center.playCommand) { me, _ in me.remote.playback.resume() }
-        on(center.pauseCommand) { me, _ in me.remote.playback.pause() }
-        on(center.togglePlayPauseCommand) { me, _ in me.remote.playback.playPause() }
-        on(center.nextTrackCommand) { me, _ in me.remote.playback.next() }
-        on(center.previousTrackCommand) { me, _ in me.remote.playback.previous() }
-        on(center.changePlaybackPositionCommand) { me, seconds in if let seconds { me.remote.playback.seek(to: seconds) } }
+        on(center.playCommand, needs: { $0.playPause }) { me, _ in me.remote.playback.resume() }
+        on(center.pauseCommand, needs: { $0.playPause }) { me, _ in me.remote.playback.pause() }
+        on(center.togglePlayPauseCommand, needs: { $0.playPause }) { me, _ in me.remote.playback.playPause() }
+        on(center.nextTrackCommand, needs: { $0.next }) { me, _ in me.remote.playback.next() }
+        on(center.previousTrackCommand, needs: { $0.previous }) { me, _ in me.remote.playback.previous() }
+        on(center.changePlaybackPositionCommand, needs: { $0.seek }) { me, seconds in if let seconds { me.remote.playback.seek(to: seconds) } }
     }
 
-    /// MediaPlayer may call a handler on any queue: it isn't the main actor's, and hops there.
-    nonisolated private static func register(_ command: MPRemoteCommand, _ action: @escaping @Sendable (Double?) -> Void) -> Any {
+    /// Greys out the lock screen's buttons that would do nothing, and lights the others.
+    private func apply(_ now: SystemControls) {
+        guard controls.withLock({ $0 }) != now else { return }
+        controls.withLock { $0 = now }
+        let center = MPRemoteCommandCenter.shared()
+        center.playCommand.isEnabled = now.playPause
+        center.pauseCommand.isEnabled = now.playPause
+        center.togglePlayPauseCommand.isEnabled = now.playPause
+        center.nextTrackCommand.isEnabled = now.next
+        center.previousTrackCommand.isEnabled = now.previous
+        center.changePlaybackPositionCommand.isEnabled = now.seek
+    }
+
+    /// MediaPlayer may call a handler on any queue: it isn't the main actor's, and hops there. A press that can do nothing
+    /// right now (headphone buttons and CarPlay send them whatever is greyed out) is answered as that, not as done.
+    nonisolated private static func register(_ command: MPRemoteCommand, allowed: @escaping @Sendable () -> Bool,
+                                             _ action: @escaping @Sendable (Double?) -> Void) -> Any {
         command.addTarget { event in
+            guard allowed() else { return .noActionableNowPlayingItem }
             action((event as? MPChangePlaybackPositionCommandEvent)?.positionTime)
             return .success
         }
@@ -267,34 +283,40 @@ public final class PhoneSystem {
         // Read so a seek or a stall brings this back; the lock screen is told where the song is this instant.
         _ = playback.anchor
         askOutput()
-        guard let entry = playback.nowPlaying else {
+        // Shuffle, repeat and edits change what Next can do and where the song is in the queue.
+        let queue = playback.queue
+        let card = NowPlayingCard(queue: queue, nowPlaying: playback.nowPlaying, duration: playback.duration, position: playback.livePosition,
+                                  playing: playback.player.state == .playing && !playback.player.isBuffering)
+        apply(SystemControls(queue: queue, card: card))
+        guard let card else {
             if shown != nil {
                 shown = nil
                 MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
             }
             return
         }
-        let now = Date()
-        let next = Shown(entry: entry.id, playing: playback.player.state == .playing && !playback.player.isBuffering,
-                         duration: playback.duration, position: playback.livePosition, at: now)
-        loadCover(entry.track.artworkKey)
-        if let shown, shown.entry == next.entry, shown.playing == next.playing, shown.duration == next.duration,
-           abs(shown.expected(at: now) - next.position) < 1.5 { return }
-        shown = next
-        publish(entry.track, next)
+        loadCover(card.artworkKey)
+        guard card.isNews(after: shown) else { return }
+        shown = card
+        publish(card)
     }
 
-    private func publish(_ track: TrackSummary, _ state: Shown) {
+    private func publish(_ card: NowPlayingCard) {
         var info: [String: Any] = [
-            MPMediaItemPropertyTitle: track.title,
-            MPMediaItemPropertyArtist: track.artist,
-            MPMediaItemPropertyAlbumTitle: track.album,
-            MPMediaItemPropertyPlaybackDuration: state.duration,
-            MPNowPlayingInfoPropertyElapsedPlaybackTime: state.position,
-            MPNowPlayingInfoPropertyPlaybackRate: state.playing ? 1.0 : 0.0,
+            MPMediaItemPropertyTitle: card.title,
+            MPMediaItemPropertyArtist: card.artist,
+            MPMediaItemPropertyAlbumTitle: card.album,
+            MPMediaItemPropertyPlaybackDuration: card.duration,
+            MPNowPlayingInfoPropertyElapsedPlaybackTime: card.position,
+            MPNowPlayingInfoPropertyPlaybackRate: card.playing ? 1.0 : 0.0,
+            MPNowPlayingInfoPropertyDefaultPlaybackRate: 1.0,
             MPNowPlayingInfoPropertyMediaType: MPNowPlayingInfoMediaType.audio.rawValue,
+            MPNowPlayingInfoPropertyPlaybackQueueIndex: card.queueIndex,
+            MPNowPlayingInfoPropertyPlaybackQueueCount: card.queueCount,
         ]
-        if let cover, cover.key == track.artworkKey { info[MPMediaItemPropertyArtwork] = cover.art }
+        if let number = card.trackNumber { info[MPMediaItemPropertyAlbumTrackNumber] = number }
+        if let disc = card.discNumber { info[MPMediaItemPropertyDiscNumber] = disc }
+        if let cover, cover.key == card.artworkKey { info[MPMediaItemPropertyArtwork] = cover.art }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = info
     }
 
@@ -307,7 +329,7 @@ public final class PhoneSystem {
             defer { coverTask = nil }
             guard let data = await artwork(key), let image = UIImage(data: data), !Task.isCancelled else { return }
             cover = (key, Self.art(image))
-            if let entry = remote.playback.nowPlaying, entry.track.artworkKey == key, let shown { publish(entry.track, shown) }
+            if let shown, shown.artworkKey == key, remote.playback.nowPlaying?.id == shown.entry { publish(shown) }
         }
     }
 }

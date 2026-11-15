@@ -69,6 +69,91 @@ public struct PositionAnchor: Sendable, Equatable {
     }
 }
 
+/// What the lock screen and Control Center are told about the song: who, where in it, and where in the queue. Built here,
+/// where it is tested; the system glue only hands it to iOS.
+public struct NowPlayingCard: Equatable, Sendable {
+    /// The queue entry it is about.
+    public var entry: String
+    public var title: String
+    public var artist: String
+    public var album: String
+    public var trackNumber: Int?
+    public var discNumber: Int?
+    public var artworkKey: String?
+    public var duration: Double
+    /// Where the song was at `at`.
+    public var position: Double
+    /// Sounding and moving: not paused, not waiting for audio from the Mac.
+    public var playing: Bool
+    public var at: Date
+    /// The song's place in the queue, counting from zero, and how many songs the queue holds.
+    public var queueIndex: Int
+    public var queueCount: Int
+
+    /// nil with nothing playing: the lock screen then shows nothing of ours.
+    public init?(queue: PhoneQueue, nowPlaying: PhoneQueue.Entry?, duration: Double, position: Double, playing: Bool, at: Date = Date()) {
+        guard let nowPlaying else { return nil }
+        entry = nowPlaying.id
+        title = nowPlaying.track.title
+        artist = nowPlaying.track.artist
+        album = nowPlaying.track.album
+        trackNumber = nowPlaying.track.trackNumber
+        discNumber = nowPlaying.track.discNumber
+        artworkKey = nowPlaying.track.artworkKey
+        self.duration = max(0, duration)
+        self.position = max(0, position)
+        self.playing = playing
+        self.at = at
+        // The song being heard, which for a moment at a join is not yet the queue's current one.
+        queueIndex = queue.entries.firstIndex { $0.id == nowPlaying.id } ?? queue.currentIndex ?? 0
+        queueCount = queue.entries.count
+    }
+
+    /// Where the lock screen, counting on by itself, takes the song to be at `now`.
+    public func expected(at now: Date) -> Double { playing ? position + now.timeIntervalSince(at) : position }
+
+    /// Whether the lock screen has to be told again after it was told `shown`. A song that simply plays on is not news
+    /// (the lock screen counts by itself); another song, a pause, a seek, a stall, or the queue changing around it is.
+    public func isNews(after shown: NowPlayingCard?) -> Bool {
+        guard let shown else { return true }
+        var same = shown
+        same.position = position
+        same.at = at
+        guard same == self else { return true }
+        return abs(shown.expected(at: at) - position) >= 1.5
+    }
+}
+
+/// Which of the lock screen's buttons do something right now. A button that would do nothing is shown greyed out rather
+/// than accepting a press and ignoring it.
+public struct SystemControls: Equatable, Sendable {
+    /// Play, pause and the headphone button.
+    public var playPause: Bool
+    public var next: Bool
+    public var previous: Bool
+    /// Dragging the lock screen's scrubber.
+    public var seek: Bool
+
+    public static let none = SystemControls(playPause: false, next: false, previous: false, seek: false)
+
+    public init(playPause: Bool, next: Bool, previous: Bool, seek: Bool) {
+        self.playPause = playPause
+        self.next = next
+        self.previous = previous
+        self.seek = seek
+    }
+
+    /// For the song on `card` in `queue`. Next needs a song to go to (the following one, or the first again under Repeat
+    /// All; Repeat One doesn't stop Next moving on, as in the app). Previous always has something to do: it restarts the
+    /// song when there is none before it. The scrubber needs a known length.
+    public init(queue: PhoneQueue, card: NowPlayingCard?) {
+        guard let card else { self = .none; return }
+        let index = queue.entries.firstIndex { $0.id == card.entry }
+        let hasFollowing = index.map { $0 + 1 < queue.entries.count } ?? false
+        self.init(playPause: true, next: hasFollowing || (queue.repeatMode == .all && !queue.entries.isEmpty), previous: true, seek: card.duration > 0)
+    }
+}
+
 public enum RouteChangePolicy {
     public enum Reason: Sendable, Equatable { case oldDeviceUnavailable, newDeviceAvailable, other }
 
