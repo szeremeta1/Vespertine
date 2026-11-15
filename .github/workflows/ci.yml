@@ -127,7 +127,13 @@ jobs:
       # Building and testing take about 5 minutes; a hang prints the test process's stacks after 15 instead of waiting
       # out the job.
       - name: VespertineKit tests (release)
-        run: scripts/run-with-watchdog.sh 900 swift test --package-path Packages/VespertineKit -c release
+        run: scripts/run-with-watchdog.sh 900 swift test --package-path Packages/VespertineKit -c release --skip VespertineUPnPTests --skip VespertineAirPlayTests
+      # The network player and AirPlay tests play to a fake renderer and a fake receiver over the loopback, against the
+      # deadlines the app really uses (a player that doesn't start, a receiver that goes quiet). Among the kit's other
+      # 1,900 tests every test waits tens of seconds for a thread on a three-core runner, which those deadlines would
+      # take for a dead device, so they run on their own.
+      - name: Network player and AirPlay tests (release)
+        run: scripts/run-with-watchdog.sh 600 swift test --package-path Packages/VespertineKit -c release --skip-build --filter 'VespertineUPnPTests|VespertineAirPlayTests'
       - name: Analysis core tests (macOS, with the app-parity tests)
         run: swift test --package-path Packages/VespertineAnalysis
       # The phone remote's protocol, with its TLS pre-shared-key WebSocket tested end to end on the loopback.

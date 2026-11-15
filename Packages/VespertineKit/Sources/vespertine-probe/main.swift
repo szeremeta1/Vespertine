@@ -153,6 +153,7 @@ if args.count >= 4, args[1] == "gapless", let device = devices.first(where: { $0
         case .deviceUnavailable(let n): print("\(t) \(n) unavailable")
         case .deviceNotResponding(let n): print("\(t) \(n) not responding")
         case .speakerGroupCarriesOn(let g, let without): print("\(t) \(g) carries on without \(without.joined(separator: ", "))")
+        case .notice(let m): print("\(t) note: \(m)")
         }
     }
     engine.play(items[0])

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- Written for the tests: a UPnP AV renderer as an embedded device, with a URLBase. -->
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+  <specVersion><major>1</major><minor>0</minor></specVersion>
+  <URLBase>http://10.0.0.7:8200/base/</URLBase>
+  <device>
+    <deviceType>urn:schemas-upnp-org:device:Basic:1</deviceType>
+    <friendlyName>Bridge</friendlyName>
+    <manufacturer>Example</manufacturer>
+    <modelName>Bridge</modelName>
+    <UDN>uuid:root-0001</UDN>
+    <deviceList>
+      <device>
+        <deviceType>urn:schemas-upnp-org:device:MediaRenderer:1</deviceType>
+        <friendlyName>Living Room &amp; Kitchen</friendlyName>
+        <manufacturer>Example Audio</manufacturer>
+        <modelName>Streamer S1</modelName>
+        <UDN>uuid:renderer-0002</UDN>
+        <serviceList>
+          <service>
+            <serviceType>urn:schemas-upnp-org:service:AVTransport:1</serviceType>
+            <serviceId>urn:upnp-org:serviceId:AVTransport</serviceId>
+            <SCPDURL>avt.xml</SCPDURL>
+            <controlURL>control/avt</controlURL>
+            <eventSubURL>event/avt</eventSubURL>
+          </service>
+          <service>
+            <serviceType>urn:schemas-upnp-org:service:ConnectionManager:1</serviceType>
+            <serviceId>urn:upnp-org:serviceId:ConnectionManager</serviceId>
+            <SCPDURL>cm.xml</SCPDURL>
+            <controlURL>control/cm</controlURL>
+            <eventSubURL></eventSubURL>
+          </service>
+        </serviceList>
+      </device>
+    </deviceList>
+  </device>
+</root>
