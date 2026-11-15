@@ -150,6 +150,19 @@ struct VespertineCommands: Commands {
                 .keyboardShortcut(.downArrow, modifiers: [.command, .option])
                 .disabled(model.activeDevice == nil)
             Divider()
+            // Balance of the output playing, 5 points a press. Disabled where it can't apply; the reason is the item's help.
+            Button("Balance Left") { model.adjustBalance(.left) }
+                .keyboardShortcut(.leftArrow, modifiers: [.control, .command])
+                .disabled(model.balanceBypass != nil)
+                .help(model.balanceBypass?.explanation ?? "")
+            Button("Balance Right") { model.adjustBalance(.right) }
+                .keyboardShortcut(.rightArrow, modifiers: [.control, .command])
+                .disabled(model.balanceBypass != nil)
+                .help(model.balanceBypass?.explanation ?? "")
+            Button("Center Balance") { model.adjustBalance(.center) }
+                .keyboardShortcut("0", modifiers: [.control, .command])
+                .disabled(model.balanceBypass != nil || model.balanceDevice.map { model.settings.balance(for: $0.uid) == 0 } ?? true)
+            Divider()
             Button("Go to Current Album") {
                 if let key = model.player.current?.track.albumKey {
                     model.sidebar = .albums

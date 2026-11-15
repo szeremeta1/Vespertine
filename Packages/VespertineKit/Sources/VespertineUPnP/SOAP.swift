@@ -15,6 +15,14 @@ public enum UPnPError: Error, Equatable, Sendable {
     case unreachable(String)
     case badResponse
 
+    /// The renderer wasn't reached at all (as opposed to reached and refusing).
+    public var isLinkFailure: Bool {
+        switch self {
+        case .timeout, .unreachable: true
+        case .fault, .http, .badResponse: false
+        }
+    }
+
     public var message: String {
         switch self {
         case .fault(let code, let description):
@@ -134,7 +142,7 @@ public struct SOAPClient: Sendable {
         request.httpBody = SOAP.envelope(serviceType: service.type, action: action, arguments: arguments)
         let data: Data, response: URLResponse
         do {
-            (data, response) = try await Self.session.data(for: request)
+            (data, response) = try await Self.overStaleConnection { try await Self.session.data(for: request) }
         } catch let error as URLError where error.code == .timedOut {
             throw UPnPError.timeout
         } catch {
@@ -143,6 +151,16 @@ public struct SOAPClient: Sendable {
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
         guard status == 200 else { throw SOAP.parseFault(data) ?? UPnPError.http(status) }
         return try SOAP.parseResponse(data, action: action)
+    }
+
+    /// Runs `send`, once more when the connection it went out on turns out to be dead. Connections are kept open between
+    /// calls, and a renderer closes its end after a while without saying so (or restarts): the first call after a pause
+    /// then fails with "the network connection was lost" before the renderer has seen it. URLSession tries a GET again by
+    /// itself but never a POST, which every SOAP call is. The second try opens a new connection.
+    static func overStaleConnection<T>(_ send: () async throws -> T) async throws -> T {
+        do { return try await send() } catch let error as URLError where error.code == .networkConnectionLost {
+            return try await send()
+        }
     }
 
     /// GET of a description or SCPD, at most `limit` bytes (more is an error, and isn't read).

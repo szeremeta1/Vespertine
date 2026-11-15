@@ -102,6 +102,8 @@ final class AppSettings {
     var appVolumeChoices: [String: Bool] { didSet { defaults.set(appVolumeChoices, forKey: "appVolumeChoices") } }
     /// Vespertine's volume level per output (0…1). Outputs that aren't listed use `digitalVolume`.
     var appVolumeLevels: [String: Double] { didSet { defaults.set(appVolumeLevels, forKey: "appVolumeLevels") } }
+    /// Left/right balance per output UID: -1 (left) ... 1 (right). An output that is centered has no entry.
+    var appBalances: [String: Double] { didSet { defaults.set(appBalances, forKey: "appBalances") } }
     /// While an output is muted from the Controls menu: the level Mute brings back (output UID → 0…1).
     var appVolumeRestore: [String: Double] { didSet { defaults.set(appVolumeRestore, forKey: "appVolumeRestore") } }
     var defaultImportMode: ImportMode { didSet { defaults.set(defaultImportMode.rawValue, forKey: "importMode") } }
@@ -253,6 +255,7 @@ final class AppSettings {
         digitalVolume = defaults.double(forKey: "digitalVolume")
         appVolumeChoices = defaults.dictionary(forKey: "appVolumeChoices") as? [String: Bool] ?? [:]
         appVolumeLevels = defaults.dictionary(forKey: "appVolumeLevels") as? [String: Double] ?? [:]
+        appBalances = defaults.dictionary(forKey: "appBalances") as? [String: Double] ?? [:]
         appVolumeRestore = defaults.dictionary(forKey: "appVolumeRestore") as? [String: Double] ?? [:]
         defaultImportMode = ImportMode(rawValue: defaults.string(forKey: "importMode") ?? "") ?? .copyAndOrganize
         let music = FileManager.default.urls(for: .musicDirectory, in: .userDomainMask)[0]
@@ -388,6 +391,7 @@ final class AppSettings {
         if appVolumeChoices[new] == nil, let choice = appVolumeChoices[old] { appVolumeChoices[new] = choice }
         if appVolumeLevels[new] == nil, let level = appVolumeLevels[old] { appVolumeLevels[new] = level }
         if appVolumeRestore[new] == nil, let level = appVolumeRestore[old] { appVolumeRestore[new] = level }
+        if appBalances[new] == nil, let balance = appBalances[old] { appBalances[new] = balance }
     }
 
     func rateChoice(for uid: String) -> RateChoice { RateChoice(code: rateChoices[uid] ?? "match") }
@@ -413,6 +417,18 @@ final class AppSettings {
         appVolumeLevels[uid] = min(max(level, 0), 1)
         // A level set by hand ends a mute: what Mute remembered is out of date.
         if level > 0, appVolumeRestore[uid] != nil { appVolumeRestore[uid] = nil }
+    }
+
+    /// The balance of `uid`: -1 (left) ... 1 (right), 0 for an output that was never moved off center.
+    func balance(for uid: String) -> Double { BalanceLaw.clamped(appBalances[uid] ?? 0) }
+    /// The center is stored as no entry at all, so "nothing set" stays exact.
+    func setBalance(_ balance: Double, for uid: String) {
+        let value = BalanceLaw.clamped(balance)
+        if value == 0 { appBalances[uid] = nil } else { appBalances[uid] = value }
+    }
+    /// Balance Left, Balance Right or Center Balance for `uid`.
+    func applyBalance(_ action: BalanceControls.Action, for uid: String) {
+        setBalance(BalanceControls.apply(action, to: balance(for: uid)), for: uid)
     }
 
     /// Volume Up, Volume Down or Mute on Vespertine's own volume for `uid`.
@@ -458,6 +474,7 @@ final class AppSettings {
         s.ratePolicies = rateChoices.mapValues { RateChoice(code: $0).policy }
         s.releaseExclusiveAfterPause = releaseAfterPause
         s.digitalVolumeDB = digitalVolumeDB
+        s.deviceBalances = appBalances
         s.deviceDigitalVolumes = deviceDigitalVolumes
         s.preferHardwareVolume = true
         s.atmosBySystem = atmosBySystem

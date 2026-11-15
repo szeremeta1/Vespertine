@@ -72,8 +72,13 @@ public actor OpenHomeTransport: RendererTransport {
     }
 
     /// Makes the Playlist source the current one (a renderer may be on its radio or a receiver source).
+    /// A renderer that doesn't list its sources is left on the one it is on. One that can't be reached is an error here, not
+    /// skipped: the calls after this one may get through, and would then start a song on a renderer still on another source,
+    /// which plays nothing and says nothing.
     private func selectPlaylistSource() async throws {
-        guard let xml = try? await client.call(product, "SourceXml")["Value"] else { return }
+        let xml: String?
+        do { xml = try await client.call(product, "SourceXml")["Value"] } catch let error as UPnPError where error.isLinkFailure { throw error } catch { return }
+        guard let xml else { return }
         let types = SourceListParser.types(Data(xml.utf8))
         guard let index = types.firstIndex(of: "Playlist") else { return }
         let current = try? await client.call(product, "SourceIndex")["Value"].flatMap { Int($0) }
