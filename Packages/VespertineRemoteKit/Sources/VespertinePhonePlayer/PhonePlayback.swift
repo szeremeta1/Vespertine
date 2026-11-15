@@ -257,7 +257,8 @@ public final class PhonePlayback {
     /// `ahead`: the song is opened while another plays. `plain`: never as DoP.
     private func opened(_ entry: PhoneQueue.Entry, ahead: Bool = false, plain: Bool = false) async throws -> Open {
         if let have = open[entry.id] { return have }
-        if let running = opening[entry.id] { return try await running.value }
+        // One being opened that was let go of meanwhile is no use: it is closed when it gets here.
+        if let running = opening[entry.id], !running.isCancelled { return try await running.value }
         guard let song = entry.track.id else { throw Failure.notInLibrary }
         if let kept = kept(song), let file = try? FileByteSource(url: kept.file) {
             let result = Open(song: song, descriptor: kept.descriptor, source: file)
@@ -288,8 +289,14 @@ public final class PhonePlayback {
             return Open(song: song, descriptor: descriptor, source: source, stream: source, line: line)
         }
         opening[entry.id] = task
-        defer { opening[entry.id] = nil }
+        defer { if opening[entry.id] == task { opening[entry.id] = nil } }
         let result = try await task.value
+        // Let go of in the moment between the stream being ready and it getting here (the phone was told to stop, another
+        // song was chosen): it is given back to the Mac, not kept to be played later.
+        if task.isCancelled {
+            close(result)
+            throw CancellationError()
+        }
         open[entry.id] = result
         return result
     }
@@ -365,9 +372,7 @@ public final class PhonePlayback {
         for (entry, task) in opening where !keeping.contains(entry) { task.cancel() }
         for (entry, stream) in open where !keeping.contains(entry) {
             open[entry] = nil
-            stream.stream?.close()
-            received += stream.stream?.bufferedBytes ?? 0
-            if let line = stream.line { Task { await line.close() } }
+            close(stream)
         }
     }
 
@@ -376,6 +381,10 @@ public final class PhonePlayback {
         opening[entry]?.cancel()
         guard let stream = open[entry] else { return }
         open[entry] = nil
+        close(stream)
+    }
+
+    private func close(_ stream: Open) {
         stream.stream?.close()
         received += stream.stream?.bufferedBytes ?? 0
         if let line = stream.line { Task { await line.close() } }
