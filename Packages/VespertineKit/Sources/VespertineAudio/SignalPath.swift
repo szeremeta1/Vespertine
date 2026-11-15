@@ -25,6 +25,10 @@ public struct SignalPath: Sendable, Hashable {
     public var equalizer: String? = nil
     /// The preset chosen for this output that can't be applied to this stream (DoP, bitstream), by name; nil = none chosen.
     public var bypassedEqualizer: String? = nil
+    /// Left/right balance applied to this stream: -1 (left) ... 1 (right), 0 = none.
+    public var balance: Double = 0
+    /// Why the balance chosen for this output is not applied to this stream; nil = none chosen, or it is applied.
+    public var bypassedBalance: BalanceBypass? = nil
     /// The room correction profile applied (its name), nil = none.
     public var roomCorrection: String? = nil
     /// The room correction chosen for this output that doesn't apply to this stream (native DSD kept, bitstream,
@@ -215,6 +219,7 @@ public struct SignalPath: Sendable, Hashable {
     public var modifiesSamples: Bool {
         if let rg = replayGainDB, rg != 0 { return true }
         if equalizer != nil { return true }
+        if balance != 0 { return true }
         if roomCorrection != nil, group?.stage != .integerDelay { return true }
         if case .digital(let db) = volume, db != 0 { return true }
         return false

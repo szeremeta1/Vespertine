@@ -560,6 +560,12 @@ struct NRTRenderContext {
     uint32_t scratchFrames;
 
     _Atomic double gain;
+    // Left/right balance: the level each of a stereo stream's two channels is headed for (1.0 = untouched), and how far
+    // the levels in use move toward it per frame. The levels in use belong to the I/O thread.
+    _Atomic double balL, balR;
+    _Atomic double balStep;
+    double balLiveL, balLiveR;
+    bool balStarted;
     _Atomic uint32_t ditherBits;
     _Atomic bool passthrough;
     _Atomic bool dop;
@@ -659,6 +665,11 @@ NRTRenderContext *nrt_context_create(NRTRing *ring, uint32_t maxFramesPerSlice) 
     ctx->scratch = calloc((size_t)ctx->scratchFrames * nrt_ring_channels(ring), sizeof(float));
     if (!ctx->scratch) { free(ctx); return NULL; }
     atomic_init(&ctx->gain, 1.0);
+    atomic_init(&ctx->balL, 1.0);
+    atomic_init(&ctx->balR, 1.0);
+    atomic_init(&ctx->balStep, 1.0);
+    ctx->balLiveL = ctx->balLiveR = 1.0;
+    ctx->balStarted = false;
     atomic_init(&ctx->ditherBits, 24);
     atomic_init(&ctx->passthrough, false);
     atomic_init(&ctx->dop, false);
@@ -769,6 +780,21 @@ void nrt_context_set_gain(NRTRenderContext *ctx, double gain, uint32_t ditherBit
     atomic_store(&ctx->gain, isfinite(gain) && gain >= 0 ? gain : 0.0);
 }
 double nrt_context_gain(const NRTRenderContext *ctx) { return atomic_load(&ctx->gain); }
+
+static inline double balance_level(double v) { return isfinite(v) ? (v < 0 ? 0.0 : (v > 1 ? 1.0 : v)) : 1.0; }
+
+void nrt_context_set_balance(NRTRenderContext *ctx, double left, double right, uint32_t rampFrames) {
+    atomic_store(&ctx->balStep, rampFrames > 0 ? 1.0 / (double)rampFrames : 1.0);
+    atomic_store(&ctx->balL, balance_level(left));
+    atomic_store(&ctx->balR, balance_level(right));
+}
+
+// One frame nearer its target, never past it.
+static inline double balance_toward(double live, double target, double step) {
+    if (live < target) { live += step; return live > target ? target : live; }
+    if (live > target) { live -= step; return live < target ? target : live; }
+    return live;
+}
 
 void nrt_context_set_eq(NRTRenderContext *ctx, const NRTBiquad *sections, uint32_t count, double preamp) {
     NRTEQBank *bank = &ctx->eqBanks[ctx->eqBack];
@@ -1352,7 +1378,20 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
 
     // The fader: idle (full level, no ramp) leaves this test as it was, so the copy path stays a copy.
     const bool fading = ctx->fadeLeft > 0 || ctx->fadeLevel != 1.0;
-    const bool processing = gain != 1.0 || equalize || roomed > 0 || (fir && fir_filtering(fir));
+    // Balance: stereo only, never integer words. Before the first frame the levels start where they are headed (a song
+    // doesn't begin with a slide); after that a change is ramped, so dragging the control can't click. Centered and
+    // settled, this test is false and the copy path stays a copy.
+    const double balTargetL = atomic_load_explicit(&ctx->balL, memory_order_relaxed);
+    const double balTargetR = atomic_load_explicit(&ctx->balR, memory_order_relaxed);
+    const double balStep = atomic_load_explicit(&ctx->balStep, memory_order_relaxed);
+    const bool balanceable = !integer && ch == 2;
+    if (!ctx->balStarted || !balanceable) {
+        ctx->balLiveL = balTargetL;
+        ctx->balLiveR = balTargetR;
+        ctx->balStarted = true;
+    }
+    const bool balanced = balanceable && (ctx->balLiveL != 1.0 || ctx->balLiveR != 1.0 || balTargetL != 1.0 || balTargetR != 1.0);
+    const bool processing = gain != 1.0 || balanced || equalize || roomed > 0 || (fir && fir_filtering(fir));
     if (processing || fading) {
         const uint32_t bits = atomic_load_explicit(&ctx->ditherBits, memory_order_relaxed);
         const double lsb = bits > 1 && bits < 32 ? 1.0 / (double)(1u << (bits - 1)) : 0.0;
@@ -1365,6 +1404,10 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
             const bool scaled = fading && (ctx->fadeLeft > 0 || ctx->fadeLevel != 1.0);
             if (fading && !processing && !scaled) continue;
             const bool silent = fading && ctx->fadeLeft == 0 && ctx->fadeLevel == 0.0;
+            if (balanced) {
+                ctx->balLiveL = balance_toward(ctx->balLiveL, balTargetL, balStep);
+                ctx->balLiveR = balance_toward(ctx->balLiveR, balTargetR, balStep);
+            }
             for (uint32_t c = 0; c < ch; c++) {
                 double s = (double)frame[c];
                 if (equalize) {
@@ -1379,6 +1422,7 @@ static void pull_inside(NRTRenderContext *ctx, uint32_t frames) {
                         s = y;
                     }
                 }
+                if (balanced) s *= c == 0 ? ctx->balLiveL : ctx->balLiveR;
                 if (scaled) {
                     if (c == 0) frameLevel = fade_frame(ctx);
                     s *= gain * frameLevel;

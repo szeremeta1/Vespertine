@@ -667,6 +667,32 @@ final class AppModel {
         }
     }
 
+    /// The output whose balance the bar and the Controls menu move: the Mac output playing or chosen. Network players
+    /// and AirPlay receivers have none (their sound isn't rendered here channel by channel).
+    var balanceDevice: OutputDevice? { rendererChosen || airPlayChosen ? nil : activeDevice }
+
+    /// Why balance is not applied to what is playing (or can't be on this output at all); nil = it is, or would be.
+    var balanceBypass: BalanceBypass? {
+        guard let device = balanceDevice else { return .notStereo }
+        // Dolby Atmos that macOS renders is placed by its own renderer, like Spatial Audio.
+        if player.systemRendering != nil { return .spatial }
+        if let path = player.signalPath { return BalanceBypass.reason(for: device, plan: path.plan) }
+        return BalanceBypass.reason(for: device)
+    }
+
+    func setBalance(_ balance: Double) {
+        guard let device = balanceDevice else { return }
+        settings.setBalance(balance, for: device.uid)
+        syncEngine()
+    }
+
+    /// Balance Left, Balance Right and Center Balance in the Controls menu.
+    func adjustBalance(_ action: BalanceControls.Action) {
+        guard let device = balanceDevice, balanceBypass == nil else { return }
+        settings.applyBalance(action, for: device.uid)
+        syncEngine()
+    }
+
     /// Push preference changes into the engine and device watchers.
     func syncEngine() {
         devices.dopUIDs = settings.effectiveDoPUIDs
