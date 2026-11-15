@@ -20,7 +20,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-01 <a id="bp-definition"></a>The badge means every sample arrives unaltered
 
 - **Text:** `docs/VERIFICATION.md:18`: "Vespertine shows **BIT-PERFECT** only when every sample of the file reaches the device's input unaltered."
-- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:223`: "/// True only when every sample reaches the DAC unaltered."
+- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:228`: "/// True only when every sample reaches the DAC unaltered."
 - **Text:** `README.md:41`: "BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met"
 - **Property:** two separate things. (a) The verdict is true only when every listed condition holds (CL-BP-02 to CL-BP-13). (b) When it is true, the words the render stage hands to Core Audio equal the decoded samples. The harness cannot see past the HAL; what the device does with the words is covered only by the loopback procedure.
 - **Governed by:** vespertine-rule for (a). For (b), the exactness of each data path (CL-FLOAT-01, CL-INT-01, CL-DOP-02) is measurable without a standard.
@@ -93,7 +93,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-09 <a id="bp-airpods-usbc"></a>AirPods Max on USB-C
 
 - **Text:** `docs/VERIFICATION.md:36`: "Vespertine detects the cable through the IORegistry (`DeviceProfile.swift`) and treats 48 kHz files as bit-perfect on that device."
-- **Text:** `docs/FEATURES.md:53`: "AirPods Max on USB-C are recognized as a lossless 24-bit / 48 kHz device. Unprocessed 48 kHz tracks meet the app's bit-perfect conditions; other rates are converted to 48 kHz."
+- **Text:** `docs/FEATURES.md:59`: "AirPods Max on USB-C are recognized as a lossless 24-bit / 48 kHz device. Unprocessed 48 kHz tracks meet the app's bit-perfect conditions; other rates are converted to 48 kHz."
 - **Text:** `site/src/i18n/en.json:259`: "48 kHz music plays bit-perfect"
 - **Property:** with the cable connected, the device profile allows bit-perfect and 48 kHz unprocessed PCM gets the badge.
 - **Governed by:** vespertine-rule, resting on Apple's description of the USB-C path. The docs already say a loopback cannot confirm it.
@@ -135,7 +135,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-BP-14 <a id="bp-speaker-group"></a>A speaker group is BIT-PERFECT only on channels no drift correction touches
 
 - **Text:** `docs/SPEAKER-GROUPS.md:15`: "Only the leader can be bit-perfect."
-- **Text:** `docs/FEATURES.md:132`: "so only the leader's channels can be bit-perfect, and the signal path says which."
+- **Text:** `docs/FEATURES.md:138`: "so only the leader's channels can be bit-perfect, and the signal path says which."
 - **Property:** a Vespertine speaker group is labelled BIT-PERFECT only when every channel the song uses lands on a DAC that is not resampled (the clock leader, or DACs sharing a hardware clock), each used DAC passes the single-DAC format rules at the song's rate, and nothing mixes, changes the level, filters or applies a digital volume (a whole-frame delay only shifts samples). A resampled follower, a fold, a trim, a polarity flip or a lowered preamp on an output that carries music gives the badge the single-DAC rules would (ROOM CORRECTION, RESAMPLED…). A user's own aggregate stays CL-BP-08.
 - **Governed by:** vespertine-rule.
 - **Route:** inventory (`GroupSignalPath` has its own unit tests, `GroupSignalPathTests` and `GroupBitPerfectTests`, and an opt-in loopback check on virtual devices; not one of the seven groups); hardware (`hardware/SPEAKER-GROUPS.md`, the leader's samples on a real DAC).
@@ -146,7 +146,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-EQ-01 <a id="eq-label"></a>An active preset replaces BIT-PERFECT with EQUALIZER
 
-- **Text:** `docs/FEATURES.md:87`: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER."
+- **Text:** `docs/FEATURES.md:93`: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER."
 - **Text:** `site/src/i18n/en.json:276`: "Off by default; when it’s on, the signal path says"
 - **Text:** `README.md:125`: "when it is on the signal path says EQUALIZER."
 - **Property:** with an equalizer preset applied, the verdict is false; and when no earlier reason applies (resampling, DSD → PCM, lossy source, mixing, device class, spatial, channels), the status line is EQUALIZER.
@@ -162,7 +162,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-EQ-03 <a id="eq-not-dop"></a>EQ does not touch DoP or bitstream
 
-- **Text:** `docs/FEATURES.md:89`: "EQ does not process DoP, system-rendered Atmos, or the experimental receiver bitstream path"
+- **Text:** `docs/FEATURES.md:95`: "EQ does not process DoP, system-rendered Atmos, or the experimental receiver bitstream path"
 - **Property:** with DoP mode on in the render stage, an equalizer bank set on the context leaves the DoP words unchanged.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (DoP render group).
@@ -258,7 +258,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-DOP-05 <a id="dop-plan"></a>DoP only when the DAC is marked capable and supports the carrier rate
 
 - **Text:** `docs/ARCHITECTURE.md:23`: "DoP is planned only when the DAC is marked DoP-capable and supports that carrier rate; otherwise FFmpeg converts DSD to PCM at an eighth of the DSD rate and the planner resamples as needed."
-- **Text:** `docs/FEATURES.md:49`: "DoP is off until enabled for a device because a non-DoP DAC would play the carrier as noise."
+- **Text:** `docs/FEATURES.md:55`: "DoP is off until enabled for a device because a non-DoP DAC would play the carrier as noise."
 - **Property:** DoP mode only when the device is marked DoP-capable and lists the carrier rate; DSD → PCM otherwise, at DSD rate / 8.
 - **Governed by:** vespertine-rule; DoP 1.1 §4 advises the host to check DSD capability first.
 - **Route:** spec-traced (rate group).
@@ -428,7 +428,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-RATE-03 <a id="rate-handback"></a>The device is handed back on quit
 
-- **Text:** `docs/FEATURES.md:45`: "At quit, each device is restored to its earlier rate and depth, or your chosen default."
+- **Text:** `docs/FEATURES.md:51`: "At quit, each device is restored to its earlier rate and depth, or your chosen default."
 - **Text:** `site/src/i18n/en.json:138`: "Hands your DAC back at the rate and depth it had before, when Vespertine quits."
 - **Text:** `docs/ARCHITECTURE.md:13`: "`DeviceRestore` remembers each device's format before the first change, so it can be put back when Vespertine quits."
 - **Property:** after quit, the device's nominal rate and physical format read back equal what they were before Vespertine first changed them (or the chosen default).
@@ -448,7 +448,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-GAP-01 <a id="gapless"></a>Gapless, including CUE albums
 
-- **Text:** `docs/FEATURES.md:45`: "Tracks with the same output format play gaplessly, including CUE-sheet albums."
+- **Text:** `docs/FEATURES.md:51`: "Tracks with the same output format play gaplessly, including CUE-sheet albums."
 - **Text:** `site/src/i18n/en.json:135`: "Gapless, including CUE-sheet albums split from one file."
 - **Text:** `docs/ARCHITECTURE.md:41`: "If the new plan is device-compatible (same rate, depth, mode and channels), decoding simply continues into the same ring buffer"
 - **Property:** two consecutive device-compatible tracks (or CUE regions of one file) produce the same samples as the file played straight through, with no inserted or dropped frame at the boundary.
@@ -494,7 +494,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-TR-02 <a id="transitions-window"></a>Only the transition is processed; the rest stays bit-perfect
 
 - **Text:** `docs/TRANSITIONS.md:107`: "Only while it's heard is the music not bit-perfect"
-- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:227`: "guard transition?.audible != true"
+- **Text:** `Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift:232`: "guard transition?.audible != true"
 - **Property:** with transitions on, frames outside a crossfade or a dip's ramp are the source's samples bit for bit, and the verdict is false only while a transition is heard (held at least 2 s).
 - **Governed by:** vespertine-rule.
 - **Route:** inventory (closed-form sample checks in `TransitionGoldenTests.swift` and `SmartMixGoldenTests.swift`, verdict tests in `TransitionPlannerTests.swift`; harness mutants C-FLT-001-tr, C-INT-001-tr and C-DOPS-004-tr, killed by the float, integer and DoP groups' checks).
@@ -547,7 +547,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-HIRES-01 <a id="hires-padding"></a>Zero padding is detected exactly
 
-- **Text:** `docs/FEATURES.md:59`: "Analysis detects zero-padded bit depth exactly."
+- **Text:** `docs/FEATURES.md:65`: "Analysis detects zero-padded bit depth exactly."
 - **Text:** `site/src/i18n/en.json:238`: "Only zero padding is exact"
 - **Text:** `docs/ANALYSIS.md:13`: "Every sample's lowest bits are zero. Exact."
 - **Property:** the reported effective bit depth is 24 minus the number of low bits that are zero in every sample.
@@ -556,7 +556,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 ### CL-HIRES-02 <a id="hires-heuristics"></a>The other verdicts are estimates
 
-- **Text:** `docs/FEATURES.md:59`: "Possible upsampling, lossy origin and synthetic high frequencies are spectral estimates, shown as questions with measurements and alternative explanations."
+- **Text:** `docs/FEATURES.md:65`: "Possible upsampling, lossy origin and synthetic high frequencies are spectral estimates, shown as questions with measurements and alternative explanations."
 - **Text:** `docs/ANALYSIS.md:7`: "Only zero padding is exact."
 - **Property:** none to test against a standard; the docs list the known false positives and misses (`docs/ANALYSIS.md#limits`).
 - **Governed by:** heuristic.

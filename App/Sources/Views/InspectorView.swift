@@ -270,6 +270,14 @@ struct SignalPathView: View {
             s.append(Step(title: String(localized: "Equalizer"), detail: "\(eq) · \(bypass.explanation)",
                           value: String(localized: "bypassed", comment: "A signal path step (equalizer) is chosen but not applied to this stream")))
         }
+        if path.balance != 0 {
+            s.append(Step(title: String(localized: "Balance"), detail: String(localized: "64-bit digital, TPDF dither"),
+                          value: BalanceLaw.caption(path.balance), tone: .changed))
+        } else if let bypass = path.bypassedBalance {
+            // Chosen for this output but not in the signal: say so rather than leave the row out.
+            s.append(Step(title: String(localized: "Balance"), detail: bypass.explanation,
+                          value: String(localized: "bypassed", comment: "A signal path step (equalizer) is chosen but not applied to this stream")))
+        }
         switch path.volume {
         case .hardware:
             s.append(Step(title: String(localized: "Volume"), detail: String(localized: "DAC hardware control"), value: String(localized: "unity · 0.0 dB"), tone: .good))

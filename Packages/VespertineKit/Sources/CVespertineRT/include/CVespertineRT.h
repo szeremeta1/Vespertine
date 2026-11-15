@@ -69,6 +69,11 @@ void nrt_context_destroy(NRTRenderContext *_Nullable ctx);
 /// A gain of exactly 1.0 leaves samples untouched (bit-transparent path).
 void nrt_context_set_gain(NRTRenderContext *_Nonnull ctx, double gain, uint32_t ditherBits);
 double nrt_context_gain(const NRTRenderContext *_Nonnull ctx);
+/// Left/right balance for a stereo stream: the level of each channel, 0...1 (1 = untouched). Applied with the gain,
+/// after the equalizer and before dither; never to DoP, passthrough or integer words, or to a stream that isn't stereo.
+/// A change reaches its target over `rampFrames` frames for a full swing (0: at once). With both at 1 and settled,
+/// nothing is done and the copy path stays a copy.
+void nrt_context_set_balance(NRTRenderContext *_Nonnull ctx, double left, double right, uint32_t rampFrames);
 
 /// When set (DoP), samples are never modified and meters are not computed.
 void nrt_context_set_passthrough(NRTRenderContext *_Nonnull ctx, bool passthrough);

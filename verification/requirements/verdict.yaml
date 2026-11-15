@@ -204,9 +204,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 87"
+    section: "line 93"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 87, from: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER.", to: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER." }
+    cache: { repo: docs/FEATURES.md, lines: 93, from: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER.", to: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER." }
   requirement: "On a PCM path that would otherwise be BIT-PERFECT, an active equalizer preset makes the badge exactly \"EQUALIZER\"."
   quote_sha256: 91af30f470ee9e93f90067b89d53ec5a14391dd891da113421239b9cc2c5486f
   kind: vespertine-rule
