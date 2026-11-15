@@ -17,11 +17,13 @@ struct QueueEntry: Identifiable, Hashable {
     var versions: [Track] = []
     /// Added with Play Next or Add to Queue: listed under Playing Next, ahead of the rest of what was playing.
     var queuedByUser = false
+    /// A song a control app sent ("Receive from Other Apps"): not in the library, never kept, counted or scrobbled.
+    var received = false
     var id: UUID { item.id }
 
     /// The same entry (same place in the queue, same flags) playing `track` through `item`.
     func replacing(_ track: Track, item: PlayableItem) -> QueueEntry {
-        QueueEntry(item: item, track: track, versions: versions, queuedByUser: queuedByUser)
+        QueueEntry(item: item, track: track, versions: versions, queuedByUser: queuedByUser, received: received)
     }
 }
 
@@ -127,6 +129,8 @@ final class PlayerController {
     let discord = DiscordPresence()
 
     var current: QueueEntry? { currentIndex.flatMap { queue.indices.contains($0) ? queue[$0] : nil } }
+    /// The song playing when it is one of the library's (not one a control app sent).
+    var currentLibraryTrack: Track? { current.flatMap { $0.received ? nil : $0.track } }
     var isPlaying: Bool { state == .playing }
     var loading: Bool { (buffering && state != .paused) || (requested != nil && current.map { shares.isNetwork($0.track) } == true) }
     var canCancelLoading: Bool { loading && requested != nil }
@@ -199,6 +203,7 @@ final class PlayerController {
     /// The output changed (another device, Spatial Audio on or off): upcoming songs switch to the version
     /// that suits it. The song that's playing carries on as it is.
     func resolveVersions() {
+        if onKeptQueue({ resolveVersions() }) { return }
         guard let wanted = wantsMultichannel() else { return }
         let start = (currentIndex ?? -1) + 1
         var changed = false
@@ -224,6 +229,8 @@ final class PlayerController {
         guard !tracks.isEmpty else { return }
         let entries = entries(tracks, allowing: allowing, transitions: transitions, exactly: exactly)
         guard !entries.isEmpty else { return }
+        // The listener's own play ends a control app's session: the two never mix.
+        endReceiverSession(telling: .tookOver, stopping: false)
         if let shuffled, shuffled != shuffle {
             settingShuffle = true
             shuffle = shuffled
@@ -247,7 +254,11 @@ final class PlayerController {
 
     /// Plays `tracks` right after the current song, ahead of anything else in Playing Next. `exactly`: see `entries`.
     func playNext(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, exactly: Set<String> = []) {
-        guard let i = currentIndex else { play(tracks, allowing: allowing, exactly: exactly); return }
+        if onKeptQueue({ playNext(tracks, allowing: allowing, exactly: exactly) }) { return }
+        guard let i = currentIndex else {
+            if editingKeptQueue { beginKeptQueue(entries(tracks, allowing: allowing, exactly: exactly)) } else { play(tracks, allowing: allowing, exactly: exactly) }
+            return
+        }
         let entries = entries(tracks, allowing: allowing, exactly: exactly).map { var e = $0; e.queuedByUser = true; return e }
         queue.insert(contentsOf: entries, at: i + 1)
         originalOrder.append(contentsOf: entries)
@@ -258,7 +269,11 @@ final class PlayerController {
     /// playing (as Apple Music's Play Last does), so they're heard without first sitting through the whole album.
     /// `exactly`: see `entries`.
     func addToQueue(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, exactly: Set<String> = []) {
-        guard let i = currentIndex else { play(tracks, allowing: allowing, exactly: exactly); return }
+        if onKeptQueue({ addToQueue(tracks, allowing: allowing, exactly: exactly) }) { return }
+        guard let i = currentIndex else {
+            if editingKeptQueue { beginKeptQueue(entries(tracks, allowing: allowing, exactly: exactly)) } else { play(tracks, allowing: allowing, exactly: exactly) }
+            return
+        }
         let entries = entries(tracks, allowing: allowing, exactly: exactly).map { var e = $0; e.queuedByUser = true; return e }
         queue.insert(contentsOf: entries, at: i + 1 + playingNext.count)
         originalOrder.append(contentsOf: entries)
@@ -270,6 +285,7 @@ final class PlayerController {
     /// Removes songs from the queue by entry, never the one playing. Entries no longer queued are ignored, so a
     /// request made from a list drawn a moment ago (the song ended meanwhile) can't remove the wrong song.
     func removeFromQueue(_ ids: some Collection<UUID>) {
+        if onKeptQueue({ removeFromQueue(ids) }) { return }
         let remove = Set(ids).subtracting(current.map { [$0.id] } ?? [])
         guard queue.contains(where: { remove.contains($0.id) }) else { return }
         let currentID = current?.id
@@ -283,6 +299,7 @@ final class PlayerController {
     /// that are playing, already played or gone are left alone. `playingNext` says whether they join Playing Next
     /// or play as part of the rest; nil decides by where they land (among Playing Next's songs, they join it).
     func moveUpcoming(_ ids: [UUID], before target: UUID?, playingNext: Bool? = nil) {
+        if onKeptQueue({ moveUpcoming(ids, before: target, playingNext: playingNext) }) { return }
         guard let c = currentIndex else { return }
         let upcoming = Array(queue[(c + 1)...])
         let byID = Dictionary(upcoming.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
@@ -305,6 +322,7 @@ final class PlayerController {
 
     /// Moves upcoming entries by their places in `upcoming` (as a list's drag reports them).
     func moveUpcoming(from source: IndexSet, to destination: Int) {
+        if onKeptQueue({ moveUpcoming(from: source, to: destination) }) { return }
         let shown = Array(upcoming)
         let ids = source.sorted().compactMap { shown.indices.contains($0) ? shown[$0].id : nil }
         moveUpcoming(ids, before: destination < shown.count ? shown[destination].id : nil)
@@ -312,6 +330,7 @@ final class PlayerController {
 
     /// Moves upcoming entries (in the order they play) to the front of Playing Next.
     func playNext(entries ids: [UUID]) {
+        if onKeptQueue({ playNext(entries: ids) }) { return }
         let chosen = Set(ids)
         let shown = Array(upcoming)
         let ordered = shown.map(\.id).filter(chosen.contains)
@@ -321,14 +340,20 @@ final class PlayerController {
 
     /// Empties Up Next (only the songs that come after the one playing).
     func clearUpcoming() {
+        if onKeptQueue({ clearUpcoming() }) { return }
         guard let c = currentIndex else { return }
         removeFromQueue(queue[(c + 1)...].map(\.id))
     }
 
     /// Empties Playing Next: the rest of what was playing carries on after the current song.
-    func clearPlayingNext() { removeFromQueue(playingNext.map(\.id)) }
+    func clearPlayingNext() {
+        if onKeptQueue({ clearPlayingNext() }) { return }
+        removeFromQueue(playingNext.map(\.id))
+    }
 
     func jump(to id: UUID) {
+        // A song of the listener's own queue, chosen while a control app plays: the control app's session ends.
+        if let session = receiverSession, session.queue.contains(where: { $0.id == id }) { endReceiverSession(telling: .tookOver, stopping: false) }
         guard let i = queue.firstIndex(where: { $0.id == id }) else { return }
         currentIndex = i
         start(queue[i])
@@ -342,6 +367,7 @@ final class PlayerController {
     /// your order, and the ones that already had their turn stay behind the song playing. Turning shuffle off puts
     /// the rest back in its order, after them.
     private func applyShuffle(keepingCurrent: Bool = true) {
+        if onKeptQueue({ applyShuffle(keepingCurrent: keepingCurrent) }) { return }
         guard !queue.isEmpty else { return }
         let current = self.current
         let next = Array(playingNext)
@@ -417,7 +443,9 @@ final class PlayerController {
     }
 
     private func syncMirror(reloadCurrent: Bool = false) {
-        mirror.update(queue.map(\.item), repeatMode: repeatMode)
+        guard !editingKeptQueue else { return }
+        // Repeat is the listener's, for the listener's queue: a control app's songs play once, in the order it sends them.
+        mirror.update(queue.map(\.item), repeatMode: receiverSession == nil ? repeatMode : .off)
         if let rendererInfo {
             let entries = queue
             rendererInfo.withLock { map in for entry in entries where map[entry.id] == nil { map[entry.id] = Self.rendererInfo(entry.track) } }
@@ -435,6 +463,8 @@ final class PlayerController {
     func useRenderer(_ playback: (any NetworkPlayback)?, missing: String? = nil) {
         let missing = playback == nil ? missing : nil
         guard playback !== renderer || missing != missingRenderer else { return }
+        // A control app's song plays on this Mac's own outputs only: handing the output to a network player ends its session.
+        if playback != nil || missing != nil { endReceiverSession(telling: .tookOver) }
         let wasActive = state == .playing || requested != nil
         let carried = wasActive ? (pendingRendererStart ?? current) : pendingRendererStart
         let at = pendingRendererStart == nil ? position : 0
@@ -527,6 +557,7 @@ final class PlayerController {
     /// Files in the queue were moved or renamed (found by a rescan): point their entries at the new
     /// files so the rest of the queue keeps playing. The song that's playing isn't interrupted.
     func tracksMoved(_ moves: [Int64: Int64]) {
+        if onKeptQueue({ tracksMoved(moves) }) { return }
         let moved = library.tracks(ids: Array(Set(moves.values)))
         let byID = Dictionary(moved.compactMap { t in t.id.map { ($0, t) } }, uniquingKeysWith: { a, _ in a })
         func remap(_ entry: QueueEntry) -> QueueEntry {
@@ -543,12 +574,14 @@ final class PlayerController {
     /// A share came back mounted at another path and the library repointed its songs: queued entries still name the old
     /// path (and the old offline-copy key), so the rest of the queue would fail to open. Point them at the new files.
     func sourceRelinked(_ sourceID: Int64) {
+        if onKeptQueue({ sourceRelinked(sourceID) }) { return }
         let ids = Set((queue + originalOrder).compactMap { $0.track.sourceId == sourceID ? $0.track.id : nil })
         guard !ids.isEmpty else { return }
         tracksMoved(Dictionary(uniqueKeysWithValues: ids.map { ($0, $0) }))
     }
 
     func refreshReplayGain() {
+        if onKeptQueue({ refreshReplayGain() }) { return }
         queue = queue.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id, transitions: $0.item.context?.override)) }
         originalOrder = originalOrder.map { $0.replacing($0.track, item: makeItem($0.track, id: $0.id, transitions: $0.item.context?.override)) }
         syncMirror(reloadCurrent: true)
@@ -598,6 +631,197 @@ final class PlayerController {
         return db
     }
 
+    // MARK: Receive from Other Apps (a control app's session)
+
+    /// What a control app is playing here, and the listener's own queue kept aside meanwhile.
+    struct ReceiverSession {
+        var app: ReceiverControlApp
+        /// The listener's queue as it was when the control app began; it comes back when the control app stops.
+        var queue: [QueueEntry]
+        var originalOrder: [QueueEntry]
+        var currentIndex: Int?
+        /// Where the listener's song was.
+        var position: TimeInterval
+        /// The song of the listener's queue that was current, if there was one.
+        var current: QueueEntry? { currentIndex.flatMap { queue.indices.contains($0) ? queue[$0] : nil } }
+        var upcoming: ArraySlice<QueueEntry> {
+            guard let i = currentIndex, i + 1 < queue.count else { return [] }
+            return queue[(i + 1)...]
+        }
+    }
+
+    /// Set while a control app's songs are the ones in `queue`.
+    private(set) var receiverSession: ReceiverSession?
+    /// Told what became of a control app's songs; the receiver passes it on to the control app.
+    @ObservationIgnored var receiverEvents: ((ReceiverPlayerEvent) -> Void)?
+    /// How long a session is kept after its last song ended: a control app that sends one song at a time sends the next at once.
+    @ObservationIgnored var receiverLingerTime: Duration = .seconds(10)
+    @ObservationIgnored private var receiverLinger: Task<Void, Never>?
+    /// Set while a change is being made to the listener's kept queue (see `onKeptQueue`).
+    @ObservationIgnored private var editingKeptQueue = false
+    /// Where the listener's own song was when a control app took over: Play carries on from there.
+    @ObservationIgnored private var resumeAt: (id: UUID, seconds: TimeInterval)?
+    /// QA only: a session is on screen for a screenshot (see `showReceiverDemo`).
+    @ObservationIgnored private var receiverDemo = false
+
+    static var receiverNeedsThisMac: String {
+        String(localized: "Vespertine is playing to a network player. Choose one of this Mac’s outputs to play what other apps send.",
+               comment: "A control app sent a song to Receive from Other Apps while the chosen output is a network player or an AirPlay receiver.")
+    }
+
+    private static func entry(_ track: ReceiverTrack) -> QueueEntry {
+        var entry = QueueEntry(item: track.item, track: .transient(location: track.item.url.absoluteString, title: track.info.title, artist: track.info.artist,
+                                                                    album: track.info.album, duration: track.info.duration ?? 0))
+        entry.received = true
+        return entry
+    }
+
+    /// A control app pressed Play: its song plays in place of whatever does, and `next` follows it without a gap. The listener's
+    /// own queue is kept as it is, paused, until the control app stops or the listener plays something of their own.
+    func receiverPlay(_ track: ReceiverTrack, next: ReceiverTrack?, from app: ReceiverControlApp) {
+        receiverLinger?.cancel()
+        receiverLinger = nil
+        guard renderer == nil, missingRenderer == nil else {
+            lastError = Self.receiverNeedsThisMac
+            receiverEvents?(.failed(track.id, Self.receiverNeedsThisMac))
+            return
+        }
+        if receiverSession == nil {
+            let at = state == .stopped ? (resumeAt.flatMap { $0.id == current?.id ? $0.seconds : nil } ?? 0) : position
+            receiverSession = ReceiverSession(app: app, queue: queue, originalOrder: originalOrder, currentIndex: currentIndex, position: at)
+        } else {
+            receiverSession?.app = app
+        }
+        let entries = [track, next].compactMap { $0 }.map(Self.entry)
+        queue = entries
+        originalOrder = entries
+        currentIndex = 0
+        mirror.update(entries.map(\.item), repeatMode: .off)
+        start(entries[0])
+    }
+
+    /// What follows the control app's song (nil: nothing).
+    func receiverSetNext(_ track: ReceiverTrack?) {
+        guard receiverSession != nil, let playing = current, playing.received else { return }
+        queue = [playing] + [track].compactMap { $0 }.map(Self.entry)
+        originalOrder = queue
+        currentIndex = 0
+        syncMirror()
+    }
+
+    func receiverResume() {
+        guard receiverSession != nil, state == .paused else { return }
+        request(.playing)
+        engine.resume()
+    }
+
+    /// The receiver refused what a control app sent (an address it won't fetch, a song that isn't music): the listener sees why.
+    func receiverRefused(_ message: String) { lastError = message }
+
+    /// The control app pressed Stop: its songs go, and the listener's queue is back as it was, stopped at its song.
+    func receiverStop() { endReceiverSession() }
+
+    /// A picture for a control app's song arrived (kept in memory only): the song shows it from now on.
+    func receiverArtwork(_ key: String, for id: UUID) {
+        guard receiverSession != nil, let i = queue.firstIndex(where: { $0.id == id && $0.received }) else { return }
+        var track = queue[i].track
+        track.artworkKey = key
+        queue[i] = queue[i].replacing(track, item: queue[i].item)
+        originalOrder = queue
+        if i == currentIndex { updateNowPlayingInfo() }
+    }
+
+    /// QA only (`-VespertineReceiverDemo`, see DeveloperHooks): how a control app's session looks, without a sound. `songs` stand
+    /// in for what the app sent and `kept` for the listener's own queue. Nothing is fetched or played and the engine isn't
+    /// touched; `poll` leaves what is shown alone until the app quits.
+    func showReceiverDemo(from app: ReceiverControlApp, songs: [Track], kept: [Track], artworkKey: String?) {
+        guard !songs.isEmpty else { return }
+        let own = entries(kept)
+        receiverSession = ReceiverSession(app: app, queue: own, originalOrder: own, currentIndex: own.isEmpty ? nil : 0, position: 0)
+        let sent = songs.prefix(2).map { song -> QueueEntry in
+            let id = UUID()
+            var entry = QueueEntry(item: PlayableItem(id: id, url: ReceiverStreams.itemURL(id), cacheKey: ReceiverStreams.cacheKey(id)),
+                                   track: .transient(location: ReceiverStreams.itemURL(id).absoluteString, title: song.title, artist: song.displayArtist,
+                                                     album: song.displayAlbum, duration: song.duration, artworkKey: artworkKey))
+            entry.received = true
+            return entry
+        }
+        queue = sent
+        originalOrder = sent
+        currentIndex = 0
+        receiverDemo = true
+        state = .playing
+        duration = sent[0].track.duration
+        position = min(71, duration / 3)
+    }
+
+    /// The control app's last song ended (or failed): the session waits a little for the next one, then the listener's queue returns.
+    private func receiverSongsEnded() {
+        guard receiverSession != nil, receiverLinger == nil else { return }
+        receiverEvents?(.ended)
+        let wait = receiverLingerTime
+        receiverLinger = Task { [weak self] in
+            try? await Task.sleep(for: wait)
+            guard !Task.isCancelled, let self else { return }
+            self.receiverLinger = nil
+            self.endReceiverSession()
+        }
+    }
+
+    /// Ends a control app's session, if there is one: the listener's queue is back as it was, at its song, not playing. `event`:
+    /// what the control app is told. `stopping`: off when something of the listener's is about to play in its place.
+    func endReceiverSession(telling event: ReceiverPlayerEvent? = nil, stopping: Bool = true) {
+        guard let session = receiverSession else { return }
+        receiverLinger?.cancel()
+        receiverLinger = nil
+        receiverSession = nil
+        if stopping {
+            stop()
+            state = .stopped
+        }
+        queue = session.queue
+        originalOrder = session.originalOrder
+        currentIndex = session.currentIndex
+        playedToEnd = false
+        failedSinceStart = false
+        signalPath = nil
+        if let current, session.position > 1 {
+            resumeAt = (current.id, session.position)
+            position = session.position
+            duration = current.track.duration
+        } else {
+            resumeAt = nil
+            position = 0
+            duration = current?.track.duration ?? 0
+        }
+        syncMirror()
+        updateNowPlayingInfo()
+        if let event { receiverEvents?(event) }
+    }
+
+    /// While a control app plays, the listener's own queue is the one kept aside: a change to it is made there, and nothing that
+    /// is playing is touched. False when no control app plays (the caller then changes `queue` itself).
+    private func onKeptQueue(_ change: () -> Void) -> Bool {
+        guard var session = receiverSession, !editingKeptQueue else { return false }
+        let playing = (queue, originalOrder, currentIndex)
+        (queue, originalOrder, currentIndex) = (session.queue, session.originalOrder, session.currentIndex)
+        editingKeptQueue = true
+        change()
+        editingKeptQueue = false
+        (session.queue, session.originalOrder, session.currentIndex) = (queue, originalOrder, currentIndex)
+        (queue, originalOrder, currentIndex) = playing
+        receiverSession = session
+        return true
+    }
+
+    /// Songs added while a control app plays and the listener had no queue: they wait as the listener's queue.
+    private func beginKeptQueue(_ entries: [QueueEntry]) {
+        guard !entries.isEmpty else { return }
+        queue = entries
+        originalOrder = entries
+        currentIndex = 0
+    }
+
     // MARK: Transport
 
     /// The song you asked for, until the engine reports it playing. Meanwhile the engine still describes the
@@ -616,6 +840,7 @@ final class PlayerController {
     private func start(_ entry: QueueEntry, at seconds: TimeInterval = 0) {
         if holdForMissingRenderer(entry) { return }
         requested = entry.id
+        resumeAt = nil
         requestedState = nil
         seekRestart = nil
         requestedPosition = nil
@@ -656,7 +881,12 @@ final class PlayerController {
         case .stopped:
             // After the queue played to its end, Play starts it from the first song, as Apple Music does.
             if playedToEnd, currentIndex == queue.count - 1, let first = queue.first { currentIndex = 0; start(first) }
-            else if let current { start(current) }
+            else if let current {
+                // After a control app's session, the listener's song carries on from where it was.
+                let resume = resumeAt?.id == current.id ? resumeAt?.seconds : nil
+                start(current)
+                if let resume, renderer == nil { seek(to: resume) }
+            }
             else if let first = queue.first { currentIndex = 0; start(first) }
         }
     }
@@ -671,13 +901,14 @@ final class PlayerController {
     private func request(_ target: PlaybackState) {
         requestedState = (target, state, .now)
         state = target
+        if receiverSession != nil { receiverEvents?(target == .paused ? .paused : .resumed) }
         updateNowPlayingInfo()
     }
 
     func next() {
         guard let i = currentIndex else { return }
         if i + 1 < queue.count { currentIndex = i + 1; start(queue[i + 1]) }
-        else if repeatMode == .all, let first = queue.first { currentIndex = 0; start(first) }
+        else if repeatMode == .all, receiverSession == nil, let first = queue.first { currentIndex = 0; start(first) }
     }
 
     func previous() {
@@ -719,6 +950,7 @@ final class PlayerController {
             if let requested, requested != item.id { return }
             let fresh = requested != nil   // the song just chosen: a new play, even if it was seeked while opening
             requested = nil
+            if receiverSession != nil { receiverEvents?(.started(item.id)) }
             playedToEnd = false
             failedSinceStart = false
             if let i = queue.firstIndex(where: { $0.id == item.id }) { currentIndex = i }
@@ -736,18 +968,27 @@ final class PlayerController {
             listenedEntry = item.id
             prefetchNetworkTracks()
             updateNowPlayingInfo()
-            if settings.scrobble, let track = current?.track {
+            if settings.scrobble, let entry = current, !entry.received {
+                let track = entry.track
                 Task { try? await ListenBrainzClient.shared.submit(track, kind: .playingNow) }
             }
         case .queueEnded:
             playedToEnd = !failedSinceStart
             seekRestart = nil
             updateNowPlayingInfo()
+            receiverSongsEnded()
         case .failed(let item, let message):
             if let requested, let item, requested != item.id { return }   // about a song skipped past
             requested = nil
             failedSinceStart = true
-            let track = queue.first { $0.id == item?.id }?.track ?? current?.track
+            let failed = queue.first { $0.id == item?.id } ?? current
+            if receiverSession != nil, failed?.received == true {
+                // A control app's song: there is no file of the listener's to look for. The control app is told why, too.
+                lastError = message
+                receiverEvents?(.failed(item?.id, message))
+                break
+            }
+            let track = failed?.track
             if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
                 lastError = String(localized: "“\(track.title)” is on a network share that isn’t connected. Vespertine reconnects automatically when the server is reachable.")
             } else if let track {
@@ -852,6 +1093,7 @@ final class PlayerController {
     }
 
     func poll(_ snapshot: EngineSnapshot? = nil) {
+        if receiverDemo { return }
         let snap = snapshot ?? renderer?.snapshot ?? engine.snapshot
         if let requestedState, snap.state != requestedState.from
             || requestedState.state == .playing && Date().timeIntervalSince(requestedState.at) > 30 {
@@ -859,6 +1101,13 @@ final class PlayerController {
         }
         let stateChanged = requestedState == nil && state != snap.state
         if requestedState == nil { state = snap.state }
+        if stateChanged, receiverSession != nil, requested == nil {
+            switch snap.state {
+            case .paused: receiverEvents?(.paused)
+            case .playing: receiverEvents?(.resumed)
+            case .stopped: receiverSongsEnded()
+            }
+        }
         // Until the engine reports the song you asked for, what it says is about the previous one.
         if let requested {
             if snap.item?.id == requested || snap.state == .stopped && snap.lastError != nil { self.requested = nil }
@@ -867,7 +1116,7 @@ final class PlayerController {
             // A seek lands when the engine's position gets there (or after a few seconds, whatever it says).
             if abs(snap.position - target.seconds) < 1.5 || Date().timeIntervalSince(target.at) > 4 { requestedPosition = nil }
         }
-        if requested == nil, requestedPosition == nil {
+        if requested == nil, requestedPosition == nil, !(resumeAt != nil && snap.state == .stopped) {
             if abs(position - snap.position) > 0.02 { position = snap.position }
             if duration != snap.duration, snap.duration > 0 || snap.item == nil { duration = snap.duration }
         }
@@ -929,7 +1178,7 @@ final class PlayerController {
             historyEntry = entry.id
             if let id = entry.track.id { library.recordHistory(id) }
         }
-        if state == .playing, let entry = current, listenedEntry == entry.id, scrobbledEntry != entry.id, duration > 30,
+        if state == .playing, let entry = current, !entry.received, listenedEntry == entry.id, scrobbledEntry != entry.id, duration > 30,
            listened >= min(duration / 2, 240) {
             scrobbledEntry = entry.id
             if let id = entry.track.id { library.markPlayed(id) }
@@ -950,7 +1199,9 @@ final class PlayerController {
     /// What the Discord status shows now: the song while it plays (not while paused, buffering from a share, or
     /// waiting for the output), with its start set back by the position so Discord's progress bar is right.
     var discordNowPlaying: DiscordNowPlaying? {
-        guard state == .playing, !buffering, waitingForDevice == nil, let track = current?.track else { return nil }
+        // A control app's song is the control app's to announce: nothing about it is looked up or sent anywhere.
+        guard state == .playing, !buffering, waitingForDevice == nil, let entry = current, !entry.received else { return nil }
+        let track = entry.track
         // Until the engine reports this song, its signal path is the previous one's.
         let path = requested == nil ? signalPath : nil
         let length = duration > 0 ? duration : track.duration
@@ -1016,7 +1267,7 @@ final class PlayerController {
             MPNowPlayingInfoPropertyElapsedPlaybackTime: position,
             MPNowPlayingInfoPropertyPlaybackRate: state == .playing ? 1.0 : 0.0,
         ]
-        if let key = track.artworkKey ?? library.album(key: track.albumKey)?.artworkKey,
+        if let key = track.isTransient ? track.artworkKey : track.artworkKey ?? library.album(key: track.albumKey)?.artworkKey,
            let image = ArtworkCache.shared.cached(key, size: 600) ?? ArtworkCache.shared.cached(key, size: 160) {
             info[MPMediaItemPropertyArtwork] = Self.artwork(image)
         }

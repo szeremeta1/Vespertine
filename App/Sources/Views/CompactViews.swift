@@ -244,6 +244,7 @@ struct PlaybackSettings: View {
             SpeakerGroupsSettingsSection()
             RendererSettingsSection()
             AirPlaySettingsSection()
+            ReceiverSettingsSection()
             SystemOutputSettingsSection()
             Section("Surround formats") {
                 Picker("Dolby Atmos", selection: $s.atmosBySystem) {
