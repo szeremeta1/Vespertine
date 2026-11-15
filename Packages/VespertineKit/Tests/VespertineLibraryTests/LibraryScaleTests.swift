@@ -7,6 +7,7 @@
 
 import Foundation
 import GRDB
+import SQLite3
 import Testing
 @testable import VespertineLibrary
 
