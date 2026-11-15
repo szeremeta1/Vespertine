@@ -134,30 +134,97 @@ struct PlayPauseStateTests {
         await expectPlaying(rig, "resumed")
     }
 
+    /// What the look-ahead run saw, judged afterwards.
+    private struct LookAheadRun: Sendable {
+        var scene = ""
+        var whileFetched: Observation?
+        var paused: Observation?
+        var pausedAt = 0.0, positionAfter = 0.0
+        /// Seconds of sound that came out between the two readings of the playhead.
+        var heardSince = 0.0
+        var resumed: Observation?
+        var endedPaused: Observation?
+        var endedPlaying: Observation?
+    }
+
     @Test("While the next song is fetched from a slow share the playing one still shows its playhead, pauses, resumes and loses nothing")
     func lookAheadWait() async throws {
         let rig = try PlayPauseRig(nextBytesPerSecond: 0.7 * 1_048_576)
         let first = rig.item(), next = rig.nextItem()
         rig.engine.nextItemProvider = { $0.id == first.id ? next : nil }
-        rig.engine.play(first)
-        await expectPlaying(rig, "started")
-        await rig.sleep(ms: 1500)      // the decoder has the whole song, and is now waiting for the next one
-        // What plays now is the buffered song: the playhead moves with it, and nothing says "buffering" (it is not).
-        let o = await rig.observe(1.0)
-        #expect(o.state == .playing && o.audible && o.moving && !o.buffering, "while the next song is fetched: \(o)")
-        rig.engine.pause()
-        await rig.sleep(ms: 500)
-        let pausedAt = rig.engine.snapshot.position
-        await expectPaused(rig, "paused during the fetch")
-        rig.engine.resume()
-        await rig.sleep(ms: 300)
-        let after = await rig.observe(1.0)
-        #expect(after.state == .playing && after.audible && after.moving, "resumed during the fetch: \(after)")
-        #expect(rig.engine.snapshot.position - pausedAt < 2.5, "the paused song lost its place: paused at \(pausedAt), now \(rig.engine.snapshot.position)")
-        rig.engine.pause(); await rig.sleep(ms: 60); rig.engine.resume(); await rig.sleep(ms: 60); rig.engine.pause()
-        await expectPaused(rig, "quick presses during the fetch ending on pause")
-        rig.engine.resume(); await rig.sleep(ms: 80); rig.engine.pause(); await rig.sleep(ms: 80); rig.engine.resume()
-        await expectPlaying(rig, "quick presses during the fetch ending on play")
+        // The scene is set with the output's clock held and moved by the test, so it does not depend on how fast the machine
+        // runs: the song is longer than the output's buffer, so the decoder has all of it (and turns to the next one) only
+        // once some of it has played, and that much is played a quarter second at a time, each once it is there. The scene
+        // is the next song's fetch under way, and from then on the share sends nothing more until the test is over: the
+        // fetch lasts as long as the presses do, however long the machine takes over them. (Left to real time, a test task
+        // resumed late found the first song played out, or the next one already fetched.) The presses then come from a
+        // thread of its own, as in `pauseDuringBuffering`.
+        rig.holdOutput(true)
+        let step = Int(PlayPauseRig.rate / 4)
+        let run = await rig.onOwnThread { rig -> LookAheadRun in
+            defer { rig.nextShare.stall(false) }
+            var run = LookAheadRun()
+            func readable() -> Int { rig.engine.currentSessionForTesting?.readableFrames ?? 0 }
+            func fetching() -> Bool { rig.nextShare.bytesAsked > 0 }
+            func note() -> String {
+                let seen = rig.engine.snapshot
+                return "\(seen.state), buffering \(seen.isBuffering), at \(seen.position) s, \(readable()) frames to play, \(rig.nextShare.bytesAsked) bytes of the next song asked for, \(rig.elapsed) s in"
+            }
+            rig.engine.play(first)
+            guard rig.waitBlocking(timeout: 120, { $0.state == .playing && readable() >= step }) else {
+                run.scene = "the song never played: \(note())"
+                return run
+            }
+            // Up to eight seconds of the song (it is 24 s long, the buffer holds under 22): the decoder reaches its end.
+            for _ in 0..<32 where !fetching() {
+                guard rig.waitBlocking(timeout: 120, { _ in fetching() || readable() >= step }) else { break }
+                if !fetching() { rig.outputs.withLock { $0.last }?.advance(seconds: 0.25) }
+            }
+            guard rig.waitBlocking(timeout: 120, { _ in fetching() }) else {
+                run.scene = "the next song was never asked for: \(note())"
+                return run
+            }
+            rig.nextShare.stall(true)
+            rig.holdOutput(false)
+            guard rig.waitBlocking(timeout: 120, { $0.state == .playing && !$0.isBuffering }) else {
+                run.scene = "the song was not playing when its clock was let go: \(note())"
+                return run
+            }
+
+            // What plays now is the buffered song: the playhead moves with it, and nothing says "buffering" (it is not).
+            run.whileFetched = rig.observeBlocking(1.0)
+            rig.engine.pause()
+            Thread.sleep(forTimeInterval: 0.4)                // the pause fades out, then the output stops
+            run.paused = rig.observeBlocking(0.6)
+            // The place the pause left the song at, and the sound that has come out so far: what the playhead may move by
+            // after this is what is heard after this, whatever the machine does between the two readings.
+            run.pausedAt = rig.engine.snapshot.position
+            let heard = rig.audibleFrames
+            rig.engine.resume()
+            Thread.sleep(forTimeInterval: 0.3)
+            run.resumed = rig.observeBlocking(1.0)
+            run.positionAfter = rig.engine.snapshot.position
+            run.heardSince = Double(rig.audibleFrames - heard) / PlayPauseRig.rate
+
+            rig.engine.pause(); Thread.sleep(forTimeInterval: 0.06); rig.engine.resume(); Thread.sleep(forTimeInterval: 0.06); rig.engine.pause()
+            Thread.sleep(forTimeInterval: 0.4)
+            run.endedPaused = rig.observeBlocking(0.6)
+            rig.engine.resume(); Thread.sleep(forTimeInterval: 0.08); rig.engine.pause(); Thread.sleep(forTimeInterval: 0.08); rig.engine.resume()
+            _ = rig.waitBlocking(timeout: 30) { $0.state == .playing && !$0.isBuffering }
+            run.endedPlaying = rig.observeBlocking(0.8)
+            return run
+        }
+        #expect(run.scene == "", "\(run.scene)")
+        guard run.scene == "" else { return }
+        func paused(_ o: Observation?) -> Bool { o.map { $0.state == .paused && !$0.audible && !$0.moving && !$0.buffering } == true }
+        func playing(_ o: Observation?) -> Bool { o.map { $0.state == .playing && $0.audible && $0.moving } == true }
+        #expect(playing(run.whileFetched) && run.whileFetched?.buffering == false, "while the next song is fetched: \(String(describing: run.whileFetched))")
+        #expect(paused(run.paused), "paused during the fetch: \(String(describing: run.paused))")
+        #expect(playing(run.resumed), "resumed during the fetch: \(String(describing: run.resumed))")
+        #expect(run.positionAfter - run.pausedAt < run.heardSince + 0.75,
+                "the paused song lost its place: paused at \(run.pausedAt), at \(run.positionAfter) after \(run.heardSince) s of sound")
+        #expect(paused(run.endedPaused), "quick presses during the fetch ending on pause: \(String(describing: run.endedPaused))")
+        #expect(playing(run.endedPlaying), "quick presses during the fetch ending on play: \(String(describing: run.endedPlaying))")
     }
 
     @Test("Random presses of play and pause against a slow share and a slow output settle on the last one")
