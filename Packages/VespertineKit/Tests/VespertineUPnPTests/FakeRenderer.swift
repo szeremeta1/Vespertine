@@ -67,6 +67,8 @@ final class FakeRenderer: @unchecked Sendable {
     func stopOnDevice() { lock.withLock { state = "Stopped" } }
     /// The next call of `action` fails with UPnP error `code`.
     func fail(_ action: String, code: Int, times: Int = 1) { lock.withLock { failures[action] = (code, times) } }
+    /// `action` answers again.
+    func succeed(_ action: String) { lock.withLock { failures[action] = nil } }
 
     /// The bytes fetched from `uri` once the fetch is complete (waits up to 10 s).
     func fetched(_ uri: String) async -> Data? {

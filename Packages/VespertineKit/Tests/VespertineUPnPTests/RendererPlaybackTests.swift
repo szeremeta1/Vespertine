@@ -55,6 +55,13 @@ final class EventLog: @unchecked Sendable {
     }
 }
 
+/// A clock that stands still until a test moves it.
+final class SteppedClock: @unchecked Sendable {
+    private let time = Locked(Date(timeIntervalSinceReferenceDate: 0))
+    var now: Date { time.withLock { $0 } }
+    func advance(by seconds: TimeInterval) { time.withLock { $0 += seconds } }
+}
+
 struct Harness {
     let fake: FakeRenderer
     let media: MediaServer
@@ -62,14 +69,17 @@ struct Harness {
     let events: EventLog
     let queue: [PlayableItem]
 
-    static func make(kind: FakeRenderer.Kind, files: Int = 3, startTimeout: TimeInterval = 15, lostAfter: TimeInterval = 0.3) async throws -> Harness {
+    /// `pollInterval` 0 with a `clock`: the test steps the polls (`settleForTests`) and the time itself.
+    static func make(kind: FakeRenderer.Kind, files: Int = 3, startTimeout: TimeInterval = 15, lostAfter: TimeInterval = 0.3,
+                     pollInterval: TimeInterval = 0.05, clock: SteppedClock? = nil) async throws -> Harness {
         let fake = try await FakeRenderer(kind: kind)
         let media = MediaServer()
         try await media.start()
         let device = try await RendererDevice.load(location: fake.location)
         let queue = try (0..<files).map { PlayableItem(url: try makeWAV(seed: $0 + 1)) }
-        let playback = RendererPlayback(renderer: device, transport: try device.makeTransport(), media: media, pollInterval: 0.05,
-                                        startTimeout: startTimeout, lostAfter: lostAfter)
+        let now: @Sendable () -> Date = if let clock { { clock.now } } else { { Date() } }
+        let playback = RendererPlayback(renderer: device, transport: try device.makeTransport(), media: media, pollInterval: pollInterval,
+                                        startTimeout: startTimeout, lostAfter: lostAfter, now: now)
         let items = Locked(queue)
         playback.nextItemProvider = { finished in
             let q = items.withLock { $0 }
@@ -121,7 +131,7 @@ struct RendererPlaybackTests {
         #expect(await h.events.wait(for: "started \(h.queue[1].url.lastPathComponent)"))
         let second = try #require(h.fake.currentURI)
         #expect(await h.fake.fetched(second) == (try Data(contentsOf: h.queue[1].url)))
-        try await Task.sleep(for: .milliseconds(200))
+        await h.playback.settleForTests()
         #expect(h.fake.playlistURIs.count == 2)
         #expect(h.fake.playlistURIs.first == second)
         // The last song ends: the queue has ended.
@@ -169,7 +179,7 @@ struct RendererPlaybackTests {
         h.fake.fail("SetNextAVTransportURI", code: 716, times: 100)
         h.playback.play(h.queue[0])
         #expect(await h.events.wait(for: "started \(h.queue[0].url.lastPathComponent)"))
-        try await Task.sleep(for: .milliseconds(200))
+        await h.playback.settleForTests()
         #expect(h.playback.snapshot.state == .playing)
         #expect(!h.events.all.contains { $0.hasPrefix("failed") })
         try await h.playToEnd()
@@ -178,18 +188,57 @@ struct RendererPlaybackTests {
         #expect(await h.fake.fetched(uri) == (try Data(contentsOf: h.queue[1].url)))
     }
 
+    // The two tests below ask the renderer for its state themselves and move their own clock: what they judge is the
+    // order of things, which a slow machine doesn't change.
     @Test("A moment without an answer isn't a lost renderer: the song is kept and plays on")
     func briefSilence() async throws {
-        let h = try await Harness.make(kind: .openHome, lostAfter: 30)
+        let clock = SteppedClock()
+        let h = try await Harness.make(kind: .openHome, lostAfter: 30, pollInterval: 0, clock: clock)
         defer { h.close() }
         h.playback.play(h.queue[0])
-        #expect(await h.events.wait(for: "started"))
-        h.fake.fail("TransportState", code: 501, times: 6)
-        try await Task.sleep(for: .milliseconds(800))
-        #expect(!h.events.all.contains { $0.hasPrefix("lost") })
+        await h.playback.settleForTests()
+        #expect(h.playback.isEngaged)
+        #expect(h.playback.snapshot.state == .playing)
+        h.fake.fail("TransportState", code: 501, times: .max)
+        for _ in 0..<6 {
+            clock.advance(by: 1)
+            await h.playback.settleForTests()
+            // Not answering, and not given up on.
+            #expect(!h.playback.isEngaged)
+            #expect(h.playback.snapshot.state == .playing)
+            #expect(h.playback.snapshot.item?.id == h.queue[0].id)
+        }
+        // It answers again.
+        h.fake.succeed("TransportState")
+        clock.advance(by: 1)
+        await h.playback.settleForTests()
+        #expect(h.playback.isEngaged)
         #expect(h.playback.snapshot.state == .playing)
         #expect(h.playback.snapshot.item?.id == h.queue[0].id)
+        #expect(!h.events.all.contains { $0.hasPrefix("lost") })
+    }
+
+    @Test("Without an answer for as long as it is given, the renderer is lost, and not before")
+    func lostByTheClock() async throws {
+        let clock = SteppedClock()
+        let h = try await Harness.make(kind: .openHome, lostAfter: 30, pollInterval: 0, clock: clock)
+        defer { h.close() }
+        h.playback.play(h.queue[0])
+        await h.playback.settleForTests()
         #expect(h.playback.isEngaged)
+        h.fake.fail("TransportState", code: 501, times: .max)
+        // Any number of failed polls in no time at all isn't a lost renderer.
+        for _ in 0..<5 { await h.playback.settleForTests() }
+        #expect(h.playback.snapshot.state == .playing)
+        clock.advance(by: 29)
+        await h.playback.settleForTests()
+        #expect(h.playback.snapshot.state == .playing)
+        #expect(h.playback.snapshot.item?.id == h.queue[0].id)
+        clock.advance(by: 1)
+        await h.playback.settleForTests()
+        #expect(h.playback.snapshot.state == .stopped)
+        #expect(!h.playback.isEngaged)
+        #expect(await h.events.wait(for: "lost Fake Renderer"))
     }
 
     @Test("A paused song stays paused when its stream is made again (a change of settings)")
@@ -199,12 +248,12 @@ struct RendererPlaybackTests {
         h.playback.play(h.queue[0])
         #expect(await h.events.wait(for: "started"))
         h.playback.pause()
-        try await Task.sleep(for: .milliseconds(200))
+        await h.playback.settleForTests()
         #expect(h.fake.transportState == "Paused")
         // WAV is passed through here; digital volume would need a processed stream, which this harness has no maker for,
         // so the restart is asked for directly, as a seek in a processed stream does.
         h.playback.restartForTests(at: 10)
-        try await Task.sleep(for: .milliseconds(500))
+        await h.playback.settleForTests()
         #expect(h.fake.transportState == "Paused")
         #expect(h.playback.snapshot.state == .paused)
         #expect(!h.playback.wantsPlaying)
@@ -217,14 +266,14 @@ struct RendererPlaybackTests {
         h.playback.play(h.queue[0])
         #expect(await h.events.wait(for: "started"))
         h.playback.pause()
-        try await Task.sleep(for: .milliseconds(200))
+        await h.playback.settleForTests()
         #expect(h.fake.transportState == "Paused")
         #expect(h.playback.snapshot.state == .paused)
         h.playback.resume()
-        try await Task.sleep(for: .milliseconds(200))
+        await h.playback.settleForTests()
         #expect(h.fake.transportState == "Playing")
         h.playback.seek(to: 30)
-        try await Task.sleep(for: .milliseconds(200))
+        await h.playback.settleForTests()
         #expect(h.fake.calls.contains { $0.action == "SeekSecondAbsolute" && $0.arguments["Value"] == "30" })
         #expect(abs(h.playback.snapshot.position - 30) < 2)
     }
@@ -244,7 +293,7 @@ struct RendererPlaybackTests {
             return q[i + 1]
         }
         h.playback.queueChanged()
-        try await Task.sleep(for: .milliseconds(300))
+        await h.playback.settleForTests()
         #expect(h.fake.currentURI == current)
         #expect(h.fake.playlistURIs.count == 2)
         #expect(h.fake.playlistURIs.last != before.last)
@@ -347,7 +396,7 @@ struct RendererTransientTests {
         #expect(await h.events.wait(for: "started"))
         h.fake.fail("Pause", code: 701)
         h.playback.pause()
-        try await Task.sleep(for: .milliseconds(800))
+        await h.playback.settleForTests()
         #expect(h.fake.transportState == "Paused")
         #expect(!h.events.all.contains { $0.hasPrefix("failed") })
     }
@@ -363,7 +412,7 @@ struct RendererTransientTests {
         h.playback.seek(to: 40)
         #expect(await h.events.wait(for: "notice"))
         #expect(!h.events.all.contains { $0.hasPrefix("failed") })
-        try await Task.sleep(for: .milliseconds(200))
+        await h.playback.settleForTests()
         #expect(h.fake.transportState == "Playing")
         #expect(h.fake.currentURI == uri)
         #expect(h.playback.snapshot.state == .playing)
@@ -378,7 +427,7 @@ struct RendererTransientTests {
         h.fake.fail("Pause", code: 701, times: 2)
         h.playback.pause()
         #expect(await h.events.wait(for: "notice"))
-        try await Task.sleep(for: .milliseconds(300))
+        await h.playback.settleForTests()
         #expect(h.fake.transportState == "Playing")
         #expect(h.playback.snapshot.state == .playing)
         #expect(h.playback.wantsPlaying)
@@ -391,11 +440,11 @@ struct RendererTransientTests {
         h.playback.play(h.queue[0])
         #expect(await h.events.wait(for: "started"))
         h.playback.pause()
-        try await Task.sleep(for: .milliseconds(300))
+        await h.playback.settleForTests()
         h.fake.fail("Play", code: 701, times: 2)
         h.playback.resume()
         #expect(await h.events.wait(for: "notice"))
-        try await Task.sleep(for: .milliseconds(300))
+        await h.playback.settleForTests()
         #expect(h.fake.transportState == "Paused")
         #expect(h.playback.snapshot.state == .paused)
         #expect(!h.playback.wantsPlaying)
