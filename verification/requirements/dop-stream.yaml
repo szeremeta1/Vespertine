@@ -101,9 +101,9 @@
   source:
     doc: "Vespertine docs/FEATURES.md"
     version: "98cad1a"
-    section: "line 89"
+    section: "line 95"
     availability: repository
-    cache: { repo: docs/FEATURES.md, lines: 89, from: "EQ does not process DoP", to: "EQ does not process DoP" }
+    cache: { repo: docs/FEATURES.md, lines: 95, from: "EQ does not process DoP", to: "EQ does not process DoP" }
   requirement: "A software gain other than 1.0, or the equalizer turned on, leaves DoP output unchanged: the same frames come out as with unity gain and no equalizer."
   quote_sha256: 572ce6e690e171601522597920d2482669acfbb4f5482d27c0a6bf75d3bf0813
   kind: vespertine-rule

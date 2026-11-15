@@ -109,6 +109,8 @@ public struct EngineSettings: Sendable, Equatable {
     public var preferHardwareVolume = false
     /// Per-output digital volume (dB) by UID, overriding `digitalVolumeDB` for that output; a nil value means none there.
     public var deviceDigitalVolumes: [String: Double?] = [:]
+    /// Left/right balance per output by UID: -1 (left) ... 1 (right); none stored = centered. See `balance(for:)`.
+    public var deviceBalances: [String: Double] = [:]
     /// Spatial Audio for multichannel music, per device UID. Unset: head tracked on AirPods and Beats, off elsewhere.
     public var spatialModes: [String: SpatialMode] = [:]
     /// Spatialize stereo, per device UID: stereo and mono upmixed to 5.1 for Spatial Audio or multichannel speakers. Off
@@ -1070,7 +1072,9 @@ public final class PlaybackEngine: @unchecked Sendable {
         // A 16-bit word has no room for gain either: digital volume or an equalizer reopens it at the device's full depth.
         let leavesInteger = (session?.applied.integerMode == true || session?.plan.sixteenBit == .requested)
             && (new.digitalVolume(for: sessionDevice) != nil || new.equalizer(for: sessionDevice) != nil
-                || new.roomCorrection(for: sessionDevice) != nil)
+                || new.roomCorrection(for: sessionDevice) != nil
+                // Balance the same: moved off center mid-song, an integer or 16-bit output reopens on the path that can apply it.
+                || (session.map { new.appliedBalance(for: sessionDevice, plan: $0.plan) != nil } ?? false))
         // Room render belongs to the decoder and queued audio. Rebuild it for the output actually playing (or the
         // parked choice), including on/off; editing another group must not interrupt this song.
         let activeUID = sessionDevice?.uid ?? old.deviceUID
@@ -1496,7 +1500,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                                       dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
             plan.integerSamples = wantsIntegerMode(plan, source: probed, item: item, device: device)
             plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.planningCapabilities,
-                                                 eligible: mayMatchSixteenBit(item: item, device: device))
+                                                 eligible: mayMatchSixteenBit(plan, item: item, device: device))
         }
         if session == nil || !GroupOutput.isSameOutput(sessionDevice, device) || !(session!.plan.isDeviceCompatible(with: plan)) {
             do { try replaceSession(device: device, plan: plan) } catch {
@@ -1664,6 +1668,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                               bypassedEqualizer: plan.mode == .pcm ? nil : settings.equalizer(for: device)?.name,
                               roomCorrection: room?.name,
                               bypassedRoomCorrection: room == nil ? settings.roomCorrection(for: device)?.name : nil)
+        setBalance(on: &path, device: device, integer: session.applied.integerMode)
         path.roomFiltersSkipped = room?.filtersTooLong(sampleRate: session.applied.sampleRate, channelCount: plan.channels) ?? false
         if let playing = routingGroup(for: device) ?? session.groupResources?.group {
             // A speaker group: the DACs that carry this song, each as read back from it, and what is done to the samples.
@@ -1680,12 +1685,24 @@ public final class PlaybackEngine: @unchecked Sendable {
         return path
     }
 
+    /// What the signal path says about balance: the value applied, or why the one chosen for this output isn't.
+    private func setBalance(on path: inout SignalPath, device: OutputDevice?, integer: Bool) {
+        let applied = integer ? nil : settings.appliedBalance(for: device, plan: path.plan)
+        path.balance = applied ?? 0
+        path.bypassedBalance = settings.balance(for: device) == nil ? nil : settings.balanceBypass(for: device, plan: path.plan)
+    }
+
     private func applyGain() {
         let digital = settings.digitalVolume(for: sessionDevice)
         atmos?.setVolume(Float(digital.map { pow(10, $0 / 20) } ?? 1))
         guard let session else { return }
         let db = session.plan.isPassthrough ? 0 : (digital ?? 0)
         nrt_context_set_gain(session.context, db == 0 ? 1.0 : pow(10, db / 20), UInt32(session.applied.physicalBitDepth))
+        // Balance: stereo PCM Vespertine renders, and nothing else (DoP, bitstream and integer words are never scaled;
+        // Spatial Audio places the channels itself). A change is ramped over about 10 ms.
+        let balance = session.applied.integerMode ? nil : settings.appliedBalance(for: sessionDevice, plan: session.plan)
+        let sides = BalanceLaw.gains(balance ?? 0)
+        nrt_context_set_balance(session.context, sides.left, sides.right, UInt32(max(session.applied.sampleRate * 0.010, 1)))
         // The equalizer runs only on PCM Vespertine renders: never on DoP or bitstream frames, or integer samples.
         let eq = session.plan.isPassthrough || session.applied.integerMode ? nil : settings.equalizer(for: sessionDevice)
         let sections = eq?.sections(sampleRate: session.applied.sampleRate) ?? []
@@ -1882,16 +1899,16 @@ public final class PlaybackEngine: @unchecked Sendable {
         return settings.integerMode && !settings.transitions.avoidsUnmixableModes && settings.exclusive && !device.alwaysShared && plan.mode == .pcm && !plan.resamples && plan.spatial == .off
             && plan.channels == source.channels && source.encoding == .pcm && probed.exactAsIntegers
             && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
-            && settings.roomCorrection(for: device) == nil
+            && settings.roomCorrection(for: device) == nil && settings.appliedBalance(for: device, plan: plan) == nil
             && device.planningCapabilities.physicalFormats.contains { $0.isInteger && !$0.isMixable && $0.bitDepth == 32 }
     }
 
     /// The engine's half of "Match 16-bit sources" (the plan's half is `FormatPlanner.matchSixteenBit`): the setting
     /// is on, the output is held exclusively and isn't the built-in one, and nothing changes the samples.
-    private func mayMatchSixteenBit(item: PlayableItem, device: OutputDevice) -> Bool {
+    private func mayMatchSixteenBit(_ plan: OutputPlan, item: PlayableItem, device: OutputDevice) -> Bool {
         settings.matchSixteenBit && !settings.transitions.avoidsUnmixableModes && settings.exclusive && !device.alwaysShared
             && settings.digitalVolume(for: device) == nil && (item.replayGainDB ?? 0) == 0 && settings.equalizer(for: device) == nil
-            && settings.roomCorrection(for: device) == nil
+            && settings.roomCorrection(for: device) == nil && settings.appliedBalance(for: device, plan: plan) == nil
     }
 
     /// The item playing (or paused), whichever path plays it.
@@ -2233,7 +2250,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                                               dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
                 plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.planningCapabilities,
-                                                     eligible: mayMatchSixteenBit(item: next, device: device))
+                                                     eligible: mayMatchSixteenBit(plan, item: next, device: device))
                 if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
                 formatB = .plan(plan)
                 planB = plan
@@ -2324,6 +2341,7 @@ public final class PlaybackEngine: @unchecked Sendable {
     private func mixDitherBits(_ device: OutputDevice, session: OutputSession) -> Int {
         session.applied.physicalIsInteger && settings.digitalVolume(for: device) == nil
             && settings.equalizer(for: device) == nil && settings.roomCorrection(for: device, plan: session.plan) == nil
+            && settings.appliedBalance(for: device, plan: session.plan) == nil
             ? session.applied.physicalBitDepth : 0
     }
 
@@ -2389,7 +2407,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                                           dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
             plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
             plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.planningCapabilities,
-                                                 eligible: mayMatchSixteenBit(item: next, device: device))
+                                                 eligible: mayMatchSixteenBit(plan, item: next, device: device))
             if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
             if !session.plan.isDeviceCompatible(with: plan),
                let resampled = resampledToSession(plan, probed: probed, item: next, device: device, session: session) { plan = resampled }
@@ -2562,7 +2580,7 @@ public final class PlaybackEngine: @unchecked Sendable {
                                               dsdToPCMForTransitions: settings.transitions.avoidsUnmixableModes)
                 plan.integerSamples = wantsIntegerMode(plan, source: probed, item: next, device: device)
                 plan = FormatPlanner.matchSixteenBit(plan, source: probed.format, device: device.planningCapabilities,
-                                                     eligible: mayMatchSixteenBit(item: next, device: device))
+                                                     eligible: mayMatchSixteenBit(plan, item: next, device: device))
                 if let grouped = groupPlan(for: probed, device: device) { plan = grouped }
                 if session.plan.isDeviceCompatible(with: plan) {
                     // Transitions: a gap between the songs is silence written ahead of the next one (DSD silence on
@@ -2782,6 +2800,7 @@ public final class PlaybackEngine: @unchecked Sendable {
         } else if path != nil {
             path?.bypassedEqualizer = settings.equalizer(for: sessionDevice)?.name
         }
+        if path != nil { setBalance(on: &path!, device: sessionDevice, integer: path?.applied.integerMode == true) }
         if let plan = path?.plan {
             let room = path?.applied.integerMode == true ? nil : settings.roomCorrection(for: sessionDevice, plan: plan)
             path?.roomCorrection = room?.name

@@ -42,6 +42,12 @@ Integer mode needs exclusive access and a DAC with a non-mixable 32-bit integer 
 
 Vespertine uses hardware volume where available; optional digital volume and ReplayGain appear in the signal path when they change the samples.
 
+### Balance
+
+Each output has its own left/right balance: the **BAL** chip beside the volume, or Controls › Balance Left, Balance Right and Center Balance (⌃⌘←, ⌃⌘→, ⌃⌘0), in steps of 5. Centered, it does nothing at all: the samples are not touched and a bit-perfect output stays bit-perfect. Off center, the far speaker is turned down in software (the near one is never made louder: half way is -3 dB, all the way is silence), a change is ramped over about 10 ms so it can't click, and the signal path says DIGITAL GAIN and shows the value, because the output is no longer bit-perfect. Integer mode and "Match 16-bit sources" are not used for a stream while its balance is off center.
+
+Balance applies to two-channel PCM that Vespertine renders, DSD converted to PCM included. It is never applied to DoP or a bitstream (scaling would destroy them), with Spatial Audio or Dolby Atmos rendered by macOS, to mono or surround streams, or to speaker groups; there the control is disabled and says why, the value is kept, and it applies again on the next stream that can take it. Network players and AirPlay receivers have no balance control. The Mac's own Balance (System Settings › Sound) is separate, and Vespertine never reads or changes it.
+
 Vespertine remembers the output you chose. If it isn't connected, Settings › Playback decides what happens: play on the best connected output (the default), on the Mac's sound output, or wait for it. The output chip, picker and inspector name the missing device and any stand-in, and playback moves back when it returns, even if macOS gives it a new ID; its own settings come with it. If it disconnects during a song, playback resumes from the same position when it returns. At quit, each device is restored to its earlier rate and depth, or your chosen default. Tracks with the same output format play gaplessly, including CUE-sheet albums.
 
 ## DSD and AirPods Max

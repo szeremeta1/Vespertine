@@ -529,6 +529,7 @@ struct VolumeControl: View {
                 .accessibilityLabel("Volume control in Vespertine")
                 .popover(isPresented: $showOptions, arrowEdge: .top) { options(device) }
             }
+            if let device = model.balanceDevice { BalanceChip(device: device) }
         }
         // Volume Up, Down or Mute on an output with no volume to move: open the note that says where to set one.
         .onChange(of: model.volumeNoteRequests) { showOptions = true }
@@ -542,6 +543,87 @@ struct VolumeControl: View {
         .padding(14)
         .frame(width: 320)
         .environment(model)
+    }
+}
+
+/// Left/right balance for the output playing: a chip beside the volume that opens the slider. Off center it says which
+/// way and how far (in the chip itself, not only by its colour), because a balance that was forgotten sounds like a fault.
+struct BalanceChip: View {
+    @Environment(AppModel.self) private var model
+    let device: OutputDevice
+    @State private var showBalance = false
+
+    var body: some View {
+        let balance = model.settings.balance(for: device.uid)
+        let points = BalanceLaw.points(balance)
+        let applied = points != 0 && model.balanceBypass == nil
+        Button { showBalance.toggle() } label: {
+            HStack(spacing: 3) {
+                // The arrows are the same in every language, and always point at the speaker that is louder.
+                if points < 0 { Text(verbatim: "◀\(-points)").font(Typeface.mono(9.5)).fixedSize() }
+                Text("BAL", comment: "Short label: left/right balance").font(Typeface.mono(9.5)).fixedSize()
+                if points > 0 { Text(verbatim: "\(points)▶").font(Typeface.mono(9.5)).fixedSize() }
+                Image(systemName: "chevron.up").font(.system(size: 7, weight: .semibold))
+            }
+            .foregroundStyle(applied ? Palette.copper : Palette.text3)
+            .environment(\.layoutDirection, .leftToRight)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .help(Text("Balance"))
+        .accessibilityLabel(Text("Balance"))
+        .accessibilityValue(Text(BalanceLaw.caption(balance)))
+        .popover(isPresented: $showBalance, arrowEdge: .top) { BalancePanel(device: device).environment(model) }
+    }
+}
+
+/// The balance slider, its value, Center, and the notes that go with it.
+struct BalancePanel: View {
+    @Environment(AppModel.self) private var model
+    let device: OutputDevice
+
+    var body: some View {
+        let balance = model.settings.balance(for: device.uid)
+        let bypass = model.balanceBypass
+        VStack(alignment: .leading, spacing: 10) {
+            SectionLabel(text: device.name)
+            HStack {
+                Text("Balance").font(Typeface.ui(12))
+                Spacer()
+                Text(BalanceLaw.caption(balance)).font(Typeface.mono(10.5)).foregroundStyle(balance == 0 ? Palette.text3 : Palette.copper)
+            }
+            // Left is the left speaker in every language: this row never mirrors.
+            HStack(spacing: 8) {
+                Text("Left", comment: "Balance slider: the left speaker's end.").font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).accessibilityHidden(true)
+                BrassSlider(value: Binding(get: { (balance + 1) / 2 }, set: { model.setBalance(BalanceLaw.snapped($0 * 2 - 1)) }),
+                            tint: .clear, accessibilityName: String(localized: "Balance"),
+                            accessibilityValueText: { BalanceLaw.caption($0 * 2 - 1) }, accessibilityStep: BalanceLaw.step / 2)
+                    .background(alignment: .center) { Capsule().fill(Palette.text.opacity(0.35)).frame(width: 1.5, height: 9) }
+                    .frame(height: 16)
+                    .simultaneousGesture(TapGesture(count: 2).onEnded { model.setBalance(0) })
+                    .accessibilityHint(Text(bypass?.explanation ?? ""))
+                Text("Right", comment: "Balance slider: the right speaker's end.").font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).accessibilityHidden(true)
+            }
+            .environment(\.layoutDirection, .leftToRight)
+            .disabled(bypass != nil)
+            .opacity(bypass == nil ? 1 : 0.45)
+            HStack {
+                Button { model.setBalance(0) } label: { Text("Center Balance") }
+                    .controlSize(.small)
+                    .disabled(balance == 0)
+                Spacer()
+            }
+            if let bypass {
+                Text(bypass.explanation).font(Typeface.ui(10.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+            } else if balance != 0 {
+                Text("Balance is applied in software, so this output is no longer bit-perfect while it is off center.")
+                    .font(Typeface.ui(10.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
+            }
+            Text("The Mac's own Balance (System Settings) is separate and adds to this.")
+                .font(Typeface.ui(10.5)).foregroundStyle(Palette.text3).fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .frame(width: 320)
     }
 }
 
