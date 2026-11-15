@@ -160,8 +160,6 @@ enum DeveloperHooks {
         }
         // `-VespertineStreamingDemo http://127.0.0.1:4533`: turns Music Servers on and signs in to a test server at that address
         // (user "listener"), with the sign-in held in memory only. `-VespertineStreamingDemoName "Home Server"` names it.
-        // With `-streamingSwitchPlace tab|online|library`, `-streamingBrowse merged|sidebar|both` and
-        // `-streamingMark glyph|label|column` for each way of showing it.
         if let address = d.string(forKey: "VespertineStreamingDemo") {
             let id = OpenSubsonicProvider.providerID
             model.streaming.setOn(true, id)
@@ -170,13 +168,12 @@ enum DeveloperHooks {
                                                        request: ProviderSignIn(server: address, user: "listener", secret: .password("demo")))
             print("[qa] streaming demo: \(failure ?? "signed in")")
         }
-        // `-VespertineOpenSettings playback|library|network|online|streaming|remote`: opens Settings on that tab.
+        // `-VespertineOpenSettings playback|library|network|online|remote`: opens Settings on that tab.
         if let tab = d.string(forKey: "VespertineOpenSettings") {
             switch tab {
             case "library": model.settingsTab = .library
             case "network": model.settingsTab = .network
             case "online": model.settingsTab = .online
-            case "streaming": model.settingsTab = .streaming
             case "remote": model.settingsTab = .remote
             default: model.settingsTab = .playback
             }

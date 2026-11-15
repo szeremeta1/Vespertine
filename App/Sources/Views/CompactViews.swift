@@ -167,7 +167,7 @@ struct DarkWindowAppearance: NSViewRepresentable {
 
 /// The Settings window's tabs; `AppModel.settingsTab` is the one showing (the setup assistant opens Settings on one).
 enum SettingsTab: Hashable {
-    case playback, library, network, online, streaming, remote, updates, about
+    case playback, library, network, online, remote, updates, about
 }
 
 struct SettingsView: View {
@@ -180,9 +180,6 @@ struct SettingsView: View {
             LibrarySettings().tabItem { Label("Library", systemImage: "books.vertical") }.tag(SettingsTab.library)
             NetworkSettings().tabItem { Label("Network", systemImage: "server.rack") }.tag(SettingsTab.network)
             OnlineSettings().tabItem { Label("Online", systemImage: "globe") }.tag(SettingsTab.online)
-            if StreamingSwitchPlace.current == .tab {
-                StreamingSettings().tabItem { Label("Streaming", systemImage: "music.note.house") }.tag(SettingsTab.streaming)
-            }
             RemoteSettingsView().tabItem { Label("Remote", systemImage: "iphone") }.tag(SettingsTab.remote)
             UpdateSettings().tabItem { Label("Updates", systemImage: "arrow.down.circle") }.tag(SettingsTab.updates)
             AboutSettings().tabItem { Label("About", systemImage: "info.circle") }.tag(SettingsTab.about)
@@ -353,7 +350,8 @@ struct LibrarySettings: View {
                     Button("Connect to Server…") { openWindow(id: "main"); model.showConnectServer = true }
                 }
             }
-            if StreamingSwitchPlace.current == .library { StreamingSettingsSection() }
+            // Music servers sit with the other places music comes from, under the folders and network shares.
+            StreamingSettingsSection()
             Section("Importing") {
                 Picker("When adding music", selection: $s.defaultImportMode) {
                     Text("Reference files in place").tag(ImportMode.reference)
@@ -435,7 +433,6 @@ struct OnlineSettings: View {
     var body: some View {
         @Bindable var s = model.settings
         Form {
-            if StreamingSwitchPlace.current == .online { StreamingSettingsSection() }
             Section("MusicBrainz") {
                 Toggle("Fetch cover art from the Cover Art Archive", isOn: $s.fetchArtworkOnline)
                 Text("Lookups only happen when you ask for them. Nothing is sent in the background.")

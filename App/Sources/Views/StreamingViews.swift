@@ -23,14 +23,7 @@ enum StreamingSwitch {
     }
 }
 
-/// Settings › Streaming: the tab, when the switch has a tab of its own.
-struct StreamingSettings: View {
-    var body: some View {
-        Form { StreamingSettingsSection() }.formStyle(.grouped)
-    }
-}
-
-/// The switch and, while it is on, the servers. A section of a Settings form, wherever the switch sits.
+/// The switch and, while it is on, the servers: a section of Settings › Library, under Sources.
 struct StreamingSettingsSection: View {
     @Environment(AppModel.self) private var model
     @State private var signingIn: SignInTarget?
@@ -196,30 +189,16 @@ private struct ServerSignInSheet: View {
     }
 }
 
-/// Beside a streamed song's format: that it comes from a server. One of three ways the owner picks from (`StreamingMark`).
+/// Beside a streamed song's format: a small glyph that says it comes from a server, and which one when pointed at.
 struct StreamMarkView: View {
     let name: String
 
     var body: some View {
-        switch StreamingMark.current {
-        case .glyph:
-            Image(systemName: "music.note.house")
-                .font(.system(size: 10))
-                .rowForeground(Palette.text3)
-                .help(label)
-                .accessibilityLabel(label)
-        case .label:
-            Text(name)
-                .font(Typeface.mono(8.5, weight: .semibold))
-                .lineLimit(1).truncationMode(.tail)
-                .frame(maxWidth: 110)
-                .padding(.horizontal, 5).padding(.vertical, 2)
-                .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(.foreground.opacity(0.5)))
-                .rowForeground(Palette.text3)
-                .help(label)
-        case .column:
-            EmptyView()
-        }
+        Image(systemName: "music.note.house")
+            .font(.system(size: 10))
+            .rowForeground(Palette.text3)
+            .help(label)
+            .accessibilityLabel(label)
     }
 
     private var label: String {
@@ -232,7 +211,7 @@ struct ServerSidebarSection: View {
     @Environment(AppModel.self) private var model
 
     var body: some View {
-        if model.streaming.anyOn, StreamingBrowse.current.showsInSidebar, !model.library.streamedAccounts.isEmpty {
+        if model.streaming.anyOn, !model.library.streamedAccounts.isEmpty {
             Section(StreamingSwitch.sectionTitle) {
                 ForEach(model.library.streamedAccounts, id: \.path) { source in
                     if let id = source.id {

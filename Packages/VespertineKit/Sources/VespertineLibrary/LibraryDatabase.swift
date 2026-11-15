@@ -1283,13 +1283,16 @@ Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE filePath 
         }
     }
 
-    func stats() throws -> Stats {
-        try writer.read { db in try stats(db)! }
+    func stats(filesOnly: Bool = false) throws -> Stats {
+        try writer.read { db in try stats(db, filesOnly: filesOnly)! }
     }
 
     /// The counts as one read of `db` sees them. The bytes are those of files: a song streamed from a server takes no room here.
-    func stats(_ db: Database) throws -> Stats? {
-        let visible = try visibleTracksClause(db)
+    /// `filesOnly` leaves a music server's songs out of the counts too: the Library's own lists show files, and a server's music
+    /// is under the server's entry.
+    func stats(_ db: Database, filesOnly: Bool = false) throws -> Stats? {
+        var visible = try visibleTracksClause(db)
+        if filesOnly { visible += " AND (sourceId IS NULL OR sourceId NOT IN (SELECT id FROM source WHERE path LIKE '\(StreamLocation.prefix)%'))" }
         return try Row.fetchOne(db, sql: """
             SELECT count(DISTINCT albumKey) AS a, count(*) AS t, count(DISTINCT lower(coalesce(albumArtist, artist))) AS ar,
                    coalesce((SELECT sum(size) FROM (SELECT max(fileSize) AS size FROM track WHERE isMissing = 0 AND filePath != '' GROUP BY filePath)), 0) AS b, coalesce(sum(duration), 0) AS d FROM track WHERE isMissing = 0 AND \(visible)

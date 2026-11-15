@@ -482,4 +482,22 @@ struct StreamingCoreTests {
         try await core.setStarred(false, track: streamed)
         #expect(shared.withLock { $0.asked }.suffix(2) == ["star s1", "unstar s1"])
     }
+
+    @Test("The library's own counts leave out a server's songs: its only album and artist are not counted, and the shared album stays")
+    func fileCounts() async throws {
+        let (core, database, _, _, fileIDs) = try rig()
+        core.setEnabled([])
+        let before = try database.stats()
+        #expect(try database.stats(filesOnly: true) == before)
+
+        core.setEnabled(["fake"])
+        let account = try core.addAccount("fake", name: "Home server")
+        _ = try await core.provider("fake", account: account)?.signIn(ProviderSignIn(server: "https://music.example", user: "listener", secret: .password("pw")))
+        _ = try await core.sync("fake", account: account)
+
+        let all = try database.stats()
+        #expect(all.tracks == fileIDs.count + 3)
+        #expect(all.albums == before.albums + 1)
+        #expect(try database.stats(filesOnly: true) == before)
+    }
 }

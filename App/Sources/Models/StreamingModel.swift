@@ -11,52 +11,6 @@ import VespertineLibrary
 import VespertineOpenSubsonic
 import VespertineStreaming
 
-/// Where the provider's switch sits in Settings. One of three candidates the owner picks from
-/// (`defaults write … streamingSwitchPlace online`); the default is the one in use.
-enum StreamingSwitchPlace: String {
-    /// Its own tab, Settings › Streaming.
-    case tab
-    /// Settings › Online.
-    case online
-    /// Settings › Library, under Sources.
-    case library
-
-    static var current: StreamingSwitchPlace {
-        StreamingSwitchPlace(rawValue: UserDefaults.standard.string(forKey: "streamingSwitchPlace") ?? "") ?? .tab
-    }
-}
-
-/// Where a server's music shows (`defaults write … streamingBrowse sidebar`).
-enum StreamingBrowse: String {
-    /// In Albums, Artists and Songs beside the files.
-    case merged
-    /// Only under the server's own entry in the sidebar.
-    case sidebar
-    /// Both.
-    case both
-
-    static var current: StreamingBrowse {
-        StreamingBrowse(rawValue: UserDefaults.standard.string(forKey: "streamingBrowse") ?? "") ?? .both
-    }
-
-    var showsInLibrary: Bool { self != .sidebar }
-    var showsInSidebar: Bool { self != .merged }
-}
-
-/// How a song says it comes from a server (`defaults write … streamingMark label`).
-enum StreamingMark: String {
-    /// A small glyph beside the format.
-    case glyph
-    /// The server's name beside the format.
-    case label
-    /// Nothing beside the format: the Source column only.
-    case column
-
-    static var current: StreamingMark {
-        StreamingMark(rawValue: UserDefaults.standard.string(forKey: "streamingMark") ?? "") ?? .glyph
-    }
-}
-
 @Observable
 @MainActor
 final class StreamingModel {

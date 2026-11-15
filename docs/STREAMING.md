@@ -2,8 +2,8 @@
 
 Vespertine has no built-in client for any commercial streaming service. It has two things, each off by default behind its own switch:
 
-- A receiver. Other apps on your network send it music, and it plays that music through the same engine and the same signal path as a file. See [Play to Vespertine](#play-to-vespertine-upnp-beta).
-- A client for your own music server. Servers that speak the open OpenSubsonic API (Navidrome, Gonic, Airsonic and others) can sit beside your files in the one library. See [Music servers](#music-servers-opensubsonic-beta).
+- A receiver. Other apps on your network send it music, and it plays that music through the same engine and the same signal path as a file. See [Receive from Other Apps](#receive-from-other-apps-beta).
+- A client for your own music server. Servers that speak the open OpenSubsonic API (Navidrome, Gonic, Airsonic and others) get their own section in the sidebar, and their songs play like your files. See [Music servers](#music-servers-opensubsonic-beta).
 
 ## Receive from Other Apps (beta)
 
@@ -59,14 +59,15 @@ OpenHome control is not part of this version.
 
 ## Music servers (OpenSubsonic, beta)
 
-Off by default. The switch is "Music Servers (OpenSubsonic, beta)" in Settings.
+Off by default. The switch is "Music Servers (OpenSubsonic, beta)" in Settings › Library, under Sources, next to your folders and network shares.
 
 OpenSubsonic is the open API at [opensubsonic.netlify.app](https://opensubsonic.netlify.app). It is spoken by servers you run yourself, such as Navidrome, Gonic and Airsonic. It is not a commercial service, and there is no account with anyone but your own server.
 
 ### What you see
 
-- Your server's albums, artists, songs, playlists and favorites beside your files. An album you hold as files and on the server is one album with two copies, and the copies list says which is which.
-- A Source column in song lists while a server is on, saying where each song comes from.
+- Each server under Music Servers in the sidebar. Selecting it shows that server's albums.
+- Albums, Artists, Songs, Genres and Recently Added, and the counts beside them, show your files only. An album you hold as files and on the server stays in Albums as one album with two copies, and the copies list says which is which.
+- Search, Favorites, playlists and history include the server's songs. A server's song carries a small house-and-note glyph beside its format, and pointing at it names the server. Song lists also gain a Source column while a server is on.
 - A song's format as the server lists it, followed by "≈", until Vespertine has played the song. Once played, the format is what was read, and the "≈" goes.
 - The signal path as for any file. Vespertine asks the server for the original file (`format=raw`). If the server sends something else anyway, the signal path says "Converted by the server" and the badge is never `BIT-PERFECT`.
 - Seeking reads from the middle of the file by HTTP range, as it does for a file on a share. Two songs in a row play without a gap when their formats allow it, as two files do.

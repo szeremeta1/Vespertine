@@ -99,11 +99,9 @@ struct TrackTable: View {
     private var showsSource: Bool { model.streaming.anyOn && !model.library.streamedAccounts.isEmpty }
 
     /// The widths the columns start at. They add up to what is left beside the sidebar and the inspector in a 1440 pt window,
-    /// so no column starts past the right edge: with the Source column the others give up its width between them, and a
-    /// server's name beside the format (`StreamingMark.label`) takes its room from them too.
+    /// so no column starts past the right edge: with the Source column the others give up its width between them.
     private var ideal: (title: CGFloat, artist: CGFloat, album: CGFloat, format: CGFloat, source: CGFloat) {
-        guard showsSource else { return (240, 140, 150, 190, 0) }
-        return StreamingMark.current == .label ? (165, 100, 100, 205, 80) : (185, 115, 115, 165, 95)
+        showsSource ? (185, 115, 115, 165, 95) : (240, 140, 150, 190, 0)
     }
 
     private func sourceName(_ track: Track) -> String {
@@ -167,8 +165,7 @@ struct TrackTable: View {
                     }
                 }
             }
-            // A server's name beside the format is not cut short by the next column.
-            .width(min: showsSource && StreamingMark.current == .label ? 205 : 150, ideal: ideal.format)
+            .width(min: 150, ideal: ideal.format)
 
             // Where each song comes from. There only while a music server is on and has an account: with files alone it
             // would say nothing.
@@ -690,7 +687,7 @@ struct SongsView: View {
                 if !list.tracks.isEmpty { try? await Task.sleep(for: .milliseconds(400)) }
                 guard !Task.isCancelled else { return }
                 let database = model.library.database
-                // Left to a music server's own page when servers are browsed from the sidebar alone.
+                // A music server's songs are listed on its own page.
                 let filesOnly = model.hidesServerOnly
                 let tracks = await Task.detached(priority: .userInitiated) {
                     let all = (try? database.allTracks()) ?? []

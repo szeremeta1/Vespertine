@@ -177,6 +177,10 @@ final class LibraryStore {
     }
 
     private(set) var stats = LibraryDatabase.Stats(albums: 0, tracks: 0, artists: 0, bytes: 0, duration: 0)
+    /// The same counts without the songs of music servers.
+    private(set) var fileStats = LibraryDatabase.Stats(albums: 0, tracks: 0, artists: 0, bytes: 0, duration: 0)
+    /// What the Library's own entries count (Albums, Artists, Songs): the files. A music server's music is under its own entry.
+    var libraryStats: LibraryDatabase.Stats { streamedAccounts.isEmpty ? stats : fileStats }
     /// Bumped whenever tracks change, so detail views can reload.
     private(set) var revision = 0
     /// Counts the changes that can alter a song's cover without its queue entry knowing (tag edits, reverts, enrichment).
@@ -261,8 +265,10 @@ final class LibraryStore {
     private func loadSidebarState() {
         let database = database
         guard let state = try? database.writer.read({ db in
-            (try LibraryDatabase.sources(db), try database.playlists(db), try database.stats(db), try database.streamedSources(db))
+            (try LibraryDatabase.sources(db), try database.playlists(db), try database.stats(db), try database.streamedSources(db),
+             try database.stats(db, filesOnly: true))
         }) else { return }
+        if let files = state.4 { fileStats = files }
         sources = state.0
         playlists = state.1
         if let stats = state.2 { self.stats = stats }
@@ -354,8 +360,14 @@ final class LibraryStore {
             } catch {}
         })
         tasks.append(Task { [weak self] in
-            let obs = ValueObservation.tracking { db in try database.stats(db) }
-            do { for try await value in obs.values(in: writer) { if Task.isCancelled { break }; if let value, self?.stats != value { self?.stats = value } } } catch {}
+            let obs = ValueObservation.tracking { db in (try database.stats(db), try database.stats(db, filesOnly: true)) }
+            do {
+                for try await (all, files) in obs.values(in: writer) {
+                    if Task.isCancelled { break }
+                    if let all, self?.stats != all { self?.stats = all }
+                    if let files, self?.fileStats != files { self?.fileStats = files }
+                }
+            } catch {}
         })
         tasks.append(Task { [weak self] in
             let obs = ValueObservation.tracking { db in try database.streamedSources(db) }

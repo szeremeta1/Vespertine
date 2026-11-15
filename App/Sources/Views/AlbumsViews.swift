@@ -108,7 +108,7 @@ struct AlbumsGridView: View {
         let count = families.count
         if !filter.isEmpty { return String(localized: "\(count) of \(AlbumFamilies.group(base).count) albums") }
         guard isLibrary else { return String(localized: "\(count) albums") }
-        let s = model.library.stats
+        let s = model.library.libraryStats
         return [String(localized: "\(count) albums"), String(localized: "\(s.albums) editions"),
                 String(localized: "\(s.tracks) tracks"), s.bytes.byteString].joined(separator: " · ")
     }
@@ -590,7 +590,7 @@ struct ArtistsView: View {
     var body: some View {
         let filter = model.filter(scope)
         let artists = model.artists(filter)
-        let total = model.library.artists.count
+        let total = model.libraryArtistCount
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 PageHeader(title: String(localized: "Artists"),

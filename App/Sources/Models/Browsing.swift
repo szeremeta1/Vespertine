@@ -262,10 +262,11 @@ extension AppModel {
         }
     }
 
-    /// Whether a music server's albums are left to its own entry in the sidebar (`StreamingBrowse.sidebar`).
-    var hidesServerOnly: Bool { !StreamingBrowse.current.showsInLibrary && !library.streamedAccounts.isEmpty }
+    /// Whether there is a music server's music to leave out of the Library's own lists (Albums, Artists, Songs, Genres,
+    /// Recently Added): it is listed under the server's entry in the sidebar. Search, favorites and playlists still find it.
+    var hidesServerOnly: Bool { !library.streamedAccounts.isEmpty }
 
-    /// `albums` without those that are on a music server only, when servers are browsed from the sidebar alone.
+    /// `albums` without those that are on a music server only. An album the files have too stays, with the server's as a copy.
     private func withoutServerOnly(_ albums: [Album]) -> [Album] {
         guard hidesServerOnly else { return albums }
         let servers = Set(library.streamedAccounts.compactMap(\.id))
@@ -292,8 +293,12 @@ extension AppModel {
 
     /// Genres of the albums through the filter, counted by those albums.
     func genres(_ filter: LibraryFilter) -> [GenreSummary] {
-        filter.isEmpty ? library.genres : Genres.summarize(filtered(library.albums, by: filter))
+        filter.isEmpty && !hidesServerOnly ? library.genres : Genres.summarize(filtered(withoutServerOnly(library.albums), by: filter))
     }
+
+    /// The artists and genres the Library's own pages and counts cover: those of the files.
+    var libraryArtistCount: Int { hidesServerOnly ? artists(LibraryFilter()).count : library.artists.count }
+    var libraryGenreCount: Int { genres(LibraryFilter()).count }
 
     // MARK: Songs
 
