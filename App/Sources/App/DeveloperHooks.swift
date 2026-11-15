@@ -10,6 +10,7 @@ import AppKit
 import Foundation
 import VespertineAudio
 import VespertineLibrary
+import VespertineUPnP
 import SwiftUI
 
 /// The launch arguments (`-Key value`) and nothing else. QA hooks read only these: UserDefaults also answers from
@@ -159,7 +160,8 @@ enum DeveloperHooks {
                 || d.string(forKey: "VespertineFormatFilter") != nil || d.string(forKey: "VespertineSidebar") != nil
                 || d.string(forKey: "VespertineOpenSheet") != nil || d.string(forKey: "VespertineFilter") != nil
                 || d.string(forKey: "VespertineOpenArtist") != nil || d.string(forKey: "VespertineOpenGenre") != nil
-                || d.string(forKey: "VespertinePlaySong") != nil || d.string(forKey: "VespertineShowQueue") != nil else { return }
+                || d.string(forKey: "VespertinePlaySong") != nil || d.string(forKey: "VespertineShowQueue") != nil
+                || d.string(forKey: "VespertineReceiverDemo") != nil else { return }
 
         // Wait (bounded) for the library to contain the requested album.
         let wanted = play ?? open
@@ -222,6 +224,15 @@ enum DeveloperHooks {
                 try? await Task.sleep(for: .seconds(d.double(forKey: "VespertinePauseAfter")))
                 model.player.engine.pause()
             }
+        }
+        // `-VespertineReceiverDemo mconnect`: shows how Play to Vespertine looks while a control app of that name plays, without
+        // a sound: the last album's first songs stand in for what the app sent, the first album's for the listener's own queue.
+        // With `-receiverPresentation chip|banner|path` and `-receiverQueue remote|dimmed` for each way of showing it.
+        if let name = d.string(forKey: "VespertineReceiverDemo"), let sent = model.library.albums.last, let own = model.library.albums.first {
+            let songs = model.library.tracks(albumKey: sent.key)
+            model.player.showReceiverDemo(from: ReceiverControlApp(name: name, address: "192.0.2.7"), songs: songs,
+                                          kept: model.library.tracks(albumKey: own.key), artworkKey: model.artworkKey(songs.first))
+            print("[qa] receiver demo: \(songs.first?.title ?? "-") from \(name)")
         }
         if d.bool(forKey: "VespertineOpenMini") { openWindow?(id: "mini") }
         if let play, let album = model.library.albums.first(where: { $0.title == play }) {

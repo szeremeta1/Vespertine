@@ -21,10 +21,29 @@ public final class HTTPServer: @unchecked Sendable {
     /// Connections open at once; more are closed as they arrive.
     let maximumConnections: Int
 
-    public init(headerTimeout: TimeInterval = 10, maximumConnections: Int = 32, handler: @escaping Handler) {
+    /// Whether a connection from this address is taken at all (nil: from anywhere). A refused one is closed before a byte is read.
+    let admits: (@Sendable (String?) -> Bool)?
+
+    public init(headerTimeout: TimeInterval = 10, maximumConnections: Int = 32, admits: (@Sendable (String?) -> Bool)? = nil,
+                handler: @escaping Handler) {
         self.headerTimeout = headerTimeout
         self.maximumConnections = maximumConnections
+        self.admits = admits
         self.handler = handler
+    }
+
+    /// The address at the other end of `connection`, without a zone ("%en0") and with an IPv4-mapped IPv6 address as IPv4.
+    static func peer(of connection: NWConnection) -> String? {
+        guard case .hostPort(let host, _) = connection.endpoint else { return nil }
+        switch host {
+        case .ipv4(let address): return address.rawValue.map(String.init).joined(separator: ".")
+        case .ipv6(let address):
+            if let mapped = address.asIPv4 { return mapped.rawValue.map(String.init).joined(separator: ".") }
+            let raw = [UInt8](address.rawValue)
+            return stride(from: 0, to: 16, by: 2).map { String(UInt16(raw[$0]) << 8 | UInt16(raw[$0 + 1]), radix: 16) }.joined(separator: ":")
+        case .name(let name, _): return name
+        @unknown default: return nil
+        }
     }
 
     /// Listens on every interface, on `port` (0: any free one), and returns the port once ready.
@@ -60,13 +79,15 @@ public final class HTTPServer: @unchecked Sendable {
 
     private func accept(_ connection: NWConnection) {
         let id = ObjectIdentifier(connection)
+        let peer = Self.peer(of: connection)
+        let welcome = admits?(peer) ?? true
         let admitted = state.withLock { () -> Bool in
-            guard connections.count < maximumConnections else { return false }
+            guard welcome, connections.count < maximumConnections else { return false }
             connections[id] = connection
             return true
         }
         guard admitted else {
-            // Over the cap: closed at once, before anything is read.
+            // Over the cap, or from an address that is not taken: closed at once, before anything is read.
             connection.start(queue: queue)
             connection.forceCancel()
             return
@@ -80,18 +101,19 @@ public final class HTTPServer: @unchecked Sendable {
         connection.start(queue: queue)
         let deadline = DispatchWorkItem { connection.forceCancel() }
         queue.asyncAfter(deadline: .now() + headerTimeout, execute: deadline)
-        receive(connection, buffer: Data(), deadline: deadline)
+        receive(connection, peer: peer, buffer: Data(), deadline: deadline)
     }
 
-    private func receive(_ connection: NWConnection, buffer: Data, deadline: DispatchWorkItem) {
+    private func receive(_ connection: NWConnection, peer: String?, buffer: Data, deadline: DispatchWorkItem) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 64 * 1024) { [weak self] content, _, complete, error in
             guard let self else { connection.cancel(); return }
             var buffer = buffer
             if let content { buffer.append(content) }
             if error != nil { deadline.cancel(); connection.cancel(); return }
             switch HTTPRequest.read(buffer) {
-            case .request(let request):
+            case .request(var request):
                 deadline.cancel()
+                request.peer = peer
                 let handler = self.handler
                 Task {
                     var response = await handler(request)
@@ -106,7 +128,7 @@ public final class HTTPServer: @unchecked Sendable {
                     connection.cancel()
                 }
             case .incomplete:
-                if complete { deadline.cancel(); connection.cancel() } else { self.receive(connection, buffer: buffer, deadline: deadline) }
+                if complete { deadline.cancel(); connection.cancel() } else { self.receive(connection, peer: peer, buffer: buffer, deadline: deadline) }
             }
         }
     }

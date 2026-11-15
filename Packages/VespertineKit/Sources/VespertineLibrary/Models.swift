@@ -170,6 +170,7 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
 
     /// "FLAC · 24/96", "DSD128", "MP3 · 320k": the format without the layout.
     var baseFormatSummary: String {
+        if isTransient { return "" }   // nothing is known of its format until it plays (the signal path says then)
         if isDSD { return "DSD\(Int((sampleRate / 44_100).rounded()))" }
         let rate = sampleRate.truncatingRemainder(dividingBy: 1000) == 0
             ? String(Int(sampleRate / 1000)) : String(format: "%.1f", sampleRate / 1000)
@@ -267,6 +268,26 @@ public struct Album: Sendable, Hashable, Identifiable {
         self.trackCount = trackCount; self.duration = duration; self.artworkKey = artworkKey; self.formatSummary = formatSummary
         self.codec = codec; self.maxBitDepth = maxBitDepth; self.maxSampleRate = maxSampleRate; self.isHiRes = isHiRes
         self.isDSD = isDSD; self.addedAt = addedAt; self.totalSize = totalSize; self.sourcePath = sourcePath; self.maxChannels = maxChannels
+    }
+}
+
+extension Track {
+    /// See `transient(location:title:artist:album:duration:artworkKey:)`.
+    public var isTransient: Bool { id == nil && sourceId == nil && filePath.isEmpty }
+
+    /// A song that is not in the library and never will be: one a control app sent to play. It has no row (`id` is nil), no source
+    /// and no file, so nothing that keeps, counts or looks up a library song applies to it. `location` only tells it apart.
+    public static func transient(location: String, title: String, artist: String? = nil, album: String? = nil, duration: Double = 0,
+                                 artworkKey: String? = nil) -> Track {
+        Track(id: nil, sourceId: nil, location: location, filePath: "", fileSize: 0, modifiedAt: .distantPast, addedAt: .distantPast,
+              codec: "", isLossless: false, isDSD: false, sampleRate: 0, bitDepth: nil, channels: 2, duration: duration, bitrate: nil,
+              cueStartFrame: nil, cueFrameLength: nil, title: title, artist: artist, album: album, albumArtist: nil, composer: nil,
+              genre: nil, releaseDate: nil, year: nil, trackNumber: nil, trackTotal: nil, discNumber: nil, discTotal: nil,
+              compilation: false, grouping: nil, comment: nil, lyrics: nil, bpm: nil, rating: nil, isrc: nil, label: nil,
+              musicBrainzReleaseID: nil, musicBrainzRecordingID: nil, titleSort: nil, artistSort: nil, albumSort: nil,
+              albumArtistSort: nil, extraTags: [:], rgTrackGain: nil, rgTrackPeak: nil, rgAlbumGain: nil, rgAlbumPeak: nil,
+              artworkKey: artworkKey, playCount: 0, lastPlayedAt: nil, isMissing: false, effectiveBitDepth: nil, bandwidthHz: nil,
+              analysisVerdict: nil)
     }
 }
 

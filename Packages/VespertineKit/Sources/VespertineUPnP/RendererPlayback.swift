@@ -68,7 +68,7 @@ public final class RendererPlayback: @unchecked Sendable {
         var track: RendererTrack
         var path: SignalPath
         var processedFile: GrowingFile?
-        /// A TIDAL song's whole copy in the transient playback cache (the media server serves it, or it is decoded); deleted when
+        /// A streamed song's whole copy in the transient playback cache (the media server serves it, or it is decoded); deleted when
         /// the entry is let go. Nil for local and share files.
         var staged: StagedRemoteFile? = nil
         /// Where the stream starts in the song (a processed stream restarted at a position).
@@ -405,7 +405,7 @@ public final class RendererPlayback: @unchecked Sendable {
     /// Prepares `item` to be sent: its media URL, metadata and signal path.
     private func prepareEntry(for item: PlayableItem, at seconds: TimeInterval) throws -> Entry {
         let resolved = urlResolver?(item) ?? item.url
-        // A stream (TIDAL) is copied whole first: the renderer pulls a file, and the decoder reads one.
+        // A stream is copied whole first: the renderer pulls a file, and the decoder reads one.
         let staged = resolved.isFileURL ? nil : try StagedRemoteFile.stage(item)
         let url = staged?.url ?? resolved
         let described = try? SourceDescription.describe(item, url: url)

@@ -23,13 +23,13 @@ extension PlaybackCacheReader {
     public func cancel() {}
 }
 
-/// A source that is not a file on a mounted share (a streaming service's track, say): opened by a URL of its own scheme (see
+/// A source that is not a file on a mounted share (a stream sent by a control app, a music server's track): opened by a URL of its own scheme (see
 /// `NetworkPlaybackCache.registerRemoteReader`) and copied into the cache like a share's file.
 public protocol RemoteCacheReader: PlaybackCacheReader {
     /// The extension of the cache file the bytes are copied to (`flac`): decoders and `NetworkStart` choose by it, since the
-    /// URL (`tidal://track/1`) has none.
+    /// URL (`stream://track/1`) has none.
     var fileExtension: String { get }
-    /// What a song says when this source sends nothing for the no-progress limit ("TIDAL isn't answering"); nil for the
+    /// What a song says when this source sends nothing for the no-progress limit ("The server isn't answering"); nil for the
     /// share's wording.
     var notAnsweringMessage: String? { get }
 }
@@ -78,6 +78,8 @@ struct ShareReadFailure: LocalizedError, CustomNSError {
     init(_ underlying: Error) { self.underlying = underlying }
 
     var errorDescription: String? {
+        // A remote source's own words for its silence already say what failed, and it is no share.
+        if case NetworkPlaybackCache.Failure.notAnswering(let words?) = underlying { return words }
         let reason = underlying.localizedDescription
         return String(localized: "Reading this song from the share failed: \(reason)",
                       comment: "A read of a song on a network share failed part way through. The placeholder is the system's reason, such as “The operation couldn’t be completed. Stale NFS file handle”.")
@@ -161,20 +163,11 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         remoteMessages.withLock { $0[scheme.lowercased()] = notAnsweringMessage }
     }
 
-    /// Forgets `scheme`: its songs no longer open (TIDAL switched off). Copies already open keep their reader.
+    /// Forgets `scheme`: its songs no longer open (its switch went off). Copies already open keep their reader.
     public static func unregisterRemoteReader(scheme: String) {
         remoteOpeners.withLock { $0[scheme.lowercased()] = nil }
         remoteMessages.withLock { $0[scheme.lowercased()] = nil }
     }
-
-    /// Told once each time a copy of a `scheme://…` song is complete, while its lease still holds it: the song's URL and a hard link to
-    /// the staged file (same disk, no copy). The handler owns the link and must delete it; the staged file itself goes with the lease
-    /// as always. For analysis of streamed songs (decision 206). Nil stops it.
-    public static func setCompletionHandler(scheme: String, _ handler: (@Sendable (_ url: URL, _ file: URL) -> Void)?) {
-        completionHandlers.withLock { $0[scheme.lowercased()] = handler }
-    }
-
-    private static let completionHandlers = Locked([String: @Sendable (URL, URL) -> Void]())
 
     /// Whether songs at `scheme://…` have an opener.
     public static func hasRemoteReader(scheme: String) -> Bool {
@@ -376,14 +369,6 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
                 self.reserved.withLock { $0 -= size }
             }
             reserved.withLock { $0 += size }
-            if remote != nil, let scheme = url.scheme?.lowercased(), let handler = Self.completionHandlers.withLock({ $0[scheme] }) {
-                storage.onComplete = { staged in
-                    let link = staged.deletingLastPathComponent()
-                        .appendingPathComponent("complete-" + UUID().uuidString).appendingPathExtension(staged.pathExtension)
-                    guard (try? FileManager.default.linkItem(at: staged, to: link)) != nil else { return }
-                    handler(url, link)
-                }
-            }
             source = nil   // the copy's from here on
             let entry = Entry(storage)
             entries = entries.filter { $0.value.value != nil }
@@ -737,8 +722,6 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         /// The copy lanes that have not ended (a lane ends when the copy is over, cancelled or failed). Under `condition`.
         var activeLanes: Set<Int> = []
         var progress: (@Sendable (Int64) -> Void)?
-        /// Called once, from the copy lane that writes the last block, with the staged file (`setCompletionHandler`). Under `condition`.
-        var onComplete: (@Sendable (URL) -> Void)?
         /// On `clock`: when the copy started.
         let startedAt: TimeInterval
 
@@ -966,14 +949,10 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
                             done += n
                         }
                     }
-                    let completed = condition.withLock { () -> (@Sendable (URL) -> Void)? in
+                    condition.withLock {
                         inFlight.remove(block)
                         ready.insert(block); condition.broadcast()
-                        guard ready.count == blocks, let done = onComplete else { return nil }
-                        onComplete = nil
-                        return done
                     }
-                    completed?(url)
                     // In order, never backwards, though lanes finish their blocks in any order.
                     reporting.withLock {
                         let (report, copied) = condition.withLock { (progress, min(size, Int64(ready.count) * Int64(chunk))) }
@@ -1073,7 +1052,7 @@ final class PlaybackFile {
     }
 }
 
-/// A song from a registered remote scheme (TIDAL), copied whole into the transient playback cache for an output that needs a
+/// A song from a registered remote scheme (a stream), copied whole into the transient playback cache for an output that needs a
 /// local file of its own (UPnP and AirPlay players: the media server serves the bytes, or the song is decoded and sent). The
 /// copy is a lease like the engine's: it lives as long as this object, and its file is deleted when the last holder lets go,
 /// so nothing stays on disk. Local and share files need none (`stage` returns nil).

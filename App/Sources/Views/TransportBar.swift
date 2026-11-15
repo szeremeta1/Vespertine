@@ -49,7 +49,15 @@ struct TransportBar: View {
         HStack(spacing: 12) {
             ArtworkView(key: model.artworkKey(model.player.current?.track), size: 160, cornerRadius: 5)
                 .frame(width: 46, height: 46)
-            if let track = model.player.current?.track {
+            if let track = model.player.current?.track, track.isTransient {
+                // A control app's song: nothing of the library's to open.
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(track.title).font(Typeface.serif(14)).foregroundStyle(Palette.text).lineLimit(1)
+                    Text(verbatim: [track.artist, track.album].compactMap { $0 }.joined(separator: " — ")).font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineLimit(1)
+                }
+                .accessibilityElement(children: .combine)
+                ReceiverChip()
+            } else if let track = model.player.current?.track {
                 Button {
                     model.sidebar = .albums
                     model.path = []

@@ -119,7 +119,7 @@ struct AlbumCard: View {
     let album: Album
     @State private var hovering = false
 
-    var isPlaying: Bool { model.player.current?.track.albumKey == album.key && model.player.state != .stopped }
+    var isPlaying: Bool { model.player.currentLibraryTrack?.albumKey == album.key && model.player.state != .stopped }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -212,7 +212,7 @@ struct AlbumFamilyCard: View {
     let family: AlbumFamily
 
     private var isPlaying: Bool {
-        guard let key = model.player.current?.track.albumKey, model.player.state != .stopped else { return false }
+        guard let key = model.player.currentLibraryTrack?.albumKey, model.player.state != .stopped else { return false }
         return family.contains(key)
     }
 

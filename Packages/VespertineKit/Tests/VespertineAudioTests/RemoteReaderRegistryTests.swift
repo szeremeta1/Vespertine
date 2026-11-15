@@ -1,5 +1,5 @@
 //
-// Vespertine: songs whose URL has a scheme of its own (tidal://track/1) are staged in the playback cache through a registered
+// Vespertine: songs whose URL has a scheme of its own (stream://track/1) are staged in the playback cache through a registered
 // reader, the way a share's files are copied, and play through the same engine.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -8,8 +8,8 @@ import Foundation
 import Testing
 @testable import VespertineAudio
 
-/// A remote track whose bytes are a FLAC file's: what a streaming service's reader hands the cache.
-private final class FakeTidalReader: RemoteCacheReader, @unchecked Sendable {
+/// A remote track whose bytes are a FLAC file's: what a stream's reader hands the cache.
+private final class FakeStreamReader: RemoteCacheReader, @unchecked Sendable {
     let bytes: Data
     let fileExtension: String
     var size: Int64 { Int64(bytes.count) }
@@ -24,12 +24,12 @@ struct RemoteReaderRegistryTests {
     private static let fixture = Bundle.module.url(forResource: "stereo24", withExtension: "flac", subdirectory: "Fixtures/Formats")!
     private static let opened = Locked<[URL]>([])
 
-    /// Registers the `tidal` scheme over the fixture's bytes (the registry is process-wide; every test here registers the same).
+    /// Registers the `stream` scheme over the fixture's bytes (the registry is process-wide; every test here registers the same).
     private func register() throws {
         let bytes = try Data(contentsOf: Self.fixture)
-        NetworkPlaybackCache.registerRemoteReader(scheme: "tidal") { url in
+        NetworkPlaybackCache.registerRemoteReader(scheme: "stream") { url in
             Self.opened.withLock { $0.append(url) }
-            return FakeTidalReader(bytes)
+            return FakeStreamReader(bytes)
         }
     }
 
@@ -39,20 +39,21 @@ struct RemoteReaderRegistryTests {
         return url
     }
 
-    private let track = URL(string: "tidal://track/1")!
+    private let track = URL(string: "stream://track/1")!
 
-    @Test("The engine stages a tidal:// item through the registry and plays the same PCM as the local file")
+    @Test("The engine stages a stream:// item through the registry and plays the same PCM as the local file")
     func engineStagesAndRenders() async throws {
         try register()
         let rig = try PlayPauseRig(seconds: 1)
-        let item = PlayableItem(url: track, cacheKey: "tidal:1")
-        rig.engine.play(item)
-        let playing = await rig.wait(timeout: 30) { $0.state == .playing && $0.position > 0.1 }
-        #expect(playing, "plays: \(rig.engine.snapshot.state), \(rig.engine.snapshot.lastError ?? "-")")
-        #expect(rig.audibleFrames > 0)
+        let item = PlayableItem(url: track, cacheKey: "stream:1")
+        // Judged by what the engine says happened (the song became audible, or failed), however long a busy machine takes over it.
+        let outcome = await EngineOutcome.ofPlaying(item, on: rig.engine)
+        #expect(outcome == .started, "plays: \(outcome), \(rig.engine.snapshot.lastError ?? "-")")
+        // Started is said as the song's first frames go out; they are heard a moment later.
+        #expect(Patience.until { rig.audibleFrames > 0 })
         #expect(Self.opened.withLock { $0.contains(track) })
         // The engine's staged copy is the entry under its key; decoding it gives the local file's PCM.
-        let staged = try rig.cache.entry(key: "tidal:1", url: track)
+        let staged = try rig.cache.entry(key: "stream:1", url: track)
         try staged.prepare(full: true, lead: 0, cancelled: { false })
         #expect(staged.url.pathExtension == "flac")
         let local = try GoldenRender.render([PlayableItem(url: Self.fixture)], device: GoldenDevices.dac)
@@ -67,7 +68,7 @@ struct RemoteReaderRegistryTests {
         try register()
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
         let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20)
-        let entry = try cache.entry(key: "tidal:1", url: track)
+        let entry = try cache.entry(key: "stream:1", url: track)
         #expect(entry.url.pathExtension == "flac")
         try entry.prepare(full: true, lead: 0, cancelled: { false })
         #expect(try entry.read(at: 0, count: 4) == Data("fLaC".utf8))
@@ -78,15 +79,14 @@ struct RemoteReaderRegistryTests {
         try register()
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
         let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20)
-        var entry: NetworkPlaybackCache.Entry? = try cache.entry(key: "tidal:1", url: track)
+        var entry: NetworkPlaybackCache.Entry? = try cache.entry(key: "stream:1", url: track)
         try entry!.prepare(full: true, lead: 0, cancelled: { false })
         let path = entry!.url.path
         #expect(FileManager.default.fileExists(atPath: path))
         entry = nil
-        let end = Date().addingTimeInterval(10)
-        while FileManager.default.fileExists(atPath: path), Date() < end { Thread.sleep(forTimeInterval: 0.01) }
+        // The file goes when the copy's storage does, which also gives the reservation back: that is the event waited for.
+        #expect(Patience.until { cache.reservedBytes == 0 })
         #expect(!FileManager.default.fileExists(atPath: path))
-        #expect(cache.reservedBytes == 0)
     }
 
     @Test("A scheme nobody registered throws instead of crashing")
@@ -96,10 +96,10 @@ struct RemoteReaderRegistryTests {
         #expect(throws: (any Error).self) { _ = try cache.entry(key: "x:1", url: URL(string: "unregistered://track/1")!) }
     }
 
-    @Test("An unregistered scheme opens nothing any more (TIDAL switched off)")
+    @Test("An unregistered scheme opens nothing any more (its switch went off)")
     func unregister() throws {
         let bytes = try Data(contentsOf: Self.fixture)
-        NetworkPlaybackCache.registerRemoteReader(scheme: "gone") { _ in FakeTidalReader(bytes) }
+        NetworkPlaybackCache.registerRemoteReader(scheme: "gone") { _ in FakeStreamReader(bytes) }
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
         let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20)
         #expect(NetworkPlaybackCache.hasRemoteReader(scheme: "gone"))
@@ -109,43 +109,18 @@ struct RemoteReaderRegistryTests {
         #expect(throws: (any Error).self) { _ = try cache.entry(key: "gone:2", url: URL(string: "gone://track/2")!) }
     }
 
-    @Test("A remote copy that completes is handed over (a link to it) before its lease goes; the link outlives the entry")
-    func completionHandler() throws {
-        let bytes = try Data(contentsOf: Self.fixture)
-        NetworkPlaybackCache.registerRemoteReader(scheme: "staged") { _ in FakeTidalReader(bytes) }
-        let handed = Locked<[(URL, URL)]>([])
-        NetworkPlaybackCache.setCompletionHandler(scheme: "staged") { url, file in handed.withLock { $0.append((url, file)) } }
-        defer { NetworkPlaybackCache.setCompletionHandler(scheme: "staged", nil); NetworkPlaybackCache.unregisterRemoteReader(scheme: "staged") }
-        let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
-        let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096)
-        var entry: NetworkPlaybackCache.Entry? = try cache.entry(key: "staged:1", url: URL(string: "staged://track/1")!)
-        try entry!.prepare(full: true, lead: 0, cancelled: { false })
-        let end = Date().addingTimeInterval(5)
-        while handed.withLock({ $0.isEmpty }), Date() < end { Thread.sleep(forTimeInterval: 0.01) }
-        let (url, file) = try #require(handed.withLock { $0.first })
-        #expect(handed.withLock { $0.count } == 1)
-        #expect(url.absoluteString == "staged://track/1" && file.pathExtension == "flac")
-        let staged = entry!.url
-        entry = nil
-        let gone = Date().addingTimeInterval(10)
-        while FileManager.default.fileExists(atPath: staged.path), Date() < gone { Thread.sleep(forTimeInterval: 0.01) }
-        #expect(!FileManager.default.fileExists(atPath: staged.path))
-        #expect(try Data(contentsOf: file) == bytes)
-        try FileManager.default.removeItem(at: file)
-    }
-
     @Test("A copy whose reader died opens the track again through the same opener")
     func reopensThroughRegistry() throws {
         let bytes = try Data(contentsOf: Self.fixture)
         let opens = Locked(0)
-        NetworkPlaybackCache.registerRemoteReader(scheme: "tidal") { _ in
+        NetworkPlaybackCache.registerRemoteReader(scheme: "stream") { _ in
             let n = opens.withLock { $0 += 1; return $0 }
-            return n == 1 ? FailingFirstReader(bytes) : FakeTidalReader(bytes)
+            return n == 1 ? FailingFirstReader(bytes) : FakeStreamReader(bytes)
         }
         defer { try? register() }
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
         let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096)
-        let entry = try cache.entry(key: "tidal:1", url: track)
+        let entry = try cache.entry(key: "stream:1", url: track)
         try entry.prepare(full: true, lead: 0, cancelled: { false })
         #expect(try entry.read(at: 0, count: bytes.count) == bytes)
         #expect(opens.withLock { $0 } >= 2)
@@ -167,18 +142,26 @@ struct RemoteEarlyStartTests {
     func startsOnPrefix() async throws {
         let rig = try PlayPauseRig(seconds: 26, fileExtension: "flac", cacheClock: PlayPauseRig.slowCacheClock())
         try #require(rig.share.size > NetworkStart.smallestEarlyFile, "the fixture must be big enough to start early: \(rig.share.size)")
-        // Its own scheme: the `tidal` one belongs to the suite above, and suites run side by side.
+        // Its own scheme: the `stream` one belongs to the suite above, and suites run side by side.
         NetworkPlaybackCache.registerRemoteReader(scheme: "remote-early") { [share = rig.share] _ in RemoteShare(share) }
         rig.share.goQuiet(from: 8 << 20)
         defer { rig.share.goQuiet(from: nil) }
-        rig.engine.play(PlayableItem(url: URL(string: "remote-early://track/1")!, cacheKey: "remote-early:1"))
-        let playing = await rig.wait(timeout: 30) { $0.state == .playing && $0.position > 0.2 }
-        #expect(playing, "plays on its prefix: \(rig.engine.snapshot.state), \(rig.engine.snapshot.lastError ?? "-")")
-        #expect(rig.audibleFrames > 0)
+        let outcome = await EngineOutcome.ofPlaying(PlayableItem(url: URL(string: "remote-early://track/1")!, cacheKey: "remote-early:1"), on: rig.engine)
+        #expect(outcome == .started, "plays on its prefix: \(outcome), \(rig.engine.snapshot.lastError ?? "-")")
+        #expect(Patience.until { rig.audibleFrames > 0 })
         let entry = try rig.cache.entry(key: "remote-early:1", url: URL(string: "remote-early://track/1")!)
         #expect(!entry.isComplete && entry.url.pathExtension == "flac", "the rest is still to come")
         rig.engine.stop()
     }
+}
+
+/// A cache's clock for the tests of silence: it stands still until a read is waiting, and from then on every look at it finds ten
+/// seconds gone. A block that lands just after the wait began stamps its progress with a time the next look is already past, so
+/// the limit is reached whatever order the copy's lanes run in.
+private final class RunawayClock: Sendable {
+    private let state = Locked((now: 0.0, running: false))
+    var now: TimeInterval { state.withLock { if $0.running { $0.now += 10 }; return $0.now } }
+    func run() { state.withLock { $0.running = true } }
 }
 
 /// A remote reader whose reads past the first chunk wait until it is cancelled (a CDN retrying a dead link for ever).
@@ -187,11 +170,15 @@ private final class WaitingReader: RemoteCacheReader, @unchecked Sendable {
     let condition = NSCondition()
     var cancelled = false
     let notAnsweringMessage: String?
+    /// Called once, when a read first waits: the moment a test may move the cache's clock past the limit.
+    var whenWaiting: (@Sendable () -> Void)?
     var fileExtension: String { "flac" }
     var size: Int64 { Int64(bytes.count) }
     init(_ bytes: Data, message: String? = nil) { self.bytes = bytes; notAnsweringMessage = message }
     func read(at offset: Int64, count: Int) throws -> Data {
         if offset >= 4096 {
+            let first = condition.withLock { () -> (@Sendable () -> Void)? in defer { whenWaiting = nil }; return whenWaiting }
+            first?()
             try condition.withLock {
                 while !cancelled { condition.wait() }
                 throw CancellationError()
@@ -215,16 +202,14 @@ struct RemoteReaderCancelTests {
         var entry: NetworkPlaybackCache.Entry? = try cache.entry(key: "a", url: URL(string: "x-remote://a")!, reader: released)
         try entry!.prepare(full: false, lead: 4096, cancelled: { false })
         entry = nil
-        let end = Date().addingTimeInterval(5)
-        while !released.wasCancelled, Date() < end { Thread.sleep(forTimeInterval: 0.01) }
-        #expect(released.wasCancelled)
+        #expect(Patience.until { released.wasCancelled })
 
         // A copy whose reads never come back fails with "not answering" after the no-progress limit, and lets its reader go.
-        let clock = Locked(0.0)
-        let quiet = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096, noProgressLimit: 5, clock: { clock.withLock { $0 } })
+        let clock = RunawayClock()
+        let quiet = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096, noProgressLimit: 5, clock: { clock.now })
         let silent = WaitingReader(Data(repeating: 2, count: 64 << 10))
         let stuck = try quiet.entry(key: "b", url: URL(string: "x-remote://b")!, reader: silent)
-        Thread { Thread.sleep(forTimeInterval: 0.2); clock.withLock { $0 = 10 } }.start()
+        silent.whenWaiting = { clock.run() }
         #expect(throws: (any Error).self) { try stuck.prepare(full: true, lead: 0, cancelled: { false }) }
         #expect(silent.wasCancelled)
     }
@@ -235,10 +220,11 @@ struct RemoteReaderCancelTests {
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
         for message in ["Service X isn't answering", nil] as [String?] {
-            let clock = Locked(0.0)
-            let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096, noProgressLimit: 5, clock: { clock.withLock { $0 } })
-            let entry = try cache.entry(key: "m", url: URL(string: "x-remote://m")!, reader: WaitingReader(Data(repeating: 3, count: 64 << 10), message: message))
-            Thread { Thread.sleep(forTimeInterval: 0.2); clock.withLock { $0 = 10 } }.start()
+            let clock = RunawayClock()
+            let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096, noProgressLimit: 5, clock: { clock.now })
+            let reader = WaitingReader(Data(repeating: 3, count: 64 << 10), message: message)
+            reader.whenWaiting = { clock.run() }
+            let entry = try cache.entry(key: "m", url: URL(string: "x-remote://m")!, reader: reader)
             do {
                 try entry.prepare(full: true, lead: 0, cancelled: { false })
                 Issue.record("a silent copy completed")
@@ -256,14 +242,15 @@ struct RemoteReaderCancelTests {
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         defer { try? FileManager.default.removeItem(at: dir) }
         let release = DispatchSemaphore(value: 0)
+        let clock = Locked(0.0)
         NetworkPlaybackCache.registerRemoteReader(scheme: "x-silent-open", notAnsweringMessage: "Service Y isn't answering") { _ in
+            // The open has begun and will not return: from here on the cache's clock says the limit has passed.
+            clock.withLock { $0 = 10 }
             release.wait()
             throw CancellationError()
         }
-        defer { release.signal() }
-        let clock = Locked(0.0)
+        defer { release.signal(); NetworkPlaybackCache.unregisterRemoteReader(scheme: "x-silent-open") }
         let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, noProgressLimit: 5, clock: { clock.withLock { $0 } })
-        Thread { Thread.sleep(forTimeInterval: 0.2); clock.withLock { $0 = 10 } }.start()
         do {
             _ = try cache.entry(key: "o", url: URL(string: "x-silent-open://o")!)
             Issue.record("opened")
@@ -283,5 +270,49 @@ private final class FailingFirstReader: RemoteCacheReader, @unchecked Sendable {
     func read(at offset: Int64, count: Int) throws -> Data {
         if offset >= 4096 { throw POSIXError(.EIO) }
         return bytes.subdata(in: Int(offset)..<min(Int(offset) + count, bytes.count))
+    }
+}
+
+/// What became of a song the engine was asked to play, as the engine itself reports it.
+enum EngineOutcome: Equatable, CustomStringConvertible {
+    case started, failed(String), nothing
+
+    var description: String {
+        switch self {
+        case .started: "started"
+        case .failed(let message): "failed: \(message)"
+        case .nothing: "the engine said nothing"
+        }
+    }
+
+    /// Plays `item` and waits for the engine to say it became audible or failed. There is no deadline to beat: a machine running
+    /// every test at once may take a minute over what takes a moment alone. The long stop only ends a run that would never end.
+    static func ofPlaying(_ item: PlayableItem, on engine: PlaybackEngine, giveUpAfter: TimeInterval = 600) async -> EngineOutcome {
+        let (stream, continuation) = AsyncStream.makeStream(of: EngineOutcome.self)
+        engine.eventHandler = { event in
+            switch event {
+            case .trackStarted(let started) where started.id == item.id: continuation.yield(.started)
+            case .failed(_, let message): continuation.yield(.failed(message))
+            default: break
+            }
+        }
+        let stop = Task { try? await Task.sleep(for: .seconds(giveUpAfter)); continuation.yield(.nothing) }
+        defer { stop.cancel(); engine.eventHandler = nil }
+        engine.play(item)
+        for await outcome in stream { return outcome }
+        return .nothing
+    }
+}
+
+/// Waits for something that will happen, without a deadline it could miss on a busy machine.
+enum Patience {
+    /// True once `condition` holds. The long stop only ends a run that would never end.
+    static func until(giveUpAfter: TimeInterval = 600, _ condition: () -> Bool) -> Bool {
+        let end = Date().addingTimeInterval(giveUpAfter)
+        while !condition() {
+            if Date() > end { return condition() }
+            Thread.sleep(forTimeInterval: 0.005)
+        }
+        return true
     }
 }

@@ -63,7 +63,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         var heard = false
         /// Its decoder stopped on an error, and that has been said.
         var errorSaid = false
-        /// A TIDAL song's whole copy in the transient playback cache, read by `frames`; deleted when the segment is let go.
+        /// A streamed song's whole copy in the transient playback cache, read by `frames`; deleted when the segment is let go.
         var staged: StagedRemoteFile?
 
         init(item: PlayableItem, frames: AirPlayFrames, path: SignalPath, offset: TimeInterval, duration: TimeInterval, announces: Bool) {
@@ -500,7 +500,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         onOpen?(Thread.current.name == Pacer.threadName)
         if let delay = openDelay?(item), delay > 0 { Thread.sleep(forTimeInterval: delay) }
         let resolved = urlResolver?(item) ?? item.url
-        // A stream (TIDAL) is copied whole first: the frames are decoded from a local file.
+        // A stream is copied whole first: the frames are decoded from a local file.
         let staged = resolved.isFileURL ? nil : try StagedRemoteFile.stage(item)
         let url = staged?.url ?? resolved
         let (settings, receiverDB) = state.withLock { ($0.settings, $0.receiverVolumeDB) }

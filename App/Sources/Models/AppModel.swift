@@ -189,6 +189,8 @@ final class AppModel {
     private(set) var renderers: RendererOutputModel?
     /// AirPlay receivers; nil unless the Settings switch (AirPlay Players (beta)) is on.
     private(set) var airPlay: AirPlayOutputModel?
+    /// This Mac as a UPnP receiver for control apps; nil unless the Settings switch (Play to Vespertine (UPnP, beta)) is on.
+    private(set) var receiver: ReceiverModel?
     /// Mac Sound Output (beta): speaker groups published as outputs of the Mac.
     let systemOutput: SystemOutputModel
     let library: LibraryStore
@@ -337,9 +339,13 @@ final class AppModel {
         }
         if settings.upnpRenderersFeature {
             renderers = RendererSwitch.apply(true, to: settings, current: nil, onChange: { [weak self] in self?.syncEngine() })
+            renderers?.hiddenUDN = settings.upnpReceiverFeature ? settings.upnpReceiverID : nil
         }
         if settings.airPlayPlayersFeature {
             airPlay = AirPlaySwitch.apply(true, to: settings, current: nil, onChange: { [weak self] in self?.syncEngine() })
+        }
+        if settings.upnpReceiverFeature {
+            receiver = ReceiverSwitch.apply(true, to: settings, current: nil, make: makeReceiver)
         }
         syncEngine()
         dopSetup.onChoicesChanged = { [weak self] in self?.syncEngine() }
@@ -358,10 +364,14 @@ final class AppModel {
                 let relay = self.player.volumeRelay, engine = self.player.engine
                 // A network player or AirPlay receiver is told to stop too: it would otherwise play on by itself.
                 let network = self.player.renderer
+                // Control apps are told the receiver is gone (ssdp:byebye), so it leaves their lists at once.
+                let goodbye: @Sendable () -> Void
+                if let receiver = self.receiver { goodbye = receiver.goodbyeStep() } else { goodbye = {} }
                 let discord = self.player.discord.shutdownStep()
                 let onQuit = self.settings.deviceOnQuit
                 QuitSequence.run(steps: [
                     { relay.stop() },
+                    goodbye,
                     discord,
                     { network?.stopAndWait(timeout: 1.5) },
                     { engine.stopAndWait() },
@@ -508,6 +518,51 @@ final class AppModel {
         syncEngine()
     }
 
+    /// The Play to Vespertine (UPnP, beta) switch. Off, a control app's song stops and the listener's queue is back.
+    func setReceiverFeature(_ on: Bool) {
+        receiver = ReceiverSwitch.apply(on, to: settings, current: receiver, make: makeReceiver)
+        renderers?.hiddenUDN = on ? settings.upnpReceiverID : nil
+    }
+
+    private func makeReceiver() -> ReceiverModel {
+        let model = ReceiverModel(player: player, settings: settings)
+        model.volume = ReceiverVolume(
+            read: { [weak self] in self?.receiverVolume() ?? (1, false) },
+            set: { [weak self] in self?.setReceiverVolume($0) },
+            setMuted: { [weak self] muted in
+                guard let self, self.settings.upnpReceiverVolume, self.volumeRoute != .fixed, self.isVolumeMuted != muted else { return }
+                self.adjustVolume(.mute)
+            })
+        return model
+    }
+
+    /// The volume a control app is shown: the playing output's own, else Vespertine's for it, else fixed at full.
+    private func receiverVolume() -> (level: Double, muted: Bool) {
+        guard let device = activeDevice else { return (1, false) }
+        switch volumeRoute {
+        case .software: return (settings.appVolumeLevel(for: device.uid), settings.isMuted(device.uid))
+        case .hardware: return (Double(devices.hardwareVolume ?? 1), devices.isHardwareMuted)
+        case .fixed: return (1, false)
+        }
+    }
+
+    /// A control app set the volume (only while the listener lets control apps do that). An output with no volume of its own
+    /// and Vespertine's volume off gets Vespertine's volume turned on for it: the signal path then says the level is applied.
+    private func setReceiverVolume(_ level: Double) {
+        guard settings.upnpReceiverVolume, let device = activeDevice else { return }
+        switch volumeRoute {
+        case .hardware:
+            devices.setHardwareVolume(Float(level))
+        case .software:
+            settings.setAppVolumeLevel(level, for: device.uid)
+            syncEngine()
+        case .fixed:
+            settings.setUsesAppVolume(true, for: device.uid)
+            settings.setAppVolumeLevel(level, for: device.uid)
+            syncEngine()
+        }
+    }
+
     /// The Network Players (UPnP, beta) switch. Turning it off while a renderer is the chosen output stops the music and lets
     /// go of it: what was playing on the renderer doesn't start on this Mac's own output.
     func setRenderersFeature(_ on: Bool) {
@@ -517,6 +572,7 @@ final class AppModel {
             settings.selectedDevice = nil
         }
         renderers = RendererSwitch.apply(on, to: settings, current: renderers, onChange: { [weak self] in self?.syncEngine() })
+        renderers?.hiddenUDN = settings.upnpReceiverFeature ? settings.upnpReceiverID : nil
         syncEngine()
     }
 
@@ -695,6 +751,7 @@ final class AppModel {
 
     /// Push preference changes into the engine and device watchers.
     func syncEngine() {
+        defer { receiver?.volumeMayHaveChanged() }
         devices.dopUIDs = settings.effectiveDoPUIDs
         let device = plannedDevice
         var engineSettings = settings.engineSettings(groups: speakerGroups?.groups ?? [])
@@ -803,6 +860,8 @@ final class AppModel {
     /// embedded art, or art from a folder image), so Now Playing matches the album page.
     func artworkKey(_ track: Track?) -> String? {
         guard let track else { return nil }
+        // A control app's song belongs to no album of the library: it shows the picture it came with, or none.
+        if track.isTransient { return track.artworkKey }
         return track.artworkKey ?? library.album(key: track.albumKey)?.artworkKey
     }
 

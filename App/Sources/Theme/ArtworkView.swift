@@ -19,10 +19,25 @@ final class ArtworkCache {
 
     init() { cache.countLimit = 600; visualizerPictures.countLimit = 8 }
 
-    func cached(_ key: String, size: Int) -> NSImage? { cache.object(forKey: "\(key)_\(size)" as NSString) }
+    /// Pictures that are never written anywhere (a song a control app sent came with one): the last few, by a key made here.
+    private var memoryOnly: [(key: String, image: NSImage)] = []
+    static let memoryOnlyLimit = 8
+
+    /// Keeps `image` in memory under a new key, for as long as it is among the last few kept.
+    func keepInMemory(_ image: NSImage) -> String {
+        let key = "memory-\(UUID().uuidString)"
+        memoryOnly.append((key, image))
+        if memoryOnly.count > Self.memoryOnlyLimit { memoryOnly.removeFirst(memoryOnly.count - Self.memoryOnlyLimit) }
+        return key
+    }
+
+    func cached(_ key: String, size: Int) -> NSImage? {
+        cache.object(forKey: "\(key)_\(size)" as NSString) ?? memoryOnly.first { $0.key == key }?.image
+    }
 
     func image(_ key: String, size: Int) async -> NSImage? {
         if let hit = cached(key, size: size) { return hit }
+        if key.hasPrefix("memory-") { return nil }
         guard let store else { return nil }
         let url = store.url(for: key, minimumSize: size)
         let image = await Task.detached(priority: .userInitiated) { NSImage(contentsOf: url) }.value
