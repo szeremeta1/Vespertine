@@ -443,7 +443,8 @@ public final class ShareMac: RemoteChannel {
         case .playPause, .play, .pause, .next, .previous, .stop, .seek, .setShuffle, .setRepeat,
              .jump, .removeFromQueue, .moveInQueue, .clearUpcoming,
              .playAlbum, .playTracks, .playPlaylist, .playNext, .addToQueue, .playAlbums, .playCopy,
-             .selectOutput, .volume, .setVolume, .setTransitions:
+             .selectOutput, .volume, .setVolume, .setTransitions,
+             .setEqualizer, .setRoomCorrection, .setSpatialMode, .setSpatializeStereo, .setBalance:
             return .failed(reason: "")
 
         case .setFavorite(let ids, let on):

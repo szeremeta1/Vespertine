@@ -152,8 +152,36 @@ final class PlayTarget {
         if signal.cut {
             return String(localized: "CUT ON THE MAC", comment: "Signal badge on the iPhone: the song is one track cut out of a longer lossless file (a CUE sheet album) by the Mac, with its sound unchanged. Same style as CONVERTED ON THE MAC.")
         }
-        return signal.converted ? String(localized: "CONVERTED ON THE MAC", comment: "Signal badge: the Mac converted this song to a format the iPhone can play.")
-                         : String(localized: "ORIGINAL FILE", comment: "Signal badge: the iPhone plays the song's own file, as it is on the Mac.")
+        if signal.converted {
+            return String(localized: "CONVERTED ON THE MAC", comment: "Signal badge: the Mac converted this song to a format the iPhone can play.")
+        }
+        // The two stronger wordings hold only while nothing is known to change the samples on the way to a DAC
+        // (`PhoneSignal.untouched`): a lower volume, another rate, Bluetooth or the speaker, or anything Vespertine does
+        // to the sound brings back the plain one.
+        if signal.verifiedOnDAC {
+            return String(localized: "ORIGINAL FILE · VERIFIED ON THIS DAC", comment: "Signal badge on the iPhone (short, uppercase): the song's own lossless file plays with nothing changing its samples, on a DAC that passed the DoP listening test at this song's sample rate. DAC stays as it is.")
+        }
+        if signal.untouched {
+            return String(localized: "ORIGINAL FILE · NO PROCESSING", comment: "Signal badge on the iPhone (short, uppercase): the song's own lossless file plays on a DAC at the song's own sample rate, with the volume at 100% and nothing in Vespertine changing the sound.")
+        }
+        return String(localized: "ORIGINAL FILE", comment: "Signal badge: the iPhone plays the song's own file, as it is on the Mac.")
+    }
+
+    /// The DoP test's results for a DAC, as rows: the rates it played the chord at, and the rates it didn't.
+    static func dopRows(_ dacs: DoPDACs, route: PhoneRoute?) -> [(label: String, value: String)] {
+        let results = dacs.results(for: route?.uid)
+        func rates(_ passed: Bool) -> String? {
+            let list = results.filter { ($0.result == .passed) == passed }.map { PhoneSignal.kilohertz($0.carrier) }
+            return list.isEmpty ? nil : String(localized: "\(list.joined(separator: ", ")) kHz", comment: "Signal chip: a sample rate.")
+        }
+        var rows: [(String, String)] = []
+        if let passed = rates(true) {
+            rows.append((String(localized: "DoP passed at", comment: "Row label on the iPhone's Output screen: the sample rates at which this DAC passed the DoP listening test. The value is a list of rates, e.g. 176.4, 352.8 kHz. DoP stays as it is."), passed))
+        }
+        if let failed = rates(false) {
+            rows.append((String(localized: "DoP not passed at", comment: "Row label on the iPhone's Output screen: the sample rates at which this DAC did not pass the DoP listening test. The value is a list of rates, e.g. 192, 384 kHz. DoP stays as it is."), failed))
+        }
+        return rows
     }
 
     /// What the output runs at, and that iOS changed the rate to get there when it did.
@@ -174,7 +202,7 @@ final class PlayTarget {
     }
 
     /// The Output screen's read-back: what the song is and what iOS says the output is doing with it. Facts only.
-    static func report(_ signal: PhoneSignal, route: PhoneRoute?) -> [(label: String, value: String)] {
+    static func report(_ signal: PhoneSignal, route: PhoneRoute?, dop: DoPDACs = DoPDACs()) -> [(label: String, value: String)] {
         var rows: [(String, String)] = [
             (String(localized: "Song", comment: "Row label on the iPhone's Output screen: the playing song's format, e.g. 24/192."), signal.streamFormat),
             (String(localized: "Song’s channels", comment: "Row label on the iPhone's Output screen: how many channels the playing song has."), String(signal.channels)),
@@ -214,6 +242,12 @@ final class PlayTarget {
             rows.append((String(localized: "ReplayGain"), String(localized: "None for this song", comment: "Value on the iPhone's Output screen, for the row ReplayGain: ReplayGain is turned on, but the playing song has no ReplayGain values (or is DSD sent as DoP), so it plays unchanged.")))
         }
         if let volume = signal.volume { rows.append((String(localized: "Volume"), percent(volume))) }
+        if signal.untouched {
+            rows.append((String(localized: "Original file", comment: "Row label on the iPhone's Output screen: the song's own lossless file is playing. The value is No processing or Verified on this DAC."),
+                         signal.verifiedOnDAC ? String(localized: "Verified on this DAC", comment: "Value on the iPhone's Output screen, for the row Original file: this DAC passed the DoP listening test at this song's sample rate. DAC stays as it is.")
+                                              : String(localized: "No processing", comment: "Value on the iPhone's Output screen, for the row Original file: nothing changes the song's samples on the way to the DAC.")))
+        }
+        rows.append(contentsOf: dopRows(dop, route: route).map { ($0.label, $0.value) })
         return rows
     }
 

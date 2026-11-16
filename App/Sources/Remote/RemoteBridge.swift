@@ -40,7 +40,40 @@ struct RemoteBridge {
             volume: volumeState,
             waitingFor: player.waitingForDevice,
             error: player.errorForRemote,
-            transitions: settings.transitionsFeature ? settings.transitions.enabled : nil)
+            transitions: settings.transitionsFeature ? settings.transitions.enabled : nil,
+            sound: soundState)
+    }
+
+    /// The Mac output whose room correction and Spatial Audio a remote sets: the one playing or chosen. A speaker group
+    /// has its own pages for those on the Mac, and a network player or AirPlay receiver has neither.
+    private var soundDevice: OutputDevice? {
+        guard !model.networkOutputChosen, let device = model.activeDevice, !GroupOutput.isGroupOutput(device) else { return nil }
+        return device
+    }
+
+    /// The output whose equalizer a remote sets: the Mac output playing or chosen, or the chosen network player (which
+    /// is sent the equalized song). An AirPlay receiver has none.
+    private var equalizerUID: String? {
+        if model.rendererChosen { return settings.selectedDeviceUID }
+        return model.networkOutputChosen ? nil : model.activeDevice?.uid
+    }
+
+    /// The sound settings of the output in use, as its panel on the Mac has them; nil with no output to set them on.
+    var soundState: SoundState? {
+        var sound = SoundState()
+        if let uid = equalizerUID {
+            let playsHere = uid == model.activeDevice?.uid
+            sound.equalizer = RemoteSound.equalizer(for: uid, settings: settings,
+                                                    bypassed: playsHere ? model.equalizerStatus.reason.map { String(localized: "Not applied: \($0.explanation)") } : nil)
+        }
+        if let device = soundDevice {
+            sound.room = RemoteSound.room(for: device.uid, settings: settings)
+            sound.spatial = RemoteSound.spatial(for: device, settings: settings)
+        }
+        if let device = model.balanceDevice {
+            sound.balance = BalanceState(value: settings.balance(for: device.uid), bypassed: model.balanceBypass?.explanation)
+        }
+        return sound.isEmpty ? nil : sound
     }
 
     var volumeState: VolumeState {
@@ -427,6 +460,26 @@ struct RemoteBridge {
                 return .failed(reason: String(localized: "Transitions are turned off in Vespertine’s settings on the Mac.", bundle: ReplyWords.bundle, comment: "Remote control: the phone tried to turn on transitions, but the feature is off in Settings."))
             }
             model.setTransitions(on)
+
+        case .setEqualizer(let preset):
+            guard let uid = equalizerUID, RemoteSound.setEqualizer(preset, for: uid, settings: settings) else { return Self.unavailable }
+            model.syncEngine()
+        case .setRoomCorrection(let profile):
+            guard let device = soundDevice, RemoteSound.setRoom(profile, for: device.uid, settings: settings) else { return Self.unavailable }
+            model.syncEngine()
+        case .setSpatialMode(let mode):
+            guard let device = soundDevice else { return Self.unavailable }
+            RemoteSound.setSpatialMode(mode, for: device, settings: settings)
+            model.syncEngine()
+        case .setSpatializeStereo(let on):
+            guard let device = soundDevice, RemoteSound.setSpatializeStereo(on, for: device, settings: settings) else { return Self.unavailable }
+            model.syncEngine()
+        case .setBalance(let value):
+            // As the Mac's own panel: the slider doesn't move while what plays can't take it (DoP, Spatial Audio), but
+            // Center always works.
+            let balance = BalanceLaw.snapped(BalanceState.clamped(value))
+            guard model.balanceDevice != nil, balance == 0 || model.balanceBypass == nil else { return Self.unavailable }
+            model.setBalance(balance)
         }
         return .ok
     }

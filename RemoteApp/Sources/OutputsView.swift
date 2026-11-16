@@ -69,7 +69,7 @@ struct OutputsView: View {
                 }
                 if playsHere, let phone = session.phone, let signal = phone.signal {
                     Section {
-                        ForEach(PlayTarget.report(signal, route: phone.route), id: \.label) { row in
+                        ForEach(PlayTarget.report(signal, route: phone.route, dop: phone.dopDACs), id: \.label) { row in
                             LabeledContent(row.label, value: row.value)
                         }
                     } header: {
@@ -228,6 +228,12 @@ private struct DoPSection: View {
     var body: some View {
         Section {
             if let status { Text(status).foregroundStyle(Color.secondary) }
+            // Which rates this DAC played the chord at: there whether or not a song is playing.
+            if !probe.isBusy {
+                ForEach(PlayTarget.dopRows(phone.dopDACs, route: phone.route), id: \.label) { row in
+                    LabeledContent(row.label, value: row.value)
+                }
+            }
             Button { probe.run() } label: {
                 HStack {
                     Text("Test DoP")
@@ -243,6 +249,9 @@ private struct DoPSection: View {
                 Button("Music") { probe.answer(.music) }
                 Button("Hiss") { probe.answer(.hiss) }
                 Button("Cancel", role: .cancel) { probe.cancel() }
+            } message: {
+                // The chord is played at each rate in turn: which one the question is about.
+                Text("\(PhoneSignal.kilohertz(probe.carrier)) kHz")
             }
         } header: {
             Text("Play DSD natively?")
