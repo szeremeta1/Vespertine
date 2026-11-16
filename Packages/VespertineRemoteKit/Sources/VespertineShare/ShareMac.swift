@@ -77,6 +77,13 @@ public struct ShareSayings: Sendable {
 
     public static let english = ShareSayings(words: .english, trouble: { "The share can’t be reached (\($0))." }, notInLibrary: "That isn’t on the share any more.",
                                              noPlaylists: "Playlists are kept on the Mac.", changed: "That file has changed on the share. Scan the share again.")
+
+    /// A folder on the phone, in English (the app says the same in its own languages).
+    public static let englishFolder = ShareSayings(words: .english, trouble: { error in
+        error == .accessDenied ? "Vespertine can’t open this folder any more. Choose the folder again."
+            : "This folder can’t be found. If it is on a drive, plug the drive in. If it was moved or renamed, choose the folder again."
+    }, notInLibrary: "That file isn’t in the folder any more.", noPlaylists: "Playlists are kept on the Mac. A folder has none.",
+                                                   changed: "That file has changed. Vespertine is reading the folder again.")
 }
 
 /// Runs blocking share reads one after another on a thread of their own, so nothing that waits on the network holds up
@@ -128,6 +135,9 @@ public final class ShareMac: RemoteChannel {
     public var rescanAfter: TimeInterval = 24 * 3600
     /// How many songs a first scan reads between showing (and keeping) what it has found so far.
     public var glimpseEvery = 200
+    /// A song asked for whose file is gone is taken off the lists there and then, and one whose file changed has the
+    /// library looked at again, without being asked. For a folder on the phone, where looking again costs nothing.
+    public var mendsItself = false
 
     private let files: any ShareFiles
     private let playback: any ShareFiles
@@ -234,6 +244,8 @@ public final class ShareMac: RemoteChannel {
             return await openStream(id, maxSampleRate: maxSampleRate, smaller: smaller ?? false, dop: dop)
         case .artwork(let key, let size):
             return await artwork(key, size: size)
+        case .streamInfo(let ids, let maxSampleRate) where ids.count == 1:
+            return await streamInfo(ids[0], maxSampleRate: maxSampleRate)
         default:
             return perform(command)
         }
@@ -399,9 +411,12 @@ public final class ShareMac: RemoteChannel {
         do {
             let found = try await playbackWorker.run { try playback.info(song.path) }
             noteReachable(true)
-            guard found.size == song.size else { return .failed(reason: sayings.changed) }
+            guard found.size == song.size else {
+                if mendsItself { rescan() }
+                return .failed(reason: sayings.changed)
+            }
         } catch let error as SMBError {
-            if error != .notFound { noteReachable(false) }
+            if error != .notFound { noteReachable(false) } else if mendsItself { drop(song) }
             return .failed(reason: error == .notFound ? sayings.notInLibrary : sayings.trouble(error))
         } catch {
             return .failed(reason: sayings.trouble(.closed))
@@ -453,7 +468,54 @@ public final class ShareMac: RemoteChannel {
                                               tag: Self.tag(size: song.size, modified: song.modified), chunkSize: RemoteProtocol.defaultChunkSize))
     }
 
+    /// A song whose file is gone: off the lists now (it isn't shown as something that can be played), and the index
+    /// with it.
+    private func drop(_ song: ShareSong) {
+        guard library.songs.contains(where: { $0.id == song.id }) else { return }
+        library.songs.removeAll { $0.id == song.id }
+        store.save(library)
+        catalog = ShareCatalog(library, favorites: favorites, words: sayings.words)
+        revision += 1
+        onChange?()
+    }
+
     // MARK: Covers
+
+    private func streamInfo(_ id: Int64, _ song: ShareSong, replayGain: ReplayGain?, maxSampleRate: Double? = nil) -> StreamInfo? {
+        if let dsd = song.tags.dsd {
+            // Asked without an output in mind: the PCM form (DoP is offered when a song is opened for a DAC).
+            guard let rendering = DSDRendering.plan(dsd, maxSampleRate: maxSampleRate) else { return nil }
+            return StreamInfo(id: id, streamable: true, kind: .pcm, source: format(song), delivered: delivered(rendering), macOnlyReason: nil,
+                              byteSize: nil, totalFrames: rendering.frames, replayGain: replayGain, encoderDelay: nil, endPadding: nil)
+        }
+        if decoders?.extensions.contains(SongTagReader.fileExtension(song.fileName)) ?? false {
+            let delivered = StreamFormat(codec: "PCM", container: "caf", sampleRate: song.tags.sampleRate, bitDepth: song.tags.bitDepth,
+                                         channels: song.tags.channels, channelLabels: nil, lossless: song.tags.lossless)
+            return StreamInfo(id: id, streamable: true, kind: .decoded, source: format(song), delivered: delivered, macOnlyReason: nil,
+                              byteSize: nil, totalFrames: song.tags.frames, replayGain: replayGain, encoderDelay: nil, endPadding: nil)
+        }
+        return StreamInfo(id: id, streamable: true, kind: .original, source: format(song), delivered: format(song), macOnlyReason: nil,
+                          byteSize: song.size, totalFrames: song.tags.frames, replayGain: replayGain, encoderDelay: nil, endPadding: nil)
+    }
+
+    /// One song asked about by itself is being asked for its ReplayGain values, to be played with them: its tags are
+    /// read from the file again (a few small reads), so that an index made before those were read, or a file tagged
+    /// since, still answers with what the file says now. A share that can't be read answers with what the index has.
+    private func streamInfo(_ id: Int64, maxSampleRate: Double?) async -> RemoteReply {
+        guard let song = catalog.songs[id] else { return .streamInfo(items: []) }
+        let playback = playback
+        let path = song.path, size = song.size
+        let name = path.split(separator: "/").last.map(String.init) ?? path
+        let values: ReplayGain?
+        do {
+            values = try await playbackWorker.run {
+                try SongTagReader.read(name: name, size: size) { offset, length in try playback.read(path, offset: offset, length: length) }
+            }?.replayGain
+        } catch {
+            values = song.tags.replayGain
+        }
+        return .streamInfo(items: [streamInfo(id, song, replayGain: values, maxSampleRate: maxSampleRate)].compactMap { $0 })
+    }
 
     private func artwork(_ key: String, size: Int) async -> RemoteReply {
         guard let cover = catalog.covers[key] else { return .failed(reason: "") }
@@ -506,7 +568,8 @@ public final class ShareMac: RemoteChannel {
         case .playPause, .play, .pause, .next, .previous, .stop, .seek, .setShuffle, .setRepeat,
              .jump, .removeFromQueue, .moveInQueue, .clearUpcoming,
              .playAlbum, .playTracks, .playPlaylist, .playNext, .addToQueue, .playAlbums, .playCopy,
-             .selectOutput, .volume, .setVolume, .setTransitions:
+             .selectOutput, .volume, .setVolume, .setTransitions,
+             .setEqualizer, .setRoomCorrection, .setSpatialMode, .setSpatializeStereo, .setBalance:
             return .failed(reason: "")
 
         case .setFavorite(let ids, let on):
@@ -565,20 +628,7 @@ public final class ShareMac: RemoteChannel {
         case .streamInfo(let ids, let maxSampleRate):
             return .streamInfo(items: ids.compactMap { id in
                 guard let song = catalog.songs[id] else { return nil }
-                if let dsd = song.tags.dsd {
-                    // Asked without an output in mind: the PCM form (DoP is offered when a song is opened for a DAC).
-                    guard let rendering = DSDRendering.plan(dsd, maxSampleRate: maxSampleRate) else { return nil }
-                    return StreamInfo(id: id, streamable: true, kind: .pcm, source: format(song), delivered: delivered(rendering), macOnlyReason: nil,
-                                      byteSize: nil, totalFrames: rendering.frames, replayGain: nil, encoderDelay: nil, endPadding: nil)
-                }
-                if decoders?.extensions.contains(SongTagReader.fileExtension(song.fileName)) ?? false {
-                    let delivered = StreamFormat(codec: "PCM", container: "caf", sampleRate: song.tags.sampleRate, bitDepth: song.tags.bitDepth,
-                                                 channels: song.tags.channels, channelLabels: nil, lossless: song.tags.lossless)
-                    return StreamInfo(id: id, streamable: true, kind: .decoded, source: format(song), delivered: delivered, macOnlyReason: nil,
-                                      byteSize: nil, totalFrames: song.tags.frames, replayGain: nil, encoderDelay: nil, endPadding: nil)
-                }
-                return StreamInfo(id: id, streamable: true, kind: .original, source: format(song), delivered: format(song), macOnlyReason: nil,
-                                  byteSize: song.size, totalFrames: song.tags.frames, replayGain: nil, encoderDelay: nil, endPadding: nil)
+                return streamInfo(id, song, replayGain: song.tags.replayGain, maxSampleRate: maxSampleRate)
             })
         case .streamRead:
             return .failed(reason: "")

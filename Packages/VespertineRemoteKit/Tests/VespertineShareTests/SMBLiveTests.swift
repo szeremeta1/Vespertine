@@ -1,6 +1,7 @@
 //
 // Vespertine: the SMB client against a real server. Runs only when VESPERTINE_SMB names one
-// ("host:port/share/user/password"), which the suite's machine does not: see docs/PHONE-SHARES.md for how it is run.
+// ("host:port/share/user/password", or "host:port/share" to sign in as a guest), which the suite's machine does not:
+// see docs/PHONE-SHARES.md for how it is run.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
@@ -10,10 +11,11 @@ import Testing
 
 private let live: (host: String, port: Int, share: String, user: String, password: String)? = {
     guard let text = ProcessInfo.processInfo.environment["VESPERTINE_SMB"] else { return nil }
-    let parts = text.split(separator: "/", maxSplits: 3).map(String.init)
+    let parts = text.split(separator: "/", maxSplits: 3, omittingEmptySubsequences: false).map(String.init)
     let address = parts.first?.split(separator: ":").map(String.init) ?? []
-    guard parts.count == 4, address.count == 2, let port = Int(address[1]) else { return nil }
-    return (address[0], port, parts[1], parts[2], parts[3])
+    guard parts.count >= 2, address.count == 2, let port = Int(address[1]) else { return nil }
+    // No account: a guest.
+    return (address[0], port, parts[1], parts.count > 2 ? parts[2] : "", parts.count > 3 ? parts[3] : "")
 }()
 
 @Suite(.enabled(if: live != nil)) struct SMBLiveTests {
@@ -21,7 +23,15 @@ private let live: (host: String, port: Int, share: String, user: String, passwor
         let live = try #require(live)
         let connection = SMBConnection(transport: try SocketTransport(host: live.host, port: live.port))
         try connection.connect(server: live.host, share: live.share, credentials: SMBCredentials(name: live.user, password: live.password))
-        print("dialect", String(connection.dialect, radix: 16))
+        print("dialect", String(connection.dialect, radix: 16), "encrypted", connection.encrypted, "guest", connection.guest)
+        // What the server is expected to have agreed to, when the run says: "311", "encrypted", "guest", with commas between.
+        for expected in (ProcessInfo.processInfo.environment["VESPERTINE_SMB_EXPECT"] ?? "").split(separator: ",") {
+            switch expected {
+            case "encrypted": #expect(connection.encrypted)
+            case "guest": #expect(connection.guest)
+            default: #expect(String(connection.dialect, radix: 16) == expected)
+            }
+        }
         let top = try connection.open("", folder: true)
         let names = try connection.list(top).map(\.name)
         try connection.close(top)
@@ -63,17 +73,44 @@ private let live: (host: String, port: Int, share: String, user: String, passwor
         #expect(again == library)
     }
 
-    /// Writes the conversation SMBReplayTests plays back, for the server VESPERTINE_SMB names.
+    /// A large file read through in megabyte pieces and compared byte for byte with a local copy of it:
+    /// VESPERTINE_SMB_BIG is its path on the share, VESPERTINE_SMB_BIG_FILE the copy's.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["VESPERTINE_SMB_BIG"] != nil)) func readsALargeFileByteForByte() throws {
+        let live = try #require(live)
+        let path = try #require(ProcessInfo.processInfo.environment["VESPERTINE_SMB_BIG"])
+        let local = try FileHandle(forReadingFrom: URL(fileURLWithPath: ProcessInfo.processInfo.environment["VESPERTINE_SMB_BIG_FILE"] ?? "/nonexistent"))
+        defer { try? local.close() }
+        let connection = SMBConnection(transport: try SocketTransport(host: live.host, port: live.port, timeout: 60))
+        try connection.connect(server: live.host, share: live.share, credentials: SMBCredentials(name: live.user, password: live.password))
+        let file = try connection.open(path, folder: false)
+        var offset: Int64 = 0
+        var differs: Int64?
+        while offset < file.size, differs == nil {
+            let piece = try connection.read(file, offset: offset, length: 1 << 20)
+            guard !piece.isEmpty else { break }
+            if Data(piece) != (try local.read(upToCount: piece.count) ?? Data()) { differs = offset }
+            offset += Int64(piece.count)
+        }
+        #expect(differs == nil, "the megabyte at \(differs ?? 0) differs")
+        #expect(offset == file.size)
+        #expect((try local.read(upToCount: 1) ?? Data()).isEmpty, "the local copy is longer")
+        print("read", offset, "bytes; dialect", String(connection.dialect, radix: 16), "encrypted", connection.encrypted, "guest", connection.guest)
+        try connection.close(file)
+        connection.disconnect()
+    }
+
+    /// Writes the conversation SMBReplayTests plays back, for the server VESPERTINE_SMB names. VESPERTINE_SMB_RECORD is
+    /// the folder to write to; VESPERTINE_SMB_RECORD_NAME names the recording when the version alone doesn't say it.
     @Test(.enabled(if: !(ProcessInfo.processInfo.environment["VESPERTINE_SMB_RECORD"] ?? "").isEmpty)) func record() throws {
         let live = try #require(live)
         let transport = RecordingTransport(try SocketTransport(host: live.host, port: live.port))
         let connection = SMBConnection(transport: transport, options: recordedOptions)
-        try recordedConversation(connection)
-        let name = "smb" + String(connection.dialect, radix: 16)
+        try recordedConversation(connection, credentials: SMBCredentials(name: live.user, password: live.password))
+        let name = ProcessInfo.processInfo.environment["VESPERTINE_SMB_RECORD_NAME"] ?? "smb" + String(connection.dialect, radix: 16)
         try transport.source(named: name).write(toFile: ProcessInfo.processInfo.environment["VESPERTINE_SMB_RECORD"]! + "/\(name).txt", atomically: true, encoding: .utf8)
     }
 
-    @Test func aWrongPasswordIsRefusedAsASignInFailure() throws {
+    @Test(.enabled(if: live?.user.isEmpty == false)) func aWrongPasswordIsRefusedAsASignInFailure() throws {
         let live = try #require(live)
         let connection = SMBConnection(transport: try SocketTransport(host: live.host, port: live.port))
         #expect(throws: SMBError.signInFailed) {

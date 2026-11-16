@@ -86,4 +86,83 @@ import VespertineRemoteProtocol
         folded.surround = .off
         #expect(!PlayTarget.report(folded, route: speaker).contains { $0.label == "Surround on Headphones" })
     }
+
+    @Test func replayGainIsOffUntilChosenAndAChoiceIsKept() {
+        #expect(PlayTarget.replayGain(stored: nil) == .off)
+        #expect(PlayTarget.replayGain(stored: "nonsense") == .off)
+        #expect(PlayTarget.replayGain(stored: "track") == .track && PlayTarget.replayGain(stored: "album") == .album)
+    }
+
+    @Test func theOutputScreenSaysWhatReplayGainDoesToTheSongOnlyWhileItIsOn() {
+        // Off: no row at all.
+        #expect(!PlayTarget.report(signal(rate: 44_100, route: dac), route: dac).contains { $0.label == "ReplayGain" })
+        var said = signal(rate: 44_100, route: dac)
+        said.replayGain = -6.2
+        said.processed = true
+        #expect(PlayTarget.report(said, route: dac).first { $0.label == "ReplayGain" }?.value == "−6.2 dB")
+        said.replayGain = 1.5
+        #expect(PlayTarget.report(said, route: dac).first { $0.label == "ReplayGain" }?.value == "+1.5 dB")
+        // On, and this song has nothing to go by: said, so the row isn't taken for a fault.
+        said.replayGain = nil
+        said.replayGainHasNothing = true
+        #expect(PlayTarget.report(said, route: dac).first { $0.label == "ReplayGain" }?.value == "None for this song")
+    }
+
+    // MARK: The original file on a DAC: what is said, and what takes it back
+
+    private let tested = PhoneRoute(name: "K11", portType: "USBAudio", sampleRate: 192_000, channels: 2, spatial: false, uid: "usb:k11")
+    private var results: DoPDACs {
+        var dacs = DoPDACs()
+        var run = DoPTestRun(uid: "usb:k11", name: "K11")
+        for result in [DoPDACs.CarrierResult.passed, .passed, .hiss, .declined] { _ = run.finish(result, into: &dacs) }
+        return dacs
+    }
+    private func original(rate: Double = 192_000, on route: PhoneRoute, volume: Double? = 1, passed: Bool = false) -> PhoneSignal {
+        var said = signal(rate: rate, route: route)
+        said.volume = volume
+        said.dacPassedAtRate = passed
+        return said
+    }
+
+    @Test func theBadgeSaysNoProcessingOnlyWhileNothingChangesTheSamples() {
+        #expect(PlayTarget.badge(original(on: tested)) == "ORIGINAL FILE · NO PROCESSING")
+        // The volume below 100%.
+        #expect(PlayTarget.badge(original(on: tested, volume: 0.8)) == "ORIGINAL FILE")
+        #expect(PlayTarget.badge(original(on: tested, volume: nil)) == "ORIGINAL FILE")
+        // Resampled by iOS.
+        #expect(PlayTarget.badge(original(rate: 96_000, on: tested)) == "ORIGINAL FILE")
+        // Bluetooth and the speaker.
+        let pods = PhoneRoute(name: "AirPods Max", portType: "BluetoothA2DPOutput", sampleRate: 192_000, channels: 2, spatial: true)
+        let speaker = PhoneRoute(name: "Speaker", portType: "Speaker", sampleRate: 192_000, channels: 2, spatial: false)
+        #expect(PlayTarget.badge(original(on: pods)) == "ORIGINAL FILE" && PlayTarget.badge(original(on: speaker)) == "ORIGINAL FILE")
+        // A gain or an equalizer in Vespertine.
+        var gained = original(on: tested, passed: true)
+        gained.processed = true
+        #expect(PlayTarget.badge(gained) == "ORIGINAL FILE")
+    }
+
+    @Test func theBadgeSaysVerifiedOnlyOnADacThatPassedAtTheSongsRate() {
+        #expect(PlayTarget.badge(original(on: tested, passed: true)) == "ORIGINAL FILE · VERIFIED ON THIS DAC")
+        #expect(PlayTarget.badge(original(on: tested, volume: 0.8, passed: true)) == "ORIGINAL FILE")
+        #expect(PlayTarget.badge(original(rate: 96_000, on: tested, passed: true)) == "ORIGINAL FILE")
+        let rows = PlayTarget.report(original(on: tested, passed: true), route: tested, dop: results)
+        #expect(rows.first { $0.label == "Original file" }?.value == "Verified on this DAC")
+        #expect(PlayTarget.report(original(on: tested), route: tested).first { $0.label == "Original file" }?.value == "No processing")
+        #expect(!PlayTarget.report(original(on: tested, volume: 0.8), route: tested).contains { $0.label == "Original file" })
+        for words in [PlayTarget.badge(original(on: tested)), PlayTarget.badge(original(on: tested, passed: true))] + rows.flatMap({ [$0.label, $0.value] }) {
+            #expect(!words.lowercased().contains("bit-perfect") && !words.lowercased().contains("bit perfect"))
+        }
+    }
+
+    @Test func theOutputScreenListsTheRatesTheDacPassedTheDoPTestAt() {
+        let rows = PlayTarget.report(original(on: tested), route: tested, dop: results)
+        #expect(rows.first { $0.label == "DoP passed at" }?.value == "176.4, 192 kHz")
+        #expect(rows.first { $0.label == "DoP not passed at" }?.value == "352.8, 384 kHz")
+        // Another DAC, and one never tested, get no such rows.
+        #expect(!PlayTarget.report(original(on: dac), route: dac, dop: results).contains { $0.label.hasPrefix("DoP") })
+        #expect(PlayTarget.dopRows(DoPDACs(), route: tested).isEmpty)
+        var hiss = DoPDACs()
+        hiss.record(.hiss, uid: "usb:k11", name: "K11")
+        #expect(PlayTarget.dopRows(hiss, route: tested).map(\.label) == ["DoP not passed at"])
+    }
 }

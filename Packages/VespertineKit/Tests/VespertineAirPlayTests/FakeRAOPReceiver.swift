@@ -63,6 +63,14 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         set { lock.withLock { _stall = newValue } }
     }
     private var _stall: [String: TimeInterval] = [:]
+    /// An MFi receiver: every request but OPTIONS is refused (403) until the sender has done `POST /auth-setup`.
+    var requiresAuthSetup: Bool {
+        get { lock.withLock { _requiresAuthSetup } }
+        set { lock.withLock { _requiresAuthSetup = newValue } }
+    }
+    private var _requiresAuthSetup = false
+    private var introduced = false
+
     /// The RTP times of the packets that came with the marker (the first of each stream after RECORD or FLUSH).
     var markerTimestamps: [UInt32] { lock.withLock { _markerTimestamps } }
     private var _markerTimestamps: [UInt32] = []
@@ -171,6 +179,14 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         var headers: [(String, String)] = [("CSeq", cseq), ("Server", "AirTunes/366.0")]
         if let wait = stall[request.method ?? ""] { Thread.sleep(forTimeInterval: wait) }
         if let status = refuse[request.method ?? ""] { return .response(status, "Refused", headers: headers) }
+        if request.method == "POST", request.url == "/auth-setup" {
+            // 0x01 (unencrypted) and a 32-byte key; the answer is the receiver's key, then a certificate and signature
+            // (stand-ins here: the sender reads none of it).
+            guard request.body.count == 33, request.body.first == 0x01 else { return .response(400, "Bad Request", headers: headers) }
+            lock.withLock { introduced = true }
+            return .response(200, "OK", headers: headers + [("Content-Type", "application/octet-stream")], body: Data(repeating: 0xA5, count: 32 + 4 + 16))
+        }
+        if requiresAuthSetup, request.method != "OPTIONS", !lock.withLock({ introduced }) { return .response(403, "Forbidden", headers: headers) }
         switch request.method {
         case "ANNOUNCE":
             let attributes = SDP.attributes(String(decoding: request.body, as: UTF8.self))
