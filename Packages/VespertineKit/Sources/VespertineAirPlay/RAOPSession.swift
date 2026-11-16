@@ -18,6 +18,7 @@ public final class RAOPSession: @unchecked Sendable {
     private let endpoint: NWEndpoint
     private let encryption: RAOPEncryption
     private let rsaKey: SecKey?
+    private let password: String?
     private let log = Logger(subsystem: "org.szeremeta.vespertine.player", category: "airplay")
 
     /// The connection, sockets and keep-alive: set by connect and close (the playback's worker), read by the pacer and the
@@ -44,6 +45,9 @@ public final class RAOPSession: @unchecked Sendable {
         var ports = RAOPTransport(server: 0, control: 0, timing: nil)
         var session: String?
         var cseq = 1
+        /// The receiver's password challenge, and which case of hex digits it took.
+        var challenge: RTSPDigest.Challenge?
+        var uppercaseDigest = false
         var seq = UInt16.random(in: 0...UInt16.max)
         var head = UInt32.random(in: 0...(UInt32.max / 2))
         var first = true
@@ -77,8 +81,10 @@ public final class RAOPSession: @unchecked Sendable {
     public static let silenceBeforeProbe: TimeInterval = 8
 
     /// `rsaKey`: the key the AES key is wrapped with (the AirPort Express key unless a test gives its own).
-    public init(name: String, endpoint: NWEndpoint, encryption: RAOPEncryption, rsaKey: SecKey? = nil) {
+    /// `password`: the receiver's, when it has one (asked for by its 401; never sent, only its digest).
+    public init(name: String, endpoint: NWEndpoint, encryption: RAOPEncryption, rsaKey: SecKey? = nil, password: String? = nil) {
         self.name = name
+        self.password = password.flatMap { $0.isEmpty ? nil : $0 }
         self.endpoint = endpoint
         self.encryption = encryption
         self.rsaKey = rsaKey ?? (encryption == .rsa ? try? RSAWrap.airPortExpressKey() : nil)
@@ -104,17 +110,39 @@ public final class RAOPSession: @unchecked Sendable {
 
     private func request(_ method: String, url: String? = nil, headers extra: [(String, String)] = [], body: Data = Data()) async throws -> RTSPMessage {
         guard let rtsp else { throw RAOPError.closed }
-        let (cseq, session) = state.withLock { s -> (Int, String?) in defer { s.cseq += 1 }; return (s.cseq, s.session) }
-        var headers: [(String, String)] = [("CSeq", String(cseq)), ("User-Agent", "Vespertine/1 AirPlay/366.0"),
-                                           ("Client-Instance", clientInstance), ("DACP-ID", clientInstance), ("Active-Remote", activeRemote)]
-        if let session { headers.append(("Session", session)) }
-        headers += extra
-        let response = try await rtsp.send(.request(method, url ?? self.url, headers: headers, body: body))
-        // Some receivers leave CSeq out (OwnTone notes Reflector and Airfoil); one that names another request is answering
-        // something else.
-        if let answered = response["CSeq"], answered != String(cseq) { throw RAOPError.badResponse("\(method) (CSeq \(answered), not \(cseq))") }
-        guard response.status == 200 else { throw RAOPError.refused(method, response.status) }
-        return response
+        let target = url ?? self.url
+        // A receiver with a password answers 401 with a challenge: the request goes again with the password's digest,
+        // then with the digits in the other case (receivers differ), then in the first case against the newest challenge
+        // (one that had only gone stale), and after that the refusal stands.
+        var refusals = 0
+        while true {
+            let (cseq, session, challenge, uppercase) = state.withLock { s -> (Int, String?, RTSPDigest.Challenge?, Bool) in
+                defer { s.cseq += 1 }
+                return (s.cseq, s.session, s.challenge, s.uppercaseDigest)
+            }
+            var headers: [(String, String)] = [("CSeq", String(cseq)), ("User-Agent", "Vespertine/1 AirPlay/366.0"),
+                                               ("Client-Instance", clientInstance), ("DACP-ID", clientInstance), ("Active-Remote", activeRemote)]
+            if let session { headers.append(("Session", session)) }
+            if let challenge, let password {
+                headers.append(("Authorization", RTSPDigest.authorization(challenge, password: password, method: method, uri: target, uppercase: uppercase)))
+            }
+            headers += extra
+            let response = try await rtsp.send(.request(method, target, headers: headers, body: body))
+            // Some receivers leave CSeq out (OwnTone notes Reflector and Airfoil); one that names another request is answering
+            // something else.
+            if let answered = response["CSeq"], answered != String(cseq) { throw RAOPError.badResponse("\(method) (CSeq \(answered), not \(cseq))") }
+            if response.status == 401, password != nil, refusals < 3, let asked = response["WWW-Authenticate"].flatMap(RTSPDigest.Challenge.parse) {
+                refusals += 1
+                state.withLock { s in
+                    // Refused with a digest already sent: the other case of digits, against the challenge it gives now.
+                    if challenge != nil { s.uppercaseDigest.toggle() }
+                    s.challenge = asked
+                }
+                continue
+            }
+            guard response.status == 200 else { throw RAOPError.refused(method, response.status) }
+            return response
+        }
     }
 
     /// OPTIONS, ANNOUNCE, SETUP and RECORD; then the receiver takes audio. `volumeDB`: sent right after (nil: left alone).
