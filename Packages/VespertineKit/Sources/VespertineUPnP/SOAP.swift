@@ -212,13 +212,18 @@ public struct RendererTrackInfo: Sendable, Hashable {
     public var album: String?
     public var artworkURL: URL?
     public var duration: TimeInterval?
+    /// The library's key for the song's cover (an output that is sent the picture itself, as an AirPlay receiver is, asks
+    /// for it by this).
+    public var artworkKey: String?
 
-    public init(title: String, artist: String? = nil, album: String? = nil, artworkURL: URL? = nil, duration: TimeInterval? = nil) {
+    public init(title: String, artist: String? = nil, album: String? = nil, artworkURL: URL? = nil, duration: TimeInterval? = nil,
+                artworkKey: String? = nil) {
         self.title = title
         self.artist = artist
         self.album = album
         self.artworkURL = artworkURL
         self.duration = duration
+        self.artworkKey = artworkKey
     }
 }
 

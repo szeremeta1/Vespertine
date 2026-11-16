@@ -9,6 +9,7 @@ import Foundation
 import Observation
 import VespertineAirPlay
 import VespertineAudio
+import VespertineLibrary
 import VespertineUPnP
 
 @Observable
@@ -21,6 +22,10 @@ final class AirPlayOutputModel {
     @ObservationIgnored private(set) var playback: AirPlayPlayback?
     /// Called when the list of receivers changes.
     @ObservationIgnored var onChange: (() -> Void)?
+    /// A song's cover file by its library key, for receivers that show one.
+    @ObservationIgnored var artwork: (@Sendable (String) -> Data?)? {
+        didSet { playback?.artworkProvider = artwork }
+    }
 
     init(service: AirPlayService = AirPlayService()) {
         self.service = service
@@ -79,8 +84,26 @@ final class AirPlayOutputModel {
         guard let made = AirPlayPlayback(device: device) else { playback = nil; return nil }
         made.update(settings: settings)
         made.setReceiverVolume(decibels: receiverVolumeDB)
+        made.artworkProvider = artwork
         playback = made
         return made
+    }
+}
+
+/// The cover an AirPlay receiver is sent: the library's stored picture near the size a receiver's display uses.
+enum AirPlayCover {
+    /// The file for `key`, read where it is called (off the main thread, by the playback). Keys are the library's own
+    /// (letters, digits, dashes); anything else is refused, so a key can never name a file outside the artwork folder.
+    nonisolated static func data(key: String, store: ArtworkStore) -> Data? {
+        guard !key.isEmpty, key.count <= 128,
+              key.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }) else { return nil }
+        // The 600-pixel thumbnail (a JPEG) when there is one; the original only if it is one receivers take and not huge.
+        guard let data = try? Data(contentsOf: store.url(for: key, minimumSize: 600)), AirPlayArtwork.contentType(of: data) != nil else { return nil }
+        return data
+    }
+
+    nonisolated static func provider(store: ArtworkStore) -> @Sendable (String) -> Data? {
+        { key in data(key: key, store: store) }
     }
 }
 

@@ -457,8 +457,8 @@ final class PlayerController {
         // Repeat is the listener's, for the listener's queue: a control app's songs play once, in the order it sends them.
         mirror.update(queue.map(\.item), repeatMode: receiverSession == nil ? repeatMode : .off)
         if let rendererInfo {
-            let entries = queue
-            rendererInfo.withLock { map in for entry in entries where map[entry.id] == nil { map[entry.id] = Self.rendererInfo(entry.track) } }
+            let fresh = queue.map { ($0.id, trackInfo(for: $0.track)) }
+            rendererInfo.withLock { map in for (id, info) in fresh where map[id] == nil { map[id] = info } }
         }
         if let renderer { renderer.queueChanged() } else { engine.queueChanged(reloadCurrent: reloadCurrent) }
     }
@@ -498,7 +498,8 @@ final class PlayerController {
             playback.nextItemProvider = { finished in mirror.item(after: finished.id) }
             playback.urlResolver = { @Sendable item in item.cacheKey.flatMap { cache.localURL(forKey: $0) } ?? item.url }
             let info = Locked([UUID: RendererTrackInfo]())
-            info.withLock { map in for entry in queue { map[entry.id] = Self.rendererInfo(entry.track) } }
+            let all = queue.map { ($0.id, trackInfo(for: $0.track)) }
+            info.withLock { map in for (id, described) in all { map[id] = described } }
             rendererInfo = info
             playback.metadataProvider = { item in info.withLock { $0[item.id] } }
             playback.eventHandler = { [weak self] event in self?.handle(event) }
@@ -558,6 +559,15 @@ final class PlayerController {
 
     /// Titles for the renderer's display, by queue entry (kept current as the queue changes).
     @ObservationIgnored private var rendererInfo: Locked<[UUID: RendererTrackInfo]>?
+
+    /// The key of a song's cover as the app shows it (its own, else its album's), for outputs that are sent the picture.
+    @ObservationIgnored var rendererArtworkKey: ((Track) -> String?)?
+
+    private func trackInfo(for track: Track) -> RendererTrackInfo {
+        var info = Self.rendererInfo(track)
+        info.artworkKey = rendererArtworkKey?(track)
+        return info
+    }
 
     nonisolated static func rendererInfo(_ track: Track) -> RendererTrackInfo {
         RendererTrackInfo(title: track.title, artist: track.displayArtist.libraryDisplayName, album: track.displayAlbum.libraryDisplayName,
@@ -871,7 +881,8 @@ final class PlayerController {
         bedMeters = nil
         channelLevels = []
         shares.skipped(to: entry.track, upcoming: upcoming.map(\.track))
-        rendererInfo?.withLock { $0[entry.id] = Self.rendererInfo(entry.track) }
+        let described = trackInfo(for: entry.track)
+        rendererInfo?.withLock { $0[entry.id] = described }
         if let renderer {
             if seconds > 0 {
                 position = seconds
