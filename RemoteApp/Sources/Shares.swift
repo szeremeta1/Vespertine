@@ -42,7 +42,7 @@ struct ShareStatus: Equatable {
 
     /// The share can't be used right now: the reason, for showing.
     var trouble: String? {
-        let words: (SMBError) -> String = folder ? FolderWording.trouble : ShareWording.trouble
+        func words(_ error: SMBError) -> String { folder ? FolderWording.trouble(error) : ShareWording.trouble(error) }
         if case .failed(let error) = scan { return words(error) }
         return reachable == false ? words(.unreachable) : nil
     }
