@@ -52,6 +52,9 @@ import VespertineRemoteProtocol
         #expect(pods.surroundMode(wanted: .off) == .off)
         // Headphones that don't follow your head get the fixed rendering, and say so.
         #expect(plain.surroundMode(wanted: .headTracked) == .fixed)
+        // On a system whose mixer can't turn the scene with the head (before iOS 18), even AirPods get Fixed, and say so.
+        #expect(pods.surroundMode(wanted: .headTracked, canTrackHead: false) == .fixed)
+        #expect(pods.surroundMode(wanted: .fixed, canTrackHead: false) == .fixed)
         // Speakers get the plain fold: a binaural rendering is made for ears, not for a room.
         #expect(speaker.surroundMode(wanted: .headTracked) == .off)
         #expect(tv.surroundMode(wanted: .fixed) == .off)

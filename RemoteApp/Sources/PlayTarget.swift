@@ -18,14 +18,21 @@ final class PlayTarget {
 
     /// "This iPhone" is chosen in Output. Kept between launches.
     private(set) var onThisDevice = UserDefaults.standard.bool(forKey: PlayTarget.key)
-    /// How surround songs are played on headphones here: Head Tracked unless chosen otherwise. Kept between launches.
-    var surround = SpatialModeChoice(rawValue: UserDefaults.standard.string(forKey: PlayTarget.surroundKey) ?? "") ?? .headTracked {
+    /// How surround songs are played on headphones here: folded to stereo (Off) until you choose Fixed or Head Tracked.
+    /// Kept between launches.
+    var surround = PlayTarget.surround(stored: UserDefaults.standard.string(forKey: PlayTarget.surroundKey)) {
         didSet {
             UserDefaults.standard.set(surround.rawValue, forKey: Self.surroundKey)
             made?.remote.surroundChoice = surround
         }
     }
     private static let surroundKey = "surroundOnThisDevice"
+
+    /// The choice kept from an earlier launch, or Off for someone who never made one: the spatial rendering is asked for,
+    /// never the starting point.
+    static func surround(stored: String?) -> SpatialModeChoice { stored.flatMap(SpatialModeChoice.init(rawValue:)) ?? .off }
+    /// The choices the picker offers: Head Tracked only where the system can turn the scene with your head (iOS 18).
+    static var surroundChoices: [SpatialModeChoice] { PhonePlayer.systemTracksHead ? [.off, .fixed, .headTracked] : [.off, .fixed] }
     /// Why songs aren't fetched right now (cellular data with playing over it turned off), or nil.
     @ObservationIgnored var holdReason: String?
     /// How much has been fetched from the Mac for playing here since the app opened.
@@ -174,6 +181,15 @@ final class PlayTarget {
         }
         if signal.discreteOutputs != nil {
             rows.append((String(localized: "Surround"), String(localized: "A channel to each output", comment: "Value on the iPhone's Output screen, for the row Surround: each channel of a surround song goes to its own output of an audio interface, unmixed.")))
+        } else if let surround = signal.surround, route?.isHeadphones == true {
+            // What is being done to the song right now, which isn't always what was chosen (Head Tracked on headphones
+            // that don't follow your head plays Fixed).
+            let value = switch surround {
+            case .off: String(localized: "Off")
+            case .fixed: String(localized: "Fixed")
+            case .headTracked: String(localized: "Head Tracked")
+            }
+            rows.append((String(localized: "Surround on Headphones"), value))
         }
         if let volume = signal.volume { rows.append((String(localized: "Volume"), percent(volume))) }
         return rows

@@ -192,6 +192,20 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         #expect(remote.playback.player.outputSpeakers == nil)
     }
 
+    @Test func surroundIsFoldedUntilARenderingIsChosenAndThenOnlyOnHeadphones() throws {
+        let (remote, _) = try made()
+        let pods = PhoneRoute(name: "AirPods Max", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true)
+        remote.route = pods
+        #expect(remote.surroundChoice == .off)
+        #expect(remote.playback.player.spatialMode == .off, "nobody chose a spatial rendering")
+        remote.surroundChoice = .fixed
+        #expect(remote.playback.player.spatialMode == .fixed)
+        remote.route = PhoneRoute(name: "K11", portType: "USBAudio", sampleRate: 48_000, channels: 6, spatial: false, maximumChannels: 6)
+        #expect(remote.playback.player.spatialMode == .off, "an interface gets the channels")
+        remote.route = PhoneRoute(name: "Speaker", portType: "Speaker", sampleRate: 48_000, channels: 2, spatial: false)
+        #expect(remote.playback.player.spatialMode == .off)
+    }
+
     @Test func theSignalSaysWhatTheOutputGaveAndWhetherTheVolumeIsAtItsTop() {
         let descriptor = StreamDescriptor(stream: 1, kind: .original, byteSize: 10,
                                           format: StreamFormat(codec: "FLAC", container: "flac", sampleRate: 192_000, bitDepth: 24, channels: 2, channelLabels: nil, lossless: true),

@@ -240,10 +240,11 @@ extension PhoneRoute {
     }
 
     /// How a surround song is played on this output when you asked for `wanted`: rendered for headphones only on
-    /// headphones, head tracked only where the headphones follow your head, folded to stereo everywhere else.
-    public func surroundMode(wanted: SpatialModeChoice) -> SpatialModeChoice {
+    /// headphones, head tracked only where the headphones follow your head and the system can turn the scene with it
+    /// (`canTrackHead`: iOS 18 and later), folded to stereo everywhere else.
+    public func surroundMode(wanted: SpatialModeChoice, canTrackHead: Bool = true) -> SpatialModeChoice {
         guard isHeadphones, !isMultichannel, wanted != .off else { return .off }
-        return wanted == .headTracked && !spatial ? .fixed : wanted
+        return wanted == .headTracked && !(spatial && canTrackHead) ? .fixed : wanted
     }
 
     /// The rate to ask iOS for so `streamRate` isn't resampled: only on outputs that can change rate (a USB DAC, the

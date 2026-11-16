@@ -68,16 +68,25 @@ public final class PhonePlayer {
     }
     public private(set) var rendering: Rendering = .untouched
 
-    /// How surround songs are played: rendered for headphones (Fixed, or Head Tracked on AirPods that follow your head),
-    /// or folded to stereo (Off). Stereo songs are never touched. Changing it while a surround song plays carries on from
-    /// the same place.
-    public var spatialMode: SpatialMode = .fixed {
+    /// How surround songs are played: folded to stereo (Off, which it is until you choose otherwise), or rendered for
+    /// headphones (Fixed, or Head Tracked on AirPods that follow your head). Stereo and mono songs, DSD sent as DoP and
+    /// surround on an interface with an output per channel never go through the spatial mixer, whatever this says.
+    /// Changing it while a surround song plays carries on from the same place.
+    public var spatialMode: SpatialMode = .off {
         didSet {
             guard spatialMode != oldValue, (pump.processingFormat()?.channelCount ?? 0) > 2 else { return }
             recoverFromConfigurationChange()
         }
     }
     @ObservationIgnored private var environment: AVAudioEnvironmentNode?
+
+    /// Whether Apple's spatial mixer can turn the scene with the listener's head on this system: it has had the switch
+    /// since iOS 18 and macOS 15. Before that Head Tracked is rendered, and named, as Fixed.
+    public nonisolated static var systemTracksHead: Bool {
+        if #available(iOS 18.0, macOS 15.0, *) { true } else { false }
+    }
+    /// `systemTracksHead`, unless a test says otherwise.
+    @ObservationIgnored public let canTrackHead: Bool
 
     /// The speaker on each channel of the output, when it has more than two (`ChannelLayouts.outputSpeakers`): surround
     /// songs then go to those channels, one each, instead of being rendered for headphones or folded. nil for a stereo
@@ -123,8 +132,9 @@ public final class PhonePlayer {
     /// The song played to its end: Play starts it over.
     @ObservationIgnored private var finished = false
 
-    public init(engine: AVAudioEngine = AVAudioEngine()) {
+    public init(engine: AVAudioEngine = AVAudioEngine(), canTrackHead: Bool = PhonePlayer.systemTracksHead) {
         self.engine = engine
+        self.canTrackHead = canTrackHead
         engine.attach(node)
         // "Played back" allows for the output's latency (a Bluetooth route's is long); an engine rendering offline has no
         // output to wait for and only says "rendered".
@@ -244,7 +254,8 @@ public final class PhonePlayer {
                 environment = made
                 return made
             }()
-            let tracked = spatialMode == .headTracked
+            // What the badge says is what the mixer was told: a system without the switch isn't said to track.
+            let tracked = spatialMode == .headTracked && canTrackHead
             node.sourceMode = .ambienceBed
             node.renderingAlgorithm = .auto
             mixer.outputType = .headphones

@@ -128,11 +128,12 @@ public final class PhoneRemote {
     @ObservationIgnored public var onDoPDACsChanged: ((DoPDACs) -> Void)?
     /// The highest carrier rate the output takes DoP at right now, or nil (`DoPGate.ceiling`).
     public var dopCeiling: Double? { DoPGate.ceiling(route: route, volume: outputVolume, dacs: dopDACs) }
-    /// How you want surround songs played; the output decides what it gets (`PhoneRoute.surroundMode`).
-    public var surroundChoice: SpatialModeChoice = .headTracked { didSet { applySurround() } }
+    /// How you want surround songs played: folded to stereo until you choose a rendering for headphones. The output
+    /// decides what it gets (`PhoneRoute.surroundMode`).
+    public var surroundChoice: SpatialModeChoice = .off { didSet { applySurround() } }
 
     private func applySurround() {
-        let mode = route.map { $0.surroundMode(wanted: surroundChoice) } ?? surroundChoice
+        let mode = route.map { $0.surroundMode(wanted: surroundChoice, canTrackHead: playback.player.canTrackHead) } ?? surroundChoice
         let wanted: SpatialMode = switch mode {
         case .off: .off
         case .fixed: .fixed

@@ -149,6 +149,76 @@ private func level(_ samples: [Float]) -> Float {
         #expect(player.rendering == .untouched && player.isUntouchedPath)
     }
 
+    // MARK: Asked for, never the starting point
+
+    @Test func untilARenderingIsChosenSurroundIsFoldedToStereo() throws {
+        let url = try surroundFile(channels: 6, only: nil)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let player = PhonePlayer(engine: try offline())
+        #expect(player.spatialMode == .off)
+        try player.load(url, format: format(fivePointOne))
+        #expect(player.rendering == .downmix)
+    }
+
+    @Test func aSystemThatCannotFollowTheHeadRendersFixedAndSaysFixed() throws {
+        // Before iOS 18 the mixer has no head-tracking switch: asking for Head Tracked there must not be named as it.
+        let url = try surroundFile(channels: 6, only: nil)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let player = PhonePlayer(engine: try offline(), canTrackHead: false)
+        player.spatialMode = .headTracked
+        try player.load(url, format: format(fivePointOne))
+        #expect(player.rendering == .spatial(headTracked: false))
+    }
+
+    /// Two channels of 24-bit samples that no processing could leave alone by luck: every sample differs, the top byte
+    /// alternates the way DoP's markers do, and the rate is whatever the caller says (a CD's, a DoP carrier's). The WAV is
+    /// written byte by byte: Apple's writer won't make one above 192 kHz.
+    private func exactFile(rate: Double, frames: Int = 8_192) throws -> (url: URL, planes: [[Float]]) {
+        func little<T: FixedWidthInteger>(_ value: T) -> Data { withUnsafeBytes(of: value.littleEndian) { Data($0) } }
+        var samples = Data(capacity: frames * 6)
+        var planes: [[Float]] = [[], []]
+        for i in 0..<frames {
+            for c in 0..<2 {
+                // 0x05 and 0xFA in the top byte, as DoP frames carry, over sixteen bits that change every sample.
+                let marker: Int32 = i % 2 == 0 ? 0x05 : 0xFA
+                let word = (marker << 16) | Int32((i &* 40_503 &+ c &* 977) & 0xFFFF)
+                samples.append(contentsOf: [UInt8(word & 0xFF), UInt8((word >> 8) & 0xFF), UInt8((word >> 16) & 0xFF)])
+                planes[c].append(Float(word >= 0x80_0000 ? word - 0x100_0000 : word) / 8_388_608)
+            }
+        }
+        var wav = Data("RIFF".utf8) + little(UInt32(36 + samples.count)) + Data("WAVEfmt ".utf8)
+        wav += little(UInt32(16)) + little(UInt16(1)) + little(UInt16(2)) + little(UInt32(rate)) + little(UInt32(rate) * 6)
+        wav += little(UInt16(6)) + little(UInt16(24)) + Data("data".utf8) + little(UInt32(samples.count)) + samples
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("exact-\(UUID()).wav")
+        try wav.write(to: url)
+        return (url, planes)
+    }
+
+    @Test(arguments: [SpatialMode.off, .fixed, .headTracked], [44_100.0, 176_400.0, 352_800.0])
+    func twoChannelSongsAndDoPFramesComeOutSampleForSampleWhateverIsChosen(mode: SpatialMode, rate: Double) throws {
+        let (url, planes) = try exactFile(rate: rate)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let engine = AVAudioEngine()
+        try engine.enableManualRenderingMode(.offline, format: AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: rate, channels: 2, interleaved: false)!,
+                                             maximumFrameCount: 4096)
+        let player = PhonePlayer(engine: engine)
+        player.spatialMode = mode
+        try player.load(url, format: StreamFormat(codec: "WAV", container: "wav", sampleRate: rate, bitDepth: 24, channels: 2, channelLabels: nil, lossless: true))
+        try player.play()
+        #expect(player.rendering == .untouched && player.isUntouchedPath)
+        let buffer = AVAudioPCMBuffer(pcmFormat: engine.manualRenderingFormat, frameCapacity: 4096)!
+        var out: [[Float]] = [[], []]
+        while out[0].count < planes[0].count {
+            guard try engine.renderOffline(AVAudioFrameCount(min(planes[0].count - out[0].count, 4096)), to: buffer) == .success else { break }
+            for c in 0..<2 { out[c].append(contentsOf: UnsafeBufferPointer(start: buffer.floatChannelData![c], count: Int(buffer.frameLength))) }
+        }
+        #expect(out == planes, "\(mode) at \(rate): the spatial mixer is not in a two-channel song's path")
+        // Choosing a rendering while it plays changes nothing for it either.
+        player.spatialMode = mode == .fixed ? .headTracked : .fixed
+        #expect(player.rendering == .untouched && player.state == .playing)
+        player.halt()
+    }
+
     @Test func changingTheModeWhileASurroundSongPlaysCarriesOn() throws {
         let url = try surroundFile(channels: 6, only: nil, seconds: 2)
         defer { try? FileManager.default.removeItem(at: url) }
