@@ -25,6 +25,25 @@ import UIKit
         #expect(dark == [0x09, 0x09, 0x0A])
     }
 
+    /// The AirPlay button is UIKit's: its two colours are the palette's own, in both appearances.
+    @Test @MainActor func theAirPlayButtonUsesThePalette() {
+        func parts(_ colour: UIColor, _ style: UIUserInterfaceStyle) -> [CGFloat] {
+            var (r, g, b, a): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+            colour.resolvedColor(with: UITraitCollection(userInterfaceStyle: style)).getRed(&r, green: &g, blue: &b, alpha: &a)
+            return [r, g, b].map { ($0 * 255).rounded() }
+        }
+        #expect(parts(Palette.brassUI, .dark) == [0xC8, 0xA6, 0x6A])
+        #expect(parts(Palette.brassUI, .light) == [0x7C, 0x65, 0x41])
+        #expect(parts(UIColor(Palette.brass), .dark) == parts(Palette.brassUI, .dark))
+        #expect(parts(UIColor(Palette.text2), .light) == parts(Palette.text2UI, .light))
+    }
+
+    /// It shows only while this device is the one playing: it can't change where a Mac plays.
+    @Test func theAirPlayButtonShowsOnlyWhenThisDevicePlays() {
+        #expect(RoutePickerPlacement.shows(playsHere: true))
+        #expect(!RoutePickerPlacement.shows(playsHere: false))
+    }
+
     @Test func aBadgeRowIsLaidOutOffTheMainThread() async {
         let placed = await Task.detached {
             FlowRows.place([CGSize(width: 80, height: 20), CGSize(width: 80, height: 20)], width: 100, spacing: 6, lineSpacing: 6, centered: false)
