@@ -173,7 +173,10 @@ struct NetworkSettings: View {
         let usage = model.shares.cacheUsage
         Form {
             Section("Shares") {
-                if model.shares.sources.isEmpty {
+                if !s.localLibrary {
+                    // Shares are part of the local library: while it is off none is listed or connected to.
+                    Text(LocalLibrarySwitch.emptyExplanation).font(.callout).foregroundStyle(.secondary)
+                } else if model.shares.sources.isEmpty {
                     Text("No network shares yet. Connect to a NAS, file server or another Mac, on your network or over Tailscale.")
                         .font(.callout).foregroundStyle(.secondary)
                 }
@@ -181,6 +184,7 @@ struct NetworkSettings: View {
                     ShareRow(source: source, removing: $removingSource)
                 }
                 Button("Connect to Server…") { openWindow(id: "main"); model.showConnectServer = true }   // its sheet is on the main window
+                    .disabled(!s.localLibrary)
             }
             Section {
                 Toggle("Keep local copies of music played from shares", isOn: $s.networkCache)

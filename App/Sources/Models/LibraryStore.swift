@@ -41,7 +41,10 @@ final class LibraryStore {
     private(set) var favoriteCount = 0
     /// Albums with at least one favorite song (present), for the Favorites filter on album pages.
     private(set) var favoriteAlbumKeys: Set<String> = []
+    /// The folders, drives and shares. None while the local library is off (`filesOn`): nothing lists, scans or watches them.
     private(set) var sources: [LibrarySource] = []
+    /// Whether the music in folders, on drives and on shares is part of the app (Settings › Library › Local Library).
+    private(set) var filesOn = true
     /// The accounts on music servers whose provider is switched on (none while it is off). They are not among `sources`:
     /// an account is not a folder, and nothing scans it.
     private(set) var streamedAccounts: [LibrarySource] = []
@@ -180,7 +183,8 @@ final class LibraryStore {
     /// The same counts without the songs of music servers.
     private(set) var fileStats = LibraryDatabase.Stats(albums: 0, tracks: 0, artists: 0, bytes: 0, duration: 0)
     /// What the Library's own entries count (Albums, Artists, Songs): the files. A music server's music is under its own entry.
-    var libraryStats: LibraryDatabase.Stats { streamedAccounts.isEmpty ? stats : fileStats }
+    /// With the local library off there are no files, and the servers' music is what they list.
+    var libraryStats: LibraryDatabase.Stats { streamedAccounts.isEmpty || !filesOn ? stats : fileStats }
     /// Bumped whenever tracks change, so detail views can reload.
     private(set) var revision = 0
     /// Counts the changes that can alter a song's cover without its queue entry knowing (tag edits, reverts, enrichment).
@@ -213,11 +217,15 @@ final class LibraryStore {
     @ObservationIgnored var launchScanDelay: Duration = .seconds(3)
 
     /// `shownProviders`: the streaming providers whose switch is on, set before anything is read so that the first frame
-    /// already leaves out the accounts of those that are off. Nil (tests, tools) leaves nothing out.
-    init(dataDirectory: URL, automaticScanning: @escaping () -> Bool = { false }, shownProviders: Set<String>? = nil) throws {
+    /// already leaves out the accounts of those that are off. Nil (tests, tools) leaves nothing out. `showsFiles`: the Local
+    /// Library switch, set as early for the same reason.
+    init(dataDirectory: URL, automaticScanning: @escaping () -> Bool = { false }, shownProviders: Set<String>? = nil,
+         showsFiles: Bool = true) throws {
         self.automaticScanning = automaticScanning
         database = try LibraryDatabase(url: dataDirectory.appendingPathComponent("Library.sqlite"))
         database.shownProviders = shownProviders
+        database.showsFiles = showsFiles
+        filesOn = showsFiles
         artwork = ArtworkStore(directory: dataDirectory.appendingPathComponent("Artwork", isDirectory: true))
         scanner = LibraryScanner(database: database, artwork: artwork)
         tagWriter = TagWriter(database: database, scanner: scanner,
@@ -269,7 +277,7 @@ final class LibraryStore {
              try database.stats(db, filesOnly: true))
         }) else { return }
         if let files = state.4 { fileStats = files }
-        sources = state.0
+        sources = filesOn ? state.0 : []
         playlists = state.1
         if let stats = state.2 { self.stats = stats }
         streamedAccounts = state.3
@@ -279,7 +287,28 @@ final class LibraryStore {
     /// A streaming provider's switch changed, so its accounts' songs joined or left what the library shows. The database
     /// already answers the new way (`LibraryDatabase.shownProviders`); nothing was written, so the observations would not
     /// hear of it by themselves and are started again.
-    func streamingVisibilityChanged() {
+    func streamingVisibilityChanged() { visibilityChanged() }
+
+    /// The Local Library switch changed. Off: the songs of folders, drives and shares leave every list, the folders stop being
+    /// watched and nothing more is scanned or added; a scan already running reads to its end. Nothing is deleted, so on brings
+    /// it all back, and what changed in the folders meanwhile is looked for as at launch (with automatic scanning on).
+    func setFilesOn(_ on: Bool) {
+        guard filesOn != on else { return }
+        filesOn = on
+        database.showsFiles = on
+        if !on {
+            changedDuringScan = []
+            scanFailures = [:]
+        }
+        visibilityChanged()
+        updateWatcher()
+        if on {
+            checkedAtLaunch = false
+            rescanLocalAtLaunch()
+        }
+    }
+
+    private func visibilityChanged() {
         for task in tasks { task.cancel() }
         tasks = []
         loadSidebarState()
@@ -350,6 +379,7 @@ final class LibraryStore {
                 for try await value in obs.values(in: writer) {
                     if Task.isCancelled { break }
                     // A share relinked to a new mount point rewrites its tracks' paths.
+                    let value = self?.filesOn == false ? [] : value
                     if let self, self.sources != value {
                         if !self.sources.isEmpty { self.revision += 1 }
                         self.sources = value
@@ -389,6 +419,7 @@ final class LibraryStore {
     // MARK: Sources and scanning
 
     func addFolders(_ urls: [URL], mode: ImportMode, managedRoot: URL) async {
+        guard filesOn else { return }   // the local library is off: nothing is added to it
         do {
             switch mode {
             case .reference:
@@ -412,6 +443,7 @@ final class LibraryStore {
     /// `restart`: asked for by the user (Rescan), so a scan of the source that has stalled is replaced and one still
     /// running is followed by another (`LibraryScanner.scan`). Scans the app starts by itself join the one running.
     func scan(_ source: LibrarySource, restart: Bool = false) async {
+        guard filesOn else { return }
         scanProgress = ScanProgress(sourcePath: source.path, processed: 0, total: 0, added: 0, updated: 0)
         do {
             let summary = try await scanner.scan(source, restart: restart) { [weak self] progress in
@@ -586,6 +618,7 @@ final class LibraryStore {
     /// Adds found music. Import copies (APFS clones) just the chosen files; reference adds their folders.
     /// Returns the album keys that were added, for a follow-up enrichment pass.
     func add(found files: [URL], mode: ImportMode, managedRoot: URL) async -> [String] {
+        guard filesOn else { return [] }
         let before = Set(albums.map(\.key))
         do {
             switch mode {
