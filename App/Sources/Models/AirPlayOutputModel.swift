@@ -9,6 +9,7 @@ import Foundation
 import Observation
 import VespertineAirPlay
 import VespertineAudio
+import VespertineLibrary
 import VespertineUPnP
 
 @Observable
@@ -21,6 +22,10 @@ final class AirPlayOutputModel {
     @ObservationIgnored private(set) var playback: AirPlayPlayback?
     /// Called when the list of receivers changes.
     @ObservationIgnored var onChange: (() -> Void)?
+    /// A receiver whose password the listener is being asked for (the sheet is up while this is set).
+    var passwordRequest: AirPlayPasswordRequest?
+    /// Where receivers' passwords are kept.
+    @ObservationIgnored var passwords = AirPlayPasswords.keychain
 
     init(service: AirPlayService = AirPlayService()) {
         self.service = service
@@ -51,6 +56,34 @@ final class AirPlayOutputModel {
         devices = []
     }
 
+    /// The listener chose `device` in the output list: it becomes the output (`select`), after its password has been
+    /// asked for when it has one and none is saved.
+    func choose(_ device: AirPlayDevice, select: @escaping @MainActor (String) -> Void) {
+        guard device.needsPassword else { return select(device.uid) }
+        let passwords = self.passwords
+        Task {
+            // The keychain is read off the main thread (it can put up macOS's own prompt).
+            let saved = await Task.detached { passwords.read(device.deviceID) != nil }.value
+            if saved { select(device.uid) } else { passwordRequest = AirPlayPasswordRequest(device: device, refused: false) }
+        }
+    }
+
+    /// The listener gave the password asked for: it is saved, and the receiver becomes (or stays) the output.
+    func submit(password: String, select: @escaping @MainActor (String) -> Void) async {
+        guard let request = passwordRequest else { return }
+        let passwords = self.passwords
+        await Task.detached { passwords.write(password, request.device.deviceID) }.value
+        passwordRequest = nil
+        select(request.device.uid)
+    }
+
+    func cancelPassword() { passwordRequest = nil }
+
+    func forgetPassword(for device: AirPlayDevice) async {
+        let passwords = self.passwords
+        await Task.detached { passwords.write(nil, device.deviceID) }.value
+    }
+
     func device(uid: String?) -> AirPlayDevice? {
         guard let uid, AirPlayDevice.isAirPlayUID(uid) else { return nil }
         return devices.first { $0.uid == uid && $0.isSupported }
@@ -79,8 +112,42 @@ final class AirPlayOutputModel {
         guard let made = AirPlayPlayback(device: device) else { playback = nil; return nil }
         made.update(settings: settings)
         made.setReceiverVolume(decibels: receiverVolumeDB)
+        let passwords = self.passwords
+        made.passwordProvider = { passwords.read(device.deviceID) }
+        // A missing, changed or mistyped password: the listener is asked (again).
+        made.passwordRefused = { [weak self] in
+            Task { @MainActor in self?.passwordRequest = AirPlayPasswordRequest(device: device, refused: true) }
+        }
         playback = made
         return made
+    }
+}
+
+/// The listener is asked for a receiver's password: on choosing it with none saved, or after it refused the one saved.
+nonisolated struct AirPlayPasswordRequest: Identifiable, Equatable, Sendable {
+    let device: AirPlayDevice
+    let refused: Bool
+    var id: String { device.uid + (refused ? "!" : "") }
+}
+
+/// Receivers' passwords by device id: the keychain in the app, a dictionary in tests. Both calls can block (the keychain
+/// may put up macOS's own prompt), so they are made off the main thread.
+nonisolated struct AirPlayPasswords: Sendable {
+    var read: @Sendable (_ deviceID: String) -> String?
+    /// nil or empty removes it.
+    var write: @Sendable (_ password: String?, _ deviceID: String) -> Void
+
+    static func account(_ deviceID: String) -> String { "airplay-password-" + deviceID }
+
+    static let keychain = AirPlayPasswords(
+        read: { id in Keychain.read(AirPlayPasswords.account(id)).value.flatMap { $0.isEmpty ? nil : $0 } },
+        write: { password, id in _ = Keychain.write(password, account: AirPlayPasswords.account(id)) })
+
+    /// Kept in memory only.
+    static func memory(_ start: [String: String] = [:]) -> AirPlayPasswords {
+        let box = Locked(start)
+        return AirPlayPasswords(read: { id in box.withLock { $0[id] } },
+                                write: { password, id in box.withLock { $0[id] = (password?.isEmpty == false) ? password : nil } })
     }
 }
 

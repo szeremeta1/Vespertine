@@ -40,7 +40,19 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         get { hooks.withLock { $0.events } }
         set { hooks.withLock { $0.events = newValue } }
     }
+    /// The receiver's password, for one that has one. Called off the main thread, when a session is opened.
+    public var passwordProvider: (@Sendable () -> String?)? {
+        get { hooks.withLock { $0.password } }
+        set { hooks.withLock { $0.password = newValue } }
+    }
+    /// The receiver refused the session for want of the right password (the song has failed; the listener can be asked).
+    public var passwordRefused: (@Sendable () -> Void)? {
+        get { hooks.withLock { $0.refused } }
+        set { hooks.withLock { $0.refused = newValue } }
+    }
     private struct Hooks {
+        var password: (@Sendable () -> String?)?
+        var refused: (@Sendable () -> Void)?
         var next: (@Sendable (PlayableItem) -> PlayableItem?)?
         var resolver: (@Sendable (PlayableItem) -> URL)?
         var metadata: (@Sendable (PlayableItem) -> RendererTrackInfo?)?
@@ -448,7 +460,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                 }
             }
             if !open {
-                let made = RAOPSession(name: device.name, endpoint: endpoint, encryption: encryption, rsaKey: rsaKey)
+                let made = RAOPSession(name: device.name, endpoint: endpoint, encryption: encryption, rsaKey: rsaKey,
+                                       password: device.needsPassword ? passwordProvider?() : nil)
                 made.onLost = { [weak self] in self?.enqueue.yield(.lost) }
                 let volume = state.withLock { $0.receiverVolumeDB }
                 try await made.connect(volumeDB: volume)
@@ -458,7 +471,10 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         } catch {
             session = nil
             // Overtaken by a later play or stop: that one decides what is said.
-            if generation.withLock({ $0 }) == g { fail(item, error) }
+            if generation.withLock({ $0 }) == g {
+                fail(item, error)
+                if let refusal = error as? RAOPError, case .refused(_, 401) = refusal { passwordRefused?() }
+            }
             return
         }
         guard generation.withLock({ $0 }) == g, let session else { return }

@@ -21,6 +21,11 @@ private final class CountingBrowser: BonjourBrowsing, @unchecked Sendable {
     func stop() { lock.withLock { browsing = false } }
 }
 
+/// What the output list was told to choose.
+@MainActor private final class Chosen {
+    var list: [String] = []
+}
+
 @Suite("AirPlay players settings switch", .serialized) @MainActor
 struct AirPlaySwitchTests {
     private func scratch() throws -> (root: URL, defaults: UserDefaults, suite: String) {
@@ -28,6 +33,76 @@ struct AirPlaySwitchTests {
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         let suite = root.appendingPathComponent("defaults.plist").path
         return (root, try #require(UserDefaults(suiteName: suite)), suite)
+    }
+
+    private func locked(_ pw: String) throws -> AirPlayDevice {
+        let record = try #require(RAOPRecord.parse(serviceName: "AABBCCDDEE10@Den", txt: ["et": "0", "pw": pw]))
+        return AirPlayDevice(deviceID: record.deviceID, name: record.name, raop: record)
+    }
+
+    private func model(_ passwords: AirPlayPasswords) -> AirPlayOutputModel {
+        let model = AirPlayOutputModel(service: AirPlayService(discovery: AirPlayDiscovery(browser: CountingBrowser(), excludedName: nil)))
+        model.passwords = passwords
+        return model
+    }
+
+    private func settle(_ condition: @MainActor () -> Bool) async {
+        for _ in 0..<400 where !condition() { try? await Task.sleep(for: .milliseconds(5)) }
+    }
+
+    @Test("Choosing a receiver with a password asks for it; one with a saved password, or without one, is chosen at once")
+    func choosing() async throws {
+        let den = try locked("true")
+        let chosen = Chosen()
+        let empty = model(.memory())
+        empty.choose(den) { chosen.list.append($0) }
+        await settle { empty.passwordRequest != nil }
+        #expect(empty.passwordRequest == AirPlayPasswordRequest(device: den, refused: false))
+        #expect(chosen.list.isEmpty)
+
+        let saved = model(.memory([den.deviceID: "attic"]))
+        saved.choose(den) { chosen.list.append($0) }
+        await settle { !chosen.list.isEmpty }
+        #expect(chosen.list == [den.uid])
+        #expect(saved.passwordRequest == nil)
+
+        let open = try locked("false")
+        let any = model(.memory())
+        any.choose(open) { chosen.list.append($0) }
+        #expect(chosen.list == [den.uid, open.uid])
+        #expect(any.passwordRequest == nil)
+    }
+
+    @Test("The password given is saved under the receiver's id and the receiver is chosen; Cancel saves nothing; Forget removes it")
+    func submitting() async throws {
+        let den = try locked("true")
+        let passwords = AirPlayPasswords.memory()
+        let airPlay = model(passwords)
+        let chosen = Chosen()
+        airPlay.choose(den) { chosen.list.append($0) }
+        await settle { airPlay.passwordRequest != nil }
+        airPlay.cancelPassword()
+        #expect(airPlay.passwordRequest == nil && chosen.list.isEmpty && passwords.read(den.deviceID) == nil)
+
+        airPlay.choose(den) { chosen.list.append($0) }
+        await settle { airPlay.passwordRequest != nil }
+        await airPlay.submit(password: "attic") { chosen.list.append($0) }
+        #expect(passwords.read(den.deviceID) == "attic")
+        #expect(chosen.list == [den.uid])
+        #expect(airPlay.passwordRequest == nil)
+        // Nothing is asked for: no sheet, nothing saved.
+        await airPlay.submit(password: "other") { chosen.list.append($0) }
+        #expect(passwords.read(den.deviceID) == "attic" && chosen.list == [den.uid])
+
+        await airPlay.forgetPassword(for: den)
+        #expect(passwords.read(den.deviceID) == nil)
+        #expect(AirPlayPasswords.account("AABBCCDDEE10") == "airplay-password-AABBCCDDEE10")
+    }
+
+    @Test("The output list says a receiver has a password")
+    func passwordDetail() throws {
+        #expect(AirPlayText.detail(try locked("true")) == "AIRPLAY · ALAC 16/44.1 · PASSWORD")
+        #expect(AirPlayText.detail(try locked("false")) == "AIRPLAY · ALAC 16/44.1")
     }
 
     @Test("The switch says beta, and its line says what off means")

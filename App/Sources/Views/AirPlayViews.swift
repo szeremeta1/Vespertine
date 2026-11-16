@@ -35,10 +35,55 @@ struct AirPlaySettingsSection: View {
     }
 }
 
+/// Asks for an AirPlay receiver's password: when one is chosen with none saved, and again when it refuses the one saved.
+struct AirPlayPasswordSheet: View {
+    @Environment(AppModel.self) private var model
+    let request: AirPlayPasswordRequest
+    @State private var password = ""
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Password for “\(request.device.name)”", comment: "Title of the sheet that asks for an AirPlay receiver's password. %@ is the receiver's name.")
+                .font(.headline)
+            Text("This AirPlay receiver asks for a password. Vespertine saves it in your keychain.")
+                .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            if request.refused {
+                Label(String(localized: "The receiver didn’t accept that password.", comment: "In the sheet that asks for an AirPlay receiver's password, after a wrong one."),
+                      systemImage: "exclamationmark.triangle")
+                    .font(.callout).foregroundStyle(Palette.copper).fixedSize(horizontal: false, vertical: true)
+            }
+            SecureField("Password", text: $password)
+                .textFieldStyle(.roundedBorder)
+                .focused($focused)
+                .onSubmit(connect)
+            HStack {
+                Spacer()
+                Button("Cancel", role: .cancel) { model.airPlay?.cancelPassword() }
+                    .keyboardShortcut(.cancelAction)
+                Button("Connect", action: connect)
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(password.isEmpty)
+            }
+        }
+        .padding(20)
+        .frame(width: 360)
+        .onAppear { focused = true }
+    }
+
+    private func connect() {
+        guard !password.isEmpty, let airPlay = model.airPlay else { return }
+        let entered = password
+        Task { await airPlay.submit(password: entered) { model.selectDevice($0) } }
+    }
+}
+
 enum AirPlayText {
     /// The output list's second line for a receiver.
     static func detail(_ device: AirPlayDevice) -> String {
         switch device.support {
+        case .supported(.none) where device.needsPassword:
+            String(localized: "AIRPLAY · ALAC 16/44.1 · PASSWORD", comment: "Output list: an AirPlay receiver that asks for a password before it plays (short, uppercase)")
         case .supported(.none): String(localized: "AIRPLAY · ALAC 16/44.1", comment: "Output list: an AirPlay receiver Vespertine sends ALAC 16-bit / 44.1 kHz to (short, uppercase)")
         case .supported(.rsa): String(localized: "AIRPLAY · ALAC 16/44.1 · ENCRYPTED", comment: "Output list: an AirPlay receiver that asks for encrypted audio (short, uppercase)")
         case .unsupported(let reason): reason.localizedUppercase
@@ -82,6 +127,17 @@ struct AirPlayDetails: View {
                 }
             }
             RendererEqualizerChoice(uid: device.uid)
+            if device.needsPassword, let airPlay = model.airPlay {
+                Button(String(localized: "Forget Password", comment: "Button under an AirPlay receiver that has a password: removes the saved password from the keychain.")) {
+                    Task {
+                        await airPlay.forgetPassword(for: device)
+                        // Without its password it can't play. The song is not carried over to this Mac's own output.
+                        model.player.stopBeforeLeavingNetworkOutput()
+                        model.selectDevice(nil)
+                    }
+                }
+                .controlSize(.small)
+            }
             VStack(alignment: .leading, spacing: 4) {
                 Text("For the best result").font(Typeface.ui(12))
                 ForEach(AirPlayText.advice, id: \.self) { line in

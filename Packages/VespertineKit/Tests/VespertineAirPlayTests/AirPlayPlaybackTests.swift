@@ -62,6 +62,77 @@ struct AirPlayPlaybackTests {
         #expect(parameters.contains { String(decoding: $0.body, as: UTF8.self).hasPrefix("progress: ") })
     }
 
+    func locked(_ receiver: FakeRAOPReceiver, pw: String = "true") throws -> (AirPlayPlayback, EventLog) {
+        let record = try #require(RAOPRecord.parse(serviceName: "B827EB000005@Den", txt: ["et": "0", "md": "0,2", "cn": "0,1", "pw": pw]))
+        var device = AirPlayDevice(deviceID: record.deviceID, name: record.name, raop: record)
+        device.host = "127.0.0.1"
+        device.port = receiver.port
+        let p = try #require(AirPlayPlayback(device: device))
+        let log = EventLog()
+        p.eventHandler = { event in log.events.append(event) }
+        return (p, log)
+    }
+
+    @Test("A receiver with a password plays once the password is given, and nobody is asked again")
+    func passwordReceiver() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.password = "attic"
+        let (url, samples) = try writeWAV(seconds: 0.6, seed: 31)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let (p, log) = try locked(receiver)
+        defer { p.shutdown() }
+        let refused = Locked(0)
+        p.passwordProvider = { "attic" }
+        p.passwordRefused = { refused.withLock { $0 += 1 } }
+        let item = PlayableItem(url: url)
+        p.play(item, at: 0)
+        await wait { log.ended }
+        #expect(log.started == [item.id])
+        #expect(log.failures.isEmpty)
+        #expect(refused.withLock { $0 } == 0)
+        #expect(Array(receiver.samples.map(Int32.init).prefix(samples.count)) == samples)
+    }
+
+    @Test("A wrong or missing password fails the song saying so, and asks for the password once")
+    func passwordRefused() async throws {
+        for given in ["cellar", nil] as [String?] {
+            let receiver = try FakeRAOPReceiver()
+            defer { receiver.stop() }
+            receiver.password = "attic"
+            let (url, _) = try writeWAV(seconds: 0.6, seed: 32)
+            defer { try? FileManager.default.removeItem(at: url) }
+            let (p, log) = try locked(receiver)
+            defer { p.shutdown() }
+            let refused = Locked(0)
+            p.passwordProvider = { given }
+            p.passwordRefused = { refused.withLock { $0 += 1 } }
+            p.play(PlayableItem(url: url), at: 0)
+            await wait { !log.failures.isEmpty }
+            #expect(log.failures.count == 1)
+            #expect(log.failures.first?.contains("password") == true)
+            #expect(log.started.isEmpty)
+            #expect(refused.withLock { $0 } == 1)
+            #expect(receiver.packetCount == 0)
+        }
+    }
+
+    @Test("A receiver without a password is never asked for one: the saved passwords aren't read")
+    func passwordNotRead() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        let (url, _) = try writeWAV(seconds: 0.6, seed: 33)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let (p, log) = try locked(receiver, pw: "false")
+        defer { p.shutdown() }
+        let read = Locked(0)
+        p.passwordProvider = { read.withLock { $0 += 1 }; return "x" }
+        p.play(PlayableItem(url: url), at: 0)
+        await wait { log.ended }
+        #expect(read.withLock { $0 } == 0)
+        #expect(!receiver.requests.contains { $0["Authorization"] != nil })
+    }
+
     @Test("The signal path says what was sent: BIT-PERFECT · 16/44.1 SENT for CD format, CONVERTED for 24-bit")
     func badges() async throws {
         let receiver = try FakeRAOPReceiver()

@@ -68,6 +68,9 @@ struct MainWindow: View {
             model.player.togglePlayPause()
             return .handled
         }
+        .sheet(item: Binding(get: { model.airPlay?.passwordRequest }, set: { if $0 == nil { model.airPlay?.cancelPassword() } })) { request in
+            AirPlayPasswordSheet(request: request)
+        }
         .sheet(item: Binding(get: { model.lookupTracks.map(LookupRequest.init) }, set: { model.lookupTracks = $0?.tracks })) { request in
             MusicBrainzSheet(tracks: request.tracks)
                 .environment(model)
