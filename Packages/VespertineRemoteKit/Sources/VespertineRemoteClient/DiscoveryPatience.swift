@@ -85,8 +85,8 @@ public final class DiscoveryPatience {
     private func begin() {
         round += 1
         let mine = round
-        let wait = wait
-        let sleep = sleep
+        let wait = self.wait
+        let sleep = self.sleep
         timer = Task { [weak self] in
             do { try await sleep(wait) } catch { return }
             guard let self, self.round == mine else { return }
