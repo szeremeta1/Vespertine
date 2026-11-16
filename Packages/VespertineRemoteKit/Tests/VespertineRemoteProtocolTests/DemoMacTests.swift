@@ -121,6 +121,54 @@ struct DemoMacTests {
         #expect(pushes.lastQueue?.current?.track.favorite == !song.favorite)
     }
 
+    @Test func theSoundOfEachOutputIsSetAndKept() async throws {
+        let (mac, pushes) = try await opened()
+        #expect(try await ask(mac, .pause) == .ok)
+        // The DAC starts with everything off and centered, and offers all four.
+        let start = try #require(pushes.lastPlayer?.sound)
+        #expect(start.equalizer?.selected == nil && start.equalizer?.presets.count == 2)
+        #expect(start.room?.selected == nil && start.room?.chosen == start.room?.profiles.first?.id)
+        #expect(start.spatial == SpatialState(mode: .off, spatializeStereo: nil))
+        #expect(start.balance == BalanceState(value: 0))
+
+        let preset = try #require(start.equalizer?.presets.last?.id), profile = try #require(start.room?.profiles.first?.id)
+        #expect(try await ask(mac, .setEqualizer(preset: preset)) == .ok)
+        #expect(try await ask(mac, .setRoomCorrection(profile: profile)) == .ok)
+        // Spatialize stereo has nothing to do on a stereo DAC until Spatial Audio is on.
+        #expect(try await ask(mac, .setSpatializeStereo(on: true)) != .ok)
+        #expect(try await ask(mac, .setSpatialMode(mode: .fixed)) == .ok)
+        #expect(try await ask(mac, .setSpatializeStereo(on: true)) == .ok)
+        #expect(try await ask(mac, .setBalance(value: -7)) == .ok)
+        let set = try #require(pushes.lastPlayer?.sound)
+        #expect(set.equalizer?.selected == preset && set.room?.selected == profile)
+        #expect(set.spatial == SpatialState(mode: .fixed, spatializeStereo: true))
+        #expect(set.balance?.value == -1, "a value past the end stops at it")
+
+        // What this Mac doesn't have is refused, and nothing changes.
+        #expect(try await ask(mac, .setEqualizer(preset: "gone")) != .ok)
+        #expect(try await ask(mac, .setRoomCorrection(profile: "gone")) != .ok)
+        #expect(pushes.lastPlayer?.sound == set)
+
+        // Off again: room correction keeps its choice for next time.
+        #expect(try await ask(mac, .setEqualizer(preset: nil)) == .ok)
+        #expect(try await ask(mac, .setRoomCorrection(profile: nil)) == .ok)
+        #expect(pushes.lastPlayer?.sound?.equalizer?.selected == nil)
+        #expect(pushes.lastPlayer?.sound?.room?.selected == nil && pushes.lastPlayer?.sound?.room?.chosen == profile)
+
+        // The receiver has its own sound: nothing set on the DAC, no room profile and no balance to move.
+        #expect(try await ask(mac, .selectOutput(uid: "demo-receiver")) == .ok)
+        let receiver = try #require(pushes.lastPlayer?.sound)
+        #expect(receiver.spatial == SpatialState(mode: .off, spatializeStereo: false))
+        #expect(receiver.room?.profiles.isEmpty == true && receiver.balance == nil)
+        #expect(try await ask(mac, .setBalance(value: 0.5)) != .ok)
+        #expect(try await ask(mac, .setRoomCorrection(profile: profile)) != .ok)
+        // Back on the DAC, what was set there is still there.
+        #expect(try await ask(mac, .selectOutput(uid: "demo-dac")) == .ok)
+        #expect(pushes.lastPlayer?.sound?.spatial == SpatialState(mode: .fixed, spatializeStereo: true))
+        #expect(pushes.lastPlayer?.sound?.balance?.value == -1)
+        mac.close()
+    }
+
     @Test func looksSongsUpByIDInTheOrderAsked() async throws {
         let (mac, _) = try await opened()
         guard case .songs(let all, _) = try await ask(mac, .songs(offset: 0, limit: 3)), all.count == 3 else { Issue.record("no songs"); return }

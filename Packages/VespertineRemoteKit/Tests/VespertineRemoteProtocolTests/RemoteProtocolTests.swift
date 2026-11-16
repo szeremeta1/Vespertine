@@ -69,6 +69,8 @@ private let copied: TrackSummary = {
             .createPlaylist(name: "Sunday", ids: []),
             .library, .genres, .genreAlbums(key: "jazz"), .recentlyAdded(limit: 150), .sourceAlbums(id: 3),
             .playAlbums(keys: ["k", "l"], shuffled: true), .playCopy(ids: [1, 2], startAt: 1),
+            .setEqualizer(preset: "P1"), .setEqualizer(preset: nil), .setRoomCorrection(profile: "R1"), .setRoomCorrection(profile: nil),
+            .setSpatialMode(mode: .headTracked), .setSpatializeStereo(on: true), .setBalance(value: -0.25),
         ]
         for command in commands {
             let message = ClientMessage(id: 7, command: command)
@@ -154,6 +156,83 @@ private let copied: TrackSummary = {
         // Version 2 is the stream channel. Everything added since 1.1.0 is new commands and optional fields: nothing a
         // version 1 remote or Mac would misread, so a version 1 phone is still let in (see RemoteStreamTests).
         #expect(RemoteProtocol.version == 2 && RemoteProtocol.minimumVersion == 1)
+    }
+}
+
+/// The sound of the Mac's output (equalizer, room correction, Spatial Audio, balance): new commands and one optional
+/// field, so a Mac and a remote from before them go on working with each other.
+@Suite struct Sound {
+    private func player(sound: SoundState?) -> PlayerState {
+        PlayerState(playback: .paused, loading: false, nowPlaying: nil, position: 0, positionAt: Date(timeIntervalSince1970: 1_800_000_000),
+                    duration: 0, shuffle: false, repeatMode: .off, signal: nil, output: "FiiO K11",
+                    volume: VolumeState(route: .hardware, level: 0.4, muted: false), waitingFor: nil, error: nil, transitions: nil, sound: sound)
+    }
+
+    private let full = SoundState(
+        equalizer: EqualizerState(presets: [SoundChoice(id: "P1", name: "Warm"), SoundChoice(id: "P2", name: "Late Night")], selected: "P2",
+                                  bypassed: "Not applied: native DSD (DoP) is sent untouched"),
+        room: RoomCorrectionState(profiles: [SoundChoice(id: "R1", name: "Desk")], selected: nil, chosen: "R1"),
+        spatial: SpatialState(mode: .fixed, spatializeStereo: true),
+        balance: BalanceState(value: -0.25, bypassed: "Not available with Spatial Audio"))
+
+    @Test func theCommandsKeepTheirShape() throws {
+        #expect(try json(RemoteCommand.setEqualizer(preset: "P1")) == #"{"setEqualizer":{"preset":"P1"}}"#)
+        #expect(try json(RemoteCommand.setEqualizer(preset: nil)) == #"{"setEqualizer":{}}"#)
+        #expect(try json(RemoteCommand.setRoomCorrection(profile: "R1")) == #"{"setRoomCorrection":{"profile":"R1"}}"#)
+        #expect(try json(RemoteCommand.setRoomCorrection(profile: nil)) == #"{"setRoomCorrection":{}}"#)
+        #expect(try json(RemoteCommand.setSpatialMode(mode: .headTracked)) == #"{"setSpatialMode":{"mode":"headTracked"}}"#)
+        #expect(try json(RemoteCommand.setSpatializeStereo(on: false)) == #"{"setSpatializeStereo":{"on":false}}"#)
+        #expect(try json(RemoteCommand.setBalance(value: 0.5)) == #"{"setBalance":{"value":0.5}}"#)
+        // Written by hand, with nothing inside: off.
+        let off = try RemoteProtocol.decoder().decode(RemoteCommand.self, from: Data(#"{"setEqualizer":{}}"#.utf8))
+        #expect(off == .setEqualizer(preset: nil))
+    }
+
+    @Test func theStateRoundTripsWholeAndInParts() throws {
+        #expect(try roundTrip(ServerMessage.player(player(sound: full))) == .player(player(sound: full)))
+        // An output with only an equalizer (a network player), and one with nothing chosen anywhere.
+        let parts = [SoundState(equalizer: EqualizerState(presets: [], selected: nil)),
+                     SoundState(room: RoomCorrectionState(profiles: [], selected: nil, chosen: nil),
+                                spatial: SpatialState(mode: .off, spatializeStereo: nil), balance: BalanceState(value: 0))]
+        for sound in parts { #expect(try roundTrip(sound) == sound) }
+        #expect(try json(SoundState(spatial: SpatialState(mode: .off, spatializeStereo: nil))) == #"{"spatial":{"mode":"off"}}"#)
+        #expect(SoundState().isEmpty && !full.isEmpty)
+    }
+
+    @Test func aMacFromBeforeThemSaysNothingAndIsStillRead() throws {
+        // What 1.2.0 sends for the player, word for word: no `sound`. A remote reads it and offers none of the controls.
+        let old = #"{"player":{"_0":{"duration":562.3,"loading":false,"output":"FiiO K11","playback":"playing","position":12.5,"positionAt":1800000000,"repeatMode":"all","shuffle":false,"transitions":false,"volume":{"level":0.4,"muted":false,"route":"hardware"}}}}"#
+        guard case .player(let state) = try RemoteProtocol.decoder().decode(ServerMessage.self, from: Data(old.utf8)) else {
+            Issue.record("not a player message"); return
+        }
+        #expect(state.sound == nil && state.output == "FiiO K11" && state.transitions == false)
+        // That Mac answers a command it doesn't know with `failed`, which a remote reads like any refusal.
+        let refusal = #"{"reply":{"id":9,"result":{"failed":{"reason":"This Mac’s Vespertine doesn’t know that command. Update Vespertine on the Mac."}}}}"#
+        guard case .reply(9, .failed(let reason)) = try RemoteProtocol.decoder().decode(ServerMessage.self, from: Data(refusal.utf8)) else {
+            Issue.record("not a refusal"); return
+        }
+        #expect(!reason.isEmpty)
+    }
+
+    @Test func aRemoteFromBeforeThemIsSentNothingItWouldTripOver() throws {
+        // With no sound to report the key is left out, so the message is the one an older remote has always been sent.
+        #expect(try !json(player(sound: nil)).contains("sound"))
+        // With one, the rest of the message is unchanged: an older remote passes over the key it doesn't know.
+        struct OlderPlayer: Decodable { var output: String?; var transitions: Bool? }
+        let data = try RemoteProtocol.encoder().encode(player(sound: full))
+        #expect(try RemoteProtocol.decoder().decode(OlderPlayer.self, from: data).output == "FiiO K11")
+    }
+
+    @Test func aChangedSoundIsNewsToARemote() {
+        var changed = full
+        changed.balance?.value = 0
+        #expect(player(sound: full).differs(from: player(sound: changed)))
+        #expect(!player(sound: full).differs(from: player(sound: full)))
+    }
+
+    @Test func balanceStaysWithinItsEnds() {
+        #expect(BalanceState.clamped(-3) == -1 && BalanceState.clamped(2) == 1 && BalanceState.clamped(0.3) == 0.3)
+        #expect(BalanceState.clamped(.nan) == 0 && BalanceState.clamped(.infinity) == 0)
     }
 }
 
