@@ -142,11 +142,13 @@ struct SetupFlow: View {
                     }
                 }
                 .frame(width: 112)
+                // Read as text, in order, with the step you are on marked as the selected one.
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(item.title)
-                .accessibilityAddTraits(item == step ? .isSelected : [])
+                .accessibilityAddTraits(item == step ? [.isStaticText, .isSelected] : .isStaticText)
             }
         }
+        .accessibilityElement(children: .contain)
         .padding(.top, 26)
         .animation(reduceMotion ? nil : .spring(response: 0.55, dampingFraction: 0.8), value: step)
     }
@@ -417,7 +419,24 @@ private struct SetupOption<Control: View>: View {
                 control
             }
         }
-        .accessibilityElement(children: .combine)
+        // The parts stay separate: the switch or picker keeps its own name, role and value (combined, some lost them).
+        .accessibilityElement(children: .contain)
+    }
+}
+
+/// A card that is one of several choices (how music is added, where it plays): to VoiceOver and other assistive
+/// apps it is a checkbox that is on while it's the chosen one, since the tick is only drawn.
+private struct ChoiceAccessibility: ViewModifier {
+    let name: String
+    let detail: String
+    let selected: Bool
+    let choose: () -> Void
+
+    func body(content: Content) -> some View {
+        content.accessibilityRepresentation {
+            Toggle(isOn: Binding(get: { selected }, set: { if $0 { choose() } })) { Text(verbatim: name) }
+                .accessibilityHint(Text(verbatim: detail))
+        }
     }
 }
 
@@ -547,7 +566,7 @@ private struct SetupMusic: View {
         .onAppear { shown = true }
     }
 
-    private func modeCard(_ mode: ImportMode, symbol: String, title: LocalizedStringKey, detail: LocalizedStringKey) -> some View {
+    private func modeCard(_ mode: ImportMode, symbol: String, title: LocalizedStringResource, detail: LocalizedStringResource) -> some View {
         let selected = model.settings.defaultImportMode == mode
         return Button { model.settings.defaultImportMode = mode } label: {
             SetupCard(selected: selected, padding: 14) {
@@ -570,7 +589,9 @@ private struct SetupMusic: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityAddTraits(selected ? .isSelected : [])
+        .modifier(ChoiceAccessibility(name: String(localized: title), detail: String(localized: detail), selected: selected) {
+            model.settings.defaultImportMode = mode
+        })
     }
 
     private func actionTile(_ symbol: String, _ title: LocalizedStringKey, _ detail: LocalizedStringKey, recommended: Bool = false,
@@ -629,6 +650,40 @@ private struct SetupMusic: View {
 
 // MARK: - Output
 
+/// The Output step's list of devices: how tall it may be, and whether there are more rows than fit (the list then shows
+/// its scroll bar and fades at the bottom, so a DAC further down isn't missed).
+nonisolated enum SetupOutputList {
+    /// A row: the card's padding around its round symbol.
+    static let rowHeight: CGFloat = 64
+    static let rowSpacing: CGFloat = 10
+    static let edgePadding: CGFloat = 6
+    static let fadeHeight: CGFloat = 28
+    /// What the list had before it grew with the window: four rows, and less while the DoP card is under it.
+    static let smallest: CGFloat = 300
+    static let smallestWithDoPCard: CGFloat = 210
+    /// The rest of the page: heading, the line about plugging in a DAC, the fallback picker; and the DoP card.
+    static let aroundList: CGFloat = 230
+    static let dopCard: CGFloat = 96
+
+    /// The tallest the list may be on a page `pageHeight` high: what the rest of the page leaves, never less than before.
+    static func maxHeight(pageHeight: CGFloat, dopCard: Bool) -> CGFloat {
+        let floor = dopCard ? smallestWithDoPCard : smallest
+        let room = pageHeight - aroundList - (dopCard ? Self.dopCard : 0)
+        return max(floor, room.rounded(.down))
+    }
+
+    /// The height `rows` rows take, with the padding above and below them.
+    static func contentHeight(rows: Int) -> CGFloat {
+        guard rows > 0 else { return 0 }
+        return CGFloat(rows) * rowHeight + CGFloat(rows - 1) * rowSpacing + 2 * edgePadding
+    }
+
+    static func overflows(rows: Int, maxHeight: CGFloat) -> Bool { contentHeight(rows: rows) > maxHeight }
+
+    /// What a row is scrolled to by: its device, or System Default.
+    static func rowID(_ uid: String?) -> String { uid.map { "device:\($0)" } ?? "system-default" }
+}
+
 private struct SetupOutput: View {
     @Environment(AppModel.self) private var model
     @State private var shown = false
@@ -640,12 +695,16 @@ private struct SetupOutput: View {
         let devices = model.devices.devices
         let recommended = OutputChoice.best(among: devices).flatMap { $0.transport == .builtIn || devices.count == 1 ? nil : $0.uid }
         let dopDevice = dopCandidate
+        GeometryReader { page in
+        let listHeight = SetupOutputList.maxHeight(pageHeight: page.size.height, dopCard: dopDevice != nil)
+        let fades = SetupOutputList.overflows(rows: devices.count + 1, maxHeight: listHeight)
         VStack(spacing: 0) {
             SetupHeading(title: "Choose where it plays",
                          detail: "Pick your DAC, headphones or speakers. Vespertine remembers your choice and goes back to it whenever it's connected.",
                          shown: shown)
+            ScrollViewReader { list in
             ScrollView {
-                VStack(spacing: 10) {
+                VStack(spacing: SetupOutputList.rowSpacing) {
                     row(nil, name: String(localized: "System Default"), detail: String(localized: "Follows System Settings › Sound"),
                         symbol: "gearshape", index: 0)
                     ForEach(Array(devices.enumerated()), id: \.element.uid) { index, device in
@@ -654,15 +713,36 @@ private struct SetupOutput: View {
                             .transition(reduceMotion ? .opacity : .asymmetric(insertion: .scale(scale: 0.94).combined(with: .opacity), removal: .opacity))
                     }
                 }
-                .padding(.vertical, 6)
+                .padding(.top, SetupOutputList.edgePadding)
+                // Room under the last row, so it clears the fade when the list is scrolled to its end.
+                .padding(.bottom, fades ? SetupOutputList.fadeHeight : SetupOutputList.edgePadding)
                 .padding(.horizontal, 4)
                 .animation(reduceMotion ? nil : .spring(response: 0.5, dampingFraction: 0.8), value: devices.map(\.uid))
             }
-            .scrollIndicators(.never)
-            // The list gives up some room while the DoP card is shown under it.
-            .frame(maxWidth: 620, maxHeight: dopDevice == nil ? 300 : 210)
+            // More outputs than fit: the scroll bar shows, the bottom edge fades, and the chosen one is brought into view.
+            .scrollIndicators(fades ? .visible : .never)
+            .scrollIndicatorsFlash(trigger: fades)
+            .mask {
+                VStack(spacing: 0) {
+                    Color.black
+                    LinearGradient(colors: [.black, .black.opacity(fades ? 0 : 1)], startPoint: .top, endPoint: .bottom)
+                        .frame(height: SetupOutputList.fadeHeight)
+                }
+            }
+            // As tall as the window allows; it gives up some room while the DoP card is shown under it.
+            .frame(maxWidth: 620, maxHeight: listHeight)
             .fixedSize(horizontal: false, vertical: true)
             .padding(.top, 26)
+            .onAppear { list.scrollTo(SetupOutputList.rowID(settings.selectedDeviceUID), anchor: .center) }
+            .onChange(of: settings.selectedDeviceUID) { _, uid in
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.25)) { list.scrollTo(SetupOutputList.rowID(uid)) }
+            }
+            // A DAC plugged in while this page is open, and the best one here, is not left below the fold.
+            .onChange(of: devices.map(\.uid)) { old, new in
+                guard settings.selectedDeviceUID == nil, let recommended, new.contains(recommended), !old.contains(recommended) else { return }
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.25)) { list.scrollTo(SetupOutputList.rowID(recommended)) }
+            }
+            }
             HStack(spacing: 8) {
                 Circle().fill(Palette.brassHi).frame(width: 6, height: 6)
                     .shadow(color: Palette.brass, radius: pulse ? 6 : 1)
@@ -696,6 +776,8 @@ private struct SetupOutput: View {
         }
         .animation(.easeInOut(duration: 0.3), value: dopDevice?.uid)
         .padding(.horizontal, 40)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
         .onAppear {
             shown = true
             guard !reduceMotion else { return }
@@ -735,9 +817,8 @@ private struct SetupOutput: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(name)
-        .accessibilityValue(detail)
-        .accessibilityAddTraits(selected ? .isSelected : [])
+        .modifier(ChoiceAccessibility(name: name, detail: detail, selected: selected) { model.selectDevice(uid) })
+        .id(SetupOutputList.rowID(uid))
         .reveal(shown, delay: 0.12 + 0.05 * Double(min(index, 8)))
     }
 }

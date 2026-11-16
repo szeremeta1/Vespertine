@@ -64,6 +64,7 @@ struct ConnectServerSheet: View {
                 Section {
                     TextField("Server address", text: $address, prompt: Text("smb://server/share/folder"))
                         .textContentType(.URL)
+                        .accessibilityLabel("Server address")
                         .onSubmit(connect)
                     Text("Also accepts \\\\server\\share, nfs://server/export and https://server/path (WebDAV). A folder after the share name limits Vespertine to that folder.")
                         .font(.caption).foregroundStyle(.secondary)
@@ -77,9 +78,10 @@ struct ConnectServerSheet: View {
                         .pickerStyle(.segmented)
                         if !asGuest {
                             if NetworkShare(string: address)?.user == nil {
-                                TextField("Name", text: $user)
+                                TextField("Name", text: $user).accessibilityLabel("Name")
                             }
                             SecureField("Password", text: $password, prompt: savedPassword ? Text("Saved in Keychain") : Text("Required"))
+                                .accessibilityLabel("Password")
                             Toggle("Remember this password in my keychain", isOn: $remember)
                             if share?.kind == .webdav, share?.secure == false {
                                 Label("This address uses http, so your name, password and music cross the network unencrypted. Use https if the server offers it.",
@@ -91,6 +93,7 @@ struct ConnectServerSheet: View {
                 }
                 Section {
                     TextField("Name in library", text: $name, prompt: share.map { Text($0.defaultName) } ?? Text("Optional"))
+                        .accessibilityLabel("Name in library")
                     Toggle("Read-only (recommended)", isOn: $readOnly)
                     (readOnly
                          ? Text("Vespertine never changes files on the share. Tag edits stay in the library.")
