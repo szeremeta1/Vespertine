@@ -30,7 +30,10 @@ home. Now Playing says **SMB share** as the source, and Output shows the share, 
 | Played from a share | FLAC, ALAC and AAC (`.m4a`, `.mp4`, `.m4b`), WAV (also RF64), AIFF, MP3 |
 | Counted as "Files that need the Mac", not listed | DSD (`.dsf`, `.dff`), APE, WavPack, TTA, Ogg, Opus, WMA, DTS, TrueHD/MLP, AC-3/E-AC-3, MKA, ISO, TAK |
 | Covers | `cover`, `folder`, `front`, `album` or `albumart` `.jpg`/`.jpeg`/`.png` in the album's folder, else the picture inside a file |
-| Not there | Playlists (they are the Mac's), CUE sheets, ReplayGain, gapless trim values for MP3/AAC |
+| Not there | Playlists (they are the Mac's), CUE sheets, ReplayGain |
+
+MP3 and AAC albums on a share join without a gap, like the lossless ones: the phone's decoder reads the encoder's delay and padding
+from each file and leaves them out (see `docs/REMOTE-STREAMING.md`).
 
 Folders a NAS keeps for itself (`@eaDir`, `#recycle`, `$RECYCLE.BIN`, `System Volume Information`, `lost+found`, snapshots), hidden files
 and names starting with a dot are skipped. Songs without tags are filed by their folder and file name.

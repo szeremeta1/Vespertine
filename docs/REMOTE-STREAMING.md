@@ -163,4 +163,8 @@ signing in is not counted, since a phone trying every route at once hangs up on 
 - Favorites and play counts made while offline are not sent back to the Mac.
 - Finding the Mac from away and moving between networks are covered by unit tests against a fake Mac only; B9 and B10 are not run.
 - DSD→FLAC speed in a release build is unmeasured (debug: about 20 s of CPU per second of 5.1 DSD64 on a loaded machine).
-- ReplayGain values are sent; gapless delay/padding are not (`encoderDelay`/`endPadding` are always nil).
+- ReplayGain values are sent.
+- MP3 and AAC albums join without a gap like lossless ones. The silence an encoder puts before a song and after it is left out by the
+  phone's decoder (Apple's), which reads how much from the file itself: a LAME header or an iTunSMPB comment in an MP3, an edit list or an
+  iTunSMPB tag in an M4A. `LossyGaplessTests` holds it to that with one tone cut in two and encoded as two songs. So the Mac sends no
+  delay or padding (`encoderDelay`/`endPadding` stay nil). An MP3 that records neither plays whole, as it does in any player.
