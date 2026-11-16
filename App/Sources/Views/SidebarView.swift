@@ -84,6 +84,8 @@ struct SidebarView: View {
                 }
             }
 
+            // The folders, drives and shares, while the local library is on.
+            if model.library.filesOn {
             Section {
                 ForEach(model.library.sources) { source in
                     if let id = source.id {
@@ -153,6 +155,7 @@ struct SidebarView: View {
                     .fixedSize()
                     .help("Add music")
                 }
+            }
             }
 
             // The listener's music servers, while that is switched on and they have a place of their own here.

@@ -276454,6 +276454,275 @@
         }
       }
     },
+    "Local Library": {
+      "comment": "Settings › Library: the switch that makes the music files in the listener’s folders, on their drives and on their network shares part of the app. It is on by default.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የአካባቢ ቤተ-መጻሕፍት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المكتبة المحلية"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "লোকাল লাইব্রেরি"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Místní knihovna"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lokalt bibliotek"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lokale Mediathek"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τοπική βιβλιοθήκη"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteca local"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کتابخانهٔ محلی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paikallinen kirjasto"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lokal na Library"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliothèque locale"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "લોકલ લાઇબ્રેરી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laburaren Gida"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ספריה מקומית"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लोकल लाइब्रेरी"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Helyi könyvtár"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perpustakaan Lokal"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libreria locale"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ローカルライブラリ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಲೋಕಲ್ ಲೈಬ್ರರಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로컬 보관함"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ലോക്കൽ ലൈബ്രറി"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लोकल लायब्ररी"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pustaka Setempat"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lokalt bibliotek"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lokale bibliotheek"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਲੋਕਲ ਲਾਇਬ੍ਰੇਰੀ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteka lokalna"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteca Local"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteca local"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotecă locală"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lokalt bibliotek"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maktaba ya Ndani"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "லோக்கல் லைப்ரரி"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "లోకల్ లైబ్రరీ"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "คลังในเครื่อง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel Arşiv"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Локальна медіатека"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لوکل لائبریری"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thư viện cục bộ"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本機資料庫"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本地资料库"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本機資料庫"
+          }
+        }
+      }
+    },
     "Location": {
       "localizations": {
         "am": {
@@ -466847,6 +467116,275 @@
         }
       }
     },
+    "The local library is off, so the music in your folders and on your network shares isn’t shown. Turn it back on in Settings › Library, or add a music server there.": {
+      "comment": "Main window, when the Local Library switch is off and no music server is set up. “Settings › Library” is the Library tab of the Settings window.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የአካባቢ ቤተ-መጻሕፍቱ ጠፍቷል፣ ስለዚህ በአቃፊዎችዎ እና በአውታረ መረብ ማጋራቶችዎ ላይ ያለው ሙዚቃ አይታይም። በቅንብሮች › ቤተ-መጻሕፍት ውስጥ መልሰው ያብሩት፣ ወይም እዚያ የሙዚቃ አገልጋይ ያክሉ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المكتبة المحلية متوقفة، لذلك لا تُعرض الموسيقى الموجودة في مجلداتك وفي مشاركات الشبكة. أعد تشغيلها من الإعدادات › المكتبة، أو أضف خادم موسيقى هناك."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "লোকাল লাইব্রেরি বন্ধ আছে, তাই আপনার ফোল্ডার ও নেটওয়ার্ক শেয়ারে থাকা সংগীত দেখানো হচ্ছে না। সেটিংস › লাইব্রেরি থেকে এটি আবার চালু করুন, অথবা সেখানে একটি মিউজিক সার্ভার যোগ করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Místní knihovna je vypnutá, takže se hudba z vašich složek a síťových sdílení nezobrazuje. Zapněte ji znovu v Nastavení › Knihovna, nebo tam přidejte hudební server."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det lokale bibliotek er slået fra, så musikken i dine mapper og på dine netværksdelinger vises ikke. Slå det til igen i Indstillinger › Bibliotek, eller tilføj en musikserver dér."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die lokale Mediathek ist aus, daher wird die Musik in deinen Ordnern und auf deinen Netzwerkfreigaben nicht angezeigt. Schalte sie unter Einstellungen › Mediathek wieder ein oder füge dort einen Musikserver hinzu."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η τοπική βιβλιοθήκη είναι απενεργοποιημένη, οπότε η μουσική στους φακέλους σας και στους κοινόχρηστους φακέλους δικτύου δεν εμφανίζεται. Ενεργοποιήστε την ξανά στις Ρυθμίσεις › Βιβλιοθήκη ή προσθέστε εκεί έναν διακομιστή μουσικής."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La biblioteca local está desactivada, así que no se muestra la música de tus carpetas ni de tus recursos compartidos de red. Vuelve a activarla en Ajustes › Biblioteca, o añade allí un servidor de música."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کتابخانهٔ محلی خاموش است، بنابراین موسیقی موجود در پوشه‌ها و اشتراک‌های شبکهٔ شما نشان داده نمی‌شود. آن را در تنظیمات › کتابخانه دوباره روشن کنید، یا همان‌جا یک سرور موسیقی اضافه کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paikallinen kirjasto on pois päältä, joten kansioissasi ja verkkojaoissasi olevaa musiikkia ei näytetä. Ota se takaisin käyttöön kohdassa Asetukset › Kirjasto tai lisää siellä musiikkipalvelin."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Naka-off ang lokal na library, kaya hindi ipinapakita ang musika sa iyong mga folder at mga network share. I-on ulit ito sa Mga Setting › Library, o magdagdag doon ng music server."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La bibliothèque locale est désactivée : la musique de vos dossiers et de vos partages réseau n’est donc pas affichée. Réactivez-la dans Réglages › Bibliothèque, ou ajoutez-y un serveur de musique."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "લોકલ લાઇબ્રેરી બંધ છે, તેથી તમારા ફોલ્ડર અને નેટવર્ક શેરમાં રહેલું સંગીત બતાવવામાં આવતું નથી. તેને સેટિંગ્સ › લાઇબ્રેરીમાં ફરી ચાલુ કરો, અથવા ત્યાં મ્યુઝિક સર્વર ઉમેરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An kashe laburaren gida, don haka ba a nuna kiɗan da ke cikin manyan fayilolinka da na cibiyar sadarwa. Sake kunna shi a Saituna › Laburare, ko ka ƙara sabar kiɗa a can."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הספריה המקומית כבויה, ולכן המוזיקה שבתיקיות ובשיתופי הרשת שלך לא מוצגת. הפעל אותה שוב בהגדרות › ספריה, או הוסף שם שרת מוזיקה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लोकल लाइब्रेरी बंद है, इसलिए आपके फ़ोल्डरों और नेटवर्क शेयर में रखा संगीत नहीं दिखाया जा रहा है। इसे सेटिंग्स › लाइब्रेरी में फिर से चालू करें, या वहाँ कोई संगीत सर्वर जोड़ें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A helyi könyvtár ki van kapcsolva, ezért a mappáidban és a hálózati megosztásaidon lévő zene nem látható. Kapcsold vissza a Beállítások › Könyvtár lapon, vagy adj hozzá ott egy zeneszervert."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perpustakaan lokal nonaktif, sehingga musik di folder dan share jaringan Anda tidak ditampilkan. Aktifkan kembali di Pengaturan › Perpustakaan, atau tambahkan server musik di sana."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La libreria locale è disattivata, quindi la musica nelle tue cartelle e nelle tue condivisioni di rete non viene mostrata. Riattivala in Impostazioni › Libreria, oppure aggiungi lì un server musicale."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ローカルライブラリがオフのため、フォルダやネットワーク共有にある音楽は表示されません。「設定」›「ライブラリ」でオンに戻すか、そこでミュージックサーバを追加してください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಲೋಕಲ್ ಲೈಬ್ರರಿ ಆಫ್ ಆಗಿದೆ, ಆದ್ದರಿಂದ ನಿಮ್ಮ ಫೋಲ್ಡರ್‌ಗಳು ಮತ್ತು ನೆಟ್‌ವರ್ಕ್ ಶೇರ್‌ಗಳಲ್ಲಿರುವ ಸಂಗೀತವನ್ನು ತೋರಿಸಲಾಗುತ್ತಿಲ್ಲ. ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ಲೈಬ್ರರಿಯಲ್ಲಿ ಅದನ್ನು ಮತ್ತೆ ಆನ್ ಮಾಡಿ, ಅಥವಾ ಅಲ್ಲಿ ಮ್ಯೂಸಿಕ್ ಸರ್ವರ್ ಸೇರಿಸಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로컬 보관함이 꺼져 있어 폴더와 네트워크 공유에 있는 음악이 표시되지 않습니다. 설정 › 보관함에서 다시 켜거나 그곳에서 음악 서버를 추가하세요."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ലോക്കൽ ലൈബ്രറി ഓഫ് ആണ്, അതിനാൽ നിങ്ങളുടെ ഫോൾഡറുകളിലും നെറ്റ്‌വർക്ക് ഷെയറുകളിലുമുള്ള സംഗീതം കാണിക്കുന്നില്ല. ക്രമീകരണങ്ങൾ › ലൈബ്രറിയിൽ അത് വീണ്ടും ഓൺ ചെയ്യുക, അല്ലെങ്കിൽ അവിടെ ഒരു മ്യൂസിക് സെർവർ ചേർക്കുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लोकल लायब्ररी बंद आहे, त्यामुळे तुमच्या फोल्डर आणि नेटवर्क शेअरमधील संगीत दाखवले जात नाही. ती सेटिंग्ज › लायब्ररीमध्ये पुन्हा सुरू करा, किंवा तिथे म्युझिक सर्व्हर जोडा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pustaka setempat dimatikan, jadi muzik dalam folder dan perkongsian rangkaian anda tidak dipaparkan. Hidupkannya semula dalam Tetapan › Pustaka, atau tambah pelayan muzik di sana."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det lokale biblioteket er av, så musikken i mappene dine og på nettverksdelingene dine vises ikke. Slå det på igjen i Innstillinger › Bibliotek, eller legg til en musikktjener der."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De lokale bibliotheek staat uit, dus de muziek in je mappen en op je netwerkshares wordt niet getoond. Zet hem weer aan in Instellingen › Bibliotheek, of voeg daar een muziekserver toe."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਲੋਕਲ ਲਾਇਬ੍ਰੇਰੀ ਬੰਦ ਹੈ, ਇਸ ਲਈ ਤੁਹਾਡੇ ਫੋਲਡਰਾਂ ਅਤੇ ਨੈੱਟਵਰਕ ਸ਼ੇਅਰਾਂ ਵਿਚਲਾ ਸੰਗੀਤ ਨਹੀਂ ਦਿਖਾਇਆ ਜਾ ਰਿਹਾ। ਇਸਨੂੰ ਸੈਟਿੰਗਾਂ › ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਮੁੜ ਚਾਲੂ ਕਰੋ, ਜਾਂ ਉੱਥੇ ਕੋਈ ਮਿਊਜ਼ਿਕ ਸਰਵਰ ਜੋੜੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteka lokalna jest wyłączona, więc muzyka z Twoich folderów i zasobów sieciowych nie jest pokazywana. Włącz ją ponownie w Ustawienia › Biblioteka albo dodaj tam serwer muzyczny."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A biblioteca local está desativada, então a música nas suas pastas e nos seus compartilhamentos de rede não é mostrada. Ative-a de novo em Ajustes › Biblioteca ou adicione um servidor de música lá."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A biblioteca local está desativada, pelo que a música nas suas pastas e nas suas partilhas de rede não é mostrada. Volte a ativá-la em Definições › Biblioteca ou adicione aí um servidor de música."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteca locală este dezactivată, așa că muzica din folderele tale și din partajările de rețea nu este afișată. Activeaz-o din nou în Configurări › Bibliotecă sau adaugă acolo un server de muzică."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det lokala biblioteket är av, så musiken i dina mappar och på dina nätverksresurser visas inte. Slå på det igen i Inställningar › Bibliotek, eller lägg till en musikserver där."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maktaba ya ndani imezimwa, kwa hiyo muziki ulio kwenye folda zako na folda zako za mtandao hauonyeshwi. Iwashe tena kwenye Mipangilio › Maktaba, au ongeza seva ya muziki hapo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "லோக்கல் லைப்ரரி அணைக்கப்பட்டுள்ளது, எனவே உங்கள் கோப்புறைகள் மற்றும் நெட்வொர்க் பகிர்வுகளில் உள்ள இசை காட்டப்படவில்லை. அமைப்புகள் › லைப்ரரியில் அதை மீண்டும் இயக்கவும், அல்லது அங்கே ஒரு மியூசிக் சர்வரைச் சேர்க்கவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "లోకల్ లైబ్రరీ ఆఫ్‌లో ఉంది, కాబట్టి మీ ఫోల్డర్‌లు, నెట్‌వర్క్ షేర్‌లలో ఉన్న సంగీతం చూపబడదు. సెట్టింగ్‌లు › లైబ్రరీలో దాన్ని మళ్లీ ఆన్ చేయండి, లేదా అక్కడ మ్యూజిక్ సర్వర్‌ను జోడించండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "คลังในเครื่องปิดอยู่ เพลงในโฟลเดอร์และแชร์เครือข่ายของคุณจึงไม่แสดง เปิดอีกครั้งได้ที่ การตั้งค่า › คลัง หรือเพิ่มเซิร์ฟเวอร์เพลงที่นั่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel arşiv kapalı olduğundan klasörlerinizdeki ve ağ paylaşımlarınızdaki müzik gösterilmiyor. Ayarlar › Arşiv’den yeniden açın veya orada bir müzik sunucusu ekleyin."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Локальну медіатеку вимкнено, тому музика з ваших папок і мережевих ресурсів не показується. Увімкніть її знову в розділі «Параметри» › «Медіатека» або додайте там музичний сервер."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لوکل لائبریری بند ہے، اس لیے آپ کے فولڈرز اور نیٹ ورک شیئرز میں موجود موسیقی نہیں دکھائی جا رہی۔ اسے ترتیبات › لائبریری میں دوبارہ چالو کریں، یا وہاں کوئی میوزک سرور شامل کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thư viện cục bộ đang tắt, nên nhạc trong các thư mục và chia sẻ mạng của bạn không được hiển thị. Hãy bật lại trong Cài đặt › Thư viện, hoặc thêm máy chủ nhạc ở đó."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本機資料庫已關閉，因此不會顯示你的檔案夾和網絡共享中的音樂。請在「設定」›「資料庫」中重新開啟，或在該處加入音樂伺服器。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本地资料库已关闭，因此不会显示你的文件夹和网络共享中的音乐。请在“设置”›“资料库”中重新打开，或在那里添加音乐服务器。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本機資料庫已關閉，因此不會顯示你的檔案夾和網路共享中的音樂。請在「設定」›「資料庫」中重新開啟，或在該處加入音樂伺服器。"
+          }
+        }
+      }
+    },
     "The Mac's sound output": {
       "comment": "Completes “When the chosen output isn't connected, play on”",
       "extractionState": "manual",
@@ -471943,6 +472481,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "音樂會合併到剩下的輸出上繼續播放。如果消失的是時脈主導，則改為暫停：該群組絕不會悄悄切換到另一個時脈繼續播放。"
+          }
+        }
+      }
+    },
+    "The music in your folders, on your drives and on your network shares. Off, Vespertine shows none of it and scans, watches and connects to none of it. Nothing is deleted.": {
+      "comment": "Settings › Library: the caption under the Local Library switch.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በአቃፊዎችዎ፣ በድራይቮችዎ እና በአውታረ መረብ ማጋራቶችዎ ላይ ያለው ሙዚቃ። ሲጠፋ Vespertine ከእሱ ምንም አያሳይም፤ አይቃኝም፣ አይከታተልም፣ አይገናኝም። ምንም ነገር አይሰረዝም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الموسيقى الموجودة في مجلداتك وعلى أقراصك وفي مشاركات الشبكة لديك. عند إيقافها، لا يعرض Vespertine أيًّا منها ولا يفحصها ولا يراقبها ولا يتصل بها. لا يُحذف أي شيء."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনার ফোল্ডার, ড্রাইভ ও নেটওয়ার্ক শেয়ারে থাকা সংগীত। বন্ধ থাকলে Vespertine এর কিছুই দেখায় না এবং এর কিছুই স্ক্যান করে না, নজরে রাখে না বা এর সঙ্গে সংযোগ করে না। কিছুই মুছে ফেলা হয় না।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hudba ve vašich složkách, na vašich discích a v síťových sdíleních. Když je vypnuto, Vespertine z ní nic nezobrazuje a nic z ní neprohledává, nesleduje ani se k ničemu nepřipojuje. Nic se nesmaže."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musikken i dine mapper, på dine drev og på dine netværksdelinger. Når det er slået fra, viser Vespertine intet af den og scanner, overvåger og forbinder ikke til noget af den. Intet bliver slettet."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Musik in deinen Ordnern, auf deinen Laufwerken und auf deinen Netzwerkfreigaben. Ist die Option aus, zeigt Vespertine nichts davon an und scannt, überwacht und verbindet sich mit nichts davon. Es wird nichts gelöscht."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η μουσική στους φακέλους σας, στους δίσκους σας και στους κοινόχρηστους φακέλους δικτύου. Όταν είναι απενεργοποιημένη, το Vespertine δεν εμφανίζει τίποτα από αυτήν και δεν σαρώνει, δεν παρακολουθεί και δεν συνδέεται με τίποτα από αυτήν. Δεν διαγράφεται τίποτα."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La música de tus carpetas, de tus discos y de tus recursos compartidos de red. Si está desactivada, Vespertine no muestra nada de ella y no la escanea, ni la vigila, ni se conecta a ella. No se borra nada."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موسیقی موجود در پوشه‌ها، درایوها و اشتراک‌های شبکهٔ شما. وقتی خاموش است، Vespertine هیچ‌چیز از آن را نشان نمی‌دهد و هیچ‌یک را اسکن نمی‌کند، زیر نظر نمی‌گیرد و به آن وصل نمی‌شود. هیچ‌چیز حذف نمی‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kansioissasi, levyilläsi ja verkkojaoissasi oleva musiikki. Kun asetus on pois päältä, Vespertine ei näytä siitä mitään eikä skannaa, seuraa tai yhdistä mihinkään siitä. Mitään ei poisteta."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang musika sa iyong mga folder, mga drive, at mga network share. Kapag naka-off, wala sa mga ito ang ipinapakita ng Vespertine, at hindi nito ini-scan, binabantayan, o kinokonektahan ang alinman dito. Walang binubura."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La musique de vos dossiers, de vos disques et de vos partages réseau. Lorsque l’option est désactivée, Vespertine n’en affiche rien et n’analyse, ne surveille ni ne contacte aucun d’eux. Rien n’est supprimé."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમારા ફોલ્ડર, ડ્રાઇવ અને નેટવર્ક શેરમાં રહેલું સંગીત. બંધ હોય ત્યારે Vespertine તેમાંથી કશું બતાવતું નથી અને તેમાંથી કશું સ્કૅન કરતું નથી, તેના પર નજર રાખતું નથી કે તેની સાથે જોડાતું નથી. કશું ડિલીટ થતું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiɗan da ke cikin manyan fayilolinka, a kan faifanka da kuma a kan manyan fayilolin cibiyar sadarwa. Idan an kashe shi, Vespertine ba ya nuna ko ɗaya daga cikinsa, kuma ba ya bincika, ba ya sa ido, ba ya haɗuwa da ko ɗaya daga cikinsa. Ba a goge komai."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המוזיקה שבתיקיות שלך, בכוננים שלך ובשיתופי הרשת שלך. כשהאפשרות כבויה, Vespertine לא מציג דבר ממנה, ולא סורק אותה, לא עוקב אחריה ולא מתחבר אליה. שום דבר לא נמחק."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आपके फ़ोल्डरों, ड्राइव और नेटवर्क शेयर में रखा संगीत। बंद होने पर Vespertine इसमें से कुछ भी नहीं दिखाता और न ही इसमें से कुछ स्कैन करता है, न उस पर नज़र रखता है, न उससे कनेक्ट होता है। कुछ भी डिलीट नहीं होता।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A mappáidban, a meghajtóidon és a hálózati megosztásaidon lévő zene. Kikapcsolt állapotban a Vespertine semmit sem mutat belőle, és semmit sem olvas be, figyel vagy csatlakoztat belőle. Semmi sem törlődik."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musik di folder, drive, dan share jaringan Anda. Saat nonaktif, Vespertine tidak menampilkan apa pun darinya dan tidak memindai, memantau, atau menghubungkan ke satu pun darinya. Tidak ada yang dihapus."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La musica nelle tue cartelle, sui tuoi dischi e nelle tue condivisioni di rete. Se è disattivata, Vespertine non ne mostra nulla e non ne analizza, controlla o collega nulla. Non viene eliminato nulla."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "フォルダ、ドライブ、ネットワーク共有にある音楽です。オフのとき、Vespertineはそれらを一切表示せず、スキャンも監視も接続も行いません。何も削除されません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮ್ಮ ಫೋಲ್ಡರ್‌ಗಳು, ಡ್ರೈವ್‌ಗಳು ಮತ್ತು ನೆಟ್‌ವರ್ಕ್ ಶೇರ್‌ಗಳಲ್ಲಿರುವ ಸಂಗೀತ. ಆಫ್ ಆಗಿದ್ದರೆ Vespertine ಅದರಲ್ಲಿ ಏನನ್ನೂ ತೋರಿಸುವುದಿಲ್ಲ ಮತ್ತು ಅದರಲ್ಲಿ ಯಾವುದನ್ನೂ ಸ್ಕ್ಯಾನ್ ಮಾಡುವುದಿಲ್ಲ, ಗಮನಿಸುವುದಿಲ್ಲ ಅಥವಾ ಅದಕ್ಕೆ ಸಂಪರ್ಕಿಸುವುದಿಲ್ಲ. ಏನನ್ನೂ ಅಳಿಸಲಾಗುವುದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "폴더, 드라이브, 네트워크 공유에 있는 음악입니다. 끄면 Vespertine이 그 음악을 전혀 표시하지 않으며 스캔하거나 감시하거나 연결하지도 않습니다. 아무것도 삭제되지 않습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങളുടെ ഫോൾഡറുകളിലും ഡ്രൈവുകളിലും നെറ്റ്‌വർക്ക് ഷെയറുകളിലുമുള്ള സംഗീതം. ഓഫ് ആയിരിക്കുമ്പോൾ Vespertine അതിൽ ഒന്നും കാണിക്കുന്നില്ല; അതിൽ ഒന്നും സ്കാൻ ചെയ്യുകയോ നിരീക്ഷിക്കുകയോ അതിലേക്ക് കണക്റ്റ് ചെയ്യുകയോ ഇല്ല. ഒന്നും ഇല്ലാതാക്കുന്നില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुमच्या फोल्डर, ड्राइव्ह आणि नेटवर्क शेअरमधील संगीत. बंद असताना Vespertine त्यातील काहीही दाखवत नाही आणि त्यातील काहीही स्कॅन करत नाही, त्यावर लक्ष ठेवत नाही किंवा त्याला कनेक्ट होत नाही. काहीही हटवले जात नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muzik dalam folder, pemacu dan perkongsian rangkaian anda. Apabila dimatikan, Vespertine tidak memaparkan apa-apa daripadanya dan tidak mengimbas, memantau atau menyambung kepada mana-mana daripadanya. Tiada apa-apa yang dipadamkan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musikken i mappene dine, på diskene dine og på nettverksdelingene dine. Når det er av, viser Vespertine ingenting av den og skanner, overvåker og kobler ikke til noe av den. Ingenting blir slettet."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De muziek in je mappen, op je schijven en op je netwerkshares. Als het uit staat, toont Vespertine er niets van en scant, bewaakt en verbindt het met geen ervan. Er wordt niets verwijderd."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਤੁਹਾਡੇ ਫੋਲਡਰਾਂ, ਡਰਾਈਵਾਂ ਅਤੇ ਨੈੱਟਵਰਕ ਸ਼ੇਅਰਾਂ ਵਿਚਲਾ ਸੰਗੀਤ। ਬੰਦ ਹੋਣ ਤੇ Vespertine ਇਸ ਵਿੱਚੋਂ ਕੁਝ ਵੀ ਨਹੀਂ ਦਿਖਾਉਂਦਾ ਅਤੇ ਨਾ ਇਸ ਵਿੱਚੋਂ ਕੁਝ ਸਕੈਨ ਕਰਦਾ ਹੈ, ਨਾ ਉਸ ਉੱਤੇ ਨਜ਼ਰ ਰੱਖਦਾ ਹੈ, ਨਾ ਉਸ ਨਾਲ ਜੁੜਦਾ ਹੈ। ਕੁਝ ਵੀ ਮਿਟਾਇਆ ਨਹੀਂ ਜਾਂਦਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muzyka w Twoich folderach, na Twoich dyskach i w zasobach sieciowych. Gdy jest wyłączona, Vespertine nie pokazuje niczego z niej i niczego z niej nie skanuje, nie obserwuje ani się z niczym nie łączy. Nic nie jest usuwane."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A música nas suas pastas, nos seus discos e nos seus compartilhamentos de rede. Com a opção desativada, o Vespertine não mostra nada dela e não escaneia, observa nem se conecta a nada dela. Nada é apagado."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A música nas suas pastas, nos seus discos e nas suas partilhas de rede. Se estiver desativada, o Vespertine não mostra nada dela e não analisa, vigia nem se liga a nada dela. Nada é apagado."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muzica din folderele tale, de pe discurile tale și din partajările de rețea. Când este dezactivată, Vespertine nu afișează nimic din ea și nu scanează, nu urmărește și nu se conectează la nimic din ea. Nu se șterge nimic."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musiken i dina mappar, på dina enheter och på dina nätverksresurser. När det är av visar Vespertine ingenting av den och skannar, bevakar och ansluter inte till något av den. Ingenting raderas."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muziki ulio kwenye folda zako, diski zako na folda zako za mtandao. Ikizimwa, Vespertine haionyeshi chochote kati ya huo, wala haichanganui, haifuatilii wala haiunganishi na chochote kati ya huo. Hakuna kinachofutwa."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "உங்கள் கோப்புறைகள், டிரைவ்கள் மற்றும் நெட்வொர்க் பகிர்வுகளில் உள்ள இசை. அணைத்திருந்தால் Vespertine அதில் எதையும் காட்டாது; அதில் எதையும் ஸ்கேன் செய்யாது, கண்காணிக்காது, இணைக்காது. எதுவும் நீக்கப்படாது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీ ఫోల్డర్‌లు, డ్రైవ్‌లు, నెట్‌వర్క్ షేర్‌లలో ఉన్న సంగీతం. ఆఫ్‌లో ఉంటే Vespertine దానిలో దేన్నీ చూపదు; దానిలో దేన్నీ స్కాన్ చేయదు, గమనించదు, కనెక్ట్ కాదు. ఏదీ తొలగించబడదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพลงในโฟลเดอร์ ไดรฟ์ และแชร์เครือข่ายของคุณ เมื่อปิดอยู่ Vespertine จะไม่แสดงเพลงเหล่านี้เลย และจะไม่สแกน เฝ้าดู หรือเชื่อมต่อกับแหล่งใดเลย ไม่มีอะไรถูกลบ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klasörlerinizdeki, sürücülerinizdeki ve ağ paylaşımlarınızdaki müzik. Kapalıyken Vespertine bunların hiçbirini göstermez; hiçbirini taramaz, izlemez ve hiçbirine bağlanmaz. Hiçbir şey silinmez."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Музика у ваших папках, на ваших дисках і на мережевих ресурсах. Якщо вимкнено, Vespertine не показує нічого з неї й нічого з неї не сканує, не відстежує та ні до чого не під’єднується. Нічого не видаляється."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آپ کے فولڈرز، ڈرائیوز اور نیٹ ورک شیئرز میں موجود موسیقی۔ بند ہونے پر Vespertine اس میں سے کچھ نہیں دکھاتا اور نہ اس میں سے کچھ اسکین کرتا ہے، نہ اس پر نظر رکھتا ہے، نہ اس سے جڑتا ہے۔ کچھ بھی حذف نہیں ہوتا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhạc trong các thư mục, ổ đĩa và chia sẻ mạng của bạn. Khi tắt, Vespertine không hiển thị gì trong số đó và không quét, theo dõi hay kết nối với bất kỳ nguồn nào trong số đó. Không có gì bị xóa."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的檔案夾、磁碟和網絡共享中的音樂。關閉後，Vespertine 不會顯示其中任何音樂，也不會掃描、監看或連接其中任何一處。不會刪除任何內容。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的文件夹、磁盘和网络共享中的音乐。关闭后，Vespertine 不会显示其中任何音乐，也不会扫描、监视或连接其中任何一处。不会删除任何内容。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的檔案夾、磁碟和網路共享中的音樂。關閉後，Vespertine 不會顯示其中任何音樂，也不會掃描、監看或連接其中任何一處。不會刪除任何內容。"
           }
         }
       }

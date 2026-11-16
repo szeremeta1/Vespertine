@@ -118,6 +118,9 @@ final class AppSettings {
     /// Scan for new music by itself: watch local folders, look again at launch, and recheck network shares now and then.
     /// Off by default; "Rescan Library" and each source's Rescan always work. (The key keeps its old name.)
     var watchFolders: Bool { didSet { defaults.set(watchFolders, forKey: "watchFolders") } }
+    /// The music in folders, on drives and on network shares is part of the app (Settings › Library › Local Library). On by
+    /// default. Off, none of it is listed, scanned, watched or connected to (`LocalLibrarySwitch`); nothing is deleted.
+    var localLibrary: Bool { didSet { defaults.set(localLibrary, forKey: LocalLibrarySwitch.key) } }
     var fetchArtworkOnline: Bool { didSet { defaults.set(fetchArtworkOnline, forKey: "fetchArtworkOnline") } }
     var scrobble: Bool { didSet { defaults.set(scrobble, forKey: "scrobble") } }
     /// Show the song that's playing as the Discord status (through the Discord app on this Mac).
@@ -243,7 +246,7 @@ final class AppSettings {
         defaults.register(defaults: [
             "exclusiveMode": false, "atmosBySystem": true, "integerMode": true, "matchSixteenBit": false, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
             "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.reference.rawValue,
-            "watchFolders": false, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "dopListUpdates": true, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
+            "watchFolders": false, LocalLibrarySwitch.key: true, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "dopListUpdates": true, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
             "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "airPlayPlayersFeature": false,
@@ -283,6 +286,7 @@ final class AppSettings {
             ? resolvedDataDirectory.appendingPathComponent("Music", isDirectory: true).path
             : defaults.string(forKey: "managedFolder") ?? music.appendingPathComponent("Vespertine").path
         watchFolders = defaults.bool(forKey: "watchFolders")
+        localLibrary = defaults.bool(forKey: LocalLibrarySwitch.key)
         fetchArtworkOnline = defaults.bool(forKey: "fetchArtworkOnline")
         scrobble = defaults.bool(forKey: "scrobble")
         discordPresence = defaults.bool(forKey: "discordPresence")

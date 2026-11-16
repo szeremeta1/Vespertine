@@ -143,6 +143,7 @@ final class AnalysisQueue {
     /// analysis); Analyze Library asks for the shares too, since that's what pressing it means, and reads what
     /// the servers have analyzed first (the periodic sync only runs with automatic analysis on).
     func analyzeLibrary(includeNetwork: Bool? = nil) {
+        guard library.filesOn else { return }   // the local library is off: no file is read
         let network = includeNetwork ?? settings.analyzeNetworkShares
         let database = library.database, generation = generation
         Task { [weak self] in

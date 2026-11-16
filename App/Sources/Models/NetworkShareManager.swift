@@ -79,7 +79,9 @@ final class NetworkShareManager {
     }
 
     /// Read from the database, not the store's observed copy, which may not have loaded yet at launch.
+    /// None while the local library is off: no share is connected to, checked or rescanned.
     var sources: [LibrarySource] {
+        guard library.filesOn else { return [] }
         let observed = library.sources // observed, so views refresh when shares are added or removed
         return (observed.isEmpty ? (try? library.database.sources()) ?? [] : observed).filter(\.isNetwork)
     }

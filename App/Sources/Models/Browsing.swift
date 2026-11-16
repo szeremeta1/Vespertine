@@ -264,7 +264,8 @@ extension AppModel {
 
     /// Whether there is a music server's music to leave out of the Library's own lists (Albums, Artists, Songs, Genres,
     /// Recently Added): it is listed under the server's entry in the sidebar. Search, favorites and playlists still find it.
-    var hidesServerOnly: Bool { !library.streamedAccounts.isEmpty }
+    /// With the local library off there are no files to list, so those lists are the servers' music.
+    var hidesServerOnly: Bool { library.filesOn && !library.streamedAccounts.isEmpty }
 
     /// `albums` without those that are on a music server only. An album the files have too stays, with the server's as a copy.
     private func withoutServerOnly(_ albums: [Album]) -> [Album] {
