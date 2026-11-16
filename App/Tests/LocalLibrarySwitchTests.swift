@@ -120,7 +120,7 @@ struct LocalLibrarySwitchTests {
         #expect(scratch.defaults.persistentDomain(forName: scratch.suite)?[LocalLibrarySwitch.key] == nil)
 
         apply(false, scratch)
-        #expect(scratch.defaults.persistentDomain(forName: scratch.suite)?[LocalLibrarySwitch.key] as? Bool == false)
+        #expect(scratch.defaults.object(forKey: LocalLibrarySwitch.key) as? Bool == false, "stored: the default it replaces is on")
         #expect(!AppSettings(defaults: scratch.defaults, dataDirectory: scratch.root).localLibrary)
         apply(true, scratch)
         #expect(AppSettings(defaults: scratch.defaults, dataDirectory: scratch.root).localLibrary)
