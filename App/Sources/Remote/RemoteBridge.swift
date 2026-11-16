@@ -39,7 +39,7 @@ struct RemoteBridge {
             output: model.activeDevice?.name ?? model.missingChosenOutput,
             volume: volumeState,
             waitingFor: player.waitingForDevice,
-            error: player.lastError,
+            error: player.errorForRemote,
             transitions: settings.transitionsFeature ? settings.transitions.enabled : nil)
     }
 

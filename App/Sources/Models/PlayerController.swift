@@ -946,6 +946,10 @@ final class PlayerController {
 
     func clearError() { lastError = nil }
 
+    /// What the phone remote is told went wrong. The banner's message while there is one; after it was dismissed (it goes by
+    /// itself in a few seconds), still why playback stopped, for as long as Now Playing on the Mac says so.
+    var errorForRemote: String? { lastError ?? (state == .stopped && waitingForDevice == nil ? stopReason : nil) }
+
     /// Seconds of listening that put a song in the play history.
     static let historyListen: TimeInterval = 10
 
@@ -1113,6 +1117,8 @@ final class PlayerController {
     @ObservationIgnored var streamedSongPlayed: ((Track, Date) -> Void)?
     /// Told when a song stopped because its server sent nothing for too long; gives back what to say (the server by name).
     @ObservationIgnored var serverUnanswered: ((Track) -> String?)?
+    /// What the listener calls the music server a song is on (the account's name in the sidebar).
+    @ObservationIgnored var serverName: ((Track) -> String?)?
     /// Told when a song from a server plays: the server is answering.
     @ObservationIgnored var serverAnswered: ((Track) -> Void)?
     /// The streamed song that started and has not been reported to `serverAnswered` yet: reported once it is heard.
@@ -1165,6 +1171,8 @@ final class PlayerController {
 
     /// What the listener calls the share a song is on: its name in Sources, else the folder's, else the volume's in its path.
     private func shareName(for track: Track) -> String {
+        // A song on a music server: the server, not the folder its copy is kept in while it plays.
+        if track.streamRef != nil, let server = serverName?(track) { return server }
         if let source = library.sources.first(where: { $0.id == track.sourceId }) {
             return source.name ?? URL(fileURLWithPath: source.path).lastPathComponent
         }
