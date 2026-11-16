@@ -66975,6 +66975,275 @@
         }
       }
     },
+    "To sign in as a guest, leave the account and password empty.": {
+      "comment": "Shown on the iPhone or iPad. An “SMB share” is a shared network folder of music (on a NAS or another computer) that the iPhone reads by itself, without a Mac. Under the Account and Password fields of the form that adds a share: a server that allows guests lets you in with no account. “Account” and “password” are the two fields above it.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እንደ እንግዳ ለመግባት መለያውንና የይለፍ ቃሉን ባዶ ይተዉ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لتسجيل الدخول كضيف، اترك حقلي الحساب وكلمة السر فارغين."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অতিথি হিসেবে সাইন ইন করতে অ্যাকাউন্ট ও পাসওয়ার্ড খালি রাখুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chcete-li se přihlásit jako host, nechte účet i heslo prázdné."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lad konto og adgangskode stå tomme for at logge ind som gæst."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um dich als Gast anzumelden, lass Account und Passwort leer."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Για σύνδεση ως επισκέπτης, αφήστε κενά τον λογαριασμό και το συνθηματικό."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para iniciar sesión como invitado, deja la cuenta y la contraseña en blanco."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "برای ورود به‌عنوان مهمان، حساب و گذرواژه را خالی بگذارید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kirjaudu vieraana jättämällä tili ja salasana tyhjiksi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para mag-sign in bilang bisita, iwanang blangko ang account at password."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pour vous connecter en tant qu’invité, laissez le compte et le mot de passe vides."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "મહેમાન તરીકે સાઇન ઇન કરવા માટે એકાઉન્ટ અને પાસવર્ડ ખાલી રાખો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Don shiga a matsayin baƙo, bar asusu da kalmar sirri babu komai."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כדי להתחבר כאורח, יש להשאיר את החשבון והסיסמה ריקים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अतिथि के रूप में साइन इन करने के लिए खाता और पासवर्ड खाली छोड़ें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vendégként való bejelentkezéshez hagyd üresen a fiókot és a jelszót."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk masuk sebagai tamu, kosongkan akun dan kata sandi."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per accedere come ospite, lascia vuoti account e password."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ゲストとしてサインインするには、アカウントとパスワードを空欄のままにします。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಅತಿಥಿಯಾಗಿ ಸೈನ್ ಇನ್ ಮಾಡಲು ಖಾತೆ ಮತ್ತು ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ಖಾಲಿ ಬಿಡಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "게스트로 로그인하려면 계정과 암호를 비워 두십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "അതിഥിയായി സൈൻ ഇൻ ചെയ്യാൻ അക്കൗണ്ടും പാസ്‌വേഡും ശൂന്യമായി വിടുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पाहुणा म्हणून साइन इन करण्यासाठी खाते आणि पासवर्ड रिकामे ठेवा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Untuk daftar masuk sebagai tetamu, biarkan akaun dan kata laluan kosong."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La konto og passord stå tomme for å logge på som gjest."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laat account en wachtwoord leeg om als gast in te loggen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਮਹਿਮਾਨ ਵਜੋਂ ਸਾਈਨ ਇਨ ਕਰਨ ਲਈ ਖਾਤਾ ਅਤੇ ਪਾਸਵਰਡ ਖਾਲੀ ਛੱਡੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aby zalogować się jako gość, pozostaw konto i hasło puste."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para entrar como convidado, deixe a conta e a senha em branco."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para iniciar sessão como convidado, deixe a conta e a palavra-passe em branco."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pentru a vă autentifica drept oaspete, lăsați necompletate contul și parola."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lämna konto och lösenord tomma för att logga in som gäst."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ili kuingia kama mgeni, acha akaunti na nenosiri vikiwa tupu."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "விருந்தினராக உள்நுழைய, கணக்கையும் கடவுச்சொல்லையும் காலியாக விடவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అతిథిగా సైన్ ఇన్ చేయడానికి ఖాతా, పాస్‌వర్డ్‌లను ఖాళీగా వదిలేయండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "หากต้องการลงชื่อเข้าในฐานะผู้เยี่ยมชม ให้เว้นบัญชีและรหัสผ่านว่างไว้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konuk olarak giriş yapmak için hesabı ve parolayı boş bırakın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Щоб увійти як гість, залиште обліковий запис і пароль порожніми."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مہمان کے طور پر سائن ان کرنے کے لیے اکاؤنٹ اور پاس ورڈ خالی چھوڑ دیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Để đăng nhập với tư cách khách, hãy để trống tài khoản và mật khẩu."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "如要以訪客身份登入，請將帳户和密碼留空。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要以访客身份登录，请将账户和密码留空。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "若要以訪客身分登入，請將帳號和密碼留空。"
+          }
+        }
+      }
+    },
     "The port isn’t known yet. Connect to this Mac once on its own network and Vespertine fills it in.": {
       "localizations": {
         "am": {
@@ -77457,271 +77726,271 @@
         }
       }
     },
-    "Vespertine can’t talk to this server. It needs SMB 2 or SMB 3, without required encryption.": {
-      "comment": "Shown on the iPhone or iPad. An “SMB share” is a shared network folder of music (on a NAS or another computer) that the iPhone reads by itself, without a Mac. Error when a file server only offers versions or settings of the SMB file-sharing protocol the app doesn't support. Keep “SMB 2” and “SMB 3”. “without required encryption” means the server must not insist on encrypting the connection.",
+    "Vespertine can’t talk to this server. It needs SMB 2 or SMB 3.": {
+      "comment": "Shown on the iPhone or iPad. An “SMB share” is a shared network folder of music (on a NAS or another computer) that the iPhone reads by itself, without a Mac. Error when a file server only offers versions of the SMB file-sharing protocol the app doesn't support. Keep “SMB 2” and “SMB 3”.",
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ከዚህ አገልጋይ ጋር መነጋገር አይችልም። ምስጠራን የማያስገድድ SMB 2 ወይም SMB 3 ያስፈልገዋል።"
+            "value": "Vespertine ከዚህ አገልጋይ ጋር መነጋገር አይችልም። SMB 2 ወይም SMB 3 ያስፈልገዋል።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يتعذر على Vespertine التواصل مع هذا الخادم. يتطلب SMB 2 أو SMB 3، دون فرض التشفير."
+            "value": "يتعذر على Vespertine التواصل مع هذا الخادم. يتطلب SMB 2 أو SMB 3."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine এই সার্ভারের সাথে যোগাযোগ করতে পারছে না। এর জন্য SMB 2 বা SMB 3 দরকার, যেখানে এনক্রিপশন বাধ্যতামূলক নয়।"
+            "value": "Vespertine এই সার্ভারের সাথে যোগাযোগ করতে পারছে না। এর জন্য SMB 2 বা SMB 3 দরকার।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine se s tímto serverem nedomluví. Potřebuje SMB 2 nebo SMB 3 bez vyžadovaného šifrování."
+            "value": "Vespertine se s tímto serverem nedomluví. Potřebuje SMB 2 nebo SMB 3."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine kan ikke kommunikere med denne server. Det kræver SMB 2 eller SMB 3 uden obligatorisk kryptering."
+            "value": "Vespertine kan ikke kommunikere med denne server. Det kræver SMB 2 eller SMB 3."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine kann mit diesem Server nicht kommunizieren. Erforderlich ist SMB 2 oder SMB 3, ohne erzwungene Verschlüsselung."
+            "value": "Vespertine kann mit diesem Server nicht kommunizieren. Erforderlich ist SMB 2 oder SMB 3."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Το Vespertine δεν μπορεί να επικοινωνήσει με αυτόν τον διακομιστή. Χρειάζεται SMB 2 ή SMB 3, χωρίς υποχρεωτική κρυπτογράφηση."
+            "value": "Το Vespertine δεν μπορεί να επικοινωνήσει με αυτόν τον διακομιστή. Χρειάζεται SMB 2 ή SMB 3."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine no puede comunicarse con este servidor. Necesita SMB 2 o SMB 3, sin encriptación obligatoria."
+            "value": "Vespertine no puede comunicarse con este servidor. Necesita SMB 2 o SMB 3."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine نمی‌تواند با این سرور ارتباط برقرار کند. به SMB 2 یا SMB 3، بدون رمزگذاری اجباری، نیاز دارد."
+            "value": "Vespertine نمی‌تواند با این سرور ارتباط برقرار کند. به SMB 2 یا SMB 3 نیاز دارد."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ei voi kommunikoida tämän palvelimen kanssa. Tarvitaan SMB 2 tai SMB 3 ilman pakollista salausta."
+            "value": "Vespertine ei voi kommunikoida tämän palvelimen kanssa. Tarvitaan SMB 2 tai SMB 3."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hindi makausap ng Vespertine ang server na ito. Kailangan nito ng SMB 2 o SMB 3, nang walang sapilitang encryption."
+            "value": "Hindi makausap ng Vespertine ang server na ito. Kailangan nito ng SMB 2 o SMB 3."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ne peut pas communiquer avec ce serveur. Il lui faut SMB 2 ou SMB 3, sans chiffrement obligatoire."
+            "value": "Vespertine ne peut pas communiquer avec ce serveur. Il lui faut SMB 2 ou SMB 3."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine આ સર્વર સાથે વાત કરી શકતું નથી. તેને SMB 2 અથવા SMB 3 જોઈએ, જેમાં એન્ક્રિપ્શન ફરજિયાત ન હોય."
+            "value": "Vespertine આ સર્વર સાથે વાત કરી શકતું નથી. તેને SMB 2 અથવા SMB 3 જોઈએ."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ba zai iya magana da wannan sabar ba. Yana buƙatar SMB 2 ko SMB 3, ba tare da tilasta ɓoye bayanai ba."
+            "value": "Vespertine ba zai iya magana da wannan sabar ba. Yana buƙatar SMB 2 ko SMB 3."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine לא יכול לתקשר עם השרת הזה. נדרש SMB 2 או SMB 3, ללא חובת הצפנה."
+            "value": "Vespertine לא יכול לתקשר עם השרת הזה. נדרש SMB 2 או SMB 3."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine इस सर्वर से संपर्क नहीं कर सकता। इसके लिए SMB 2 या SMB 3 चाहिए, जिसमें एन्क्रिप्शन अनिवार्य न हो।"
+            "value": "Vespertine इस सर्वर से संपर्क नहीं कर सकता। इसके लिए SMB 2 या SMB 3 चाहिए।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A Vespertine nem tud kommunikálni ezzel a szerverrel. SMB 2 vagy SMB 3 szükséges, kötelező titkosítás nélkül."
+            "value": "A Vespertine nem tud kommunikálni ezzel a szerverrel. SMB 2 vagy SMB 3 szükséges."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine tidak dapat berkomunikasi dengan server ini. Diperlukan SMB 2 atau SMB 3, tanpa enkripsi yang diwajibkan."
+            "value": "Vespertine tidak dapat berkomunikasi dengan server ini. Diperlukan SMB 2 atau SMB 3."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine non può comunicare con questo server. Servono SMB 2 o SMB 3, senza crittografia obbligatoria."
+            "value": "Vespertine non può comunicare con questo server. Servono SMB 2 o SMB 3."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertineはこのサーバと通信できません。暗号化を必須としないSMB 2またはSMB 3が必要です。"
+            "value": "Vespertineはこのサーバと通信できません。SMB 2またはSMB 3が必要です。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ಈ ಸರ್ವರ್ ಜೊತೆ ಸಂವಹನ ನಡೆಸಲು ಸಾಧ್ಯವಿಲ್ಲ. ಇದಕ್ಕೆ ಎನ್‌ಕ್ರಿಪ್ಶನ್ ಕಡ್ಡಾಯವಲ್ಲದ SMB 2 ಅಥವಾ SMB 3 ಬೇಕು."
+            "value": "Vespertine ಈ ಸರ್ವರ್ ಜೊತೆ ಸಂವಹನ ನಡೆಸಲು ಸಾಧ್ಯವಿಲ್ಲ. ಇದಕ್ಕೆ SMB 2 ಅಥವಾ SMB 3 ಬೇಕು."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine이 이 서버와 통신할 수 없습니다. 암호화를 필수로 요구하지 않는 SMB 2 또는 SMB 3가 필요합니다."
+            "value": "Vespertine이 이 서버와 통신할 수 없습니다. SMB 2 또는 SMB 3가 필요합니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine-ന് ഈ സെർവറുമായി ആശയവിനിമയം നടത്താനാവില്ല. എൻക്രിപ്ഷൻ നിർബന്ധമാക്കാത്ത SMB 2 അല്ലെങ്കിൽ SMB 3 ഇതിന് വേണം."
+            "value": "Vespertine-ന് ഈ സെർവറുമായി ആശയവിനിമയം നടത്താനാവില്ല. ഇതിന് SMB 2 അല്ലെങ്കിൽ SMB 3 വേണം."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine या सर्व्हरशी संवाद साधू शकत नाही. त्यासाठी SMB 2 किंवा SMB 3 लागते, ज्यात एन्क्रिप्शन अनिवार्य नसावे."
+            "value": "Vespertine या सर्व्हरशी संवाद साधू शकत नाही. त्यासाठी SMB 2 किंवा SMB 3 लागते."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine tidak dapat berkomunikasi dengan pelayan ini. Ia memerlukan SMB 2 atau SMB 3, tanpa penyulitan yang diwajibkan."
+            "value": "Vespertine tidak dapat berkomunikasi dengan pelayan ini. Ia memerlukan SMB 2 atau SMB 3."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine kan ikke kommunisere med denne tjeneren. Det kreves SMB 2 eller SMB 3, uten påkrevd kryptering."
+            "value": "Vespertine kan ikke kommunisere med denne tjeneren. Det kreves SMB 2 eller SMB 3."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine kan niet met deze server communiceren. Daarvoor is SMB 2 of SMB 3 nodig, zonder verplichte versleuteling."
+            "value": "Vespertine kan niet met deze server communiceren. Daarvoor is SMB 2 of SMB 3 nodig."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ਇਸ ਸਰਵਰ ਨਾਲ ਗੱਲ ਨਹੀਂ ਕਰ ਸਕਦਾ। ਇਸ ਲਈ SMB 2 ਜਾਂ SMB 3 ਚਾਹੀਦਾ ਹੈ, ਜਿਸ ਵਿੱਚ ਐਨਕ੍ਰਿਪਸ਼ਨ ਲਾਜ਼ਮੀ ਨਾ ਹੋਵੇ।"
+            "value": "Vespertine ਇਸ ਸਰਵਰ ਨਾਲ ਗੱਲ ਨਹੀਂ ਕਰ ਸਕਦਾ। ਇਸ ਲਈ SMB 2 ਜਾਂ SMB 3 ਚਾਹੀਦਾ ਹੈ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine nie może porozumieć się z tym serwerem. Wymaga SMB 2 lub SMB 3, bez wymuszonego szyfrowania."
+            "value": "Vespertine nie może porozumieć się z tym serwerem. Wymaga SMB 2 lub SMB 3."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine não consegue se comunicar com este servidor. É necessário SMB 2 ou SMB 3, sem criptografia obrigatória."
+            "value": "O Vespertine não consegue se comunicar com este servidor. É necessário SMB 2 ou SMB 3."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine não consegue comunicar com este servidor. É necessário SMB 2 ou SMB 3, sem encriptação obrigatória."
+            "value": "O Vespertine não consegue comunicar com este servidor. É necessário SMB 2 ou SMB 3."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine nu poate comunica cu acest server. Are nevoie de SMB 2 sau SMB 3, fără criptare obligatorie."
+            "value": "Vespertine nu poate comunica cu acest server. Are nevoie de SMB 2 sau SMB 3."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine kan inte kommunicera med den här servern. Det krävs SMB 2 eller SMB 3, utan obligatorisk kryptering."
+            "value": "Vespertine kan inte kommunicera med den här servern. Det krävs SMB 2 eller SMB 3."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine haiwezi kuwasiliana na seva hii. Inahitaji SMB 2 au SMB 3, bila usimbaji fiche wa lazima."
+            "value": "Vespertine haiwezi kuwasiliana na seva hii. Inahitaji SMB 2 au SMB 3."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine-ஆல் இந்தச் சர்வருடன் தொடர்புகொள்ள முடியவில்லை. இதற்கு, என்க்ரிப்ஷனைக் கட்டாயமாக்காத SMB 2 அல்லது SMB 3 தேவை."
+            "value": "Vespertine-ஆல் இந்தச் சர்வருடன் தொடர்புகொள்ள முடியவில்லை. இதற்கு SMB 2 அல்லது SMB 3 தேவை."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ఈ సర్వర్‌తో కమ్యూనికేట్ చేయలేకపోతోంది. దీనికి ఎన్‌క్రిప్షన్‌ను తప్పనిసరి చేయని SMB 2 లేదా SMB 3 అవసరం."
+            "value": "Vespertine ఈ సర్వర్‌తో కమ్యూనికేట్ చేయలేకపోతోంది. దీనికి SMB 2 లేదా SMB 3 అవసరం."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine สื่อสารกับเซิร์ฟเวอร์นี้ไม่ได้ ต้องใช้ SMB 2 หรือ SMB 3 โดยไม่บังคับการเข้ารหัส"
+            "value": "Vespertine สื่อสารกับเซิร์ฟเวอร์นี้ไม่ได้ ต้องใช้ SMB 2 หรือ SMB 3"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine bu sunucuyla iletişim kuramıyor. Şifrelemenin zorunlu tutulmadığı SMB 2 veya SMB 3 gerekir."
+            "value": "Vespertine bu sunucuyla iletişim kuramıyor. SMB 2 veya SMB 3 gerekir."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine не може обмінюватися даними з цим сервером. Потрібен SMB 2 або SMB 3 без обов’язкового шифрування."
+            "value": "Vespertine не може обмінюватися даними з цим сервером. Потрібен SMB 2 або SMB 3."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine اس سرور سے رابطہ نہیں کر سکتا۔ اسے SMB 2 یا SMB 3 درکار ہے، لازمی انکرپشن کے بغیر۔"
+            "value": "Vespertine اس سرور سے رابطہ نہیں کر سکتا۔ اسے SMB 2 یا SMB 3 درکار ہے۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine không thể giao tiếp với máy chủ này. Ứng dụng cần SMB 2 hoặc SMB 3, không bắt buộc mã hóa."
+            "value": "Vespertine không thể giao tiếp với máy chủ này. Ứng dụng cần SMB 2 hoặc SMB 3."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 無法與此伺服器通訊。伺服器需要支援 SMB 2 或 SMB 3，而且不強制要求加密。"
+            "value": "Vespertine 無法與此伺服器通訊。伺服器需要支援 SMB 2 或 SMB 3。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 无法与此服务器通信。服务器需要支持 SMB 2 或 SMB 3，且不强制要求加密。"
+            "value": "Vespertine 无法与此服务器通信。服务器需要支持 SMB 2 或 SMB 3。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 無法與此伺服器通訊。伺服器需要支援 SMB 2 或 SMB 3，且不強制要求加密。"
+            "value": "Vespertine 無法與此伺服器通訊。伺服器需要支援 SMB 2 或 SMB 3。"
           }
         }
       }
