@@ -20,7 +20,13 @@ final class RemoteAppModel {
     private(set) var session: RemoteSession?
     /// The SMB shares this device plays from by itself, without a Mac.
     private(set) var shares: [SavedShare]
-    /// What the open share is doing (scanning, not answering), for the screens; nil when a Mac or nothing is open.
+    /// The folders of music on this device that were added from Files.
+    private(set) var folders: [SavedFolder]
+    /// The app's own folder has music in it (files opened in Vespertine from other apps): it is listed with the folders.
+    private(set) var ownFolderInUse: Bool
+    /// Why a file opened in Vespertine from another app couldn't be played, for an alert.
+    var openedFileTrouble: String?
+    /// What the open share or folder is doing (scanning, not answering), for the screens; nil when a Mac or nothing is open.
     private(set) var shareStatus: ShareStatus?
     /// Goes up when the open share's library changed under the screens (a scan found new or changed songs).
     private(set) var libraryRevision = 0
@@ -43,6 +49,11 @@ final class RemoteAppModel {
 
     @ObservationIgnored private let keychain = PairingKeychain()
     @ObservationIgnored private let shareKeychain = ShareKeychain()
+    @ObservationIgnored private let folderShelf = SavedFolder.shelf
+    /// The permission to read the open folder, held while it is open.
+    @ObservationIgnored private var folderAccess: FolderAccess?
+    /// Waiting for a file just opened in Vespertine to be indexed, to play it.
+    @ObservationIgnored private var playWhenRead: Task<Void, Never>?
     /// The open share, answering the screens as a Mac would.
     @ObservationIgnored private var shareMac: ShareMac?
     /// Pairings that are never saved (a made-up one for screenshots).
@@ -57,6 +68,8 @@ final class RemoteAppModel {
     init() {
         pairings = keychain.load().sorted { $0.pairedAt < $1.pairedAt }
         shares = shareKeychain.load().sorted { $0.addedAt < $1.addedAt }
+        folders = folderShelf.load()
+        ownFolderInUse = OpenedFiles.holdsAnything(SavedFolder.ownURL)
         discovery.onChange = { [weak self] macs in self?.discovered(macs) }
         discovery.start()
         searchChanged()
@@ -73,10 +86,14 @@ final class RemoteAppModel {
             choose(pairing)
         } else if let last = UserDefaults.standard.string(forKey: Self.lastMacKey), let share = shares.first(where: { $0.id == last }) {
             choose(share)
-        } else if pairings.count == 1, shares.isEmpty {
+        } else if let last = UserDefaults.standard.string(forKey: Self.lastMacKey), let folder = shownFolders.first(where: { $0.id == last }) {
+            choose(folder)
+        } else if pairings.count == 1, shares.isEmpty, shownFolders.isEmpty {
             choose(pairings[0])
-        } else if shares.count == 1, pairings.isEmpty {
+        } else if shares.count == 1, pairings.isEmpty, shownFolders.isEmpty {
             choose(shares[0])
+        } else if shownFolders.count == 1, pairings.isEmpty, shares.isEmpty {
+            choose(shownFolders[0])
         }
     }
 
@@ -155,33 +172,42 @@ final class RemoteAppModel {
         // Two connections: a song being played never waits behind a scan or a cover.
         let mac = ShareMac(id: share.id, name: share.name, files: share.files(), playback: share.files(), store: share.store,
                            sayings: ShareWording.sayings, shrink: { data, size in ShareCovers.shrink(data, to: size) })
+        open(mac, id: share.id, name: share.name, device: "share")
+    }
+
+    /// Opens a share's or a folder's library as the session, in place of a Mac.
+    private func open(_ mac: ShareMac, id: String, name: String, device: String) {
         mac.onChange = { [weak self, weak mac] in
             guard let self, let mac, self.shareMac === mac else { return }
             self.noteShare(mac)
         }
         // The same one each time the session connects: the app coming back to the front opens it again.
-        let pairing = SavedPairing(serverID: share.id, name: share.name, device: "share", key: Data())
+        let pairing = SavedPairing(serverID: id, name: name, device: device, key: Data())
         let session = RemoteSession(pairing: pairing, clientName: deviceName) { mac }
         session.onConnected = { [weak session] _, _ in
             if let session { KeptShelf.shared.connected(session) }
         }
         shareMac = mac
-        shareStatus = ShareStatus(mac)
+        shareStatus = ShareStatus(mac, folder: session.isFolder)
         self.session = session
         artwork.session = session
-        UserDefaults.standard.set(share.id, forKey: Self.lastMacKey)
+        UserDefaults.standard.set(id, forKey: Self.lastMacKey)
         session.connect()
     }
 
     private func closeShare() {
+        playWhenRead?.cancel()
+        playWhenRead = nil
         shareMac?.onChange = nil
         shareMac = nil
         shareRevisionSeen = 0
         shareStatus = nil
+        folderAccess?.letGo()
+        folderAccess = nil
     }
 
     private func noteShare(_ mac: ShareMac) {
-        let status = ShareStatus(mac)
+        let status = ShareStatus(mac, folder: session?.isFolder ?? false)
         if status != shareStatus { shareStatus = status }
         if mac.revision != shareRevisionSeen {
             shareRevisionSeen = mac.revision
@@ -214,6 +240,143 @@ final class RemoteAppModel {
         KeptShelf.shared.forget(serverID: share.id)
         PlayTarget.queues.forget(share.id)
         shares.removeAll { $0.id == share.id }
+    }
+
+    // MARK: Folders on this device
+
+    /// The folders to list: the app's own (once it holds music) and the ones added from Files.
+    var shownFolders: [SavedFolder] { (ownFolderInUse ? [SavedFolder.own] : []) + folders }
+
+    /// The folder that is open, if one is.
+    var openFolder: SavedFolder? {
+        guard let id = session?.pairing.serverID else { return nil }
+        return shownFolders.first { $0.id == id }
+    }
+
+    /// Opens a folder in place of a Mac: this device reads the songs where they are and is where they play.
+    func choose(_ folder: SavedFolder) {
+        PlayTarget.shared.leave()
+        session?.close()
+        closeShare()
+        // A reader for the lists and one for the song playing, so a song never waits behind a scan.
+        let files: FolderFiles, playback: FolderFiles
+        if let bookmark = folder.bookmark {
+            let id = folder.id
+            let access = FolderAccess(bookmark: bookmark) { [weak self] fresh in
+                Task { @MainActor in self?.keep(bookmark: fresh, for: id) }
+            }
+            folderAccess = access
+            files = FolderFiles(locate: { try access.url() }, lost: { access.letGo() })
+            playback = FolderFiles(locate: { try access.url() }, lost: { access.letGo() })
+        } else {
+            let own = SavedFolder.ownURL
+            try? FileManager.default.createDirectory(at: own, withIntermediateDirectories: true)
+            files = FolderFiles(at: own)
+            playback = FolderFiles(at: own)
+        }
+        let mac = ShareMac(id: folder.id, name: folder.name, files: files, playback: playback, store: folder.store,
+                           sayings: FolderWording.sayings, shrink: { data, size in ShareCovers.shrink(data, to: size) })
+        // Looking at a folder on the device costs little: every time it is opened, and when a file turns out changed.
+        mac.rescanAfter = 0
+        mac.mendsItself = true
+        open(mac, id: folder.id, name: folder.name, device: "folder")
+    }
+
+    /// A folder was chosen in the Files picker: keeps the way back to it (a bookmark, on this device only) and opens it.
+    func add(folderAt url: URL) {
+        guard let bookmark = FolderAccess.bookmark(for: url) else {
+            pairingError = FolderWording.trouble(.accessDenied)
+            return
+        }
+        pairingError = nil
+        let folder = SavedFolder(name: url.lastPathComponent, bookmark: bookmark)
+        folderShelf.upsert(folder)
+        folders.append(folder)
+        choose(folder)
+    }
+
+    /// An added folder was pointed at its place again (the way back to it was lost, or it moved): it keeps its index,
+    /// its favorites and its queue.
+    func rechoose(_ folder: SavedFolder, at url: URL) {
+        guard !folder.isOwn, let bookmark = FolderAccess.bookmark(for: url) else { return }
+        var updated = folder
+        updated.bookmark = bookmark
+        keep(updated)
+        choose(updated)
+    }
+
+    func forget(_ folder: SavedFolder) {
+        guard !folder.isOwn else { return }
+        if session?.pairing.serverID == folder.id { leave() }
+        folderShelf.remove(id: folder.id)
+        folder.store.remove()
+        KeptShelf.shared.forget(serverID: folder.id)
+        PlayTarget.queues.forget(folder.id)
+        folders.removeAll { $0.id == folder.id }
+    }
+
+    private func keep(_ folder: SavedFolder) {
+        folderShelf.upsert(folder)
+        if let index = folders.firstIndex(where: { $0.id == folder.id }) { folders[index] = folder }
+    }
+
+    /// The system said the bookmark was out of date and gave a fresh one.
+    private func keep(bookmark: Data, for id: String) {
+        guard var folder = folders.first(where: { $0.id == id }) else { return }
+        folder.bookmark = bookmark
+        keep(folder)
+    }
+
+    /// A music file opened in Vespertine from another app ("Open in", the share sheet, Files): copied into the app's own
+    /// folder, which is opened, and played from there.
+    func openFile(_ url: URL) {
+        let name = url.lastPathComponent
+        let own = SavedFolder.ownURL
+        Task { [weak self] in
+            let outcome = await Task.detached(priority: .userInitiated) {
+                let scoped = url.startAccessingSecurityScopedResource()
+                defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+                return OpenedFiles.take(url, into: own)
+            }.value
+            guard let self else { return }
+            switch outcome {
+            case .added(let path):
+                self.ownFolderInUse = true
+                if self.session?.pairing.serverID == SavedFolder.ownID, let mac = self.shareMac {
+                    mac.rescan()
+                } else {
+                    self.choose(SavedFolder.own)
+                }
+                self.play(openedFile: path)
+            case .notPlayable:
+                self.openedFileTrouble = FolderWording.notPlayable(name)
+            case .failed:
+                self.openedFileTrouble = FolderWording.notCopied(name)
+            }
+        }
+    }
+
+    /// Plays the file at `path` in the app's own folder once the folder has been read and lists it.
+    private func play(openedFile path: String) {
+        playWhenRead?.cancel()
+        playWhenRead = Task { [weak self] in
+            // The scan of a folder on the device takes a moment; the wait is bounded so a file that never shows is let be.
+            var lookedAgain = false
+            for _ in 0..<400 {
+                guard let self, !Task.isCancelled, let mac = self.shareMac, let session = self.session, session.isFolder else { return }
+                if session.isConnected, !mac.isScanning, mac.library.scanned != nil {
+                    if let song = mac.library.songs.first(where: { $0.path == path }) {
+                        _ = await session.run(.playTracks(ids: [song.id], startAt: 0, shuffled: false))
+                        return
+                    }
+                    // A scan already under way when the file arrived may have passed its place: one more look.
+                    guard !lookedAgain else { return }
+                    lookedAgain = true
+                    mac.rescan()
+                }
+                try? await Task.sleep(for: .milliseconds(50))
+            }
+        }
     }
 
     func isPaired(_ mac: DiscoveredMac) -> Bool {
@@ -341,6 +504,10 @@ final class RemoteAppModel {
 
     /// A `vespertine-remote://pair?…` link, from the Camera app or the in-app scanner.
     func open(_ url: URL) {
+        if url.isFileURL {
+            openFile(url)
+            return
+        }
         guard let link = PairingLink(url: url) else { return }
         pair(link: link)
     }
@@ -402,6 +569,9 @@ final class RemoteAppModel {
             session?.checkLink()
             session?.connect()
             networkChanged(online: isOnline, cellular: onCellular)
+            // Music may have been put into, or taken out of, the app's own folder in Files meanwhile.
+            let inUse = OpenedFiles.holdsAnything(SavedFolder.ownURL) || session?.pairing.serverID == SavedFolder.ownID
+            if inUse != ownFolderInUse { ownFolderInUse = inUse }
         case .background:
             // iOS may end the app from here without telling it: the queue and the place in the song are written now.
             PlayTarget.shared.saveQueue()

@@ -5,6 +5,7 @@
 
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 import VespertineRemoteClient
 import VespertineRemoteProtocol
 import VespertineShare
@@ -28,6 +29,11 @@ struct RootView: View {
                     .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
             }
         }
+        // A file opened in Vespertine from another app that it can't play.
+        .alert(Text(verbatim: model.openedFileTrouble ?? ""), isPresented: Binding(get: { model.openedFileTrouble != nil },
+                                                                                set: { if !$0 { model.openedFileTrouble = nil } })) {
+            Button("Done") { model.openedFileTrouble = nil }
+        }
     }
 }
 
@@ -40,6 +46,7 @@ struct MacsView: View {
     @State private var showingSettings = false
     @State private var addingShare = false
     @State private var editingShare: SavedShare?
+    @State private var choosingFolder = false
 
     var body: some View {
         NavigationStack {
@@ -95,6 +102,19 @@ struct MacsView: View {
                         }
                     }
                 }
+                if !model.shownFolders.isEmpty {
+                    Section("Your Folders") {
+                        ForEach(model.shownFolders) { folder in
+                            Button { model.choose(folder) } label: { FolderRow(folder: folder) }
+                                .buttonStyle(.plain)
+                                .accessibilityIdentifier("folder-row")
+                                .swipeActions {
+                                    // The app's own folder is emptied in Files, where its music can be seen.
+                                    if !folder.isOwn { Button("Forget", role: .destructive) { model.forget(folder) } }
+                                }
+                        }
+                    }
+                }
                 Section {
                     let unpaired = model.unpairedMacs
                     let blocked = model.discovery.problem?.isEmpty == false
@@ -131,10 +151,16 @@ struct MacsView: View {
                     Section { Text(error).foregroundStyle(.red) }
                 }
                 Section {
-                    Button { addingShare = true } label: { Label("Add an SMB Share", systemImage: "externaldrive.badge.plus") }
-                        .accessibilityIdentifier("add-share")
+                    Button { choosingFolder = true } label: { Label("Add a Folder from Files", systemImage: "folder.badge.plus") }
+                        .accessibilityIdentifier("add-folder")
                 } header: {
                     Text("Play Without a Mac")
+                } footer: {
+                    Text("Music in a folder in the Files app plays on this device by itself: a folder on this device, in iCloud Drive or on a drive plugged in. The music stays where it is.")
+                }
+                Section {
+                    Button { addingShare = true } label: { Label("Add an SMB Share", systemImage: "externaldrive.badge.plus") }
+                        .accessibilityIdentifier("add-share")
                 } footer: {
                     Text("Music in a shared folder on a NAS or another computer plays on this device by itself, with no Mac running. Away from home, the share is reached over Tailscale or another VPN.")
                 }
@@ -173,6 +199,9 @@ struct MacsView: View {
             .sheet(isPresented: $showingSettings) { SettingsView() }
             .sheet(isPresented: $addingShare) { ShareEditView() }
             .sheet(item: $editingShare) { ShareEditView(editing: $0) }
+            .fileImporter(isPresented: $choosingFolder, allowedContentTypes: [.folder]) { result in
+                if case .success(let url) = result { model.add(folderAt: url) }
+            }
             .sheet(isPresented: $scanning) {
                 PairingScannerSheet { link in
                     scanning = false
