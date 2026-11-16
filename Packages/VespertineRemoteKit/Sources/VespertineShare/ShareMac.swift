@@ -214,6 +214,8 @@ public final class ShareMac: RemoteChannel {
             return await openStream(id)
         case .artwork(let key, let size):
             return await artwork(key, size: size)
+        case .streamInfo(let ids, _) where ids.count == 1:
+            return await streamInfo(ids[0])
         default:
             return perform(command)
         }
@@ -366,6 +368,30 @@ public final class ShareMac: RemoteChannel {
 
     // MARK: Covers
 
+    private func streamInfo(_ id: Int64, _ song: ShareSong, replayGain: ReplayGain?) -> StreamInfo {
+        StreamInfo(id: id, streamable: true, kind: .original, source: format(song), delivered: format(song), macOnlyReason: nil,
+                   byteSize: song.size, totalFrames: song.tags.frames, replayGain: replayGain, encoderDelay: nil, endPadding: nil)
+    }
+
+    /// One song asked about by itself is being asked for its ReplayGain values, to be played with them: its tags are
+    /// read from the file again (a few small reads), so that an index made before those were read, or a file tagged
+    /// since, still answers with what the file says now. A share that can't be read answers with what the index has.
+    private func streamInfo(_ id: Int64) async -> RemoteReply {
+        guard let song = catalog.songs[id] else { return .streamInfo(items: []) }
+        let playback = playback
+        let path = song.path, size = song.size
+        let name = path.split(separator: "/").last.map(String.init) ?? path
+        let values: ReplayGain?
+        do {
+            values = try await playbackWorker.run {
+                try SongTagReader.read(name: name, size: size) { offset, length in try playback.read(path, offset: offset, length: length) }
+            }?.replayGain
+        } catch {
+            values = song.tags.replayGain
+        }
+        return .streamInfo(items: [streamInfo(id, song, replayGain: values)])
+    }
+
     private func artwork(_ key: String, size: Int) async -> RemoteReply {
         guard let cover = catalog.covers[key] else { return .failed(reason: "") }
         let size = min(max(size, 32), 2048)
@@ -476,8 +502,7 @@ public final class ShareMac: RemoteChannel {
         case .streamInfo(let ids, _):
             return .streamInfo(items: ids.compactMap { id in
                 guard let song = catalog.songs[id] else { return nil }
-                return StreamInfo(id: id, streamable: true, kind: .original, source: format(song), delivered: format(song), macOnlyReason: nil,
-                                  byteSize: song.size, totalFrames: song.tags.frames, replayGain: nil, encoderDelay: nil, endPadding: nil)
+                return streamInfo(id, song, replayGain: song.tags.replayGain)
             })
         case .streamRead:
             return .failed(reason: "")

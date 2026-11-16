@@ -194,6 +194,8 @@ private final class DoPMac: @unchecked Sendable {
     let seconds: Double
     /// Songs that are PCM whatever is asked.
     var pcmSongs: Set<Int64> = []
+    /// The ReplayGain values the Mac has for every song.
+    var replayGain: ReplayGain?
 
     init(seconds: Double = 3) { self.seconds = seconds }
 
@@ -226,6 +228,11 @@ private final class DoPMac: @unchecked Sendable {
                                        close: { [self] stream in lock.withLock { open[stream] = nil; _closed.append(stream) } },
                                        isConnected: { true })
         client.openDoP = { [self] song, _, dop in answer(song, dop: dop) }
+        client.info = { [self] song in
+            let format = StreamFormat(codec: "DSD", container: "dsf", sampleRate: 2_822_400, bitDepth: 1, channels: 2, channelLabels: nil, lossless: true)
+            return StreamInfo(id: song, streamable: true, kind: .flac, source: format, delivered: nil, macOnlyReason: nil, byteSize: nil, totalFrames: nil,
+                              replayGain: replayGain, encoderDelay: nil, endPadding: nil)
+        }
         return client
     }
 }
@@ -408,6 +415,27 @@ private final class DoPMac: @unchecked Sendable {
         try await until { playback.stream != nil && playback.stream?.dsdRate == nil && playback.player.state == .playing && mac.asks.count >= 4 }
         #expect(mac.asks.suffix(2).allSatisfy { $0.dop == nil })
         #expect(Set(mac.asks.suffix(2).map(\.song)) == [1, 2])
+        playback.stop()
+    }
+
+    @Test func replayGainNeverTouchesDoPFramesButLevelsTheSameSongSentAsPCM() async throws {
+        let mac = DoPMac()
+        mac.replayGain = ReplayGain(trackGain: -6, trackPeak: 0.5, albumGain: nil, albumPeak: nil)
+        let (playback, output) = try make(mac)
+        output.ceiling = 768_000
+        playback.replayGain = .track
+        playback.play([track(1)])
+        try await until { playback.player.state == .playing }
+        // The frames are DSD bits: multiplying them would be noise. Nothing is done, and the phone says nothing is.
+        #expect(playback.stream?.dsdRate == 2_822_400)
+        #expect(playback.appliedGain == nil && playback.player.gain == 1 && !playback.player.isProcessing)
+        #expect(playback.replayGainHasNothing)
+        // The DAC stops taking DoP: the song comes back as PCM, and now it is levelled.
+        output.ceiling = nil
+        playback.outputChanged()
+        try await until { playback.stream != nil && playback.stream?.dsdRate == nil && playback.player.state == .playing }
+        #expect(playback.appliedGain?.decibels == -6 && playback.player.isProcessing)
+        #expect(abs(playback.player.gain - Float(pow(10, -6.0 / 20))) < 1e-6)
         playback.stop()
     }
 }

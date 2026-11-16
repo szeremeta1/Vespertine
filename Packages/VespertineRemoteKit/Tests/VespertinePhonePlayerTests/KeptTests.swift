@@ -37,6 +37,11 @@ private final class KeepingMac: @unchecked Sendable {
     var refused: Set<Int64> = []
     /// Songs the Mac brings down when asked for the smaller form.
     var bringsDown: Set<Int64> = []
+    /// The ReplayGain values the Mac has for each song.
+    var gains: [Int64: ReplayGain] = [:]
+    private var _asked: [Int64] = []
+    /// The songs it was asked about without opening them.
+    var asked: [Int64] { lock.withLock { _asked } }
 
     var opened: [Int64] { lock.withLock { _opened } }
     var rates: [Double?] { lock.withLock { _rates } }
@@ -77,6 +82,20 @@ private final class KeepingMac: @unchecked Sendable {
             let end = min(Int(offset) + length, data.count)
             return StreamFrame(request: 1, stream: stream, offset: offset, endOfStream: end >= data.count, payload: Data(data[Int(offset)..<end]))
         }, close: { [self] _ in lock.withLock { _closed += 1 } }, isConnected: { [self] in connected })
+    }
+
+    /// The same Mac, one that can also say what it knows about a song without opening it.
+    var answeringClient: PhoneStreamClient {
+        var client = client
+        client.info = { [self] id in
+            lock.withLock {
+                guard _connected else { return nil }
+                _asked.append(id)
+                return StreamInfo(id: id, streamable: true, kind: .original, source: Self.format(), delivered: nil, macOnlyReason: nil, byteSize: nil,
+                                  totalFrames: nil, replayGain: gains[id], encoderDelay: nil, endPadding: nil)
+            }
+        }
+        return client
     }
 }
 
@@ -256,7 +275,7 @@ private func bytes(_ id: Int64, count: Int = 3500) -> Data { Data((0..<count).ma
         let engine = AVAudioEngine()
         try engine.enableManualRenderingMode(.offline, format: AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 44_100, channels: 2, interleaved: false)!,
                                              maximumFrameCount: 4096)
-        return PhonePlayback(client: mac.client, player: PhonePlayer(engine: engine), cacheDirectory: folder())
+        return PhonePlayback(client: mac.answeringClient, player: PhonePlayer(engine: engine), cacheDirectory: folder())
     }
 
     @Test func aPhoneToldToStopLetsGoOfTheSongItHadFetchedToo() async throws {
@@ -334,6 +353,45 @@ private func bytes(_ id: Int64, count: Int = 3500) -> Data { Data((0..<count).ma
         // The song that isn't kept can't follow with the Mac off: the first still plays.
         #expect(playback.nowPlaying?.track.id == 1 && playback.notice == nil)
         playback.stop()
+    }
+
+    @Test func aKeptSongIsLevelledWithTheMacOffFromTheValuesKeptWithIt() async throws {
+        let (keeper, mac, directory) = try made([])
+        mac.files[1] = try tone()
+        mac.gains[1] = ReplayGain(trackGain: -6.2, trackPeak: 0.3, albumGain: -4, albumPeak: 0.3)
+        keeper.client = mac.answeringClient
+        keeper.keep(album([1]))
+        try await wait { keeper.isIdle }
+        // The values were asked for as the song was kept, and are still there when the app opens again.
+        #expect(mac.asked == [1])
+        #expect(try KeptStore(directory: directory).kept(1)?.replayGain == mac.gains[1])
+        mac.connected = false
+
+        let playback = try offlinePlayback(mac)
+        playback.kept = { [store = keeper.store] id in store.kept(id).map { ($0.file, $0.descriptor) } }
+        playback.keptGain = { [store = keeper.store] id in store.kept(id)?.replayGain }
+        playback.replayGain = .track
+        playback.play([song(1)])
+        try await wait { playback.player.state == .playing }
+        #expect(playback.appliedGain?.decibels == -6.2 && playback.player.isProcessing)
+        #expect(mac.asked == [1], "the Mac is off: it is not asked")
+        playback.replayGain = .album
+        try await wait { playback.appliedGain?.decibels == -4 }
+        playback.stop()
+    }
+
+    @Test func aSongKeptBeforeItsValuesWereGetsThemWhenTheMacNextSaysThem() async throws {
+        let (keeper, mac, directory) = try made([])
+        mac.files[1] = try tone()
+        keeper.keep(album([1]))
+        try await wait { keeper.isIdle }
+        #expect(keeper.store.kept(1) != nil && keeper.store.kept(1)?.replayGain == nil)
+        let values = ReplayGain(trackGain: 2.5, trackPeak: 0.4, albumGain: nil, albumPeak: nil)
+        keeper.store.noteReplayGain(values, of: 1)
+        #expect(try KeptStore(directory: directory).kept(1)?.replayGain == values)
+        // A song that isn't kept is not made up by being told about.
+        keeper.store.noteReplayGain(values, of: 9)
+        #expect(keeper.store.kept(9) == nil)
     }
 }
 #endif
