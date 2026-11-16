@@ -14,7 +14,8 @@ final class AppSettings {
     var vinyl: Bool { didSet { defaults.set(vinyl, forKey: Keys.vinyl) } }
     /// Cover Flow shifts its perspective as the device tilts (never with Reduce Motion on).
     var tiltParallax: Bool { didSet { defaults.set(tiltParallax, forKey: Keys.tilt) } }
-    /// Songs may be fetched from the Mac over cellular data when music plays on this device. On unless turned off.
+    /// Songs may be fetched from the Mac over cellular data when music plays on this device. Off unless turned on:
+    /// streaming lossless music can use a lot of a data plan, so the person opts in. A choice already made is kept.
     var cellularPlayback: Bool { didSet { defaults.set(cellularPlayback, forKey: Keys.cellular) } }
     var albumsLayout: AlbumsLayout { didSet { defaults.set(albumsLayout.rawValue, forKey: Keys.albums) } }
 
@@ -29,7 +30,7 @@ final class AppSettings {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        defaults.register(defaults: [Keys.vinyl: false, Keys.tilt: true, Keys.albums: AlbumsLayout.grid.rawValue, Keys.cellular: true])
+        defaults.register(defaults: [Keys.vinyl: false, Keys.tilt: true, Keys.albums: AlbumsLayout.grid.rawValue, Keys.cellular: false])
         vinyl = defaults.bool(forKey: Keys.vinyl)
         tiltParallax = defaults.bool(forKey: Keys.tilt)
         cellularPlayback = defaults.bool(forKey: Keys.cellular)

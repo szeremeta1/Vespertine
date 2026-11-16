@@ -134,14 +134,14 @@ nothing about other rates or volumes. Until PCM is measured, the phone shows no 
 
 1. Tailscale on both. Pair at home on Wi-Fi first and type nothing: the Connection screen should list the Mac's addresses, one of them
    Tailscale. Then phone on cellular, Wi-Fi off. Expect it to reconnect by itself and Now Playing to say "Tailscale".
-2. Play 24/192 FLAC, 24/96 stereo, then the DSD 5.1. Note time to first sound, and any dropout over 30 minutes.
-3. Settings › Play over Cellular Data off: the next song must not start, and the reason is shown. On again: it plays.
+2. Play over Cellular Data is off on a fresh install: a song must not start, and the reason is shown. Turn it on in Settings: it plays.
+3. Play 24/192 FLAC, 24/96 stereo, then the DSD 5.1. Note time to first sound, and any dropout over 30 minutes.
 4. Settings shows how much was fetched from the Mac.
 
 ## B10. Handover and restart (4 min)
 
-1. While a song plays on Wi-Fi (with Tailscale available), turn Wi-Fi off. Expect the song to carry on from the buffer, "Waiting for
-   the Mac" if it runs dry, then the same song continuing, without starting over.
+1. With Play over Cellular Data on, while a song plays on Wi-Fi (with Tailscale available), turn Wi-Fi off. Expect the song to
+   carry on from the buffer, "Waiting for the Mac" if it runs dry, then the same song continuing, without starting over.
 2. Quit and reopen Vespertine on the Mac mid-song. Expect the same, with no new pairing.
 3. Note how many seconds each took to resume, and whether the route shown changed (Home network, Tailscale).
 4. Tailscale off on the phone, away from home: expect "Turn on Tailscale" wording, not a bare failure. Mac asleep: expect "not answering".

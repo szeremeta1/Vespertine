@@ -83,6 +83,7 @@ import VespertineRemoteProtocol
         #expect(!settings.vinyl)
         #expect(settings.tiltParallax)
         #expect(settings.albumsLayout == .grid)
+        #expect(!settings.cellularPlayback)
         settings.vinyl = true
         settings.tiltParallax = false
         settings.albumsLayout = .coverFlow
@@ -90,6 +91,21 @@ import VespertineRemoteProtocol
         #expect(again.vinyl)
         #expect(!again.tiltParallax)
         #expect(again.albumsLayout == .coverFlow)
+    }
+
+    @Test func cellularPlaybackIsOffUntilTurnedOnAndAChoiceIsKept() throws {
+        let name = "vt-tests-\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: name))
+        defer { defaults.removePersistentDomain(forName: name) }
+        // Nothing chosen yet: playing over cellular data is off.
+        #expect(!AppSettings(defaults: defaults).cellularPlayback)
+        // Turned on: it stays on.
+        AppSettings(defaults: defaults).cellularPlayback = true
+        #expect(AppSettings(defaults: defaults).cellularPlayback)
+        // Turned off again by hand: it stays off.
+        AppSettings(defaults: defaults).cellularPlayback = false
+        #expect(!AppSettings(defaults: defaults).cellularPlayback)
+        #expect(defaults.object(forKey: "cellularPlayback") as? Bool == false)
     }
 
     @Test func timesReadLikeAClock() {
