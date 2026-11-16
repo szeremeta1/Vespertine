@@ -215,7 +215,16 @@ struct OutputsView: View {
             LabeledContent("Folder", value: folder.name)
             LabeledContent("Songs", value: status.songs.formatted())
             if status.needTheMac > 0 {
-                LabeledContent("Files that need the Mac", value: status.needTheMac.formatted())
+                if status.needs.isEmpty {
+                    LabeledContent("Files that need the Mac", value: status.needTheMac.formatted())
+                } else {
+                    NavigationLink {
+                        MacNeededView(needs: status.needs)
+                    } label: {
+                        LabeledContent("Files that need the Mac", value: status.needTheMac.formatted())
+                    }
+                    .accessibilityIdentifier("folder-mac-needed")
+                }
             }
             if status.unreadable > 0 {
                 LabeledContent("Files that couldn’t be read", value: status.unreadable.formatted())
