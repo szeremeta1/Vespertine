@@ -105,8 +105,9 @@ public final class DemoMac: RemoteChannel {
 
     private let words: DemoWords
 
+    /// `appVersion`: the version the pretend Mac says it runs. The app passes its own, so the demo never shows an old one.
     /// `words`: what a real Mac would say in its own language (output descriptions, the signal badge, a source's state).
-    public init(name: String, appVersion: String = "1.1.0", words: DemoWords = .localized, artwork: @escaping @MainActor (String, Int) -> Data?) {
+    public init(name: String, appVersion: String, words: DemoWords = .localized, artwork: @escaping @MainActor (String, Int) -> Data?) {
         info = ServerInfo(name: name, serverID: Self.serverID, appVersion: appVersion)
         self.artwork = artwork
         self.words = words

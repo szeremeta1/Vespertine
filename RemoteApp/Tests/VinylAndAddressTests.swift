@@ -107,6 +107,16 @@ import VespertineRemoteProtocol
         #expect(!RemoteAppModel.showsDemoNotice(isDemo: true, screenshotRun: true))
         #expect(!RemoteAppModel.showsDemoNotice(isDemo: false, screenshotRun: false))
     }
+
+    @Test func theDemoMacShowsThisAppsVersion() {
+        #expect(RemoteAppModel.demoVersion(info: ["CFBundleShortVersionString": "1.2"]) == "1.2")
+        #expect(RemoteAppModel.demoVersion(info: ["CFBundleShortVersionString": 3]).isEmpty)
+        #expect(RemoteAppModel.demoVersion(info: nil).isEmpty)
+        // The app under test says a version of its own, and the demo repeats it.
+        let own = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        #expect(own?.isEmpty == false)
+        #expect(RemoteAppModel.demoVersion(info: Bundle.main.infoDictionary) == own)
+    }
 }
 
 @Suite @MainActor struct ConvertingAndReach {
