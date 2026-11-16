@@ -105,18 +105,23 @@ struct VespertineCommands: Commands {
         CommandGroup(after: .newItem) {
             Button("Find Music on This Mac…") { model.showFindMusic = true }
                 .keyboardShortcut("f", modifiers: [.command, .shift])
+                .disabled(!model.settings.localLibrary)
             Button("Add Folder to Library…") { model.presentImporter(.reference) }
                 .keyboardShortcut("o", modifiers: [.command])
+                .disabled(!model.settings.localLibrary)
             Button("Import & Organize…") { model.presentImporter(.copyAndOrganize) }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
+                .disabled(!model.settings.localLibrary)
             Button("Connect to Server…") { model.showConnectServer = true }
                 .keyboardShortcut("k", modifiers: [.command])
+                .disabled(!model.settings.localLibrary)
             Divider()
             Button("Import Playlist…") { model.importPlaylistFiles() }
             Button("Import Apple Music Library…") { model.importAppleMusicLibrary() }
             Divider()
             Button("Rescan Library") { Task { await model.library.rescanAll() } }
                 .keyboardShortcut("r", modifiers: [.command, .option])
+                .disabled(!model.settings.localLibrary)
             Button("Remove Missing Songs…") { model.askToRemoveMissingSongs() }
             Button("Enrich Metadata…") { model.enrichAlbumKeys = [] }
                 .keyboardShortcut("e", modifiers: [.command, .shift])

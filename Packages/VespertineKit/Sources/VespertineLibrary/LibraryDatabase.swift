@@ -11,6 +11,8 @@ public final class LibraryDatabase: Sendable {
     public let writer: any DatabaseWriter
     /// Which streaming providers' rows the queries below return (see `shownProviders`). Nil: every row, as before there were any.
     let providersShown = Locked<Set<String>?>(nil)
+    /// Whether the songs of folders, drives and network shares are left out of the queries below (see `showsFiles`).
+    let filesHidden = Locked(false)
 
     /// Opens (or creates) the library at `url`.
     public convenience init(url: URL) throws {
@@ -604,9 +606,9 @@ Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE filePath 
 
     func tracks(ids: [Int64]) throws -> [Track] {
         try writer.read { db in
-            let hidden = try hiddenSourceIDs(db)
+            let hidden = try hiddenSourceIDs(db), files = showsFiles
             let byID = Dictionary(uniqueKeysWithValues: try Track.fetchAll(db, keys: ids).compactMap { t in t.id.map { ($0, t) } })
-            return ids.compactMap { byID[$0] }.filter { !hidden.contains($0.sourceId ?? -1) }
+            return ids.compactMap { byID[$0] }.filter { track in track.sourceId.map { !hidden.contains($0) } ?? files }
         }
     }
 
