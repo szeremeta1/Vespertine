@@ -248,6 +248,7 @@ struct ErrorBanner: View {
 
 struct EmptyLibraryView: View {
     @Environment(AppModel.self) private var model
+    @Environment(\.openSettings) private var openSettings
 
     var body: some View {
         VStack(spacing: 18) {
@@ -257,6 +258,18 @@ struct EmptyLibraryView: View {
             Text("Your library is empty")
                 .font(Typeface.serif(30))
                 .foregroundStyle(Palette.text)
+            if !model.library.filesOn {
+                // The local library is off: adding folders would add nothing that shows.
+                Text(LocalLibrarySwitch.emptyExplanation)
+                    .font(Typeface.ui(13))
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(Palette.text2)
+                    .lineSpacing(3)
+                    .frame(maxWidth: 520)
+                Button("Open Settings") { model.settingsTab = .library; openSettings() }
+                    .buttonStyle(BrassButtonStyle())
+                    .padding(.top, 6)
+            } else {
             Text("Vespertine can look through this Mac for music, check each file's real format, and bring in\nyour hi-res and lossless albums. You can also add folders yourself.")
                 .font(Typeface.ui(13))
                 .multilineTextAlignment(.center)
@@ -277,6 +290,7 @@ struct EmptyLibraryView: View {
                 .font(Typeface.mono(10.5))
                 .foregroundStyle(Palette.text3)
                 .padding(.top, 10)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

@@ -328,8 +328,12 @@ struct LibrarySettings: View {
 
     var body: some View {
         @Bindable var s = model.settings
+        let rows = LocalLibrarySwitch.rows(on: s.localLibrary)
         Form {
             Section("Sources") {
+                Toggle(LocalLibrarySwitch.title, isOn: Binding(get: { s.localLibrary }, set: { model.setLocalLibrary($0) }))
+                Text(LocalLibrarySwitch.explanation).font(.caption).foregroundStyle(.secondary)
+                if rows.contains(.sources) {
                 ForEach(model.library.sources) { source in
                     HStack {
                         Image(systemName: source.isNetwork ? "server.rack" : (source.mode == .managed ? "tray.full" : "folder"))
@@ -349,9 +353,11 @@ struct LibrarySettings: View {
                     Button("Import & Organize…") { openWindow(id: "main"); model.presentImporter(.copyAndOrganize) }
                     Button("Connect to Server…") { openWindow(id: "main"); model.showConnectServer = true }
                 }
+                }
             }
             // Music servers sit with the other places music comes from, under the folders and network shares.
             StreamingSettingsSection()
+            if rows.contains(.importing) {
             Section("Importing") {
                 Picker("When adding music", selection: $s.defaultImportMode) {
                     Text("Reference files in place").tag(ImportMode.reference)
@@ -373,6 +379,8 @@ struct LibrarySettings: View {
                     .onChange(of: s.skipNonMusic) { model.library.setSkipsNonMusic(s.skipNonMusic) }
                 Button("Find Music on This Mac…") { openWindow(id: "main"); model.showFindMusic = true }
             }
+            }
+            if rows.contains(.analysis) {
             Section {
                 Toggle("Analyze new music automatically", isOn: $s.autoAnalyze)
                     .onChange(of: s.autoAnalyze) { if s.autoAnalyze { model.analysis.analyzeLibrary() } }
@@ -401,6 +409,7 @@ struct LibrarySettings: View {
                     Text("Analyze Library Now includes network shares, and pauses while music plays from one.")
                 }
                 .font(.caption).foregroundStyle(.secondary)
+            }
             }
             Section("Library data") {
                 LabeledContent("Location") {
