@@ -1,7 +1,8 @@
 //
 // Vespertine: the phone's player. Decodes with Apple's decoders (`StreamDecoder`) a little ahead of what is being heard and
 // hands the audio to an AVAudioEngine player node that feeds the main mixer at unity: no effects, no EQ, no sample-rate
-// conversion of ours. What iOS then does with the signal (its own mixing, a fixed output rate, volume) is iOS's, and the app
+// conversion of ours. The one thing it can be asked to do to the samples is a song's ReplayGain (`Item.gain`), which is
+// 1, and so nothing at all, unless the listener turned ReplayGain on. What iOS then does with the signal (its own mixing, a fixed output rate, volume) is iOS's, and the app
 // says so. A song starts while its stream is still arriving, a seek goes straight to its place, and the song after it carries
 // on without a gap when it has the same rate and channels.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
@@ -37,11 +38,16 @@ public final class PhonePlayer {
         public let id: String
         public let source: any ByteSource
         public let format: StreamFormat
+        /// What every sample of the song is multiplied by (its ReplayGain, `AppliedGain.scale`). At 1, which it is unless
+        /// asked otherwise, the samples are not touched: no multiplication is done. Never anything but 1 for DoP frames,
+        /// which are DSD bits, not samples.
+        public let gain: Float
 
-        public init(id: String, source: any ByteSource, format: StreamFormat) {
+        public init(id: String, source: any ByteSource, format: StreamFormat, gain: Float = 1) {
             self.id = id
             self.source = source
             self.format = format
+            self.gain = gain.isFinite && gain > 0 ? gain : 1
         }
     }
 
@@ -52,8 +58,14 @@ public final class PhonePlayer {
     public private(set) var duration: Double = 0
     /// Playing, but the next audio hasn't arrived from the Mac yet.
     public private(set) var isBuffering = false
-    /// The signal goes from the file to the output through a player node and a mixer at unity gain, with nothing else.
+    /// The signal goes from the file to the output through a player node and a mixer at unity gain, with nothing else:
+    /// stereo or mono, and nothing of Vespertine's changing the samples (`isProcessing`).
     public private(set) var isUntouchedPath = false
+    /// Vespertine is changing the samples of the song being heard on purpose: its gain isn't 1 (ReplayGain is on and the
+    /// song has a value). Whatever names the signal path reads this; nothing here words it.
+    public private(set) var isProcessing = false
+    /// What the samples of the song being heard are multiplied by: 1 when they are left as they are.
+    public private(set) var gain: Float = 1
 
     /// What happens to the song's channels on the way out.
     public enum Rendering: Equatable, Sendable {
@@ -268,8 +280,17 @@ public final class PhonePlayer {
             engine.connect(node, to: engine.mainMixerNode, format: processing)
             rendering = processing.channelCount > 2 ? .downmix : .untouched
         }
-        isUntouchedPath = rendering == .untouched
+        noteGain()
         pump.setAhead(seconds: scheduleAhead)
+    }
+
+    /// Reads the gain of the song being heard, and with it whether the path is still the untouched one.
+    private func noteGain() {
+        let now = current?.gain ?? 1
+        if gain != now { gain = now }
+        if isProcessing != (now != 1) { isProcessing = now != 1 }
+        let untouched = rendering == .untouched && now == 1
+        if isUntouchedPath != untouched { isUntouchedPath = untouched }
     }
 
     // MARK: Transport
@@ -331,6 +352,7 @@ public final class PhonePlayer {
         finished = false
         isBuffering = false
         state = .idle
+        noteGain()
     }
 
     /// Stops, forgets the song and stops the engine too, so nothing of this player's reaches the output (not even
@@ -386,6 +408,7 @@ public final class PhonePlayer {
             if let next = pump.item(id) {
                 current = next
                 format = next.format
+                noteGain()
             }
             onAdvance?(id)
         }
@@ -627,12 +650,13 @@ private final class Pump: @unchecked Sendable {
     func fill(_ mine: Int, buffers: Int = .max) {
         var made = 0
         while made < buffers {
-            let plan: (decoder: StreamDecoder, frames: AVAudioFrameCount)? = lock.withLock {
+            let plan: (decoder: StreamDecoder, frames: AVAudioFrameCount, gain: Float)? = lock.withLock {
                 guard generation == mine, !drained, let decoder else { return nil }
                 let rate = decoder.processingFormat.sampleRate
                 guard Double(scheduled - consumed) < aheadSeconds * rate else { return nil }
                 starving = running && scheduled <= consumed
-                return (decoder, AVAudioFrameCount(min(32_768, max(4_096, rate / 4))))
+                // The gain of the song this buffer is read from: the one after it has its own from its first frame.
+                return (decoder, AVAudioFrameCount(min(32_768, max(4_096, rate / 4))), item?.gain ?? 1)
             }
             guard let plan, let buffer = AVAudioPCMBuffer(pcmFormat: plan.decoder.processingFormat, frameCapacity: plan.frames) else { return }
             let before = plan.decoder.position
@@ -648,6 +672,13 @@ private final class Pump: @unchecked Sendable {
             if count == 0 {
                 guard moveToNext(mine, after: plan.decoder) else { return }
                 continue
+            }
+            // ReplayGain, when the song has one: each sample times one number. At 1 the buffer is handed on as decoded.
+            if plan.gain != 1, let planes = buffer.floatChannelData {
+                for channel in 0..<Int(buffer.format.channelCount) {
+                    let samples = UnsafeMutableBufferPointer(start: planes[channel], count: count)
+                    for index in samples.indices { samples[index] *= plan.gain }
+                }
             }
             let now = rendered()
             let live: Bool = lock.withLock {

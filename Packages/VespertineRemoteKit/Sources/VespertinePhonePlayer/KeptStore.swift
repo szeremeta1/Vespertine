@@ -50,6 +50,9 @@ public struct KeptSong: Sendable, Equatable {
     public var file: URL
     /// What the Mac sent: the format, and whether it is the original file.
     public var descriptor: StreamDescriptor
+    /// The song's ReplayGain values as the Mac gave them, so they are here with the Mac off. nil: it has none, or it was
+    /// kept before they were.
+    public var replayGain: ReplayGain?
 }
 
 public struct KeptProgress: Sendable, Equatable {
@@ -69,6 +72,7 @@ public final class KeptStore {
     private struct Record: Codable {
         var name: String
         var descriptor: StreamDescriptor
+        var replayGain: ReplayGain?
     }
 
     private struct Index: Codable {
@@ -105,7 +109,7 @@ public final class KeptStore {
     public func list(_ id: String) -> KeptList? { lists.first { $0.id == id } }
 
     public func kept(_ song: Int64) -> KeptSong? {
-        songs[song].map { KeptSong(song: song, file: directory.appendingPathComponent($0.name), descriptor: $0.descriptor) }
+        songs[song].map { KeptSong(song: song, file: directory.appendingPathComponent($0.name), descriptor: $0.descriptor, replayGain: $0.replayGain) }
     }
 
     public func progress(of id: String) -> KeptProgress {
@@ -151,7 +155,7 @@ public final class KeptStore {
     func partFile(for song: Int64) -> URL { directory.appendingPathComponent("\(song).part") }
 
     /// The file at `partFile(for:)` arrived whole: it becomes the kept song.
-    func arrived(_ song: Int64, descriptor: StreamDescriptor) throws {
+    func arrived(_ song: Int64, descriptor: StreamDescriptor, replayGain: ReplayGain? = nil) throws {
         let name = "\(song)-\(descriptor.tag.prefix(16).filter { $0.isLetter || $0.isNumber || $0 == "-" }).\(descriptor.format.container)"
         let place = directory.appendingPathComponent(name)
         try? FileManager.default.removeItem(at: place)
@@ -160,9 +164,17 @@ public final class KeptStore {
             bytes -= old.descriptor.byteSize
             if old.name != name { try? FileManager.default.removeItem(at: directory.appendingPathComponent(old.name)) }
         }
-        songs[song] = Record(name: name, descriptor: descriptor)
+        songs[song] = Record(name: name, descriptor: descriptor, replayGain: replayGain)
         bytes += descriptor.byteSize
         prune()
+        save()
+    }
+
+    /// The Mac said what a kept song's ReplayGain values are (a song kept before they were kept gets them this way).
+    public func noteReplayGain(_ values: ReplayGain?, of song: Int64) {
+        guard var record = songs[song], record.replayGain != values else { return }
+        record.replayGain = values
+        songs[song] = record
         save()
     }
 

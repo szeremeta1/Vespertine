@@ -81,6 +81,13 @@ public struct PhoneSignal: Equatable, Sendable {
     public var dsdRate: Double?
     /// Sent as DoP, but the output isn't at the carrier rate or the volume isn't at its top: the DAC isn't getting DSD.
     public var dopBroken: Bool { dsdRate != nil && (resampled || volumeReduced) }
+    /// Vespertine is changing the samples on purpose (a gain, an equalizer, anything of the kind). Whatever does so sets
+    /// this, and the "no processing" wording goes while it is set.
+    public var processed = false
+    /// The ReplayGain being applied to the song, in decibels (after its peak has had its say). nil: none is.
+    public var replayGain: Double?
+    /// ReplayGain is on and this song has nothing done to it: its file has no values, or it is DSD sent as DoP.
+    public var replayGainHasNothing = false
 
     public init(stream: StreamDescriptor, route: PhoneRoute?) {
         dsdRate = stream.dsdRate
@@ -262,6 +269,10 @@ public final class PhoneRemote {
                 signal.discreteOutputs = outputs
             }
             signal.volume = outputVolume
+            // ReplayGain multiplies every sample: the song is no longer the file's own samples while it does.
+            signal.replayGain = playback.appliedGain?.decibels
+            signal.replayGainHasNothing = playback.replayGainHasNothing
+            signal.processed = playback.appliedGain != nil
             return signal
         }
     }
