@@ -103,6 +103,11 @@ struct NowPlayingPanel: View {
                         if let bed = player.bedMeters, bed.names.count > 2 {
                             ChannelMetersView(bed: bed, bitstream: false, levels: model.player.channelLevels).padding(.top, 14)
                         }
+                    } else if let reason = player.stopReason, player.state == .stopped, player.waitingForDevice == nil {
+                        // The song stopped and is not being prepared: why, where its signal path was.
+                        Label { Text(verbatim: reason) } icon: { Image(systemName: "exclamationmark.triangle") }
+                            .font(Typeface.ui(12)).foregroundStyle(Palette.copper).padding(.top, 16)
+                            .accessibilityElement(children: .combine)
                     } else if !player.buffering || player.waitingForDevice != nil {
                         // While a song's bytes are still on their way from a share, the line below says so (with how far it got):
                         // "Preparing output…" then read as an output that had stopped answering.

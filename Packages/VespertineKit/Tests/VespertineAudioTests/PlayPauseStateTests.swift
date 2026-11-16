@@ -29,6 +29,8 @@ struct PlayPauseStateTests {
     private struct QuietShareRun: Sendable {
         var ranShort = false
         var short = ""
+        /// The engine said the song still played while it was buffering (the buffer was a quarter full and more).
+        var playedWhileBuffering = false
         var pausedAt = 0.0, positionAfterPause = 0.0
         var whilePaused: Observation?
         var resumedQuiet: Observation?
@@ -55,6 +57,7 @@ struct PlayPauseStateTests {
             rig.engine.play(rig.item())
             run.ranShort = rig.waitBlocking(timeout: 120) { $0.state == .playing && $0.isBuffering && rig.share.readsWaiting > 0 && $0.bufferFill > 0.25 }
             let seen = rig.engine.snapshot
+            run.playedWhileBuffering = seen.playsWhileBuffering
             run.short = "\(seen.state), buffering \(seen.isBuffering), \(rig.share.readsWaiting) reads waiting, buffer \(seen.bufferFill), \(rig.elapsed) s in"
             rig.holdOutput(false)
             run.pausedAt = rig.engine.snapshot.position
@@ -74,6 +77,7 @@ struct PlayPauseStateTests {
             return run
         }
         #expect(run.ranShort, "the share never went quiet under the song: \(run.short)")
+        #expect(!run.ranShort || run.playedWhileBuffering, "buffering with a quarter of the buffer still to play is not a wait the listener hears: \(run.short)")
         func paused(_ o: Observation?) -> Bool { o.map { $0.state == .paused && !$0.audible && !$0.moving && !$0.buffering } == true }
         func playing(_ o: Observation?) -> Bool { o.map { $0.state == .playing && $0.audible } == true }
         #expect(paused(run.whilePaused), "paused while buffering: \(String(describing: run.whilePaused))")

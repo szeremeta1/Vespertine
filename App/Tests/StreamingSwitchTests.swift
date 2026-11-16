@@ -281,6 +281,61 @@ struct StreamingSwitchTests {
         #expect(app.unanswered(track) == nil)
     }
 
+    @Test("A song whose server stopped answering says so in Now Playing, and every start of a song from that server, the same one played again too, says the server answers")
+    func stopReasonAndReplay() async throws {
+        let scratch = try scratch()
+        defer { clean(scratch) }
+        scratch.notes.withLock { $0.songs = [song("s1", title: "From The Server")] }
+        let id = CountingProvider.providerID
+        let app = model(scratch)
+        app.setOn(true, id)
+        #expect(await app.signIn(id, name: "Home", request: ProviderSignIn(server: "", user: "listener", secret: .password("x"))) == nil)
+        #expect(await until { scratch.library.allTracks().contains { $0.isStreamed } })
+        let track = try #require(scratch.library.allTracks().first { $0.isStreamed })
+
+        let shares = NetworkShareManager(library: scratch.library, settings: scratch.settings, dataDirectory: scratch.root)
+        let player = PlayerController(library: scratch.library, settings: scratch.settings, shares: shares)
+        defer { player.stop() }
+        let answered = Locked(0)
+        player.serverUnanswered = { _ in PlayerController.notAnswering("Home") }
+        player.serverAnswered = { _ in answered.withLock { $0 += 1 } }
+        // The engine's events and snapshots are handed to the player here, one after another with nothing between them: the
+        // song itself never plays (its provider serves no audio), and what the engine says of that comes after this test's turn.
+        player.play([track])
+        let item = try #require(player.current?.item)
+        let engineSays = try #require(player.engine.eventHandler)
+        var playing = player.engine.snapshot
+        playing.lastError = nil
+        playing.outputDevice = nil
+        playing.item = item
+        playing.state = .playing
+        playing.isBuffering = false
+        playing.position = 1
+
+        engineSays(.failed(item, StreamingCore.notAnsweringMessage))
+        #expect(player.stopReason == PlayerController.notAnswering("Home"), "Now Playing says why the song stopped")
+        #expect(player.lastError == PlayerController.notAnswering("Home"))
+        #expect(answered.withLock { $0 } == 0)
+
+        // The same queue entry is played again and is heard.
+        engineSays(.trackStarted(item))
+        #expect(player.stopReason == nil, "a song that started has no reason for having stopped")
+        var waiting = playing
+        waiting.isBuffering = true
+        player.poll(waiting)
+        #expect(answered.withLock { $0 } == 0, "a song still waited for is not its server answering")
+        player.poll(playing)
+        #expect(answered.withLock { $0 } == 1)
+        player.poll(playing)
+        #expect(answered.withLock { $0 } == 1, "once for each start")
+
+        // And again: the entry that was reported before is reported again when it starts again.
+        engineSays(.failed(item, StreamingCore.notAnsweringMessage))
+        engineSays(.trackStarted(item))
+        player.poll(playing)
+        #expect(answered.withLock { $0 } == 2)
+    }
+
     @Test("On then off leaves no task running and the provider stopped")
     func onThenOffLeavesNothing() async throws {
         let scratch = try scratch()

@@ -89,6 +89,11 @@ final class PlayerController {
     private(set) var underruns = 0
     /// A network read stalled; output is paused until enough is buffered (resumes by itself).
     private(set) var buffering = false
+    /// Buffering while what has arrived still plays (see `EngineSnapshot.playsWhileBuffering`).
+    private(set) var playsWhileBuffering = false
+    /// Why the song in Now Playing stopped and is not playing: its music server stopped answering. Said there, where the
+    /// song's signal path was, until a song is started; the banner says it too, and goes after a few seconds.
+    private(set) var stopReason: String?
     /// While the song is copied from a share before it plays: how much is local (0…1).
     private(set) var bufferingFraction: Double?
     /// While the song waits on a share that has sent nothing for 10 s or more: "“Share” isn’t answering. Still trying…" (the Inspector
@@ -133,7 +138,11 @@ final class PlayerController {
     /// The song playing when it is one of the library's (not one a control app sent).
     var currentLibraryTrack: Track? { current.flatMap { $0.received ? nil : $0.track } }
     var isPlaying: Bool { state == .playing }
-    var loading: Bool { (buffering && state != .paused) || (requested != nil && current.map { shares.isNetwork($0.track) } == true) }
+    /// The song is waited for and nothing of it is heard: a spinner over play. Not while what has arrived still plays (the
+    /// share or the server is slow or quiet, the buffer is not empty yet): Now Playing says "Buffering", the button stays pause.
+    var loading: Bool {
+        (buffering && !playsWhileBuffering && state != .paused) || (requested != nil && current.map { shares.isNetwork($0.track) } == true)
+    }
     var canCancelLoading: Bool { loading && requested != nil }
     var upcoming: ArraySlice<QueueEntry> {
         guard let i = currentIndex, i + 1 < queue.count else { return [] }
@@ -853,6 +862,7 @@ final class PlayerController {
         requestedPosition = nil
         playedToEnd = false
         failedSinceStart = false
+        stopReason = nil
         position = 0
         duration = entry.track.duration
         // The signal path, meters and Now Playing describe the new song from now on (it's still opening).
@@ -960,6 +970,9 @@ final class PlayerController {
             if receiverSession != nil { receiverEvents?(.started(item.id)) }
             playedToEnd = false
             failedSinceStart = false
+            stopReason = nil
+            // Every start of a song from a music server, the same queue entry played again too, is its server answering.
+            answerOwed = queue.first { $0.id == item.id }?.track.isStreamed == true ? item.id : nil
             if let i = queue.firstIndex(where: { $0.id == item.id }) { currentIndex = i }
             if !fresh, seekRestart == item.id {
                 seekRestart = nil
@@ -1000,6 +1013,7 @@ final class PlayerController {
                 // A song on a music server: there is no file to look for. The reason is the server's or the provider's. A server
                 // that stopped answering is named, the way a network player that doesn't answer is.
                 lastError = message == StreamingCore.notAnsweringMessage ? serverUnanswered?(track) ?? message : message
+                if message == StreamingCore.notAnsweringMessage { stopReason = lastError }
             } else if let track, shares.isNetwork(track), !shares.isReachable(track), !shares.cache.isAvailable(track) {
                 lastError = String(localized: "“\(track.title)” is on a network share that isn’t connected. Vespertine reconnects automatically when the server is reachable.")
             } else if let track {
@@ -1101,6 +1115,17 @@ final class PlayerController {
     @ObservationIgnored var serverUnanswered: ((Track) -> String?)?
     /// Told when a song from a server plays: the server is answering.
     @ObservationIgnored var serverAnswered: ((Track) -> Void)?
+    /// The streamed song that started and has not been reported to `serverAnswered` yet: reported once it is heard.
+    @ObservationIgnored private var answerOwed: UUID?
+
+    /// A song from a music server started and is playing, not waiting on the network: its server is told to be answering,
+    /// once for each start.
+    private func reportServerAnswering(_ snap: EngineSnapshot) {
+        guard let owed = answerOwed, requested == nil, snap.state == .playing, snap.item?.id == owed, !snap.isBuffering,
+              let entry = current, entry.id == owed else { return }
+        answerOwed = nil
+        serverAnswered?(entry.track)
+    }
     /// The queue entry whose stream's format was written to the library, so it is written once.
     @ObservationIgnored private var confirmedStreamEntry: UUID?
 
@@ -1131,7 +1156,6 @@ final class PlayerController {
         guard let entry = current, confirmedStreamEntry != entry.id, let stream = entry.track.streamRef, let path = signalPath,
               let finding = StreamFindings.finding(cacheKey: stream.cacheKey) else { return }
         confirmedStreamEntry = entry.id
-        serverAnswered?(entry.track)
         let source = path.source
         library.confirmStreamedFormat(ConfirmedStreamFormat(codec: source.codec, isLossless: source.encoding != .lossy, isDSD: source.encoding == .dsd,
                                                             sampleRate: source.sampleRate, bitDepth: source.encoding == .pcm ? source.bitDepth : nil,
@@ -1191,6 +1215,7 @@ final class PlayerController {
             let path = streamVerdict(snap.signalPath)
             if signalPath != path { signalPath = path }
             confirmStreamedFormat()
+            reportServerAnswering(snap)
             if systemRendering != snap.systemRendering { systemRendering = snap.systemRendering }
             if bedMeters != snap.bedMeters { bedMeters = snap.bedMeters }
         }
@@ -1201,6 +1226,7 @@ final class PlayerController {
         syncVolumeRelay()
         if underruns != snap.underruns { underruns = snap.underruns }
         if buffering != snap.isBuffering { buffering = snap.isBuffering }
+        if playsWhileBuffering != snap.playsWhileBuffering { playsWhileBuffering = snap.playsWhileBuffering }
         if bufferingFraction != snap.bufferingFraction { bufferingFraction = snap.bufferingFraction }
         updateShareNotice(snap.shareStalledSeconds != nil)
         if settings.networkCache, let current, current.id == snap.item?.id, adoptedSource != current.id,
