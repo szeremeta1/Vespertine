@@ -109,11 +109,19 @@ final class RemoteAppModel {
         closeShare()
         let pairing = SavedPairing(serverID: DemoMac.serverID, name: String(localized: "Demo Mac"), device: "demo", key: Data())
         // One pretend Mac for the whole demo, so the queue survives the app going to the background and back.
-        let mac = DemoMac(name: pairing.name) { key, size in DemoArtwork.png(key: key, size: size) }
+        let mac = DemoMac(name: pairing.name, appVersion: Self.demoVersion(info: Bundle.main.infoDictionary)) { key, size in
+            DemoArtwork.png(key: key, size: size)
+        }
         let session = RemoteSession(pairing: pairing, clientName: deviceName) { mac }
         self.session = session
         artwork.session = session
         session.connect()
+    }
+
+    /// The version the demo's pretend Mac shows: this app's own, so it is never a release behind. Nothing if the app
+    /// can't say (the line is then left out).
+    nonisolated static func demoVersion(info: [String: Any]?) -> String {
+        (info?["CFBundleShortVersionString"] as? String)?.trimmingCharacters(in: .whitespaces) ?? ""
     }
 
     /// Back to the list of Macs.

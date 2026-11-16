@@ -11,7 +11,7 @@ import VespertineRemoteProtocol
 @MainActor
 struct DemoMacTests {
     private func opened() async throws -> (DemoMac, Pushes) {
-        let mac = DemoMac(name: "Demo") { _, _ in Data([0x89, 0x50, 0x4E, 0x47]) }
+        let mac = DemoMac(name: "Demo", appVersion: "9.8.7") { _, _ in Data([0x89, 0x50, 0x4E, 0x47]) }
         let pushes = Pushes()
         mac.onPush = { pushes.messages.append($0) }
         try await mac.open(timeout: .seconds(1))
@@ -38,6 +38,8 @@ struct DemoMacTests {
         let (mac, pushes) = try await opened()
         let reply = try await ask(mac, .hello(device: "demo", name: "Phone", protocolVersion: RemoteProtocol.version))
         #expect(reply == .welcome(mac.info))
+        // The pretend Mac says the version it was given (the app passes its own), never one written into the demo.
+        #expect(mac.info.appVersion == "9.8.7")
         for _ in 0..<20 where pushes.messages.count < 3 { await Task.yield() }
         #expect(pushes.lastPlayer?.nowPlaying != nil)
         #expect(pushes.lastQueue?.current != nil)
@@ -183,7 +185,7 @@ struct DemoMacTests {
     @Test func theDemoSpeaksTheWordsItIsGiven() async throws {
         let words = DemoWords(systemDefault: "Systemstandard", builtInSpeakers: "MacBook Pro-Lautsprecher", dac: "USB-DAC", receiver: "HDMI · 8 Kanäle",
                               speakerGroup: "Lautsprechergruppe · 2 Ausgänge", bitPerfect: "BITGENAU", sourceOnline: "ONLINE", sourceOffline: "OFFLINE")
-        let mac = DemoMac(name: "Demo", words: words) { _, _ in nil }
+        let mac = DemoMac(name: "Demo", appVersion: "9.8.7", words: words) { _, _ in nil }
         let pushes = Pushes()
         mac.onPush = { pushes.messages.append($0) }
         try await mac.open(timeout: .seconds(1))

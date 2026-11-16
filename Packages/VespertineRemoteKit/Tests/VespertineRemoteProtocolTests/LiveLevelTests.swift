@@ -112,7 +112,7 @@ struct LiveLevelTests {
 
     @Test("Dragging the session's volume sends setVolume to the Mac as it moves")
     func sessionSendsSetVolume() async {
-        let mac = DemoMac(name: "Demo") { _, _ in nil }
+        let mac = DemoMac(name: "Demo", appVersion: "9.8.7") { _, _ in nil }
         let session = RemoteSession(pairing: SavedPairing(serverID: DemoMac.serverID, name: "Demo", device: "demo", key: Data()), clientName: "Test") { mac }
         session.connect()
         #expect(await waitUntil { session.isConnected && session.player != nil })
