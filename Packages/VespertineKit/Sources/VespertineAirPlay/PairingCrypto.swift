@@ -39,7 +39,11 @@ enum PairingCrypto {
     static func seal(_ plain: Data, key: SymmetricKey, nonce: Data, authenticating extra: Data = Data()) throws -> Data {
         guard nonce.count <= 12, let nonce = try? ChaChaPoly.Nonce(data: padded(nonce)) else { throw Failure.malformed }
         let box = try ChaChaPoly.seal(plain, using: key, nonce: nonce, authenticating: extra)
-        return box.ciphertext + box.tag
+        // Built from nothing, so that the result counts from zero (CryptoKit's pieces are slices that don't).
+        var sealed = Data(capacity: plain.count + tagLength)
+        sealed.append(box.ciphertext)
+        sealed.append(box.tag)
+        return sealed
     }
 
     static func open(_ sealed: Data, key: SymmetricKey, nonce: Data, authenticating extra: Data = Data()) throws -> Data {

@@ -191,6 +191,8 @@ struct PairingPrimitivesTests {
         let other = PairingCrypto.key(secret: hex(srpKey), salt: "Pair-Verify-Encrypt-Salt", info: "Pair-Verify-Encrypt-Info")
         let nonce = PairingCrypto.nonce("PS-Msg05")
         let sealed = try PairingCrypto.seal(Data("hello".utf8), key: key, nonce: nonce)
+        // What is sealed counts from zero, whatever CryptoKit's own pieces do.
+        #expect(sealed.startIndex == 0 && sealed.count == 5 + PairingCrypto.tagLength)
         var changed = sealed
         changed[0] ^= 1
         #expect(throws: PairingCrypto.Failure.notAuthentic) { try PairingCrypto.open(changed, key: key, nonce: nonce) }
