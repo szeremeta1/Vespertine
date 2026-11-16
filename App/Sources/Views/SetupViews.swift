@@ -503,6 +503,34 @@ private struct SetupWelcome: View {
 
 // MARK: - Music
 
+/// The Music step's folder tile. It follows the choice above it, and is named as that command is in the menus, the empty
+/// library and Settings › Library: "Add a Folder" leaves files where they are, "Import & Organize" copies them.
+nonisolated enum SetupFolderTile: Equatable {
+    case addFolder, importAndOrganize
+
+    init(mode: ImportMode) {
+        switch mode {
+        case .reference: self = .addFolder
+        case .copyAndOrganize: self = .importAndOrganize
+        }
+    }
+
+    /// What the folder panel it opens does with the folders chosen.
+    var mode: ImportMode {
+        switch self {
+        case .addFolder: .reference
+        case .importAndOrganize: .copyAndOrganize
+        }
+    }
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .addFolder: "Add a Folder"
+        case .importAndOrganize: "Import & Organize"
+        }
+    }
+}
+
 private struct SetupMusic: View {
     @Environment(AppModel.self) private var model
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -527,8 +555,9 @@ private struct SetupMusic: View {
             HStack(spacing: 14) {
                 actionTile("sparkle.magnifyingglass", "Find Music on This Mac", "Searches your drives and checks every file's real format.",
                            recommended: true) { model.showFindMusic = true }
-                actionTile("folder.badge.plus", "Add a Folder", "Choose a folder or drive yourself.") {
-                    model.presentImporter(settings.defaultImportMode)
+                // Named for what it will do with the choice above, as the same two commands are everywhere else.
+                actionTile("folder.badge.plus", SetupFolderTile(mode: settings.defaultImportMode).title, "Choose a folder or drive yourself.") {
+                    model.presentImporter(SetupFolderTile(mode: settings.defaultImportMode).mode)
                 }
                 actionTile("server.rack", "Connect to a Server", "Music on a NAS or another Mac, over SMB.") {
                     model.showConnectServer = true
@@ -843,7 +872,7 @@ private struct SetupExtras: View {
         @Bindable var updater = updater
         VStack(spacing: 0) {
             SetupHeading(title: "A few extras",
-                         detail: "Vespertine sends nothing in the background unless it’s switched on, here or in Settings.",
+                         detail: "Vespertine reaches the internet only for what’s switched on. The few that start on are on this page: switch off any you don’t want.",
                          shown: shown)
             VStack(spacing: 12) {
                 SetupOption(symbol: "checkmark.seal", title: "Check each file's real quality",
@@ -868,7 +897,7 @@ private struct SetupExtras: View {
                     }
                     .reveal(shown, delay: 0.28)
                 }
-                // On by default, so it's shown with the other things that reach the network on their own.
+                // On by default, so it's shown with the other things that reach the network on their own (the heading says so).
                 SetupOption(symbol: "list.bullet.rectangle", title: "Update the list of DoP DACs",
                             detail: "Once a day, downloads the signed list of DACs known to play DSD natively, so a newly confirmed DAC needs no app update. Nothing about you is sent.",
                             on: settings.dopListUpdates) {

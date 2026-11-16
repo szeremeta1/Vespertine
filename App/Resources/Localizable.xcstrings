@@ -623736,270 +623736,271 @@
         }
       }
     },
-    "Vespertine sends nothing in the background unless it’s switched on, here or in Settings.": {
+    "Vespertine reaches the internet only for what’s switched on. The few that start on are on this page: switch off any you don’t want.": {
+      "comment": "Setup assistant, Extras page: the sentence under the heading. Some switches on this page (cover art, updates, the DoP DAC list) are already on when the page opens.",
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "እዚህ ወይም በቅንብሮች ውስጥ ካልበራ በስተቀር Vespertine ከበስተጀርባ ምንም ነገር አይልክም።"
+            "value": "Vespertine ወደ በይነመረብ የሚገናኘው ለበሩት ነገሮች ብቻ ነው። በርተው የሚጀምሩት ጥቂቶቹ በዚህ ገጽ ላይ ናቸው፤ የማይፈልጉትን ያጥፉ።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "لا يرسل Vespertine أي شيء في الخلفية ما لم يكن مفعّلًا، هنا أو في الإعدادات."
+            "value": "لا يتصل Vespertine بالإنترنت إلا لما هو مفعّل. القليل الذي يبدأ مفعّلًا موجود في هذه الصفحة: أوقف ما لا تريده."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "এখানে বা সেটিংসে চালু না থাকলে Vespertine ব্যাকগ্রাউন্ডে কিছুই পাঠায় না।"
+            "value": "যা চালু আছে শুধু তার জন্যই Vespertine ইন্টারনেটে যায়। যে কয়েকটি শুরু থেকেই চালু থাকে সেগুলো এই পৃষ্ঠাতেই আছে: যেটি চান না সেটি বন্ধ করে দিন।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine na pozadí nic neodesílá, pokud to není zapnuté – tady nebo v Nastavení."
+            "value": "Vespertine se k internetu připojuje jen kvůli tomu, co je zapnuté. Těch pár věcí, které jsou zapnuté od začátku, je na této stránce: co nechcete, vypněte."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine sender intet i baggrunden, medmindre det er slået til, her eller i Indstillinger."
+            "value": "Vespertine går kun på internettet for det, der er slået til. De få, der er slået til fra starten, står på denne side: slå dem fra, du ikke vil have."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine sendet nichts im Hintergrund, außer es ist eingeschaltet – hier oder in den Einstellungen."
+            "value": "Vespertine greift nur für das aufs Internet zu, was eingeschaltet ist. Die wenigen Dinge, die von Anfang an eingeschaltet sind, stehen auf dieser Seite: Schalte aus, was du nicht möchtest."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Το Vespertine δεν στέλνει τίποτα στο παρασκήνιο, εκτός αν είναι ενεργοποιημένο, εδώ ή στις Ρυθμίσεις."
+            "value": "Το Vespertine συνδέεται στο διαδίκτυο μόνο για όσα είναι ενεργοποιημένα. Τα λίγα που ξεκινούν ενεργοποιημένα βρίσκονται σε αυτή τη σελίδα: απενεργοποιήστε όσα δεν θέλετε."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine no envía nada en segundo plano a menos que esté activado, aquí o en Ajustes."
+            "value": "Vespertine solo se conecta a internet para lo que está activado. Lo poco que viene activado está en esta página: desactiva lo que no quieras."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine هیچ چیزی را در پس‌زمینه ارسال نمی‌کند، مگر اینکه روشن باشد، اینجا یا در تنظیمات."
+            "value": "Vespertine فقط برای چیزهایی که روشن هستند به اینترنت وصل می‌شود. چند موردی که از ابتدا روشن هستند در همین صفحه‌اند: هرکدام را نمی‌خواهید خاموش کنید."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ei lähetä mitään taustalla, ellei sitä ole otettu käyttöön täällä tai Asetuksissa."
+            "value": "Vespertine käyttää internetiä vain siihen, mikä on otettu käyttöön. Ne muutamat, jotka ovat käytössä alusta alkaen, ovat tällä sivulla: poista käytöstä ne, joita et halua."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Walang ipinapadala ang Vespertine sa background maliban kung naka-on ito, dito o sa Settings."
+            "value": "Kumokonekta lang ang Vespertine sa internet para sa mga naka-on. Nasa page na ito ang iilang naka-on sa simula: i-off ang anumang ayaw mo."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine n’envoie rien en arrière-plan, sauf si c’est activé, ici ou dans les Réglages."
+            "value": "Vespertine n’accède à Internet que pour ce qui est activé. Les quelques options activées au départ sont sur cette page : désactivez celles dont vous ne voulez pas."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "અહીં કે સેટિંગ્સમાં ચાલુ ન હોય ત્યાં સુધી Vespertine બૅકગ્રાઉન્ડમાં કશું મોકલતું નથી."
+            "value": "જે ચાલુ હોય ફક્ત તેના માટે જ Vespertine ઇન્ટરનેટ સુધી પહોંચે છે. જે થોડાં શરૂઆતથી ચાલુ હોય છે તે આ પેજ પર છે: જે ન જોઈતાં હોય તે બંધ કરો."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ba ya aika komai a bayan fage sai dai idan an kunna shi, a nan ko a cikin Saituna."
+            "value": "Vespertine yana shiga intanet ne kawai don abin da aka kunna. Kaɗan ɗin da suke farawa a kunne suna kan wannan shafin: kashe duk wanda ba ka so."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine לא שולח שום דבר ברקע, אלא אם זה מופעל, כאן או ב״הגדרות״."
+            "value": "Vespertine מתחבר לאינטרנט רק עבור מה שמופעל. המעטים שמופעלים מההתחלה נמצאים בעמוד הזה: כבו את מה שאינכם רוצים."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "जब तक यह चालू न हो, यहाँ या सेटिंग्ज़ में, Vespertine बैकग्राउंड में कुछ भी नहीं भेजता।"
+            "value": "Vespertine केवल उन्हीं चीज़ों के लिए इंटरनेट तक पहुँचता है जो चालू हैं। जो कुछ चीज़ें शुरू से चालू रहती हैं वे इसी पेज पर हैं: जो नहीं चाहिए उन्हें बंद कर दें।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A Vespertine semmit sem küld a háttérben, hacsak nincs bekapcsolva itt vagy a Beállításokban."
+            "value": "A Vespertine csak ahhoz éri el az internetet, ami be van kapcsolva. Az a néhány, ami kezdettől be van kapcsolva, ezen az oldalon található: kapcsolja ki, amelyiket nem szeretné."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine tidak mengirim apa pun di latar belakang kecuali diaktifkan, di sini atau di Pengaturan."
+            "value": "Vespertine hanya mengakses internet untuk hal yang diaktifkan. Beberapa yang aktif sejak awal ada di halaman ini: nonaktifkan yang tidak Anda inginkan."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine non invia nulla in background, a meno che non sia attivato, qui o in Impostazioni."
+            "value": "Vespertine accede a internet solo per ciò che è attivato. Le poche opzioni attive fin dall’inizio sono in questa pagina: disattiva quelle che non vuoi."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ここか「設定」でオンにしない限り、Vespertineがバックグラウンドで何かを送信することはありません。"
+            "value": "Vespertineがインターネットに接続するのは、オンになっている機能のためだけです。最初からオンになっている少数の項目はこのページにあります。不要なものはオフにしてください。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಇಲ್ಲಿ ಅಥವಾ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಆನ್ ಆಗಿರದ ಹೊರತು Vespertine ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಏನನ್ನೂ ಕಳುಹಿಸುವುದಿಲ್ಲ."
+            "value": "ಆನ್ ಆಗಿರುವುದಕ್ಕಾಗಿ ಮಾತ್ರ Vespertine ಇಂಟರ್ನೆಟ್ ಅನ್ನು ತಲುಪುತ್ತದೆ. ಆರಂಭದಿಂದಲೇ ಆನ್ ಆಗಿರುವ ಕೆಲವು ಈ ಪುಟದಲ್ಲಿವೆ: ನಿಮಗೆ ಬೇಡವಾದವುಗಳನ್ನು ಆಫ್ ಮಾಡಿ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "여기나 설정에서 켜지 않는 한 Vespertine은 백그라운드에서 아무것도 전송하지 않습니다."
+            "value": "Vespertine은 켜져 있는 기능을 위해서만 인터넷에 연결합니다. 처음부터 켜져 있는 몇 가지는 이 페이지에 있습니다. 원하지 않는 것은 끄십시오."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "ഇവിടെയോ ക്രമീകരണങ്ങളിലോ ഓണാക്കിയിട്ടില്ലെങ്കിൽ Vespertine പശ്ചാത്തലത്തിൽ ഒന്നും അയയ്ക്കില്ല."
+            "value": "ഓണാക്കിയിട്ടുള്ളവയ്ക്കുവേണ്ടി മാത്രമേ Vespertine ഇന്റർനെറ്റിലേക്ക് പോകൂ. തുടക്കത്തിലേ ഓണായിരിക്കുന്ന ചുരുക്കം ചിലത് ഈ പേജിലുണ്ട്: വേണ്ടാത്തവ ഓഫാക്കുക."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "हे चालू केल्याशिवाय, इथे किंवा सेटिंग्जमध्ये, Vespertine बॅकग्राउंडमध्ये काहीही पाठवत नाही."
+            "value": "जे चालू आहे फक्त त्यासाठीच Vespertine इंटरनेटशी जोडले जाते. सुरुवातीपासून चालू असलेल्या थोड्या गोष्टी या पेजवर आहेत: नको असलेल्या बंद करा."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine tidak menghantar apa-apa di latar belakang melainkan ia diaktifkan, di sini atau dalam Seting."
+            "value": "Vespertine hanya mengakses internet untuk perkara yang diaktifkan. Beberapa yang aktif dari mula ada pada halaman ini: nyahaktifkan mana-mana yang anda tidak mahu."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine sender ingenting i bakgrunnen med mindre det er slått på, her eller i Innstillinger."
+            "value": "Vespertine går bare på internett for det som er slått på. De få som er slått på fra starten, står på denne siden: slå av dem du ikke vil ha."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine verstuurt niets op de achtergrond, tenzij het is aangezet, hier of in Instellingen."
+            "value": "Vespertine gebruikt internet alleen voor wat is aangezet. De paar dingen die vanaf het begin aanstaan, staan op deze pagina: zet uit wat je niet wilt."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਜਦੋਂ ਤੱਕ ਇਹ ਚਾਲੂ ਨਾ ਹੋਵੇ, ਇੱਥੇ ਜਾਂ ਸੈਟਿੰਗਾਂ ਵਿੱਚ, Vespertine ਬੈਕਗ੍ਰਾਊਂਡ ਵਿੱਚ ਕੁਝ ਵੀ ਨਹੀਂ ਭੇਜਦਾ।"
+            "value": "ਜੋ ਚਾਲੂ ਹੈ ਸਿਰਫ਼ ਉਸ ਲਈ ਹੀ Vespertine ਇੰਟਰਨੈੱਟ ਤੱਕ ਪਹੁੰਚਦਾ ਹੈ। ਜੋ ਕੁਝ ਚੀਜ਼ਾਂ ਸ਼ੁਰੂ ਤੋਂ ਚਾਲੂ ਹੁੰਦੀਆਂ ਹਨ ਉਹ ਇਸ ਪੰਨੇ ’ਤੇ ਹਨ: ਜੋ ਨਹੀਂ ਚਾਹੀਦੀਆਂ ਉਹ ਬੰਦ ਕਰ ਦਿਓ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine nic nie wysyła w tle, chyba że jest to włączone – tutaj lub w Ustawieniach."
+            "value": "Vespertine łączy się z internetem tylko na potrzeby tego, co jest włączone. Te kilka rzeczy, które są włączone od początku, jest na tej stronie: wyłącz te, których nie chcesz."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine não envia nada em segundo plano, a menos que esteja ativado, aqui ou nos Ajustes."
+            "value": "O Vespertine só acessa a internet para o que está ativado. Os poucos itens que já começam ativados estão nesta página: desative os que você não quiser."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine não envia nada em segundo plano, a menos que esteja ativado, aqui ou nas Definições."
+            "value": "O Vespertine só acede à internet para o que está ativado. Os poucos itens que começam ativados estão nesta página: desative os que não quiser."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine nu trimite nimic în fundal decât dacă este activat, aici sau în Configurări."
+            "value": "Vespertine accesează internetul doar pentru ce este activat. Cele câteva care sunt activate de la început se află pe această pagină: dezactivați-le pe cele pe care nu le doriți."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine skickar ingenting i bakgrunden om det inte är påslaget, här eller i Inställningar."
+            "value": "Vespertine använder internet bara för det som är påslaget. De få som är påslagna från början finns på den här sidan: stäng av dem du inte vill ha."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine haitumi chochote chinichini isipokuwa kimewashwa, hapa au katika Mipangilio."
+            "value": "Vespertine hufikia intaneti kwa ajili ya vilivyowashwa tu. Vichache vinavyoanza vikiwa vimewashwa viko kwenye ukurasa huu: zima chochote usichokitaka."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "இங்கோ அமைப்புகளிலோ இயக்கப்படாத வரை Vespertine பின்னணியில் எதையும் அனுப்பாது."
+            "value": "இயக்கப்பட்டுள்ளவற்றுக்காக மட்டுமே Vespertine இணையத்தை அணுகும். தொடக்கத்திலேயே இயக்கத்தில் இருக்கும் சில இந்தப் பக்கத்தில் உள்ளன: வேண்டாதவற்றை முடக்குங்கள்."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "ఇక్కడ లేదా సెట్టింగ్‌లలో ఆన్ చేసి ఉంటే తప్ప Vespertine బ్యాక్‌గ్రౌండ్‌లో దేనినీ పంపదు."
+            "value": "ఆన్‌లో ఉన్న వాటి కోసం మాత్రమే Vespertine ఇంటర్నెట్‌ను చేరుకుంటుంది. మొదటి నుంచే ఆన్‌లో ఉండే కొన్ని ఈ పేజీలో ఉన్నాయి: మీకు వద్దనుకున్న వాటిని ఆఫ్ చేయండి."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine จะไม่ส่งสิ่งใดในเบื้องหลัง เว้นแต่จะเปิดไว้ ที่นี่หรือใน การตั้งค่า"
+            "value": "Vespertine จะเชื่อมต่ออินเทอร์เน็ตเฉพาะสำหรับสิ่งที่เปิดไว้เท่านั้น รายการไม่กี่อย่างที่เปิดไว้ตั้งแต่ต้นอยู่ในหน้านี้ ปิดรายการที่คุณไม่ต้องการได้"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine, burada ya da Ayarlar’da açılmadıkça arka planda hiçbir şey göndermez."
+            "value": "Vespertine internete yalnızca açık olan şeyler için bağlanır. Baştan açık gelen birkaç seçenek bu sayfadadır: istemediklerinizi kapatın."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine нічого не надсилає у фоні, якщо це не ввімкнено — тут або в Параметрах."
+            "value": "Vespertine звертається до інтернету лише для того, що ввімкнено. Ті кілька пунктів, які ввімкнено від початку, є на цій сторінці: вимкніть ті, що вам не потрібні."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine پس منظر میں کچھ نہیں بھیجتا، جب تک یہ آن نہ ہو، یہاں یا سیٹنگز میں۔"
+            "value": "Vespertine صرف ان چیزوں کے لیے انٹرنیٹ تک پہنچتا ہے جو آن ہیں۔ جو چند چیزیں شروع سے آن ہوتی ہیں وہ اسی صفحے پر ہیں: جو نہیں چاہییں انہیں بند کر دیں۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine không gửi gì trong nền trừ khi được bật, ở đây hoặc trong Cài đặt."
+            "value": "Vespertine chỉ truy cập internet cho những gì đang bật. Vài mục được bật sẵn nằm trên trang này: hãy tắt mục nào bạn không muốn."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "除非在这里或“设置”中打开，否则 Vespertine 不会在后台发送任何内容。"
+            "value": "Vespertine 只会为已打开的功能访问互联网。少数默认打开的项目都在本页：不需要的可以关闭。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "除非在這裡或「設定」中開啟，否則 Vespertine 不會在背景傳送任何內容。"
+            "value": "Vespertine 只會為已開啟的功能連上網際網路。少數預設開啟的項目都在此頁面：不需要的可以關閉。"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "除非在這裡或「設定」中開啟，否則 Vespertine 不會在背景傳送任何內容。"
+            "value": "Vespertine 只會為已開啟的功能連接互聯網。少數預設開啟的項目都在此頁面：不需要的可以關閉。"
           }
         }
       }
