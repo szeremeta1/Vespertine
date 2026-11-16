@@ -7,6 +7,7 @@ import Network
 import Observation
 import SwiftUI
 import UIKit
+import VespertineDecoders
 import VespertineRemoteClient
 import VespertineRemoteProtocol
 import VespertineShare
@@ -154,7 +155,7 @@ final class RemoteAppModel {
         closeShare()
         // Two connections: a song being played never waits behind a scan or a cover.
         let mac = ShareMac(id: share.id, name: share.name, files: share.files(), playback: share.files(), store: share.store,
-                           sayings: ShareWording.sayings, shrink: { data, size in ShareCovers.shrink(data, to: size) })
+                           sayings: ShareWording.sayings, decoders: PhoneDecoders(), shrink: { data, size in ShareCovers.shrink(data, to: size) })
         mac.onChange = { [weak self, weak mac] in
             guard let self, let mac, self.shareMac === mac else { return }
             self.noteShare(mac)

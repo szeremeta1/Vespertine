@@ -20,6 +20,9 @@ public enum StreamKind: String, Codable, Sendable, Equatable {
     /// PCM the phone itself makes of a song as it reads it (a DSD file on a share: its bits as DoP frames, or converted).
     /// Never sent by a Mac.
     case pcm
+    /// The song's own samples, decoded by the phone itself from a file it read (APE, WavPack, Ogg Vorbis or Opus on a
+    /// share) and given to its player as PCM. Never sent by a Mac.
+    case decoded
 }
 
 /// An audio format, as the phone needs to open it.

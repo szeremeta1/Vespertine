@@ -175,7 +175,7 @@ struct OutputsView: View {
         } footer: {
             VStack(alignment: .leading, spacing: 6) {
                 if let trouble = status.trouble { Text(trouble) }
-                Text("A scan reads only new and changed files, and runs by itself once a day when the share is opened. This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; APE, WavPack and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.")
+                Text("A scan reads only new and changed files, and runs by itself once a day when the share is opened. This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; DTS, TrueHD and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.")
             }
         }
     }

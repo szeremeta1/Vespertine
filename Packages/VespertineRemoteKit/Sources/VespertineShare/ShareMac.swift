@@ -134,6 +134,7 @@ public final class ShareMac: RemoteChannel {
     private let store: ShareStore
     private let sayings: ShareSayings
     private let shrink: @Sendable (Data, Int) -> Data?
+    private let decoders: (any ShareDecoders)?
     private let libraryWorker = ShareWorker("library")
     private let playbackWorker = ShareWorker("playback")
     private let now: @Sendable () -> Date
@@ -142,11 +143,22 @@ public final class ShareMac: RemoteChannel {
     private var isOpen = false
     private var scanning: Task<Void, Never>?
     private var stop: StopFlag?
-    /// An open stream: the song, and for a DSD file how it is given to the player (nil: the file's own bytes).
+    /// A file being decoded for the player. Only the playback worker touches the decoder.
+    private final class Decoding: @unchecked Sendable {
+        let decoder: any ShareDecoder
+        let rendering: DecodedRendering
+        init(_ decoder: any ShareDecoder) {
+            self.decoder = decoder
+            rendering = DecodedRendering(decoder.info)
+        }
+    }
+    /// An open stream: the song, and how it is given to the player: for a DSD file its `rendering`, for a file the app
+    /// has a decoder for its `decoding` (neither: the file's own bytes).
     private struct OpenStream {
         var song: ShareSong
         var rendering: DSDRendering?
-        var size: Int64 { rendering?.byteSize ?? song.size }
+        var decoding: Decoding?
+        var size: Int64 { rendering?.byteSize ?? decoding?.rendering.byteSize ?? song.size }
     }
     private var streams: [Int: OpenStream] = [:]
     private var nextStream = 0
@@ -155,8 +167,9 @@ public final class ShareMac: RemoteChannel {
     ///   - files: the share for browsing: scans and covers. `playback`: the same share on a connection of its own, so
     ///     a song being played never waits behind a scan.
     ///   - shrink: makes a cover no larger than a size in pixels (nil: use it as it is).
+    ///   - decoders: the kinds of file the app opens with a decoder library (APE, WavPack, Ogg Vorbis, Opus).
     public init(id: String, name: String, files: any ShareFiles, playback: any ShareFiles, store: ShareStore, sayings: ShareSayings = .english,
-                appVersion: String = "", now: @escaping @Sendable () -> Date = { Date() },
+                appVersion: String = "", decoders: (any ShareDecoders)? = nil, now: @escaping @Sendable () -> Date = { Date() },
                 shrink: @escaping @Sendable (Data, Int) -> Data? = { data, _ in data }) {
         info = ServerInfo(name: name, serverID: id, appVersion: appVersion)
         self.files = files
@@ -164,6 +177,7 @@ public final class ShareMac: RemoteChannel {
         self.store = store
         self.sayings = sayings
         self.shrink = shrink
+        self.decoders = decoders
         self.now = now
         favorites = store.favorites()
         library = store.library() ?? ShareLibrary()
@@ -234,6 +248,10 @@ public final class ShareMac: RemoteChannel {
                 if let rendering = open.rendering {
                     return try rendering.read(offset: offset, length: length) { try playback.read(path, offset: $0, length: $1) }
                 }
+                // A file the app decodes: the range is decoded from the frames it covers.
+                if let decoding = open.decoding {
+                    return try decoding.rendering.read(offset: offset, length: length, decoder: decoding.decoder)
+                }
                 return try playback.read(path, offset: offset, length: length)
             }
             noteReachable(true)
@@ -241,6 +259,9 @@ public final class ShareMac: RemoteChannel {
         } catch let error as SMBError {
             noteReachable(false)
             throw RemoteLinkError.readFailed(sayings.trouble(error))
+        } catch where open.decoding != nil {
+            // The decoder gave up on the file: it is damaged past where it opened.
+            throw RemoteLinkError.readFailed(sayings.changed)
         }
     }
 
@@ -256,7 +277,7 @@ public final class ShareMac: RemoteChannel {
         onChange?()
         let stop = StopFlag()
         self.stop = stop
-        let files = files, previous = library, started = now(), store = store, glimpseEvery = glimpseEvery
+        let files = files, previous = library, started = now(), store = store, glimpseEvery = glimpseEvery, decoders = decoders
         let moved: @Sendable (Int) -> Void = { [weak self] songs in Task { @MainActor in self?.scanMoved(songs) } }
         // Kept at once, on the scan's own thread: a scan cut short (the app closed, the share gone) carries on from it.
         let glimpsed: @Sendable (ShareLibrary) -> Void = { [weak self] partial in
@@ -268,7 +289,7 @@ public final class ShareMac: RemoteChannel {
             let result: Result<ShareLibrary, Error>
             do {
                 let scanned = try await libraryWorker.run {
-                    try ShareScanner.scan(files, previous: previous, now: started, glimpseEvery: glimpseEvery, progress: { moved($0.songs) }, glimpse: glimpsed, cancelled: { stop.isSet })
+                    try ShareScanner.scan(files, previous: previous, now: started, glimpseEvery: glimpseEvery, decoders: decoders, progress: { moved($0.songs) }, glimpse: glimpsed, cancelled: { stop.isSet })
                 }
                 result = .success(scanned)
             } catch {
@@ -391,14 +412,42 @@ public final class ShareMac: RemoteChannel {
             rendering = DSDRendering.plan(dsd, maxSampleRate: maxSampleRate, smaller: smaller, dop: dop)
             guard rendering != nil else { return .failed(reason: sayings.notInLibrary) }
         }
+        var decoding: Decoding?
+        let type = SongTagReader.fileExtension(song.fileName)
+        if rendering == nil, let decoders, decoders.extensions.contains(type) {
+            do {
+                decoding = try await playbackWorker.run {
+                    guard case .opened(let decoder) = try decoders.open(type: type, size: song.size, read: { try playback.read(song.path, offset: $0, length: $1) }),
+                          decoder.info.playsHere else { return nil }
+                    return Decoding(decoder)
+                }
+            } catch let error as SMBError {
+                noteReachable(false)
+                return .failed(reason: sayings.trouble(error))
+            } catch {
+                return .failed(reason: sayings.trouble(.closed))
+            }
+            guard isOpen else { return .failed(reason: "") }
+            // The file is not what was indexed (or no longer one the phone plays).
+            guard let opened = decoding, abs(opened.rendering.sampleRate - song.tags.sampleRate) < 0.5, opened.rendering.channels == song.tags.channels else {
+                return .failed(reason: sayings.changed)
+            }
+        }
         nextStream += 1
-        streams[nextStream] = OpenStream(song: song, rendering: rendering)
+        streams[nextStream] = OpenStream(song: song, rendering: rendering, decoding: decoding)
         // More than a handful open means some were never closed: the oldest go.
         for old in streams.keys.sorted().dropLast(8) { streams[old] = nil }
         if let rendering {
             return .streamOpened(StreamDescriptor(stream: nextStream, kind: .pcm, byteSize: rendering.byteSize, format: delivered(rendering),
                                                   frames: rendering.frames, tag: Self.tag(rendering, size: song.size, modified: song.modified),
                                                   chunkSize: RemoteProtocol.defaultChunkSize, dsdRate: rendering.form == .dop ? song.tags.sampleRate : nil))
+        }
+        if let decoded = decoding?.rendering {
+            let format = StreamFormat(codec: "PCM", container: "caf", sampleRate: decoded.sampleRate, bitDepth: decoded.float ? nil : decoded.sampleBytes * 8,
+                                      channels: decoded.channels, channelLabels: nil, lossless: song.tags.lossless)
+            return .streamOpened(StreamDescriptor(stream: nextStream, kind: .decoded, byteSize: decoded.byteSize, format: format, frames: decoded.frames,
+                                                  tag: "pcm\(Int(decoded.sampleRate))-" + Self.tag(size: song.size, modified: song.modified),
+                                                  chunkSize: RemoteProtocol.defaultChunkSize))
         }
         return .streamOpened(StreamDescriptor(stream: nextStream, kind: .original, byteSize: song.size, format: format(song), frames: song.tags.frames,
                                               tag: Self.tag(size: song.size, modified: song.modified), chunkSize: RemoteProtocol.defaultChunkSize))
@@ -521,6 +570,12 @@ public final class ShareMac: RemoteChannel {
                     guard let rendering = DSDRendering.plan(dsd, maxSampleRate: maxSampleRate) else { return nil }
                     return StreamInfo(id: id, streamable: true, kind: .pcm, source: format(song), delivered: delivered(rendering), macOnlyReason: nil,
                                       byteSize: nil, totalFrames: rendering.frames, replayGain: nil, encoderDelay: nil, endPadding: nil)
+                }
+                if decoders?.extensions.contains(SongTagReader.fileExtension(song.fileName)) ?? false {
+                    let delivered = StreamFormat(codec: "PCM", container: "caf", sampleRate: song.tags.sampleRate, bitDepth: song.tags.bitDepth,
+                                                 channels: song.tags.channels, channelLabels: nil, lossless: song.tags.lossless)
+                    return StreamInfo(id: id, streamable: true, kind: .decoded, source: format(song), delivered: delivered, macOnlyReason: nil,
+                                      byteSize: nil, totalFrames: song.tags.frames, replayGain: nil, encoderDelay: nil, endPadding: nil)
                 }
                 return StreamInfo(id: id, streamable: true, kind: .original, source: format(song), delivered: format(song), macOnlyReason: nil,
                                   byteSize: song.size, totalFrames: song.tags.frames, replayGain: nil, encoderDelay: nil, endPadding: nil)

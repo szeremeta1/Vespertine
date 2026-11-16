@@ -72,7 +72,10 @@ public enum ShareScanner {
     /// `glimpse`: while a share is scanned for the first time (no earlier scan ever finished), what has been found so
     /// far, every `glimpseEvery` songs and with `scanned` nil: a large library over a slow line can be browsed, and
     /// picked up again where it stopped, long before the scan is done.
+    ///
+    /// `decoders`: the kinds of file the app opens with a decoder library (DecodedFormats.swift).
     public static func scan(_ files: any ShareFiles, previous: ShareLibrary? = nil, now: Date = Date(), glimpseEvery: Int = 200,
+                            decoders: (any ShareDecoders)? = nil,
                             progress: (Progress) -> Void = { _ in }, glimpse: (ShareLibrary) -> Void = { _ in },
                             cancelled: () -> Bool = { false }) throws -> ShareLibrary {
         var known: [String: ShareSong] = [:]
@@ -107,8 +110,10 @@ public enum ShareScanner {
                     if let rank = coverNames.firstIndex(of: String(stem)), cover.map({ rank < $0.rank }) ?? true { cover = (rank, entry.name) }
                     continue
                 }
-                if SongTagReader.needsTheMac.contains(type) { library.needTheMac += 1; continue }
-                guard SongTagReader.playable.contains(type), entry.size > 0 else { continue }
+                // A kind the app has a decoder for is opened here, whatever the list of the Mac's kinds says.
+                let decoded = decoders?.extensions.contains(type) ?? false
+                if !decoded, SongTagReader.needsTheMac.contains(type) { library.needTheMac += 1; continue }
+                guard decoded || SongTagReader.playable.contains(type), entry.size > 0 else { continue }
                 if let old = known[path], old.size == entry.size, old.modified == entry.modified {
                     used.insert(old.id)
                     library.songs.append(old)
@@ -117,7 +122,15 @@ public enum ShareScanner {
                 if cancelled() { throw CancellationError() }
                 let tags: SongTags?
                 do {
-                    tags = try SongTagReader.read(name: entry.name, size: entry.size) { offset, length in try files.read(path, offset: offset, length: length) }
+                    if decoded, let decoders {
+                        switch try decoders.open(type: type, size: entry.size, read: { offset, length in try files.read(path, offset: offset, length: length) }) {
+                        case .opened(let decoder) where decoder.info.playsHere: tags = SongTagReader.tags(decoder.info, size: entry.size)
+                        case .opened, .needsTheMac: library.needTheMac += 1; continue
+                        case .unreadable: tags = nil
+                        }
+                    } else {
+                        tags = try SongTagReader.read(name: entry.name, size: entry.size) { offset, length in try files.read(path, offset: offset, length: length) }
+                    }
                 } catch let error as SMBError where !SMBShare.lineIsGone(error) && error != .unreachable {
                     tags = nil
                 }

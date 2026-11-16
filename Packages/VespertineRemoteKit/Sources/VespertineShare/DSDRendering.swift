@@ -31,7 +31,7 @@ public struct DSDRendering: Equatable, Sendable {
         return UInt8(out)
     }
     /// The CAF header before the samples.
-    public static let headerSize = 68
+    public static let headerSize = CAFHeader.size
     /// The highest PCM rate a conversion makes unless the output is said to take more (as the Mac's conversions).
     public static let defaultCeiling = 192_000.0
     /// The most of the file asked for in one read.
@@ -90,26 +90,7 @@ public struct DSDRendering: Equatable, Sendable {
     // MARK: The bytes
 
     /// The CAF header: big-endian 24-bit PCM. CAF, because its sizes are 64-bit (an hour of DSD128 as DoP is past WAV's 4 GB).
-    public var header: [UInt8] {
-        var out: [UInt8] = []
-        func put(_ value: UInt64, _ count: Int) { for shift in stride(from: (count - 1) * 8, through: 0, by: -8) { out.append(UInt8(truncatingIfNeeded: value >> UInt64(shift))) } }
-        out += Array("caff".utf8)
-        put(1, 2)                                   // file version
-        put(0, 2)                                   // file flags
-        out += Array("desc".utf8)
-        put(32, 8)
-        put(sampleRate.bitPattern, 8)
-        out += Array("lpcm".utf8)
-        put(0, 4)                                   // format flags: integer, big-endian
-        put(UInt64(channels * 3), 4)                // bytes per packet
-        put(1, 4)                                   // frames per packet
-        put(UInt64(channels), 4)
-        put(24, 4)                                  // bits per channel
-        out += Array("data".utf8)
-        put(UInt64(4 + frames * Int64(channels * 3)), 8)
-        put(0, 4)                                   // edit count
-        return out
-    }
+    public var header: [UInt8] { CAFHeader.bytes(sampleRate: sampleRate, channels: channels, sampleBytes: 3, float: false, frames: frames) }
 
     /// Up to `length` bytes of the file from `offset`; fewer only at its end. `fetch` reads a range of the DSD file.
     public func read(offset: Int64, length: Int, fetch: (Int64, Int) throws -> Data) throws -> Data {

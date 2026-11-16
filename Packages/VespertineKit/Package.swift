@@ -26,6 +26,9 @@ let package = Package(
         .package(path: "../VespertineAnalysis"),
         // Speaker layouts and Spatial Audio beds, shared with the iPhone player (VespertineChannels).
         .package(path: "../VespertineRemoteKit"),
+        // The iPhone's decoders for APE, WavPack, Ogg Vorbis and Opus: only the tests use them here, to hold them to the
+        // Mac's own decoding of the same files.
+        .package(path: "../VespertineDecoders"),
     ],
     targets: [
         // Real-time pieces (ring buffer, IOProc, meters) in plain C so the render
@@ -124,7 +127,9 @@ let package = Package(
         // Synthetic test media both test targets build (SACD images, DST frames, DSDIFF files).
         .target(name: "VespertineTestSupport", path: "Tests/VespertineTestSupport"),
         .testTarget(name: "VespertineAudioTests", dependencies: ["VespertineAudio", "CVespertineRT", "CVespertineGuard", "VespertineTestSupport", "VespertineLibrary",
-                                                                 .product(name: "SFBAudioEngine", package: "SFBAudioEngine")],
+                                                                 .product(name: "SFBAudioEngine", package: "SFBAudioEngine"),
+                                                                 .product(name: "VespertineDecoders", package: "VespertineDecoders"),
+                                                                 .product(name: "VespertineShare", package: "VespertineRemoteKit")],
                     resources: [.copy("Fixtures")]),
         .testTarget(name: "VespertineGroupProbeTests", dependencies: ["VespertineGroupProbe", "VespertineAudio"], resources: [.copy("Fixtures")]),
         .testTarget(name: "VespertineUPnPTests", dependencies: ["VespertineUPnP", "VespertineAudio",

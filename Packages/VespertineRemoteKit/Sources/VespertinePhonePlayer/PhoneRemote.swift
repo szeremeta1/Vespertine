@@ -86,9 +86,10 @@ public struct PhoneSignal: Equatable, Sendable {
 
     public init(stream: StreamDescriptor, route: PhoneRoute?) {
         dsdRate = stream.dsdRate
-        converted = stream.kind != .original
+        // A file this device decoded itself is the song's own file, as one iOS decodes is.
+        converted = stream.kind != .original && stream.kind != .decoded
         convertedHere = stream.kind == .pcm
-        cut = stream.kind != .original && stream.cut == true
+        cut = stream.kind == .flac && stream.cut == true
         lossless = stream.format.lossless
         streamRate = stream.format.sampleRate
         bitDepth = stream.format.bitDepth

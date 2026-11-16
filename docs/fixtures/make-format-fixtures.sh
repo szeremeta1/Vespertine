@@ -1,6 +1,7 @@
 #!/bin/zsh
 # Generates the format fixtures (1-2 s of synthesized tones) into out/. Needs ffmpeg (libopus, libmp3lame), flac/metaflac, afconvert.
 set -euo pipefail
+HERE=${0:A:h}
 mkdir -p out && cd out   # run from a scratch directory
 F() { ffmpeg -hide_banner -v error -y "$@"; }
 # Stereo 24-bit: L 440 Hz, R 550 Hz, 1 s.
@@ -22,6 +23,12 @@ F -i stereo24.wav -c:a aac -b:a 128k aac-stereo.mkv
 F -i stereo24.wav -c:a libmp3lame -b:a 192k mp3-stereo.mka
 F -i stereo24.wav -c:a vorbis -strict -2 -b:a 128k vorbis-stereo.webm
 F -i stereo24.wav -c:a pcm_s24le pcm-stereo.mka
+# For the iPhone's decoders (PhoneDecodersTests): APE made with the Monkey's Audio SDK itself (make-ape-fixture), Vorbis in Ogg.
+F -i stereo24.wav -c:a pcm_s16le stereo16.wav
+APE() { swift run --package-path "$HERE/make-ape-fixture" make-ape-fixture "$@"; }
+APE stereo16.wav ape-stereo16.ape "Monkey Tone" "The Vesper Quartet" "Formats" "3"
+APE stereo24.wav ape-stereo24.ape "Monkey Tone" "The Vesper Quartet" "Formats" "3"
+F -i stereo24.wav -c:a vorbis -strict -2 -b:a 128k -metadata title="Vorbis Tone" -metadata artist="The Vesper Quartet" -metadata album="Formats" -metadata track="4" vorbis-stereo.ogg
 # Gapless: 2 s of a cosine (starts at full scale: a delay shows as a mismatch from the first sample).
 F -f lavfi -i "aevalsrc=0.5*cos(2*PI*440*t):s=48000:d=2" -c:a pcm_s16le cos2s.wav
 F -i cos2s.wav -c:a libmp3lame -b:a 192k gapless.mp3
