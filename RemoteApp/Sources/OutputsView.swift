@@ -96,6 +96,10 @@ struct OutputsView: View {
                     } footer: {
                         Text("Choose one of these and Vespertine on the Mac plays there.")
                     }
+                    // The sound of the output the Mac plays to, while the Mac is what plays.
+                    if !playsHere, let player = session.player, let sound = player.sound, !sound.isEmpty {
+                        MacSoundSection(session: session, sound: sound, output: player.output, feedback: feedback)
+                    }
                     Section {
                         LabeledContent("Mac", value: session.server?.name ?? session.pairing.name)
                         if let version = session.server?.appVersion, !version.isEmpty {
