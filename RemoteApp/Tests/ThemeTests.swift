@@ -38,6 +38,22 @@ import UIKit
         #expect(parts(UIColor(Palette.text2), .light) == parts(Palette.text2UI, .light))
     }
 
+    /// The sidebar's chosen row is drawn on the accent colour: its words must be readable there in both appearances
+    /// (ivory on bright brass was about 2 to 1).
+    @Test @MainActor func wordsOnTheChosenSidebarRowAreReadable() {
+        func luminance(_ colour: UIColor, _ style: UIUserInterfaceStyle) -> Double {
+            var (r, g, b, a): (CGFloat, CGFloat, CGFloat, CGFloat) = (0, 0, 0, 0)
+            colour.resolvedColor(with: UITraitCollection(userInterfaceStyle: style)).getRed(&r, green: &g, blue: &b, alpha: &a)
+            func linear(_ c: CGFloat) -> Double { c <= 0.03928 ? Double(c) / 12.92 : pow((Double(c) + 0.055) / 1.055, 2.4) }
+            return 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b)
+        }
+        for style in [UIUserInterfaceStyle.light, .dark] {
+            let (words, row) = (luminance(Palette.onBrassUI, style), luminance(Palette.brassUI, style))
+            let contrast = (max(words, row) + 0.05) / (min(words, row) + 0.05)
+            #expect(contrast >= 4.5)
+        }
+    }
+
     /// It shows only while this device is the one playing: it can't change where a Mac plays.
     @Test func theAirPlayButtonShowsOnlyWhenThisDevicePlays() {
         #expect(RoutePickerPlacement.shows(playsHere: true))

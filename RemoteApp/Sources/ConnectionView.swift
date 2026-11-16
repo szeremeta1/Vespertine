@@ -33,6 +33,7 @@ nonisolated enum AddressEntry: Equatable {
 struct MacConnectionView: View {
     @Environment(RemoteAppModel.self) private var model
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var typeSize
     let serverID: String
     @State private var text = ""
     @State private var loaded = false
@@ -150,7 +151,8 @@ struct MacConnectionView: View {
             Image(systemName: systemImage).foregroundStyle(good ? Palette.brass : Palette.text3).rowIconColumn()
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                Text(detail).font(.signal(.caption)).foregroundStyle(Palette.text2).lineLimit(1).truncationMode(.middle)
+                Text(detail).font(.signal(.caption)).foregroundStyle(Palette.text2)
+                    .lineLimit(RemoteLayout.rowDetailLines(accessibilityText: typeSize.isAccessibilitySize)).truncationMode(.middle)
             }
             Spacer(minLength: 0)
             if active {

@@ -67,6 +67,11 @@ final class AdaptiveLayoutTests: XCTestCase {
         XCTAssertLessThan(RemoteLayout.bannerLargestText, .accessibility3)
     }
 
+    func testTheSidebarIsWiderAtAccessibilityTextSizes() {
+        XCTAssertEqual(RemoteLayout.sidebarWidth(accessibilityText: false).ideal, 250)
+        XCTAssertGreaterThan(RemoteLayout.sidebarWidth(accessibilityText: true).min, RemoteLayout.sidebarWidth(accessibilityText: false).max)
+    }
+
     func testASongWithCopiesGivesItsLengthsPlaceToTheCopiesButtonOnANarrowWindow() {
         XCTAssertTrue(RemoteLayout.rowShowsLength(copies: 0, regularWidth: false))
         XCTAssertTrue(RemoteLayout.rowShowsLength(copies: 1, regularWidth: false))

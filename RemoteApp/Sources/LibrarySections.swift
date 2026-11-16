@@ -13,16 +13,24 @@ struct CountedLabel: View {
     let title: String
     let symbol: String
     var count: Int?
+    /// The row is the sidebar's chosen one, drawn on brass: its words are ink, as on the play button, not ivory on tan.
+    var selected = false
     @Environment(\.dynamicTypeSize) private var typeSize
 
+    private var quiet: Color { selected ? Palette.onBrass.opacity(0.75) : Palette.text3 }
+
     var body: some View {
+        if selected { label.foregroundStyle(Palette.onBrass) } else { label }
+    }
+
+    private var label: some View {
         Label {
             if typeSize.isAccessibilitySize {
                 // At the largest sizes the name gets the whole width and wraps; the count goes under it.
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title).lineLimit(RemoteLayout.rowTitleLines(accessibilityText: true))
                     if let count, count > 0 {
-                        Text(count.formatted()).font(.signal(.caption)).foregroundStyle(Palette.text3)
+                        Text(count.formatted()).font(.signal(.caption)).foregroundStyle(quiet)
                     }
                 }
             } else {
@@ -30,7 +38,7 @@ struct CountedLabel: View {
                     Text(title).lineLimit(RemoteLayout.rowTitleLines(accessibilityText: false)).minimumScaleFactor(0.8)
                     Spacer()
                     if let count, count > 0 {
-                        Text(count.formatted()).font(.signal(.caption)).foregroundStyle(Palette.text3).fixedSize()
+                        Text(count.formatted()).font(.signal(.caption)).foregroundStyle(quiet).fixedSize()
                     }
                 }
             }
@@ -44,6 +52,9 @@ struct CountedLabel: View {
 /// A source as the Mac's sidebar lists it: its kind's symbol, its name, and whether it's offline or being scanned.
 struct SourceLabel: View {
     let source: SourceSummary
+    /// The sidebar's chosen row, drawn on brass (see `CountedLabel.selected`).
+    var selected = false
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     static func symbol(_ kind: SourceKind) -> String {
         switch kind {
@@ -55,22 +66,26 @@ struct SourceLabel: View {
     }
 
     var body: some View {
+        if selected { label.foregroundStyle(Palette.onBrass) } else { label }
+    }
+
+    private var label: some View {
         Label {
             HStack {
-                Text(source.name).lineLimit(1).truncationMode(.middle)
+                Text(source.name).lineLimit(RemoteLayout.rowDetailLines(accessibilityText: typeSize.isAccessibilitySize)).truncationMode(.middle)
                 Spacer(minLength: 4)
                 if source.scanning {
                     ProgressView().controlSize(.mini)
                 } else if !source.online {
                     Text("OFFLINE")
                         .font(.signal(.caption2).weight(.semibold))
-                        .foregroundStyle(Palette.text3)
+                        .foregroundStyle(selected ? Palette.onBrass.opacity(0.75) : Palette.text3)
                         .padding(.horizontal, 4).padding(.vertical, 2)
                         .overlay(RoundedRectangle(cornerRadius: 3).strokeBorder(Palette.hairlineStrong))
                 }
             }
         } icon: {
-            Image(systemName: Self.symbol(source.kind))
+            if !RemoteLayout.rowStacks(accessibilityText: typeSize.isAccessibilitySize) { Image(systemName: Self.symbol(source.kind)) }
         }
         .opacity(source.online ? 1 : 0.55)
         .accessibilityElement(children: .combine)

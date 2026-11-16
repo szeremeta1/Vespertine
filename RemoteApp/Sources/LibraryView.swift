@@ -424,18 +424,25 @@ struct AlbumView: View {
                 Chip(text: album.format, highlighted: album.hiRes || album.dsd)
                 if let year = album.year { Chip(text: String(year)) }
             }
-            HStack {
-                Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: false)) } label: {
-                    Label("Play", systemImage: "play.fill").frame(maxWidth: .infinity)
-                }
-                Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: true)) } label: {
-                    Label("Shuffle", systemImage: "shuffle").frame(maxWidth: .infinity)
-                }
+            // Side by side while both words fit on a line each; one over the other when they don't (beside the cover on an
+            // iPad with its sidebar open, and at the largest text sizes), never a word broken across lines.
+            ViewThatFits(in: .horizontal) {
+                HStack { playButtons }
+                VStack(spacing: 8) { playButtons }
             }
             .buttonStyle(.bordered)
             .disabled(!session.isConnected)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder private var playButtons: some View {
+        Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: false)) } label: {
+            Label("Play", systemImage: "play.fill").lineLimit(1).frame(maxWidth: .infinity)
+        }
+        Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: true)) } label: {
+            Label("Shuffle", systemImage: "shuffle").lineLimit(1).frame(maxWidth: .infinity)
+        }
     }
 }
 

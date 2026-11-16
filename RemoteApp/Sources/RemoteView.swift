@@ -11,6 +11,7 @@ import VespertineShare
 struct RemoteView: View {
     @Environment(RemoteAppModel.self) private var model
     @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var typeSize
     let session: RemoteSession
     @State private var destination: RemoteDestination = .nowPlaying
     @State private var visibility: NavigationSplitViewVisibility = .all
@@ -42,7 +43,8 @@ struct RemoteView: View {
     }
 
     private var splitView: some View {
-        NavigationSplitView(columnVisibility: $visibility) {
+        let sidebar = RemoteLayout.sidebarWidth(accessibilityText: typeSize.isAccessibilitySize)
+        return NavigationSplitView(columnVisibility: $visibility) {
             List(selection: Binding<RemoteDestination?>(get: { destination }, set: {
                 if let selected = $0 { destination = selected }
             })) {
@@ -65,7 +67,7 @@ struct RemoteView: View {
                 if !session.isShare, let sources = overview?.sources, !sources.isEmpty {
                     Section("Sources") {
                         ForEach(sources) { source in
-                            NavigationLink(value: RemoteDestination.source(source.id)) { SourceLabel(source: source) }
+                            NavigationLink(value: RemoteDestination.source(source.id)) { SourceLabel(source: source, selected: destination == .source(source.id)) }
                                 .accessibilityIdentifier("sidebar-source")
                                 .hoverEffect(.highlight)
                         }
@@ -76,7 +78,7 @@ struct RemoteView: View {
             .listStyle(.sidebar)
             .obsidianList()
             .navigationTitle(session.pairing.name)
-            .navigationSplitViewColumnWidth(min: 220, ideal: 250, max: 300)
+            .navigationSplitViewColumnWidth(min: sidebar.min, ideal: sidebar.ideal, max: sidebar.max)
             .toolbar {
                 ToolbarItem(placement: .bottomBar) {
                     Button("Macs", systemImage: "desktopcomputer") { model.leave() }
@@ -101,7 +103,7 @@ struct RemoteView: View {
     }
 
     private func sidebarLink(_ place: RemoteDestination, count: Int? = nil) -> some View {
-        NavigationLink(value: place) { CountedLabel(title: place.title, symbol: place.symbol, count: count) }
+        NavigationLink(value: place) { CountedLabel(title: place.title, symbol: place.symbol, count: count, selected: destination == place) }
             .accessibilityIdentifier("sidebar-" + place.id)
             .hoverEffect(.highlight)
     }

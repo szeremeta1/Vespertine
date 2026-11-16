@@ -9,13 +9,15 @@ import VespertineShare
 /// A share in the list of Macs: where it is, in a line.
 struct ShareRow: View {
     let share: SavedShare
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "externaldrive.connected.to.line.below").foregroundStyle(Palette.brass).rowIconColumn()
             VStack(alignment: .leading, spacing: 2) {
                 Text(share.name).font(.serif(.body, weight: .medium)).foregroundStyle(Palette.text)
-                Text(verbatim: share.address.display).font(.caption).foregroundStyle(Palette.text2).lineLimit(1).truncationMode(.middle)
+                Text(verbatim: share.address.display).font(.caption).foregroundStyle(Palette.text2)
+                    .lineLimit(RemoteLayout.rowDetailLines(accessibilityText: typeSize.isAccessibilitySize)).truncationMode(.middle)
             }
             Spacer(minLength: 0)
         }

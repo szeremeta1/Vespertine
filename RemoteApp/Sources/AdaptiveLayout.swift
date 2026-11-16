@@ -157,6 +157,11 @@ nonisolated enum RemoteLayout {
     /// The width of a row's symbol column at the ordinary text size (it grows with the text).
     static let rowIconWidth: CGFloat = 28
 
+    /// The sidebar's width: wider at the accessibility text sizes, where 250 points broke "Queue" and "Songs" in two.
+    static func sidebarWidth(accessibilityText: Bool) -> (min: CGFloat, ideal: CGFloat, max: CGFloat) {
+        accessibilityText ? (320, 400, 460) : (220, 250, 300)
+    }
+
     /// The largest text a banner above the screens follows. Past it, a notice took two fifths of a small screen and was
     /// still cut short.
     static let bannerLargestText = DynamicTypeSize.accessibility1

@@ -19,6 +19,10 @@ enum Palette {
     static let brass = Color(uiColor: brassUI)
     static let brassHi = adaptive(light: 0x7C6541, dark: 0xE7CD98)
     static let brassLo = Color(hex: 0x7C6541)
+    /// Words and symbols on the accent colour (the sidebar's chosen row): ink on the dark appearance's bright brass,
+    /// white on the light appearance's deep brass.
+    static let onBrass = Color(uiColor: onBrassUI)
+    static let onBrassUI = dynamic(light: 0xFFFFFF, dark: 0x1A140A)
     static let copper = adaptive(light: 0x7C6541, dark: 0xC98B5B)
     // The transport is always a brass object, with dark ink in both appearances.
     static let brassGradient = LinearGradient(colors: [Color(hex: 0xE7CD98), Color(hex: 0xC8A66A)], startPoint: .top, endPoint: .bottom)
@@ -88,16 +92,22 @@ extension View {
 }
 
 extension View {
-    /// The column a row's symbol (or track number) sits in: 28 points at ordinary text sizes, and wider as the text grows,
-    /// so a large symbol never runs into the words beside it.
+    /// The column a row's symbol (or track number) sits in: 28 points at the ordinary text size, growing with the text so
+    /// a symbol never runs into the words beside it. At the accessibility sizes the symbol steps aside altogether: the
+    /// words say the same thing and need the width ("Studio Mac mini" broke in the middle of "Studio" beside it).
     func rowIconColumn(alignment: Alignment = .center) -> some View { modifier(RowIconColumn(alignment: alignment)) }
 }
 
 private struct RowIconColumn: ViewModifier {
     let alignment: Alignment
+    @Environment(\.dynamicTypeSize) private var typeSize
     @ScaledMetric(relativeTo: .body) private var width: CGFloat = RemoteLayout.rowIconWidth
 
-    func body(content: Content) -> some View { content.frame(width: width, alignment: alignment) }
+    func body(content: Content) -> some View {
+        if !RemoteLayout.rowStacks(accessibilityText: typeSize.isAccessibilitySize) {
+            content.frame(width: width, alignment: alignment)
+        }
+    }
 }
 
 /// A list row for a song, an album or an artist: a picture or number, a name over a quieter line, and what trails it
