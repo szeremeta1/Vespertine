@@ -49,7 +49,7 @@ struct LocalLibraryHiddenTests {
         #expect(off.tracksByID.isEmpty)
         #expect(off.artists.isEmpty)
         #expect(off.genres.isEmpty)
-        #expect(off.playlistTracks.allSatisfy(\.isEmpty), "the listener's playlists stay, without the songs that are left out")
+        #expect(off.playlistTracks.allSatisfy { $0.isEmpty }, "the listener's playlists stay, without the songs that are left out")
         #expect(off.playlists.map(\.name) == filesOnly.playlists.map(\.name))
         #expect(off.search.isEmpty)
         #expect(off.searchSubstring.isEmpty)
@@ -84,7 +84,7 @@ struct LocalLibraryHiddenTests {
         database.showsFiles = false
         let servers = try LibraryAnswers(database)
         #expect(servers.tracks.count == 2)
-        #expect(servers.tracks.allSatisfy(\.isStreamed))
+        #expect(servers.tracks.allSatisfy { $0.isStreamed })
         #expect(Set(servers.albums.map(\.title)) == ["Quiet Hours", "Tidewater"])
         #expect(servers.albums.first { $0.title == "Quiet Hours" }?.trackCount == 1, "only the server's copy of the shared album")
         #expect(Set(servers.artists.map(\.name)) == ["The Night Shift", "Mira Vale"])
