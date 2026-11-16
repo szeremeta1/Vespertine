@@ -36,7 +36,26 @@ struct RAOPRecordTests {
         #expect(AirPlayDevice(deviceID: r.deviceID, name: r.name, raop: r).support == .supported(.rsa))
     }
 
-    @Test("FairPlay/MFi-only receivers and AirPlay 2-only devices are listed as not supported yet")
+    @Test("MFi receivers (et 4) are supported, sent unencrypted after auth-setup; the others ask for none")
+    func mfi() throws {
+        func device(_ et: String) throws -> AirPlayDevice {
+            let r = try #require(RAOPRecord.parse(serviceName: "AABBCCDDEEFF@Speaker", txt: ["et": et, "cn": "0,1", "tp": "UDP"]))
+            return AirPlayDevice(deviceID: r.deviceID, name: r.name, raop: r)
+        }
+        #expect(try device("4").support == .supported(.none))
+        #expect(try device("4").needsAuthSetup)
+        #expect(try device("0,4").support == .supported(.none))
+        #expect(try device("0,4").needsAuthSetup)
+        // RSA is the fallback only when neither none nor MFi is offered.
+        #expect(try device("1,4").support == .supported(.none))
+        #expect(try device("0").needsAuthSetup == false)
+        #expect(try device("1").needsAuthSetup == false)
+        #expect(try device("3,5").needsAuthSetup == false)
+        let ap2 = try #require(AirPlayRecord.parse(serviceName: "Kitchen", txt: ["deviceid": "AA:BB:CC:DD:EE:01"]))
+        #expect(AirPlayDevice(deviceID: ap2.deviceID, name: ap2.name, raop: nil, airplay: ap2).needsAuthSetup == false)
+    }
+
+    @Test("FairPlay-only receivers and AirPlay 2-only devices are listed as not supported yet")
     func unsupported() throws {
         let fp = try #require(RAOPRecord.parse(serviceName: "AABBCCDDEEFF@TV", txt: ["et": "3,5", "cn": "1"]))
         #expect(AirPlayDevice(deviceID: fp.deviceID, name: fp.name, raop: fp).support == .unsupported(AirPlayDevice.airPlay2Only))

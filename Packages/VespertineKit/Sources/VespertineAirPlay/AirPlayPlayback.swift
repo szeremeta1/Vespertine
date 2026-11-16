@@ -468,7 +468,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             }
             if !open {
                 let made = RAOPSession(name: device.name, endpoint: endpoint, encryption: encryption, rsaKey: rsaKey,
-                                       password: device.needsPassword ? passwordProvider?() : nil)
+                                       authSetup: device.needsAuthSetup, password: device.needsPassword ? passwordProvider?() : nil)
                 made.onLost = { [weak self] in self?.enqueue.yield(.lost) }
                 let volume = state.withLock { $0.receiverVolumeDB }
                 try await made.connect(volumeDB: volume)

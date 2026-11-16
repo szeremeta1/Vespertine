@@ -62,6 +62,30 @@ struct AirPlayPlaybackTests {
         #expect(parameters.contains { String(decoding: $0.body, as: UTF8.self).hasPrefix("progress: ") })
     }
 
+    @Test("A song plays on an MFi receiver (et 4) that refuses everything until auth-setup")
+    func mfiReceiver() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.requiresAuthSetup = true
+        let (url, samples) = try writeWAV(seconds: 0.6, seed: 21)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let record = try #require(RAOPRecord.parse(serviceName: "B827EB000004@Speaker", txt: ["et": "4", "md": "0,2", "cn": "0,1", "tp": "UDP"]))
+        var device = AirPlayDevice(deviceID: record.deviceID, name: record.name, raop: record)
+        device.host = "127.0.0.1"
+        device.port = receiver.port
+        let p = try #require(AirPlayPlayback(device: device))
+        defer { p.shutdown() }
+        let log = EventLog()
+        p.eventHandler = { event in log.events.append(event) }
+        let item = PlayableItem(url: url)
+        p.play(item, at: 0)
+        await wait { log.ended }
+        #expect(log.started == [item.id])
+        #expect(log.failures.isEmpty)
+        #expect(Array(receiver.methods.prefix(5)) == ["OPTIONS", "POST", "ANNOUNCE", "SETUP", "RECORD"])
+        #expect(Array(receiver.samples.map(Int32.init).prefix(samples.count)) == samples)
+    }
+
     func locked(_ receiver: FakeRAOPReceiver, pw: String = "true") throws -> (AirPlayPlayback, EventLog) {
         let record = try #require(RAOPRecord.parse(serviceName: "B827EB000005@Den", txt: ["et": "0", "md": "0,2", "cn": "0,1", "pw": pw]))
         var device = AirPlayDevice(deviceID: record.deviceID, name: record.name, raop: record)

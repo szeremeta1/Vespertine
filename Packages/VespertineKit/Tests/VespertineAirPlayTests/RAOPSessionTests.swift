@@ -96,6 +96,52 @@ struct RAOPSessionTests {
         #expect(receiver.methods.count == 5)
     }
 
+    @Test("An MFi receiver is sent auth-setup after OPTIONS: 0x01 and a 32-byte key, new each time; then the session as usual")
+    func authSetup() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.requiresAuthSetup = true
+        let session = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none, authSetup: true)
+        try await session.connect(volumeDB: nil)
+        #expect(receiver.methods == ["OPTIONS", "POST", "ANNOUNCE", "SETUP", "RECORD"])
+        let post = receiver.requests[1]
+        #expect(post.url == "/auth-setup")
+        #expect(post["Content-Type"] == "application/octet-stream")
+        #expect(post.body.count == 33 && post.body.first == MFiAuthSetup.unencrypted)
+        #expect(post.body.dropFirst() != Data(count: 32))
+        #expect(MFiAuthSetup.body() != MFiAuthSetup.body())
+        #expect(MFiAuthSetup.body(publicKey: Data(repeating: 9, count: 32)) == Data([0x01]) + Data(repeating: 9, count: 32))
+        // The audio is unencrypted, as the 0x01 said.
+        #expect(!String(decoding: receiver.requests[2].body, as: UTF8.self).contains("rsaaeskey"))
+        let samples = (0..<704).map { Int16(truncatingIfNeeded: $0 &* 37) }
+        session.send(Array(samples[0..<704]))
+        await receiver.waitFor { receiver.samples.count >= 704 }
+        #expect(Array(receiver.samples.prefix(704)) == samples)
+        await session.teardown()
+    }
+
+    @Test("Without auth-setup an MFi receiver refuses the session (what a receiver did before Vespertine sent it)")
+    func authSetupMissing() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.requiresAuthSetup = true
+        let session = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none)
+        await #expect(throws: RAOPError.refused("ANNOUNCE", 403)) { try await session.connect(volumeDB: nil) }
+        #expect(!receiver.methods.contains("POST"))
+    }
+
+    @Test("A receiver that lists MFi and refuses auth-setup is still tried: the session goes on without it")
+    func authSetupRefused() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.refuse = ["POST": 404]
+        let session = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none, authSetup: true)
+        try await session.connect(volumeDB: nil)
+        #expect(receiver.methods == ["OPTIONS", "POST", "ANNOUNCE", "SETUP", "RECORD"])
+        #expect(session.isConnected)
+        await session.teardown()
+    }
+
     @Test("Handshake in order, with the SDP, ports and RTP-Info; the audio decodes to exactly what was sent")
     func plain() async throws {
         let receiver = try FakeRAOPReceiver()

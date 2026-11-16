@@ -7,16 +7,30 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
+import CryptoKit
 import Foundation
 import Network
 import os
 import Security
 import VespertineAudio
 
+/// What a sender sends an MFi receiver before a session (`POST /auth-setup`): that the audio will come unencrypted, and a
+/// Curve25519 public key made for this one request. The receiver answers with its own key, its MFi certificate and a
+/// signature; a sender has no use for them (it isn't checking that the receiver is licensed), only for the 200.
+public enum MFiAuthSetup {
+    /// "The audio is not encrypted."
+    public static let unencrypted: UInt8 = 0x01
+
+    public static func body(publicKey: Data = Curve25519.KeyAgreement.PrivateKey().publicKey.rawRepresentation) -> Data {
+        Data([unencrypted]) + publicKey
+    }
+}
+
 public final class RAOPSession: @unchecked Sendable {
     public let name: String
     private let endpoint: NWEndpoint
     private let encryption: RAOPEncryption
+    private let authSetup: Bool
     private let rsaKey: SecKey?
     private let password: String?
     private let log = Logger(subsystem: "org.szeremeta.vespertine.player", category: "airplay")
@@ -81,12 +95,15 @@ public final class RAOPSession: @unchecked Sendable {
     public static let silenceBeforeProbe: TimeInterval = 8
 
     /// `rsaKey`: the key the AES key is wrapped with (the AirPort Express key unless a test gives its own).
+    /// `authSetup`: the receiver lists MFi authentication, so the session introduces itself with `POST /auth-setup` first.
     /// `password`: the receiver's, when it has one (asked for by its 401; never sent, only its digest).
-    public init(name: String, endpoint: NWEndpoint, encryption: RAOPEncryption, rsaKey: SecKey? = nil, password: String? = nil) {
+    public init(name: String, endpoint: NWEndpoint, encryption: RAOPEncryption, rsaKey: SecKey? = nil, authSetup: Bool = false,
+                password: String? = nil) {
         self.name = name
         self.password = password.flatMap { $0.isEmpty ? nil : $0 }
         self.endpoint = endpoint
         self.encryption = encryption
+        self.authSetup = authSetup
         self.rsaKey = rsaKey ?? (encryption == .rsa ? try? RSAWrap.airPortExpressKey() : nil)
         // Apple's encoder if its configuration is the SDP's; the verbatim frame otherwise (lossless either way).
         encoder = try? ALACEncoder()
@@ -159,6 +176,15 @@ public final class RAOPSession: @unchecked Sendable {
             guard !host.isEmpty, !host.contains(":") else { throw RAOPError.unreachable }
             state.withLock { $0.host = host }
             _ = try await request("OPTIONS", url: "*")
+            if authSetup {
+                // A receiver that lists MFi and refuses this may still take the session (some list it and don't ask for
+                // it); one that needs it refuses the ANNOUNCE next, and that is the error shown. A lost connection is one.
+                do {
+                    _ = try await request("POST", url: "/auth-setup", headers: [("Content-Type", "application/octet-stream")], body: MFiAuthSetup.body())
+                } catch RAOPError.refused(_, let status) {
+                    log.info("AirPlay \(self.name, privacy: .public) refused auth-setup (\(status)); going on without")
+                }
+            }
             var rsa: Data?
             var extra: [(String, String)] = [("Content-Type", "application/sdp")]
             if encryption == .rsa {
