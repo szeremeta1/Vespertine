@@ -60,7 +60,8 @@ struct LocalLibraryHiddenTests {
         #expect(off.stats.albums == 0)
         #expect(off.accounts.isEmpty)
         #expect(try database.tracks(ids: ids).isEmpty)
-        #expect(try database.writer.read { db in try database.visibleTracksClause(db) } == "0")
+        let clause = try await database.writer.read { db in try database.visibleTracksClause(db) }
+        #expect(clause == "0")
 
         // Nothing was deleted: the rows are where they were, and every answer comes back with the switches.
         let rows = try await database.writer.read { db in try Int.fetchOne(db, sql: "SELECT count(*) FROM track") }
