@@ -302088,6 +302088,544 @@
         }
       }
     },
+    "More ways to play": {
+      "comment": "Setup assistant: the heading of the page with the switches for network players, AirPlay players, receiving music from other apps, and music servers.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ተጨማሪ የማጫወቻ መንገዶች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "طرق أخرى للتشغيل"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "চালানোর আরও উপায়"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Další způsoby přehrávání"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flere måder at afspille på"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weitere Wiedergabemöglichkeiten"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Περισσότεροι τρόποι αναπαραγωγής"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más formas de reproducir"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "راه‌های بیشتر برای پخش"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lisää toistotapoja"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iba pang paraan ng pag-play"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autres façons d’écouter"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વગાડવાની વધુ રીતો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙarin hanyoyin kunnawa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "דרכים נוספות להשמיע"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "चलाने के और तरीक़े"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "További lejátszási módok"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cara lain untuk memutar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altri modi di riprodurre"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その他の再生方法"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪ್ಲೇ ಮಾಡಲು ಇನ್ನಷ್ಟು ವಿಧಾನಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "더 많은 재생 방법"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പ്ലേ ചെയ്യാൻ കൂടുതൽ വഴികൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्ले करण्याचे आणखी मार्ग"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lebih banyak cara untuk memainkan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Flere måter å spille på"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Meer manieren om af te spelen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਚਲਾਉਣ ਦੇ ਹੋਰ ਤਰੀਕੇ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Więcej sposobów odtwarzania"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais formas de reproduzir"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mais formas de reproduzir"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mai multe moduri de redare"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fler sätt att spela"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Njia zaidi za kucheza"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இயக்க மேலும் வழிகள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ప్లే చేయడానికి మరిన్ని మార్గాలు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "วิธีเล่นเพิ่มเติม"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daha fazla çalma yolu"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Інші способи відтворення"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "چلانے کے مزید طریقے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm cách để phát"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更多播放方式"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更多播放方式"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更多播放方式"
+          }
+        }
+      }
+    },
+    "Play to other players on your network, take music from other apps, or add your own music server. Each stays off until you switch it on, here or in Settings.": {
+      "comment": "Setup assistant, More ways to play page: the sentence under the heading. The four switches below it are network players (UPnP), AirPlay players, Receive from Other Apps and Music Servers.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በአውታረ መረብዎ ላይ ባሉ ሌሎች ማጫወቻዎች ያጫውቱ፣ ከሌሎች መተግበሪያዎች ሙዚቃ ይቀበሉ፣ ወይም የራስዎን የሙዚቃ አገልጋይ ያክሉ። እያንዳንዱ እዚህ ወይም በቅንብሮች ውስጥ እስኪያበሩት ድረስ ጠፍቶ ይቆያል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "شغّل على مشغّلات أخرى على شبكتك، أو استقبل الموسيقى من تطبيقات أخرى، أو أضف خادم الموسيقى الخاص بك. يبقى كل منها متوقفًا إلى أن تفعّله، هنا أو في الإعدادات."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনার নেটওয়ার্কের অন্য প্লেয়ারে চালান, অন্য অ্যাপ থেকে মিউজিক নিন, অথবা নিজের মিউজিক সার্ভার যোগ করুন। এখানে বা সেটিংসে চালু না করা পর্যন্ত প্রতিটিই বন্ধ থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehrávejte na jiných přehrávačích ve své síti, přijímejte hudbu z jiných aplikací nebo přidejte vlastní hudební server. Každá z možností zůstává vypnutá, dokud ji nezapnete – tady nebo v Nastavení."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspil på andre afspillere på dit netværk, modtag musik fra andre apps, eller tilføj din egen musikserver. Hver af dem er slået fra, indtil du slår den til, her eller i Indstillinger."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiele auf anderen Playern in deinem Netzwerk ab, empfange Musik von anderen Apps oder füge deinen eigenen Musikserver hinzu. Alles bleibt ausgeschaltet, bis du es einschaltest – hier oder in den Einstellungen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Παίξτε σε άλλους αναπαραγωγείς του δικτύου σας, δεχτείτε μουσική από άλλες εφαρμογές ή προσθέστε τον δικό σας διακομιστή μουσικής. Το καθένα μένει απενεργοποιημένο μέχρι να το ενεργοποιήσετε, εδώ ή στις Ρυθμίσεις."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduce en otros reproductores de tu red, recibe música de otras apps o añade tu propio servidor de música. Cada opción sigue desactivada hasta que la actives, aquí o en Ajustes."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روی پخش‌کننده‌های دیگر شبکه‌تان پخش کنید، از برنامه‌های دیگر موسیقی بگیرید یا سرور موسیقی خودتان را اضافه کنید. هرکدام تا وقتی آن را روشن نکنید خاموش می‌ماند، اینجا یا در تنظیمات."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toista verkkosi muilla soittimilla, vastaanota musiikkia muista apeista tai lisää oma musiikkipalvelimesi. Jokainen pysyy pois käytöstä, kunnes otat sen käyttöön täällä tai Asetuksissa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mag-play sa ibang mga player sa network mo, tumanggap ng musika mula sa ibang app, o idagdag ang sarili mong music server. Naka-off ang bawat isa hangga’t hindi mo ino-on, dito o sa Settings."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écoutez sur d’autres lecteurs de votre réseau, recevez de la musique d’autres apps ou ajoutez votre propre serveur de musique. Chaque option reste désactivée tant que vous ne l’activez pas, ici ou dans les Réglages."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમારા નેટવર્ક પરના બીજા પ્લેયર પર વગાડો, બીજી ઍપમાંથી મ્યુઝિક લો, અથવા તમારું પોતાનું મ્યુઝિક સર્વર ઉમેરો. અહીં કે સેટિંગ્સમાં તમે ચાલુ ન કરો ત્યાં સુધી દરેક બંધ રહે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kunna a kan wasu masu kunnawa a cibiyar sadarwarka, karɓi kiɗa daga wasu manhajoji, ko ƙara sabar kiɗanka. Kowannensu yana kashe har sai ka kunna shi, a nan ko a cikin Saituna."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "השמיעו בנגנים אחרים ברשת שלכם, קבלו מוזיקה מאפליקציות אחרות או הוסיפו שרת מוזיקה משלכם. כל אחד מהם נשאר כבוי עד שתפעילו אותו, כאן או ב״הגדרות״."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अपने नेटवर्क के दूसरे प्लेयर पर चलाएँ, दूसरे ऐप से संगीत लें, या अपना संगीत सर्वर जोड़ें। जब तक आप इन्हें चालू न करें, यहाँ या सेटिंग्ज़ में, हर एक बंद रहता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Játsszon le a hálózat más lejátszóin, fogadjon zenét más appokból, vagy adja hozzá saját zeneszerverét. Mindegyik kikapcsolva marad, amíg be nem kapcsolja itt vagy a Beállításokban."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Putar ke pemutar lain di jaringan Anda, terima musik dari app lain, atau tambahkan server musik Anda sendiri. Masing-masing tetap nonaktif sampai Anda mengaktifkannya, di sini atau di Pengaturan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riproduci su altri lettori della tua rete, ricevi musica da altre app o aggiungi il tuo server musicale. Ogni opzione resta disattivata finché non la attivi, qui o in Impostazioni."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ネットワーク上のほかのプレーヤーで再生したり、ほかのアプリから音楽を受け取ったり、自分のミュージックサーバを追加したりできます。いずれも、ここか「設定」でオンにするまではオフのままです。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮ್ಮ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿರುವ ಇತರ ಪ್ಲೇಯರ್‌ಗಳಲ್ಲಿ ಪ್ಲೇ ಮಾಡಿ, ಇತರ ಆ್ಯಪ್‌ಗಳಿಂದ ಸಂಗೀತವನ್ನು ಪಡೆಯಿರಿ, ಅಥವಾ ನಿಮ್ಮದೇ ಮ್ಯೂಸಿಕ್ ಸರ್ವರ್ ಸೇರಿಸಿ. ಇಲ್ಲಿ ಅಥವಾ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ನೀವು ಆನ್ ಮಾಡುವವರೆಗೆ ಪ್ರತಿಯೊಂದೂ ಆಫ್ ಆಗಿರುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "네트워크의 다른 플레이어로 재생하거나, 다른 앱에서 음악을 받거나, 자신의 음악 서버를 추가할 수 있습니다. 각 기능은 여기나 설정에서 켜기 전까지 꺼져 있습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങളുടെ നെറ്റ്‌വർക്കിലെ മറ്റ് പ്ലെയറുകളിൽ പ്ലേ ചെയ്യുക, മറ്റ് ആപ്പുകളിൽ നിന്ന് സംഗീതം സ്വീകരിക്കുക, അല്ലെങ്കിൽ നിങ്ങളുടെ സ്വന്തം മ്യൂസിക് സെർവർ ചേർക്കുക. ഇവിടെയോ ക്രമീകരണങ്ങളിലോ നിങ്ങൾ ഓണാക്കുന്നതുവരെ ഓരോന്നും ഓഫായിരിക്കും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुमच्या नेटवर्कवरील इतर प्लेअरवर प्ले करा, इतर ॲपमधून संगीत घ्या, किंवा तुमचा स्वतःचा म्युझिक सर्व्हर जोडा. तुम्ही चालू करेपर्यंत, इथे किंवा सेटिंग्जमध्ये, प्रत्येक बंद राहते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mainkan pada pemain lain dalam rangkaian anda, terima muzik daripada app lain, atau tambah pelayan muzik anda sendiri. Setiap satu kekal nyahaktif sehingga anda mengaktifkannya, di sini atau dalam Seting."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spill på andre spillere i nettverket ditt, ta imot musikk fra andre apper, eller legg til din egen musikktjener. Hver av dem er slått av til du slår den på, her eller i Innstillinger."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speel af op andere spelers in je netwerk, ontvang muziek van andere apps of voeg je eigen muziekserver toe. Alles blijft uit totdat je het aanzet, hier of in Instellingen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਪਣੇ ਨੈੱਟਵਰਕ ਦੇ ਹੋਰ ਪਲੇਅਰਾਂ ’ਤੇ ਚਲਾਓ, ਹੋਰ ਐਪਾਂ ਤੋਂ ਸੰਗੀਤ ਲਓ, ਜਾਂ ਆਪਣਾ ਮਿਊਜ਼ਿਕ ਸਰਵਰ ਜੋੜੋ। ਜਦੋਂ ਤੱਕ ਤੁਸੀਂ ਚਾਲੂ ਨਾ ਕਰੋ, ਇੱਥੇ ਜਾਂ ਸੈਟਿੰਗਾਂ ਵਿੱਚ, ਹਰ ਇੱਕ ਬੰਦ ਰਹਿੰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarzaj na innych odtwarzaczach w swojej sieci, odbieraj muzykę z innych aplikacji albo dodaj własny serwer muzyczny. Każda z tych opcji pozostaje wyłączona, dopóki jej nie włączysz – tutaj lub w Ustawieniach."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduza em outros reprodutores da sua rede, receba música de outros apps ou adicione seu próprio servidor de música. Cada opção fica desativada até você ativá-la, aqui ou nos Ajustes."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduza noutros leitores da sua rede, receba música de outras apps ou adicione o seu próprio servidor de música. Cada opção fica desativada até a ativar, aqui ou nas Definições."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redați pe alte playere din rețeaua dvs., primiți muzică de la alte aplicații sau adăugați propriul server de muzică. Fiecare rămâne dezactivată până când o activați, aici sau în Configurări."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spela på andra spelare i ditt nätverk, ta emot musik från andra appar eller lägg till din egen musikserver. Var och en är avstängd tills du slår på den, här eller i Inställningar."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cheza kwenye vichezaji vingine katika mtandao wako, pokea muziki kutoka programu nyingine, au ongeza seva yako ya muziki. Kila kimoja hubaki kimezimwa hadi ukiwashe, hapa au katika Mipangilio."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "உங்கள் நெட்வொர்க்கில் உள்ள மற்ற பிளேயர்களில் இயக்குங்கள், மற்ற ஆப்ஸிலிருந்து இசையைப் பெறுங்கள், அல்லது உங்கள் சொந்த மியூசிக் சர்வரைச் சேருங்கள். இங்கோ அமைப்புகளிலோ நீங்கள் இயக்கும் வரை ஒவ்வொன்றும் முடக்கத்திலேயே இருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీ నెట్‌వర్క్‌లోని ఇతర ప్లేయర్‌లలో ప్లే చేయండి, ఇతర యాప్‌ల నుంచి సంగీతాన్ని స్వీకరించండి, లేదా మీ సొంత మ్యూజిక్ సర్వర్‌ను జోడించండి. ఇక్కడ లేదా సెట్టింగ్‌లలో మీరు ఆన్ చేసే వరకు ప్రతిదీ ఆఫ్‌లోనే ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่นไปยังเครื่องเล่นอื่นในเครือข่ายของคุณ รับเพลงจากแอปอื่น หรือเพิ่มเซิร์ฟเวอร์เพลงของคุณเอง แต่ละรายการจะปิดอยู่จนกว่าคุณจะเปิด ที่นี่หรือใน การตั้งค่า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ağınızdaki diğer oynatıcılarda çalın, diğer uygulamalardan müzik alın ya da kendi müzik sunucunuzu ekleyin. Her biri, burada ya da Ayarlar’da siz açana kadar kapalı kalır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворюйте на інших програвачах у своїй мережі, приймайте музику з інших програм або додайте власний музичний сервер. Кожна з цих можливостей вимкнена, доки ви її не ввімкнете — тут або в Параметрах."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اپنے نیٹ ورک کے دوسرے پلیئرز پر چلائیں، دوسری ایپس سے موسیقی لیں، یا اپنا میوزک سرور شامل کریں۔ جب تک آپ آن نہ کریں، یہاں یا سیٹنگز میں، ہر ایک بند رہتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát tới các đầu phát khác trong mạng của bạn, nhận nhạc từ ứng dụng khác hoặc thêm máy chủ nhạc của riêng bạn. Mỗi mục đều tắt cho đến khi bạn bật, ở đây hoặc trong Cài đặt."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放到网络中的其他播放器、接收其他 App 发来的音乐，或添加你自己的音乐服务器。每一项在你打开之前都保持关闭，可在这里或“设置”中打开。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放到網路中的其他播放器、接收其他 App 傳來的音樂，或加入你自己的音樂伺服器。每一項在你開啟之前都保持關閉，可在這裡或「設定」中開啟。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放到網絡中的其他播放器、接收其他 App 傳來的音樂，或加入你自己的音樂伺服器。每一項在你開啟之前都保持關閉，可在這裡或「設定」中開啟。"
+          }
+        }
+      }
+    },
     "Most Played": {
       "localizations": {
         "am": {
@@ -405096,6 +405634,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "取樣率、DSD、環繞聲及其他所有細節，都在「設定」›「播放」中。"
+          }
+        }
+      }
+    },
+    "Left and right balance is the BAL button in the player.": {
+      "comment": "Setup assistant, Sound page, small print. “BAL” is the short label on the balance button in the player bar: write it exactly as the key “BAL” is translated in your language.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የግራና ቀኝ ሚዛን በማጫወቻው ላይ ያለው BAL አዝራር ነው።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "توازن اليسار واليمين هو زر BAL في المشغّل."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "বাম-ডান ব্যালেন্স হলো প্লেয়ারের BAL বোতাম।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyvážení levého a pravého kanálu je tlačítko BAL v přehrávači."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Balancen mellem venstre og højre er knappen BAL i afspilleren."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Links-rechts-Balance ist die Taste BAL im Player."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η ισορροπία αριστερά-δεξιά είναι το κουμπί BAL στο πρόγραμμα αναπαραγωγής."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El balance izquierda-derecha es el botón BAL del reproductor."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بالانس چپ و راست همان دکمهٔ BAL در پخش‌کننده است."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vasemman ja oikean tasapaino on soittimen BAL-painike."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang balance ng kaliwa at kanan ay ang BAL button sa player."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La balance gauche-droite est le bouton BAL du lecteur."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ડાબા-જમણા બૅલેન્સ માટે પ્લેયરમાં BAL બટન છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daidaiton hagu da dama shi ne maɓallin BAL a cikin mai kunnawa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "איזון ימין-שמאל הוא הכפתור BAL בנגן."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बाएँ-दाएँ संतुलन के लिए प्लेयर में BAL बटन है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A bal–jobb balansz a lejátszó BAL gombja."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keseimbangan kiri-kanan adalah tombol BAL di pemutar."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il bilanciamento sinistra-destra è il pulsante BAL nel lettore."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左右のバランスは、プレーヤーのBALボタンで調整します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಎಡ-ಬಲ ಬ್ಯಾಲೆನ್ಸ್‌ಗಾಗಿ ಪ್ಲೇಯರ್‌ನಲ್ಲಿ BAL ಬಟನ್ ಇದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "좌우 균형은 플레이어의 BAL 버튼으로 조절합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഇടത്-വലത് ബാലൻസിന് പ്ലെയറിൽ BAL ബട്ടൺ ഉണ്ട്."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "डाव्या-उजव्या बॅलन्ससाठी प्लेअरमध्ये BAL बटण आहे."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imbangan kiri-kanan ialah butang BAL pada pemain."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Balansen mellom venstre og høyre er knappen BAL i spilleren."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De links-rechtsbalans is de knop BAL in de speler."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਖੱਬੇ-ਸੱਜੇ ਬੈਲੰਸ ਲਈ ਪਲੇਅਰ ਵਿੱਚ BAL ਬਟਨ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Balans lewo-prawo to przycisk BAL w odtwarzaczu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O balanço esquerda-direita é o botão BAL no reprodutor."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O balanço esquerda-direita é o botão BAL no leitor."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Balansul stânga-dreapta este butonul BAL din player."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Balansen mellan vänster och höger är knappen BAL i spelaren."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usawa wa kushoto na kulia ni kitufe cha BAL kwenye kichezaji."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இடது-வலது சமநிலைக்கு பிளேயரில் BAL பொத்தான் உள்ளது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఎడమ-కుడి బ్యాలెన్స్ కోసం ప్లేయర్‌లో BAL బటన్ ఉంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สมดุลซ้าย-ขวาคือปุ่ม BAL ในเครื่องเล่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sol-sağ dengesi, oynatıcıdaki BAL düğmesidir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Баланс лівого й правого каналів — це кнопка БАЛ у програвачі."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بائیں دائیں بیلنس کے لیے پلیئر میں BAL بٹن ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cân bằng trái-phải là nút BAL trong trình phát."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左右平衡是播放器中的“平衡”按钮。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左右平衡是播放器中的「平衡」按鈕。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左右平衡是播放器中的「平衡」按鈕。"
           }
         }
       }
