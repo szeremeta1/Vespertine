@@ -14,6 +14,8 @@ import VespertineShare
 @Observable
 final class RemoteAppModel {
     let discovery = RemoteDiscovery()
+    /// How long "Looking for Macs" has been turning with nothing to pair with: after a while the list says what to try.
+    let search = DiscoveryPatience()
     private(set) var pairings: [SavedPairing]
     private(set) var session: RemoteSession?
     /// The SMB shares this device plays from by itself, without a Mac.
@@ -57,6 +59,7 @@ final class RemoteAppModel {
         shares = shareKeychain.load().sorted { $0.addedAt < $1.addedAt }
         discovery.onChange = { [weak self] macs in self?.discovered(macs) }
         discovery.start()
+        searchChanged()
         pathMonitor.pathUpdateHandler = { [weak self] path in
             let online = path.status == .satisfied
             let cellular = path.usesInterfaceType(.cellular) && !path.usesInterfaceType(.wifi) && !path.usesInterfaceType(.wiredEthernet)
@@ -220,6 +223,18 @@ final class RemoteAppModel {
         return discovery.macs.filter { !isPaired($0) }
     }
 
+    /// The search for Macs, or what it found, changed: the wait before "No Macs found" follows it.
+    func searchChanged() {
+        search.update(looking: discovery.isBrowsing, found: unpairedMacs.count)
+    }
+
+    /// "Try Again" under "No Macs found": the search starts afresh, and the spinner turns for a full wait.
+    func lookAgain() {
+        discovery.stop()
+        discovery.start()
+        search.lookAgain()
+    }
+
     /// The "Demo: a made-up library" bar. Hidden in App Store captures (-VTScreenshot YES), which still use the demo library.
     nonisolated static func showsDemoNotice(isDemo: Bool, screenshotRun: Bool) -> Bool { isDemo && !screenshotRun }
 
@@ -254,6 +269,7 @@ final class RemoteAppModel {
     /// kept against its saved addresses, so it also works from away; and a paired Mac that just appeared, or moved, is
     /// tried now if the session with it isn't connected, rather than at the next retry.
     private func discovered(_ macs: [DiscoveredMac]) {
+        searchChanged()
         var moved = false
         for mac in macs {
             guard let port = mac.port, let index = pairings.firstIndex(where: { $0.serverID == mac.serverID }) else { continue }
@@ -373,6 +389,7 @@ final class RemoteAppModel {
         switch phase {
         case .active:
             discovery.start()
+            searchChanged()
             // A connection kept while the app was away may have died without a word: ask, and connect if there is none.
             session?.checkLink()
             session?.connect()
@@ -383,6 +400,7 @@ final class RemoteAppModel {
             // Music playing on this device needs its songs from the Mac: the connection stays while it plays.
             if !PlayTarget.shared.isBusy { session?.suspend() }
             discovery.stop()
+            searchChanged()
         default:
             break
         }
