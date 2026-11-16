@@ -66,7 +66,10 @@ struct ShareEditView: View {
                         .textContentType(.password)
                         .accessibilityIdentifier("share-password")
                 } footer: {
-                    Text("The password is kept in the Keychain on this device and is sent only to this server.")
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("The password is kept in the Keychain on this device and is sent only to this server.")
+                        Text("To sign in as a guest, leave the account and password empty.")
+                    }
                 }
                 Section {
                     TextField("Name", text: $name, prompt: Text(verbatim: typed.map(SavedShare.suggestedName) ?? ""))

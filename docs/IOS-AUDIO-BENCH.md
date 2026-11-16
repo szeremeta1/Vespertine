@@ -25,6 +25,7 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B11 | Keep on This Device, airplane mode | not run | | | |
 | B12 | The demo plays | not run | | | |
 | B13 | The queue comes back after the app is closed | not run | | | |
+| B14 | Music on the phone: a folder from Files, iCloud Drive, a USB drive | not run | | | |
 
 ## Before any script
 
@@ -63,6 +64,9 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 5. On Tailscale over cellular (B9's setup), jump to ten seconds before the end of a song. Whether the next song joins without a
    gap depends on it arriving in time: note which happened. If it didn't arrive, expect a short wait and then the next song from
    its first note, never a skipped song.
+6. Repeat steps 1 and 2 with a gapless album in MP3 and one in AAC (a live album or a continuous mix, ripped as it was sold): no
+   silence and no click between songs. The package tests show the delay and padding are left out to the frame; this step is the
+   same thing heard on real albums.
 
 ## B4. Surround on AirPods Max (5 min)
 
@@ -114,8 +118,12 @@ knob down first.
 
 1. With the DAC never tested: play a DSD64 song. Expect **CONVERTED ON THE MAC** and PCM on the DAC's display. Nowhere "DoP".
 2. Output › Play DSD natively? › Test DoP. Expect the music to stop, about five seconds of a soft chord, then "Did you hear music or
-   hiss?". Note what the DAC's display showed during the sound (DSD64, or PCM 176.4), and what you heard.
-3. Answer what you heard. After Music: play the DSD64 song again. Expect **NATIVE DSD · DoP**, the DAC showing DSD64, Output showing
+   hiss?" with "176.4 kHz" under it. Note what the DAC's display showed during the sound (DSD64, or PCM 176.4), and what you heard.
+3. Answer what you heard. After Music the same chord follows at 192, 352.8 and 384 kHz, with the same question and the rate under it
+   each time. For each rate note what the DAC's display showed (DSD64 for 176.4 and 192, DSD128 for 352.8 and 384) and answer what you
+   heard. A rate the DAC won't run at is skipped without a question. When it ends, the section lists "DoP passed at" and, if any,
+   "DoP not passed at", and they must match what the display showed. Write the four results in the table under these steps.
+   Then: play the DSD64 song again. Expect **NATIVE DSD · DoP**, the DAC showing DSD64, Output showing
    Song DSD64, DoP 176.4 kHz, Output runs at 176.4 kHz, Resampled by iOS No. Any hiss or noise at any point is a FAIL: note when.
 4. Let two DSD64 songs of one album play through: no click, no burst of noise and no drop out of DSD between them.
 5. Seek, pause and resume in a DSD song: note any click or noise.
@@ -125,10 +133,22 @@ knob down first.
 8. Unplug the DAC mid-DSD-song: a pause, silence from the speaker. Plug another DAC in: it is not sent DoP until it passes its own test.
 9. On a DAC that does not take DoP: run the test, expect a quiet hiss or silence, answer Hiss. DSD stays PCM; "DoP stays off for this DAC."
 10. Test with the volume below 100%: expect "The test needs the volume at 100%." and no sound.
+11. On a DAC that passed at 176.4 or 192 kHz, volume at 100%: play a lossless stereo album at that rate (24/176.4 or 24/192). Expect the
+    badge **ORIGINAL FILE · VERIFIED ON THIS DAC**, and in Output the rows "Original file: Verified on this DAC" and "DoP passed at".
+    Play a 16/44.1 or 24/96 album: expect **ORIGINAL FILE · NO PROCESSING** (no DoP test reaches those rates).
+12. With either of those badges showing, each of these must bring back plain **ORIGINAL FILE** within a second or so: one step down
+    on the phone's volume; unplugging the DAC so the speaker or AirPods take over; a song at a rate the DAC won't run at (Resampled by
+    iOS: Yes). Back at 100% on the DAC at the song's rate, the stronger badge returns.
+
+| DAC | 176.4 kHz | 192 kHz | 352.8 kHz | 384 kHz | Date, device, iOS, build |
+|---|---|---|---|---|---|
+| | | | | | |
 
 Bit-exactness of PCM is a separate measurement (a DAC with a bit-perfect light, or a digital loopback into a recorder, and the files in
-`docs/fixtures`). A DAC playing the DoP test as music has received those frames exactly, at 176.4 kHz and 100% volume; that says
-nothing about other rates or volumes. Until PCM is measured, the phone shows no "bit-perfect" badge anywhere, and must not.
+`docs/fixtures`). A DAC playing the DoP test as music has received those frames exactly, at that rate and 100% volume; that says
+nothing about other rates or volumes, and DoP has no rate below 176.4 kHz. So **VERIFIED ON THIS DAC** appears only for a song at a
+rate that DAC passed at, with nothing known to change its samples. Until PCM is measured, the phone shows no "bit-perfect" badge
+anywhere, and must not.
 
 ## B9. Away from home (5 min, plus a 30 min listen)
 
@@ -169,3 +189,22 @@ Macs › Try the Demo. Output › This iPhone. Play any album: soft generated no
    on this device (those play; the others say the Mac isn't answering). Note what you see.
 6. Choose another Mac (or a share), play something there, and go back to the first: each has its own queue. The demo starts empty
    every time. Forgetting a Mac in Macs removes its queue.
+
+## B14. Music on the phone (8 min)
+
+No Mac is needed. Have a folder of a few albums (one that runs without gaps) in three places: on the phone (Files › On My iPhone),
+in iCloud Drive, and on a USB drive with an adapter for the phone.
+
+1. Macs › **Add a Folder from Files**, choose the folder on the phone. Expect it under Your Folders, its albums and covers listed,
+   and a song to play. Output shows the folder, its count of songs and when it was last scanned.
+2. Play the gapless album across two songs: no gap, no click.
+3. Swipe the app away and open it again: the folder opens by itself, with its queue, and plays. Nothing asks for the folder again.
+4. In Files, delete one song and rename another. Back in the app: the deleted song is gone from its album and the renamed one is
+   there under its new name, without tapping Scan Again.
+5. The same with the folder in iCloud Drive. Note whether songs that aren't downloaded are listed, and whether playing one
+   downloads it (this has not been seen on a real phone; write down what happens).
+6. The same with the folder on the USB drive. Mid-song, pull the drive out: the song stops and the app says the folder can't be
+   found and to plug the drive in. Plug it in, tap Try Again: the songs play again.
+7. In Files, long-press a FLAC or MP3 anywhere › Share › Vespertine (or Open in Vespertine). Expect the app to open **Opened
+   Files** and play it. In Files › On My iPhone › Vespertine the copy is there; delete it and it leaves the app's list.
+8. Open a file the phone can't play by itself (a `.dsf`): an alert says so, and nothing is added.
