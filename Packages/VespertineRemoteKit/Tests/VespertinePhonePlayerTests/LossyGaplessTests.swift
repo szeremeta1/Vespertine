@@ -105,7 +105,7 @@ private func worst(_ samples: ArraySlice<Float>, from first: Int) -> (frame: Int
         for channel in out {
             let music = worst(channel[..<whole], from: 0)
             #expect(music.by < lossyStep, "frame \(music.frame) is \(music.by) from the tone: it is one tone from the first frame to the last")
-            // The join itself: the second song's first frame is the tone's frame 13,000, right after the first song's last.
+            // The join itself: the second song's first frame is the tone's frame 13,230, right after the first song's last.
             let join = worst(channel[(GaplessFixtures.firstFrames - 64)..<(GaplessFixtures.firstFrames + 64)], from: GaplessFixtures.firstFrames - 64)
             #expect(join.by < lossyStep, "frame \(join.frame) at the join is \(join.by) from the tone")
             #expect(channel[whole...].allSatisfy { $0 == 0 }, "no padding is played after the last song")
