@@ -136,6 +136,30 @@ enum NTLM {
         }
     }
 
+    static let anonymous: UInt32 = 0x0000_0800
+
+    /// The third message of someone signing in as nobody: no name, no proof of anything (MS-NLMP 3.1.5.1.2). A server
+    /// that lets guests in without an account takes this.
+    static func anonymous(challenge: [UInt8]) throws -> [UInt8] {
+        let parsed = try parseChallenge(challenge)
+        let header = 88
+        var w = ByteWriter()
+        w.raw(signature)
+        w.u32(3)
+        func put(_ count: Int, _ at: Int) { w.u16(UInt16(count)); w.u16(UInt16(count)); w.u32(UInt32(at)) }
+        put(1, header)       // the LM answer: one zero byte
+        put(0, header + 1)   // no NT answer
+        put(0, header)       // no domain
+        put(0, header)       // no user
+        put(0, header + 1)   // no workstation
+        put(0, header + 1)   // no session key
+        w.u32(asked & (parsed.flags | unicode | ntlm) | anonymous)
+        w.zeros(8)           // version
+        w.zeros(16)          // no digest of the three messages: there is no key to make one with
+        w.u8(0)
+        return w.bytes
+    }
+
     /// The third message: proof of the password, bound to the server's challenge.
     /// - Parameters:
     ///   - negotiate, challenge: the first two messages exactly as sent and received (the answer carries a digest of all three).

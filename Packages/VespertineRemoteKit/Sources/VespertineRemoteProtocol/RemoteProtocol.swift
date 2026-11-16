@@ -176,6 +176,17 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     /// 0…1, on whatever `VolumeState.route` says moves.
     case setVolume(level: Double)
     case setTransitions(on: Bool)
+    // The sound of the output the Mac plays to, as `PlayerState.sound` describes it. A Mac from before these answers
+    // `.failed` and sends no `sound`, so a remote doesn't offer them there. The Mac also refuses one that its own output
+    // panel wouldn't offer for this output.
+    /// A saved preset (`SoundChoice.id`) for this output; nil: off.
+    case setEqualizer(preset: String?)
+    /// Switches room correction on with a profile measured on this output; nil: off, keeping the choice.
+    case setRoomCorrection(profile: String?)
+    case setSpatialMode(mode: SpatialModeValue)
+    case setSpatializeStereo(on: Bool)
+    /// −1 (all left) … 1 (all right); 0 centers.
+    case setBalance(value: Double)
 
     // Streaming to the phone (protocol 2): the phone plays the song itself from the Mac's bytes.
     /// What the Mac would send for these songs (answered with `.streamInfo`): the original file or a lossless FLAC it makes,

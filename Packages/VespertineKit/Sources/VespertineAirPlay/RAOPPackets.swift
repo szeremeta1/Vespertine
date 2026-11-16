@@ -156,6 +156,22 @@ public enum DMAP {
     }
 }
 
+/// A cover for the receiver's display. Receivers take JPEG and PNG; `image/none` (no body) takes the last one down.
+public enum AirPlayArtwork {
+    public static let none = "image/none"
+    /// More than any receiver's display needs; a larger file is left out rather than sent.
+    public static let maximumBytes = 2_000_000
+
+    /// `image/jpeg` or `image/png` by the file's first bytes; nil for anything else, too large, or empty.
+    public static func contentType(of data: Data) -> String? {
+        guard !data.isEmpty, data.count <= maximumBytes else { return nil }
+        let head = [UInt8](data.prefix(8))
+        if head.starts(with: [0xFF, 0xD8, 0xFF]) { return "image/jpeg" }
+        if head.starts(with: [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]) { return "image/png" }
+        return nil
+    }
+}
+
 /// The SDP an ANNOUNCE carries: ALAC 352 frames, 16-bit, 44.1 kHz stereo; the RSA-wrapped AES key and IV when encrypted.
 public enum SDP {
     public static let fmtp = "352 0 16 40 10 14 2 255 0 0 44100"

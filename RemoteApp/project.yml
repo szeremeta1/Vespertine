@@ -51,6 +51,15 @@ targets:
         NSLocalNetworkUsageDescription: "Vespertine looks for Macs running Vespertine on your network, and connects only to the Macs you pair with and the shares you add."
         NSBonjourServices: ["_vespertine._tcp"]
         NSCameraUsageDescription: "Vespertine uses the camera only to scan the pairing code that the Vespertine app shows on your Mac."
+        # Music files open in Vespertine from Files, the share sheet and other apps ("Open in"); the app's own folder,
+        # where they are put, shows in Files under On My iPhone.
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Audio
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes: [public.audio]
         # Scanning the Mac's QR code with the Camera app opens Vespertine on this device and pairs.
         CFBundleURLTypes:
           - CFBundleURLName: org.szeremeta.VespertineRemote.pair

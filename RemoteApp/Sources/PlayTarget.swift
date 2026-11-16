@@ -33,6 +33,18 @@ final class PlayTarget {
     static func surround(stored: String?) -> SpatialModeChoice { stored.flatMap(SpatialModeChoice.init(rawValue:)) ?? .off }
     /// The choices the picker offers: Head Tracked only where the system can turn the scene with your head (iOS 18).
     static var surroundChoices: [SpatialModeChoice] { PhonePlayer.systemTracksHead ? [.off, .fixed, .headTracked] : [.off, .fixed] }
+    /// Whether songs played here are levelled with the ReplayGain values in their files, and by which of them. Off until
+    /// chosen: with it off no sample is changed. Kept between launches.
+    var replayGain = PlayTarget.replayGain(stored: UserDefaults.standard.string(forKey: PlayTarget.replayGainKey)) {
+        didSet {
+            UserDefaults.standard.set(replayGain.rawValue, forKey: Self.replayGainKey)
+            made?.remote.playback.replayGain = replayGain
+        }
+    }
+    private static let replayGainKey = "replayGainOnThisDevice"
+
+    /// The choice kept from an earlier launch, or Off for someone who never made one.
+    static func replayGain(stored: String?) -> ReplayGainChoice { stored.flatMap(ReplayGainChoice.init(rawValue:)) ?? .off }
     /// Why songs aren't fetched right now (cellular data with playing over it turned off), or nil.
     @ObservationIgnored var holdReason: String?
     /// How much has been fetched from the Mac for playing here since the app opened.
@@ -98,6 +110,10 @@ final class PlayTarget {
         playback.holdReason = { [weak self] in self?.holdReason }
         let keeper = KeptShelf.shared.keeper(for: session)
         playback.kept = { [weak keeper] song in keeper?.store.kept(song).map { ($0.file, $0.descriptor) } }
+        // A kept song's ReplayGain values are kept beside it, so it is levelled the same with the Mac off.
+        playback.keptGain = { [weak keeper] song in keeper?.store.kept(song)?.replayGain }
+        playback.onGainValues = { [weak keeper] song, values in keeper?.store.noteReplayGain(values, of: song) }
+        playback.replayGain = replayGain
         remote.macName = session.server?.name ?? session.pairing.name
         let system = PhoneSystem(remote: remote) { [weak session] key in
             guard let session, case .artwork(_, _, _, let data) = await session.send(.artwork(key: key, size: 600)) else { return nil }
@@ -139,8 +155,36 @@ final class PlayTarget {
         if signal.convertedHere {
             return String(localized: "CONVERTED ON THIS DEVICE", comment: "Signal badge on the iPhone or iPad (short, uppercase): the song is a DSD file that this device converted to PCM itself, with no Mac involved. Same style as CONVERTED ON THE MAC.")
         }
-        return signal.converted ? String(localized: "CONVERTED ON THE MAC", comment: "Signal badge: the Mac converted this song to a format the iPhone can play.")
-                         : String(localized: "ORIGINAL FILE", comment: "Signal badge: the iPhone plays the song's own file, as it is on the Mac.")
+        if signal.converted {
+            return String(localized: "CONVERTED ON THE MAC", comment: "Signal badge: the Mac converted this song to a format the iPhone can play.")
+        }
+        // The two stronger wordings hold only while nothing is known to change the samples on the way to a DAC
+        // (`PhoneSignal.untouched`): a lower volume, another rate, Bluetooth or the speaker, or anything Vespertine does
+        // to the sound brings back the plain one.
+        if signal.verifiedOnDAC {
+            return String(localized: "ORIGINAL FILE · VERIFIED ON THIS DAC", comment: "Signal badge on the iPhone (short, uppercase): the song's own lossless file plays with nothing changing its samples, on a DAC that passed the DoP listening test at this song's sample rate. DAC stays as it is.")
+        }
+        if signal.untouched {
+            return String(localized: "ORIGINAL FILE · NO PROCESSING", comment: "Signal badge on the iPhone (short, uppercase): the song's own lossless file plays on a DAC at the song's own sample rate, with the volume at 100% and nothing in Vespertine changing the sound.")
+        }
+        return String(localized: "ORIGINAL FILE", comment: "Signal badge: the iPhone plays the song's own file, as it is on the Mac.")
+    }
+
+    /// The DoP test's results for a DAC, as rows: the rates it played the chord at, and the rates it didn't.
+    static func dopRows(_ dacs: DoPDACs, route: PhoneRoute?) -> [(label: String, value: String)] {
+        let results = dacs.results(for: route?.uid)
+        func rates(_ passed: Bool) -> String? {
+            let list = results.filter { ($0.result == .passed) == passed }.map { PhoneSignal.kilohertz($0.carrier) }
+            return list.isEmpty ? nil : String(localized: "\(list.joined(separator: ", ")) kHz", comment: "Signal chip: a sample rate.")
+        }
+        var rows: [(String, String)] = []
+        if let passed = rates(true) {
+            rows.append((String(localized: "DoP passed at", comment: "Row label on the iPhone's Output screen: the sample rates at which this DAC passed the DoP listening test. The value is a list of rates, e.g. 176.4, 352.8 kHz. DoP stays as it is."), passed))
+        }
+        if let failed = rates(false) {
+            rows.append((String(localized: "DoP not passed at", comment: "Row label on the iPhone's Output screen: the sample rates at which this DAC did not pass the DoP listening test. The value is a list of rates, e.g. 192, 384 kHz. DoP stays as it is."), failed))
+        }
+        return rows
     }
 
     /// What the output runs at, and that iOS changed the rate to get there when it did.
@@ -161,7 +205,7 @@ final class PlayTarget {
     }
 
     /// The Output screen's read-back: what the song is and what iOS says the output is doing with it. Facts only.
-    static func report(_ signal: PhoneSignal, route: PhoneRoute?) -> [(label: String, value: String)] {
+    static func report(_ signal: PhoneSignal, route: PhoneRoute?, dop: DoPDACs = DoPDACs()) -> [(label: String, value: String)] {
         var rows: [(String, String)] = [
             (String(localized: "Song", comment: "Row label on the iPhone's Output screen: the playing song's format, e.g. 24/192."), signal.streamFormat),
             (String(localized: "Song’s channels", comment: "Row label on the iPhone's Output screen: how many channels the playing song has."), String(signal.channels)),
@@ -194,8 +238,25 @@ final class PlayTarget {
             }
             rows.append((String(localized: "Surround on Headphones"), value))
         }
+        // Only while ReplayGain is on: what is being done to this song's samples, or that nothing is.
+        if let gain = signal.replayGain {
+            rows.append((String(localized: "ReplayGain"), String(localized: "\(decibels(gain)) dB")))
+        } else if signal.replayGainHasNothing {
+            rows.append((String(localized: "ReplayGain"), String(localized: "None for this song", comment: "Value on the iPhone's Output screen, for the row ReplayGain: ReplayGain is turned on, but the playing song has no ReplayGain values (or is DSD sent as DoP), so it plays unchanged.")))
+        }
         if let volume = signal.volume { rows.append((String(localized: "Volume"), percent(volume))) }
+        if signal.untouched {
+            rows.append((String(localized: "Original file", comment: "Row label on the iPhone's Output screen: the song's own lossless file is playing. The value is No processing or Verified on this DAC."),
+                         signal.verifiedOnDAC ? String(localized: "Verified on this DAC", comment: "Value on the iPhone's Output screen, for the row Original file: this DAC passed the DoP listening test at this song's sample rate. DAC stays as it is.")
+                                              : String(localized: "No processing", comment: "Value on the iPhone's Output screen, for the row Original file: nothing changes the song's samples on the way to the DAC.")))
+        }
+        rows.append(contentsOf: dopRows(dop, route: route).map { ($0.label, $0.value) })
         return rows
+    }
+
+    /// "−6.2", "+1.5": a gain with its sign, to one decimal place.
+    static func decibels(_ value: Double) -> String {
+        (value < 0 ? "−" : "+") + abs(value).formatted(.number.precision(.fractionLength(1)))
     }
 }
 

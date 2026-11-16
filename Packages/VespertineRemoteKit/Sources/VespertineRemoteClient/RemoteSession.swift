@@ -136,6 +136,9 @@ public final class RemoteSession {
     /// The "Mac" is a share the phone reads itself (see VespertineShare): there is no Mac, and music plays on this device.
     public static let sharePrefix = "share-"
     public var isShare: Bool { pairing.serverID.hasPrefix(Self.sharePrefix) }
+    /// The share is a folder on this device (chosen in Files, or the app's own) rather than one on a server.
+    public static let folderPrefix = sharePrefix + "folder-"
+    public var isFolder: Bool { pairing.serverID.hasPrefix(Self.folderPrefix) }
 
     public var isConnected: Bool { phase == .connected }
     /// Whether the Mac speaks protocol 2: it can stream songs to this phone (an older Mac only takes commands).
