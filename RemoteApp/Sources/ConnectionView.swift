@@ -147,7 +147,7 @@ struct MacConnectionView: View {
 
     private func row(_ title: LocalizedStringKey, systemImage: String, detail: String, good: Bool, active: Bool) -> some View {
         HStack(spacing: 12) {
-            Image(systemName: systemImage).foregroundStyle(good ? Palette.brass : Palette.text3).frame(width: 28)
+            Image(systemName: systemImage).foregroundStyle(good ? Palette.brass : Palette.text3).rowIconColumn()
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                 Text(detail).font(.signal(.caption)).foregroundStyle(Palette.text2).lineLimit(1).truncationMode(.middle)

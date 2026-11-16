@@ -148,6 +148,26 @@ nonisolated enum RemoteLayout {
     /// line cut "Albums" and "Artists" down to the same stub.
     static func rowTitleLines(accessibilityText: Bool) -> Int? { accessibilityText ? nil : 1 }
 
+    /// A row's quieter second line: one line, or up to three at the accessibility sizes.
+    static func rowDetailLines(accessibilityText: Bool) -> Int { accessibilityText ? 3 : 1 }
+
+    /// At the accessibility sizes a row's name, its second line and what trails it are stacked, without the picture.
+    static func rowStacks(accessibilityText: Bool) -> Bool { accessibilityText }
+
+    /// The width of a row's symbol column at the ordinary text size (it grows with the text).
+    static let rowIconWidth: CGFloat = 28
+
+    /// The largest text a banner above the screens follows. Past it, a notice took two fifths of a small screen and was
+    /// still cut short.
+    static let bannerLargestText = DynamicTypeSize.accessibility1
+
+    /// A banner's words and its buttons sit side by side, or the buttons go under the words at the accessibility sizes.
+    static func bannerStacks(accessibilityText: Bool) -> Bool { accessibilityText }
+
+    /// A song row with several copies shows its "2 COPIES" button; on a narrow window the length gives way to it (the
+    /// copies list shows each length), so the name isn't cut to a few letters.
+    static func rowShowsLength(copies: Int, regularWidth: Bool) -> Bool { copies <= 1 || regularWidth }
+
     /// The largest text the mini player follows: past it, its buttons no longer fit beside a title of any length.
     static let miniPlayerLargestText = DynamicTypeSize.accessibility1
 

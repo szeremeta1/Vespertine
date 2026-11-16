@@ -62,7 +62,7 @@ struct MacsView: View {
                             HStack(spacing: 4) {
                                 Button { model.choose(saved) } label: {
                                     HStack(spacing: 12) {
-                                        Image(systemName: SavedPairing.symbol(portable: saved.portable)).foregroundStyle(Palette.brass).frame(width: 28)
+                                        Image(systemName: SavedPairing.symbol(portable: saved.portable)).foregroundStyle(Palette.brass).rowIconColumn()
                                         VStack(alignment: .leading, spacing: 2) {
                                             Text(saved.name).font(.serif(.body, weight: .medium)).foregroundStyle(Palette.text)
                                             Text(reach(saved)).font(.caption).foregroundStyle(Palette.text2)

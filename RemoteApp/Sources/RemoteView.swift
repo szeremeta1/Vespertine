@@ -288,6 +288,7 @@ private struct ClearsMiniPlayer: ViewModifier {
 /// Says when the Mac isn't connected, and why.
 struct ConnectionBanner: View {
     @Environment(RemoteAppModel.self) private var model
+    @Environment(\.dynamicTypeSize) private var typeSize
     let session: RemoteSession
     @State private var editing = false
     /// Still within the first seconds of the Mac not answering.
@@ -295,6 +296,24 @@ struct ConnectionBanner: View {
 
     var body: some View {
         if session.isShare { shareBanner } else { macBanner }
+    }
+
+    /// A banner's words beside its buttons; at the accessibility text sizes the buttons go under the words, which then
+    /// have the whole width and are never cut short.
+    private func notice<Words: View, Buttons: View>(@ViewBuilder words: () -> Words, @ViewBuilder buttons: () -> Buttons) -> some View {
+        let stacked = RemoteLayout.bannerStacks(accessibilityText: typeSize.isAccessibilitySize)
+        let layout = stacked ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6)) : AnyLayout(HStackLayout(spacing: 10))
+        return layout {
+            HStack(spacing: 10) {
+                words().fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+            }
+            HStack(spacing: 16) { buttons() }
+        }
+        .padding(.horizontal).padding(.vertical, 8)
+        .background(Palette.surface)
+        // A notice, not the page: it stops growing where it would crowd out what it is a notice about.
+        .dynamicTypeSize(...RemoteLayout.bannerLargestText)
     }
 
     /// A share has no Mac to wait for: what is said is the first scan going on, or why the share can't be used.
@@ -316,15 +335,13 @@ struct ConnectionBanner: View {
             .background(Palette.surface)
             .accessibilityIdentifier("folder-trouble")
         } else if let trouble = status?.trouble {
-            HStack(spacing: 10) {
+            notice {
                 Text(trouble).font(.footnote)
-                Spacer(minLength: 0)
+            } buttons: {
                 Button("Try Again") { model.rescanShare() }.font(.footnote.weight(.medium))
                     .disabled(status?.scan.isRunning ?? false)
                 Button("Macs") { model.leave() }.font(.footnote.weight(.medium))
             }
-            .padding(.horizontal).padding(.vertical, 8)
-            .background(Palette.surface)
             .accessibilityIdentifier("share-trouble")
         } else if let status, status.scanned == nil, case .scanning(let songs) = status.scan {
             banner(Text("Reading “\(session.pairing.name)” for the first time. Songs found so far: \(songs.formatted())", comment: "Banner on the iPhone while an SMB share is scanned for the first time. The first %@ is the share's name, the second a count of songs that goes up."), busy: true)
@@ -338,13 +355,11 @@ struct ConnectionBanner: View {
             case .connected where session.isDemo && !model.showsDemoNotice:
                 EmptyView()
             case .connected where session.isDemo:
-                HStack(spacing: 10) {
+                notice {
                     Text(session.phone == nil ? "Demo: a made-up library. To hear it, choose this device in Output." : "Demo: a made-up library, with sound the app makes itself.").font(.footnote)
-                    Spacer(minLength: 0)
+                } buttons: {
                     Button("Leave Demo") { model.leave() }.font(.footnote.weight(.medium))
                 }
-                .padding(.horizontal).padding(.vertical, 8)
-                .background(Palette.surface)
             case .connected, .closed:
                 EmptyView()
             case .connecting:
@@ -358,6 +373,7 @@ struct ConnectionBanner: View {
                         .buttonStyle(.borderedProminent)
                 }
                 .font(.callout).padding().frame(maxWidth: .infinity).background(Palette.surface)
+                .dynamicTypeSize(...RemoteLayout.bannerLargestText)
             case .incompatible:
                 banner(Text("This version of Vespertine on this device doesn’t match Vespertine on the Mac. Update both to the latest version."), busy: false)
             }
@@ -391,7 +407,7 @@ struct ConnectionBanner: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack(spacing: 10) {
                 ProgressView()
-                Text(Self.words(trouble, mac: name)).font(.footnote)
+                Text(Self.words(trouble, mac: name)).font(.footnote).fixedSize(horizontal: false, vertical: true)
                 Spacer(minLength: 0)
             }
             .accessibilityElement(children: .combine)
@@ -408,6 +424,7 @@ struct ConnectionBanner: View {
         }
         .padding(.horizontal).padding(.vertical, 8)
         .background(Palette.surface)
+        .dynamicTypeSize(...RemoteLayout.bannerLargestText)
     }
 
     /// Why the Mac can't be reached, and what would fix it. Vespertine keeps trying meanwhile.
@@ -425,14 +442,12 @@ struct ConnectionBanner: View {
     }
 
     private func banner(_ text: Text, busy: Bool) -> some View {
-        HStack(spacing: 10) {
+        notice {
             if busy { ProgressView() }
             text.font(.footnote)
-            Spacer(minLength: 0)
+        } buttons: {
             Button("Macs") { model.leave() }.font(.footnote.weight(.medium))
         }
-        .padding(.horizontal).padding(.vertical, 8)
-        .background(Palette.surface)
     }
 }
 

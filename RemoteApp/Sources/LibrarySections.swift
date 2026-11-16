@@ -35,7 +35,8 @@ struct CountedLabel: View {
                 }
             }
         } icon: {
-            Image(systemName: symbol)
+            // At the largest sizes the symbol steps aside: beside it, "Albums" broke in the middle of the word.
+            if !RemoteLayout.rowStacks(accessibilityText: typeSize.isAccessibilitySize) { Image(systemName: symbol) }
         }
     }
 }
@@ -147,7 +148,8 @@ struct GenresGrid: View {
                         NavigationLink { AlbumsGrid(session: session, listing: .genre(key: genre.key, name: genre.name)) } label: {
                             VStack(alignment: .leading, spacing: 4) {
                                 GenreMosaic(keys: genre.artworkKeys)
-                                Text(genre.name).font(.serif(.subheadline, weight: .medium)).foregroundStyle(Palette.text).lineLimit(1)
+                                Text(genre.name).font(.serif(.subheadline, weight: .medium)).foregroundStyle(Palette.text)
+                                    .lineLimit(RemoteLayout.rowDetailLines(accessibilityText: typeSize.isAccessibilitySize))
                                 Text("Albums: \(genre.albumCount)").font(.signal(.caption2)).foregroundStyle(Palette.text3)
                             }
                             .accessibilityElement(children: .combine)

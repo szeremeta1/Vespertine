@@ -12,7 +12,7 @@ struct ShareRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: "externaldrive.connected.to.line.below").foregroundStyle(Palette.brass).frame(width: 28)
+            Image(systemName: "externaldrive.connected.to.line.below").foregroundStyle(Palette.brass).rowIconColumn()
             VStack(alignment: .leading, spacing: 2) {
                 Text(share.name).font(.serif(.body, weight: .medium)).foregroundStyle(Palette.text)
                 Text(verbatim: share.address.display).font(.caption).foregroundStyle(Palette.text2).lineLimit(1).truncationMode(.middle)
@@ -72,7 +72,7 @@ struct ShareEditView: View {
                     }
                 }
                 Section {
-                    TextField("Name", text: $name, prompt: Text(verbatim: typed.map(SavedShare.suggestedName) ?? ""))
+                    TextField("Name", text: $name, prompt: Text(verbatim: typed.map(SavedShare.suggestedName) ?? String(localized: "Name")))
                         .accessibilityIdentifier("share-name")
                 } footer: {
                     Text("Vespertine reads the songs’ tags from the share and keeps a list of them on this device. The first time takes a while for a large library; after that only new and changed files are read.")
