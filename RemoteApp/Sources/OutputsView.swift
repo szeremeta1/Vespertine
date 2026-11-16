@@ -21,22 +21,29 @@ struct OutputsView: View {
         NavigationStack {
             List {
                 Section {
-                    Button { PlayTarget.shared.choose(thisDevice: true) } label: {
-                        HStack {
-                            Image(systemName: UIDevice.current.userInterfaceIdiom == .pad ? "ipad" : "iphone")
-                                .frame(width: 28)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(PlayTarget.deviceName)
-                                Text(hereDetail).font(.caption).foregroundStyle(Color.secondary)
+                    HStack(spacing: 4) {
+                        Button { PlayTarget.shared.choose(thisDevice: true) } label: {
+                            HStack {
+                                Image(systemName: UIDevice.current.userInterfaceIdiom == .pad ? "ipad" : "iphone")
+                                    .frame(width: 28)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(PlayTarget.deviceName)
+                                    Text(hereDetail).font(.caption).foregroundStyle(Color.secondary)
+                                }
+                                Spacer()
+                                if playsHere { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
                             }
-                            Spacer()
-                            if playsHere { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
+                            .contentShape(Rectangle())
                         }
-                        .contentShape(Rectangle())
+                        .buttonStyle(.plain)
+                        .disabled(!PlayTarget.shared.canPlayHere(session))
+                        .accessibilityAddTraits(playsHere ? .isSelected : [])
+                        // Where this device's sound goes (AirPlay, Bluetooth, a DAC): the system's own list, a tap away.
+                        if RoutePickerPlacement.shows(playsHere: playsHere) {
+                            RoutePickerButton().frame(width: 44, height: 44)
+                                .accessibilityIdentifier("airplay")
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .disabled(!PlayTarget.shared.canPlayHere(session))
-                    .accessibilityAddTraits(playsHere ? .isSelected : [])
                     if playsHere {
                         // Head Tracked chosen on a system that can't do it is shown as what plays: Fixed.
                         Picker("Surround on Headphones", selection: Binding(get: {

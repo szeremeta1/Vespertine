@@ -321,8 +321,15 @@ struct NowPlayingView: View {
         if let volume = player?.volume {
             switch volume.route {
             case .fixed where session.phone != nil:
-                Label(Self.deviceVolume(volume.level), systemImage: "speaker.wave.2")
-                    .font(.caption).foregroundStyle(Palette.text2)
+                HStack(spacing: 8) {
+                    Label(Self.deviceVolume(volume.level), systemImage: "speaker.wave.2")
+                        .font(.caption).foregroundStyle(Palette.text2)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if RoutePickerPlacement.shows(playsHere: session.phone != nil) {
+                        RoutePickerButton().frame(width: 44, height: 44)
+                            .accessibilityIdentifier("airplay")
+                    }
+                }
             case .fixed:
                 Label("Fixed volume: set the level on your amplifier or DAC", systemImage: "speaker.slash")
                     .font(.caption).foregroundStyle(Palette.text2)
