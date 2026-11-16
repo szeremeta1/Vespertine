@@ -109,4 +109,16 @@ public struct BalanceState: Codable, Sendable, Equatable {
         guard value.isFinite else { return 0 }
         return min(max(value, -1), 1)
     }
+
+    /// The value as whole points, −100…100, as it is shown ("20% left").
+    public var points: Int { Self.points(value) }
+
+    public static func points(_ value: Double) -> Int { Int((clamped(value) * 100).rounded()) }
+
+    /// Where a slider let go at `value` settles: on the center when within 3 points of it (as the Mac's own slider
+    /// does), else where it is.
+    public static func settled(_ value: Double) -> Double {
+        let value = clamped(value)
+        return abs(value) <= 0.03 ? 0 : value
+    }
 }

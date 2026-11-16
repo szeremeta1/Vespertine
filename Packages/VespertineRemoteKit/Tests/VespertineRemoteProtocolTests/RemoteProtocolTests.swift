@@ -234,6 +234,14 @@ private let copied: TrackSummary = {
         #expect(BalanceState.clamped(-3) == -1 && BalanceState.clamped(2) == 1 && BalanceState.clamped(0.3) == 0.3)
         #expect(BalanceState.clamped(.nan) == 0 && BalanceState.clamped(.infinity) == 0)
     }
+
+    @Test func balanceIsShownInWholePointsAndASliderSettlesOnTheCenter() {
+        #expect(BalanceState(value: -0.2).points == -20 && BalanceState(value: 0.354).points == 35 && BalanceState(value: 0).points == 0)
+        #expect(BalanceState.points(7) == 100 && BalanceState.points(.nan) == 0)
+        // Let go a hair off the middle, the slider is centered; further out it stays where it was put.
+        #expect(BalanceState.settled(0.02) == 0 && BalanceState.settled(-0.03) == 0)
+        #expect(BalanceState.settled(0.05) == 0.05 && BalanceState.settled(-0.4) == -0.4 && BalanceState.settled(3) == 1)
+    }
 }
 
 @Suite struct Position {
