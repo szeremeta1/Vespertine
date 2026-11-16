@@ -85262,6 +85262,1351 @@
           }
         }
       }
+    },
+    "DSD in surround": {
+      "comment": "Shown on the iPhone or iPad, in the list of music files on a network share that only the Mac app can open. A row label followed by a number of files: DSD audio files (from SACDs) with more than two channels, such as 5.1.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD በሰራውንድ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD بصوت محيطي"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সারাউন্ডে DSD"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD s prostorovým zvukem"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD i surround"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD in Surround"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD σε surround"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD en sonido envolvente"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD فراگیر"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD-surround"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD na surround"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD en surround"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સરાઉન્ડમાં DSD"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD mai sautin kewaye"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD בסראונד"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सराउंड में DSD"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Térhatású DSD"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD surround"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD in surround"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サラウンドのDSD"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸರೌಂಡ್‌ನಲ್ಲಿ DSD"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서라운드 DSD"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സറൗണ്ടിലുള്ള DSD"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सराउंडमधील DSD"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD dalam surround"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD i surround"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD in surround"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸਰਾਊਂਡ ਵਿੱਚ DSD"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD w dźwięku przestrzennym"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD em surround"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD em surround"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD în surround"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD i surround"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD ya sauti zingira"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "சரவுண்டில் DSD"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "సరౌండ్‌లో DSD"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD แบบเซอร์ราวด์"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround DSD"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD з об’ємним звуком"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "سراؤنڈ میں DSD"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD âm thanh vòm"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "環繞聲 DSD"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "环绕声 DSD"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "環繞聲 DSD"
+          }
+        }
+      }
+    },
+    "Disc images (ISO)": {
+      "comment": "Shown on the iPhone or iPad, in the list of music files on a network share that only the Mac app can open. A row label followed by a number of files: .iso files, each a copy of a whole disc (an SACD mostly).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የዲስክ ምስሎች (ISO)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صور الأقراص (ISO)"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ডিস্ক ইমেজ (ISO)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obrazy disků (ISO)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diskbilleder (ISO)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disc-Images (ISO)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Είδωλα δίσκων (ISO)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imágenes de disco (ISO)"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ایمیج‌های دیسک (ISO)"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Levykuvat (ISO)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga disc image (ISO)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Images disque (ISO)"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ડિસ્ક ઇમેજ (ISO)"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hotunan faifai (ISO)"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "תמונות דיסק (ISO)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "डिस्क इमेज (ISO)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lemezképek (ISO)"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image disk (ISO)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Immagini disco (ISO)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ディスクイメージ(ISO)"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಡಿಸ್ಕ್ ಇಮೇಜ್‌ಗಳು (ISO)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "디스크 이미지(ISO)"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഡിസ്ക് ഇമേജുകൾ (ISO)"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "डिस्क इमेज (ISO)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imej cakera (ISO)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diskfiler (ISO)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schijfkopieën (ISO)"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਡਿਸਕ ਇਮੇਜ (ISO)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obrazy dysków (ISO)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imagens de disco (ISO)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imagens de disco (ISO)"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imagini de disc (ISO)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skivavbilder (ISO)"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Picha za diski (ISO)"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "டிஸ்க் இமேஜ்கள் (ISO)"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "డిస్క్ ఇమేజ్‌లు (ISO)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ดิสก์อิมเมจ (ISO)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disk görüntüleri (ISO)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Образи дисків (ISO)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ڈسک امیجز (ISO)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ảnh đĩa (ISO)"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光碟映像 (ISO)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光盘映像 (ISO)"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "光碟映像檔 (ISO)"
+          }
+        }
+      }
+    },
+    "Surround in other formats": {
+      "comment": "Shown on the iPhone or iPad, in the list of music files on a network share that only the Mac app can open. A row label followed by a number of files: files with more than two channels (5.1 and the like) in formats the device otherwise opens itself. The row above it is “DSD in surround”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሰራውንድ በሌሎች ቅርጸቶች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صوت محيطي بتنسيقات أخرى"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অন্যান্য ফরম্যাটে সারাউন্ড"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prostorový zvuk v jiných formátech"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround i andre formater"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround in anderen Formaten"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround σε άλλες μορφές"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sonido envolvente en otros formatos"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صدای فراگیر در قالب‌های دیگر"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround muissa muodoissa"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround sa ibang mga format"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround dans d’autres formats"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "અન્ય ફોર્મેટમાં સરાઉન્ડ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sautin kewaye a wasu tsare-tsare"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סראונד בפורמטים אחרים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अन्य फ़ॉर्मैट में सराउंड"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Térhatású hang más formátumokban"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround dalam format lain"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround in altri formati"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その他のフォーマットのサラウンド"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇತರ ಫಾರ್ಮ್ಯಾಟ್‌ಗಳಲ್ಲಿ ಸರೌಂಡ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기타 포맷의 서라운드"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മറ്റ് ഫോർമാറ്റുകളിലെ സറൗണ്ട്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इतर फॉरमॅटमधील सराउंड"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround dalam format lain"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround i andre formater"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround in andere formaten"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹੋਰ ਫਾਰਮੈਟਾਂ ਵਿੱਚ ਸਰਾਊਂਡ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dźwięk przestrzenny w innych formatach"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround em outros formatos"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround noutros formatos"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround în alte formate"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Surround i andra format"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sauti zingira katika miundo mingine"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பிற வடிவங்களில் சரவுண்ட்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఇతర ఫార్మాట్‌లలో సరౌండ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เซอร์ราวด์ในรูปแบบอื่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diğer biçimlerde surround"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Об’ємний звук в інших форматах"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دیگر فارمیٹس میں سراؤنڈ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Âm thanh vòm ở định dạng khác"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他格式的環繞聲"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他格式的环绕声"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他格式的環繞聲"
+          }
+        }
+      }
+    },
+    "Other formats": {
+      "comment": "Shown on the iPhone or iPad, in the list of music files on a network share that only the Mac app can open. The last row label, followed by a number of files: files in formats that have no row of their own.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሌሎች ቅርጸቶች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تنسيقات أخرى"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অন্যান্য ফরম্যাট"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jiné formáty"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andre formater"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andere Formate"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Άλλες μορφές"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Otros formatos"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قالب‌های دیگر"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muut muodot"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iba pang mga format"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autres formats"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "અન્ય ફોર્મેટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wasu tsare-tsare"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פורמטים אחרים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अन्य फ़ॉर्मैट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Egyéb formátumok"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Format lain"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altri formati"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その他のフォーマット"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಇತರ ಫಾರ್ಮ್ಯಾಟ್‌ಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기타 포맷"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മറ്റ് ഫോർമാറ്റുകൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इतर फॉरमॅट"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Format lain"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andre formater"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andere formaten"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹੋਰ ਫਾਰਮੈਟ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inne formaty"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outros formatos"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outros formatos"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alte formate"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andra format"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miundo mingine"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பிற வடிவங்கள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఇతర ఫార్మాట్‌లు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รูปแบบอื่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diğer biçimler"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Інші формати"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دیگر فارمیٹس"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Định dạng khác"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他格式"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他格式"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他格式"
+          }
+        }
+      }
+    },
+    "This device can’t open these files by itself, so they aren’t in its library. Vespertine on a Mac can open them: add them to the Mac’s library, then play them there or from the Mac on this device.": {
+      "comment": "Shown on the iPhone or iPad under the list of music files on a network share that the device can't open by itself (DTS, TrueHD, DSD in surround and the like). “Library” is the device's list of songs; “the Mac's library” is the Mac app's.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ መሣሪያ እነዚህን ፋይሎች ብቻውን መክፈት አይችልም፣ ስለዚህ በቤተ-ሙዚቃው ውስጥ የሉም። በMac ላይ ያለው Vespertine ሊከፍታቸው ይችላል፦ ወደ Mac ቤተ-ሙዚቃ ያክሏቸው፣ ከዚያ እዚያ ወይም ከMac በዚህ መሣሪያ ላይ ያጫውቷቸው።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يستطيع هذا الجهاز فتح هذه الملفات بنفسه، ولذلك لا تظهر في مكتبته. يستطيع Vespertine على الـ Mac فتحها: أضفها إلى مكتبة الـ Mac، ثم شغّلها هناك أو من الـ Mac على هذا الجهاز."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই ডিভাইস নিজে থেকে এই ফাইলগুলি খুলতে পারে না, তাই এগুলি এর লাইব্রেরিতে নেই। Mac-এ Vespertine এগুলি খুলতে পারে: Mac-এর লাইব্রেরিতে এগুলি যোগ করুন, তারপর সেখানে বা Mac থেকে এই ডিভাইসে চালান।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toto zařízení tyto soubory samo neotevře, proto nejsou v jeho knihovně. Vespertine na Macu je otevřít umí: přidejte je do knihovny na Macu a přehrávejte je tam, nebo z Macu na tomto zařízení."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne enhed kan ikke selv åbne disse filer, så de er ikke i dens bibliotek. Vespertine på en Mac kan åbne dem: Føj dem til Mac’ens bibliotek, og afspil dem der eller fra Mac’en på denne enhed."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieses Gerät kann diese Dateien nicht selbst öffnen, deshalb sind sie nicht in seiner Mediathek. Vespertine auf einem Mac kann sie öffnen: Füge sie zur Mediathek des Mac hinzu und spiele sie dann dort oder vom Mac aus auf diesem Gerät ab."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτή η συσκευή δεν μπορεί να ανοίξει μόνη της αυτά τα αρχεία, γι’ αυτό δεν βρίσκονται στη βιβλιοθήκη της. Το Vespertine σε Mac μπορεί να τα ανοίξει: προσθέστε τα στη βιβλιοθήκη του Mac και μετά αναπαραγάγετέ τα εκεί ή από το Mac σε αυτή τη συσκευή."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este dispositivo no puede abrir estos archivos por sí mismo, así que no están en su biblioteca. Vespertine en un Mac sí puede abrirlos: añádelos a la biblioteca del Mac y reprodúcelos allí o desde el Mac en este dispositivo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این دستگاه نمی‌تواند این فایل‌ها را خودش باز کند، برای همین در کتابخانهٔ آن نیستند. Vespertine روی Mac می‌تواند آن‌ها را باز کند: آن‌ها را به کتابخانهٔ Mac اضافه کنید، سپس همان‌جا یا از Mac روی این دستگاه پخش کنید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tämä laite ei voi avata näitä tiedostoja itse, joten ne eivät ole sen kirjastossa. Macin Vespertine voi avata ne: lisää ne Macin kirjastoon ja toista ne siellä tai Macista tällä laitteella."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi kayang buksan ng device na ito ang mga file na ito nang mag-isa, kaya wala ang mga ito sa library nito. Kaya itong buksan ng Vespertine sa Mac: idagdag ang mga ito sa library ng Mac, pagkatapos ay i-play doon o mula sa Mac sa device na ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet appareil ne peut pas ouvrir ces fichiers par lui-même, ils ne figurent donc pas dans sa bibliothèque. Vespertine sur un Mac peut les ouvrir : ajoutez-les à la bibliothèque du Mac, puis lisez-les là-bas ou depuis le Mac sur cet appareil."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ ડિવાઇસ આ ફાઇલો જાતે ખોલી શકતું નથી, તેથી તે તેની લાઇબ્રેરીમાં નથી. Mac પરનું Vespertine તેને ખોલી શકે છે: તેને Macની લાઇબ્રેરીમાં ઉમેરો, પછી ત્યાં અથવા Macમાંથી આ ડિવાઇસ પર વગાડો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan na'urar ba za ta iya buɗe waɗannan fayilolin da kanta ba, shi ya sa ba sa cikin ɗakin kiɗanta. Vespertine a kan Mac zai iya buɗe su: ƙara su zuwa ɗakin kiɗan Mac, sannan ka kunna su a can ko daga Mac a kan wannan na'urar."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המכשיר הזה לא יכול לפתוח את הקבצים האלה בעצמו, ולכן הם לא נמצאים בספרייה שלו. Vespertine ב־Mac יכול לפתוח אותם: הוסיפו אותם לספרייה של ה־Mac, ואז נגנו אותם שם או מה־Mac במכשיר הזה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यह डिवाइस इन फ़ाइलों को खुद नहीं खोल सकता, इसलिए ये इसकी लाइब्रेरी में नहीं हैं। Mac पर Vespertine इन्हें खोल सकता है: इन्हें Mac की लाइब्रेरी में जोड़ें, फिर वहीं या Mac से इस डिवाइस पर चलाएँ।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez az eszköz önállóan nem tudja megnyitni ezeket a fájlokat, ezért nincsenek a könyvtárában. A Macen futó Vespertine meg tudja nyitni őket: add hozzá őket a Mac könyvtárához, majd játszd le ott, vagy a Macről ezen az eszközön."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perangkat ini tidak dapat membuka file ini sendiri, sehingga tidak ada di perpustakaannya. Vespertine di Mac dapat membukanya: tambahkan ke perpustakaan Mac, lalu putar di sana atau dari Mac di perangkat ini."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo dispositivo non può aprire questi file da solo, quindi non sono nella sua libreria. Vespertine su un Mac può aprirli: aggiungili alla libreria del Mac, poi riproducili lì o dal Mac su questo dispositivo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデバイスだけではこれらのファイルを開けないため、ライブラリには表示されません。Mac上のVespertineなら開けます。Macのライブラリに追加してから、Macで再生するか、Macからこのデバイスで再生してください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಸಾಧನವು ಈ ಫೈಲ್‌ಗಳನ್ನು ತಾನಾಗಿಯೇ ತೆರೆಯಲು ಸಾಧ್ಯವಿಲ್ಲ, ಆದ್ದರಿಂದ ಅವು ಇದರ ಲೈಬ್ರರಿಯಲ್ಲಿ ಇಲ್ಲ. Mac ನಲ್ಲಿರುವ Vespertine ಅವುಗಳನ್ನು ತೆರೆಯಬಲ್ಲದು: ಅವುಗಳನ್ನು Mac ನ ಲೈಬ್ರರಿಗೆ ಸೇರಿಸಿ, ನಂತರ ಅಲ್ಲಿ ಅಥವಾ Mac ನಿಂದ ಈ ಸಾಧನದಲ್ಲಿ ಪ್ಲೇ ಮಾಡಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 기기는 이 파일들을 자체적으로 열 수 없어 보관함에 표시되지 않습니다. Mac의 Vespertine은 열 수 있습니다. Mac의 보관함에 추가한 다음 Mac에서 재생하거나 Mac에서 이 기기로 재생하세요."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ ഉപകരണത്തിന് ഈ ഫയലുകൾ സ്വയം തുറക്കാനാവില്ല, അതിനാൽ അവ ഇതിന്റെ ലൈബ്രറിയിൽ ഇല്ല. Mac-ലെ Vespertine-ന് അവ തുറക്കാനാകും: അവ Mac-ന്റെ ലൈബ്രറിയിൽ ചേർക്കുക, തുടർന്ന് അവിടെയോ Mac-ൽ നിന്ന് ഈ ഉപകരണത്തിലോ പ്ലേ ചെയ്യുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हे डिव्हाइस या फाइल्स स्वतः उघडू शकत नाही, म्हणून त्या त्याच्या लायब्ररीत नाहीत. Mac वरील Vespertine त्या उघडू शकते: त्या Mac च्या लायब्ररीत जोडा, मग तिथे किंवा Mac वरून या डिव्हाइसवर प्ले करा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peranti ini tidak dapat membuka fail ini dengan sendiri, jadi fail ini tiada dalam pustakanya. Vespertine pada Mac boleh membukanya: tambahkannya ke pustaka Mac, kemudian mainkannya di sana atau dari Mac pada peranti ini."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne enheten kan ikke åpne disse filene selv, så de er ikke i biblioteket. Vespertine på en Mac kan åpne dem: Legg dem til i Mac-ens bibliotek, og spill dem av der eller fra Mac-en på denne enheten."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit apparaat kan deze bestanden niet zelf openen, dus ze staan niet in de bibliotheek. Vespertine op een Mac kan ze wel openen: voeg ze toe aan de bibliotheek van de Mac en speel ze daar af, of vanaf de Mac op dit apparaat."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਹ ਡਿਵਾਈਸ ਇਨ੍ਹਾਂ ਫ਼ਾਈਲਾਂ ਨੂੰ ਆਪਣੇ ਆਪ ਨਹੀਂ ਖੋਲ੍ਹ ਸਕਦਾ, ਇਸ ਲਈ ਇਹ ਇਸ ਦੀ ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਨਹੀਂ ਹਨ। Mac ਉੱਤੇ Vespertine ਇਨ੍ਹਾਂ ਨੂੰ ਖੋਲ੍ਹ ਸਕਦਾ ਹੈ: ਇਨ੍ਹਾਂ ਨੂੰ Mac ਦੀ ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਜੋੜੋ, ਫਿਰ ਉੱਥੇ ਜਾਂ Mac ਤੋਂ ਇਸ ਡਿਵਾਈਸ ਉੱਤੇ ਚਲਾਓ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To urządzenie nie potrafi samo otworzyć tych plików, dlatego nie ma ich w jego bibliotece. Vespertine na Macu potrafi je otworzyć: dodaj je do biblioteki na Macu, a potem odtwarzaj tam lub z Maca na tym urządzeniu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este dispositivo não consegue abrir esses arquivos sozinho, então eles não estão na biblioteca dele. O Vespertine em um Mac consegue abri-los: adicione-os à biblioteca do Mac e reproduza-os lá ou a partir do Mac neste dispositivo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este dispositivo não consegue abrir estes ficheiros sozinho, por isso não estão na sua biblioteca. O Vespertine num Mac consegue abri-los: adicione-os à biblioteca do Mac e reproduza-os lá ou a partir do Mac neste dispositivo."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acest dispozitiv nu poate deschide singur aceste fișiere, așa că nu se află în biblioteca lui. Vespertine pe un Mac le poate deschide: adaugă-le în biblioteca de pe Mac, apoi redă-le acolo sau de pe Mac pe acest dispozitiv."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den här enheten kan inte öppna de här filerna själv, så de finns inte i dess bibliotek. Vespertine på en Mac kan öppna dem: lägg till dem i Macens bibliotek och spela dem sedan där eller från Macen på den här enheten."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kifaa hiki hakiwezi kufungua faili hizi chenyewe, kwa hivyo hazipo kwenye maktaba yake. Vespertine kwenye Mac inaweza kuzifungua: ziongeze kwenye maktaba ya Mac, kisha zicheze huko au kutoka Mac kwenye kifaa hiki."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்தச் சாதனத்தால் இந்தக் கோப்புகளைத் தானாகத் திறக்க முடியாது, எனவே அவை இதன் நூலகத்தில் இல்லை. Mac-இல் உள்ள Vespertine அவற்றைத் திறக்கும்: அவற்றை Mac-இன் நூலகத்தில் சேர்த்து, பிறகு அங்கே அல்லது Mac-இலிருந்து இந்தச் சாதனத்தில் இயக்குங்கள்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ పరికరం ఈ ఫైల్‌లను తనంతట తాను తెరవలేదు, అందుకే అవి దీని లైబ్రరీలో లేవు. Macలోని Vespertine వాటిని తెరవగలదు: వాటిని Mac లైబ్రరీకి జోడించి, తర్వాత అక్కడ లేదా Mac నుండి ఈ పరికరంలో ప్లే చేయండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อุปกรณ์นี้เปิดไฟล์เหล่านี้ด้วยตัวเองไม่ได้ ไฟล์จึงไม่อยู่ในคลังของอุปกรณ์ Vespertine บน Mac เปิดได้: เพิ่มไฟล์ลงในคลังของ Mac แล้วเล่นที่นั่นหรือเล่นจาก Mac บนอุปกรณ์นี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu aygıt bu dosyaları kendi başına açamaz, bu yüzden arşivinde yer almazlar. Mac’teki Vespertine onları açabilir: Mac’in arşivine ekleyin, sonra orada veya Mac’ten bu aygıtta çalın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей пристрій не може відкрити ці файли самостійно, тому їх немає в його медіатеці. Vespertine на Mac може їх відкрити: додайте їх до медіатеки Mac, а потім відтворюйте там або з Mac на цьому пристрої."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ ڈیوائس ان فائلوں کو خود نہیں کھول سکتا، اس لیے یہ اس کی لائبریری میں نہیں ہیں۔ Mac پر Vespertine انہیں کھول سکتا ہے: انہیں Mac کی لائبریری میں شامل کریں، پھر وہیں یا Mac سے اس ڈیوائس پر چلائیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thiết bị này không tự mở được các tệp này nên chúng không có trong thư viện của thiết bị. Vespertine trên máy Mac mở được: hãy thêm chúng vào thư viện của máy Mac, rồi phát ở đó hoặc phát từ máy Mac trên thiết bị này."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此裝置無法自行開啟這些檔案，因此它們不在其資料庫中。Mac 上的 Vespertine 可以開啟：請將它們加入 Mac 的資料庫，然後在 Mac 上播放，或從 Mac 在此裝置上播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此设备无法自行打开这些文件，因此它们不在其资料库中。Mac 上的 Vespertine 可以打开：请将它们添加到 Mac 的资料库，然后在 Mac 上播放，或从 Mac 在此设备上播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此裝置無法自行打開這些檔案，因此它們不在其資料庫中。Mac 上的 Vespertine 可以打開：請將它們加入 Mac 的資料庫，然後在 Mac 上播放，或從 Mac 在此裝置上播放。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

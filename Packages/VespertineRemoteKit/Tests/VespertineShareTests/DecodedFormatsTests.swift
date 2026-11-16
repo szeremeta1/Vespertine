@@ -88,6 +88,7 @@ private func toneShare() -> FakeShare {
         let library = try ShareScanner.scan(toneShare(), decoders: ToneDecoders())
         #expect(library.songs.map(\.fileName) == ["01 Monkey.ape", "02 Pack.wv", "03 Float.ogg"])
         #expect(library.needTheMac == 3, "5.1 Opus, DSD in WavPack, and TTA")
+        #expect(library.needs == ["surround": 1, "other": 1, "tta": 1])
         #expect(library.unreadable == 1)
         let ape = try #require(library.songs.first).tags
         #expect(ape.codec == "APE" && ape.sampleRate == 44_100 && ape.bitDepth == 16 && ape.channels == 2 && ape.frames == 5_000 && ape.lossless && ape.bitRate == nil)
@@ -102,6 +103,7 @@ private func toneShare() -> FakeShare {
     @Test func withoutDecodersTheyAllNeedTheMac() throws {
         let library = try ShareScanner.scan(toneShare())
         #expect(library.songs.isEmpty && library.needTheMac == 7 && library.unreadable == 0)
+        #expect(library.needs == ["other": 6, "tta": 1])
     }
 
     @Test func aFileAlreadyIndexedIsNotOpenedAgain() throws {

@@ -22,6 +22,8 @@ struct ShareStatus: Equatable {
     var reachable: Bool?
     var songs = 0
     var needTheMac = 0
+    /// The same files by why they need the Mac; empty until a scan has kept the reasons.
+    var needs: [MacNeed.Count] = []
     var unreadable = 0
     /// When the last whole scan ended; nil until one has.
     var scanned: Date?
@@ -33,6 +35,7 @@ struct ShareStatus: Equatable {
         reachable = mac.reachable
         songs = mac.library.songs.count
         needTheMac = mac.library.needTheMac
+        needs = mac.library.needsByKind
         unreadable = mac.library.unreadable
         scanned = mac.library.scanned
     }
@@ -41,6 +44,26 @@ struct ShareStatus: Equatable {
     var trouble: String? {
         if case .failed(let error) = scan { return ShareWording.trouble(error) }
         return reachable == false ? ShareWording.trouble(.unreachable) : nil
+    }
+}
+
+extension MacNeed {
+    /// What the files are, as the list of files that need the Mac names them. A format's own name is the same in every language.
+    var label: String {
+        switch self {
+        case .surroundDSD: String(localized: "DSD in surround", comment: "Shown on the iPhone or iPad, in the list of music files on a network share that only the Mac app can open. A row label followed by a number of files: DSD audio files (from SACDs) with more than two channels, such as 5.1.")
+        case .dst: "DSD (DST)"
+        case .dts: "DTS"
+        case .trueHD: "Dolby TrueHD, MLP"
+        case .dolbyDigital: "Dolby Digital"
+        case .tta: "TTA"
+        case .tak: "TAK"
+        case .wma: "WMA"
+        case .matroska: "Matroska (MKA)"
+        case .discImage: String(localized: "Disc images (ISO)", comment: "Shown on the iPhone or iPad, in the list of music files on a network share that only the Mac app can open. A row label followed by a number of files: .iso files, each a copy of a whole disc (an SACD mostly).")
+        case .surround: String(localized: "Surround in other formats", comment: "Shown on the iPhone or iPad, in the list of music files on a network share that only the Mac app can open. A row label followed by a number of files: files with more than two channels (5.1 and the like) in formats the device otherwise opens itself. The row above it is “DSD in surround”.")
+        case .other: String(localized: "Other formats", comment: "Shown on the iPhone or iPad, in the list of music files on a network share that only the Mac app can open. The last row label, followed by a number of files: files in formats that have no row of their own.")
+        }
     }
 }
 

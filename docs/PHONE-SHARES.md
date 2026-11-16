@@ -32,6 +32,8 @@ home. Now Playing says **SMB share** as the source, and Output shows the share, 
 | Covers | `cover`, `folder`, `front`, `album` or `albumart` `.jpg`/`.jpeg`/`.png` in the album's folder, else the picture inside a file (not read from inside APE, WavPack, Ogg and Opus files) |
 | Not there | Playlists (they are the Mac's), CUE sheets, ReplayGain, gapless trim values for MP3/AAC |
 
+Tapping "Files that need the Mac" lists them by what they are, each with its number of files: DSD in surround, DSD (DST), DTS, Dolby TrueHD and MLP, Dolby Digital, TTA, TAK, WMA, Matroska (MKA), disc images (ISO), surround in other formats, and other formats. The screen says that Vespertine on a Mac opens them. A share scanned before this version shows the count alone until its next scan.
+
 Folders a NAS keeps for itself (`@eaDir`, `#recycle`, `$RECYCLE.BIN`, `System Volume Information`, `lost+found`, snapshots), hidden files
 and names starting with a dot are skipped. Songs without tags are filed by their folder and file name.
 

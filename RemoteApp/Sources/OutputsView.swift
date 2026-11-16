@@ -153,7 +153,16 @@ struct OutputsView: View {
             }
             LabeledContent("Songs", value: status.songs.formatted())
             if status.needTheMac > 0 {
-                LabeledContent("Files that need the Mac", value: status.needTheMac.formatted())
+                if status.needs.isEmpty {
+                    LabeledContent("Files that need the Mac", value: status.needTheMac.formatted())
+                } else {
+                    NavigationLink {
+                        MacNeededView(needs: status.needs)
+                    } label: {
+                        LabeledContent("Files that need the Mac", value: status.needTheMac.formatted())
+                    }
+                    .accessibilityIdentifier("share-mac-needed")
+                }
             }
             if status.unreadable > 0 {
                 LabeledContent("Files that couldn’t be read", value: status.unreadable.formatted())
@@ -273,5 +282,29 @@ private struct DoPSection: View {
         case nil:
             return nil
         }
+    }
+}
+
+/// The files on the share that this device can't open by itself, by what they are: DTS, TrueHD, DSD in surround…
+struct MacNeededView: View {
+    let needs: [MacNeed.Count]
+
+    var body: some View {
+        List {
+            Section {
+                ForEach(needs, id: \.need) { count in
+                    LabeledContent {
+                        Text(verbatim: count.files.formatted())
+                    } label: {
+                        Text(verbatim: count.need.label)
+                    }
+                }
+            } footer: {
+                Text("This device can’t open these files by itself, so they aren’t in its library. Vespertine on a Mac can open them: add them to the Mac’s library, then play them there or from the Mac on this device.")
+            }
+        }
+        .obsidianList()
+        .navigationTitle("Files that need the Mac")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
