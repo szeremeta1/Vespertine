@@ -125,6 +125,9 @@ knob down first.
 8. Unplug the DAC mid-DSD-song: a pause, silence from the speaker. Plug another DAC in: it is not sent DoP until it passes its own test.
 9. On a DAC that does not take DoP: run the test, expect a quiet hiss or silence, answer Hiss. DSD stays PCM; "DoP stays off for this DAC."
 10. Test with the volume below 100%: expect "The test needs the volume at 100%." and no sound.
+11. From an SMB share, no Mac involved (Your Shares): play a DSD64 `.dsf` or `.dff` on the DAC that passed. Expect **NATIVE DSD · DoP**
+    and the DAC showing DSD64. Unplug the DAC and play it on the phone's speaker: expect **CONVERTED ON THIS DEVICE**, clean sound at a
+    normal level, and seeking that lands where asked. Any hiss or noise is a FAIL.
 
 Bit-exactness of PCM is a separate measurement (a DAC with a bit-perfect light, or a digital loopback into a recorder, and the files in
 `docs/fixtures`). A DAC playing the DoP test as music has received those frames exactly, at 176.4 kHz and 100% volume; that says

@@ -3080,271 +3080,271 @@
         }
       }
     },
-    "A scan reads only new and changed files, and runs by itself once a day when the share is opened. This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; DSD, APE, WavPack and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.": {
-      "comment": "Shown on the iPhone or iPad. An “SMB share” is a shared network folder of music (on a NAS or another computer) that the iPhone reads by itself, without a Mac. Output screen, footer under the share's details. Keep all format names (FLAC, ALAC, WAV, AIFF, MP3, AAC, DSD, APE, WavPack) as they are. “listed here” = shown in this app's library.",
+    "A scan reads only new and changed files, and runs by itself once a day when the share is opened. This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; APE, WavPack and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.": {
+      "comment": "Shown on the iPhone or iPad. An “SMB share” is a shared network folder of music (on a NAS or another computer) that the iPhone reads by itself, without a Mac. Output screen, footer under the share's details. Keep all format names (FLAC, ALAC, WAV, AIFF, MP3, AAC, APE, WavPack) as they are. “listed here” = shown in this app's library.",
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "ቅኝት የሚያነበው አዲስና የተቀየሩ ፋይሎችን ብቻ ነው፣ ማጋሪያው ሲከፈትም በቀን አንድ ጊዜ በራሱ ይካሄዳል። ይህ መሣሪያ የFLAC፣ ALAC፣ WAV፣ AIFF፣ MP3 እና AAC ፋይሎችን ራሱ ይከፍታል፤ DSD፣ APE፣ WavPack እና ሌሎች ቅርጸቶች ለመቀየር በMac ላይ ያለ Vespertine ያስፈልጋቸዋል፣ ስለዚህ እዚህ አይዘረዘሩም።"
+            "value": "ቅኝት የሚያነበው አዲስና የተቀየሩ ፋይሎችን ብቻ ነው፣ ማጋሪያው ሲከፈትም በቀን አንድ ጊዜ በራሱ ይካሄዳል። ይህ መሣሪያ የFLAC፣ ALAC፣ WAV፣ AIFF፣ MP3 እና AAC ፋይሎችን ራሱ ይከፍታል፤ APE፣ WavPack እና ሌሎች ቅርጸቶች ለመቀየር በMac ላይ ያለ Vespertine ያስፈልጋቸዋል፣ ስለዚህ እዚህ አይዘረዘሩም።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "لا يقرأ الفحص إلا الملفات الجديدة والمتغيّرة، ويجري تلقائيًا مرة في اليوم عند فتح المشاركة. يفتح هذا الجهاز ملفات FLAC و ALAC و WAV و AIFF و MP3 و AAC بنفسه؛ أما DSD و APE و WavPack والتنسيقات الأخرى فتحتاج إلى Vespertine على Mac لتحويلها، ولذلك لا تظهر هنا."
+            "value": "لا يقرأ الفحص إلا الملفات الجديدة والمتغيّرة، ويجري تلقائيًا مرة في اليوم عند فتح المشاركة. يفتح هذا الجهاز ملفات FLAC و ALAC و WAV و AIFF و MP3 و AAC بنفسه؛ أما APE و WavPack والتنسيقات الأخرى فتحتاج إلى Vespertine على Mac لتحويلها، ولذلك لا تظهر هنا."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "স্ক্যানে শুধু নতুন ও পরিবর্তিত ফাইলগুলো পড়া হয়, এবং শেয়ারটি খোলা হলে দিনে একবার এটি নিজে থেকেই চলে। এই ডিভাইস FLAC, ALAC, WAV, AIFF, MP3 ও AAC ফাইল নিজেই খোলে; DSD, APE, WavPack ও অন্যান্য ফরম্যাট রূপান্তর করতে Mac-এ Vespertine দরকার, তাই সেগুলো এখানে দেখানো হয় না।"
+            "value": "স্ক্যানে শুধু নতুন ও পরিবর্তিত ফাইলগুলো পড়া হয়, এবং শেয়ারটি খোলা হলে দিনে একবার এটি নিজে থেকেই চলে। এই ডিভাইস FLAC, ALAC, WAV, AIFF, MP3 ও AAC ফাইল নিজেই খোলে; APE, WavPack ও অন্যান্য ফরম্যাট রূপান্তর করতে Mac-এ Vespertine দরকার, তাই সেগুলো এখানে দেখানো হয় না।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Prohledání čte jen nové a změněné soubory a jednou denně se při otevření sdílení spustí samo. Toto zařízení samo otevírá soubory FLAC, ALAC, WAV, AIFF, MP3 a AAC; formáty DSD, APE, WavPack a další musí převést Vespertine na Macu, proto zde nejsou uvedeny."
+            "value": "Prohledání čte jen nové a změněné soubory a jednou denně se při otevření sdílení spustí samo. Toto zařízení samo otevírá soubory FLAC, ALAC, WAV, AIFF, MP3 a AAC; formáty APE, WavPack a další musí převést Vespertine na Macu, proto zde nejsou uvedeny."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "En scanning læser kun nye og ændrede filer og kører af sig selv en gang om dagen, når delingen åbnes. Denne enhed åbner selv FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer; DSD, APE, WavPack og andre formater skal konverteres af Vespertine på en Mac, så de vises ikke her."
+            "value": "En scanning læser kun nye og ændrede filer og kører af sig selv en gang om dagen, når delingen åbnes. Denne enhed åbner selv FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer; APE, WavPack og andre formater skal konverteres af Vespertine på en Mac, så de vises ikke her."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein Scan liest nur neue und geänderte Dateien und läuft einmal täglich von selbst, wenn die Freigabe geöffnet wird. Dieses Gerät öffnet FLAC-, ALAC-, WAV-, AIFF-, MP3- und AAC-Dateien selbst; DSD, APE, WavPack und andere Formate müssen von Vespertine auf einem Mac konvertiert werden und werden deshalb hier nicht aufgeführt."
+            "value": "Ein Scan liest nur neue und geänderte Dateien und läuft einmal täglich von selbst, wenn die Freigabe geöffnet wird. Dieses Gerät öffnet FLAC-, ALAC-, WAV-, AIFF-, MP3- und AAC-Dateien selbst; APE, WavPack und andere Formate müssen von Vespertine auf einem Mac konvertiert werden und werden deshalb hier nicht aufgeführt."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Η σάρωση διαβάζει μόνο τα νέα και τα αλλαγμένα αρχεία και εκτελείται αυτόματα μία φορά την ημέρα, όταν ανοίγει ο κοινόχρηστος φάκελος. Αυτή η συσκευή ανοίγει η ίδια αρχεία FLAC, ALAC, WAV, AIFF, MP3 και AAC· τα DSD, APE, WavPack και άλλες μορφές χρειάζονται το Vespertine σε Mac για τη μετατροπή τους, οπότε δεν εμφανίζονται εδώ."
+            "value": "Η σάρωση διαβάζει μόνο τα νέα και τα αλλαγμένα αρχεία και εκτελείται αυτόματα μία φορά την ημέρα, όταν ανοίγει ο κοινόχρηστος φάκελος. Αυτή η συσκευή ανοίγει η ίδια αρχεία FLAC, ALAC, WAV, AIFF, MP3 και AAC· τα APE, WavPack και άλλες μορφές χρειάζονται το Vespertine σε Mac για τη μετατροπή τους, οπότε δεν εμφανίζονται εδώ."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un escaneo solo lee los archivos nuevos y modificados, y se ejecuta por sí solo una vez al día al abrir el recurso compartido. Este dispositivo abre por sí mismo los archivos FLAC, ALAC, WAV, AIFF, MP3 y AAC; DSD, APE, WavPack y otros formatos necesitan que Vespertine los convierta en un Mac, así que no aparecen aquí."
+            "value": "Un escaneo solo lee los archivos nuevos y modificados, y se ejecuta por sí solo una vez al día al abrir el recurso compartido. Este dispositivo abre por sí mismo los archivos FLAC, ALAC, WAV, AIFF, MP3 y AAC; APE, WavPack y otros formatos necesitan que Vespertine los convierta en un Mac, así que no aparecen aquí."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "اسکن فقط فایل‌های جدید و تغییرکرده را می‌خواند و روزی یک بار، هنگام باز شدن اشتراک، خودکار انجام می‌شود. این دستگاه فایل‌های FLAC، ALAC، WAV، AIFF، MP3 و AAC را خودش باز می‌کند؛ DSD، APE، WavPack و قالب‌های دیگر برای تبدیل به Vespertine در Mac نیاز دارند و به همین دلیل اینجا فهرست نمی‌شوند."
+            "value": "اسکن فقط فایل‌های جدید و تغییرکرده را می‌خواند و روزی یک بار، هنگام باز شدن اشتراک، خودکار انجام می‌شود. این دستگاه فایل‌های FLAC، ALAC، WAV، AIFF، MP3 و AAC را خودش باز می‌کند؛ APE، WavPack و قالب‌های دیگر برای تبدیل به Vespertine در Mac نیاز دارند و به همین دلیل اینجا فهرست نمی‌شوند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Skannaus lukee vain uudet ja muuttuneet tiedostot, ja se käynnistyy itsestään kerran päivässä, kun jako avataan. Tämä laite avaa FLAC-, ALAC-, WAV-, AIFF-, MP3- ja AAC-tiedostot itse; DSD, APE, WavPack ja muut muodot vaativat, että Vespertine muuntaa ne Macissa, joten niitä ei näytetä täällä."
+            "value": "Skannaus lukee vain uudet ja muuttuneet tiedostot, ja se käynnistyy itsestään kerran päivässä, kun jako avataan. Tämä laite avaa FLAC-, ALAC-, WAV-, AIFF-, MP3- ja AAC-tiedostot itse; APE, WavPack ja muut muodot vaativat, että Vespertine muuntaa ne Macissa, joten niitä ei näytetä täällä."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ang mga bago at nabagong file lang ang binabasa ng scan, at kusa itong tumatakbo isang beses kada araw kapag binuksan ang share. Ang device na ito mismo ang nagbubukas ng mga FLAC, ALAC, WAV, AIFF, MP3 at AAC file; kailangan ng DSD, APE, WavPack at iba pang format ang Vespertine sa Mac para i-convert ang mga ito, kaya hindi nakalista ang mga iyon dito."
+            "value": "Ang mga bago at nabagong file lang ang binabasa ng scan, at kusa itong tumatakbo isang beses kada araw kapag binuksan ang share. Ang device na ito mismo ang nagbubukas ng mga FLAC, ALAC, WAV, AIFF, MP3 at AAC file; kailangan ng APE, WavPack at iba pang format ang Vespertine sa Mac para i-convert ang mga ito, kaya hindi nakalista ang mga iyon dito."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Une indexation ne lit que les fichiers nouveaux ou modifiés, et se lance d’elle-même une fois par jour à l’ouverture du partage. Cet appareil ouvre lui-même les fichiers FLAC, ALAC, WAV, AIFF, MP3 et AAC ; les formats DSD, APE, WavPack et autres doivent être convertis par Vespertine sur un Mac, et ne figurent donc pas ici."
+            "value": "Une indexation ne lit que les fichiers nouveaux ou modifiés, et se lance d’elle-même une fois par jour à l’ouverture du partage. Cet appareil ouvre lui-même les fichiers FLAC, ALAC, WAV, AIFF, MP3 et AAC ; les formats APE, WavPack et autres doivent être convertis par Vespertine sur un Mac, et ne figurent donc pas ici."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "સ્કૅન માત્ર નવી અને બદલાયેલી ફાઇલો વાંચે છે, અને શેર ખોલવામાં આવે ત્યારે દિવસમાં એક વાર આપમેળે ચાલે છે. આ ડિવાઇસ FLAC, ALAC, WAV, AIFF, MP3 અને AAC ફાઇલો જાતે ખોલે છે; DSD, APE, WavPack અને અન્ય ફૉર્મેટને રૂપાંતરિત કરવા માટે Mac પર Vespertine જોઈએ, તેથી તે અહીં બતાવાતાં નથી."
+            "value": "સ્કૅન માત્ર નવી અને બદલાયેલી ફાઇલો વાંચે છે, અને શેર ખોલવામાં આવે ત્યારે દિવસમાં એક વાર આપમેળે ચાલે છે. આ ડિવાઇસ FLAC, ALAC, WAV, AIFF, MP3 અને AAC ફાઇલો જાતે ખોલે છે; APE, WavPack અને અન્ય ફૉર્મેટને રૂપાંતરિત કરવા માટે Mac પર Vespertine જોઈએ, તેથી તે અહીં બતાવાતાં નથી."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bincike yana karanta sababbin fayiloli da waɗanda suka canza ne kawai, kuma yana gudana da kansa sau ɗaya a rana idan aka buɗe folda ta cibiyar sadarwa. Wannan na'ura tana buɗe fayilolin FLAC, ALAC, WAV, AIFF, MP3 da AAC da kanta; DSD, APE, WavPack da sauran tsare-tsare suna buƙatar Vespertine a kan Mac don ya juya su, don haka ba a nuna su a nan ba."
+            "value": "Bincike yana karanta sababbin fayiloli da waɗanda suka canza ne kawai, kuma yana gudana da kansa sau ɗaya a rana idan aka buɗe folda ta cibiyar sadarwa. Wannan na'ura tana buɗe fayilolin FLAC, ALAC, WAV, AIFF, MP3 da AAC da kanta; APE, WavPack da sauran tsare-tsare suna buƙatar Vespertine a kan Mac don ya juya su, don haka ba a nuna su a nan ba."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "סריקה קוראת רק קבצים חדשים וקבצים שהשתנו, ומתבצעת מעצמה פעם ביום כשהשיתוף נפתח. מכשיר זה פותח בעצמו קובצי FLAC, ALAC, WAV, AIFF, MP3 ו־AAC; DSD, APE, WavPack ופורמטים אחרים דורשים את Vespertine ב־Mac כדי להמיר אותם, ולכן הם אינם מופיעים כאן."
+            "value": "סריקה קוראת רק קבצים חדשים וקבצים שהשתנו, ומתבצעת מעצמה פעם ביום כשהשיתוף נפתח. מכשיר זה פותח בעצמו קובצי FLAC, ALAC, WAV, AIFF, MP3 ו־AAC; APE, WavPack ופורמטים אחרים דורשים את Vespertine ב־Mac כדי להמיר אותם, ולכן הם אינם מופיעים כאן."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "स्कैन में केवल नई और बदली हुई फ़ाइलें पढ़ी जाती हैं, और शेयर खोलने पर यह दिन में एक बार अपने आप चलता है। यह डिवाइस FLAC, ALAC, WAV, AIFF, MP3 और AAC फ़ाइलें ख़ुद खोलता है; DSD, APE, WavPack और अन्य फ़ॉर्मैट को रूपांतरित करने के लिए Mac पर Vespertine चाहिए, इसलिए वे यहाँ नहीं दिखाए जाते।"
+            "value": "स्कैन में केवल नई और बदली हुई फ़ाइलें पढ़ी जाती हैं, और शेयर खोलने पर यह दिन में एक बार अपने आप चलता है। यह डिवाइस FLAC, ALAC, WAV, AIFF, MP3 और AAC फ़ाइलें ख़ुद खोलता है; APE, WavPack और अन्य फ़ॉर्मैट को रूपांतरित करने के लिए Mac पर Vespertine चाहिए, इसलिए वे यहाँ नहीं दिखाए जाते।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A beolvasás csak az új és a módosult fájlokat olvassa be, és naponta egyszer magától elindul, amikor megnyitja a megosztást. Ez az eszköz a FLAC-, ALAC-, WAV-, AIFF-, MP3- és AAC-fájlokat maga nyitja meg; a DSD, az APE, a WavPack és más formátumok átalakításához a Macen futó Vespertine szükséges, ezért ezek itt nem jelennek meg."
+            "value": "A beolvasás csak az új és a módosult fájlokat olvassa be, és naponta egyszer magától elindul, amikor megnyitja a megosztást. Ez az eszköz a FLAC-, ALAC-, WAV-, AIFF-, MP3- és AAC-fájlokat maga nyitja meg; az APE, a WavPack és más formátumok átalakításához a Macen futó Vespertine szükséges, ezért ezek itt nem jelennek meg."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pemindaian hanya membaca file baru dan yang berubah, dan berjalan sendiri sekali sehari saat share dibuka. Perangkat ini dapat membuka sendiri file FLAC, ALAC, WAV, AIFF, MP3, dan AAC; DSD, APE, WavPack, dan format lain memerlukan Vespertine di Mac untuk mengonversinya, sehingga tidak dicantumkan di sini."
+            "value": "Pemindaian hanya membaca file baru dan yang berubah, dan berjalan sendiri sekali sehari saat share dibuka. Perangkat ini dapat membuka sendiri file FLAC, ALAC, WAV, AIFF, MP3, dan AAC; APE, WavPack, dan format lain memerlukan Vespertine di Mac untuk mengonversinya, sehingga tidak dicantumkan di sini."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Una scansione legge solo i file nuovi e modificati e parte da sola una volta al giorno quando la condivisione viene aperta. Questo dispositivo apre direttamente i file FLAC, ALAC, WAV, AIFF, MP3 e AAC; DSD, APE, WavPack e altri formati devono essere convertiti da Vespertine su un Mac, quindi non sono elencati qui."
+            "value": "Una scansione legge solo i file nuovi e modificati e parte da sola una volta al giorno quando la condivisione viene aperta. Questo dispositivo apre direttamente i file FLAC, ALAC, WAV, AIFF, MP3 e AAC; APE, WavPack e altri formati devono essere convertiti da Vespertine su un Mac, quindi non sono elencati qui."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "スキャンでは新しいファイルと変更されたファイルだけを読み込みます。共有を開いたときに、1日に1回自動的に実行されます。このデバイスはFLAC、ALAC、WAV、AIFF、MP3、AACのファイルを直接開けます。DSD、APE、WavPackなどのフォーマットは、Mac上のVespertineで変換する必要があるため、ここには表示されません。"
+            "value": "スキャンでは新しいファイルと変更されたファイルだけを読み込みます。共有を開いたときに、1日に1回自動的に実行されます。このデバイスはFLAC、ALAC、WAV、AIFF、MP3、AACのファイルを直接開けます。APE、WavPackなどのフォーマットは、Mac上のVespertineで変換する必要があるため、ここには表示されません。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಸ್ಕ್ಯಾನ್ ಹೊಸ ಮತ್ತು ಬದಲಾದ ಫೈಲ್‌ಗಳನ್ನು ಮಾತ್ರ ಓದುತ್ತದೆ, ಮತ್ತು ಶೇರ್ ತೆರೆದಾಗ ದಿನಕ್ಕೊಮ್ಮೆ ತಾನಾಗಿಯೇ ನಡೆಯುತ್ತದೆ. ಈ ಸಾಧನ FLAC, ALAC, WAV, AIFF, MP3 ಮತ್ತು AAC ಫೈಲ್‌ಗಳನ್ನು ತಾನೇ ತೆರೆಯುತ್ತದೆ; DSD, APE, WavPack ಮತ್ತು ಇತರ ಫಾರ್ಮ್ಯಾಟ್‌ಗಳನ್ನು ಪರಿವರ್ತಿಸಲು Mac ನಲ್ಲಿ Vespertine ಬೇಕು, ಆದ್ದರಿಂದ ಅವುಗಳನ್ನು ಇಲ್ಲಿ ಪಟ್ಟಿ ಮಾಡಲಾಗುವುದಿಲ್ಲ."
+            "value": "ಸ್ಕ್ಯಾನ್ ಹೊಸ ಮತ್ತು ಬದಲಾದ ಫೈಲ್‌ಗಳನ್ನು ಮಾತ್ರ ಓದುತ್ತದೆ, ಮತ್ತು ಶೇರ್ ತೆರೆದಾಗ ದಿನಕ್ಕೊಮ್ಮೆ ತಾನಾಗಿಯೇ ನಡೆಯುತ್ತದೆ. ಈ ಸಾಧನ FLAC, ALAC, WAV, AIFF, MP3 ಮತ್ತು AAC ಫೈಲ್‌ಗಳನ್ನು ತಾನೇ ತೆರೆಯುತ್ತದೆ; APE, WavPack ಮತ್ತು ಇತರ ಫಾರ್ಮ್ಯಾಟ್‌ಗಳನ್ನು ಪರಿವರ್ತಿಸಲು Mac ನಲ್ಲಿ Vespertine ಬೇಕು, ಆದ್ದರಿಂದ ಅವುಗಳನ್ನು ಇಲ್ಲಿ ಪಟ್ಟಿ ಮಾಡಲಾಗುವುದಿಲ್ಲ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "스캔은 새로운 파일과 변경된 파일만 읽으며, 공유를 열 때 하루에 한 번 자동으로 실행됩니다. 이 기기는 FLAC, ALAC, WAV, AIFF, MP3 및 AAC 파일을 직접 엽니다. DSD, APE, WavPack 및 기타 포맷은 Mac의 Vespertine에서 변환해야 하므로 여기에 표시되지 않습니다."
+            "value": "스캔은 새로운 파일과 변경된 파일만 읽으며, 공유를 열 때 하루에 한 번 자동으로 실행됩니다. 이 기기는 FLAC, ALAC, WAV, AIFF, MP3 및 AAC 파일을 직접 엽니다. APE, WavPack 및 기타 포맷은 Mac의 Vespertine에서 변환해야 하므로 여기에 표시되지 않습니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "സ്കാൻ പുതിയതും മാറിയതുമായ ഫയലുകൾ മാത്രമേ വായിക്കൂ; ഷെയർ തുറക്കുമ്പോൾ ദിവസത്തിലൊരിക്കൽ അത് സ്വയം നടക്കും. ഈ ഉപകരണം FLAC, ALAC, WAV, AIFF, MP3, AAC ഫയലുകൾ സ്വയം തുറക്കുന്നു; DSD, APE, WavPack എന്നിവയും മറ്റ് ഫോർമാറ്റുകളും പരിവർത്തനം ചെയ്യാൻ Mac-ലെ Vespertine വേണം, അതിനാൽ അവ ഇവിടെ പട്ടികപ്പെടുത്തുന്നില്ല."
+            "value": "സ്കാൻ പുതിയതും മാറിയതുമായ ഫയലുകൾ മാത്രമേ വായിക്കൂ; ഷെയർ തുറക്കുമ്പോൾ ദിവസത്തിലൊരിക്കൽ അത് സ്വയം നടക്കും. ഈ ഉപകരണം FLAC, ALAC, WAV, AIFF, MP3, AAC ഫയലുകൾ സ്വയം തുറക്കുന്നു; APE, WavPack എന്നിവയും മറ്റ് ഫോർമാറ്റുകളും പരിവർത്തനം ചെയ്യാൻ Mac-ലെ Vespertine വേണം, അതിനാൽ അവ ഇവിടെ പട്ടികപ്പെടുത്തുന്നില്ല."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "स्कॅनमध्ये फक्त नवीन आणि बदललेल्या फाइल वाचल्या जातात, आणि शेअर उघडल्यावर ते दिवसातून एकदा आपोआप चालते. हे डिव्हाइस FLAC, ALAC, WAV, AIFF, MP3 आणि AAC फाइल स्वतः उघडते; DSD, APE, WavPack आणि इतर फॉरमॅट रूपांतरित करण्यासाठी Mac वरील Vespertine लागते, त्यामुळे ते येथे दाखवले जात नाहीत."
+            "value": "स्कॅनमध्ये फक्त नवीन आणि बदललेल्या फाइल वाचल्या जातात, आणि शेअर उघडल्यावर ते दिवसातून एकदा आपोआप चालते. हे डिव्हाइस FLAC, ALAC, WAV, AIFF, MP3 आणि AAC फाइल स्वतः उघडते; APE, WavPack आणि इतर फॉरमॅट रूपांतरित करण्यासाठी Mac वरील Vespertine लागते, त्यामुळे ते येथे दाखवले जात नाहीत."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Imbasan hanya membaca fail baharu dan yang berubah, dan berjalan dengan sendirinya sekali sehari apabila perkongsian dibuka. Peranti ini membuka sendiri fail FLAC, ALAC, WAV, AIFF, MP3 dan AAC; DSD, APE, WavPack dan format lain memerlukan Vespertine pada Mac untuk menukarnya, jadi ia tidak disenaraikan di sini."
+            "value": "Imbasan hanya membaca fail baharu dan yang berubah, dan berjalan dengan sendirinya sekali sehari apabila perkongsian dibuka. Peranti ini membuka sendiri fail FLAC, ALAC, WAV, AIFF, MP3 dan AAC; APE, WavPack dan format lain memerlukan Vespertine pada Mac untuk menukarnya, jadi ia tidak disenaraikan di sini."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "En skanning leser bare nye og endrede filer og kjører av seg selv én gang om dagen når delingen åpnes. Denne enheten åpner FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer selv; DSD, APE, WavPack og andre formater må konverteres av Vespertine på en Mac, så de vises ikke her."
+            "value": "En skanning leser bare nye og endrede filer og kjører av seg selv én gang om dagen når delingen åpnes. Denne enheten åpner FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer selv; APE, WavPack og andre formater må konverteres av Vespertine på en Mac, så de vises ikke her."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Een scan leest alleen nieuwe en gewijzigde bestanden en wordt één keer per dag vanzelf uitgevoerd wanneer de share wordt geopend. Dit apparaat opent FLAC-, ALAC-, WAV-, AIFF-, MP3- en AAC-bestanden zelf; DSD, APE, WavPack en andere formaten moeten door Vespertine op een Mac worden omgezet en staan hier daarom niet in de lijst."
+            "value": "Een scan leest alleen nieuwe en gewijzigde bestanden en wordt één keer per dag vanzelf uitgevoerd wanneer de share wordt geopend. Dit apparaat opent FLAC-, ALAC-, WAV-, AIFF-, MP3- en AAC-bestanden zelf; APE, WavPack en andere formaten moeten door Vespertine op een Mac worden omgezet en staan hier daarom niet in de lijst."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਸਕੈਨ ਵਿੱਚ ਸਿਰਫ਼ ਨਵੀਆਂ ਅਤੇ ਬਦਲੀਆਂ ਫ਼ਾਈਲਾਂ ਪੜ੍ਹੀਆਂ ਜਾਂਦੀਆਂ ਹਨ, ਅਤੇ ਸ਼ੇਅਰ ਖੋਲ੍ਹਣ ’ਤੇ ਇਹ ਦਿਨ ਵਿੱਚ ਇੱਕ ਵਾਰ ਆਪਣੇ-ਆਪ ਚੱਲਦਾ ਹੈ। ਇਹ ਡਿਵਾਈਸ FLAC, ALAC, WAV, AIFF, MP3 ਅਤੇ AAC ਫ਼ਾਈਲਾਂ ਆਪ ਖੋਲ੍ਹਦਾ ਹੈ; DSD, APE, WavPack ਅਤੇ ਹੋਰ ਫ਼ਾਰਮੈਟਾਂ ਨੂੰ ਬਦਲਣ ਲਈ Mac ’ਤੇ Vespertine ਚਾਹੀਦਾ ਹੈ, ਇਸ ਲਈ ਉਹ ਇੱਥੇ ਨਹੀਂ ਦਿਖਾਏ ਜਾਂਦੇ।"
+            "value": "ਸਕੈਨ ਵਿੱਚ ਸਿਰਫ਼ ਨਵੀਆਂ ਅਤੇ ਬਦਲੀਆਂ ਫ਼ਾਈਲਾਂ ਪੜ੍ਹੀਆਂ ਜਾਂਦੀਆਂ ਹਨ, ਅਤੇ ਸ਼ੇਅਰ ਖੋਲ੍ਹਣ ’ਤੇ ਇਹ ਦਿਨ ਵਿੱਚ ਇੱਕ ਵਾਰ ਆਪਣੇ-ਆਪ ਚੱਲਦਾ ਹੈ। ਇਹ ਡਿਵਾਈਸ FLAC, ALAC, WAV, AIFF, MP3 ਅਤੇ AAC ਫ਼ਾਈਲਾਂ ਆਪ ਖੋਲ੍ਹਦਾ ਹੈ; APE, WavPack ਅਤੇ ਹੋਰ ਫ਼ਾਰਮੈਟਾਂ ਨੂੰ ਬਦਲਣ ਲਈ Mac ’ਤੇ Vespertine ਚਾਹੀਦਾ ਹੈ, ਇਸ ਲਈ ਉਹ ਇੱਥੇ ਨਹੀਂ ਦਿਖਾਏ ਜਾਂਦੇ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Skanowanie odczytuje tylko nowe i zmienione pliki, a raz dziennie uruchamia się samo przy otwarciu zasobu. To urządzenie samo otwiera pliki FLAC, ALAC, WAV, AIFF, MP3 i AAC; DSD, APE, WavPack i inne formaty wymagają konwersji przez Vespertine na Macu, więc nie są tutaj wyświetlane."
+            "value": "Skanowanie odczytuje tylko nowe i zmienione pliki, a raz dziennie uruchamia się samo przy otwarciu zasobu. To urządzenie samo otwiera pliki FLAC, ALAC, WAV, AIFF, MP3 i AAC; APE, WavPack i inne formaty wymagają konwersji przez Vespertine na Macu, więc nie są tutaj wyświetlane."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Um escaneamento lê somente os arquivos novos e alterados e é executado sozinho uma vez por dia quando o compartilhamento é aberto. Este dispositivo abre sozinho arquivos FLAC, ALAC, WAV, AIFF, MP3 e AAC; DSD, APE, WavPack e outros formatos precisam que o Vespertine em um Mac os converta, por isso não aparecem aqui."
+            "value": "Um escaneamento lê somente os arquivos novos e alterados e é executado sozinho uma vez por dia quando o compartilhamento é aberto. Este dispositivo abre sozinho arquivos FLAC, ALAC, WAV, AIFF, MP3 e AAC; APE, WavPack e outros formatos precisam que o Vespertine em um Mac os converta, por isso não aparecem aqui."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uma análise lê apenas os ficheiros novos e alterados e é executada automaticamente uma vez por dia quando a partilha é aberta. Este dispositivo abre sozinho ficheiros FLAC, ALAC, WAV, AIFF, MP3 e AAC; DSD, APE, WavPack e outros formatos precisam que o Vespertine num Mac os converta, pelo que não aparecem aqui."
+            "value": "Uma análise lê apenas os ficheiros novos e alterados e é executada automaticamente uma vez por dia quando a partilha é aberta. Este dispositivo abre sozinho ficheiros FLAC, ALAC, WAV, AIFF, MP3 e AAC; APE, WavPack e outros formatos precisam que o Vespertine num Mac os converta, pelo que não aparecem aqui."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "O scanare citește doar fișierele noi și cele modificate și rulează automat o dată pe zi, la deschiderea partajării. Acest dispozitiv deschide singur fișierele FLAC, ALAC, WAV, AIFF, MP3 și AAC; DSD, APE, WavPack și alte formate au nevoie de Vespertine pe un Mac pentru a fi convertite, așa că nu apar aici."
+            "value": "O scanare citește doar fișierele noi și cele modificate și rulează automat o dată pe zi, la deschiderea partajării. Acest dispozitiv deschide singur fișierele FLAC, ALAC, WAV, AIFF, MP3 și AAC; APE, WavPack și alte formate au nevoie de Vespertine pe un Mac pentru a fi convertite, așa că nu apar aici."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "En skanning läser bara nya och ändrade filer och körs av sig själv en gång om dagen när resursen öppnas. Den här enheten öppnar FLAC-, ALAC-, WAV-, AIFF-, MP3- och AAC-filer själv; DSD, APE, WavPack och andra format måste konverteras av Vespertine på en Mac, så de visas inte här."
+            "value": "En skanning läser bara nya och ändrade filer och körs av sig själv en gång om dagen när resursen öppnas. Den här enheten öppnar FLAC-, ALAC-, WAV-, AIFF-, MP3- och AAC-filer själv; APE, WavPack och andra format måste konverteras av Vespertine på en Mac, så de visas inte här."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uchanganuzi husoma faili mpya na zilizobadilika pekee, na hufanyika wenyewe mara moja kwa siku folda ya mtandao inapofunguliwa. Kifaa hiki chenyewe hufungua faili za FLAC, ALAC, WAV, AIFF, MP3 na AAC; DSD, APE, WavPack na miundo mingine huhitaji Vespertine kwenye Mac ili kuzigeuza, kwa hivyo hazijaorodheshwa hapa."
+            "value": "Uchanganuzi husoma faili mpya na zilizobadilika pekee, na hufanyika wenyewe mara moja kwa siku folda ya mtandao inapofunguliwa. Kifaa hiki chenyewe hufungua faili za FLAC, ALAC, WAV, AIFF, MP3 na AAC; APE, WavPack na miundo mingine huhitaji Vespertine kwenye Mac ili kuzigeuza, kwa hivyo hazijaorodheshwa hapa."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "ஸ்கேன் புதிய மற்றும் மாற்றப்பட்ட கோப்புகளை மட்டுமே படிக்கும்; பகிர்வு திறக்கப்படும்போது நாளுக்கு ஒரு முறை தானாகவே இயங்கும். இந்தச் சாதனம் FLAC, ALAC, WAV, AIFF, MP3, AAC கோப்புகளைத் தானே திறக்கும்; DSD, APE, WavPack மற்றும் பிற வடிவங்களை மாற்ற Mac-இல் Vespertine தேவை, எனவே அவை இங்கே பட்டியலிடப்படாது."
+            "value": "ஸ்கேன் புதிய மற்றும் மாற்றப்பட்ட கோப்புகளை மட்டுமே படிக்கும்; பகிர்வு திறக்கப்படும்போது நாளுக்கு ஒரு முறை தானாகவே இயங்கும். இந்தச் சாதனம் FLAC, ALAC, WAV, AIFF, MP3, AAC கோப்புகளைத் தானே திறக்கும்; APE, WavPack மற்றும் பிற வடிவங்களை மாற்ற Mac-இல் Vespertine தேவை, எனவே அவை இங்கே பட்டியலிடப்படாது."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "స్కాన్ కొత్త, మారిన ఫైల్‌లను మాత్రమే చదువుతుంది; షేర్‌ను తెరిచినప్పుడు రోజుకు ఒకసారి దానంతట అదే నడుస్తుంది. ఈ పరికరం FLAC, ALAC, WAV, AIFF, MP3, AAC ఫైల్‌లను తానే తెరుస్తుంది; DSD, APE, WavPack, ఇతర ఫార్మాట్‌లను మార్చడానికి Macలో Vespertine అవసరం, కాబట్టి అవి ఇక్కడ జాబితాలో కనిపించవు."
+            "value": "స్కాన్ కొత్త, మారిన ఫైల్‌లను మాత్రమే చదువుతుంది; షేర్‌ను తెరిచినప్పుడు రోజుకు ఒకసారి దానంతట అదే నడుస్తుంది. ఈ పరికరం FLAC, ALAC, WAV, AIFF, MP3, AAC ఫైల్‌లను తానే తెరుస్తుంది; APE, WavPack, ఇతర ఫార్మాట్‌లను మార్చడానికి Macలో Vespertine అవసరం, కాబట్టి అవి ఇక్కడ జాబితాలో కనిపించవు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "การสแกนจะอ่านเฉพาะไฟล์ใหม่และไฟล์ที่เปลี่ยนแปลง และจะทำงานเองวันละครั้งเมื่อเปิดแชร์ อุปกรณ์เครื่องนี้เปิดไฟล์ FLAC, ALAC, WAV, AIFF, MP3 และ AAC ได้เอง ส่วน DSD, APE, WavPack และรูปแบบอื่นต้องใช้ Vespertine บน Mac เพื่อแปลง จึงไม่แสดงในรายการที่นี่"
+            "value": "การสแกนจะอ่านเฉพาะไฟล์ใหม่และไฟล์ที่เปลี่ยนแปลง และจะทำงานเองวันละครั้งเมื่อเปิดแชร์ อุปกรณ์เครื่องนี้เปิดไฟล์ FLAC, ALAC, WAV, AIFF, MP3 และ AAC ได้เอง ส่วน APE, WavPack และรูปแบบอื่นต้องใช้ Vespertine บน Mac เพื่อแปลง จึงไม่แสดงในรายการที่นี่"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tarama yalnızca yeni ve değişen dosyaları okur ve paylaşım açıldığında günde bir kez kendiliğinden çalışır. Bu aygıt FLAC, ALAC, WAV, AIFF, MP3 ve AAC dosyalarını kendisi açar; DSD, APE, WavPack ve diğer biçimlerin dönüştürülmesi için Mac’te Vespertine gerekir, bu yüzden bunlar burada listelenmez."
+            "value": "Tarama yalnızca yeni ve değişen dosyaları okur ve paylaşım açıldığında günde bir kez kendiliğinden çalışır. Bu aygıt FLAC, ALAC, WAV, AIFF, MP3 ve AAC dosyalarını kendisi açar; APE, WavPack ve diğer biçimlerin dönüştürülmesi için Mac’te Vespertine gerekir, bu yüzden bunlar burada listelenmez."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Під час сканування читаються лише нові та змінені файли; воно запускається само раз на день, коли відкривається ресурс. Цей пристрій сам відкриває файли FLAC, ALAC, WAV, AIFF, MP3 й AAC; для DSD, APE, WavPack та інших форматів потрібне перетворення у Vespertine на Mac, тому їх тут не показано."
+            "value": "Під час сканування читаються лише нові та змінені файли; воно запускається само раз на день, коли відкривається ресурс. Цей пристрій сам відкриває файли FLAC, ALAC, WAV, AIFF, MP3 й AAC; для APE, WavPack та інших форматів потрібне перетворення у Vespertine на Mac, тому їх тут не показано."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "اسکین صرف نئی اور تبدیل شدہ فائلیں پڑھتا ہے، اور شیئر کھولنے پر دن میں ایک بار خود بخود چلتا ہے۔ یہ ڈیوائس FLAC، ALAC، WAV، AIFF، MP3 اور AAC فائلیں خود کھولتی ہے؛ DSD، APE، WavPack اور دیگر فارمیٹس کو تبدیل کرنے کے لیے Mac پر Vespertine درکار ہے، اس لیے وہ یہاں درج نہیں ہوتے۔"
+            "value": "اسکین صرف نئی اور تبدیل شدہ فائلیں پڑھتا ہے، اور شیئر کھولنے پر دن میں ایک بار خود بخود چلتا ہے۔ یہ ڈیوائس FLAC، ALAC، WAV، AIFF، MP3 اور AAC فائلیں خود کھولتی ہے؛ APE، WavPack اور دیگر فارمیٹس کو تبدیل کرنے کے لیے Mac پر Vespertine درکار ہے، اس لیے وہ یہاں درج نہیں ہوتے۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mỗi lần quét chỉ đọc các tệp mới và tệp đã thay đổi, và tự chạy mỗi ngày một lần khi chia sẻ được mở. Thiết bị này tự mở được các tệp FLAC, ALAC, WAV, AIFF, MP3 và AAC; DSD, APE, WavPack và các định dạng khác cần Vespertine trên máy Mac để chuyển đổi nên không được liệt kê ở đây."
+            "value": "Mỗi lần quét chỉ đọc các tệp mới và tệp đã thay đổi, và tự chạy mỗi ngày một lần khi chia sẻ được mở. Thiết bị này tự mở được các tệp FLAC, ALAC, WAV, AIFF, MP3 và AAC; APE, WavPack và các định dạng khác cần Vespertine trên máy Mac để chuyển đổi nên không được liệt kê ở đây."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "掃描只會讀取新增和已更改的檔案，並在開啟共享時每日自動執行一次。此裝置可直接開啟 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；DSD、APE、WavPack 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會在此列出。"
+            "value": "掃描只會讀取新增和已更改的檔案，並在開啟共享時每日自動執行一次。此裝置可直接開啟 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；APE、WavPack 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會在此列出。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "扫描只会读取新增和已更改的文件，并在打开共享时每天自动运行一次。此设备可直接打开 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 文件；DSD、APE、WavPack 及其他格式需要由 Mac 上的 Vespertine 转换，因此不会在此列出。"
+            "value": "扫描只会读取新增和已更改的文件，并在打开共享时每天自动运行一次。此设备可直接打开 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 文件；APE、WavPack 及其他格式需要由 Mac 上的 Vespertine 转换，因此不会在此列出。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "掃描只會讀取新增和已更動的檔案，並在打開共享時每天自動執行一次。此裝置可直接打開 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；DSD、APE、WavPack 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會列在這裡。"
+            "value": "掃描只會讀取新增和已更動的檔案，並在打開共享時每天自動執行一次。此裝置可直接打開 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；APE、WavPack 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會列在這裡。"
           }
         }
       }
@@ -14033,6 +14033,275 @@
         }
       }
     },
+    "CONVERTED ON THIS DEVICE": {
+      "comment": "Signal badge on the iPhone or iPad (short, uppercase where the language has it): the song is a DSD file that this device converted to PCM itself, with no Mac involved. Same style as CONVERTED ON THE MAC.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በዚህ መሣሪያ ላይ ተቀይሯል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "محوَّل على هذا الجهاز"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই ডিভাইসে রূপান্তরিত"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PŘEVEDENO V TOMTO ZAŘÍZENÍ"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KONVERTERET PÅ DENNE ENHED"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AUF DIESEM GERÄT KONVERTIERT"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ΜΕΤΑΤΡΟΠΗ ΣΕ ΑΥΤΗΝ ΤΗ ΣΥΣΚΕΥΗ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CONVERTIDO EN ESTE DISPOSITIVO"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تبدیل‌شده در این دستگاه"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MUUNNETTU TÄSSÄ LAITTEESSA"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NA-CONVERT SA DEVICE NA ITO"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CONVERTI SUR CET APPAREIL"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ ડિવાઇસ પર રૂપાંતરિત"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AN CANZA A WANNAN NA'URA"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הומר במכשיר זה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस डिवाइस पर रूपांतरित"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ÁTALAKÍTVA EZEN AZ ESZKÖZÖN"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DIKONVERSI DI PERANGKAT INI"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CONVERTITO SU QUESTO DISPOSITIVO"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデバイスで変換"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಸಾಧನದಲ್ಲಿ ಪರಿವರ್ತಿಸಲಾಗಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 기기에서 변환됨"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ ഉപകരണത്തിൽ പരിവർത്തനം ചെയ്തു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या डिव्हाइसवर रूपांतरित"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DITUKAR PADA PERANTI INI"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KONVERTERT PÅ DENNE ENHETEN"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OMGEZET OP DIT APPARAAT"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ ਡਿਵਾਈਸ ’ਤੇ ਬਦਲਿਆ ਗਿਆ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KONWERTOWANY NA TYM URZĄDZENIU"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CONVERTIDA NESTE DISPOSITIVO"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CONVERTIDA NESTE DISPOSITIVO"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "CONVERTIT PE ACEST DISPOZITIV"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "KONVERTERAT PÅ DEN HÄR ENHETEN"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IMEGEUZWA KWENYE KIFAA HIKI"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்தச் சாதனத்தில் மாற்றப்பட்டது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ పరికరంలో మార్చబడింది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แปลงบนอุปกรณ์เครื่องนี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BU AYGITTA DÖNÜŞTÜRÜLDÜ"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ПЕРЕТВОРЕНО НА ЦЬОМУ ПРИСТРОЇ"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس ڈیوائس پر تبدیل شدہ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ĐÃ CHUYỂN ĐỔI TRÊN THIẾT BỊ NÀY"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已在此裝置上轉換"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已在此设备上转换"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已在此裝置上轉換"
+          }
+        }
+      }
+    },
     "Converting on the Mac…": {
       "comment": "Shown on the iPhone or iPad. Now Playing: the Mac is converting the song to a format this device can play before sending it. Short, one line.",
       "localizations": {
@@ -18333,6 +18602,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "除非此 DAC 支援 DSD over PCM（DoP），否則 DSD 會在 Mac 上轉換為 PCM。進行一次簡短、輕柔的測試即可確認：測試會以 DSD 播放一段柔和的和弦，然後詢問你聽到了什麼。測試時音樂會停止，且音量必須為 100%。"
+          }
+        }
+      }
+    },
+    "DSD is converted to PCM on this device unless this DAC takes DSD over PCM (DoP). A short, quiet test can tell: it plays a soft chord as DSD and asks what you heard. Music stops for the test, and the volume has to be at 100%.": {
+      "comment": "Shown on the iPhone or iPad. Output screen, footer under a section titled “Play DSD natively?” that has one button, “Test DoP”. It is shown when a USB DAC is plugged into the iPhone. “DSD” is the audio format; “PCM” is ordinary digital audio; “DoP” (DSD over PCM) is a way of sending DSD to a DAC: keep all three abbreviations as they are. “takes” means the DAC accepts/supports it. “Music stops for the test” means whatever is playing is stopped. “the volume” is the iPhone's own volume. This variant is shown when the songs come from an SMB share that the device reads by itself: the device, not a Mac, converts DSD.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ DAC DSDን በPCM ላይ (DoP) ካልተቀበለ በስተቀር DSD በዚህ መሣሪያ ላይ ወደ PCM ይቀየራል። አጭርና ዝግ ያለ ሙከራ ይህንን ሊያረጋግጥ ይችላል፦ ለስላሳ ኮርድ እንደ DSD ያጫውታል፣ ከዚያም ምን እንደሰሙ ይጠይቃል። ለሙከራው ሙዚቃው ይቆማል፤ የድምፅ መጠኑም 100% መሆን አለበት።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يتم تحويل DSD إلى PCM على هذا الجهاز ما لم يكن هذا الـ DAC يقبل DSD عبر PCM (DoP). يمكن لاختبار قصير وهادئ أن يحسم ذلك: يشغّل تآلفًا موسيقيًا خافتًا بصيغة DSD ثم يسألك عمّا سمعته. تتوقف الموسيقى من أجل الاختبار، ويجب أن يكون مستوى الصوت 100%."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই DAC PCM-এর মাধ্যমে DSD (DoP) গ্রহণ না করলে DSD-কে এই ডিভাইসে PCM-এ রূপান্তর করা হয়। একটি ছোট, মৃদু পরীক্ষায় তা জানা যাবে: এটি DSD হিসেবে একটি মৃদু কর্ড বাজায় এবং আপনি কী শুনেছেন তা জিজ্ঞাসা করে। পরীক্ষার জন্য মিউজিক থেমে যায়, আর ভলিউম 100% থাকতে হবে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD se v tomto zařízení převádí na PCM, pokud tento DAC nepřijímá DSD přes PCM (DoP). Krátký tichý test to může zjistit: přehraje jemný akord jako DSD a zeptá se, co jste slyšeli. Hudba se kvůli testu zastaví a hlasitost musí být na 100 %."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD konverteres til PCM på denne enhed, medmindre denne DAC kan modtage DSD via PCM (DoP). En kort, stille test kan afgøre det: Den afspiller en blød akkord som DSD og spørger, hvad du hørte. Musikken stopper under testen, og lydstyrken skal være på 100 %."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD wird auf diesem Gerät in PCM konvertiert, sofern dieser DAC nicht DSD over PCM (DoP) verarbeitet. Ein kurzer, leiser Test kann das klären: Er spielt einen sanften Akkord als DSD ab und fragt, was du gehört hast. Für den Test wird die Musik gestoppt, und die Lautstärke muss 100 % betragen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το DSD μετατρέπεται σε PCM σε αυτήν τη συσκευή, εκτός αν αυτό το DAC δέχεται DSD μέσω PCM (DoP). Μια σύντομη, ήσυχη δοκιμή μπορεί να το διαπιστώσει: αναπαράγει μια απαλή συγχορδία ως DSD και ρωτά τι ακούσατε. Η μουσική σταματά για τη δοκιμή και η ένταση ήχου πρέπει να είναι στο 100%."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El DSD se convierte a PCM en este dispositivo a menos que este DAC acepte DSD sobre PCM (DoP). Una prueba breve y a bajo volumen puede averiguarlo: reproduce un acorde suave como DSD y te pregunta qué has oído. La música se detiene para la prueba y el volumen tiene que estar al 100 %."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD در این دستگاه به PCM تبدیل می‌شود، مگر اینکه این DAC، DSD روی PCM (DoP) را بپذیرد. یک آزمایش کوتاه و آرام می‌تواند این را مشخص کند: یک آکورد ملایم را به‌صورت DSD پخش می‌کند و می‌پرسد چه شنیدید. موسیقی برای آزمایش متوقف می‌شود و بلندی صدا باید روی ۱۰۰٪ باشد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD muunnetaan tässä laitteessa PCM:ksi, ellei tämä DAC ota vastaan DSD:tä PCM:n kautta (DoP). Lyhyt, hiljainen testi voi selvittää asian: se toistaa pehmeän soinnun DSD:nä ja kysyy, mitä kuulit. Musiikki pysähtyy testin ajaksi, ja äänenvoimakkuuden on oltava 100 %."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kino-convert ang DSD sa PCM sa device na ito maliban kung tumatanggap ang DAC na ito ng DSD over PCM (DoP). Malalaman ito sa isang maikli at mahinang test: magpe-play ito ng mahinang chord bilang DSD at itatanong kung ano ang narinig mo. Hihinto ang musika para sa test, at kailangang ang volume ay nasa 100%."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le DSD est converti en PCM sur cet appareil, sauf si ce DAC accepte le DSD over PCM (DoP). Un test court et discret permet de le vérifier : il lit un accord doux en DSD et vous demande ce que vous avez entendu. La musique s’arrête pendant le test, et le volume doit être à 100 %."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ DAC, DSD over PCM (DoP) ને સપોર્ટ ન કરતું હોય તો DSD ને આ ડિવાઇસ પર PCM માં રૂપાંતરિત કરવામાં આવે છે. એક ટૂંકી, ધીમી ટેસ્ટથી જાણી શકાય છે: તે DSD તરીકે એક હળવો કોર્ડ વગાડે છે અને પૂછે છે કે તમને શું સંભળાયું. ટેસ્ટ માટે સંગીત બંધ થાય છે, અને વૉલ્યૂમ 100% પર હોવું જરૂરી છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana canza DSD zuwa PCM a wannan na'ura sai dai idan wannan DAC yana karɓar DSD ta PCM (DoP). Gajeren gwaji mai ƙaramin sauti zai iya tantancewa: yana kunna wani haɗin sautuka mai laushi a matsayin DSD, sannan ya tambayi abin da kuka ji. Waƙa za ta tsaya don gwajin, kuma dole ne ƙarar sauti ta kasance a 100%."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD מומר ל־PCM במכשיר זה, אלא אם ה־DAC הזה תומך ב־DSD דרך PCM (DoP). בדיקה קצרה ושקטה יכולה לברר זאת: היא מנגנת אקורד רך כ־DSD ושואלת מה שמעת. המוזיקה נעצרת לצורך הבדיקה, ועוצמת הקול חייבת להיות 100%."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD को इस डिवाइस पर PCM में बदला जाता है, जब तक कि यह DAC PCM पर DSD (DoP) का समर्थन न करता हो। एक छोटे, धीमे टेस्ट से पता चल सकता है: यह DSD के रूप में एक हल्का कॉर्ड चलाता है और पूछता है कि आपको क्या सुनाई दिया। टेस्ट के लिए संगीत रुक जाता है, और वॉल्यूम 100% पर होना चाहिए।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DSD ezen az eszközön PCM-mé alakul, kivéve, ha ez a DAC fogadja a DSD-t PCM-en keresztül (DoP). Egy rövid, halk teszttel kideríthető: a teszt lejátszik egy lágy akkordot DSD-ként, majd megkérdezi, mit hallott. A teszt idejére a zene leáll, a hangerőt pedig 100%-ra kell állítani."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD dikonversi ke PCM di perangkat ini, kecuali jika DAC ini mendukung DSD melalui PCM (DoP). Tes singkat dengan volume pelan dapat memastikannya: tes ini memutar akor lembut sebagai DSD dan menanyakan apa yang Anda dengar. Musik berhenti selama tes, dan volume harus 100%."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il DSD viene convertito in PCM su questo dispositivo, a meno che questo DAC non accetti il DSD over PCM (DoP). Un test breve e a basso volume può verificarlo: riproduce un accordo tenue in DSD e ti chiede cosa hai sentito. La musica si interrompe per il test, e il volume deve essere al 100%."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このDACがDSD over PCM（DoP）に対応していない場合、DSDはこのデバイスでPCMに変換されます。短い小音量のテストで確認できます。テストでは静かな和音をDSDとして再生し、何が聞こえたかをおたずねします。テスト中は音楽の再生が停止します。また、音量を100%にする必要があります。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ DAC, DSD over PCM (DoP) ಅನ್ನು ಬೆಂಬಲಿಸದಿದ್ದರೆ DSD ಅನ್ನು ಈ ಸಾಧನದಲ್ಲಿ PCM ಗೆ ಪರಿವರ್ತಿಸಲಾಗುತ್ತದೆ. ಒಂದು ಚಿಕ್ಕ, ಮೆಲುವಾದ ಪರೀಕ್ಷೆಯಿಂದ ತಿಳಿಯಬಹುದು: ಅದು DSD ಆಗಿ ಒಂದು ಮೃದುವಾದ ಸ್ವರಮೇಳವನ್ನು ಪ್ಲೇ ಮಾಡಿ, ನಿಮಗೆ ಏನು ಕೇಳಿಸಿತು ಎಂದು ಕೇಳುತ್ತದೆ. ಪರೀಕ್ಷೆಗಾಗಿ ಸಂಗೀತ ನಿಲ್ಲುತ್ತದೆ, ಮತ್ತು ವಾಲ್ಯೂಮ್ 100% ನಲ್ಲಿ ಇರಬೇಕು."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 DAC가 DSD over PCM(DoP)을 지원하지 않으면 DSD는 이 기기에서 PCM으로 변환됩니다. 짧고 조용한 테스트로 확인할 수 있습니다. 테스트는 부드러운 화음을 DSD로 재생한 다음 무엇이 들렸는지 묻습니다. 테스트하는 동안 음악이 중단되며, 음량이 100%여야 합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ DAC, DSD over PCM (DoP) സ്വീകരിക്കുന്നില്ലെങ്കിൽ DSD, ഈ ഉപകരണത്തിൽ PCM-ലേക്ക് പരിവർത്തനം ചെയ്യുന്നു. ഒരു ചെറിയ, ശബ്ദം കുറഞ്ഞ ടെസ്റ്റിലൂടെ ഇത് അറിയാം: അത് ഒരു മൃദുവായ കോർഡ് DSD ആയി പ്ലേ ചെയ്ത്, നിങ്ങൾ എന്താണ് കേട്ടതെന്ന് ചോദിക്കും. ടെസ്റ്റിനായി സംഗീതം നിർത്തും, വോളിയം 100% ആയിരിക്കുകയും വേണം."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हा DAC DSD over PCM (DoP) स्वीकारत नसल्यास DSD चे या डिव्हाइसवर PCM मध्ये रूपांतर केले जाते. एक छोटी, हलक्या आवाजातील चाचणी हे सांगू शकते: ती एक सौम्य कॉर्ड DSD म्हणून प्ले करते आणि तुम्हाला काय ऐकू आले ते विचारते. चाचणीसाठी संगीत थांबते आणि व्हॉल्यूम 100% वर असणे आवश्यक आहे."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD ditukar kepada PCM pada peranti ini melainkan DAC ini menerima DSD melalui PCM (DoP). Ujian yang singkat dan perlahan boleh memastikannya: ujian ini memainkan kord yang lembut sebagai DSD dan bertanya apa yang anda dengar. Muzik dihentikan untuk ujian ini dan kelantangan mesti pada 100%."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD konverteres til PCM på denne enheten med mindre denne DAC-en tar imot DSD via PCM (DoP). En kort test med lavt volum kan avgjøre det: Den spiller av en svak akkord som DSD og spør hva du hørte. Musikken stoppes under testen, og volumet må stå på 100 %."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD wordt op dit apparaat omgezet naar PCM, tenzij deze DAC DSD over PCM (DoP) aanneemt. Een korte, zachte test kan dat uitwijzen: er wordt een zacht akkoord als DSD afgespeeld en je krijgt de vraag wat je hoorde. Voor de test stopt de muziek en moet het volume naar 100%."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD ਨੂੰ ਇਸ ਡਿਵਾਈਸ ’ਤੇ PCM ਵਿੱਚ ਬਦਲਿਆ ਜਾਂਦਾ ਹੈ, ਜਦੋਂ ਤੱਕ ਇਹ DAC DSD over PCM (DoP) ਸਵੀਕਾਰ ਨਹੀਂ ਕਰਦਾ। ਇੱਕ ਛੋਟਾ, ਹੌਲੀ ਆਵਾਜ਼ ਵਾਲਾ ਟੈਸਟ ਇਹ ਦੱਸ ਸਕਦਾ ਹੈ: ਇਹ ਇੱਕ ਮੱਧਮ ਕੋਰਡ DSD ਵਜੋਂ ਚਲਾਉਂਦਾ ਹੈ ਅਤੇ ਪੁੱਛਦਾ ਹੈ ਕਿ ਤੁਹਾਨੂੰ ਕੀ ਸੁਣਿਆ। ਟੈਸਟ ਲਈ ਸੰਗੀਤ ਰੁਕ ਜਾਂਦਾ ਹੈ ਅਤੇ ਵੌਲਿਊਮ 100% ’ਤੇ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD jest konwertowane na PCM na tym urządzeniu, chyba że ten przetwornik DAC przyjmuje DSD przez PCM (DoP). Krótki, cichy test może to rozstrzygnąć: odtwarza delikatny akord jako DSD i pyta, co było słychać. Na czas testu muzyka zostaje zatrzymana, a głośność musi być ustawiona na 100%."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O DSD é convertido em PCM neste dispositivo, a menos que este DAC aceite DSD sobre PCM (DoP). Um teste curto e em volume baixo pode confirmar: ele toca um acorde suave como DSD e pergunta o que você ouviu. A música para durante o teste, e o volume precisa estar em 100 %."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O DSD é convertido em PCM neste dispositivo, a não ser que este DAC aceite DSD sobre PCM (DoP). Um teste curto e com volume baixo pode esclarecer: reproduz um acorde suave como DSD e pergunta o que ouviu. A música para durante o teste e o volume tem de estar a 100%."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD este convertit în PCM pe acest dispozitiv, cu excepția cazului în care acest DAC acceptă DSD prin PCM (DoP). Un test scurt, la volum redus, poate lămuri acest lucru: redă un acord discret ca DSD și vă întreabă ce ați auzit. Muzica se oprește pe durata testului, iar volumul trebuie să fie la 100%."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD konverteras till PCM på den här enheten om inte den här DAC:n tar emot DSD via PCM (DoP). Ett kort test på låg volym kan avgöra det: det spelar ett svagt ackord som DSD och frågar vad du hörde. Musiken stoppas under testet och volymen måste stå på 100 %."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD hugeuzwa kuwa PCM kwenye kifaa hiki isipokuwa kama DAC hii inapokea DSD kupitia PCM (DoP). Jaribio fupi la sauti ya chini linaweza kubaini: hucheza kodi laini ya muziki kama DSD na kukuuliza ulichosikia. Muziki husimama wakati wa jaribio, na kiwango cha sauti lazima kiwe 100%."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த DAC, DSD over PCM (DoP)-ஐ ஏற்காவிட்டால், DSD ஆனது இந்தச் சாதனத்தில் PCM-ஆக மாற்றப்படும். குறுகிய, மெல்லிய ஒலியிலான ஒரு சோதனை மூலம் இதைக் கண்டறியலாம்: அது மென்மையான ஒரு கார்டு ஒலியை DSD-ஆக இயக்கி, நீங்கள் என்ன கேட்டீர்கள் என்று கேட்கும். சோதனைக்காக இசை நிறுத்தப்படும், மேலும் ஒலியளவு 100%-இல் இருக்க வேண்டும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ DAC, DSD over PCM (DoP)ని స్వీకరిస్తే తప్ప, DSD ఈ పరికరంలో PCMగా మార్చబడుతుంది. తక్కువ వాల్యూమ్‌లో చేసే ఒక చిన్న పరీక్షతో తెలుసుకోవచ్చు: అది ఒక మృదువైన కార్డ్‌ను DSDగా ప్లే చేసి, మీకు ఏమి వినిపించిందో అడుగుతుంది. పరీక్ష కోసం సంగీతం ఆగిపోతుంది, పరికరం వాల్యూమ్ 100% వద్ద ఉండాలి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD จะถูกแปลงเป็น PCM บนอุปกรณ์เครื่องนี้ เว้นแต่ DAC นี้จะรองรับ DSD over PCM (DoP) การทดสอบสั้นๆ ด้วยเสียงเบาๆ จะบอกได้ โดยจะเล่นคอร์ดเบาๆ เป็น DSD แล้วถามว่าคุณได้ยินอะไร เพลงจะหยุดเล่นระหว่างการทดสอบ และระดับเสียงต้องอยู่ที่ 100%"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu DAC, PCM üzerinden DSD (DoP) kabul etmiyorsa DSD, bu aygıtta PCM’e dönüştürülür. Kısa, kısık sesli bir test bunu ortaya koyabilir: DSD olarak yumuşak bir akor çalar ve ne duyduğunuzu sorar. Test için müzik durur ve ses düzeyinin %100 olması gerekir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD перетворюється на PCM на цьому пристрої, якщо цей ЦАП не приймає DSD через PCM (DoP). Це можна з’ясувати коротким тихим тестом: він відтворює м’який акорд як DSD і запитує, що ви почули. На час тесту музика зупиняється, а гучність має бути на рівні 100%."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جب تک یہ DAC PCM پر DSD (DoP) قبول نہ کرے، DSD کو اس ڈیوائس پر PCM میں تبدیل کیا جاتا ہے۔ ایک مختصر، دھیمی آواز والا ٹیسٹ یہ بتا سکتا ہے: یہ DSD کے طور پر ایک نرم کورڈ چلاتا ہے اور پوچھتا ہے کہ آپ نے کیا سنا۔ ٹیسٹ کے لیے موسیقی رک جاتی ہے، اور والیوم 100% پر ہونا ضروری ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DSD được chuyển đổi sang PCM trên thiết bị này trừ khi DAC này nhận DSD qua PCM (DoP). Một bài kiểm tra ngắn với âm lượng nhỏ có thể cho biết: bài kiểm tra phát một hợp âm nhẹ dưới dạng DSD rồi hỏi bạn đã nghe thấy gì. Nhạc sẽ dừng để kiểm tra và âm lượng của thiết bị phải ở mức 100%."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非此 DAC 支援 DSD over PCM（DoP），否則 DSD 會在此裝置上轉換為 PCM。進行一次簡短、輕柔的測試即可確認：測試會以 DSD 播放一段柔和的和弦，然後詢問你聽到了甚麼。測試期間音樂會停止，而音量必須為 100%。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非此 DAC 支持 DSD over PCM（DoP），否则 DSD 会在此设备上转换为 PCM。进行一次简短、轻柔的测试即可确认：测试会以 DSD 播放一段柔和的和弦，然后询问你听到了什么。测试时音乐会停止，且音量必须为 100%。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "除非此 DAC 支援 DSD over PCM（DoP），否則 DSD 會在此裝置上轉換為 PCM。進行一次簡短、輕柔的測試即可確認：測試會以 DSD 播放一段柔和的和弦，然後詢問你聽到了什麼。測試時音樂會停止，且音量必須為 100%。"
           }
         }
       }

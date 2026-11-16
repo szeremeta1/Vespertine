@@ -67,8 +67,8 @@ struct OutputsView: View {
                         Text("Read back from iOS while the song plays, not assumed. Vespertine asks a DAC for each song’s own rate and, for surround, an interface for a channel per output (in the order L, R, C, LFE, back pair, side pair). iOS doesn’t tell apps an output’s bit depth. With the volume below 100%, a DAC doesn’t receive the song’s samples unchanged.")
                     }
                 }
-                if playsHere, !session.isDemo, !session.isShare, let phone = session.phone, DoPGate.canTest(phone.route) {
-                    DoPSection(phone: phone)
+                if playsHere, !session.isDemo, let phone = session.phone, DoPGate.canTest(phone.route) {
+                    DoPSection(phone: phone, fromShare: session.isShare)
                 }
                 if session.isShare, let share = model.openShare {
                     shareSection(share)
@@ -175,7 +175,7 @@ struct OutputsView: View {
         } footer: {
             VStack(alignment: .leading, spacing: 6) {
                 if let trouble = status.trouble { Text(trouble) }
-                Text("A scan reads only new and changed files, and runs by itself once a day when the share is opened. This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; DSD, APE, WavPack and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.")
+                Text("A scan reads only new and changed files, and runs by itself once a day when the share is opened. This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; APE, WavPack and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.")
             }
         }
     }
@@ -207,10 +207,13 @@ struct OutputsView: View {
 /// Nothing is assumed from the DAC's name: it gets DoP only after you heard the test sound as music on it.
 private struct DoPSection: View {
     let phone: PhoneRemote
+    /// The songs come from a share, read by this device itself: it, not a Mac, converts DSD when the DAC takes no DoP.
+    let fromShare: Bool
     @State private var probe: DoPProbe
 
-    init(phone: PhoneRemote) {
+    init(phone: PhoneRemote, fromShare: Bool = false) {
         self.phone = phone
+        self.fromShare = fromShare
         _probe = State(initialValue: DoPProbe(remote: phone))
     }
 
@@ -236,7 +239,11 @@ private struct DoPSection: View {
         } header: {
             Text("Play DSD natively?")
         } footer: {
-            Text("DSD is converted to PCM on the Mac unless this DAC takes DSD over PCM (DoP). A short, quiet test can tell: it plays a soft chord as DSD and asks what you heard. Music stops for the test, and the volume has to be at 100%.")
+            if fromShare {
+                Text("DSD is converted to PCM on this device unless this DAC takes DSD over PCM (DoP). A short, quiet test can tell: it plays a soft chord as DSD and asks what you heard. Music stops for the test, and the volume has to be at 100%.")
+            } else {
+                Text("DSD is converted to PCM on the Mac unless this DAC takes DSD over PCM (DoP). A short, quiet test can tell: it plays a soft chord as DSD and asks what you heard. Music stops for the test, and the volume has to be at 100%.")
+            }
         }
         .onDisappear { if probe.isBusy { probe.cancel() } }
     }

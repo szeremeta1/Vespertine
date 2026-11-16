@@ -32,7 +32,7 @@ public struct ShareLibrary: Codable, Equatable, Sendable {
     public var songs: [ShareSong]
     /// The picture file found in a folder (`cover.jpg` and the like), by folder.
     public var covers: [String: String]
-    /// Music files of kinds the phone can't open without the Mac converting them (DSD, APE, WavPack…).
+    /// Music files of kinds the phone can't open without the Mac converting them (APE, WavPack, surround DSD…).
     public var needTheMac: Int
     /// Files with a playable name that couldn't be read as what the name says.
     public var unreadable: Int
@@ -122,6 +122,8 @@ public enum ShareScanner {
                     tags = nil
                 }
                 guard let tags else { library.unreadable += 1; continue }
+                // DSD in surround, or packed with DST: a file the Mac has to convert.
+                if let dsd = tags.dsd, !dsd.playsHere { library.needTheMac += 1; continue }
                 var songID = known[path]?.id ?? id(for: path)
                 while used.contains(songID) { songID += 2 }
                 used.insert(songID)
