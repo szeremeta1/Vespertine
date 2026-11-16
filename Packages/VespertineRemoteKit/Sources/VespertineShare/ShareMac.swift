@@ -77,6 +77,13 @@ public struct ShareSayings: Sendable {
 
     public static let english = ShareSayings(words: .english, trouble: { "The share can’t be reached (\($0))." }, notInLibrary: "That isn’t on the share any more.",
                                              noPlaylists: "Playlists are kept on the Mac.", changed: "That file has changed on the share. Scan the share again.")
+
+    /// A folder on the phone, in English (the app says the same in its own languages).
+    public static let englishFolder = ShareSayings(words: .english, trouble: { error in
+        error == .accessDenied ? "Vespertine can’t open this folder any more. Choose the folder again."
+            : "This folder can’t be found. If it is on a drive, plug the drive in. If it was moved or renamed, choose the folder again."
+    }, notInLibrary: "That file isn’t in the folder any more.", noPlaylists: "Playlists are kept on the Mac. A folder has none.",
+                                                   changed: "That file has changed. Vespertine is reading the folder again.")
 }
 
 /// Runs blocking share reads one after another on a thread of their own, so nothing that waits on the network holds up
@@ -128,6 +135,9 @@ public final class ShareMac: RemoteChannel {
     public var rescanAfter: TimeInterval = 24 * 3600
     /// How many songs a first scan reads between showing (and keeping) what it has found so far.
     public var glimpseEvery = 200
+    /// A song asked for whose file is gone is taken off the lists there and then, and one whose file changed has the
+    /// library looked at again, without being asked. For a folder on the phone, where looking again costs nothing.
+    public var mendsItself = false
 
     private let files: any ShareFiles
     private let playback: any ShareFiles
@@ -348,9 +358,12 @@ public final class ShareMac: RemoteChannel {
         do {
             let found = try await playbackWorker.run { try playback.info(song.path) }
             noteReachable(true)
-            guard found.size == song.size else { return .failed(reason: sayings.changed) }
+            guard found.size == song.size else {
+                if mendsItself { rescan() }
+                return .failed(reason: sayings.changed)
+            }
         } catch let error as SMBError {
-            if error != .notFound { noteReachable(false) }
+            if error != .notFound { noteReachable(false) } else if mendsItself { drop(song) }
             return .failed(reason: error == .notFound ? sayings.notInLibrary : sayings.trouble(error))
         } catch {
             return .failed(reason: sayings.trouble(.closed))
@@ -362,6 +375,17 @@ public final class ShareMac: RemoteChannel {
         for old in streams.keys.sorted().dropLast(8) { streams[old] = nil }
         return .streamOpened(StreamDescriptor(stream: nextStream, kind: .original, byteSize: song.size, format: format(song), frames: song.tags.frames,
                                               tag: Self.tag(size: song.size, modified: song.modified), chunkSize: RemoteProtocol.defaultChunkSize))
+    }
+
+    /// A song whose file is gone: off the lists now (it isn't shown as something that can be played), and the index
+    /// with it.
+    private func drop(_ song: ShareSong) {
+        guard library.songs.contains(where: { $0.id == song.id }) else { return }
+        library.songs.removeAll { $0.id == song.id }
+        store.save(library)
+        catalog = ShareCatalog(library, favorites: favorites, words: sayings.words)
+        revision += 1
+        onChange?()
     }
 
     // MARK: Covers
