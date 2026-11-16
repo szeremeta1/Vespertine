@@ -30,7 +30,7 @@ home. Now Playing says **SMB share** as the source, and Output shows the share, 
 | Played from a share | FLAC, ALAC and AAC (`.m4a`, `.mp4`, `.m4b`), WAV (also RF64), AIFF, MP3 |
 | Counted as "Files that need the Mac", not listed | DSD (`.dsf`, `.dff`), APE, WavPack, TTA, Ogg, Opus, WMA, DTS, TrueHD/MLP, AC-3/E-AC-3, MKA, ISO, TAK |
 | Covers | `cover`, `folder`, `front`, `album` or `albumart` `.jpg`/`.jpeg`/`.png` in the album's folder, else the picture inside a file |
-| ReplayGain | Read from the file's own tags when Output › ReplayGain is on: Vorbis comments in FLAC, `TXXX` frames in ID3 (MP3, WAV, AIFF), named iTunes items in MPEG-4. Read again from the file each time a song is played, so an index made by an earlier version needs no rescan |
+| ReplayGain | Read from the file's own tags when Output › ReplayGain is on: Vorbis comments in FLAC, `TXXX` frames in ID3 (MP3, WAV, AIFF), named iTunes items or QuickTime keys in MPEG-4. Read again from the file each time a song is played, so an index made by an earlier version needs no rescan |
 | Not there | Playlists (they are the Mac's), CUE sheets |
 
 MP3 and AAC albums on a share join without a gap, like the lossless ones: the phone's decoder reads the encoder's delay and padding
