@@ -109,6 +109,7 @@ final class AppSettings {
     var appBalances: [String: Double] { didSet { defaults.set(appBalances, forKey: "appBalances") } }
     /// While an output is muted from the Controls menu: the level Mute brings back (output UID → 0…1).
     var appVolumeRestore: [String: Double] { didSet { defaults.set(appVolumeRestore, forKey: "appVolumeRestore") } }
+    /// What setup's Music step and Find Music on This Mac start with. Files stay where they are unless copying is chosen.
     var defaultImportMode: ImportMode { didSet { defaults.set(defaultImportMode.rawValue, forKey: "importMode") } }
     /// An isolated QA run (`-VespertineDataDirectory`) keeps imported copies inside its data directory and never saves a
     /// changed folder, so a test import can't land in, or repoint, the real managed folder.
@@ -244,7 +245,7 @@ final class AppSettings {
         roomStore = RoomProfileStore(directory: resolvedDataDirectory)
         defaults.register(defaults: [
             "exclusiveMode": false, "atmosBySystem": true, "integerMode": true, "matchSixteenBit": false, "releaseAfterPause": 30.0, "replayGain": "off", "replayGainPreamp": 0.0,
-            "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.copyAndOrganize.rawValue,
+            "allowDigitalVolume": false, "digitalVolume": 1.0, "importMode": ImportMode.reference.rawValue,
             "watchFolders": false, LocalLibrarySwitch.key: true, "fetchArtworkOnline": true, "scrobble": false, "discordPresence": false, "dopListUpdates": true, "discordArtwork": true, "miniPlayerFloats": true, "skipNonMusic": true,
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
@@ -278,7 +279,7 @@ final class AppSettings {
         appVolumeLevels = defaults.dictionary(forKey: "appVolumeLevels") as? [String: Double] ?? [:]
         appBalances = defaults.dictionary(forKey: "appBalances") as? [String: Double] ?? [:]
         appVolumeRestore = defaults.dictionary(forKey: "appVolumeRestore") as? [String: Double] ?? [:]
-        defaultImportMode = ImportMode(rawValue: defaults.string(forKey: "importMode") ?? "") ?? .copyAndOrganize
+        defaultImportMode = ImportMode(rawValue: defaults.string(forKey: "importMode") ?? "") ?? .reference
         let music = FileManager.default.urls(for: .musicDirectory, in: .userDomainMask)[0]
         isolatedRun = dataDirectory == nil && LaunchArguments().string(forKey: "VespertineDataDirectory") != nil
         managedFolderPath = isolatedRun
