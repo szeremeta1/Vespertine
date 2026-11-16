@@ -89,6 +89,10 @@ public struct PhoneSignal: Equatable, Sendable {
     /// This DAC played the DoP test's chord at exactly the rate this song plays at (`DoPDACs.passed(at:for:)`): frames at
     /// this rate were shown to reach it as sent.
     public var dacPassedAtRate = false
+    /// The ReplayGain being applied to the song, in decibels (after its peak has had its say). nil: none is.
+    public var replayGain: Double?
+    /// ReplayGain is on and this song has nothing done to it: its file has no values, or it is DSD sent as DoP.
+    public var replayGainHasNothing = false
 
     /// Nothing between the file and the DAC is known to change the song's samples: it is the lossless file itself,
     /// Vespertine does nothing to it, and iOS reports a DAC running at the song's own rate and channel count with the
@@ -289,6 +293,10 @@ public final class PhoneRemote {
             }
             signal.volume = outputVolume
             signal.dacPassedAtRate = dopDACs.passed(at: stream.format.sampleRate, for: route?.uid)
+            // ReplayGain multiplies every sample: the song is no longer the file's own samples while it does.
+            signal.replayGain = playback.appliedGain?.decibels
+            signal.replayGainHasNothing = playback.replayGainHasNothing
+            signal.processed = playback.appliedGain != nil
             return signal
         }
     }

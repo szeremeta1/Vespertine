@@ -128,9 +128,10 @@ struct WireRig {
             1: StreamSourceFacts(id: 1, url: flac, fileExtension: "flac", codec: "FLAC", isDSD: false, isLossless: true, sampleRate: 96_000, bitDepth: 24, channels: 2,
                                  duration: 10, fileSize: Int64(original.count), modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
             3: StreamSourceFacts(id: 3, url: wav, fileExtension: "wav", codec: "WAV", isDSD: false, isLossless: true, sampleRate: 44_100, bitDepth: 16, channels: 2,
-                                 duration: 1, fileSize: Int64((try? Data(contentsOf: wav).count) ?? 0), modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
+                                 duration: 1, fileSize: Int64((try? Data(contentsOf: wav).count) ?? 0), modifiedAt: now, isRegion: false, needsMacDecoder: false,
+                                 replayGain: Self.gainOfSong3),
             4: StreamSourceFacts(id: 4, url: short, fileExtension: "wav", codec: "WAV", isDSD: false, isLossless: true, sampleRate: 44_100, bitDepth: 16, channels: 2,
-                                 duration: 0.5, fileSize: size(short), modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
+                                 duration: 0.5, fileSize: size(short), modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: Self.gainOfSong4),
             5: StreamSourceFacts(id: 5, url: other, fileExtension: "wav", codec: "WAV", isDSD: false, isLossless: true, sampleRate: 48_000, bitDepth: 16, channels: 2,
                                  duration: 0.5, fileSize: size(other), modifiedAt: now, isRegion: false, needsMacDecoder: false, replayGain: nil),
             2: StreamSourceFacts(id: 2, url: dsf, fileExtension: "dsf", codec: "DSD", isDSD: true, isLossless: true, sampleRate: 2_822_400, bitDepth: 1, channels: 6,
@@ -149,6 +150,11 @@ struct WireRig {
     }
 
     enum RigError: Error { case notConnected }
+
+    /// The ReplayGain values the Mac's library has for songs 3 and 4 (tones that peak at 0.25). They ride along in every
+    /// test: nothing is done with them unless ReplayGain is turned on. Song 4 asks for more than its peak leaves room for.
+    static let gainOfSong3 = ReplayGain(trackGain: -6.2, trackPeak: 0.25, albumGain: -3, albumPeak: 0.25)
+    static let gainOfSong4 = ReplayGain(trackGain: 15, trackPeak: 0.25, albumGain: -3, albumPeak: 0.25)
 
     /// One second of two tones, 16-bit stereo WAV at 44.1 kHz (a file Core Audio opens, as on the phone).
     static func writeTone(to url: URL, seconds: Double = 1, base: Double = 300, rate: Double = 44_100) throws {

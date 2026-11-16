@@ -33,6 +33,18 @@ final class PlayTarget {
     static func surround(stored: String?) -> SpatialModeChoice { stored.flatMap(SpatialModeChoice.init(rawValue:)) ?? .off }
     /// The choices the picker offers: Head Tracked only where the system can turn the scene with your head (iOS 18).
     static var surroundChoices: [SpatialModeChoice] { PhonePlayer.systemTracksHead ? [.off, .fixed, .headTracked] : [.off, .fixed] }
+    /// Whether songs played here are levelled with the ReplayGain values in their files, and by which of them. Off until
+    /// chosen: with it off no sample is changed. Kept between launches.
+    var replayGain = PlayTarget.replayGain(stored: UserDefaults.standard.string(forKey: PlayTarget.replayGainKey)) {
+        didSet {
+            UserDefaults.standard.set(replayGain.rawValue, forKey: Self.replayGainKey)
+            made?.remote.playback.replayGain = replayGain
+        }
+    }
+    private static let replayGainKey = "replayGainOnThisDevice"
+
+    /// The choice kept from an earlier launch, or Off for someone who never made one.
+    static func replayGain(stored: String?) -> ReplayGainChoice { stored.flatMap(ReplayGainChoice.init(rawValue:)) ?? .off }
     /// Why songs aren't fetched right now (cellular data with playing over it turned off), or nil.
     @ObservationIgnored var holdReason: String?
     /// How much has been fetched from the Mac for playing here since the app opened.
@@ -98,6 +110,10 @@ final class PlayTarget {
         playback.holdReason = { [weak self] in self?.holdReason }
         let keeper = KeptShelf.shared.keeper(for: session)
         playback.kept = { [weak keeper] song in keeper?.store.kept(song).map { ($0.file, $0.descriptor) } }
+        // A kept song's ReplayGain values are kept beside it, so it is levelled the same with the Mac off.
+        playback.keptGain = { [weak keeper] song in keeper?.store.kept(song)?.replayGain }
+        playback.onGainValues = { [weak keeper] song, values in keeper?.store.noteReplayGain(values, of: song) }
+        playback.replayGain = replayGain
         remote.macName = session.server?.name ?? session.pairing.name
         let system = PhoneSystem(remote: remote) { [weak session] key in
             guard let session, case .artwork(_, _, _, let data) = await session.send(.artwork(key: key, size: 600)) else { return nil }
@@ -219,6 +235,12 @@ final class PlayTarget {
             }
             rows.append((String(localized: "Surround on Headphones"), value))
         }
+        // Only while ReplayGain is on: what is being done to this song's samples, or that nothing is.
+        if let gain = signal.replayGain {
+            rows.append((String(localized: "ReplayGain"), String(localized: "\(decibels(gain)) dB")))
+        } else if signal.replayGainHasNothing {
+            rows.append((String(localized: "ReplayGain"), String(localized: "None for this song", comment: "Value on the iPhone's Output screen, for the row ReplayGain: ReplayGain is turned on, but the playing song has no ReplayGain values (or is DSD sent as DoP), so it plays unchanged.")))
+        }
         if let volume = signal.volume { rows.append((String(localized: "Volume"), percent(volume))) }
         if signal.untouched {
             rows.append((String(localized: "Original file", comment: "Row label on the iPhone's Output screen: the song's own lossless file is playing. The value is No processing or Verified on this DAC."),
@@ -227,6 +249,11 @@ final class PlayTarget {
         }
         rows.append(contentsOf: dopRows(dop, route: route).map { ($0.label, $0.value) })
         return rows
+    }
+
+    /// "−6.2", "+1.5": a gain with its sign, to one decimal place.
+    static func decibels(_ value: Double) -> String {
+        (value < 0 ? "−" : "+") + abs(value).formatted(.number.precision(.fractionLength(1)))
     }
 }
 

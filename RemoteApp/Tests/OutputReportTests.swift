@@ -87,6 +87,27 @@ import VespertineRemoteProtocol
         #expect(!PlayTarget.report(folded, route: speaker).contains { $0.label == "Surround on Headphones" })
     }
 
+    @Test func replayGainIsOffUntilChosenAndAChoiceIsKept() {
+        #expect(PlayTarget.replayGain(stored: nil) == .off)
+        #expect(PlayTarget.replayGain(stored: "nonsense") == .off)
+        #expect(PlayTarget.replayGain(stored: "track") == .track && PlayTarget.replayGain(stored: "album") == .album)
+    }
+
+    @Test func theOutputScreenSaysWhatReplayGainDoesToTheSongOnlyWhileItIsOn() {
+        // Off: no row at all.
+        #expect(!PlayTarget.report(signal(rate: 44_100, route: dac), route: dac).contains { $0.label == "ReplayGain" })
+        var said = signal(rate: 44_100, route: dac)
+        said.replayGain = -6.2
+        said.processed = true
+        #expect(PlayTarget.report(said, route: dac).first { $0.label == "ReplayGain" }?.value == "−6.2 dB")
+        said.replayGain = 1.5
+        #expect(PlayTarget.report(said, route: dac).first { $0.label == "ReplayGain" }?.value == "+1.5 dB")
+        // On, and this song has nothing to go by: said, so the row isn't taken for a fault.
+        said.replayGain = nil
+        said.replayGainHasNothing = true
+        #expect(PlayTarget.report(said, route: dac).first { $0.label == "ReplayGain" }?.value == "None for this song")
+    }
+
     // MARK: The original file on a DAC: what is said, and what takes it back
 
     private let tested = PhoneRoute(name: "K11", portType: "USBAudio", sampleRate: 192_000, channels: 2, spatial: false, uid: "usb:k11")

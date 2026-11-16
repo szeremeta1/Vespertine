@@ -58,6 +58,17 @@ struct OutputsView: View {
                         Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
                     }
                 }
+                if playsHere {
+                    Section {
+                        Picker("ReplayGain", selection: Binding(get: { PlayTarget.shared.replayGain }, set: { PlayTarget.shared.replayGain = $0 })) {
+                            Text("Off").tag(ReplayGainChoice.off)
+                            Text("Track").tag(ReplayGainChoice.track)
+                            Text("Album").tag(ReplayGainChoice.album)
+                        }
+                    } footer: {
+                        Text("Plays songs at a matched loudness, using the ReplayGain values in their files: Track for each song by itself, Album to keep an album’s quiet and loud songs as they are. Off, no sample is changed. A song without values, and DSD sent to a DAC as DoP, play unchanged either way.")
+                    }
+                }
                 if playsHere, let phone = session.phone, let signal = phone.signal {
                     Section {
                         ForEach(PlayTarget.report(signal, route: phone.route, dop: phone.dopDACs), id: \.label) { row in

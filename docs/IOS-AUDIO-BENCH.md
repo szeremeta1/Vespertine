@@ -26,6 +26,7 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B12 | The demo plays | not run | | | |
 | B13 | The queue comes back after the app is closed | not run | | | |
 | B14 | Music on the phone: a folder from Files, iCloud Drive, a USB drive | not run | | | |
+| B15 | ReplayGain: off by default, on, and never on DoP | not run | | | |
 
 ## Before any script
 
@@ -208,3 +209,19 @@ in iCloud Drive, and on a USB drive with an adapter for the phone.
 7. In Files, long-press a FLAC or MP3 anywhere › Share › Vespertine (or Open in Vespertine). Expect the app to open **Opened
    Files** and play it. In Files › On My iPhone › Vespertine the copy is there; delete it and it leaves the app's list.
 8. Open a file the phone can't play by itself (a `.dsf`): an alert says so, and nothing is added.
+
+## B15. ReplayGain (4 min)
+
+Needs an album whose files carry ReplayGain tags (most taggers can write them) and one song without them. Note each song's track
+and album gain from the tagger first.
+
+1. Output › This iPhone. Expect ReplayGain to say Off on a fresh install, and "What Reaches the Output" to have no ReplayGain row.
+2. Play a tagged song and choose Track. Expect the level to change at once without the song starting over, and a row
+   `ReplayGain` with the song's gain to one decimal place, such as `−6.2 dB`. Compare with the track gain the tagger shows for it.
+3. Choose Album: the row changes to the album's gain. Let the album run into its next song: no gap, no click, the row follows the song.
+4. Play the song without tags: the row says "None for this song" and it plays at its own level.
+5. On the USB DAC with a DSD song playing as NATIVE DSD · DoP (B8's setup): turn ReplayGain on. Expect the DSD light on the DAC to
+   stay on and the row to say "None for this song".
+6. Choose Off: the row goes. Close the app and open it again: the choice made last is still the one shown.
+7. Keep a tagged album on this device (B11's setup), turn the Mac off, and play it with Track chosen: the row shows the same gain as in step 2.
+8. On a share (if one is set up): a tagged FLAC, MP3 and M4A each show their gain in the row.

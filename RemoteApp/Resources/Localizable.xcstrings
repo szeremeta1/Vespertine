@@ -1,6 +1,275 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@ dB": {
+      "comment": "Shown on the iPhone or iPad. Output screen, value of the row “ReplayGain”: the gain applied to the playing song in decibels. %@ is a signed number such as −6.2. Keep “dB”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ dB"
+          }
+        }
+      }
+    },
     "%@ kHz": {
       "comment": "Visualizer axis: a frequency in kilohertz, e.g. 2 kHz.",
       "localizations": {
@@ -6030,6 +6299,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "外出時使用的位址"
+          }
+        }
+      }
+    },
+    "Album": {
+      "comment": "Shown on the iPhone or iPad. ReplayGain mode: adjust songs by their album's gain.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አልበም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الألبوم"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অ্যালবাম"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Άλμπουμ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Álbum"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آلبوم"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Albumi"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આલ્બમ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kundi"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אלבום"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "एल्बम"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アルバム"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಆಲ್ಬಮ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앨범"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ആൽബം"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "अल्बम"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਐਲਬਮ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Álbum"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Álbum"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Albamu"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஆல்பம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఆల్బమ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อัลบั้ม"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Albüm"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Альбом"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "البم"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "專輯"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "专辑"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "專輯"
           }
         }
       }
@@ -33662,6 +34200,275 @@
         }
       }
     },
+    "None for this song": {
+      "comment": "Shown on the iPhone or iPad. Output screen, value of the row “ReplayGain”: ReplayGain is turned on, but the playing song has no ReplayGain values in its file (or is DSD sent as DoP), so it plays unchanged.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ለዚህ ዘፈን የለም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا شيء لهذه الأغنية"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই গানের জন্য নেই"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pro tuto skladbu žádné"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen for dette nummer"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine für diesen Titel"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Καμία για αυτό το τραγούδι"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ninguno para esta canción"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "برای این آهنگ وجود ندارد"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ei tälle kappaleelle"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wala para sa kantang ito"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune pour ce morceau"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ ગીત માટે નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Babu don wannan waƙar"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אין לשיר הזה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस गाने के लिए नहीं है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ehhez a számhoz nincs"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada untuk lagu ini"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuno per questo brano"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この曲にはありません"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಹಾಡಿಗೆ ಇಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 노래에는 없음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ ഗാനത്തിന് ഇല്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या गाण्यासाठी नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiada untuk lagu ini"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen for denne sangen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen voor dit nummer"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ ਗੀਤ ਲਈ ਨਹੀਂ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brak dla tego utworu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum para esta música"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum para esta música"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niciuna pentru această piesă"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inga för den här låten"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hakuna kwa wimbo huu"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்தப் பாடலுக்கு இல்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ పాటకు లేవు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่มีสำหรับเพลงนี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu şarkı için yok"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Немає для цієї пісні"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس گانے کے لیے نہیں ہے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không có cho bài hát này"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此歌曲沒有"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此歌曲没有"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此歌曲沒有"
+          }
+        }
+      }
+    },
     "Not connected": {
       "localizations": {
         "am": {
@@ -46821,6 +47628,275 @@
         }
       }
     },
+    "Plays songs at a matched loudness, using the ReplayGain values in their files: Track for each song by itself, Album to keep an album’s quiet and loud songs as they are. Off, no sample is changed. A song without values, and DSD sent to a DAC as DoP, play unchanged either way.": {
+      "comment": "Shown on the iPhone or iPad. Output screen, footer under the ReplayGain picker (Off, Track, Album: use the same words as those choices). “values” are the ReplayGain tags stored in a music file. “sample” is an audio sample. Keep “ReplayGain”, “DSD”, “DAC”, “DoP”.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በፋይሎቻቸው ውስጥ ያሉትን የReplayGain እሴቶች በመጠቀም ዘፈኖችን በተመጣጠነ የድምፅ መጠን ያጫውታል፦ «ትራክ» እያንዳንዱን ዘፈን ለብቻው፣ «አልበም» ደግሞ የአልበሙን ጸጥ ያሉና ጮክ ያሉ ዘፈኖች እንዳሉ ለመጠበቅ። «ጠፍቷል» ሲሆን ምንም ናሙና አይቀየርም። እሴት የሌለው ዘፈን እና ወደ DAC እንደ DoP የሚላክ DSD በማንኛውም ሁኔታ ሳይቀየሩ ይጫወታሉ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يشغّل الأغاني بمستوى صوت متقارب، بالاعتماد على قيم ReplayGain الموجودة في ملفاتها: «المقطوعة» لكل أغنية على حدة، و«الألبوم» للإبقاء على أغاني الألبوم الهادئة والعالية كما هي. عند «إيقاف» لا تُغيَّر أي عيّنة. الأغنية التي لا تحمل قيمًا، وDSD المُرسَل إلى DAC بصيغة DoP، يُشغَّلان دون تغيير في الحالتين."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ফাইলে থাকা ReplayGain মান ব্যবহার করে গানগুলো সমান জোরে বাজায়: «ট্র্যাক» প্রতিটি গানকে আলাদাভাবে, আর «অ্যালবাম» একটি অ্যালবামের মৃদু ও জোরালো গানগুলোকে যেমন আছে তেমন রাখে। «বন্ধ» থাকলে কোনো স্যাম্পল বদলানো হয় না। যে গানে কোনো মান নেই, এবং DAC-এ DoP হিসেবে পাঠানো DSD, দুই ক্ষেত্রেই অপরিবর্তিত বাজে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehrává skladby se sjednocenou hlasitostí podle hodnot ReplayGain uložených v jejich souborech: Skladba upravuje každou skladbu zvlášť, Album zachová tiché a hlasité skladby alba tak, jak jsou. Při volbě Vypnuto se nemění žádný vzorek. Skladba bez hodnot a DSD posílané do DAC jako DoP se v obou případech přehrávají beze změny."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspiller numre med ensartet lydstyrke ud fra ReplayGain-værdierne i deres filer: Nummer justerer hvert nummer for sig, Album bevarer et albums stille og høje numre, som de er. Med Fra ændres ingen samples. Et nummer uden værdier og DSD sendt til en DAC som DoP afspilles uændret i begge tilfælde."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spielt Titel mit angeglichener Lautstärke, anhand der ReplayGain-Werte in ihren Dateien: „Titel“ gleicht jeden Titel für sich an, „Album“ lässt die leisen und lauten Titel eines Albums, wie sie sind. Bei „Aus“ wird kein Sample verändert. Ein Titel ohne Werte und DSD, das als DoP an einen DAC gesendet wird, werden in jedem Fall unverändert wiedergegeben."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αναπαράγει τα τραγούδια σε εξισωμένη ένταση, με βάση τις τιμές ReplayGain στα αρχεία τους: «Κομμάτι» για κάθε τραγούδι χωριστά, «Άλμπουμ» για να μένουν τα ήσυχα και τα δυνατά τραγούδια ενός άλμπουμ όπως είναι. Με το «Ανενεργό» δεν αλλάζει κανένα δείγμα. Ένα τραγούδι χωρίς τιμές, καθώς και DSD που στέλνεται σε DAC ως DoP, αναπαράγονται αμετάβλητα σε κάθε περίπτωση."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduce las canciones con un volumen igualado, usando los valores de ReplayGain de sus archivos: Pista ajusta cada canción por separado; Álbum mantiene las canciones suaves y fuertes de un álbum tal como son. Con Desactivado no se cambia ninguna muestra. Una canción sin valores, y el DSD enviado a un DAC como DoP, se reproducen sin cambios en cualquier caso."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آهنگ‌ها را با بلندی هم‌سطح پخش می‌کند و برای این کار از مقادیر ReplayGain داخل فایل‌هایشان استفاده می‌کند: «قطعه» هر آهنگ را جداگانه تنظیم می‌کند و «آلبوم» آهنگ‌های آرام و بلند یک آلبوم را همان‌طور که هستند نگه می‌دارد. در حالت «خاموش» هیچ نمونه‌ای تغییر نمی‌کند. آهنگی که مقداری ندارد، و DSD که به‌صورت DoP به DAC فرستاده می‌شود، در هر دو حالت بدون تغییر پخش می‌شوند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toistaa kappaleet tasatulla äänenvoimakkuudella niiden tiedostoissa olevien ReplayGain-arvojen mukaan: Raita säätää jokaisen kappaleen erikseen, Albumi säilyttää albumin hiljaiset ja kovat kappaleet sellaisinaan. Kun valinta on Pois, yhtäkään näytettä ei muuteta. Kappale, jolla ei ole arvoja, ja DAC:lle DoP-muodossa lähetetty DSD toistetaan muuttumattomina joka tapauksessa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinapatugtog ang mga kanta sa magkakatugmang lakas, gamit ang mga ReplayGain value sa kanilang mga file: Track para sa bawat kanta nang mag-isa, Album para manatili kung ano ang mahihina at malalakas na kanta ng isang album. Kapag Naka-off, walang sample na binabago. Ang kantang walang value, at ang DSD na ipinapadala sa DAC bilang DoP, ay tumutugtog nang walang pagbabago alinman ang piliin."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lit les morceaux à un volume harmonisé, d’après les valeurs ReplayGain de leurs fichiers : Piste ajuste chaque morceau séparément, Album conserve tels quels les morceaux doux et forts d’un album. Sur Désactivé, aucun échantillon n’est modifié. Un morceau sans valeurs, ainsi que le DSD envoyé à un DAC en DoP, sont lus sans modification dans tous les cas."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ફાઇલોમાં રહેલાં ReplayGain મૂલ્યોનો ઉપયોગ કરીને ગીતોને સરખા અવાજે વગાડે છે: «ટ્રૅક» દરેક ગીતને અલગથી, અને «આલ્બમ» આલ્બમનાં ધીમાં અને મોટા અવાજવાળાં ગીતોને જેમ છે તેમ રાખે છે. «બંધ» હોય ત્યારે કોઈ સેમ્પલ બદલાતો નથી. મૂલ્યો વગરનું ગીત, અને DAC પર DoP તરીકે મોકલાતું DSD, બંને સ્થિતિમાં ફેરફાર વગર વાગે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yana kunna waƙoƙi da ƙarar sauti daidaitacciya, ta amfani da ƙimomin ReplayGain da ke cikin fayilolinsu: «Waƙa» don kowace waƙa ita kaɗai, «Kundi» don barin waƙoƙin kundi masu laushi da masu ƙarfi yadda suke. Idan «A kashe» ne, ba a canza kowane samfuri. Waƙar da ba ta da ƙimomi, da DSD da ake aika wa DAC a matsayin DoP, ana kunna su ba tare da canji ba a kowane hali."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מנגן שירים בעוצמה אחידה, לפי ערכי ה-ReplayGain שבקבצים שלהם: ״רצועה״ מתאים כל שיר בנפרד, ״אלבום״ שומר על השירים השקטים והחזקים של אלבום כפי שהם. במצב ״כבוי״ שום דגימה אינה משתנה. שיר ללא ערכים, וכן DSD שנשלח ל-DAC כ-DoP, מתנגנים ללא שינוי בכל מקרה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फ़ाइलों में मौजूद ReplayGain मानों का उपयोग करके गानों को एक जैसी आवाज़ पर चलाता है: «ट्रैक» हर गाने को अलग से, और «एल्बम» किसी एल्बम के धीमे और तेज़ गानों को जैसे हैं वैसे रखता है। «बंद» होने पर कोई सैंपल नहीं बदला जाता। बिना मानों वाला गाना, और DAC को DoP के रूप में भेजा गया DSD, दोनों ही स्थितियों में बिना बदलाव के चलते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A számokat kiegyenlített hangerővel játssza le a fájljaikban található ReplayGain-értékek alapján: a Szám minden számot külön igazít, az Album meghagyja egy album halk és hangos számait olyannak, amilyenek. Ki állásban egyetlen minta sem változik. Az értékek nélküli szám, valamint a DAC-nak DoP-ként küldött DSD mindkét esetben változatlanul szól."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memutar lagu dengan kenyaringan yang diselaraskan, memakai nilai ReplayGain di dalam filenya: Trek untuk tiap lagu sendiri-sendiri, Album untuk membiarkan lagu pelan dan keras dalam satu album apa adanya. Saat Mati, tidak ada sampel yang diubah. Lagu tanpa nilai, dan DSD yang dikirim ke DAC sebagai DoP, diputar tanpa perubahan apa pun pilihannya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riproduce i brani a un volume uniformato, usando i valori ReplayGain presenti nei loro file: Traccia regola ogni brano singolarmente, Album mantiene così come sono i brani più tenui e più forti di un album. Con Disattivata nessun campione viene modificato. Un brano senza valori, e il DSD inviato a un DAC come DoP, vengono riprodotti senza modifiche in ogni caso."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ファイルに含まれるReplayGain値を使って、曲の音量をそろえて再生します。「トラック」は曲ごとに調整し、「アルバム」はアルバム内の静かな曲と大きな曲の差をそのまま保ちます。「オフ」ではサンプルは一切変更されません。値のない曲と、DoPとしてDACに送られるDSDは、どの設定でも変更されずに再生されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಫೈಲ್‌ಗಳಲ್ಲಿರುವ ReplayGain ಮೌಲ್ಯಗಳನ್ನು ಬಳಸಿ ಹಾಡುಗಳನ್ನು ಸಮಾನ ಧ್ವನಿಮಟ್ಟದಲ್ಲಿ ಪ್ಲೇ ಮಾಡುತ್ತದೆ: «ಟ್ರ್ಯಾಕ್» ಪ್ರತಿ ಹಾಡನ್ನು ಪ್ರತ್ಯೇಕವಾಗಿ, «ಆಲ್ಬಮ್» ಒಂದು ಆಲ್ಬಮ್‌ನ ಮೃದು ಮತ್ತು ಜೋರಾದ ಹಾಡುಗಳನ್ನು ಇದ್ದಂತೆಯೇ ಉಳಿಸುತ್ತದೆ. «ಆಫ್» ಇದ್ದಾಗ ಯಾವುದೇ ಸ್ಯಾಂಪಲ್ ಬದಲಾಗುವುದಿಲ್ಲ. ಮೌಲ್ಯಗಳಿಲ್ಲದ ಹಾಡು ಮತ್ತು DAC ಗೆ DoP ಆಗಿ ಕಳುಹಿಸುವ DSD ಎರಡೂ ಸಂದರ್ಭಗಳಲ್ಲಿ ಬದಲಾವಣೆಯಿಲ್ಲದೆ ಪ್ಲೇ ಆಗುತ್ತವೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파일에 들어 있는 ReplayGain 값을 사용해 노래를 고른 음량으로 재생합니다. ‘트랙’은 노래마다 따로 맞추고, ‘앨범’은 한 앨범 안의 조용한 노래와 큰 노래를 그대로 유지합니다. ‘끔’에서는 어떤 샘플도 바뀌지 않습니다. 값이 없는 노래와 DoP로 DAC에 전송되는 DSD는 어느 설정에서든 변경 없이 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഫയലുകളിലുള്ള ReplayGain മൂല്യങ്ങൾ ഉപയോഗിച്ച് ഗാനങ്ങൾ ഒരേ ശബ്ദനിലയിൽ പ്ലേ ചെയ്യുന്നു: «ട്രാക്ക്» ഓരോ ഗാനത്തെയും വെവ്വേറെ, «ആൽബം» ഒരു ആൽബത്തിലെ മൃദുവും ഉച്ചത്തിലുമുള്ള ഗാനങ്ങളെ അതേപടി നിലനിർത്തുന്നു. «ഓഫ്» ആയിരിക്കുമ്പോൾ ഒരു സാമ്പിളും മാറ്റില്ല. മൂല്യങ്ങളില്ലാത്ത ഗാനവും DAC-ലേക്ക് DoP ആയി അയയ്ക്കുന്ന DSD-യും രണ്ടു സാഹചര്യത്തിലും മാറ്റമില്ലാതെ പ്ലേ ആകും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "फाइलमधील ReplayGain मूल्ये वापरून गाणी समान आवाजात वाजवते: «ट्रॅक» प्रत्येक गाणे स्वतंत्रपणे, तर «अल्बम» एखाद्या अल्बममधील हळू आणि मोठ्या आवाजाची गाणी जशी आहेत तशी ठेवतो. «बंद» असताना कोणताही सॅम्पल बदलला जात नाही. मूल्ये नसलेले गाणे, आणि DAC कडे DoP म्हणून पाठवलेले DSD, दोन्ही स्थितींत बदल न होता वाजतात."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memainkan lagu pada kelantangan yang diselaraskan, menggunakan nilai ReplayGain dalam failnya: Trek untuk setiap lagu secara berasingan, Album untuk mengekalkan lagu perlahan dan kuat dalam sesebuah album seadanya. Apabila Mati, tiada sampel diubah. Lagu tanpa nilai, dan DSD yang dihantar ke DAC sebagai DoP, dimainkan tanpa perubahan dalam apa jua keadaan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiller sanger med utjevnet lydstyrke ut fra ReplayGain-verdiene i filene deres: Spor justerer hver sang for seg, Album beholder de stille og sterke sangene på et album slik de er. Med Av endres ingen samples. En sang uten verdier, og DSD sendt til en DAC som DoP, spilles uendret uansett."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speelt nummers op een gelijkgetrokken volume af, aan de hand van de ReplayGain-waarden in hun bestanden: Nummer past elk nummer afzonderlijk aan, Album laat de zachte en luide nummers van een album zoals ze zijn. Bij Uit wordt geen enkele sample gewijzigd. Een nummer zonder waarden, en DSD dat als DoP naar een DAC wordt gestuurd, worden in beide gevallen ongewijzigd afgespeeld."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਫ਼ਾਈਲਾਂ ਵਿਚਲੇ ReplayGain ਮੁੱਲਾਂ ਦੀ ਵਰਤੋਂ ਕਰਕੇ ਗੀਤਾਂ ਨੂੰ ਇੱਕੋ ਜਿਹੀ ਆਵਾਜ਼ ’ਤੇ ਚਲਾਉਂਦਾ ਹੈ: «ਟਰੈਕ» ਹਰ ਗੀਤ ਨੂੰ ਵੱਖਰੇ ਤੌਰ ’ਤੇ, ਅਤੇ «ਐਲਬਮ» ਕਿਸੇ ਐਲਬਮ ਦੇ ਹੌਲੇ ਅਤੇ ਉੱਚੇ ਗੀਤਾਂ ਨੂੰ ਜਿਵੇਂ ਹਨ ਉਵੇਂ ਰੱਖਦੀ ਹੈ। «ਬੰਦ» ਹੋਣ ’ਤੇ ਕੋਈ ਸੈਂਪਲ ਨਹੀਂ ਬਦਲਿਆ ਜਾਂਦਾ। ਬਿਨਾਂ ਮੁੱਲਾਂ ਵਾਲਾ ਗੀਤ, ਅਤੇ DAC ਨੂੰ DoP ਵਜੋਂ ਭੇਜਿਆ DSD, ਦੋਵੇਂ ਹਾਲਤਾਂ ਵਿੱਚ ਬਿਨਾਂ ਬਦਲਾਅ ਦੇ ਚੱਲਦੇ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwarza utwory z wyrównaną głośnością na podstawie wartości ReplayGain zapisanych w ich plikach: Utwór dopasowuje każdy utwór osobno, Album zachowuje ciche i głośne utwory z albumu takimi, jakie są. Przy ustawieniu Wyłączone żadna próbka nie jest zmieniana. Utwór bez wartości oraz DSD wysyłane do DAC jako DoP są w każdym przypadku odtwarzane bez zmian."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduz as músicas com volume nivelado, usando os valores de ReplayGain dos arquivos: Faixa ajusta cada música separadamente; Álbum mantém as músicas suaves e fortes de um álbum como são. Em Desativado, nenhuma amostra é alterada. Uma música sem valores, e o DSD enviado a um DAC como DoP, são reproduzidos sem alteração em qualquer caso."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproduz as músicas com volume nivelado, usando os valores de ReplayGain dos ficheiros: Faixa ajusta cada música separadamente; Álbum mantém as músicas suaves e fortes de um álbum tal como são. Em Desativado, nenhuma amostra é alterada. Uma música sem valores, e o DSD enviado para um DAC como DoP, são reproduzidos sem alterações em qualquer dos casos."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redă piesele la un volum uniformizat, folosind valorile ReplayGain din fișierele lor: Piesă ajustează fiecare piesă separat, Album păstrează piesele liniștite și cele puternice ale unui album așa cum sunt. Pe Dezactivat, niciun eșantion nu este modificat. O piesă fără valori și DSD-ul trimis către un DAC ca DoP sunt redate nemodificate în ambele cazuri."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spelar låtar med utjämnad ljudstyrka utifrån ReplayGain-värdena i deras filer: Spår justerar varje låt för sig, Album behåller ett albums tysta och starka låtar som de är. Med Av ändras inga samplingar. En låt utan värden, och DSD som skickas till en DAC som DoP, spelas oförändrade i båda fallen."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hucheza nyimbo kwa sauti iliyolinganishwa, kwa kutumia thamani za ReplayGain zilizo katika faili zake: Wimbo hurekebisha kila wimbo peke yake, Albamu huacha nyimbo tulivu na zenye sauti kubwa za albamu kama zilivyo. Ikiwa Imezimwa, hakuna sampuli inayobadilishwa. Wimbo usio na thamani, na DSD inayotumwa kwa DAC kama DoP, huchezwa bila kubadilishwa kwa vyovyote vile."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "கோப்புகளில் உள்ள ReplayGain மதிப்புகளைப் பயன்படுத்தி பாடல்களை ஒரே அளவு ஒலியில் இயக்குகிறது: «டிராக்» ஒவ்வொரு பாடலையும் தனித்தனியாக, «ஆல்பம்» ஒரு ஆல்பத்தின் மெல்லிய மற்றும் உரத்த பாடல்களை அப்படியே வைத்திருக்கும். «ஆஃப்» என்றால் எந்த சாம்பிளும் மாற்றப்படாது. மதிப்புகள் இல்லாத பாடலும், DAC-க்கு DoP ஆக அனுப்பப்படும் DSD-யும் எந்த நிலையிலும் மாற்றமின்றி இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఫైల్‌లలో ఉన్న ReplayGain విలువలను ఉపయోగించి పాటలను సమానమైన ధ్వని స్థాయిలో ప్లే చేస్తుంది: «ట్రాక్» ప్రతి పాటను విడిగా, «ఆల్బమ్» ఒక ఆల్బమ్‌లోని మెల్లని, బిగ్గరగా ఉండే పాటలను ఉన్నట్లే ఉంచుతుంది. «ఆఫ్» ఉన్నప్పుడు ఏ శాంపిల్ మారదు. విలువలు లేని పాట, DAC‌కు DoP గా పంపే DSD రెండు సందర్భాల్లోనూ మార్పు లేకుండా ప్లే అవుతాయి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่นเพลงด้วยความดังที่ปรับให้เสมอกัน โดยใช้ค่า ReplayGain ในไฟล์ของเพลง: “แทร็ก” ปรับแต่ละเพลงแยกกัน ส่วน “อัลบั้ม” คงเพลงเบาและเพลงดังในอัลบั้มไว้ตามเดิม เมื่อ “ปิด” จะไม่มีการเปลี่ยนแซมเปิลใดเลย เพลงที่ไม่มีค่า และ DSD ที่ส่งไปยัง DAC แบบ DoP จะเล่นโดยไม่เปลี่ยนแปลงไม่ว่ากรณีใด"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Şarkıları, dosyalarındaki ReplayGain değerlerini kullanarak dengelenmiş bir ses yüksekliğinde çalar: Parça her şarkıyı tek başına ayarlar, Albüm bir albümün sessiz ve yüksek şarkılarını olduğu gibi korur. Kapalı iken hiçbir örnek değiştirilmez. Değeri olmayan bir şarkı ve bir DAC’e DoP olarak gönderilen DSD her iki durumda da değiştirilmeden çalınır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворює пісні з вирівняною гучністю за значеннями ReplayGain у їхніх файлах: «Трек» налаштовує кожну пісню окремо, «Альбом» залишає тихі й гучні пісні альбому такими, як вони є. Коли вибрано «Вимк.», жоден семпл не змінюється. Пісня без значень, а також DSD, надісланий на ЦАП як DoP, у будь-якому разі відтворюються без змін."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فائلوں میں موجود ReplayGain قدروں کی مدد سے گانوں کو یکساں آواز پر چلاتا ہے: «ٹریک» ہر گانے کو الگ سے، اور «البم» کسی البم کے دھیمے اور اونچے گانوں کو جیسے ہیں ویسے رکھتا ہے۔ «بند» ہونے پر کوئی سیمپل تبدیل نہیں ہوتا۔ بغیر قدروں والا گانا، اور DAC کو DoP کے طور پر بھیجا گیا DSD، دونوں صورتوں میں بغیر تبدیلی کے چلتے ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát các bài hát ở độ lớn đồng đều, dựa trên giá trị ReplayGain trong tệp của chúng: Bản nhạc điều chỉnh từng bài riêng lẻ, Album giữ nguyên các bài nhỏ và to trong một album. Khi Tắt, không mẫu nào bị thay đổi. Bài hát không có giá trị, và DSD gửi tới DAC dưới dạng DoP, đều được phát nguyên vẹn trong mọi trường hợp."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "根據檔案中的 ReplayGain 數值，以一致的響度播放歌曲：「曲目」逐首調整每首歌曲，「專輯」則保留專輯內歌曲原有的強弱對比。選擇「關閉」時，不會更改任何取樣。沒有數值的歌曲，以及以 DoP 傳送到 DAC 的 DSD，無論如何都會原樣播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "根据文件中的 ReplayGain 数值，以一致的响度播放歌曲：“曲目”逐首调整每首歌曲，“专辑”则保留专辑内歌曲原有的强弱对比。选择“关闭”时，不会改动任何采样。没有数值的歌曲，以及以 DoP 发送到 DAC 的 DSD，无论如何都会原样播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "依據檔案中的 ReplayGain 數值，以一致的響度播放歌曲：「曲目」逐首調整每首歌曲，「專輯」則保留專輯內歌曲原有的強弱對比。選擇「關閉」時，不會更動任何取樣。沒有數值的歌曲，以及以 DoP 傳送到 DAC 的 DSD，無論如何都會原樣播放。"
+          }
+        }
+      }
+    },
     "Plays the demo’s made-up songs with sound": {
       "localizations": {
         "am": {
@@ -51648,6 +52724,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "重複播放"
+          }
+        }
+      }
+    },
+    "ReplayGain": {
+      "comment": "Shown on the iPhone or iPad. Output screen: the name of the ReplayGain picker and of a row in “What Reaches the Output”. A proper name: keep it.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ReplayGain"
           }
         }
       }
@@ -74766,6 +76111,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "標題"
+          }
+        }
+      }
+    },
+    "Track": {
+      "comment": "Shown on the iPhone or iPad. ReplayGain mode: adjust each song by its own gain.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ትራክ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المقطوعة"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ট্র্যাক"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skladba"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nummer"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Titel"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κομμάτι"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pista"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قطعه"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raita"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Track"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Piste"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ટ્રૅક"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waƙa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "רצועה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ट्रैक"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Szám"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trek"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traccia"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "トラック"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಟ್ರ್ಯಾಕ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "트랙"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ട്രാക്ക്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ट्रॅक"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trek"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spor"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nummer"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਟਰੈਕ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utwór"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Faixa"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Faixa"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Piesă"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spår"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wimbo"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "டிராக்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ట్రాక్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "แทร็ก"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parça"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Трек"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ٹریک"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bản nhạc"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "曲目"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "曲目"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "曲目"
           }
         }
       }

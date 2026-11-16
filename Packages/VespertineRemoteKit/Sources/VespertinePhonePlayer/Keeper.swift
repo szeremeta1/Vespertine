@@ -123,7 +123,9 @@ public final class Keeper {
                 }
             }
             bytesReceived += descriptor.byteSize
-            try store.arrived(song, descriptor: descriptor)
+            // Its ReplayGain values are kept beside it, so they are here with the Mac off (whether or not they are used now).
+            let values = await client.info?(song)?.replayGain
+            try store.arrived(song, descriptor: descriptor, replayGain: values)
             return true
         } catch {
             if !(error is CancellationError), client.isConnected() { notice = error.localizedDescription }

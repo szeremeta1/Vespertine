@@ -22,6 +22,9 @@ public struct PhoneStreamClient: Sendable {
     public var openSmaller: (@Sendable (_ song: Int64, _ maxSampleRate: Double) async -> RemoteReply)?
     /// Opens a song for a DAC that takes DoP up to the carrier rate `dop` (a DSD song may then arrive as DoP frames). nil: as `open`.
     public var openDoP: (@Sendable (_ song: Int64, _ maxSampleRate: Double?, _ dop: Double) async -> RemoteReply)?
+    /// What the Mac (or the share) says about a song without opening it: asked for its ReplayGain values, and only while
+    /// ReplayGain is on. nil: can't be asked.
+    public var info: (@Sendable (_ song: Int64) async -> StreamInfo?)?
 
     /// `open`, or `openDoP` when `dop` is given and this Mac can be asked.
     func open(song: Int64, maxSampleRate: Double?, dop: Double?) async -> RemoteReply {
@@ -50,6 +53,10 @@ public struct PhoneStreamClient: Sendable {
                   isConnected: { [weak session] in session?.isConnected ?? false })
         openSmaller = { [weak session] song, rate in await session?.send(.streamOpen(id: song, maxSampleRate: rate, smaller: true)) ?? .failed(reason: "") }
         openDoP = { [weak session] song, rate, dop in await session?.send(.streamOpen(id: song, maxSampleRate: rate, dop: dop)) ?? .failed(reason: "") }
+        info = { [weak session] song in
+            guard case .streamInfo(let items)? = await session?.send(.streamInfo(ids: [song], maxSampleRate: nil)) else { return nil }
+            return items.first { $0.id == song }
+        }
     }
 }
 
@@ -122,6 +129,63 @@ public final class PhonePlayback {
     public var bytesReceived: Int64 { open.values.reduce(received) { $0 + ($1.stream?.bufferedBytes ?? 0) } }
     /// A song kept on this device: its file and what the Mac sent it as. Such a song plays from the file, Mac or no Mac.
     @ObservationIgnored public var kept: @MainActor (Int64) -> (file: URL, descriptor: StreamDescriptor)? = { _ in nil }
+
+    // MARK: ReplayGain
+
+    /// Whether songs are levelled with the ReplayGain values in their files, and by which of them. Off until chosen:
+    /// with it off no sample is touched and nothing is asked of the Mac about gains. Changing it while a song plays
+    /// carries on from the same place with the new choice. DSD sent as DoP is never changed, whatever this says.
+    public var replayGain: ReplayGainChoice = .off {
+        didSet { if replayGain != oldValue { replayGainChanged() } }
+    }
+    /// What is being done to the song being heard for ReplayGain; nil when nothing is (off, DoP, a song with no values).
+    public private(set) var appliedGain: AppliedGain?
+    /// ReplayGain is on and the song being heard has nothing done to it: its file has no values (or they come to no
+    /// change), or it is DSD sent as DoP.
+    public var replayGainHasNothing: Bool { replayGain != .off && nowPlaying != nil && stream != nil && appliedGain == nil }
+    /// The ReplayGain values of a song kept on this device, as they were when it was kept: used when the Mac can't be asked.
+    @ObservationIgnored public var keptGain: @MainActor (Int64) -> ReplayGain? = { _ in nil }
+    /// Told the values of each song they were asked for (the app keeps them beside a kept song's file).
+    @ObservationIgnored public var onGainValues: (@MainActor (Int64, ReplayGain?) -> Void)?
+    /// The values each song's file has, as answered: asked once a song for as long as this player lives.
+    @ObservationIgnored private var gainValues: [Int64: ReplayGain?] = [:]
+    /// What was worked out for each entry that is open.
+    @ObservationIgnored private var gains: [String: AppliedGain] = [:]
+
+    /// The song's ReplayGain values: from the Mac or the share when it answers, else what was kept with the song.
+    private func values(for song: Int64) async -> ReplayGain? {
+        if let known = gainValues[song] { return known }
+        if client.isConnected(), let info = client.info, let answer = await info(song) {
+            gainValues[song] = .some(answer.replayGain)
+            onGainValues?(song, answer.replayGain)
+            return answer.replayGain
+        }
+        return keptGain(song)
+    }
+
+    /// What to multiply `entry`'s samples by. DoP frames are DSD bits, not samples: always 1.
+    private func gain(for entry: PhoneQueue.Entry, _ opened: Open) async -> AppliedGain? {
+        guard replayGain != .off, opened.descriptor.dsdRate == nil else {
+            gains[entry.id] = nil
+            return nil
+        }
+        let values = await values(for: opened.song)
+        // The choice as it is now: it may have changed while the Mac was being asked.
+        let applied = PhoneReplayGain.applied(values, choice: replayGain)
+        gains[entry.id] = applied
+        return applied
+    }
+
+    private func replayGainChanged() {
+        gains = [:]
+        // A song being started reads the choice when its stream is here. One that is loaded starts again where it is,
+        // from the stream it already has, so the change is heard at once and the song lined up after it gets its own.
+        guard loading == nil, let entry = nowPlaying, player.state != .idle else {
+            if replayGain == .off { appliedGain = nil }
+            return
+        }
+        start(entry, playing: staysPlaying, at: livePosition, keepingStreams: true)
+    }
 
     private func lineWaits(_ waiting: Bool) {
         waits = max(0, waits + (waiting ? 1 : -1))
@@ -222,7 +286,8 @@ public final class PhonePlayback {
         return true
     }
 
-    private func start(_ entry: PhoneQueue.Entry, playing: Bool = true, at seconds: Double = 0) {
+    /// `keepingStreams`: the same songs carry on (only how they are played changed), so what is open stays open.
+    private func start(_ entry: PhoneQueue.Entry, playing: Bool = true, at seconds: Double = 0, keepingStreams: Bool = false) {
         resumeAt = nil
         loading?.cancel()
         following?.cancel()
@@ -233,8 +298,9 @@ public final class PhonePlayback {
         followingEntry = nil
         stream = nil
         notice = nil
+        appliedGain = nil
         place(seconds)
-        release(keeping: [entry.id])
+        if !keepingStreams { release(keeping: [entry.id]) }
         loading = Task { [weak self] in
             guard let self else { return }
             do {
@@ -253,8 +319,11 @@ public final class PhonePlayback {
                         guard !Task.isCancelled, nowPlaying?.id == entry.id else { return }
                     }
                 }
+                let applied = await gain(for: entry, opened)
+                guard !Task.isCancelled, nowPlaying?.id == entry.id else { return }
                 stream = opened.descriptor
-                player.start(item(entry, opened), playing: startsPlaying, at: seconds)
+                appliedGain = applied
+                player.start(item(entry, opened, applied), playing: startsPlaying, at: seconds)
                 prepareFollowing(after: entry.id)
                 startTicker()
             } catch is CancellationError {
@@ -267,8 +336,9 @@ public final class PhonePlayback {
         }
     }
 
-    private func item(_ entry: PhoneQueue.Entry, _ opened: Open) -> PhonePlayer.Item {
-        PhonePlayer.Item(id: entry.id, source: opened.source, format: opened.descriptor.format)
+    private func item(_ entry: PhoneQueue.Entry, _ opened: Open, _ applied: AppliedGain?) -> PhonePlayer.Item {
+        PhonePlayer.Item(id: entry.id, source: opened.source, format: opened.descriptor.format,
+                         gain: opened.descriptor.dsdRate == nil ? applied?.scale ?? 1 : 1)
     }
 
     /// The stream for `entry`: the one already open, or a new one (asking again while the Mac converts).
@@ -368,9 +438,10 @@ public final class PhonePlayback {
                 guard let plain = try? await self.opened(next, ahead: true, plain: true), !Task.isCancelled else { return }
                 opened = plain
             }
-            guard queue.following(after: id)?.id == next.id else { return }
+            let applied = await gain(for: next, opened)
+            guard !Task.isCancelled, queue.following(after: id)?.id == next.id else { return }
             followingEntry = next.id
-            player.setFollowing(item(next, opened))
+            player.setFollowing(item(next, opened, applied))
         }
     }
 
@@ -437,6 +508,7 @@ public final class PhonePlayback {
         queue.arrive(at: id)
         nowPlaying = queue.current
         stream = open[id]?.descriptor
+        appliedGain = gains[id]
         release(keeping: Set([id, decoding, followingEntry].compactMap { $0 }))
     }
 
@@ -454,6 +526,7 @@ public final class PhonePlayback {
         notice = Self.words(error, title: entry.track.title)
         preparing = nil
         player.halt()
+        appliedGain = nil
         // A song the Mac won't send (it plays on the Mac only) is passed over, as the Mac passes over a file it can't open.
         // Anything else (the Mac went away, the network) stops here, so nothing is skipped by a bad connection.
         guard case Failure.refused = error else { return }
@@ -553,6 +626,8 @@ public final class PhonePlayback {
         decoding = nil
         followingEntry = nil
         resumeAt = nil
+        appliedGain = nil
+        gains = [:]
         place(0)
     }
 
