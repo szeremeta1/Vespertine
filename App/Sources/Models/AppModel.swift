@@ -291,7 +291,7 @@ final class AppModel {
         if let filtersURL { filters = FilterStore.load(from: filtersURL) }
         // Which streaming providers are on is known before the library is first read: one that is off is in no list.
         library = try LibraryStore(dataDirectory: settings.dataDirectory, automaticScanning: { [weak settings] in settings?.watchFolders ?? false },
-                                   shownProviders: StreamingModel.enabled(in: settings.store))
+                                   shownProviders: StreamingModel.enabled(in: settings.store), showsFiles: settings.localLibrary)
         showSetup = Self.needsSetup(settings: settings, library: library, arguments: arguments)
         devices = DeviceStore()
         loopback = LoopbackTest(dataDirectory: settings.dataDirectory)
@@ -911,8 +911,19 @@ final class AppModel {
         showImporter = true
     }
 
+    /// Turns the local library on or off (Settings › Library). See `LocalLibrarySwitch`.
+    func setLocalLibrary(_ on: Bool) {
+        guard settings.localLibrary != on else { return }
+        if !on {
+            // A page of a folder or of one of its albums has nothing left to show.
+            path = []
+            if case .source(let id) = sidebar, library.sources.contains(where: { $0.id == id }) { sidebar = .albums }
+        }
+        LocalLibrarySwitch.apply(on, to: settings, library: library, player: player, analysis: analysis, shares: shares)
+    }
+
     func openAudio(_ url: URL) {
-        guard url.isFileURL else { return }
+        guard url.isFileURL, settings.localLibrary else { return }
         let path = url.resolvingSymlinksInPath().path
         // Already in the library: play it now. Adding it would rescan the whole source it sits in first.
         let known = library.tracks(filePath: path)

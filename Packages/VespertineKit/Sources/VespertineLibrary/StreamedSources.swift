@@ -237,26 +237,46 @@ extension LibraryDatabase {
         set { providersShown.withLock { $0 = newValue } }
     }
 
-    /// The sources to leave out of the queries now: none when nothing is hidden or the library has no server account.
+    /// Whether the songs of folders, drives and network shares take part in the same lists, counts and search. The app sets it
+    /// from its Local Library switch (on by default). False, every query answers as if the library had no such source, and only
+    /// the music of the servers that are shown is left; nothing is deleted.
+    public var showsFiles: Bool {
+        get { !filesHidden.withLock { $0 } }
+        set { filesHidden.withLock { $0 = !newValue } }
+    }
+
+    /// The sources to leave out of the queries now: none when nothing is hidden.
     func hiddenSourceIDs(_ db: Database) throws -> Set<Int64> {
-        guard let shown = shownProviders else { return [] }
+        let shown = shownProviders, files = showsFiles
+        guard shown != nil || !files else { return [] }
         var hidden = Set<Int64>()
-        for row in try Row.fetchAll(db, sql: "SELECT id, path FROM source WHERE path LIKE '\(StreamLocation.prefix)%'") {
+        for row in try Row.fetchAll(db, sql: "SELECT id, path FROM source") {
             let path: String = row["path"]
-            if let account = StreamLocation.account(of: path), shown.contains(account.provider) { continue }
-            hidden.insert(row["id"])
+            if !path.hasPrefix(StreamLocation.prefix) {
+                if !files { hidden.insert(row["id"]) }
+            } else if let shown {
+                if let account = StreamLocation.account(of: path), shown.contains(account.provider) { continue }
+                hidden.insert(row["id"])
+            }
         }
         return hidden
     }
 
     /// A condition on `track` rows (or the table `qualifier` names) that holds for every row the library shows: "1" when nothing
-    /// is hidden, which leaves a library without a server account on the very SQL it always ran.
+    /// is hidden, which leaves a library without a server account on the very SQL it always ran. With the files hidden, only the
+    /// songs of the servers that are shown pass: a row without a source is a file's too.
     public func visibleTracksClause(_ db: Database, qualifier: String = "track") throws -> String {
-        let hidden = try hiddenSourceIDs(db).sorted()
-        switch hidden.count {
+        let hidden = try hiddenSourceIDs(db)
+        guard showsFiles else {
+            let shown = try Int64.fetchAll(db, sql: "SELECT id FROM source WHERE path LIKE '\(StreamLocation.prefix)%' ORDER BY id")
+                .filter { !hidden.contains($0) }
+            return shown.isEmpty ? "0" : "\(qualifier).sourceId IN (\(shown.map(String.init).joined(separator: ", ")))"
+        }
+        let ids = hidden.sorted()
+        switch ids.count {
         case 0: return "1"
-        case 1: return "\(qualifier).sourceId IS NOT \(hidden[0])"
-        default: return "(\(qualifier).sourceId IS NULL OR \(qualifier).sourceId NOT IN (\(hidden.map(String.init).joined(separator: ", "))))"
+        case 1: return "\(qualifier).sourceId IS NOT \(ids[0])"
+        default: return "(\(qualifier).sourceId IS NULL OR \(qualifier).sourceId NOT IN (\(ids.map(String.init).joined(separator: ", "))))"
         }
     }
 

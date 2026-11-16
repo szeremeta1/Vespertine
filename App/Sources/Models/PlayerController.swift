@@ -1135,6 +1135,36 @@ final class PlayerController {
     /// An account was removed from the library: the same for its songs.
     func accountRemoved(provider: String, account: String) { dropStreamed { $0.provider == provider && $0.account == account } }
 
+    /// The local library was turned off: a file of its that is playing stops, and its files leave the queue. A music server's
+    /// songs and what another app sent stay.
+    func localLibraryTurnedOff() {
+        let isFile: (QueueEntry) -> Bool = { !$0.received && !$0.track.isStreamed }
+        if var session = receiverSession {
+            // A control app's songs are playing: the listener's own queue waits behind them, and its files leave it there.
+            (session.queue, session.originalOrder, session.currentIndex) =
+                Self.dropping(isFile, queue: session.queue, originalOrder: session.originalOrder, currentIndex: session.currentIndex)
+            receiverSession = session
+            return
+        }
+        guard queue.contains(where: isFile) else { return }
+        if current.map(isFile) == true { stop() }
+        (queue, originalOrder, currentIndex) = Self.dropping(isFile, queue: queue, originalOrder: originalOrder, currentIndex: currentIndex)
+        syncMirror()
+    }
+
+    /// A queue without the entries `gone` holds for. The current entry stays current; when it went, the next one that is left
+    /// takes its place (stopped: Play starts it), else the last one.
+    static func dropping(_ gone: (QueueEntry) -> Bool, queue: [QueueEntry], originalOrder: [QueueEntry], currentIndex: Int?)
+        -> (queue: [QueueEntry], originalOrder: [QueueEntry], currentIndex: Int?) {
+        let kept = queue.filter { !gone($0) }
+        var index: Int?
+        if let currentIndex, queue.indices.contains(currentIndex), !kept.isEmpty {
+            let next = queue[currentIndex...].first { !gone($0) } ?? kept[kept.count - 1]
+            index = kept.firstIndex { $0.id == next.id }
+        }
+        return (kept, originalOrder.filter { !gone($0) }, index)
+    }
+
     private func dropStreamed(_ gone: (StreamLocation.Ref) -> Bool) {
         let entries = queue.filter { $0.track.streamRef.map(gone) == true }
         guard !entries.isEmpty else { return }
