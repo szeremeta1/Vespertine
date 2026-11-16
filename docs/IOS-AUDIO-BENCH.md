@@ -27,7 +27,7 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B13 | The queue comes back after the app is closed | not run | | | |
 | B14 | Music on the phone: a folder from Files, iCloud Drive, a USB drive | not run | | | |
 | B15 | ReplayGain: off by default, on, and never on DoP | not run | | | |
-| M1 | Measured by the app: MP3, AAC and FLAC joins, and what ReplayGain does to the level | not run | | | |
+| M1 | Measured by the app: MP3, AAC and FLAC joins, and what ReplayGain does to the level | passed | 2026-11-16 | iPhone 15 Pro Max (iPhone16,2), iOS 26.3.1 (23D8133), Debug build of 8a1797a (#381 branch) | 14 joins and 9 tagged songs on the phone's speaker path at 48,000 Hz, phone volume 0. Every `tone-*` join GAPLESS (gap 0.00 ms, slip within 0.01 samples, level step within 0.01 dB); `gap-30-80` GAP 30.02 and 80.02 ms; every GAIN line MATCHES within 0.01 dB. Not covered: anything after the app's mixer, and the DoP step of B15. Lines below. |
 
 ## Before any script
 
@@ -278,3 +278,37 @@ with its reason: a silence away from the join (the song waited for its bytes) or
 On a Mac, with no sound and no phone, the same bench runs over the same folder with the same decoders:
 `VTBENCH_FOLDER=/tmp/vtbench-music swift test --package-path Packages/VespertineRemoteKit --filter aFolderNamedFromOutside`.
 It says what the files themselves are good for before the phone is asked.
+
+### M1 report, 2026-11-16
+
+Vesper's iPhone (iPhone 15 Pro Max, iOS 26.3.1), Debug build of 8a1797a, run from the Mac it is plugged into. The same
+folder also held five extra albums (MP3 and AAC gapless, MP3 and AAC ReplayGain, and an MP3 control with 30 ms and 80 ms of silence);
+they are the `fx3-*` lines. The phone's volume was 0 throughout: the capture is taken before iOS's volume, so it did not need sound.
+
+```
+VTBENCH phone bench: iPhone16,2, Version 26.3.1 (Build 23D8133), output Speaker (Speaker) at 48000 Hz, captured at 48000 Hz, 32 songs in music
+VTBENCH JOIN fx3-ctrlmp3: 01-ctrl.mp3 > 02-ctrl.mp3: GAP, gap 30.02 ms, residual at the join -21.0 dB, elsewhere -42.0 dB, slip -0.00 samples, level step -0.00 dB, tone 1000.1 Hz, lossy
+VTBENCH JOIN fx3-ctrlmp3: 02-ctrl.mp3 > 03-ctrl.mp3: GAP, gap 80.02 ms, residual at the join -20.8 dB, elsewhere -42.6 dB, slip 0.00 samples, level step -0.00 dB, tone 1000.1 Hz, lossy
+VTBENCH JOIN fx3-gaplessm4a: 01-gm4a.m4a > 02-gm4a.m4a: GAPLESS, gap 0.00 ms, residual at the join -17.3 dB, elsewhere -48.2 dB, slip 0.01 samples, level step 0.00 dB, tone 1000.0 Hz, lossy
+VTBENCH JOIN fx3-gaplessm4a: 02-gm4a.m4a > 03-gm4a.m4a: GAPLESS, gap 0.00 ms, residual at the join -16.4 dB, elsewhere -48.5 dB, slip 0.00 samples, level step 0.00 dB, tone 1000.0 Hz, lossy
+VTBENCH JOIN fx3-gaplessmp3: 01-gmp3.mp3 > 02-gmp3.mp3: GAPLESS, gap 0.00 ms, residual at the join -33.0 dB, elsewhere -41.9 dB, slip -0.00 samples, level step 0.00 dB, tone 1000.1 Hz, lossy
+VTBENCH JOIN fx3-gaplessmp3: 02-gmp3.mp3 > 03-gmp3.mp3: GAPLESS, gap 0.00 ms, residual at the join -32.1 dB, elsewhere -42.6 dB, slip 0.00 samples, level step -0.00 dB, tone 1000.1 Hz, lossy
+VTBENCH JOIN gap-30-80: 01.flac > 02.flac: GAP, gap 30.02 ms, residual at the join -19.0 dB, elsewhere -64.0 dB, slip -0.00 samples, level step -0.00 dB, tone 1000.0 Hz
+VTBENCH JOIN gap-30-80: 02.flac > 03.flac: GAP, gap 80.02 ms, residual at the join -19.2 dB, elsewhere -63.8 dB, slip 0.00 samples, level step 0.00 dB, tone 1000.0 Hz
+VTBENCH JOIN tone-aac: 01.m4a > 02.m4a: GAPLESS, gap 0.00 ms, residual at the join -32.1 dB, elsewhere -62.2 dB, slip 0.01 samples, level step -0.00 dB, tone 1000.0 Hz, lossy
+VTBENCH JOIN tone-aac: 02.m4a > 03.m4a: GAPLESS, gap 0.00 ms, residual at the join -28.8 dB, elsewhere -61.4 dB, slip -0.01 samples, level step 0.01 dB, tone 1000.0 Hz, lossy
+VTBENCH JOIN tone-flac: 01.flac > 02.flac: GAPLESS, gap 0.00 ms, residual at the join -63.8 dB, elsewhere -63.8 dB, slip 0.00 samples, level step -0.00 dB, tone 1000.0 Hz
+VTBENCH JOIN tone-flac: 02.flac > 03.flac: GAPLESS, gap 0.00 ms, residual at the join -64.6 dB, elsewhere -64.6 dB, slip -0.00 samples, level step 0.00 dB, tone 1000.0 Hz
+VTBENCH JOIN tone-mp3: 01.mp3 > 02.mp3: GAPLESS, gap 0.00 ms, residual at the join -33.1 dB, elsewhere -60.1 dB, slip 0.00 samples, level step -0.00 dB, tone 1000.0 Hz, lossy
+VTBENCH JOIN tone-mp3: 02.mp3 > 03.mp3: GAPLESS, gap 0.00 ms, residual at the join -33.3 dB, elsewhere -59.9 dB, slip -0.00 samples, level step -0.00 dB, tone 1000.0 Hz, lossy
+VTBENCH GAIN fx3-rgm4a/01-rgm4a.m4a: MATCHES, tags track -6.20 dB peak 0.1000, album -4.00 dB peak 0.1000, off -44.08 dBFS, Track expected -6.20 dB measured -6.21 dB, Album expected -4.00 dB measured -4.01 dB
+VTBENCH GAIN fx3-rgm4a/02-rgm4a.m4a: MATCHES, tags track 3.10 dB peak 0.1000, album -4.00 dB peak 0.1000, off -44.08 dBFS, Track expected 3.10 dB measured 3.09 dB, Album expected -4.00 dB measured -4.01 dB
+VTBENCH GAIN fx3-rgm4a/03-rgm4a.m4a: MATCHES, tags track -1.50 dB peak 0.1000, album -4.00 dB peak 0.1000, off -44.08 dBFS, Track expected -1.50 dB measured -1.51 dB, Album expected -4.00 dB measured -4.01 dB
+VTBENCH GAIN fx3-rgmp3/01-rgmp3.mp3: MATCHES, tags track -6.20 dB peak 0.1000, album -4.00 dB peak 0.1000, off -44.35 dBFS, Track expected -6.20 dB measured -6.20 dB, Album expected -4.00 dB measured -4.00 dB
+VTBENCH GAIN fx3-rgmp3/02-rgmp3.mp3: MATCHES, tags track 3.10 dB peak 0.1000, album -4.00 dB peak 0.1000, off -44.35 dBFS, Track expected 3.10 dB measured 3.10 dB, Album expected -4.00 dB measured -4.00 dB
+VTBENCH GAIN fx3-rgmp3/03-rgmp3.mp3: MATCHES, tags track -1.50 dB peak 0.1000, album -4.00 dB peak 0.1000, off -44.35 dBFS, Track expected -1.50 dB measured -1.50 dB, Album expected -4.00 dB measured -4.00 dB
+VTBENCH GAIN replaygain/held.flac: MATCHES, tags track 9.00 dB peak 0.5000, album 9.00 dB peak 0.5000, off -24.08 dBFS, Track expected 6.02 dB measured 6.02 dB (held by the peak), Album expected 6.02 dB measured 6.02 dB (held by the peak)
+VTBENCH GAIN replaygain/tagged.flac: MATCHES, tags track -6.20 dB peak 0.1250, album -3.50 dB peak 0.1250, off -24.08 dBFS, Track expected -6.20 dB measured -6.20 dB, Album expected -3.50 dB measured -3.50 dB
+VTBENCH GAIN replaygain/tagged.mp3: MATCHES, tags track -6.20 dB peak 0.1250, album -3.50 dB peak 0.1250, off -24.35 dBFS, Track expected -6.20 dB measured -6.20 dB, Album expected -3.50 dB measured -3.50 dB
+VTBENCH DONE joins 14, gains 9
+```
