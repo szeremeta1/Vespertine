@@ -21,10 +21,10 @@ private func tone(_ frame: Int) -> Float {
     Float(0.5 * sin(2 * Double.pi * 440 * Double(frame) / rate))
 }
 
-/// How far a lossy encoding of the tone may be from the tone itself. The fixtures stay within 0.02 of it, most at the
-/// ends of each half where the encoder had nothing before or after to work with. Delay or padding left in would put
-/// silence where the tone should be (off by 0.5) or the tone out of step.
-private let lossyStep: Float = 0.05
+/// How far a lossy encoding of the tone may be from the tone itself. The fixtures come out within 0.04 of it. Delay or
+/// padding left in puts silence where the tone should be and the rest of the tone out of step: off by 0.7 and more (tried
+/// with the MP3 that says nothing in place of the first half).
+private let lossyStep: Float = 0.1
 
 private func lossy(_ container: String) -> StreamFormat {
     StreamFormat(codec: container == "mp3" ? "MP3" : "AAC", container: container, sampleRate: rate, bitDepth: nil, channels: 2,

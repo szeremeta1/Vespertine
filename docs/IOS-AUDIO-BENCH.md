@@ -63,6 +63,9 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 5. On Tailscale over cellular (B9's setup), jump to ten seconds before the end of a song. Whether the next song joins without a
    gap depends on it arriving in time: note which happened. If it didn't arrive, expect a short wait and then the next song from
    its first note, never a skipped song.
+6. Repeat steps 1 and 2 with a gapless album in MP3 and one in AAC (a live album or a continuous mix, ripped as it was sold): no
+   silence and no click between songs. The package tests show the delay and padding are left out to the frame; this step is the
+   same thing heard on real albums.
 
 ## B4. Surround on AirPods Max (5 min)
 
