@@ -224378,277 +224378,271 @@
         }
       }
     },
-    "Free and open source. A minute of setup and you're listening.": {
-      "extractionState": "manual",
+    "Free and open source. A few choices and you're listening.": {
+      "comment": "Setup assistant, Welcome page, under the tagline. Setup is a handful of choices; no time is promised.",
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "ነፃ እና ክፍት ምንጭ። የአንድ ደቂቃ ማዋቀር፣ ከዚያም ማዳመጥ።"
+            "value": "ነፃ እና ክፍት ምንጭ። ጥቂት ምርጫዎች፣ ከዚያም ማዳመጥ።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "مجاني ومفتوح المصدر. دقيقة من الإعداد وتبدأ الاستماع."
+            "value": "مجاني ومفتوح المصدر. بضعة اختيارات وتبدأ الاستماع."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "বিনামূল্যে ও ওপেন সোর্স। এক মিনিটের সেটআপ, তারপরই শোনা শুরু।"
+            "value": "বিনামূল্যে ও ওপেন সোর্স। কয়েকটি পছন্দ, তারপরই শোনা শুরু।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zdarma a open source. Minuta nastavení a už posloucháte."
+            "value": "Zdarma a open source. Pár voleb a už posloucháte."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gratis og open source. Et minuts opsætning, så lytter du."
+            "value": "Gratis og open source. Et par valg, så lytter du."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kostenlos und Open Source. Eine Minute einrichten, und schon hörst du Musik."
+            "value": "Kostenlos und Open Source. Ein paar Entscheidungen, und schon hörst du Musik."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Δωρεάν και ανοιχτού κώδικα. Ένα λεπτό ρύθμισης και ακούτε ήδη."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Free and open source. A minute of setup and you're listening."
+            "value": "Δωρεάν και ανοιχτού κώδικα. Λίγες επιλογές και ακούτε ήδη."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gratis y de código abierto. Un minuto de configuración y a escuchar."
+            "value": "Gratis y de código abierto. Unas pocas opciones y a escuchar."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "رایگان و متن‌باز. یک دقیقه راه‌اندازی و شروع به شنیدن می‌کنید."
+            "value": "رایگان و متن‌باز. چند انتخاب و شروع به شنیدن می‌کنید."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ilmainen ja avointa lähdekoodia. Minuutin käyttöönotto, ja pääset kuuntelemaan."
+            "value": "Ilmainen ja avointa lähdekoodia. Muutama valinta, ja pääset kuuntelemaan."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Libre at open source. Isang minutong setup at nakikinig ka na."
+            "value": "Libre at open source. Ilang pagpili lang at nakikinig ka na."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Libre et gratuit. Une minute de configuration et place à l’écoute."
+            "value": "Libre et gratuit. Quelques choix et place à l’écoute."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "મફત અને ઓપન સોર્સ. એક મિનિટનું સેટઅપ, અને સંગીત શરૂ."
+            "value": "મફત અને ઓપન સોર્સ. થોડી પસંદગીઓ, અને સંગીત શરૂ."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kyauta kuma buɗaɗɗen tushe. Minti ɗaya na saiti, sai ku fara saurare."
+            "value": "Kyauta kuma buɗaɗɗen tushe. Zaɓuɓɓuka kaɗan, sai ku fara saurare."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "חינמי וקוד פתוח. דקה של הגדרה ואתה כבר מאזין."
+            "value": "חינמי וקוד פתוח. כמה בחירות ואתה כבר מאזין."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "मुफ़्त और ओपन सोर्स। बस एक मिनट का सेटअप, और संगीत शुरू।"
+            "value": "मुफ़्त और ओपन सोर्स। बस कुछ विकल्प चुनें, और संगीत शुरू।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ingyenes és nyílt forráskódú. Egy perc beállítás, és már hallgathatja is."
+            "value": "Ingyenes és nyílt forráskódú. Néhány választás, és már hallgathatja is."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gratis dan open source. Satu menit pengaturan, lalu Anda langsung mendengarkan."
+            "value": "Gratis dan open source. Beberapa pilihan, lalu Anda langsung mendengarkan."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Libero e open source. Un minuto di configurazione e sei pronto ad ascoltare."
+            "value": "Libero e open source. Poche scelte e sei pronto ad ascoltare."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "無料のオープンソース。1分で設定して、すぐに聴き始められます。"
+            "value": "無料のオープンソース。いくつか選ぶだけで、すぐに聴き始められます。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಉಚಿತ ಮತ್ತು ಓಪನ್ ಸೋರ್ಸ್. ಒಂದು ನಿಮಿಷದ ಸೆಟಪ್, ನಂತರ ಕೇಳಲು ಶುರು."
+            "value": "ಉಚಿತ ಮತ್ತು ಓಪನ್ ಸೋರ್ಸ್. ಕೆಲವು ಆಯ್ಕೆಗಳು, ನಂತರ ಕೇಳಲು ಶುರು."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "무료 오픈 소스. 1분이면 설정을 마치고 감상을 시작할 수 있습니다."
+            "value": "무료 오픈 소스. 몇 가지만 선택하면 감상을 시작할 수 있습니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "സൗജന്യവും ഓപ്പൺ സോഴ്‌സും. ഒരു മിനിറ്റത്തെ സജ്ജീകരണം, പിന്നെ കേട്ടുതുടങ്ങാം."
+            "value": "സൗജന്യവും ഓപ്പൺ സോഴ്‌സും. കുറച്ച് തിരഞ്ഞെടുപ്പുകൾ, പിന്നെ കേട്ടുതുടങ്ങാം."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "मोफत आणि ओपन सोर्स. एक मिनिटाचा सेटअप, आणि संगीत सुरू."
+            "value": "मोफत आणि ओपन सोर्स. काही निवडी, आणि संगीत सुरू."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Percuma dan sumber terbuka. Seminit persediaan dan anda sudah boleh mendengar."
+            "value": "Percuma dan sumber terbuka. Beberapa pilihan dan anda sudah boleh mendengar."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gratis og åpen kildekode. Ett minutts oppsett, så lytter du."
+            "value": "Gratis og åpen kildekode. Noen få valg, så lytter du."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gratis en open source. Een minuutje instellen en je luistert al."
+            "value": "Gratis en open source. Een paar keuzes en je luistert al."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਮੁਫ਼ਤ ਅਤੇ ਓਪਨ ਸੋਰਸ। ਬੱਸ ਇੱਕ ਮਿੰਟ ਦਾ ਸੈੱਟਅੱਪ, ਤੇ ਸੰਗੀਤ ਸ਼ੁਰੂ।"
+            "value": "ਮੁਫ਼ਤ ਅਤੇ ਓਪਨ ਸੋਰਸ। ਬੱਸ ਕੁਝ ਚੋਣਾਂ, ਤੇ ਸੰਗੀਤ ਸ਼ੁਰੂ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Darmowy i otwartoźródłowy. Minuta konfiguracji i już słuchasz."
+            "value": "Darmowy i otwartoźródłowy. Kilka wyborów i już słuchasz."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gratuito e de código aberto. Um minuto de configuração e você já está ouvindo."
+            "value": "Gratuito e de código aberto. Algumas escolhas e você já está ouvindo."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gratuito e de código aberto. Um minuto de configuração e já está a ouvir."
+            "value": "Gratuito e de código aberto. Algumas escolhas e já está a ouvir."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gratuit și open source. Un minut de configurare și deja ascultați."
+            "value": "Gratuit și open source. Câteva alegeri și deja ascultați."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gratis och öppen källkod. En minuts inställning, sedan lyssnar du."
+            "value": "Gratis och öppen källkod. Några få val, sedan lyssnar du."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bila malipo na programu huria. Dakika moja ya kuweka mipangilio na unaanza kusikiliza."
+            "value": "Bila malipo na programu huria. Chaguo chache tu na unaanza kusikiliza."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "இலவசம், ஓப்பன் சோர்ஸ். ஒரு நிமிட அமைவு, பிறகு கேட்கத் தொடங்கலாம்."
+            "value": "இலவசம், ஓப்பன் சோர்ஸ். சில தேர்வுகள், பிறகு கேட்கத் தொடங்கலாம்."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "ఉచితం, ఓపెన్ సోర్స్. ఒక్క నిమిషం సెటప్, ఆపై వినడం మొదలు."
+            "value": "ఉచితం, ఓపెన్ సోర్స్. కొన్ని ఎంపికలు, ఆపై వినడం మొదలు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "ฟรีและเป็นโอเพนซอร์ส ตั้งค่าเพียงนาทีเดียวก็เริ่มฟังได้เลย"
+            "value": "ฟรีและเป็นโอเพนซอร์ส เลือกเพียงไม่กี่อย่างก็เริ่มฟังได้เลย"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ücretsiz ve açık kaynak. Bir dakikalık kurulumun ardından dinlemeye başlayın."
+            "value": "Ücretsiz ve açık kaynak. Birkaç seçimin ardından dinlemeye başlayın."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Безплатний і з відкритим кодом. Хвилина налаштування — і ви вже слухаєте."
+            "value": "Безплатний і з відкритим кодом. Кілька виборів — і ви вже слухаєте."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "مفت اور اوپن سورس۔ ایک منٹ کا سیٹ اپ اور آپ سن رہے ہیں۔"
+            "value": "مفت اور اوپن سورس۔ چند انتخاب اور آپ سن رہے ہیں۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Miễn phí và mã nguồn mở. Một phút thiết lập là bạn có thể nghe nhạc."
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "免費開源。只需一分鐘設定，即可開始聆聽。"
+            "value": "Miễn phí và mã nguồn mở. Vài lựa chọn là bạn có thể nghe nhạc."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "免费开源。只需一分钟设置，即可开始聆听。"
+            "value": "免费开源。只需几项选择，即可开始聆听。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "免費且開放原始碼。只要一分鐘設定，就能開始聆聽。"
+            "value": "免費且開放原始碼。只要幾項選擇，就能開始聆聽。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "免費開源。只需幾項選擇，即可開始聆聽。"
           }
         }
       }

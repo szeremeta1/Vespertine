@@ -102,7 +102,7 @@ struct SetupFlow: View {
         case .sound: SetupSound()
         case .extras: SetupExtras()
         case .remote: SetupRemote()
-        case .done: SetupDone { model.completeSetup() }
+        case .done: SetupDone(addMusic: { go(to: .music) }) { model.completeSetup() }
         }
     }
 
@@ -463,7 +463,7 @@ private struct SetupWelcome: View {
                 .multilineTextAlignment(.center)
                 .padding(.top, 12)
                 .reveal(shown, delay: 0.95)
-            Text("Free and open source. A minute of setup and you're listening.")
+            Text("Free and open source. A few choices and you're listening.")
                 .font(Typeface.ui(13))
                 .foregroundStyle(Palette.text3)
                 .multilineTextAlignment(.center)
@@ -998,8 +998,16 @@ private struct SetupRemote: View {
 
 // MARK: - Done
 
+/// What the Done step offers besides Start Listening.
+nonisolated enum SetupDoneOffer {
+    /// "Add Music" is offered while there is nothing to listen to: no songs yet, and none on their way in.
+    static func addMusic(tracks: Int, scanning: Bool) -> Bool { tracks == 0 && !scanning }
+}
+
 private struct SetupDone: View {
     @Environment(AppModel.self) private var model
+    /// Back to the Music step.
+    let addMusic: () -> Void
     let finish: () -> Void
     @State private var ring: CGFloat = 0
     @State private var check: CGFloat = 0
@@ -1037,7 +1045,7 @@ private struct SetupDone: View {
                 .padding(.top, 30)
                 .reveal(shown, delay: 0.5)
                 .accessibilityAddTraits(.isHeader)
-            Text(model.library.stats.tracks == 0 && model.library.scanProgress == nil
+            Text(emptyLibrary
                  ? "Add music whenever you're ready, from the File menu or the empty library."
                  : "Everything below can be changed later in Settings.")
                 .font(Typeface.ui(14)).foregroundStyle(Palette.text2)
@@ -1059,11 +1067,20 @@ private struct SetupDone: View {
             .overlay(RoundedRectangle(cornerRadius: 14).strokeBorder(Palette.hairlineStrong))
             .frame(maxWidth: 460)
             .padding(.top, 28)
-            Button(action: finish) {
-                HStack(spacing: 8) { Text("Start Listening"); Image(systemName: "play.fill").font(.system(size: 11)) }
+            HStack(spacing: 14) {
+                // With nothing in the library, Start Listening opens an empty one: the way back to adding music is here too.
+                if emptyLibrary {
+                    Button("Add Music", action: addMusic)
+                        .buttonStyle(QuietButtonStyle())
+                        .transition(.opacity)
+                }
+                Button(action: finish) {
+                    HStack(spacing: 8) { Text("Start Listening"); Image(systemName: "play.fill").font(.system(size: 11)) }
+                }
+                .buttonStyle(SetupPrimaryButtonStyle())
+                .keyboardShortcut(.defaultAction)
             }
-            .buttonStyle(SetupPrimaryButtonStyle())
-            .keyboardShortcut(.defaultAction)
+            .animation(.easeInOut(duration: 0.25), value: emptyLibrary)
             .padding(.top, 30)
             .reveal(shown, delay: 1.0)
         }
@@ -1077,6 +1094,10 @@ private struct SetupDone: View {
             try? await Task.sleep(for: .milliseconds(140))
             withAnimation(.easeOut(duration: 1.2)) { burst = 1 }
         }
+    }
+
+    private var emptyLibrary: Bool {
+        SetupDoneOffer.addMusic(tracks: model.library.stats.tracks, scanning: model.library.scanProgress != nil)
     }
 
     private var musicSummary: String {
