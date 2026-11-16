@@ -405,6 +405,8 @@ private struct SetupOption<Control: View>: View {
     let title: Text
     let detail: Text
     var on = false
+    /// The card's padding: less on a page with four cards of three lines, which must still fit the smallest window.
+    var padding: CGFloat = 16
     @ViewBuilder var control: Control
 
     init(symbol: String, title: LocalizedStringKey, detail: LocalizedStringKey, on: Bool = false, @ViewBuilder control: () -> Control) {
@@ -412,7 +414,8 @@ private struct SetupOption<Control: View>: View {
     }
 
     /// Words that are already in the listener's language (a Settings switch's own name and caption).
-    init(symbol: String, title: Text, detail: Text, on: Bool = false, @ViewBuilder control: () -> Control) {
+    init(symbol: String, title: Text, detail: Text, on: Bool = false, padding: CGFloat = 16, @ViewBuilder control: () -> Control) {
+        self.padding = padding
         self.symbol = symbol
         self.title = title
         self.detail = detail
@@ -421,7 +424,7 @@ private struct SetupOption<Control: View>: View {
     }
 
     var body: some View {
-        SetupCard(selected: on) {
+        SetupCard(selected: on, padding: padding) {
             HStack(alignment: .center, spacing: 14) {
                 SetupSymbol(name: symbol, selected: on)
                 VStack(alignment: .leading, spacing: 4) {
@@ -985,7 +988,7 @@ private struct SetupMore: View {
             VStack(spacing: 10) {
                 ForEach(Array(SetupMoreSwitch.allCases.enumerated()), id: \.element) { index, item in
                     let on = item.isOn(model)
-                    SetupOption(symbol: item.symbol, title: Text(verbatim: item.title), detail: Text(verbatim: item.explanation), on: on) {
+                    SetupOption(symbol: item.symbol, title: Text(verbatim: item.title), detail: Text(verbatim: item.explanation), on: on, padding: 12) {
                         HStack(spacing: 12) {
                             // A server is signed in to in Settings › Library: offered once the switch is on.
                             if on, item == .musicServers {
@@ -1006,7 +1009,7 @@ private struct SetupMore: View {
                 }
             }
             .frame(maxWidth: 680)
-            .padding(.top, 24)
+            .padding(.top, 22)
         }
         .padding(.horizontal, 40)
         .onAppear { shown = true }
