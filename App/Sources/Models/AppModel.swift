@@ -344,6 +344,7 @@ final class AppModel {
         }
         followChosenOutput()
         player.wantsMultichannel = { [weak self] in self?.outputWantsMultichannel() }
+        player.rendererArtworkKey = { [weak self] track in self?.artworkKey(track) }
         player.rendererGrace = { [weak self] in self?.renderers?.searching == true || self?.airPlay?.searching == true }
         // Which groups are published decides how long a pause keeps one from the other apps.
         systemOutput.onPublishedChanged = { [weak self] in self?.syncEngine() }
@@ -358,6 +359,7 @@ final class AppModel {
         }
         if settings.airPlayPlayersFeature {
             airPlay = AirPlaySwitch.apply(true, to: settings, current: nil, onChange: { [weak self] in self?.syncEngine() })
+            airPlay?.artwork = AirPlayCover.provider(store: library.artwork)
         }
         if settings.upnpReceiverFeature {
             receiver = ReceiverSwitch.apply(true, to: settings, current: nil, make: makeReceiver)
@@ -530,6 +532,7 @@ final class AppModel {
             settings.selectedDevice = nil
         }
         airPlay = AirPlaySwitch.apply(on, to: settings, current: airPlay, onChange: { [weak self] in self?.syncEngine() })
+        airPlay?.artwork = AirPlayCover.provider(store: library.artwork)
         syncEngine()
     }
 

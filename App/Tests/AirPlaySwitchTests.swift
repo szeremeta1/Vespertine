@@ -9,6 +9,7 @@ import Foundation
 import Testing
 import VespertineAirPlay
 import VespertineAudio
+import VespertineLibrary
 @testable import Vespertine
 
 /// Counts browses instead of starting Bonjour.
@@ -28,6 +29,24 @@ struct AirPlaySwitchTests {
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
         let suite = root.appendingPathComponent("defaults.plist").path
         return (root, try #require(UserDefaults(suiteName: suite)), suite)
+    }
+
+    @Test("A receiver's cover is the stored 600-pixel picture; a key that isn't the library's, or a picture receivers don't take, is none")
+    func cover() throws {
+        let (root, _, _) = try scratch()
+        defer { try? FileManager.default.removeItem(at: root) }
+        let store = ArtworkStore(directory: root)
+        let jpeg = Data([0xFF, 0xD8, 0xFF, 0xE0]) + Data(repeating: 3, count: 500)
+        try jpeg.write(to: store.thumbnailURL("abc-123", size: 600))
+        try Data("GIF89a".utf8).write(to: store.originalURL("gif-1"))
+        try jpeg.write(to: root.deletingLastPathComponent().appendingPathComponent("outside_600.jpg"))
+        defer { try? FileManager.default.removeItem(at: root.deletingLastPathComponent().appendingPathComponent("outside_600.jpg")) }
+        #expect(AirPlayCover.data(key: "abc-123", store: store) == jpeg)
+        #expect(AirPlayCover.provider(store: store)("abc-123") == jpeg)
+        #expect(AirPlayCover.data(key: "gif-1", store: store) == nil)
+        #expect(AirPlayCover.data(key: "missing", store: store) == nil)
+        #expect(AirPlayCover.data(key: "../outside", store: store) == nil)
+        #expect(AirPlayCover.data(key: "", store: store) == nil)
     }
 
     @Test("The switch says beta, and its line says what off means")

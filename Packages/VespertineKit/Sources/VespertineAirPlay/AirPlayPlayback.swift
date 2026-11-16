@@ -40,7 +40,14 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         get { hooks.withLock { $0.events } }
         set { hooks.withLock { $0.events = newValue } }
     }
+    /// The cover file (JPEG or PNG) for a song's `RendererTrackInfo.artworkKey`, for receivers that show one. Called off
+    /// the main thread.
+    public var artworkProvider: (@Sendable (String) -> Data?)? {
+        get { hooks.withLock { $0.artwork } }
+        set { hooks.withLock { $0.artwork = newValue } }
+    }
     private struct Hooks {
+        var artwork: (@Sendable (String) -> Data?)?
         var next: (@Sendable (PlayableItem) -> PlayableItem?)?
         var resolver: (@Sendable (PlayableItem) -> URL)?
         var metadata: (@Sendable (PlayableItem) -> RendererTrackInfo?)?
@@ -448,7 +455,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                 }
             }
             if !open {
-                let made = RAOPSession(name: device.name, endpoint: endpoint, encryption: encryption, rsaKey: rsaKey)
+                let made = RAOPSession(name: device.name, endpoint: endpoint, encryption: encryption, rsaKey: rsaKey, authSetup: device.needsAuthSetup)
                 made.onLost = { [weak self] in self?.enqueue.yield(.lost) }
                 let volume = state.withLock { $0.receiverVolumeDB }
                 try await made.connect(volumeDB: volume)
@@ -726,10 +733,15 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     private func announce(_ segment: Segment) async {
         if segment.announces { emit(.trackStarted(segment.item)) }
         guard let session, let start = segment.start, let raop = device.raop else { return }
+        let info = metadataProvider?(segment.item)
         if raop.metadata.contains(0) {
-            let info = metadataProvider?(segment.item)
             try? await session.setMetadata(title: info?.title ?? segment.item.url.deletingPathExtension().lastPathComponent,
                                            artist: info?.artist, album: info?.album, rtptime: start)
+        }
+        // The cover, or word that this song has none (so the last song's doesn't stay up).
+        if raop.metadata.contains(1) {
+            let image = info?.artworkKey.flatMap { key in artworkProvider?(key) }
+            try? await session.setArtwork(image, rtptime: start)
         }
         if raop.metadata.contains(2), segment.duration > 0 {
             let songStart = start &- UInt32(segment.offset * Double(RAOPTiming.sampleRate))

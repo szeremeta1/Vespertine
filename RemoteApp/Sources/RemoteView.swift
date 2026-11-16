@@ -71,7 +71,7 @@ struct RemoteView: View {
                         }
                     }
                 }
-                Section(session.isShare ? LocalizedStringKey("SMB Share") : LocalizedStringKey("Mac")) { sidebarLink(.output) }
+                Section(session.isFolder ? LocalizedStringKey("Folder") : session.isShare ? LocalizedStringKey("SMB Share") : LocalizedStringKey("Mac")) { sidebarLink(.output) }
             }
             .listStyle(.sidebar)
             .obsidianList()
@@ -300,7 +300,22 @@ struct ConnectionBanner: View {
     /// A share has no Mac to wait for: what is said is the first scan going on, or why the share can't be used.
     @ViewBuilder private var shareBanner: some View {
         let status = model.shareStatus
-        if let trouble = status?.trouble {
+        if let trouble = status?.trouble, session.isFolder {
+            // A folder's trouble ends in what to do, and the way to do it is here.
+            VStack(alignment: .leading, spacing: 8) {
+                Text(trouble).font(.footnote)
+                HStack(spacing: 16) {
+                    Button("Try Again") { model.rescanShare() }.disabled(status?.scan.isRunning ?? false)
+                    if let folder = model.openFolder, !folder.isOwn { ChooseFolderAgainButton(folder: folder) }
+                    Spacer(minLength: 0)
+                    Button("Macs") { model.leave() }
+                }
+                .font(.footnote.weight(.medium))
+            }
+            .padding(.horizontal).padding(.vertical, 8)
+            .background(Palette.surface)
+            .accessibilityIdentifier("folder-trouble")
+        } else if let trouble = status?.trouble {
             HStack(spacing: 10) {
                 Text(trouble).font(.footnote)
                 Spacer(minLength: 0)

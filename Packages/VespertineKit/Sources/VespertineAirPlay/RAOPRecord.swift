@@ -2,7 +2,8 @@
 // Vespertine: what an AirPlay receiver says about itself on Bonjour. `_raop._tcp` (AirPlay 1) names the service
 // `<MAC>@<name>` and lists, in its TXT record, the encryptions (`et`), codecs (`cn`), format (`sr`, `ss`, `ch`), transports
 // (`tp`) and metadata (`md`) it takes; `_airplay._tcp` (AirPlay 2 and video) adds `deviceid`, `model` and `features`.
-// Phase 1 sends ALAC 16/44.1 over RAOP, unencrypted or with RSA/AES; anything else is listed as not supported yet.
+// Vespertine sends ALAC 16/44.1 over RAOP, unencrypted (after `/auth-setup` for MFi receivers) or with RSA/AES; anything
+// else is listed as not supported yet.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -115,13 +116,18 @@ public struct AirPlayDevice: Sendable, Hashable, Identifiable {
 
     public var isSupported: Bool { if case .supported = support { true } else { false } }
 
+    /// The receiver lists MFi authentication (`et` 4: most licensed third-party speakers and AV receivers). It expects the
+    /// sender's `POST /auth-setup` before anything else, and refuses what follows without it.
+    public var needsAuthSetup: Bool { raop?.encryptions.contains(4) == true }
+
     public var support: Support {
         guard let raop else { return .unsupported(Self.airPlay2Only) }
         if raop.needsPassword {
             return .unsupported(String(localized: "Needs a password — not supported yet", comment: "Output list: an AirPlay receiver protected by a password (Vespertine can't send to it yet)."))
         }
+        // MFi receivers (`et` 4) take the audio as it is once the sender has introduced itself (`needsAuthSetup`).
         let encryption: RAOPEncryption
-        if raop.encryptions.contains(0) { encryption = .none } else if raop.encryptions.contains(1) { encryption = .rsa } else {
+        if raop.encryptions.contains(0) || raop.encryptions.contains(4) { encryption = .none } else if raop.encryptions.contains(1) { encryption = .rsa } else {
             return .unsupported(Self.airPlay2Only)
         }
         if let codecs = raop.codecs, !codecs.contains(1) { return .unsupported(Self.formatUnsupported) }

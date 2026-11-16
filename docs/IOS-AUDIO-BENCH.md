@@ -25,7 +25,11 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B11 | Keep on This Device, airplane mode | not run | | | |
 | B12 | The demo plays | not run | | | |
 | B13 | The queue comes back after the app is closed | not run | | | |
+<<<<<<< HEAD
 | B14 | ReplayGain: off by default, on, and never on DoP | not run | | | |
+=======
+| B14 | Music on the phone: a folder from Files, iCloud Drive, a USB drive | not run | | | |
+>>>>>>> origin/main
 
 ## Before any script
 
@@ -64,6 +68,9 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 5. On Tailscale over cellular (B9's setup), jump to ten seconds before the end of a song. Whether the next song joins without a
    gap depends on it arriving in time: note which happened. If it didn't arrive, expect a short wait and then the next song from
    its first note, never a skipped song.
+6. Repeat steps 1 and 2 with a gapless album in MP3 and one in AAC (a live album or a continuous mix, ripped as it was sold): no
+   silence and no click between songs. The package tests show the delay and padding are left out to the frame; this step is the
+   same thing heard on real albums.
 
 ## B4. Surround on AirPods Max (5 min)
 
@@ -187,6 +194,7 @@ Macs › Try the Demo. Output › This iPhone. Play any album: soft generated no
 6. Choose another Mac (or a share), play something there, and go back to the first: each has its own queue. The demo starts empty
    every time. Forgetting a Mac in Macs removes its queue.
 
+<<<<<<< HEAD
 ## B14. ReplayGain (4 min)
 
 Needs an album whose files carry ReplayGain tags (most taggers can write them) and one song without them. Note each song's track
@@ -202,3 +210,23 @@ and album gain from the tagger first.
 6. Choose Off: the row goes. Close the app and open it again: the choice made last is still the one shown.
 7. Keep a tagged album on this device (B11's setup), turn the Mac off, and play it with Track chosen: the row shows the same gain as in step 2.
 8. On a share (if one is set up): a tagged FLAC, MP3 and M4A each show their gain in the row.
+=======
+## B14. Music on the phone (8 min)
+
+No Mac is needed. Have a folder of a few albums (one that runs without gaps) in three places: on the phone (Files › On My iPhone),
+in iCloud Drive, and on a USB drive with an adapter for the phone.
+
+1. Macs › **Add a Folder from Files**, choose the folder on the phone. Expect it under Your Folders, its albums and covers listed,
+   and a song to play. Output shows the folder, its count of songs and when it was last scanned.
+2. Play the gapless album across two songs: no gap, no click.
+3. Swipe the app away and open it again: the folder opens by itself, with its queue, and plays. Nothing asks for the folder again.
+4. In Files, delete one song and rename another. Back in the app: the deleted song is gone from its album and the renamed one is
+   there under its new name, without tapping Scan Again.
+5. The same with the folder in iCloud Drive. Note whether songs that aren't downloaded are listed, and whether playing one
+   downloads it (this has not been seen on a real phone; write down what happens).
+6. The same with the folder on the USB drive. Mid-song, pull the drive out: the song stops and the app says the folder can't be
+   found and to plug the drive in. Plug it in, tap Try Again: the songs play again.
+7. In Files, long-press a FLAC or MP3 anywhere › Share › Vespertine (or Open in Vespertine). Expect the app to open **Opened
+   Files** and play it. In Files › On My iPhone › Vespertine the copy is there; delete it and it leaves the app's list.
+8. Open a file the phone can't play by itself (a `.dsf`): an alert says so, and nothing is added.
+>>>>>>> origin/main
