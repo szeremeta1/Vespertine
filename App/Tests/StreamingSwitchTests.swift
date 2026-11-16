@@ -291,6 +291,8 @@ struct StreamingSwitchTests {
         app.setOn(true, id)
         #expect(await app.signIn(id, name: "Home", request: ProviderSignIn(server: "", user: "listener", secret: .password("x"))) == nil)
         #expect(await until { scratch.library.allTracks().contains { $0.isStreamed } })
+        // The list of accounts follows the database a moment later: waited for, not assumed (the server's name comes from it).
+        #expect(await until { !app.accounts(id).isEmpty })
         let track = try #require(scratch.library.allTracks().first { $0.isStreamed })
 
         let shares = NetworkShareManager(library: scratch.library, settings: scratch.settings, dataDirectory: scratch.root)
