@@ -70,32 +70,36 @@ public struct DSDLayout: Codable, Equatable, Sendable {
         let count = Int(range.count)
         var planes = [[UInt8]](repeating: [UInt8](repeating: DSDRendering.silence, count: count), count: channels)
         guard count > 0 else { return planes }
-        data.withUnsafeBytes { (bytes: UnsafeRawBufferPointer) in
-            let available = bytes.count
-            switch kind {
-            case .dff:
-                for channel in 0..<channels {
-                    planes[channel].withUnsafeMutableBufferPointer { plane in
-                        var at = channel
-                        for index in 0..<count where at < available {
-                            plane[index] = bytes[at]
-                            at += channels
-                        }
-                    }
+        let bytes = [UInt8](data)
+        let available: Int = bytes.count
+        switch kind {
+        case .dff:
+            for channel in 0..<channels {
+                var plane: [UInt8] = planes[channel]
+                var at: Int = channel
+                var index = 0
+                while index < count, at < available {
+                    plane[index] = bytes[at]
+                    at += channels
+                    index += 1
                 }
-            case .dsf:
-                let block = Int64(blockSize)
-                let firstBlock = range.lowerBound / block
-                for channel in 0..<channels {
-                    planes[channel].withUnsafeMutableBufferPointer { plane in
-                        for index in 0..<count {
-                            let byte = range.lowerBound + Int64(index)
-                            let at = Int((byte / block - firstBlock) * block * Int64(channels) + Int64(channel) * block + byte % block)
-                            guard at < available else { break }
-                            plane[index] = lsbFirst ? DSDRendering.reversed[Int(bytes[at])] : bytes[at]
-                        }
-                    }
+                planes[channel] = plane
+            }
+        case .dsf:
+            let block: Int64 = Int64(blockSize)
+            let firstBlock: Int64 = range.lowerBound / block
+            let group: Int64 = block * Int64(channels)
+            for channel in 0..<channels {
+                var plane: [UInt8] = planes[channel]
+                let shift: Int64 = Int64(channel) * block
+                for index in 0..<count {
+                    let byte: Int64 = range.lowerBound + Int64(index)
+                    let inBlocks: Int64 = (byte / block - firstBlock) * group
+                    let at: Int = Int(inBlocks + shift + byte % block)
+                    guard at < available else { break }
+                    plane[index] = lsbFirst ? DSDRendering.reversed[Int(bytes[at])] : bytes[at]
                 }
+                planes[channel] = plane
             }
         }
         return planes
