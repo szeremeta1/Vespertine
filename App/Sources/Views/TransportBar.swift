@@ -332,7 +332,9 @@ struct DevicePicker: View {
                     .padding(.horizontal, 8)
                 }
                 ForEach(airPlay.devices) { d in
-                    deviceRow(d.uid, name: d.name, detail: AirPlayText.detail(d), symbol: "airplay.audio", selected: model.settings.selectedDeviceUID == d.uid)
+                    // One with a password is asked for it first (a sheet), unless it is saved.
+                    deviceRow(d.uid, name: d.name, detail: AirPlayText.detail(d), symbol: "airplay.audio", selected: model.settings.selectedDeviceUID == d.uid,
+                              action: { airPlay.choose(d) { model.selectDevice($0) } })
                         .disabled(!d.isSupported)
                         .opacity(d.isSupported ? 1 : 0.5)
                 }
@@ -352,8 +354,8 @@ struct DevicePicker: View {
         .onAppear { model.renderers?.refresh() }
     }
 
-    private func deviceRow(_ uid: String?, name: String, detail: String, symbol: String, selected: Bool) -> some View {
-        Button { model.selectDevice(uid) } label: {
+    private func deviceRow(_ uid: String?, name: String, detail: String, symbol: String, selected: Bool, action: (() -> Void)? = nil) -> some View {
+        Button { if let action { action() } else { model.selectDevice(uid) } } label: {
             HStack(spacing: 10) {
                 Image(systemName: symbol)
                     .font(.system(size: 15))
