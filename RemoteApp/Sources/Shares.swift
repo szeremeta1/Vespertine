@@ -65,7 +65,7 @@ enum ShareWording {
         case .notFound:
             String(localized: "That folder isn’t on the share.", comment: "Shown on the iPhone or iPad when the folder typed after the share's name doesn't exist.")
         case .malformed, .unsupported:
-            String(localized: "Vespertine can’t talk to this server. It needs SMB 2 or SMB 3, without required encryption.", comment: "Shown on the iPhone or iPad when a file server only offers SMB versions or settings the app doesn't support. “SMB” is the file-sharing protocol; keep it.")
+            String(localized: "Vespertine can’t talk to this server. It needs SMB 2 or SMB 3.", comment: "Shown on the iPhone or iPad when a file server only offers SMB versions the app doesn't support. “SMB” is the file-sharing protocol; keep it.")
         case .badSignature:
             String(localized: "The server’s answers couldn’t be verified, so Vespertine stopped.", comment: "Shown on the iPhone or iPad when the signature on a file server's reply is wrong (the connection may have been tampered with).")
         case .status(let code):
