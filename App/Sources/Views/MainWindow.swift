@@ -68,9 +68,7 @@ struct MainWindow: View {
             model.player.togglePlayPause()
             return .handled
         }
-        .sheet(item: Binding(get: { model.airPlay?.passwordRequest }, set: { if $0 == nil { model.airPlay?.cancelPassword() } })) { request in
-            AirPlayPasswordSheet(request: request)
-        }
+        .modifier(AirPlayPasswordPrompt())
         .sheet(item: Binding(get: { model.lookupTracks.map(LookupRequest.init) }, set: { model.lookupTracks = $0?.tracks })) { request in
             MusicBrainzSheet(tracks: request.tracks)
                 .environment(model)
@@ -112,6 +110,22 @@ struct MainWindow: View {
             if LaunchArguments().bool(forKey: "VespertineOpenSettings") { openSettings() }   // QA: -VespertineOpenSettings YES
         }
         .onOpenURL { model.openAudio($0) }
+    }
+}
+
+/// The sheet that asks for an AirPlay receiver's password. Kept out of `MainWindow.body` for the same reason as the
+/// alert below: one more modifier there and the type-checker gives up.
+private struct AirPlayPasswordPrompt: ViewModifier {
+    @Environment(AppModel.self) private var model
+
+    private var request: Binding<AirPlayPasswordRequest?> {
+        Binding(get: { model.airPlay?.passwordRequest }, set: { if $0 == nil { model.airPlay?.cancelPassword() } })
+    }
+
+    func body(content: Content) -> some View {
+        content.sheet(item: request) { (request: AirPlayPasswordRequest) in
+            AirPlayPasswordSheet(request: request).environment(model)
+        }
     }
 }
 
