@@ -30,10 +30,13 @@ public struct PlayerState: Codable, Sendable, Equatable {
     public var error: String?
     /// Transitions (Smart Mix, crossfades): nil while the feature is off in the Mac's settings.
     public var transitions: Bool?
+    /// The sound settings of the output the Mac plays to; nil from a Mac that doesn't say (one from before them), and
+    /// while there is no output to set them on.
+    public var sound: SoundState?
 
     public init(playback: PlaybackValue, loading: Bool, nowPlaying: NowPlaying?, position: Double, positionAt: Date,
                 duration: Double, shuffle: Bool, repeatMode: RepeatModeValue, signal: SignalSummary?, output: String?,
-                volume: VolumeState, waitingFor: String?, error: String?, transitions: Bool?) {
+                volume: VolumeState, waitingFor: String?, error: String?, transitions: Bool?, sound: SoundState? = nil) {
         self.playback = playback
         self.loading = loading
         self.nowPlaying = nowPlaying
@@ -48,6 +51,7 @@ public struct PlayerState: Codable, Sendable, Equatable {
         self.waitingFor = waitingFor
         self.error = error
         self.transitions = transitions
+        self.sound = sound
     }
 
     /// Whether `other` says something new to a remote that has this: anything but the position, or a position that

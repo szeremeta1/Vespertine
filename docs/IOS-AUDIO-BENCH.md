@@ -114,8 +114,12 @@ knob down first.
 
 1. With the DAC never tested: play a DSD64 song. Expect **CONVERTED ON THE MAC** and PCM on the DAC's display. Nowhere "DoP".
 2. Output › Play DSD natively? › Test DoP. Expect the music to stop, about five seconds of a soft chord, then "Did you hear music or
-   hiss?". Note what the DAC's display showed during the sound (DSD64, or PCM 176.4), and what you heard.
-3. Answer what you heard. After Music: play the DSD64 song again. Expect **NATIVE DSD · DoP**, the DAC showing DSD64, Output showing
+   hiss?" with "176.4 kHz" under it. Note what the DAC's display showed during the sound (DSD64, or PCM 176.4), and what you heard.
+3. Answer what you heard. After Music the same chord follows at 192, 352.8 and 384 kHz, with the same question and the rate under it
+   each time. For each rate note what the DAC's display showed (DSD64 for 176.4 and 192, DSD128 for 352.8 and 384) and answer what you
+   heard. A rate the DAC won't run at is skipped without a question. When it ends, the section lists "DoP passed at" and, if any,
+   "DoP not passed at", and they must match what the display showed. Write the four results in the table under these steps.
+   Then: play the DSD64 song again. Expect **NATIVE DSD · DoP**, the DAC showing DSD64, Output showing
    Song DSD64, DoP 176.4 kHz, Output runs at 176.4 kHz, Resampled by iOS No. Any hiss or noise at any point is a FAIL: note when.
 4. Let two DSD64 songs of one album play through: no click, no burst of noise and no drop out of DSD between them.
 5. Seek, pause and resume in a DSD song: note any click or noise.
@@ -125,10 +129,22 @@ knob down first.
 8. Unplug the DAC mid-DSD-song: a pause, silence from the speaker. Plug another DAC in: it is not sent DoP until it passes its own test.
 9. On a DAC that does not take DoP: run the test, expect a quiet hiss or silence, answer Hiss. DSD stays PCM; "DoP stays off for this DAC."
 10. Test with the volume below 100%: expect "The test needs the volume at 100%." and no sound.
+11. On a DAC that passed at 176.4 or 192 kHz, volume at 100%: play a lossless stereo album at that rate (24/176.4 or 24/192). Expect the
+    badge **ORIGINAL FILE · VERIFIED ON THIS DAC**, and in Output the rows "Original file: Verified on this DAC" and "DoP passed at".
+    Play a 16/44.1 or 24/96 album: expect **ORIGINAL FILE · NO PROCESSING** (no DoP test reaches those rates).
+12. With either of those badges showing, each of these must bring back plain **ORIGINAL FILE** within a second or so: one step down
+    on the phone's volume; unplugging the DAC so the speaker or AirPods take over; a song at a rate the DAC won't run at (Resampled by
+    iOS: Yes). Back at 100% on the DAC at the song's rate, the stronger badge returns.
+
+| DAC | 176.4 kHz | 192 kHz | 352.8 kHz | 384 kHz | Date, device, iOS, build |
+|---|---|---|---|---|---|
+| | | | | | |
 
 Bit-exactness of PCM is a separate measurement (a DAC with a bit-perfect light, or a digital loopback into a recorder, and the files in
-`docs/fixtures`). A DAC playing the DoP test as music has received those frames exactly, at 176.4 kHz and 100% volume; that says
-nothing about other rates or volumes. Until PCM is measured, the phone shows no "bit-perfect" badge anywhere, and must not.
+`docs/fixtures`). A DAC playing the DoP test as music has received those frames exactly, at that rate and 100% volume; that says
+nothing about other rates or volumes, and DoP has no rate below 176.4 kHz. So **VERIFIED ON THIS DAC** appears only for a song at a
+rate that DAC passed at, with nothing known to change its samples. Until PCM is measured, the phone shows no "bit-perfect" badge
+anywhere, and must not.
 
 ## B9. Away from home (5 min, plus a 30 min listen)
 

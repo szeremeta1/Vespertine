@@ -201,6 +201,13 @@ public final class RAOPSession: @unchecked Sendable {
                               body: DMAP.item(title: title, artist: artist, album: album))
     }
 
+    /// The song's cover from the frame `rtptime` on (JPEG or PNG); nil, or a picture receivers don't take, clears the one shown.
+    public func setArtwork(_ image: Data?, rtptime: UInt32) async throws {
+        let type = image.flatMap(AirPlayArtwork.contentType)
+        _ = try await request("SET_PARAMETER", headers: [("Content-Type", type ?? AirPlayArtwork.none), ("RTP-Info", "rtptime=\(rtptime)")],
+                              body: type == nil ? Data() : image ?? Data())
+    }
+
     /// Where the song is: its first frame, the frame heard now, its last (RTP times).
     public func setProgress(start: UInt32, current: UInt32, end: UInt32) async throws {
         _ = try await request("SET_PARAMETER", headers: [("Content-Type", "text/parameters")], body: Data("progress: \(start)/\(current)/\(end)\r\n".utf8))
