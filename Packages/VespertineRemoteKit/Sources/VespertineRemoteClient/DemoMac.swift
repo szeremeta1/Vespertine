@@ -96,6 +96,14 @@ public final class DemoMac: RemoteChannel {
     private var shuffle = false
     private var repeatMode: RepeatModeValue = .off
     private var transitions: Bool? = false
+    // The sound of each output, as a Mac keeps it: by output (nil: System Default).
+    private let presets = [SoundChoice(id: "demo-eq-warm", name: "Warm"), SoundChoice(id: "demo-eq-night", name: "Late Night")]
+    private let roomProfiles = [SoundChoice(id: "demo-room-chair", name: "Listening Chair")]
+    private var equalizers: [String?: String] = [:]
+    private var roomsOn: Set<String?> = []
+    private var spatialModes: [String?: SpatialModeValue] = [:]
+    private var spatialized: Set<String?> = []
+    private var balances: [String?: Double] = [:]
     private var outputs: [OutputSummary] = []
     private var level = 0.55
     private var muted = false
@@ -379,9 +387,43 @@ public final class DemoMac: RemoteChannel {
             muted = false
         case .setTransitions(let on):
             transitions = on
+
+        case .setEqualizer(let preset):
+            guard preset == nil || presets.contains(where: { $0.id == preset }) else { return notOnThisOutput }
+            equalizers[selectedUID] = preset
+        case .setRoomCorrection(let profile):
+            guard let room = soundState().room else { return notOnThisOutput }
+            guard profile == nil || room.profiles.contains(where: { $0.id == profile }) else { return notOnThisOutput }
+            if profile == nil { roomsOn.remove(selectedUID) } else { roomsOn.insert(selectedUID) }
+        case .setSpatialMode(let mode):
+            spatialModes[selectedUID] = mode
+        case .setSpatializeStereo(let on):
+            guard soundState().spatial?.spatializeStereo != nil else { return notOnThisOutput }
+            if on { spatialized.insert(selectedUID) } else { spatialized.remove(selectedUID) }
+        case .setBalance(let value):
+            guard soundState().balance != nil else { return notOnThisOutput }
+            balances[selectedUID] = BalanceState.clamped(value)
         }
         pushPlayer()
         return .ok
+    }
+
+    private let notOnThisOutput = RemoteReply.failed(reason: "This output doesn’t have that.")
+
+    private var selectedUID: String? { outputs.first(where: \.selected)?.uid }
+
+    /// The sound of the chosen output. The DAC has everything; the receiver has every channel to itself, so Spatialize
+    /// stereo shows without Spatial Audio, and there is no room profile or balance for it.
+    private func soundState() -> SoundState {
+        let uid = selectedUID
+        let receiver = uid == "demo-receiver"
+        let mode = spatialModes[uid] ?? .off
+        return SoundState(
+            equalizer: EqualizerState(presets: presets, selected: equalizers[uid]),
+            room: RoomCorrectionState(profiles: receiver ? [] : roomProfiles, selected: !receiver && roomsOn.contains(uid) ? roomProfiles[0].id : nil,
+                                      chosen: receiver ? nil : roomProfiles[0].id),
+            spatial: SpatialState(mode: mode, spatializeStereo: receiver || mode != .off ? spatialized.contains(uid) : nil),
+            balance: receiver ? nil : BalanceState(value: balances[uid] ?? 0, bypassed: nil))
     }
 
     // MARK: Playback
@@ -495,7 +537,7 @@ public final class DemoMac: RemoteChannel {
             shuffle: shuffle, repeatMode: repeatMode, signal: signal, output: output?.name,
             volume: VolumeState(route: output?.uid == "demo-receiver" ? .fixed : .hardware,
                                 level: output?.uid == "demo-receiver" ? nil : level, muted: muted),
-            waitingFor: nil, error: nil, transitions: transitions)
+            waitingFor: nil, error: nil, transitions: transitions, sound: soundState())
     }
 
     private func queueState() -> QueueState {

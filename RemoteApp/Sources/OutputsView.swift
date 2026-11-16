@@ -50,15 +50,28 @@ struct OutputsView: View {
                         }
                     }
                 } footer: {
-                    if session.isShare {
+                    if session.isFolder {
+                        Text("This device plays the songs from the folder itself, through its speaker, headphones or a DAC. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
+                    } else if session.isShare {
                         Text("This device reads the songs from the share itself and plays them, through its speaker, headphones or a DAC. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
                     } else {
                         Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
                     }
                 }
+                if playsHere {
+                    Section {
+                        Picker("ReplayGain", selection: Binding(get: { PlayTarget.shared.replayGain }, set: { PlayTarget.shared.replayGain = $0 })) {
+                            Text("Off").tag(ReplayGainChoice.off)
+                            Text("Track").tag(ReplayGainChoice.track)
+                            Text("Album").tag(ReplayGainChoice.album)
+                        }
+                    } footer: {
+                        Text("Plays songs at a matched loudness, using the ReplayGain values in their files: Track for each song by itself, Album to keep an album’s quiet and loud songs as they are. Off, no sample is changed. A song without values, and DSD sent to a DAC as DoP, play unchanged either way.")
+                    }
+                }
                 if playsHere, let phone = session.phone, let signal = phone.signal {
                     Section {
-                        ForEach(PlayTarget.report(signal, route: phone.route), id: \.label) { row in
+                        ForEach(PlayTarget.report(signal, route: phone.route, dop: phone.dopDACs), id: \.label) { row in
                             LabeledContent(row.label, value: row.value)
                         }
                     } header: {
@@ -70,8 +83,10 @@ struct OutputsView: View {
                 if playsHere, !session.isDemo, let phone = session.phone, DoPGate.canTest(phone.route) {
                     DoPSection(phone: phone, fromShare: session.isShare)
                 }
-                if session.isShare, let share = model.openShare {
-                    shareSection(share)
+                if session.isFolder {
+                    if let folder = model.openFolder { folderSection(folder) }
+                } else if session.isShare {
+                    if let share = model.openShare { shareSection(share) }
                 } else {
                     Section {
                         ForEach(Array((session.outputs?.outputs ?? []).enumerated()), id: \.offset) { _, output in
@@ -95,6 +110,10 @@ struct OutputsView: View {
                         }
                     } footer: {
                         Text("Choose one of these and Vespertine on the Mac plays there.")
+                    }
+                    // The sound of the output the Mac plays to, while the Mac is what plays.
+                    if !playsHere, let player = session.player, let sound = player.sound, !sound.isEmpty {
+                        MacSoundSection(session: session, sound: sound, output: player.output, feedback: feedback)
                     }
                     Section {
                         LabeledContent("Mac", value: session.server?.name ?? session.pairing.name)
@@ -189,6 +208,46 @@ struct OutputsView: View {
         }
     }
 
+    /// The folder the songs come from: what the last look found, looking again, and choosing the folder again.
+    @ViewBuilder private func folderSection(_ folder: SavedFolder) -> some View {
+        let status = model.shareStatus ?? ShareStatus()
+        Section {
+            LabeledContent("Folder", value: folder.name)
+            LabeledContent("Songs", value: status.songs.formatted())
+            if status.needTheMac > 0 {
+                LabeledContent("Files that need the Mac", value: status.needTheMac.formatted())
+            }
+            if status.unreadable > 0 {
+                LabeledContent("Files that couldn’t be read", value: status.unreadable.formatted())
+            }
+            if let scanned = status.scanned {
+                LabeledContent("Last scanned", value: scanned.formatted(date: .abbreviated, time: .shortened))
+            }
+            Button {
+                model.rescanShare()
+            } label: {
+                HStack {
+                    Text("Scan Again")
+                    Spacer()
+                    if status.scan.isRunning { ProgressView() }
+                }
+            }
+            .disabled(status.scan.isRunning)
+            .accessibilityIdentifier("folder-rescan")
+            if !folder.isOwn { ChooseFolderAgainButton(folder: folder) }
+        } footer: {
+            VStack(alignment: .leading, spacing: 6) {
+                if let trouble = status.trouble { Text(trouble) }
+                if folder.isOwn {
+                    Text("Music you open in Vespertine from another app is copied into Vespertine’s folder in the Files app and stays there until you delete it in Files. You can put music there yourself, too.")
+                } else {
+                    Text("Vespertine looks at the folder each time it is opened and reads only new and changed files. The music stays where it is; nothing is copied.")
+                }
+                Text("This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; DTS, TrueHD and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.")
+            }
+        }
+    }
+
     /// Under "This iPhone": where its sound goes now, or why it can't play here.
     private var hereDetail: String {
         if session.isDemo, session.phone == nil { return String(localized: "Plays the demo’s made-up songs with sound") }
@@ -229,6 +288,12 @@ private struct DoPSection: View {
     var body: some View {
         Section {
             if let status { Text(status).foregroundStyle(Color.secondary) }
+            // Which rates this DAC played the chord at: there whether or not a song is playing.
+            if !probe.isBusy {
+                ForEach(PlayTarget.dopRows(phone.dopDACs, route: phone.route), id: \.label) { row in
+                    LabeledContent(row.label, value: row.value)
+                }
+            }
             Button { probe.run() } label: {
                 HStack {
                     Text("Test DoP")
@@ -244,6 +309,9 @@ private struct DoPSection: View {
                 Button("Music") { probe.answer(.music) }
                 Button("Hiss") { probe.answer(.hiss) }
                 Button("Cancel", role: .cancel) { probe.cancel() }
+            } message: {
+                // The chord is played at each rate in turn: which one the question is about.
+                Text("\(PhoneSignal.kilohertz(probe.carrier)) kHz")
             }
         } header: {
             Text("Play DSD natively?")

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import VespertineRemoteProtocol
 
 public struct SongTags: Codable, Equatable, Sendable {
     public var title: String?
@@ -33,6 +34,8 @@ public struct SongTags: Codable, Equatable, Sendable {
     public var pictureLength: Int?
     /// For a DSD file (DSF, DSDIFF): where its audio is. `sampleRate` is then the DSD rate and `bitDepth` 1.
     public var dsd: DSDLayout?
+    /// The file's ReplayGain tags, when it has any. nil too in an index made before these were read.
+    public var replayGain: ReplayGain?
 
     public var lossless: Bool { bitDepth != nil }
 
@@ -117,6 +120,35 @@ private func yearIn(_ text: String?) -> Int? {
         }
     }
     return nil
+}
+
+/// The ReplayGain tags of a file as they are met, under whatever names its kind of tag gives them.
+struct GainTags {
+    var trackGain: Double?, trackPeak: Double?, albumGain: Double?, albumPeak: Double?
+
+    /// "-6.20 dB", "+1.5", "0.988102": the number at the front.
+    private static func number(_ text: String?) -> Double? {
+        guard let text else { return nil }
+        let front = text.trimmingCharacters(in: .whitespaces).prefix { $0.isASCII && ($0.isNumber || $0 == "-" || $0 == "+" || $0 == ".") }
+        guard let value = Double(front), value.isFinite else { return nil }
+        return value
+    }
+
+    /// Takes `value` if `name` is one of the four tags (any case). The first of each is the one kept.
+    mutating func take(_ name: String, _ value: String?) {
+        switch name.uppercased() {
+        case "REPLAYGAIN_TRACK_GAIN": trackGain = trackGain ?? Self.number(value)
+        case "REPLAYGAIN_TRACK_PEAK": trackPeak = trackPeak ?? Self.number(value)
+        case "REPLAYGAIN_ALBUM_GAIN": albumGain = albumGain ?? Self.number(value)
+        case "REPLAYGAIN_ALBUM_PEAK": albumPeak = albumPeak ?? Self.number(value)
+        default: break
+        }
+    }
+
+    var values: ReplayGain? {
+        guard trackGain != nil || trackPeak != nil || albumGain != nil || albumPeak != nil else { return nil }
+        return ReplayGain(trackGain: trackGain, trackPeak: trackPeak, albumGain: albumGain, albumPeak: albumPeak)
+    }
 }
 
 public enum SongTagReader {
@@ -227,6 +259,9 @@ public enum SongTagReader {
         tags.track = leadingNumber(seen["TRACKNUMBER"])
         tags.disc = leadingNumber(seen["DISCNUMBER"])
         tags.year = yearIn(seen["DATE"] ?? seen["YEAR"] ?? seen["ORIGINALDATE"])
+        var gain = GainTags()
+        for (key, value) in seen where key.hasPrefix("REPLAYGAIN_") { gain.take(key, value) }
+        tags.replayGain = gain.values
     }
 
     // MARK: MPEG-4 (ALAC, AAC)
@@ -302,6 +337,7 @@ public enum SongTagReader {
         if tags.duration <= 0 { tags.duration = movieDuration }
         if tags.bitDepth == nil, tags.duration > 0 { tags.bitRate = Int((Double(file.size) * 8 / tags.duration / 1000).rounded()) }
         if let items {
+            var gain = GainTags()
             for item in boxes(b, items) {
                 guard let data = boxes(b, item.body).first(where: { $0.type == "data" }), data.body.count >= 8 else { continue }
                 let payload = (data.body.lowerBound + 8)..<data.body.upperBound
@@ -318,9 +354,14 @@ public enum SongTagReader {
                 case "covr" where tags.pictureOffset == nil && !payload.isEmpty:
                     tags.pictureOffset = moovAt + Int64(payload.lowerBound)
                     tags.pictureLength = payload.count
+                case "----":
+                    // A tag with a name of its own: the name is in a box beside the value, after four bytes of flags.
+                    guard let name = boxes(b, item.body).first(where: { $0.type == "name" }), name.body.count > 4 else { break }
+                    gain.take(String(decoding: b[(name.body.lowerBound + 4)..<name.body.upperBound], as: UTF8.self), text)
                 default: break
                 }
             }
+            tags.replayGain = gain.values
         }
         return tags
     }
@@ -380,6 +421,7 @@ public enum SongTagReader {
         var track: Int?, disc: Int?, year: Int?
         /// The cover's place in the tag's bytes.
         var picture: Range<Int>?
+        var gain = GainTags()
 
         func apply(to tags: inout SongTags, tagOffset: Int64) {
             tags.title = title ?? tags.title
@@ -390,6 +432,7 @@ public enum SongTagReader {
             tags.track = track ?? tags.track
             tags.disc = disc ?? tags.disc
             tags.year = year ?? tags.year
+            tags.replayGain = gain.values ?? tags.replayGain
             if let picture {
                 tags.pictureOffset = tagOffset + Int64(picture.lowerBound)
                 tags.pictureLength = picture.count
@@ -404,7 +447,13 @@ public enum SongTagReader {
     }
 
     private static func text(_ b: [UInt8], _ range: Range<Int>) -> String? {
-        guard let encoding = b[range].first else { return nil }
+        // Several values are separated by a null: the first is taken.
+        clean(texts(b, range).first ?? "")
+    }
+
+    /// Every value of a text frame: they are separated by nulls. A frame the user named (TXXX) is its name, then its value.
+    private static func texts(_ b: [UInt8], _ range: Range<Int>) -> [String] {
+        guard let encoding = b[range].first else { return [] }
         let body = Array(b[(range.lowerBound + 1)..<range.upperBound])
         let whole: String
         switch encoding {
@@ -416,8 +465,8 @@ public enum SongTagReader {
         case 3: whole = String(decoding: body, as: UTF8.self)
         default: whole = String(body.map { Character(Unicode.Scalar($0)) })
         }
-        // Several values are separated by a null: the first is taken.
-        return clean(whole.split(separator: "\0", omittingEmptySubsequences: true).first.map(String.init) ?? "")
+        // In UTF-16 each value may start with its own byte order mark.
+        return whole.split(separator: "\0", omittingEmptySubsequences: true).map { $0.replacingOccurrences(of: "\u{FEFF}", with: "") }
     }
 
     private static func swapped(_ b: [UInt8]) -> [UInt8] {
@@ -467,6 +516,9 @@ public enum SongTagReader {
                     if genre.hasPrefix("("), let close = genre.firstIndex(of: ")"), let named = clean(String(genre[genre.index(after: close)...])) { genre = named }
                     out.genre = genre
                 }
+            case "TXXX", "TXX":
+                let parts = texts(b, body)
+                if parts.count >= 2 { out.gain.take(parts[0], parts[1]) }
             case "APIC", "PIC":
                 guard !front, let range = picture(b, body, old: major == 2) else { break }
                 out.picture = range.range

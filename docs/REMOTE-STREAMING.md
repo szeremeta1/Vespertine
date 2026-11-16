@@ -126,18 +126,36 @@ with a small metadata file beside each). One conversion runs at a time. The libr
   later, and if iOS declined asks for half, and half again (352.8 → 176.4 → 88.2 → 44.1), so any conversion left to iOS is the simplest one.
   A surround song on an interface or HDMI receiver with more than two outputs asks for that many channels and sends each channel to an output
   of its own, unmixed; on a stereo output it is folded. The Output screen's "What Reaches the Output" lists what was read back: the song,
-  the output's rate and channels, whether iOS resamples, and the volume. The engine applies no gain. A DAC, headphones or AirPlay giving way
+  the output's rate and channels, whether iOS resamples, and the volume. The engine applies no gain unless ReplayGain is
+  turned on (below). The badge for a song's own file
+  is **ORIGINAL FILE**. It reads **ORIGINAL FILE · NO PROCESSING** only while nothing is known to change the samples
+  (`PhoneSignal.untouched`): a lossless file, a DAC running at the song's rate and channel count, the volume at 100%, and nothing in
+  Vespertine altering the sound (`PhoneSignal.processed`, which any gain or equalizer must set). It reads **ORIGINAL FILE · VERIFIED
+  ON THIS DAC** when, on top of that, this DAC passed the DoP test at exactly the song's rate and the song has 24 bits or fewer. Both
+  go back to the plain badge on Bluetooth, AirPlay or the speaker, below 100% volume, and when iOS resamples. A DAC, headphones or AirPlay giving way
   to the phone's speaker pauses; playback is never carried on from the speaker.
 - **DSD on that DAC** (`PhoneDoP.swift`, `DoPProbe`): DSD is sent as DoP only to a DAC that passed a listening test on this phone. The test
   (Output › Play DSD natively? › Test DoP) plays five seconds of DSD64 made on the phone, a soft chord, as DoP at 176.4 kHz and asks
   "music or hiss?". A DAC can only play the chord if every frame reached it as sent, so "music" is the evidence; nothing is taken from the
-  DAC's name. The answer is kept by iOS's identifier for the output (`DoPDACs`). Nothing is saved unless the sound went out to the same
+  DAC's name. After "music" the same chord follows at 192, 352.8 and 384 kHz (DSD64 of the 48 kHz family, and DSD128 of both), each
+  with the same question, and each rate's result (passed, hiss, or declined by the DAC) is kept for that DAC and listed in Output as
+  "DoP passed at" and "DoP not passed at". No DSD is asked for as DoP at or above the lowest rate that didn't pass. The answer is kept by iOS's identifier for the output (`DoPDACs`). Nothing is saved unless the sound went out to the same
   stereo USB output at 176.4 kHz with the volume at 100% from start to end. After "music", `PhonePlayback` asks for DSD with `dop`, and
   before a DoP song starts it has iOS bring the output to the carrier rate and reads back that it did (`DoPOutput.bring`); if not, the song
   is asked for again as PCM and that rate is not tried on that DAC again. A song lined up behind another comes as DoP only at the rate the
   output already runs at, so nothing changes under the song being heard. If the volume leaves 100%, or the output or its rate changes
   mid-song, the song is asked for again as PCM and carries on from where it was (`PhonePlayback.outputChanged`). The badge says
   NATIVE DSD · DoP only for such a stream on such a DAC.
+- **ReplayGain** (`PhoneReplayGain`, Output › ReplayGain: Off, Track, Album; off until chosen). Off, no sample is changed and the Mac is
+  asked nothing about gains: a test renders a song through the player and compares it with the decoded file, sample for sample. On, the
+  phone asks for the song's values (`streamInfo`, which every Mac that can send songs answers) and multiplies its samples by the gain
+  they give, by the Mac's rules: the chosen kind, or the other when the file has only that; never so much that the file's stated peak
+  would pass full scale; kept between -30 and +15 dB. There is no preamp. Each song carries its own gain to the sample where it starts,
+  so a gapless join between songs with different gains changes level exactly there. DSD sent as DoP is never scaled (the frames are
+  DSD bits). A song with no values plays as it is. "What Reaches the Output" lists `ReplayGain: −6.2 dB` (or that the song has none)
+  while it is on, and `PhoneSignal.processed` is true whenever the samples are changed, for the badge to go by. A kept song's values
+  are kept with it, so it is levelled the same with the Mac off. On a share the values are read from the file's own tags when the
+  song is played (`docs/PHONE-SHARES.md`). The level is not measured here: a file without ReplayGain tags is never analysed on the phone.
 
 ## The listener's safety
 
@@ -156,4 +174,8 @@ signing in is not counted, since a phone trying every route at once hangs up on 
 - Favorites and play counts made while offline are not sent back to the Mac.
 - Finding the Mac from away and moving between networks are covered by unit tests against a fake Mac only; B9 and B10 are not run.
 - DSD→FLAC speed in a release build is unmeasured (debug: about 20 s of CPU per second of 5.1 DSD64 on a loaded machine).
-- ReplayGain values are sent; gapless delay/padding are not (`encoderDelay`/`endPadding` are always nil).
+- ReplayGain values are sent.
+- MP3 and AAC albums join without a gap like lossless ones. The silence an encoder puts before a song and after it is left out by the
+  phone's decoder (Apple's), which reads how much from the file itself: a LAME header or an iTunSMPB comment in an MP3, an edit list or an
+  iTunSMPB tag in an M4A. `LossyGaplessTests` holds it to that with one tone cut in two and encoded as two songs. So the Mac sends no
+  delay or padding (`encoderDelay`/`endPadding` stay nil). An MP3 that records neither plays whole, as it does in any player.

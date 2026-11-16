@@ -83,11 +83,41 @@ public struct PhoneSignal: Equatable, Sendable {
     public var dsdRate: Double?
     /// Sent as DoP, but the output isn't at the carrier rate or the volume isn't at its top: the DAC isn't getting DSD.
     public var dopBroken: Bool { dsdRate != nil && (resampled || volumeReduced) }
+    /// The phone holds the file itself, as it is on the Mac or the share: nothing was converted or cut out for it.
+    public var original: Bool
+    /// Vespertine is changing the samples on purpose (a gain, an equalizer, anything of the kind). Whatever does so sets
+    /// this, and the "no processing" wording goes while it is set.
+    public var processed = false
+    /// This DAC played the DoP test's chord at exactly the rate this song plays at (`DoPDACs.passed(at:for:)`): frames at
+    /// this rate were shown to reach it as sent.
+    public var dacPassedAtRate = false
+    /// The ReplayGain being applied to the song, in decibels (after its peak has had its say). nil: none is.
+    public var replayGain: Double?
+    /// ReplayGain is on and this song has nothing done to it: its file has no values, or it is DSD sent as DoP.
+    public var replayGainHasNothing = false
+
+    /// Nothing between the file and the DAC is known to change the song's samples: it is the lossless file itself,
+    /// Vespertine does nothing to it, and iOS reports a DAC running at the song's own rate and channel count with the
+    /// volume at its top. Everything here is read back or true of how the song is played; none of it is a measurement
+    /// at the DAC. Anything unknown (the rate, the volume) counts against it, and so does Bluetooth, AirPlay or the
+    /// speaker, where iOS always converts.
+    public var untouched: Bool {
+        guard original, lossless, dsdRate == nil, !processed, surround == nil, discreteOutputs == nil, onDAC else { return false }
+        guard let outputRate, outputRate > 0, !resampled, outputChannels == channels else { return false }
+        guard let volume, volume >= 0.995 else { return false }
+        return true
+    }
+
+    /// `untouched`, on a DAC that passed the DoP test at this song's rate: the one case where something other than
+    /// iOS's word says frames at this rate arrive as sent. The test carries 24 bits, so it says nothing for a song
+    /// with more.
+    public var verifiedOnDAC: Bool { untouched && dacPassedAtRate && (bitDepth ?? .max) <= 24 }
 
     public init(stream: StreamDescriptor, route: PhoneRoute?) {
         dsdRate = stream.dsdRate
         // A file this device decoded itself is the song's own file, as one iOS decodes is.
-        converted = stream.kind != .original && stream.kind != .decoded
+        original = stream.kind == .original || stream.kind == .decoded
+        converted = !original
         convertedHere = stream.kind == .pcm
         cut = stream.kind == .flac && stream.cut == true
         lossless = stream.format.lossless
@@ -266,6 +296,11 @@ public final class PhoneRemote {
                 signal.discreteOutputs = outputs
             }
             signal.volume = outputVolume
+            signal.dacPassedAtRate = dopDACs.passed(at: stream.format.sampleRate, for: route?.uid)
+            // ReplayGain multiplies every sample: the song is no longer the file's own samples while it does.
+            signal.replayGain = playback.appliedGain?.decibels
+            signal.replayGainHasNothing = playback.replayGainHasNothing
+            signal.processed = playback.appliedGain != nil
             return signal
         }
     }

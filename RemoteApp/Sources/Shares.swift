@@ -27,10 +27,13 @@ struct ShareStatus: Equatable {
     var unreadable = 0
     /// When the last whole scan ended; nil until one has.
     var scanned: Date?
+    /// It is a folder on this device, not a share on a server: its troubles are worded as a folder's.
+    var folder = false
 
     init() {}
 
-    init(_ mac: ShareMac) {
+    init(_ mac: ShareMac, folder: Bool = false) {
+        self.folder = folder
         scan = mac.scan
         reachable = mac.reachable
         songs = mac.library.songs.count
@@ -42,8 +45,9 @@ struct ShareStatus: Equatable {
 
     /// The share can't be used right now: the reason, for showing.
     var trouble: String? {
-        if case .failed(let error) = scan { return ShareWording.trouble(error) }
-        return reachable == false ? ShareWording.trouble(.unreachable) : nil
+        func words(_ error: SMBError) -> String { folder ? FolderWording.trouble(error) : ShareWording.trouble(error) }
+        if case .failed(let error) = scan { return words(error) }
+        return reachable == false ? words(.unreachable) : nil
     }
 }
 
@@ -84,7 +88,7 @@ enum ShareWording {
         case .notFound:
             String(localized: "That folder isn’t on the share.", comment: "Shown on the iPhone or iPad when the folder typed after the share's name doesn't exist.")
         case .malformed, .unsupported:
-            String(localized: "Vespertine can’t talk to this server. It needs SMB 2 or SMB 3, without required encryption.", comment: "Shown on the iPhone or iPad when a file server only offers SMB versions or settings the app doesn't support. “SMB” is the file-sharing protocol; keep it.")
+            String(localized: "Vespertine can’t talk to this server. It needs SMB 2 or SMB 3.", comment: "Shown on the iPhone or iPad when a file server only offers SMB versions the app doesn't support. “SMB” is the file-sharing protocol; keep it.")
         case .badSignature:
             String(localized: "The server’s answers couldn’t be verified, so Vespertine stopped.", comment: "Shown on the iPhone or iPad when the signature on a file server's reply is wrong (the connection may have been tampered with).")
         case .status(let code):

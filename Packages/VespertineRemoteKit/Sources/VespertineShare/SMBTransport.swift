@@ -21,7 +21,8 @@ public enum SMBError: Error, Equatable, Sendable {
     case closed
     /// The server sent something that isn't SMB as this client knows it.
     case malformed
-    /// The server only speaks a version of SMB this client doesn't (SMB 1, or nothing below 3.1.1), or insists on encryption.
+    /// The server only speaks a version of SMB this client doesn't (SMB 1), or insists on encryption with no cipher in
+    /// common (it takes nothing but AES-256, or the version agreed has no encryption).
     case unsupported
     /// The name or password was refused.
     case signInFailed

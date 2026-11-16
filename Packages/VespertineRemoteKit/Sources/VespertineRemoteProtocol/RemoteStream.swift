@@ -83,7 +83,10 @@ public struct StreamInfo: Codable, Sendable, Equatable, Identifiable {
     /// The length in sample frames of what arrives, for gapless joins.
     public var totalFrames: Int64?
     public var replayGain: ReplayGain?
-    /// Encoder delay and end padding in frames, when the Mac knows them (nil: not known, treat as none).
+    /// Encoder delay and end padding in frames. Always nil, and nothing is to be cut on their account: the phone's decoder
+    /// reads both from the file itself (a LAME header or an iTunSMPB comment in an MP3, an edit list or an iTunSMPB tag in
+    /// an M4A) and leaves them out, so an MP3 or AAC album joins without a gap with nothing said here. Kept so that every
+    /// version reads every other's messages.
     public var encoderDelay: Int?
     public var endPadding: Int?
 

@@ -20,16 +20,31 @@ public struct DoPDACs: Codable, Equatable, Sendable {
         case hiss
     }
 
+    /// How the test went at one carrier rate.
+    public enum CarrierResult: String, Codable, Sendable {
+        /// You heard the chord: frames at this rate reached the DAC exactly as sent.
+        case passed
+        /// The DAC ran at the rate, and you heard hiss or nothing.
+        case hiss
+        /// The DAC wouldn't run at the rate.
+        case declined
+    }
+
     public struct Entry: Codable, Equatable, Sendable {
         public var answer: Answer
         /// The DAC's name when it was tested, for showing.
         public var name: String
         /// The highest carrier rate it has been seen to run at, once a higher one was declined. nil: none declined yet.
         public var ceiling: Double?
+        /// How the test went at each carrier rate it was played at (the rate in Hz). nil: an answer from before the
+        /// test played more than one rate, which says nothing about any rate but the first.
+        public var carriers: [Int: CarrierResult]?
     }
 
-    /// The rate the test is played at: DSD64's carrier.
+    /// The rate the test is played at first, and the one that decides whether the DAC gets DoP at all: DSD64's carrier.
     public static let testCarrier = 176_400.0
+    /// Every rate the test plays the chord at, in order: DSD64 and DSD128, each in the 44.1 and the 48 kHz family.
+    public static let testCarriers = [176_400.0, 192_000.0, 352_800.0, 384_000.0]
     /// The highest carrier asked of a DAC that hasn't declined one: DSD256 (iOS goes no further).
     public static let highestCarrier = 768_000.0
 
@@ -42,12 +57,42 @@ public struct DoPDACs: Codable, Equatable, Sendable {
     /// The highest carrier rate to send this DAC DoP at, or nil when it gets none: not tested, or it answered hiss.
     public func ceiling(for uid: String?) -> Double? {
         guard let uid, let entry = entries[uid], entry.answer == .music else { return nil }
-        return entry.ceiling ?? Self.highestCarrier
+        var top = entry.ceiling ?? Self.highestCarrier
+        // The ceiling is one rate, so the lowest rate the test didn't pass at stops everything from there up: DoP goes
+        // only to rates below it.
+        if let failed = entry.carriers?.filter({ $0.value != .passed }).keys.min() {
+            guard let below = Self.testCarriers.last(where: { $0 < Double(failed) - 0.5 }) else { return nil }
+            top = min(top, below)
+        }
+        return top
     }
 
+    /// The first rate's answer, which starts this DAC's results afresh: music turns DoP on for it, hiss leaves it off.
     public mutating func record(_ answer: Answer, uid: String, name: String) {
-        entries[uid] = Entry(answer: answer, name: name, ceiling: nil)
+        entries[uid] = Entry(answer: answer, name: name, ceiling: nil, carriers: [Int(Self.testCarrier): answer == .music ? .passed : .hiss])
     }
+
+    /// How the test went at a rate above the first, for a DAC that passed the first. (The first rate's result is its
+    /// answer: `record(_:uid:name:)`.)
+    public mutating func record(_ result: CarrierResult, carrier: Double, uid: String) {
+        guard var entry = entries[uid], entry.answer == .music, carrier > Self.testCarrier + 0.5 else { return }
+        entry.carriers = (entry.carriers ?? [Int(Self.testCarrier): .passed]).merging([Int(carrier.rounded()): result]) { _, new in new }
+        entries[uid] = entry
+    }
+
+    /// The rates the test was played at on this DAC, in the test's order, each with how it went. Empty for a DAC that
+    /// hasn't been tested.
+    public func results(for uid: String?) -> [(carrier: Double, result: CarrierResult)] {
+        guard let uid, let entry = entries[uid] else { return [] }
+        let carriers = entry.carriers ?? [Int(Self.testCarrier): entry.answer == .music ? .passed : .hiss]
+        return Self.testCarriers.compactMap { carrier in carriers[Int(carrier)].map { (carrier, $0) } }
+    }
+
+    /// The rates this DAC played the chord at.
+    public func passed(for uid: String?) -> [Double] { results(for: uid).filter { $0.result == .passed }.map(\.carrier) }
+
+    /// Whether this DAC played the chord at exactly `rate`: frames at that rate were shown to reach it as sent.
+    public func passed(at rate: Double, for uid: String?) -> Bool { passed(for: uid).contains { abs($0 - rate) < 0.5 } }
 
     /// The DAC didn't run at `carrier` when asked: nothing above half of it is sent as DoP again. Declining the test's own
     /// rate takes the answer back altogether (it has to be tested again), since it then can't carry DoP at all.
@@ -59,6 +104,9 @@ public struct DoPDACs: Codable, Equatable, Sendable {
             return
         }
         entry.ceiling = min(entry.ceiling ?? below, below)
+        // A rate the test passed at, then declined while playing a song, is no longer said to have passed.
+        let key = Int(carrier.rounded())
+        if entry.carriers?[key] != nil { entry.carriers?[key] = .declined }
         entries[uid] = entry
     }
 
@@ -74,6 +122,42 @@ public struct DoPDACs: Codable, Equatable, Sendable {
 
     public func save(to defaults: UserDefaults = .standard) {
         if let data = try? JSONEncoder().encode(self) { defaults.set(data, forKey: Self.defaultsKey) }
+    }
+}
+
+/// One run of the DoP test: the chord at each carrier rate in turn. The first rate decides whether the DAC gets DoP at
+/// all, so the run ends there unless it passed; the rates after it are each recorded as they went, whatever the answer.
+public struct DoPTestRun: Equatable, Sendable {
+    public private(set) var remaining: [Double]
+    public let uid: String
+    public let name: String
+
+    public init(uid: String, name: String, carriers: [Double] = DoPDACs.testCarriers) {
+        self.uid = uid
+        self.name = name
+        remaining = carriers
+    }
+
+    /// The rate being played, or nil when the run is over.
+    public var carrier: Double? { remaining.first }
+    public var isFirst: Bool { remaining.first == DoPDACs.testCarrier }
+
+    /// Takes how the rate being played went, keeps it in `dacs`, and says whether another rate follows. A first rate the
+    /// DAC wouldn't run at saves nothing, as before: the test couldn't be played at all.
+    public mutating func finish(_ result: DoPDACs.CarrierResult, into dacs: inout DoPDACs) -> Bool {
+        guard let carrier else { return false }
+        if isFirst {
+            switch result {
+            case .passed: dacs.record(.music, uid: uid, name: name)
+            case .hiss: dacs.record(.hiss, uid: uid, name: name)
+            case .declined: break
+            }
+            guard result == .passed else { remaining = []; return false }
+        } else {
+            dacs.record(result, carrier: carrier, uid: uid)
+        }
+        remaining.removeFirst()
+        return !remaining.isEmpty
     }
 }
 
@@ -112,8 +196,9 @@ public enum DoPGate {
     }
 }
 
-/// The sound the DoP test plays: five seconds of DSD64 made here (nothing to ship), a soft three-note chord that rises from
-/// silence, already packed as DoP frames. A DAC that decodes DoP plays the chord. One that doesn't plays the frames as 24-bit
+/// The sound the DoP test plays: five seconds of DSD made here (nothing to ship), a soft three-note chord that rises from
+/// silence, already packed as DoP frames. It is DSD64 for the first carrier rate and the same chord at the DSD rate each
+/// other carrier holds (16 DSD bits a frame: 192 kHz is DSD64 of the 48 kHz family, 352.8 and 384 kHz are DSD128). A DAC that decodes DoP plays the chord. One that doesn't plays the frames as 24-bit
 /// PCM: the marker alternates at 88.2 kHz, far above hearing, and the DSD bits sit in the low 16 bits, 42 dB or more under
 /// full scale, so the worst case is a quiet hiss. The same recipe as the Mac's test (`DoPTestClip`).
 public enum DoPProbeClip {
@@ -144,10 +229,10 @@ public enum DoPProbeClip {
     }
 
     /// The clip's DSD bits for one channel, 8 to a byte, the oldest in the top bit; an even number of bytes.
-    public static func dsd() -> [UInt8] {
+    public static func dsd(rate dsdRate: Int = DoPProbeClip.dsdRate) -> [UInt8] {
         let samples = Int(seconds * Double(dsdRate))
         var bytes = [UInt8](repeating: 0, count: (samples + 15) / 16 * 2)
-        // The signal changes every 64 DSD samples (44.1 kHz) and is drawn straight between: plenty for a chord under 1 kHz.
+        // The signal changes every 64 DSD samples (44.1 kHz or faster) and is drawn straight between: plenty for a chord under 1 kHz.
         let step = 64
         var v1 = 0.0, v2 = 0.0, y = 0.0
         var x0 = signal(at: 0), x1 = signal(at: Double(step) / Double(dsdRate))
@@ -171,9 +256,9 @@ public enum DoPProbeClip {
         (frame & 1 == 0 ? 0x05 : 0xFA) << 16 | UInt32(first) << 8 | UInt32(second)
     }
 
-    /// The clip as DoP frames, one word a frame (both channels carry the same).
-    public static func frames() -> [UInt32] {
-        let bits = dsd()
+    /// The clip as DoP frames for `carrier`, one word a frame (both channels carry the same).
+    public static func frames(carrier: Double = DoPProbeClip.carrierRate) -> [UInt32] {
+        let bits = dsd(rate: Int(carrier.rounded()) * 16)
         return (0..<bits.count / 2).map { word(frame: $0, bits[2 * $0], bits[2 * $0 + 1]) }
     }
 

@@ -6,8 +6,8 @@ the phone. Away from home the same share is reached over Tailscale or another VP
 ## Using it
 
 First screen › **Add an SMB Share**. Type the share as `smb://server/share/folder` (also accepted: `//server/share`, `\\server\share`,
-`server/share`, with an optional `user@` and `:port`), the account and the password. The app signs in once before it keeps the share, so
-a wrong address or password is said in the form. The share then appears under **Your Shares** next to the paired Macs.
+`server/share`, with an optional `user@` and `:port`), the account and the password. For a share that lets guests in, leave the account
+and password empty. The app signs in once before it keeps the share, so a wrong address or password is said in the form. The share then appears under **Your Shares** next to the paired Macs.
 
 Opening a share scans it: the app walks the folders, reads each song's tags (a few kilobytes per file, never the whole file) and keeps
 the list on the phone. The first scan of a large library over a slow line takes a while; what has been found so far can be browsed and
@@ -30,7 +30,11 @@ home. Now Playing says **SMB share** as the source, and Output shows the share, 
 | Played from a share | FLAC, ALAC and AAC (`.m4a`, `.mp4`, `.m4b`), WAV (also RF64), AIFF, MP3, stereo or mono DSD (`.dsf`, `.dff`), and in stereo or mono: APE, WavPack (`.wv`), Ogg Vorbis (`.ogg`, `.oga`) and Opus (`.opus`, `.ogg`) |
 | Counted as "Files that need the Mac", not listed | DSD in surround or packed with DST, WavPack holding DSD, APE, WavPack, Vorbis and Opus in surround, FLAC or Speex in Ogg, TTA, WMA, DTS, TrueHD/MLP, AC-3/E-AC-3, MKA, ISO, TAK |
 | Covers | `cover`, `folder`, `front`, `album` or `albumart` `.jpg`/`.jpeg`/`.png` in the album's folder, else the picture inside a file (not read from inside APE, WavPack, Ogg and Opus files) |
-| Not there | Playlists (they are the Mac's), CUE sheets, ReplayGain, gapless trim values for MP3/AAC |
+| ReplayGain | Read from the file's own tags when Output › ReplayGain is on: Vorbis comments in FLAC, `TXXX` frames in ID3 (MP3, WAV, AIFF), named iTunes items in MPEG-4. Not read from APE, WavPack, Ogg or Opus files. Read again from the file each time a song is played, so an index made by an earlier version needs no rescan |
+| Not there | Playlists (they are the Mac's), CUE sheets |
+
+MP3 and AAC albums on a share join without a gap, like the lossless ones: the phone's decoder reads the encoder's delay and padding
+from each file and leaves them out (see `docs/REMOTE-STREAMING.md`).
 
 Tapping "Files that need the Mac" lists them by what they are, each with its number of files: DSD in surround, DSD (DST), DTS, Dolby TrueHD and MLP, Dolby Digital, TTA, TAK, WMA, Matroska (MKA), disc images (ISO), surround in other formats, and other formats. The screen says that Vespertine on a Mac opens them. A share scanned before this version shows the count alone until its next scan.
 
@@ -76,12 +80,23 @@ Only stereo and mono play here. A share scanned before this version lists these 
 `Packages/VespertineRemoteKit/Sources/VespertineShare` is a small read-only SMB client written for this app (Foundation and POSIX
 sockets only; no third-party code), because the libraries that exist are under licenses that don't fit an App Store build.
 
-- Dialects: SMB 2.0.2, 2.1, 3.0 and 3.0.2. Not SMB 1. Not servers that accept only SMB 3.1.1, and not shares that require
-  encryption: both are said in plain words when adding the share.
+- Dialects: SMB 2.0.2, 2.1, 3.0, 3.0.2 and 3.1.1; the server picks the newest it has. Not SMB 1, which is said in plain words when
+  adding the share.
+- SMB 3.1.1: the messages that agree the version and sign in are bound into the session's keys (pre-authentication integrity,
+  SHA-512), and the server's signature on its last sign-in answer is checked with them. If anything in those messages was changed on
+  the way, for example to strike out a version or a cipher, the sign-in fails instead of going on with less.
+- Encryption: when the server asks for it for the whole session, or the share asks for it, every request after that is sent encrypted
+  and every answer must arrive encrypted; an answer whose tag is wrong, or one that arrives in the clear, is refused. AES-128-GCM and
+  AES-128-CCM on SMB 3.1.1, AES-128-CCM on SMB 3.0 and 3.0.2. Not AES-256: a server set to accept nothing else is not supported. The
+  client does not turn encryption on by itself for a server that doesn't ask.
 - Sign-in: NTLMv2 inside SPNEGO, with the message integrity code and the mechanism-list signature. `user`, `DOMAIN\user` and
-  `user@domain` are accepted. No Kerberos, no guest fallback.
-- Every request after sign-in is signed (HMAC-SHA-256 on SMB 2, AES-CMAC with the SP 800-108 derived key on SMB 3) and every signed
-  reply is verified; a reply whose signature is wrong is refused, and said.
+  `user@domain` are accepted. No Kerberos.
+- Guests: with no account typed, the client signs in under the name `guest` with an empty password (what a NAS with its guest account
+  on, a Mac, Windows, and Samba set to `map to guest = Bad User` take), and where that name is refused, with no name at all (which
+  Samba takes for a share with `guest ok`). A guest session has no keys: nothing in it is signed or encrypted, so a server or share
+  that requires either turns guests away. An account that was typed is never swapped for a guest's.
+- Every request after sign-in is signed (HMAC-SHA-256 on SMB 2, AES-CMAC with the SP 800-108 derived key on SMB 3) unless it is
+  encrypted, and every signed reply is verified; a reply whose signature is wrong is refused, and said.
 - It only ever opens folders for listing and files for reading. There is no code path that writes, renames or deletes.
 - The password is kept in the Keychain (`kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`: this device only, not in iCloud Keychain
   or a backup restored elsewhere) and is used only to compute the NTLMv2 answer; it is never sent.
@@ -94,10 +109,17 @@ favorites beside it; covers are fetched when first shown and kept at the sizes a
 
 ## How it is tested
 
-- Digests and keys against the published vectors (RFC 1320, 1321, 2202, 4231, 4493, FIPS 180 and 197), NTLMv2 against the example in
-  MS-NLMP 4.2.4, and the system's CryptoKit/CommonCrypto against the portable code where both exist.
-- The client against recorded conversations with Samba 4.19 for SMB 2.0.2, 2.1 and 3.0.2 (`SMBRecordings.swift`): the same bytes
-  must be sent, and the recorded replies' signatures must verify.
+- Digests, ciphers and keys against the published vectors (RFC 1320, 1321, 2202, 3610, 4231, 4493, FIPS 180 and 197, SP 800-38C, the
+  GCM specification's test cases), NTLMv2 against the example in MS-NLMP 4.2.4, and the system's CryptoKit/CommonCrypto against the
+  portable code where both exist.
+- SMB 3's own steps against the vectors Microsoft published from Windows talking to Windows (`SMBVectors.swift`): the running digest
+  of the opening messages, the signing and encryption keys made from it, the signature on the last sign-in answer, and whole encrypted
+  messages in AES-128-GCM and AES-128-CCM, for SMB 3.1.1 and SMB 3.0.
+- The client against recorded conversations with Samba 4.19 (`SMBRecordings.swift`): SMB 2.0.2, 2.1, 3.0.2 and 3.1.1 signed; SMB 3.1.1
+  encrypted for the whole session (GCM) and for one share (CCM); SMB 3.0.2 encrypted; a guest let in by name and one let in with no
+  name. The same bytes must be sent, and the recorded replies' signatures or tags must verify. Changed in the recording, each is
+  refused: a signed answer, an encrypted answer, an answer in the clear where an encrypted one is due, and the server's first message
+  of an SMB 3.1.1 connection.
 - The tag reader against files made with FFmpeg and checked with ffprobe (`SongFixtures.swift`).
 - DSD (`DSDTests.swift`): DSF and DSDIFF files made in the test from a 1-bit modulator. As DoP, the words must equal the DoP test
   clip's (`DoPProbeClip`) for the same DSD, whatever the file kind, bit order or the way the reads are cut up. As PCM, a tone must come
@@ -110,10 +132,13 @@ favorites beside it; covers are fetched when first shown and kept at the sizes a
   `ShareMac` with a made-up decoder, and the player's own decoder reading 16, 24 and 32-bit and float samples back exactly.
 - The scan, the library and `ShareMac` on a made-up share in memory, including a share that stops answering mid-scan.
 - Against a real server when one is named: `VESPERTINE_SMB="host:port/share/user/password" swift test --package-path
-  Packages/VespertineRemoteKit --filter SMBLiveTests` (the share needs a `Music` folder; `VESPERTINE_SMB_FILE` names a local copy of
-  `Music/random.bin` to compare a large read with). CI names none.
+  Packages/VespertineRemoteKit --filter SMBLiveTests` (`host:port/share` alone signs in as a guest). The share needs a `Music` folder
+  with a 3,000,000-byte `random.bin` in it, and `VESPERTINE_SMB_FILE` names a local copy of that file to compare a read with.
+  `VESPERTINE_SMB_BIG` (a path on the share) and `VESPERTINE_SMB_BIG_FILE` (a local copy) add a large file read through and compared
+  byte for byte. `VESPERTINE_SMB_EXPECT=311,encrypted` fails the run unless the server agreed to that version and to encryption
+  (`guest` likewise). The run prints the version, and whether the session is encrypted or a guest's. CI names none.
 
 What has not been measured: a real NAS (Synology, QNAP, TrueNAS, a Mac's or Windows' file sharing), a real phone over Tailscale, and
-keeping albums from a share on a phone. DSD from a share has not been heard on a phone or seen on a DAC's display (bench B8, step 11). APE, WavPack, Ogg Vorbis and
+keeping albums from a share on a phone. DSD from a share has not been heard on a phone or seen on a DAC's display (bench B8, step 13). APE, WavPack, Ogg Vorbis and
 Opus have been decoded on a Mac only: not yet built into an app on a phone, or heard there.
 Samba is what most NAS boxes run, but that is not the same as having tried them.
