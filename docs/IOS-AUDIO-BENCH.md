@@ -25,6 +25,7 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B11 | Keep on This Device, airplane mode | not run | | | |
 | B12 | The demo plays | not run | | | |
 | B13 | The queue comes back after the app is closed | not run | | | |
+| B14 | Music on the phone: a folder from Files, iCloud Drive, a USB drive | not run | | | |
 
 ## Before any script
 
@@ -185,3 +186,22 @@ Macs › Try the Demo. Output › This iPhone. Play any album: soft generated no
    on this device (those play; the others say the Mac isn't answering). Note what you see.
 6. Choose another Mac (or a share), play something there, and go back to the first: each has its own queue. The demo starts empty
    every time. Forgetting a Mac in Macs removes its queue.
+
+## B14. Music on the phone (8 min)
+
+No Mac is needed. Have a folder of a few albums (one that runs without gaps) in three places: on the phone (Files › On My iPhone),
+in iCloud Drive, and on a USB drive with an adapter for the phone.
+
+1. Macs › **Add a Folder from Files**, choose the folder on the phone. Expect it under Your Folders, its albums and covers listed,
+   and a song to play. Output shows the folder, its count of songs and when it was last scanned.
+2. Play the gapless album across two songs: no gap, no click.
+3. Swipe the app away and open it again: the folder opens by itself, with its queue, and plays. Nothing asks for the folder again.
+4. In Files, delete one song and rename another. Back in the app: the deleted song is gone from its album and the renamed one is
+   there under its new name, without tapping Scan Again.
+5. The same with the folder in iCloud Drive. Note whether songs that aren't downloaded are listed, and whether playing one
+   downloads it (this has not been seen on a real phone; write down what happens).
+6. The same with the folder on the USB drive. Mid-song, pull the drive out: the song stops and the app says the folder can't be
+   found and to plug the drive in. Plug it in, tap Try Again: the songs play again.
+7. In Files, long-press a FLAC or MP3 anywhere › Share › Vespertine (or Open in Vespertine). Expect the app to open **Opened
+   Files** and play it. In Files › On My iPhone › Vespertine the copy is there; delete it and it leaves the app's list.
+8. Open a file the phone can't play by itself (a `.dsf`): an alert says so, and nothing is added.

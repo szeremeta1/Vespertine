@@ -25,10 +25,13 @@ struct ShareStatus: Equatable {
     var unreadable = 0
     /// When the last whole scan ended; nil until one has.
     var scanned: Date?
+    /// It is a folder on this device, not a share on a server: its troubles are worded as a folder's.
+    var folder = false
 
     init() {}
 
-    init(_ mac: ShareMac) {
+    init(_ mac: ShareMac, folder: Bool = false) {
+        self.folder = folder
         scan = mac.scan
         reachable = mac.reachable
         songs = mac.library.songs.count
@@ -39,8 +42,9 @@ struct ShareStatus: Equatable {
 
     /// The share can't be used right now: the reason, for showing.
     var trouble: String? {
-        if case .failed(let error) = scan { return ShareWording.trouble(error) }
-        return reachable == false ? ShareWording.trouble(.unreachable) : nil
+        func words(_ error: SMBError) -> String { folder ? FolderWording.trouble(error) : ShareWording.trouble(error) }
+        if case .failed(let error) = scan { return words(error) }
+        return reachable == false ? words(.unreachable) : nil
     }
 }
 

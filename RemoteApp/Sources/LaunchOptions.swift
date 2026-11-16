@@ -7,6 +7,7 @@
 //   -VTSamplePairing YES         a made-up paired Mac with a Tailscale address (never saved)
 //   -VTPlay YES                  start the demo playing
 //   -VTScreenshot YES            an App Store capture: the demo notice bar is hidden (the demo library itself stays)
+//   -VTOpenFile <path>           a music file handed to the app as "Open in Vespertine" does (the Simulator won't open file links)
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
@@ -21,6 +22,7 @@ enum LaunchOptions {
     static var samplePairing: Bool { defaults.bool(forKey: "VTSamplePairing") }
     static var screenshot: Bool { defaults.bool(forKey: "VTScreenshot") }
     static var play: Bool { defaults.bool(forKey: "VTPlay") }
+    static var openFile: String? { defaults.string(forKey: "VTOpenFile") }
     static var vinyl: Bool? { defaults.object(forKey: "VTVinyl") == nil ? nil : defaults.bool(forKey: "VTVinyl") }
 
     static var tilt: Tilt? {
