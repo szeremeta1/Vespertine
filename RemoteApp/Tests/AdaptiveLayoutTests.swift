@@ -67,6 +67,12 @@ final class AdaptiveLayoutTests: XCTestCase {
         XCTAssertLessThan(RemoteLayout.bannerLargestText, .accessibility3)
     }
 
+    func testAnAlbumsPlayAndShuffleStackBesideTheCoverAndAtAccessibilityTextSizes() {
+        XCTAssertFalse(RemoteLayout.albumButtonsStack(besideCover: false, accessibilityText: false))
+        XCTAssertTrue(RemoteLayout.albumButtonsStack(besideCover: true, accessibilityText: false))
+        XCTAssertTrue(RemoteLayout.albumButtonsStack(besideCover: false, accessibilityText: true))
+    }
+
     func testTheSidebarIsWiderAtAccessibilityTextSizes() {
         XCTAssertEqual(RemoteLayout.sidebarWidth(accessibilityText: false).ideal, 250)
         XCTAssertGreaterThan(RemoteLayout.sidebarWidth(accessibilityText: true).min, RemoteLayout.sidebarWidth(accessibilityText: false).max)

@@ -154,6 +154,9 @@ nonisolated enum RemoteLayout {
     /// At the accessibility sizes a row's name, its second line and what trails it are stacked, without the picture.
     static func rowStacks(accessibilityText: Bool) -> Bool { accessibilityText }
 
+    /// Whether an album's Play and Shuffle sit one over the other: beside the cover, and at the accessibility sizes.
+    static func albumButtonsStack(besideCover: Bool, accessibilityText: Bool) -> Bool { besideCover || accessibilityText }
+
     /// The width of a row's symbol column at the ordinary text size (it grows with the text).
     static let rowIconWidth: CGFloat = 28
 

@@ -419,17 +419,19 @@ struct AlbumView: View {
     private func albumInfo(leading: Bool) -> some View {
         VStack(alignment: leading ? .leading : .center, spacing: 10) {
             Text(album.title).font(.serif(leading ? .title2 : .title3, weight: .semibold)).multilineTextAlignment(leading ? .leading : .center)
+                .fixedSize(horizontal: false, vertical: true)
             Text(album.artist).foregroundStyle(Palette.text2)
             FlowLayout(spacing: 6, lineSpacing: 6) {
                 Chip(text: album.format, highlighted: album.hiRes || album.dsd)
                 if let year = album.year { Chip(text: String(year)) }
             }
-            // Side by side while both words fit on a line each; one over the other when they don't (beside the cover on an
-            // iPad with its sidebar open, and at the largest text sizes), never a word broken across lines.
-            ViewThatFits(in: .horizontal) {
-                HStack { playButtons }
-                VStack(spacing: 8) { playButtons }
-            }
+            // Side by side under the cover; one over the other beside it (an iPad with its sidebar open leaves the two
+            // words no room on one line) and at the largest text sizes. Chosen outright, never measured: a one-line
+            // label "fits" anywhere by losing its word to an ellipsis.
+            let buttons = RemoteLayout.albumButtonsStack(besideCover: leading, accessibilityText: typeSize.isAccessibilitySize)
+                ? AnyLayout(VStackLayout(spacing: 8)) : AnyLayout(HStackLayout())
+            buttons { playButtons }
+                .frame(maxWidth: leading ? 240 : .infinity)
             .buttonStyle(.bordered)
             .disabled(!session.isConnected)
         }
