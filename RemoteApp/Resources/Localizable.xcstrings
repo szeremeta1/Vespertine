@@ -26944,6 +26944,542 @@
         }
       }
     },
+    "No Macs found on this network.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በዚህ አውታረ መረብ ላይ ምንም Mac አልተገኘም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يُعثر على أي Mac على هذه الشبكة."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই নেটওয়ার্কে কোনো Mac পাওয়া যায়নি।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "V této síti nebyl nalezen žádný Mac."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingen Mac-computere fundet på dette netværk."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In diesem Netzwerk wurden keine Macs gefunden."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν βρέθηκαν Mac σε αυτό το δίκτυο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha encontrado ningún Mac en esta red."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هیچ Macای در این شبکه پیدا نشد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tästä verkosta ei löytynyt Maceja."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Walang nakitang Mac sa network na ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun Mac trouvé sur ce réseau."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ નેટવર્ક પર કોઈ Mac મળ્યું નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba a sami Mac a kan wannan cibiyar sadarwa ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא נמצאו מחשבי Mac ברשת זו."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इस नेटवर्क पर कोई Mac नहीं मिला।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ezen a hálózaton nem található Mac."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak ada Mac yang ditemukan di jaringan ini."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun Mac trovato su questa rete."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このネットワーク上にMacが見つかりません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ನೆಟ್‌ವರ್ಕ್‌ನಲ್ಲಿ ಯಾವುದೇ Mac ಕಂಡುಬಂದಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 네트워크에서 Mac을 찾지 못했습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ നെറ്റ്‌വർക്കിൽ Mac ഒന്നും കണ്ടെത്തിയില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "या नेटवर्कवर एकही Mac सापडला नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiada Mac ditemui pada rangkaian ini."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fant ingen Macer på dette nettverket."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geen Macs gevonden op dit netwerk."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ ਨੈੱਟਵਰਕ ’ਤੇ ਕੋਈ Mac ਨਹੀਂ ਮਿਲਿਆ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie znaleziono żadnego Maca w tej sieci."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum Mac encontrado nesta rede."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenhum Mac encontrado nesta rede."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu s-a găsit niciun Mac în această rețea."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inga Mac-datorer hittades i det här nätverket."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hakuna Mac iliyopatikana kwenye mtandao huu."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த நெட்வொர்க்கில் Mac எதுவும் கிடைக்கவில்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ నెట్‌వర్క్‌లో Mac ఏదీ కనబడలేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ไม่พบ Mac บนเครือข่ายนี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu ağda Mac bulunamadı."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "У цій мережі не знайдено комп’ютерів Mac."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اس نیٹ ورک پر کوئی Mac نہیں ملا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không tìm thấy máy Mac nào trên mạng này."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此網絡上找不到 Mac。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此网络上未找到 Mac。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此網路上找不到 Mac。"
+          }
+        }
+      }
+    },
+    "Check that this device is on the same Wi-Fi as your Mac, and that Vespertine is open on the Mac with “Let phones control Vespertine” turned on. If the Mac still doesn’t appear, allow Local Network for Vespertine in Settings › Privacy & Security.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ መሣሪያ ከMacዎ ጋር በአንድ Wi-Fi ላይ መሆኑን፣ እንዲሁም Vespertine በMac ላይ ተከፍቶ «ስልኮች Vespertineን እንዲቆጣጠሩ ፍቀድ» መብራቱን ያረጋግጡ። Mac አሁንም ካልታየ፣ በቅንብሮች › ግላዊነት እና ደህንነት ውስጥ ለVespertine አካባቢያዊ አውታረ መረብን ይፍቀዱ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تأكّد من أن هذا الجهاز متصل بشبكة Wi-Fi نفسها التي يتصل بها الـ Mac، ومن أن Vespertine مفتوح على الـ Mac مع تشغيل “السماح للهواتف بالتحكم في Vespertine”. إذا لم يظهر الـ Mac بعد ذلك، فاسمح لـ Vespertine باستخدام الشبكة المحلية من الإعدادات › الخصوصية والأمن."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "দেখে নিন এই ডিভাইসটি আপনার Mac-এর মতো একই Wi-Fi-তে আছে কি না, এবং Mac-এ Vespertine খোলা আছে ও “ফোনকে Vespertine নিয়ন্ত্রণ করতে দিন” চালু আছে কি না। এরপরও Mac দেখা না গেলে সেটিংস › গোপনীয়তা ও নিরাপত্তা-তে Vespertine-কে স্থানীয় নেটওয়ার্কের অনুমতি দিন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zkontrolujte, že je toto zařízení ve stejné Wi-Fi síti jako váš Mac a že je na Macu otevřená aplikace Vespertine se zapnutou volbou „Povolit telefonům ovládat Vespertine“. Pokud se Mac stále neobjeví, povolte aplikaci Vespertine místní síť v Nastavení › Soukromí a zabezpečení."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontroller, at denne enhed er på samme Wi-Fi som din Mac, og at Vespertine er åben på Mac’en med “Lad telefoner styre Vespertine” slået til. Hvis Mac’en stadig ikke vises, skal du give Vespertine adgang til det lokale netværk i Indstillinger › Anonymitet & sikkerhed."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prüfe, ob dieses Gerät im selben WLAN wie dein Mac ist und ob Vespertine auf dem Mac geöffnet und „Steuerung von Vespertine über Telefone erlauben“ aktiviert ist. Wenn der Mac weiterhin nicht erscheint, erlaube Vespertine unter „Einstellungen › Datenschutz & Sicherheit“ den Zugriff auf das lokale Netzwerk."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Βεβαιωθείτε ότι αυτή η συσκευή είναι στο ίδιο Wi-Fi με το Mac σας και ότι το Vespertine είναι ανοιχτό στο Mac με ενεργοποιημένο το «Να επιτρέπεται στα τηλέφωνα ο έλεγχος του Vespertine». Αν το Mac εξακολουθεί να μην εμφανίζεται, επιτρέψτε στο Vespertine την πρόσβαση στο τοπικό δίκτυο στις «Ρυθμίσεις» › «Απόρρητο και ασφάλεια»."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comprueba que este dispositivo esté en la misma red Wi-Fi que tu Mac y que Vespertine esté abierto en el Mac con “Permitir que los teléfonos controlen Vespertine” activado. Si el Mac sigue sin aparecer, permite que Vespertine use la red local en Ajustes › Privacidad y seguridad."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بررسی کنید که این دستگاه به همان Wi-Fi متصل باشد که Mac شما به آن وصل است، و Vespertine در Mac باز باشد و «اجازه به گوشی‌ها برای کنترل Vespertine» روشن باشد. اگر Mac همچنان نمایش داده نشد، در «تنظیمات» › «حریم خصوصی و امنیت» به Vespertine اجازهٔ دسترسی به شبکهٔ محلی بدهید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tarkista, että tämä laite on samassa Wi-Fi-verkossa kuin Macisi ja että Vespertine on auki Macilla ja ”Salli puhelinten ohjata Vespertinea” on päällä. Jos Mac ei vieläkään näy, salli Vespertinelle lähiverkon käyttö kohdassa Asetukset › Tietosuoja ja suojaus."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiyaking nasa parehong Wi-Fi ng Mac mo ang device na ito, at nakabukas ang Vespertine sa Mac nang naka-on ang “Hayaang kontrolin ng mga telepono ang Vespertine”. Kung hindi pa rin lumalabas ang Mac, payagan ang Local Network para sa Vespertine sa Settings › Privacy & Security."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vérifiez que cet appareil est sur le même réseau Wi-Fi que votre Mac, et que Vespertine est ouvert sur le Mac avec « Autoriser les téléphones à contrôler Vespertine » activé. Si le Mac n’apparaît toujours pas, autorisez Vespertine à accéder au réseau local dans Réglages › Confidentialité et sécurité."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તપાસો કે આ ડિવાઇસ તમારા Mac જેવા જ Wi-Fi પર છે, અને Mac પર Vespertine ખુલ્લું છે તથા “ફોનને Vespertine નિયંત્રિત કરવા દો” ચાલુ છે. Mac હજી પણ ન દેખાય, તો સેટિંગ્સ › ગોપનીયતા અને સુરક્ષામાં Vespertine માટે સ્થાનિક નેટવર્કને મંજૂરી આપો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tabbatar cewa wannan na’urar tana kan Wi-Fi ɗaya da Mac ɗinku, kuma Vespertine a buɗe yake a kan Mac ɗin tare da kunna “Bari wayoyi su sarrafa Vespertine”. Idan har yanzu Mac ɗin bai bayyana ba, ba Vespertine izinin Cibiyar Sadarwa ta Gida a Saituna › Sirri da Tsaro."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ודא שמכשיר זה מחובר לאותה רשת Wi-Fi כמו ה־Mac שלך, וש־Vespertine פתוח ב־Mac כאשר ״אפשר לטלפונים לשלוט ב־Vespertine״ מופעל. אם ה־Mac עדיין לא מופיע, אפשר ל־Vespertine גישה לרשת המקומית ב״הגדרות״ › ״פרטיות ואבטחה״."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जाँचें कि यह डिवाइस आपके Mac वाले ही Wi-Fi पर है, और Mac पर Vespertine खुला है तथा “फ़ोन को Vespertine नियंत्रित करने दें” चालू है। अगर Mac फिर भी न दिखे, तो सेटिंग्ज़ › गोपनीयता और सुरक्षा में Vespertine के लिए स्थानीय नेटवर्क की अनुमति दें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ellenőrizze, hogy ez az eszköz ugyanazon a Wi-Fi-hálózaton van-e, mint a Mac, és hogy a Macen meg van-e nyitva a Vespertine, és be van-e kapcsolva a „Telefonok vezérelhetik a Vespertine-t” beállítás. Ha a Mac továbbra sem jelenik meg, engedélyezze a Vespertine számára a helyi hálózatot a Beállítások › Adatvédelem és biztonság alatt."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pastikan perangkat ini berada di Wi-Fi yang sama dengan Mac Anda, dan Vespertine terbuka di Mac dengan “Izinkan ponsel mengontrol Vespertine” dinyalakan. Jika Mac tetap tidak muncul, izinkan Jaringan Lokal untuk Vespertine di Pengaturan › Privasi & Keamanan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controlla che questo dispositivo sia sulla stessa rete Wi-Fi del Mac e che Vespertine sia aperto sul Mac con “Consenti ai telefoni di controllare Vespertine” attivato. Se il Mac continua a non comparire, consenti a Vespertine l’accesso alla rete locale in Impostazioni › Privacy e sicurezza."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデバイスがMacと同じWi-Fiに接続されていること、MacでVespertineが開いていて「スマートフォンからのVespertineの操作を許可」がオンになっていることを確認してください。それでもMacが表示されない場合は、「設定」›「プライバシーとセキュリティ」でVespertineにローカルネットワークへのアクセスを許可してください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಸಾಧನವು ನಿಮ್ಮ Mac ಇರುವ ಅದೇ Wi-Fi ನಲ್ಲಿದೆ ಎಂದು, ಮತ್ತು Mac ನಲ್ಲಿ Vespertine ತೆರೆದಿದ್ದು “Vespertine ಅನ್ನು ನಿಯಂತ್ರಿಸಲು ಫೋನ್‌ಗಳಿಗೆ ಅನುಮತಿಸಿ” ಆನ್ ಆಗಿದೆ ಎಂದು ಪರಿಶೀಲಿಸಿ. Mac ಇನ್ನೂ ಕಾಣಿಸದಿದ್ದರೆ, ಸೆಟ್ಟಿಂಗ್‌ಗಳು › ಗೌಪ್ಯತೆ ಮತ್ತು ಭದ್ರತೆಯಲ್ಲಿ Vespertine ಗೆ ಸ್ಥಳೀಯ ನೆಟ್‌ವರ್ಕ್ ಅನುಮತಿಸಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 기기가 Mac과 동일한 Wi-Fi에 연결되어 있는지, Mac에서 Vespertine이 열려 있고 ‘휴대폰으로 Vespertine 제어 허용’이 켜져 있는지 확인하십시오. 그래도 Mac이 나타나지 않으면 설정 › 개인정보 보호 및 보안에서 Vespertine에 로컬 네트워크를 허용하십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ ഉപകരണം നിങ്ങളുടെ Mac-ന്റെ അതേ Wi-Fi-യിലാണെന്നും, Mac-ൽ Vespertine തുറന്നിട്ടുണ്ടെന്നും “Vespertine നിയന്ത്രിക്കാൻ ഫോണുകളെ അനുവദിക്കുക” ഓൺ ആണെന്നും പരിശോധിക്കുക. എന്നിട്ടും Mac കാണുന്നില്ലെങ്കിൽ, ക്രമീകരണം › സ്വകാര്യതയും സുരക്ഷയും എന്നതിൽ Vespertine-ന് ലോക്കൽ നെറ്റ്‌വർക്ക് അനുവദിക്കുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हे डिव्हाइस तुमच्या Mac च्याच Wi-Fi वर आहे, आणि Mac वर Vespertine उघडे असून “फोनना Vespertine नियंत्रित करू द्या” चालू आहे याची खात्री करा. Mac तरीही दिसत नसल्यास, सेटिंग्ज › गोपनीयता आणि सुरक्षा येथे Vespertine ला स्थानिक नेटवर्कची परवानगी द्या."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pastikan peranti ini berada pada Wi-Fi yang sama dengan Mac anda, dan Vespertine dibuka pada Mac dengan “Benarkan telefon mengawal Vespertine” dihidupkan. Jika Mac masih tidak muncul, benarkan Rangkaian Setempat untuk Vespertine dalam Seting › Privasi & Keselamatan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontroller at denne enheten er på samme Wi-Fi som Macen, og at Vespertine er åpen på Macen med «La telefoner styre Vespertine» slått på. Hvis Macen fortsatt ikke vises, gir du Vespertine tilgang til lokalt nettverk i Innstillinger › Personvern og sikkerhet."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controleer of dit apparaat op hetzelfde wifi-netwerk zit als je Mac, en of Vespertine op de Mac is geopend met ‘Laat telefoons Vespertine bedienen’ ingeschakeld. Verschijnt de Mac nog steeds niet, geef Vespertine dan toegang tot het lokale netwerk in ‘Instellingen › Privacy en beveiliging’."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜਾਂਚੋ ਕਿ ਇਹ ਡਿਵਾਈਸ ਤੁਹਾਡੇ Mac ਵਾਲੇ ਹੀ Wi-Fi ’ਤੇ ਹੈ, ਅਤੇ Mac ’ਤੇ Vespertine ਖੁੱਲ੍ਹਾ ਹੈ ਤੇ “ਫ਼ੋਨਾਂ ਨੂੰ Vespertine ਕੰਟਰੋਲ ਕਰਨ ਦਿਓ” ਚਾਲੂ ਹੈ। ਜੇ Mac ਫਿਰ ਵੀ ਨਾ ਦਿਸੇ, ਤਾਂ ਸੈਟਿੰਗਾਂ › ਪਰਦੇਦਾਰੀ ਅਤੇ ਸੁਰੱਖਿਆ ਵਿੱਚ Vespertine ਲਈ ਸਥਾਨਕ ਨੈੱਟਵਰਕ ਦੀ ਇਜਾਜ਼ਤ ਦਿਓ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprawdź, czy to urządzenie jest w tej samej sieci Wi-Fi co Twój Mac oraz czy Vespertine jest otwarty na Macu z włączoną opcją „Pozwalaj telefonom sterować Vespertine”. Jeśli Mac nadal się nie pojawia, zezwól Vespertine na dostęp do sieci lokalnej w Ustawieniach › Prywatność i ochrona."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifique se este dispositivo está na mesma rede Wi-Fi que o seu Mac e se o Vespertine está aberto no Mac com “Permitir que telefones controlem o Vespertine” ativado. Se o Mac ainda não aparecer, permita a Rede Local para o Vespertine em Ajustes › Privacidade e Segurança."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifique se este dispositivo está na mesma rede Wi-Fi que o seu Mac e se o Vespertine está aberto no Mac com “Permitir que telefones controlem o Vespertine” ativado. Se o Mac continuar sem aparecer, permita a rede local para o Vespertine em Definições › Privacidade e segurança."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verificați că acest dispozitiv este în aceeași rețea Wi-Fi ca Mac-ul dvs. și că Vespertine este deschis pe Mac, cu „Permite telefoanelor să controleze Vespertine” activat. Dacă Mac-ul tot nu apare, permiteți aplicației Vespertine accesul la rețeaua locală în Configurări › Intimitate și securitate."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kontrollera att den här enheten är på samma Wi-Fi som din Mac och att Vespertine är öppet på Macen med ”Låt telefoner styra Vespertine” påslaget. Om Macen fortfarande inte visas tillåter du lokalt nätverk för Vespertine i Inställningar › Integritet och säkerhet."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hakikisha kifaa hiki kiko kwenye Wi-Fi ileile na Mac yako, na kwamba Vespertine imefunguliwa kwenye Mac huku “Ruhusu simu kudhibiti Vespertine” ikiwa imewashwa. Ikiwa Mac bado haionekani, ruhusu Mtandao wa Ndani kwa Vespertine kwenye Mipangilio › Faragha na Usalama."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்தச் சாதனம் உங்கள் Mac இருக்கும் அதே Wi-Fi-இல் உள்ளதா என்பதையும், Mac-இல் Vespertine திறந்திருந்து “Vespertine-ஐக் கட்டுப்படுத்த ஃபோன்களை அனுமதி” ஆன் செய்யப்பட்டுள்ளதா என்பதையும் சரிபார்க்கவும். அப்போதும் Mac தோன்றவில்லை எனில், அமைப்புகள் › தனியுரிமை & பாதுகாப்பு என்பதில் Vespertine-க்கு உள்ளூர் நெட்வொர்க்கை அனுமதிக்கவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ పరికరం మీ Mac ఉన్న అదే Wi-Fiలో ఉందని, Macలో Vespertine తెరిచి ఉండి “Vespertineను నియంత్రించడానికి ఫోన్‌లను అనుమతించు” ఆన్‌లో ఉందని నిర్ధారించుకోండి. Mac ఇంకా కనిపించకపోతే, సెట్టింగ్‌లు › గోప్యత & భద్రతలో Vespertineకు స్థానిక నెట్‌వర్క్‌ను అనుమతించండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ตรวจสอบว่าอุปกรณ์นี้อยู่บน Wi-Fi เดียวกับ Mac ของคุณ และ Vespertine เปิดอยู่บน Mac โดยเปิดใช้ “อนุญาตให้โทรศัพท์ควบคุม Vespertine” ไว้ หาก Mac ยังไม่ปรากฏ ให้อนุญาตเครือข่ายภายในสำหรับ Vespertine ในการตั้งค่า › ความเป็นส่วนตัวและความปลอดภัย"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu aygıtın Mac’inizle aynı Wi-Fi ağında olduğundan ve Mac’te Vespertine’in açık, “Telefonların Vespertine’i denetlemesine izin ver” seçeneğinin de açık olduğundan emin olun. Mac hâlâ görünmüyorsa Ayarlar › Gizlilik ve Güvenlik bölümünden Vespertine için Yerel Ağ’a izin verin."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Перевірте, що цей пристрій під’єднано до тієї самої мережі Wi-Fi, що й ваш Mac, і що Vespertine відкрито на Mac з увімкненим параметром «Дозволити телефонам керувати Vespertine». Якщо Mac усе одно не з’являється, дозвольте Vespertine доступ до локальної мережі в меню «Параметри» › «Приватність і безпека»."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "چیک کریں کہ یہ ڈیوائس اسی Wi-Fi پر ہے جس پر آپ کا Mac ہے، اور Mac پر Vespertine کھلا ہے اور “فونز کو Vespertine کنٹرول کرنے دیں” آن ہے۔ اگر Mac پھر بھی نظر نہ آئے تو سیٹنگز › رازداری اور سیکیورٹی میں Vespertine کے لیے مقامی نیٹ ورک کی اجازت دیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hãy kiểm tra xem thiết bị này có dùng cùng mạng Wi-Fi với máy Mac của bạn không, và Vespertine đang mở trên máy Mac với “Cho phép điện thoại điều khiển Vespertine” được bật. Nếu máy Mac vẫn không xuất hiện, hãy cho phép Vespertine dùng Mạng cục bộ trong Cài đặt › Quyền riêng tư & Bảo mật."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請確認此裝置與你的 Mac 連接到同一個 Wi-Fi，並且 Mac 上的 Vespertine 已開啟，「允許手機控制 Vespertine」亦已開啟。如果 Mac 仍未出現，請在「設定」›「私隱與保安」中允許 Vespertine 使用本地網絡。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请确认此设备与你的 Mac 连接到同一个 Wi-Fi，并且 Mac 上的 Vespertine 已打开，“允许手机控制 Vespertine”也已打开。如果 Mac 仍未出现，请在“设置”›“隐私与安全性”中允许 Vespertine 使用本地网络。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "請確認此裝置與你的 Mac 連接到同一個 Wi-Fi，並且 Mac 上的 Vespertine 已打開，「允許手機控制 Vespertine」也已開啟。如果 Mac 仍未出現，請在「設定」›「隱私權與安全性」中允許 Vespertine 使用區域網路。"
+          }
+        }
+      }
+    },
     "Mac": {
       "comment": "Label before the Mac's name.",
       "localizations": {

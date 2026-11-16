@@ -97,11 +97,26 @@ struct MacsView: View {
                 }
                 Section {
                     let unpaired = model.unpairedMacs
-                    if unpaired.isEmpty {
+                    let blocked = model.discovery.problem?.isEmpty == false
+                    let found = model.discovery.macs.count
+                    switch DiscoveryPatience.row(stage: model.search.stage, unpaired: unpaired.count, discovered: found, blocked: blocked) {
+                    case .none:
+                        EmptyView()
+                    case .spinner:
                         HStack(spacing: 12) {
                             ProgressView()
                             Text("Looking for Macs on this network…").foregroundStyle(Palette.text2)
                         }
+                    case .advice:
+                        // The search carries on behind this: a Mac that turns up later still appears here.
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("No Macs found on this network.").foregroundStyle(Palette.text)
+                            Text("Check that this device is on the same Wi-Fi as your Mac, and that Vespertine is open on the Mac with “Let phones control Vespertine” turned on. If the Mac still doesn’t appear, allow Local Network for Vespertine in Settings › Privacy & Security.")
+                                .font(.footnote)
+                                .foregroundStyle(Palette.text2)
+                        }
+                        .accessibilityElement(children: .combine)
+                        Button { model.lookAgain() } label: { Label("Try Again", systemImage: "arrow.clockwise") }
                     }
                     ForEach(unpaired) { mac in
                         Button { pairing = mac } label: { Label(mac.name, systemImage: SavedPairing.symbol(portable: mac.portable)) }
@@ -144,6 +159,7 @@ struct MacsView: View {
             }
             .obsidianList()
             .readablePane(maxWidth: 760)
+            .onChange(of: model.unpairedMacs.count, initial: true) { model.searchChanged() }
             .navigationTitle("Macs")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
