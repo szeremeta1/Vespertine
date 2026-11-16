@@ -253,6 +253,9 @@ final class StreamingModel {
         return message
     }
 
+    /// What the listener calls the server a song is on.
+    func serverName(of track: Track) -> String? { account(of: track)?.displayName }
+
     /// A song from the server plays: it is answering again.
     func answered(_ track: Track) {
         guard let source = account(of: track), states[source.path]?.problem == PlayerController.notAnswering(source.displayName) else { return }
