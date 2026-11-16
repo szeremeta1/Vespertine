@@ -1,5 +1,5 @@
 //
-// Vespertine: first-run setup: music, output, sound, a few extras and the phone remote, shown once (and again from the
+// Vespertine: first-run setup: music, output, sound, a few extras, more ways to play and the phone remote, shown once (and again from the
 // Setup Assistant… menu item).
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -7,6 +7,7 @@
 import AppKit
 import VespertineAudio
 import VespertineLibrary
+import VespertineOpenSubsonic
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -27,12 +28,12 @@ struct MainRoot: View {
 }
 
 nonisolated enum SetupStep: Int, CaseIterable, Comparable {
-    case welcome, music, output, sound, extras, remote, done
+    case welcome, music, output, sound, extras, more, remote, done
 
     static func < (a: SetupStep, b: SetupStep) -> Bool { a.rawValue < b.rawValue }
 
     /// The steps the progress bar names (welcome and done stand outside it).
-    static let named: [SetupStep] = [.music, .output, .sound, .extras, .remote]
+    static let named: [SetupStep] = [.music, .output, .sound, .extras, .more, .remote]
 
     var title: LocalizedStringKey {
         switch self {
@@ -41,6 +42,7 @@ nonisolated enum SetupStep: Int, CaseIterable, Comparable {
         case .output: "Output"
         case .sound: "Sound"
         case .extras: "Extras"
+        case .more: "More"
         case .remote: "Remote"
         case .done: "Done"
         }
@@ -101,6 +103,7 @@ struct SetupFlow: View {
         case .output: SetupOutput()
         case .sound: SetupSound()
         case .extras: SetupExtras()
+        case .more: SetupMore()
         case .remote: SetupRemote()
         case .done: SetupDone { model.completeSetup() }
         }
@@ -141,7 +144,7 @@ struct SetupFlow: View {
                         }
                     }
                 }
-                .frame(width: 112)
+                .frame(width: 104)
                 // Read as text, in order, with the step you are on marked as the selected one.
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(item.title)
@@ -401,18 +404,34 @@ private struct SetupSymbol: View {
 /// One choice on the Sound and Extras pages: what it is, what it does, and its control.
 private struct SetupOption<Control: View>: View {
     let symbol: String
-    let title: LocalizedStringKey
-    let detail: LocalizedStringKey
+    let title: Text
+    let detail: Text
     var on = false
+    /// The card's padding: less on a page with four cards of three lines, which must still fit the smallest window.
+    var padding: CGFloat = 16
     @ViewBuilder var control: Control
 
+    init(symbol: String, title: LocalizedStringKey, detail: LocalizedStringKey, on: Bool = false, @ViewBuilder control: () -> Control) {
+        self.init(symbol: symbol, title: Text(title), detail: Text(detail), on: on, control: control)
+    }
+
+    /// Words that are already in the listener's language (a Settings switch's own name and caption).
+    init(symbol: String, title: Text, detail: Text, on: Bool = false, padding: CGFloat = 16, @ViewBuilder control: () -> Control) {
+        self.padding = padding
+        self.symbol = symbol
+        self.title = title
+        self.detail = detail
+        self.on = on
+        self.control = control()
+    }
+
     var body: some View {
-        SetupCard(selected: on) {
+        SetupCard(selected: on, padding: padding) {
             HStack(alignment: .center, spacing: 14) {
                 SetupSymbol(name: symbol, selected: on)
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(title).font(Typeface.ui(14, weight: .semibold)).foregroundStyle(Palette.text)
-                    Text(detail).font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineSpacing(2)
+                    title.font(Typeface.ui(14, weight: .semibold)).foregroundStyle(Palette.text)
+                    detail.font(Typeface.ui(12)).foregroundStyle(Palette.text2).lineSpacing(2)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 16)
@@ -522,6 +541,34 @@ private struct SetupWelcome: View {
 
 // MARK: - Music
 
+/// The Music step's folder tile. It follows the choice above it, and is named as that command is in the menus, the empty
+/// library and Settings › Library: "Add a Folder" leaves files where they are, "Import & Organize" copies them.
+nonisolated enum SetupFolderTile: Equatable {
+    case addFolder, importAndOrganize
+
+    init(mode: ImportMode) {
+        switch mode {
+        case .reference: self = .addFolder
+        case .copyAndOrganize: self = .importAndOrganize
+        }
+    }
+
+    /// What the folder panel it opens does with the folders chosen.
+    var mode: ImportMode {
+        switch self {
+        case .addFolder: .reference
+        case .importAndOrganize: .copyAndOrganize
+        }
+    }
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .addFolder: "Add a Folder"
+        case .importAndOrganize: "Import & Organize"
+        }
+    }
+}
+
 private struct SetupMusic: View {
     @Environment(AppModel.self) private var model
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -546,8 +593,9 @@ private struct SetupMusic: View {
             HStack(spacing: 14) {
                 actionTile("sparkle.magnifyingglass", "Find Music on This Mac", "Searches your drives and checks every file's real format.",
                            recommended: true) { model.showFindMusic = true }
-                actionTile("folder.badge.plus", "Add a Folder", "Choose a folder or drive yourself.") {
-                    model.presentImporter(settings.defaultImportMode)
+                // Named for what it will do with the choice above, as the same two commands are everywhere else.
+                actionTile("folder.badge.plus", SetupFolderTile(mode: settings.defaultImportMode).title, "Choose a folder or drive yourself.") {
+                    model.presentImporter(SetupFolderTile(mode: settings.defaultImportMode).mode)
                 }
                 actionTile("server.rack", "Connect to a Server", "Music on a NAS or another Mac, over SMB.") {
                     model.showConnectServer = true
@@ -900,8 +948,13 @@ private struct SetupSound: View {
             }
             .frame(maxWidth: 680)
             .padding(.top, 28)
-            Text("Sample rates, DSD, surround and every other detail are in Settings › Playback.")
+            // Balance has no switch in Settings: it's the BAL chip in the player bar, named here as the chip is.
+            (Text("Left and right balance is the BAL button in the player.") + Text(verbatim: " ")
+                + Text("Sample rates, DSD, surround and every other detail are in Settings › Playback."))
                 .font(Typeface.ui(12)).foregroundStyle(Palette.text3)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: 620)
+                .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 18)
                 .reveal(shown, delay: 0.36)
         }
@@ -924,7 +977,7 @@ private struct SetupExtras: View {
         @Bindable var updater = updater
         VStack(spacing: 0) {
             SetupHeading(title: "A few extras",
-                         detail: "Vespertine sends nothing in the background unless it’s switched on, here or in Settings.",
+                         detail: "Vespertine reaches the internet only for what’s switched on. The few that start on are on this page: switch off any you don’t want.",
                          shown: shown)
             VStack(spacing: 12) {
                 SetupOption(symbol: "checkmark.seal", title: "Check each file's real quality",
@@ -949,7 +1002,7 @@ private struct SetupExtras: View {
                     }
                     .reveal(shown, delay: 0.28)
                 }
-                // On by default, so it's shown with the other things that reach the network on their own.
+                // On by default, so it's shown with the other things that reach the network on their own (the heading says so).
                 SetupOption(symbol: "list.bullet.rectangle", title: "Update the list of DoP DACs",
                             detail: "Once a day, downloads the signed list of DACs known to play DSD natively, so a newly confirmed DAC needs no app update. Nothing about you is sent.",
                             on: settings.dopListUpdates) {
@@ -960,6 +1013,113 @@ private struct SetupExtras: View {
             }
             .frame(maxWidth: 680)
             .padding(.top, 28)
+        }
+        .padding(.horizontal, 40)
+        .onAppear { shown = true }
+    }
+}
+
+// MARK: - More ways to play
+
+/// What 1.2 added, each behind its own Settings switch and off until turned on: playing to network and AirPlay players,
+/// taking music from other apps, and the listener's own music server. The page shows those switches, in their own words.
+nonisolated enum SetupMoreSwitch: CaseIterable {
+    case networkPlayers, airPlayPlayers, receiveFromOtherApps, musicServers
+
+    var symbol: String {
+        switch self {
+        case .networkPlayers: "hifispeaker.2"
+        case .airPlayPlayers: "airplayaudio"
+        case .receiveFromOtherApps: "arrow.down.circle"
+        case .musicServers: "server.rack"
+        }
+    }
+
+    /// The switch's name, as Settings has it.
+    @MainActor var title: String {
+        switch self {
+        case .networkPlayers: RendererSwitch.title
+        case .airPlayPlayers: AirPlaySwitch.title
+        case .receiveFromOtherApps: ReceiverSwitch.title
+        case .musicServers: StreamingSwitch.title
+        }
+    }
+
+    /// The caption under it in Settings: what it does, and that nothing runs while it is off.
+    @MainActor var explanation: String {
+        switch self {
+        case .networkPlayers: RendererSwitch.explanation
+        case .airPlayPlayers: AirPlaySwitch.explanation
+        case .receiveFromOtherApps: ReceiverSwitch.explanation
+        case .musicServers: StreamingSwitch.explanation
+        }
+    }
+
+    /// Where the rest of it is set up once it is on.
+    var settingsTab: SettingsTab {
+        switch self {
+        case .networkPlayers, .airPlayPlayers, .receiveFromOtherApps: .playback
+        case .musicServers: .library
+        }
+    }
+
+    @MainActor func isOn(_ model: AppModel) -> Bool {
+        switch self {
+        case .networkPlayers: model.settings.upnpRenderersFeature
+        case .airPlayPlayers: model.settings.airPlayPlayersFeature
+        case .receiveFromOtherApps: model.settings.upnpReceiverFeature
+        case .musicServers: model.streaming.isOn(Self.musicServerProvider)
+        }
+    }
+
+    /// Turns it on or off the way its Settings switch does.
+    @MainActor func set(_ on: Bool, _ model: AppModel) {
+        switch self {
+        case .networkPlayers: model.setRenderersFeature(on)
+        case .airPlayPlayers: model.setAirPlayFeature(on)
+        case .receiveFromOtherApps: model.setReceiverFeature(on)
+        case .musicServers: model.streaming.setOn(on, Self.musicServerProvider)
+        }
+    }
+
+    static let musicServerProvider = OpenSubsonicProvider.providerID
+}
+
+private struct SetupMore: View {
+    @Environment(AppModel.self) private var model
+    @Environment(\.openSettings) private var openSettings
+    @State private var shown = false
+
+    var body: some View {
+        VStack(spacing: 0) {
+            SetupHeading(title: "More ways to play",
+                         detail: "Play to other players on your network, take music from other apps, or add your own music server. Each stays off until you switch it on, here or in Settings.",
+                         shown: shown)
+            VStack(spacing: 10) {
+                ForEach(Array(SetupMoreSwitch.allCases.enumerated()), id: \.element) { index, item in
+                    let on = item.isOn(model)
+                    SetupOption(symbol: item.symbol, title: Text(verbatim: item.title), detail: Text(verbatim: item.explanation), on: on, padding: 12) {
+                        HStack(spacing: 12) {
+                            // A server is signed in to in Settings › Library: offered once the switch is on.
+                            if on, item == .musicServers {
+                                Button("Open Settings") {
+                                    model.settingsTab = item.settingsTab
+                                    openSettings()
+                                }
+                                .buttonStyle(QuietButtonStyle())
+                                .fixedSize()
+                                .transition(.opacity)
+                            }
+                            Toggle(item.title, isOn: Binding(get: { item.isOn(model) }, set: { item.set($0, model) }))
+                                .labelsHidden().toggleStyle(.switch).tint(Palette.brass)
+                        }
+                        .animation(.easeInOut(duration: 0.25), value: on)
+                    }
+                    .reveal(shown, delay: 0.12 + 0.08 * Double(index))
+                }
+            }
+            .frame(maxWidth: 680)
+            .padding(.top, 22)
         }
         .padding(.horizontal, 40)
         .onAppear { shown = true }

@@ -299,6 +299,7 @@ struct StreamingSwitchTests {
         let answered = Locked(0)
         player.serverUnanswered = { _ in PlayerController.notAnswering("Home") }
         player.serverAnswered = { _ in answered.withLock { $0 += 1 } }
+        player.serverName = { _ in "Home" }
         // The engine's events and snapshots are handed to the player here, one after another with nothing between them: the
         // song itself never plays (its provider serves no audio), and what the engine says of that comes after this test's turn.
         player.play([track])
@@ -312,10 +313,28 @@ struct StreamingSwitchTests {
         playing.isBuffering = false
         playing.position = 1
 
+        // While the song waits for its server, the notice names the server, not the folder the song's copy is kept in.
+        var stalled = playing
+        stalled.isBuffering = true
+        stalled.shareStalledSeconds = 12
+        player.poll(stalled)
+        let notice = try #require(player.shareNotice)
+        #expect(notice.contains("“Home”"), "\(notice)")
+        #expect(app.serverName(of: track) == "Home")
+        stalled.shareStalledSeconds = nil
+        player.poll(stalled)
+        #expect(player.shareNotice == nil)
+
         engineSays(.failed(item, StreamingCore.notAnsweringMessage))
         #expect(player.stopReason == PlayerController.notAnswering("Home"), "Now Playing says why the song stopped")
         #expect(player.lastError == PlayerController.notAnswering("Home"))
         #expect(answered.withLock { $0 } == 0)
+        // The banner goes by itself after a few seconds. The phone remote is still told why playback stopped.
+        var stopped = playing
+        stopped.state = .stopped
+        player.poll(stopped)
+        player.clearError()
+        #expect(player.lastError == nil && player.errorForRemote == PlayerController.notAnswering("Home"))
 
         // The same queue entry is played again and is heard.
         engineSays(.trackStarted(item))
