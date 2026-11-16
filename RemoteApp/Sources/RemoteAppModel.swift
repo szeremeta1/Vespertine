@@ -81,6 +81,10 @@ final class RemoteAppModel {
         pathMonitor.start(queue: .main)
         #if DEBUG
         if applyLaunchOptions() { return }
+        if let path = LaunchOptions.openFile {
+            openFile(URL(fileURLWithPath: path))
+            return
+        }
         #endif
         if let last = UserDefaults.standard.string(forKey: Self.lastMacKey), let pairing = pairings.first(where: { $0.serverID == last }) {
             choose(pairing)
