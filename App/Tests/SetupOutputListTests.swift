@@ -37,7 +37,8 @@ struct SetupOutputListTests {
     func overflow() {
         #expect(SetupOutputList.contentHeight(rows: 0) == 0)
         #expect(SetupOutputList.contentHeight(rows: 1) == 76)
-        #expect(SetupOutputList.contentHeight(rows: 4) == 4 * 64 + 3 * 10 + 12)
+        // Four rows of 64, three gaps of 10, and 6 above and below.
+        #expect(SetupOutputList.contentHeight(rows: 4) == 298)
         #expect(!SetupOutputList.overflows(rows: 4, maxHeight: 300))
         #expect(SetupOutputList.overflows(rows: 5, maxHeight: 300))
         #expect(SetupOutputList.overflows(rows: 3, maxHeight: 210))
