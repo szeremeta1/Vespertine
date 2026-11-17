@@ -15,13 +15,16 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if let session = model.session {
-                RemoteView(session: session)
+            if SetupAssistant.shared.isShowing {
+                SetupFlow().transition(.opacity)
+            } else if let session = model.session {
+                RemoteView(session: session).transition(.opacity)
             } else {
-                MacsView()
+                MacsView().transition(.opacity)
             }
         }
         .animation(.default, value: model.session == nil)
+        .animation(.easeInOut(duration: 0.45), value: SetupAssistant.shared.isShowing)
         .overlay {
             if model.pendingLink != nil || model.isPairing {
                 ProgressView("Pairing…")
