@@ -194,6 +194,39 @@ final class AdaptiveNavigationTests: XCTestCase {
         }
     }
 
+    /// Now Playing has no button for the record: a tap on the cover or the record is the switch, VoiceOver gets it as the
+    /// element's action, and the choice is kept for the next launch.
+    func testATapOnTheArtSwitchesBetweenTheCoverAndTheRecord() {
+        launch()
+        let art = app.descendants(matching: .any).matching(identifier: "now-playing-art").firstMatch
+        XCTAssertTrue(art.waitForExistence(timeout: 10))
+        XCTAssertEqual(art.label, "Cover")
+        // The round button that used to sit on the cover is gone.
+        XCTAssertFalse(app.buttons["Show a Record"].exists)
+        XCTAssertFalse(app.buttons["Show the Cover"].exists)
+        capture("cover-flat")
+        art.tap()
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "now-playing-art").matching(NSPredicate(format: "label == %@", "Record")).firstMatch.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Show the Cover"].exists)
+        capture("cover-vinyl")
+        // Remembered: a launch that doesn't say otherwise starts on the record.
+        app.terminate()
+        app.launchArguments = ["-VTDemo", "YES", "-VTPlay", "YES", "-VTScreen", "nowPlaying"]
+        app.launch()
+        let again = app.descendants(matching: .any).matching(identifier: "now-playing-art").firstMatch
+        XCTAssertTrue(again.waitForExistence(timeout: 15))
+        XCTAssertEqual(again.label, "Record")
+        again.tap()
+        XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "now-playing-art").matching(NSPredicate(format: "label == %@", "Cover")).firstMatch.waitForExistence(timeout: 5))
+    }
+
+    /// Saves the screen next to the test results when VT_SHOTS names a folder.
+    private func capture(_ name: String) {
+        guard let folder = ProcessInfo.processInfo.environment["VT_SHOTS"], !folder.isEmpty else { return }
+        try? FileManager.default.createDirectory(atPath: folder, withIntermediateDirectories: true)
+        try? app.screenshot().pngRepresentation.write(to: URL(fileURLWithPath: folder).appendingPathComponent(name + ".png"))
+    }
+
     /// SwiftUI containers can surface as any element type, so look the identifier up among all of them.
     private func element(_ identifier: String) -> XCUIElement {
         app.descendants(matching: .any).matching(identifier: identifier).firstMatch

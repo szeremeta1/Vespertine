@@ -183,8 +183,9 @@ struct RemoteBridge {
 
     /// A search answered in groups: songs as the search field finds them; albums, artists and playlists by name (every
     /// word, anywhere, whatever its case or accents). Up to `limit` of each.
+    /// `oneCopyEach`: found songs with each song once (`AppModel.oneCopyEach`), while a song's versions are combined.
     static func find(_ text: String, limit: Int, in library: LibraryStore, track: (Track) -> TrackSummary, album: (Album) -> AlbumSummary,
-                     artworkKey: (Track) -> String?) -> SearchResults {
+                     artworkKey: (Track) -> String?, oneCopyEach: ([Track]) -> [Track] = { $0 }) -> SearchResults {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return SearchResults(tracks: [], albums: [], artists: [], playlists: []) }
         let limit = min(max(1, limit), 500)
@@ -196,7 +197,7 @@ struct RemoteBridge {
         let artists = Array(library.artists.lazy.filter { matches($0.name.libraryDisplayName) }.prefix(limit))
         let playlists = Array(library.playlists.lazy.filter { matches($0.name.libraryDisplayName) }.prefix(limit))
         return SearchResults(
-            tracks: library.search(trimmed).prefix(limit).map(track),
+            tracks: oneCopyEach(library.search(trimmed)).prefix(limit).map(track),
             albums: albums.map(album),
             artists: artists.map { ArtistSummary(name: $0.name.libraryDisplayName, albumCount: $0.albumCount, artworkKey: $0.artworkKey) },
             playlists: playlists.compactMap { playlistSummary($0, in: library, artworkKey: artworkKey) })
@@ -282,15 +283,19 @@ struct RemoteBridge {
     static let albumBatch = 2_000
 
     /// Every song by title, kept until the library changes: a remote asks for it a page at a time.
-    private static var songList: (library: ObjectIdentifier, revision: Int, count: Int, tracks: [Track])?
+    private static var songList: (library: ObjectIdentifier, revision: Int, count: Int, surround: Bool?, tracks: [Track])?
 
-    static func songs(of library: LibraryStore) -> [Track] {
+    /// `oneCopyEach`: the songs with each song once, as the copy that plays on this output (`AppModel.oneCopyEach`), while a
+    /// song's versions are combined; `surround` is what that choice hangs on (whether the output wants surround), so the
+    /// list is made again when it changes.
+    static func songs(of library: LibraryStore, surround: Bool? = nil, oneCopyEach: ([Track]) -> [Track] = { $0 }) -> [Track] {
         let id = ObjectIdentifier(library)
-        if let songList, songList.library == id, songList.revision == library.revision, songList.count == library.stats.tracks {
+        if let songList, songList.library == id, songList.revision == library.revision, songList.count == library.stats.tracks,
+           songList.surround == surround {
             return songList.tracks
         }
-        let tracks = byTitle(library.allTracks())
-        songList = (id, library.revision, library.stats.tracks, tracks)
+        let tracks = byTitle(oneCopyEach(library.allTracks()))
+        songList = (id, library.revision, library.stats.tracks, surround, tracks)
         return tracks
     }
 
@@ -425,15 +430,20 @@ struct RemoteBridge {
         case .search(let text, let limit):
             let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else { return .tracks(items: []) }
-            return .tracks(items: library.search(trimmed).prefix(min(max(1, limit), 500)).map(trackSummary))
+            return .tracks(items: model.oneCopyEach(library.search(trimmed)).prefix(min(max(1, limit), 500)).map(trackSummary))
 
         case .songs(let offset, let limit):
-            let songs = Self.songs(of: library)
+            let songs = Self.songs(of: library, surround: library.combinesVersions ? model.outputWantsMultichannel() : nil, oneCopyEach: model.oneCopyEach)
             let start = min(max(0, offset), songs.count)
             let end = min(start + min(max(1, limit), 500), songs.count)
-            return .songs(items: songs[start..<end].map(trackSummary), total: songs.count)
+            // Each song's other copies go with it, so the phone can list and play them (as on Favorites).
+            let page = Array(songs[start..<end])
+            guard library.combinesVersions else { return .songs(items: page.map(trackSummary), total: songs.count) }
+            let listed = zip(page, library.versions(of: page)).map { Self.ListedSong(shown: $0, copies: $1) }
+            return .songs(items: listed.map(trackSummary), total: songs.count)
         case .find(let text, let limit):
-            return .found(Self.find(text, limit: limit, in: library, track: trackSummary, album: albumSummary, artworkKey: { model.artworkKey($0) }))
+            return .found(Self.find(text, limit: limit, in: library, track: trackSummary, album: albumSummary, artworkKey: { model.artworkKey($0) },
+                                    oneCopyEach: model.oneCopyEach))
 
         case .addToPlaylist(let id, let ids):
             return Self.addToPlaylist(id, ids: ids, in: library)
@@ -516,10 +526,6 @@ struct RemoteBridge {
         return ids.compactMap { byID[$0] }
     }
 
-    // MARK: Artwork
-
-    /// A stored cover file for `key` near `size`, read off the main thread. Keys are the library's own (hex and dashes);
-    /// anything else is refused, so a key can never name a file outside the artwork folder.
     /// A playlist's songs for `RemoteCommand.playlistTracks`: a page of them (a newer phone, which asks that way because a long
     /// playlist whole would be more than one message holds), or all of them (an older phone, the web remote).
     static func playlistTracks<Song>(_ songs: [Song], offset: Int?, limit: Int?, summary: (Song) -> TrackSummary) -> RemoteReply {
@@ -529,13 +535,26 @@ struct RemoteBridge {
         return .songs(items: songs[start..<end].map(summary), total: songs.count)
     }
 
+    // MARK: Artwork
+
+    /// A stored cover file for `key` near `size`, read off the main thread. Keys are the library's own (hex and dashes);
+    /// anything else is refused, so a key can never name a file outside the artwork folder.
+    ///
+    /// A size above the largest thumbnail is answered with the original, and a hi-res original can be more than one message
+    /// may carry; the largest thumbnail goes then, so the phone gets a cover and not an error.
     static func artwork(key: String, size: Int, store: ArtworkStore?) async -> (mimeType: String, data: Data)? {
         guard let store, !key.isEmpty, key.count <= 128,
               key.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }) else { return nil }
-        let url = store.url(for: key, minimumSize: min(max(size, 1), 2048))
+        let wanted = min(max(size, 1), 2048)
+        let first = store.url(for: key, minimumSize: wanted)
+        let thumbnails = ArtworkStore.thumbnailSizes.sorted(by: >).map { store.thumbnailURL(key, size: $0) }
+        let candidates = [first] + thumbnails.filter { $0 != first }
         return await Task.detached(priority: .userInitiated) { () -> (mimeType: String, data: Data)? in
-            guard let data = try? Data(contentsOf: url), data.count <= RemoteProtocol.maximumMessageSize / 2 else { return nil }
-            return (mimeType: mimeType(of: data), data: data)
+            for url in candidates {
+                guard let data = try? Data(contentsOf: url), data.count <= RemoteProtocol.maximumMessageSize / 2 else { continue }
+                return (mimeType: mimeType(of: data), data: data)
+            }
+            return nil
         }.value
     }
 

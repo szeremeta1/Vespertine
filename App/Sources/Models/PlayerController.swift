@@ -183,29 +183,49 @@ final class PlayerController {
     /// e.g. the chosen output is reconnecting). Set by the app model.
     var wantsMultichannel: () -> Bool? = { nil }
 
+    /// Whether `tracks` are an album as it was opened: several songs, all of one album. Its versions on another edition
+    /// (the "(Dolby Atmos)" album beside it) then stay out, so an edition played from its own page is the edition that
+    /// plays. One song asked for by itself (Play Next on a favorite) is a song, not an album: it follows the output.
+    nonisolated static func keepsToOneAlbum(_ tracks: [Track]) -> Bool {
+        tracks.count > 1 && Set(tracks.map(\.albumKey)).count == 1
+    }
+
     /// Queue entries for `tracks`, each playing the version of its song that suits the output.
-    /// A song whose versions all arrive together (a whole SACD album) is queued once. With `allowing`, only
-    /// versions it accepts are considered (a filtered page asked for multichannel: stereo versions stay out).
+    /// A song whose versions all arrive together (a whole SACD album, a shuffle of the library that has a song in stereo
+    /// and in Dolby Atmos) is queued once. With `allowing`, only versions it accepts are considered (a filtered page
+    /// asked for multichannel: stereo versions stay out).
     /// `exactly`: tracks (by location) asked for as they are, a copy picked by hand, even on an album whose copies are bundled.
     private func entries(_ tracks: [Track], allowing: ((Track) -> Bool)? = nil, transitions: TransitionOverride? = nil,
                          exactly: Set<String> = []) -> [QueueEntry] {
-        // Only an album whose copies are bundled lets the output pick; any other copy plays as itself.
-        let versions = library.playbackVersions(of: tracks).enumerated().map { i, versions in
-            if exactly.contains(tracks[i].location) { return [tracks[i]] }
-            guard let allowing, versions.count > 1 else { return versions }
-            return versions.filter { $0.location == tracks[i].location || allowing($0) }
+        // An album whose copies are bundled lets the output pick among them all; elsewhere a song's stereo and surround
+        // versions follow the output while they are combined (Settings), and any other copy plays as itself.
+        let oneAlbum = Self.keepsToOneAlbum(tracks)
+        let songs = library.playbackSongs(of: tracks, acrossEditions: !oneAlbum).enumerated().map { i, song -> LibraryStore.PlaybackSong in
+            if exactly.contains(tracks[i].location) { return LibraryStore.PlaybackSong(versions: [tracks[i]]) }
+            guard let allowing, song.versions.count > 1 else { return song }
+            var song = song
+            song.versions = song.versions.filter { $0.location == tracks[i].location || allowing($0) }
+            return song
         }
         let wanted = wantsMultichannel()
-        var queued = Set<String>()
-        return zip(tracks, versions).compactMap { track, versions in
-            if versions.count > 1 {
-                let key = versions.map(\.location).sorted().joined(separator: "\u{1F}")
-                guard queued.insert(key).inserted else { return nil }
-            }
+        // What is queued of each song so far: the layouts of the tracks asked for, and the tracks that play.
+        var queued: [String: (layouts: Set<Bool>, playing: Set<String>)] = [:]
+        return zip(tracks, songs).compactMap { track, song in
+            let versions = song.versions
+            let key = versions.count > 1 ? song.key : nil
+            // Bundled copies are one entry whichever is asked for. Otherwise only a song's other-layout version
+            // is the same entry: two copies in one layout asked for together (both put in a playlist) both play.
+            if let key, let before = queued[key], song.mergesCopies || before.layouts.contains(!track.isMultichannel) { return nil }
             // A copy of the same song plays as the best copy; versions follow the output (stereo or surround).
             let isLocal: (Track) -> Bool = { [shares] in !shares.isNetwork($0) }
             let chosen = versions.count > 1 ? TrackVersions.choose(versions, multichannel: wanted ?? track.isMultichannel, isLocal: isLocal,
                                                                    isPreferred: library.isPreferredCopy) ?? track : track
+            if let key {
+                // Two stereo copies asked for on a surround output would both play the song's one surround version: once.
+                if chosen.location != track.location, queued[key]?.playing.contains(chosen.location) == true { return nil }
+                queued[key, default: ([], [])].layouts.insert(track.isMultichannel)
+                queued[key]?.playing.insert(chosen.location)
+            }
             return QueueEntry(item: makeItem(chosen, transitions: transitions), track: chosen, versions: versions.count > 1 ? versions : [])
         }
     }

@@ -682,7 +682,7 @@ struct SongsView: View {
 
     var body: some View {
         SongsPage(scope: .sidebar(.songs), title: String(localized: "Songs"), list: list) { EmptyView() } empty: { Spacer() }
-            .task(id: model.library.revision) {
+            .task(id: "\(model.library.revision)#\(model.library.combinesVersions)") {
                 // A scan changes the library many times a second: read it once things settle, and off the main thread.
                 if !list.tracks.isEmpty { try? await Task.sleep(for: .milliseconds(400)) }
                 guard !Task.isCancelled else { return }
@@ -694,7 +694,8 @@ struct SongsView: View {
                     return filesOnly ? all.filter { !$0.isStreamed } : all
                 }.value
                 guard !Task.isCancelled else { return }
-                list = SongList(tracks, model: model)
+                // A song in several versions is one row while versions are combined, its copies a click away (as on Favorites).
+                list = model.library.combinesVersions ? SongList(songs: tracks, model: model) : SongList(tracks, model: model)
             }
     }
 }
@@ -775,7 +776,7 @@ struct SearchResultsView: View {
             try? await Task.sleep(for: .milliseconds(120))
             // Typing on, or a scan changing the library again, cancels this and starts another: only the last one searches.
             guard !Task.isCancelled else { return }
-            results = SongList(model.library.search(query), model: model)
+            results = SongList(model.oneCopyEach(model.library.search(query)), model: model)
             let words = query.split(whereSeparator: \.isWhitespace).map(String.init)
             func matches(_ text: String) -> Bool { words.allSatisfy { text.localizedStandardContains($0) } }
             func startsWith(_ text: String) -> Int { text.localizedStandardRange(of: query)?.lowerBound == text.startIndex ? 0 : 1 }

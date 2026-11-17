@@ -371,6 +371,13 @@ extension AppModel {
         return TrackVersions.choose(copies, multichannel: wanted, isLocal: { [shares] in !shares.isNetwork($0) }, isPreferred: library.isPreferredCopy) ?? copies[0]
     }
 
+    /// `tracks` with each song once, as the copy that plays on this output, in the order the songs first appear: what a
+    /// list of found songs shows while a song's versions are combined. As given otherwise.
+    func oneCopyEach(_ tracks: [Track]) -> [Track] {
+        guard library.combinesVersions else { return tracks }
+        return library.songs(listing: tracks).compactMap { $0.listed.isEmpty ? nil : listedCopy(of: $0.listed) }
+    }
+
     /// Songs through a filter, in their order.
     func filtered(_ tracks: [Track], facts: [FilterFacts], by filter: LibraryFilter) -> [Track] {
         guard !filter.isEmpty else { return tracks }
