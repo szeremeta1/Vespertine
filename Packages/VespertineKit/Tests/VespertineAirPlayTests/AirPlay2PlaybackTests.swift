@@ -76,7 +76,7 @@ struct AirPlay2PlaybackTests {
 
     static let deep48 = AirPlayFormat(sampleRate: 48_000, bitDepth: 24)
     /// A receiver that says it takes 24-bit at 48 kHz, and 16-bit at 44.1 kHz, on a realtime stream.
-    static let deepInfo: [String: Any] = ["audioFormats": [["type": 96, "audioInputFormats": 0x240000]]]
+    static var deepInfo: [String: Any] { ["audioFormats": [["type": 96, "audioInputFormats": 0x240000]]] }
 
     @Test("A 24-bit / 48 kHz song goes as it is to a receiver that says it takes that: every sample, and the path says so")
     func deepSong() async throws {
