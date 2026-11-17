@@ -36,6 +36,22 @@ Settings › Playback › Speaker Groups (beta), once it is on, lists, duplicate
 - **Headroom guard.** Positive trims can push a loud song past full scale, so the chain's shared preamp is lowered by the largest boost any channel can reach (its trim plus the top of its filters, rounded up to 0.1 dB). Cuts need none, and a room profile that already leaves room keeps its own preamp. The balance between speakers holds: with +6 dB on one speaker, that speaker plays at the file's level and the others 6 dB below it. Not covered: a measured filter (impulse response), and the worst-case sum of a fold (for example 5.1 onto a quad).
 - Any trim, flip or lowered preamp on an output that carries music makes the path ROOM CORRECTION, not BIT-PERFECT; on an output that stays silent it changes nothing.
 
+## Fill the room
+
+A switch in the group's editor, off by default, for a room where people listen from anywhere and not only from the seat. With it on, every speaker plays the whole song or the whole film:
+
+- Each speaker keeps what the routing gives it (the front pair plays a stereo song's own left and right, a surround channel stays on its speaker) and adds the rest of its side of the room as a fill: a back speaker gets the front channel and the centre, a front speaker gets the surround channel. So dialogue is heard next to a back speaker, and a stereo song next to any speaker. A speaker never plays the same channel twice.
+- The fill is 3 dB under the routed sound, 15 to 18 ms later, and passed through a short all-pass chain that differs for each speaker. At the seat the sound therefore still comes from the front (the first arrival decides where a sound seems to come from), and two speakers playing the same channel do not cancel each other as much at spots between them.
+- A stereo song's ambience (what its two channels do not share) is added to the surround pair. Bass below 90 Hz from the routed sound plays in mono on the subwoofer, or on the front pair when there is none; the fill carries no bass.
+- A limiter on each speaker keeps a fill added to a loud channel from clipping. It does nothing to a speaker that stays within full scale.
+- What other apps play through [Mac Sound Output (beta)](MAC-SOUND-OUTPUT.md) gets the same fill as a plain mix, with no delay, all-pass or limiter, so that a film stays in step with its picture.
+
+Under the switch there are two styles. **Stage in front** is everything above, and is what a group gets when the switch is turned on. **Even everywhere** is for a room where no seat matters more than the rest: the fill plays at the routed sound's own level and at the same time, with no all-pass and no ambience, so every speaker of a side plays the same thing. That is the most even around the room; at the seat the sound is all around the listener and not in front, and between two speakers playing the same channel some frequencies cancel more than with the first style. Bass management and the limiter are the same in both.
+
+While the switch is on, it takes the place of the group's choice for stereo songs in Vespertine's own playback, and nothing the group plays is bit-perfect.
+
+What it cannot do: a few speakers cannot make every spot in a room the best seat. The image a stereo pair draws exists only between its two speakers; anywhere else a listener hears the nearest speaker first. Fill the room makes sure that what they hear there is the whole song at a similar level. It does not measure the room: the speakers' levels are the ones set in the group. It has not been measured or listened to on real DACs yet.
+
 ## Room correction on a group
 
 Open Room Correction with the group as the output:

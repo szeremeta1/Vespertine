@@ -20,7 +20,8 @@ public struct GroupContentPlan: Equatable, Sendable {
     public init?(source: [AudioChannelLabel], group: SpeakerGroup) {
         let render = RoomRender.plan(source: source, group: group)
         guard let router = PositionRouter(source: render?.routeLabels ?? source, group: render?.group ?? group) else { return nil }
-        self.router = router
+        // With room render the fill is part of what each output carries (`RoomRenderer` adds it itself, late and decorrelated).
+        self.router = render.map { router.adding(fill: RoomRender.fillTaps(for: $0, router: router), gain: $0.settings.fillGain) } ?? router
         self.group = group
         self.render = render
     }

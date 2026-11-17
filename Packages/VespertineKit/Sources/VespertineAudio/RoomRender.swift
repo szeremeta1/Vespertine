@@ -4,26 +4,34 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 // What it does, in order:
+//   · The fill: every speaker plays the whole song. What a speaker would not play by the routing below (the other speakers'
+//     channels of its side of the room: a back speaker has the front one's, a front speaker the surround one's, each has the
+//     centre's) it plays as a fill (`fillTaps`), 3 dB down by default, through its own all-pass chain and later than the routed
+//     sound (15 ms on the left, 18 on the right). So a listener next to any one speaker hears the song, and a film's dialogue,
+//     not only that speaker's channel; and at the aligned seat the image stays where it was, by the precedence effect, at any
+//     seat where the fill comes no more than that much closer than at the aligned one. A speaker never plays a channel twice.
 //   · Stereo and mono on a group with a front pair and a surround (or back) pair: the front pair plays the song's own left and
-//     right, sample for sample. The surround pair plays what is not coherent between the song's channels (its reverb and room
-//     sound: `StereoUpmixer`'s ambience) and a quieter copy of the whole song, each side through its own all-pass chain, so the
-//     two sides correlate neither with each other nor with the fronts. Both reach the aligned seat later than the fronts (15 and
-//     18 ms by default), so by the precedence effect the image stays at the front there and at any other seat where the surrounds
-//     come no more than that much closer, relative to the fronts, than at the aligned seat (15 ms is about 5 m of difference in
-//     path: with the fronts at the seat and the surrounds 5 m behind, the half of the room nearer the fronts). The fill is
-//     what keeps the whole song, not only its reverb, audible to a listener sitting close to the surrounds, who hears it mostly
-//     from them.
-//   · Surround songs (5.1, 7.1, a decoded Atmos bed): every channel goes where `PositionRouter` places it, unchanged.
-//   · Bass management: below the crossover (90 Hz by default) every speaker's share is summed in mono onto the bass speakers
-//     (the group's subwoofer, else the front pair, or every speaker), weighted by each speaker's level in the chain, so the bass
-//     at the seat adds up to what it was. Speakers small in the bass (a pair of bookshelf rears) stop playing what they can't.
-//     Linkwitz-Riley, 4th order: the two halves add back to a flat response. Several sources in phase below the room's
-//     transition frequency also excite its modes less unevenly from seat to seat than one does.
+//     right, sample for sample. The surround pair adds what is not coherent between the song's channels (its reverb and room
+//     sound: `StereoUpmixer`'s ambience) to its fill.
+//   · Surround songs (5.1, 7.1, a decoded Atmos bed): every channel goes where `PositionRouter` places it, unchanged, and the
+//     fill is added.
+//   · Bass management: below the crossover (90 Hz by default) every speaker's share of the routed sound is summed in mono onto
+//     the bass speakers (the group's subwoofer, else the front pair, or every speaker), weighted by each speaker's level in the
+//     chain, so the bass at the seat adds up to what it was. Speakers small in the bass (a pair of bookshelf rears) stop playing
+//     what they can't. Linkwitz-Riley, 4th order: the two halves add back to a flat response. The fill has no bass (the same
+//     high-pass): a late copy of the bass would cancel it at some frequencies.
 //   · Placement: a speaker drawn on the wrong side for its name (a right speaker drawn left of the seat, a back speaker drawn
 //     in front of it) is placed where its name says, at the drawn distance.
+//   · A limiter per speaker (`RenderLimiter`), because a fill added to a channel can pass full scale: 1.5 ms of look-ahead, and
+//     it leaves a speaker's samples exactly as they are until that speaker would clip (at its level in the chain).
 //   · Room correction (`roomWide`): below 200 Hz the profile's cuts keep 75 % of their depth and its boosts are left out. A room
 //     mode is at the same frequency everywhere in the room, but how strong it is changes from seat to seat, and a boost into a
 //     dip only fills that dip at the one seat it was measured at.
+//   · Two styles (`RoomRenderSettings.Style`). Stage in front is all of the above. Even everywhere is for a room with no seat
+//     that matters more than the rest: the fill is at the routed sound's own level and in time with it, with no all-pass and no
+//     ambience, so each speaker of a side plays the same thing. Bass management, placement and the limiter are the same.
+// What it can't do: four speakers can't make every seat the best seat. The image a stereo pair draws exists only between its
+// two speakers; elsewhere a listener hears the nearer speakers first. The fill makes sure that what they hear is the whole song.
 // Runs on the decode thread, never on the I/O thread. Output frame n is input frame n: a song comes out exactly as long as it
 // went in.
 //
@@ -41,9 +49,19 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
         case all
     }
 
+    /// What the group is filled for.
+    public enum Style: String, Codable, CaseIterable, Sendable {
+        /// The seat keeps its stage in front: the fill is quieter (`fillDB`), later and decorrelated, and a stereo song's ambience
+        /// goes to the surrounds.
+        case frontLed
+        /// No seat comes first: the fill plays at the routed sound's level, in time with it and as it is.
+        case even
+    }
+
     /// Level of the extracted ambience on the surrounds, dB.
     public var ambienceDB: Double
-    /// Level of the decorrelated copy of the whole song on the surrounds, dB; at `fillRange.lowerBound` or below there is none.
+    /// Level of the fill (the rest of the song on each speaker, decorrelated and late), dB; at `fillRange.lowerBound` or below
+    /// there is none.
     public var fillDB: Double
     /// How much later than the fronts the surrounds' share arrives, ms (left; the right is 3 ms more, to decorrelate the pair).
     public var surroundDelayMs: Double
@@ -53,6 +71,14 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
     /// Below `lowCorrectionBelowHz`, the share of each room-correction cut that is kept (0…1); boosts there are left out.
     public var lowCorrectionDepth: Double
     public var lowCorrectionBelowHz: Double
+    public var style: Style
+    /// Which defaults these settings were saved under (`currentRevision`); a file without it is from revision 1.
+    public var revision = RoomRenderSettings.currentRevision
+
+    /// 2: the fill is the whole song on every speaker at -3 dB (it was a -9 dB copy on the surround pair only, which nobody
+    /// could hear at the seat).
+    public static let currentRevision = 2
+    static let revisionOneFillDB = -9.0
 
     public static let ambienceRange: ClosedRange<Double> = -30...0
     public static let fillRange: ClosedRange<Double> = -40...0
@@ -61,8 +87,9 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
     public static let crossoverRange: ClosedRange<Double> = 40...200
     public static let lowCorrectionRange: ClosedRange<Double> = 0...500
 
-    public init(ambienceDB: Double = -6, fillDB: Double = -9, surroundDelayMs: Double = 15, crossoverHz: Double = 90,
-                bassSpeakers: BassSpeakers = .front, lowCorrectionDepth: Double = 0.75, lowCorrectionBelowHz: Double = 200) {
+    public init(ambienceDB: Double = -6, fillDB: Double = -3, surroundDelayMs: Double = 15, crossoverHz: Double = 90,
+                bassSpeakers: BassSpeakers = .front, lowCorrectionDepth: Double = 0.75, lowCorrectionBelowHz: Double = 200,
+                style: Style = .frontLed) {
         self.ambienceDB = ambienceDB
         self.fillDB = fillDB
         self.surroundDelayMs = surroundDelayMs
@@ -70,6 +97,7 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
         self.bassSpeakers = bassSpeakers
         self.lowCorrectionDepth = lowCorrectionDepth
         self.lowCorrectionBelowHz = lowCorrectionBelowHz
+        self.style = style
     }
 
     /// A field missing from a saved group takes its default, so later fields don't make older files unreadable.
@@ -83,6 +111,11 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
         bassSpeakers = (try? c.decodeIfPresent(BassSpeakers.self, forKey: .bassSpeakers)) ?? d.bassSpeakers
         lowCorrectionDepth = try c.decodeIfPresent(Double.self, forKey: .lowCorrectionDepth) ?? d.lowCorrectionDepth
         lowCorrectionBelowHz = try c.decodeIfPresent(Double.self, forKey: .lowCorrectionBelowHz) ?? d.lowCorrectionBelowHz
+        style = (try? c.decodeIfPresent(Style.self, forKey: .style)) ?? d.style
+        // The switch never had a control for the fill: a group saved with the old default takes the new one.
+        let saved = try c.decodeIfPresent(Int.self, forKey: .revision) ?? 1
+        if saved < 2, fillDB == Self.revisionOneFillDB { fillDB = d.fillDB }
+        revision = Self.currentRevision
     }
 
     /// Every value held to its range; a number that isn't one takes the default.
@@ -100,7 +133,8 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
     }
 
     var ambienceGain: Float { Float(pow(10, clamped.ambienceDB / 20)) }
-    var fillGain: Float { clamped.fillDB <= Self.fillRange.lowerBound ? 0 : Float(pow(10, clamped.fillDB / 20)) }
+    /// The fill's gain: the routed sound's own level when the room is filled evenly, else `fillDB`.
+    var fillGain: Float { style == .even ? 1 : clamped.fillDB <= Self.fillRange.lowerBound ? 0 : Float(pow(10, clamped.fillDB / 20)) }
 }
 
 /// What room render does with one song on one group: worked out before playback, so the plan, the signal path and the decoder
@@ -135,7 +169,7 @@ public enum RoomRender {
         let roles = source.map { SpeakerRole(label: ChannelLayouts.canonical($0)) }
         let isStereo = source.count == 2 && roles.contains(.frontLeft) && roles.contains(.frontRight)
         let isMono = source.count == 1
-        let upmixes = hasSurrounds && (isStereo || isMono)
+        let upmixes = hasSurrounds && (isStereo || isMono) && settings.style == .frontLed
         var routed = placed
         routed.stereoPolicy = .frontOnly
         return RoomRenderPlan(settings: settings, group: routed, source: source, upmixes: upmixes,
@@ -148,6 +182,68 @@ public enum RoomRender {
         if let l = wired[.backLeft], let r = wired[.backRight] { return (l, r) }
         if let l = wired[.sideLeft], let r = wired[.sideRight] { return (l, r) }
         return nil
+    }
+
+    // MARK: The fill
+
+    /// Which side of a song a speaker or a channel is on.
+    enum Side { case left, right, centre }
+
+    /// By its name (the drawing may contradict it: `placement`). nil for the subwoofer.
+    static func side(of role: SpeakerRole) -> Side? {
+        guard role != .lfe, let angle = role.defaultAzimuth else { return nil }
+        if abs(angle) < 1e-9 || abs(abs(angle) - 180) < 1e-9 { return .centre }
+        return angle < 0 ? .left : .right
+    }
+
+    /// How much of a channel belongs on a speaker of `side` when that speaker is to play the whole song: the stereo fold of
+    /// ITU-R BS.775 (a front channel at 1, the centre and the surrounds at -3 dB, nothing of the other side), and for a centre
+    /// speaker half of each side.
+    static func share(of channel: SpeakerRole, on side: Side) -> Float {
+        guard let from = Self.side(of: channel) else { return 0 }
+        let level: Float = channel == .frontLeft || channel == .frontRight ? 1 : PositionRouter.foldGain
+        switch (from, side) {
+        case (.left, .left), (.right, .right), (.centre, .left), (.centre, .right): return level
+        case (.centre, .centre): return 1
+        case (.left, .centre), (.right, .centre): return level / 2
+        case (.left, .right), (.right, .left): return 0
+        }
+    }
+
+    /// The fill, before its level: for each of the group's outputs, the channels (indices into `labels`) it is to play besides
+    /// what it plays already, and their gains. `direct(output, channel)`: how much of that channel the output plays already; a
+    /// channel it has is never added again (two copies of one signal on one speaker, one late, would comb). The subwoofer gets
+    /// no fill.
+    static func fillTaps(labels: [AudioChannelLabel], group: SpeakerGroup, direct: (_ output: Int, _ channel: Int) -> Float) -> [[PositionRouter.Tap]] {
+        let roles = ChannelLayouts.normalizedSurrounds(labels).map { SpeakerRole(label: $0) }
+        var result = [[PositionRouter.Tap]](repeating: [], count: max(group.totalChannels, 0))
+        for (role, output) in group.aggregateChannels where output < result.count {
+            guard let side = side(of: role) else { continue }
+            for (channel, from) in roles.enumerated() {
+                guard let from, direct(output, channel) <= 0.01 else { continue }
+                let gain = share(of: from, on: side)
+                if gain > 0 { result[output].append(PositionRouter.Tap(source: channel, gain: gain)) }
+            }
+        }
+        return result
+    }
+
+    /// The fill for channels routed by `router` as they are (Mac Sound Output's matrix).
+    public static func fillTaps(labels: [AudioChannelLabel], router: PositionRouter, group: SpeakerGroup) -> [[PositionRouter.Tap]] {
+        fillTaps(labels: labels, group: group) { output, channel in
+            router.matrixRow(output).reduce(Float(0)) { $1.source == channel ? $0 + abs($1.gain) : $0 }
+        }
+    }
+
+    /// The fill for a song played by `plan`, in the song's own channels. `router`: the plan's router (of `plan.routeLabels`).
+    /// Upmixed, its first two channels are the song's left and right (both the one channel of a mono song); the ambience it
+    /// routes besides is not the song's.
+    static func fillTaps(for plan: RoomRenderPlan, router: PositionRouter) -> [[PositionRouter.Tap]] {
+        guard plan.upmixes else { return fillTaps(labels: plan.source, router: router, group: plan.group) }
+        let mono = plan.source.count == 1
+        return fillTaps(labels: plan.source, group: plan.group) { output, channel in
+            router.matrixRow(output).reduce(Float(0)) { $1.source < 2 && (mono ? 0 : $1.source) == channel ? $0 + abs($1.gain) : $0 }
+        }
     }
 
     /// `group` with each ear-level speaker drawn on the wrong side for its name moved to where the name says, and the roles moved.
@@ -203,9 +299,12 @@ public enum RoomRender {
     public static func summary(_ plan: RoomRenderPlan) -> String {
         let s = plan.settings
         var parts: [String] = []
-        if plan.upmixes {
-            parts.append("ambience and a decorrelated fill on the surrounds, \(Int(s.surroundDelayMs.rounded())) ms after the fronts")
+        if s.style == .even {
+            parts.append("the whole song on every speaker, at one level and at one time")
+        } else if s.fillGain > 0 {
+            parts.append("the whole song on every speaker (the fill \(Int(-s.fillDB.rounded())) dB down, \(Int(s.surroundDelayMs.rounded())) ms late)")
         }
+        if plan.upmixes { parts.append("ambience on the surrounds") }
         if s.crossoverHz > 0 {
             let to = plan.group.aggregateChannels[.lfe] != nil ? "the subwoofer" : s.bassSpeakers == .front ? "the front pair" : "every speaker"
             parts.append("bass below \(Int(s.crossoverHz.rounded())) Hz on \(to)")
@@ -233,8 +332,9 @@ final class RoomRenderer {
     private var mid: [Float] = []
     private var wide: [Float] = []
     private var ambienceLeft: RenderDelay, ambienceRight: RenderDelay
-    private var fillLeft: Decorrelator, fillRight: Decorrelator
+    private var fills: [FillVoice] = []
     private var bass: BassManager?
+    private var limiter: RenderLimiter
 
     init?(plan: RoomRenderPlan, sampleRate: Double) {
         guard sampleRate.isFinite, sampleRate > 0, let router = PositionRouter(source: plan.routeLabels, group: plan.group) else { return nil }
@@ -243,7 +343,7 @@ final class RoomRenderer {
         sourceChannels = plan.source.count
         outputChannels = router.outputChannels
         let s = plan.settings.clamped
-        fillGain = plan.upmixes ? s.fillGain : 0
+        fillGain = s.fillGain
         upmixer = plan.upmixes
             ? StereoUpmixer(inputChannels: plan.source.count, sampleRate: sampleRate,
                             settings: UpmixSettings(ambienceGain: s.ambienceGain, centreAmount: 0, lfeGain: 0)) : nil
@@ -252,10 +352,16 @@ final class RoomRenderer {
         let extra = Int(((s.surroundDelayMs - 12) / 1000 * sampleRate).rounded())
         ambienceLeft = RenderDelay(frames: extra)
         ambienceRight = RenderDelay(frames: extra)
-        let fillFrames = Int((s.surroundDelayMs / 1000 * sampleRate).rounded()), offset = Int((0.003 * sampleRate).rounded())
-        fillLeft = Decorrelator(sampleRate: sampleRate, delayFrames: fillFrames, stagesMs: [2.3, 3.7, 5.3])
-        fillRight = Decorrelator(sampleRate: sampleRate, delayFrames: fillFrames + offset, stagesMs: [2.9, 4.3, 6.1])
+        if fillGain > 0 {
+            fills = FillVoice.bank(taps: RoomRender.fillTaps(for: plan, router: router), group: plan.group, settings: s, sampleRate: sampleRate)
+        }
         bass = s.crossoverHz > 0 ? BassManager(plan: plan, settings: s, outputChannels: router.outputChannels, sampleRate: sampleRate) : nil
+        // Full scale for a speaker is where its DAC clips: one turned down later in the chain (a trim, a room profile's level) may
+        // be driven that much harder here, which is what the bass management does to make up for it.
+        limiter = RenderLimiter(channels: router.outputChannels, sampleRate: sampleRate, thresholds: (0..<router.outputChannels).map { o in
+            let dB = o < plan.levelsDB.count && plan.levelsDB[o].isFinite ? plan.levelsDB[o] : 0
+            return Float(pow(10, max(-dB, 0) / 20))
+        })
     }
 
     /// Takes `frames` interleaved frames of the song and appends the group's frames now ready, interleaved, to `output`.
@@ -267,16 +373,18 @@ final class RoomRenderer {
             upmixer.process(input, frames: frames, into: &upmixedScratch)
             emitUpmixed(into: &output)
         } else {
-            render(input, frames: frames, into: &output)
+            render(input, song: input, frames: frames, into: &output)
         }
     }
 
-    /// Flushes what the upmixer still holds: after this, exactly as many frames have come out as went in.
+    /// Flushes what the upmixer and the limiter still hold: after this, exactly as many frames have come out as went in.
     func finish(into output: inout [Float]) {
-        guard let upmixer else { return }
-        upmixedScratch.removeAll(keepingCapacity: true)
-        upmixer.finish(into: &upmixedScratch)
-        emitUpmixed(into: &output)
+        if let upmixer {
+            upmixedScratch.removeAll(keepingCapacity: true)
+            upmixer.finish(into: &upmixedScratch)
+            emitUpmixed(into: &output)
+        }
+        limiter.finish(into: &output)
     }
 
     private func emitUpmixed(into output: inout [Float]) {
@@ -289,23 +397,151 @@ final class RoomRenderer {
         for j in 0..<frames {
             let l = mono ? pending[j] * half : pending[j * 2]
             let r = mono ? pending[j] * half : pending[j * 2 + 1]
-            let ls = ambienceLeft.run(upmixedScratch[j * six + 4]) + fillGain * fillLeft.run(l)
-            let rs = ambienceRight.run(upmixedScratch[j * six + 5]) + fillGain * fillRight.run(r)
-            mid.append(l); mid.append(r); mid.append(ls); mid.append(rs)
+            mid.append(l); mid.append(r)
+            mid.append(ambienceLeft.run(upmixedScratch[j * six + 4])); mid.append(ambienceRight.run(upmixedScratch[j * six + 5]))
+        }
+        mid.withUnsafeBufferPointer { routed in
+            pending.withUnsafeBufferPointer { song in render(routed.baseAddress!, song: song.baseAddress!, frames: frames, into: &output) }
         }
         pending.removeFirst(frames * sourceChannels)
-        mid.withUnsafeBufferPointer { render($0.baseAddress!, frames: frames, into: &output) }
     }
 
-    /// Routes `frames` frames of the router's channels onto the group, then runs the bass management.
-    private func render(_ input: UnsafePointer<Float>, frames: Int, into output: inout [Float]) {
+    /// Routes `frames` frames of the router's channels onto the group, runs the bass management, adds the fill (made of the
+    /// song's own channels, `song`) and limits.
+    private func render(_ input: UnsafePointer<Float>, song: UnsafePointer<Float>, frames: Int, into output: inout [Float]) {
         let count = frames * outputChannels
         if wide.count < count { wide = [Float](repeating: 0, count: count) }
         wide.withUnsafeMutableBufferPointer { w in
-            router.route(input, into: w.baseAddress!, frames: frames)
-            bass?.process(w.baseAddress!, frames: frames)
-            output.append(contentsOf: UnsafeBufferPointer(start: w.baseAddress!, count: count))
+            let out = w.baseAddress!
+            router.route(input, into: out, frames: frames)
+            bass?.process(out, frames: frames)
+            for v in fills.indices {
+                fills[v].add(song, channels: sourceChannels, into: out, width: outputChannels, frames: frames, gain: fillGain)
+            }
+            limiter.process(out, frames: frames, into: &output)
         }
+    }
+}
+
+/// One speaker's fill: its channels of the song mixed, held back, decorrelated, and (with bass management) high-passed.
+struct FillVoice {
+    let output: Int
+    let taps: [PositionRouter.Tap]
+    private var decorrelator: Decorrelator
+    private var highPass: [RenderBiquad]
+
+    /// All-pass lengths (ms) for the speakers of one side, in turn: no two speakers share a chain.
+    static let leftStages: [[Double]] = [[2.3, 3.7, 5.3], [2.5, 4.1, 5.9], [1.9, 3.3, 4.9]]
+    static let rightStages: [[Double]] = [[2.9, 4.3, 6.1], [3.1, 4.7, 6.7], [2.1, 3.5, 5.1]]
+    static let centreStages: [[Double]] = [[2.7, 3.9, 5.7], [1.7, 3.1, 4.5]]
+
+    /// A voice for every output with something to fill, in the outputs' order. The left side is `surroundDelayMs` late, the
+    /// right 3 ms more and the centre 1.5 ms more, so no two sides arrive together. Filled evenly, a voice is neither late nor
+    /// decorrelated.
+    static func bank(taps: [[PositionRouter.Tap]], group: SpeakerGroup, settings: RoomRenderSettings, sampleRate: Double) -> [FillVoice] {
+        let roleOf = Dictionary(group.aggregateChannels.map { ($0.value, $0.key) }, uniquingKeysWith: { a, _ in a })
+        var used: [RoomRender.Side: Int] = [:]
+        var voices: [FillVoice] = []
+        for (output, list) in taps.enumerated() where !list.isEmpty {
+            guard let role = roleOf[output], let side = RoomRender.side(of: role) else { continue }
+            let n = used[side, default: 0]
+            used[side] = n + 1
+            let (sets, later): ([[Double]], Double) = switch side {
+            case .left: (leftStages, 0)
+            case .right: (rightStages, 3)
+            case .centre: (centreStages, 1.5)
+            }
+            let even = settings.style == .even
+            let delay = even ? 0 : Int(((settings.surroundDelayMs + later) / 1000 * sampleRate).rounded())
+            let f = settings.crossoverHz
+            voices.append(FillVoice(output: output, taps: list,
+                                    decorrelator: Decorrelator(sampleRate: sampleRate, delayFrames: delay, stagesMs: even ? [] : sets[n % sets.count]),
+                                    highPass: f > 0 ? [RenderBiquad(highPass: true, frequency: f, sampleRate: sampleRate),
+                                                       RenderBiquad(highPass: true, frequency: f, sampleRate: sampleRate)] : []))
+        }
+        return voices
+    }
+
+    mutating func add(_ song: UnsafePointer<Float>, channels: Int, into out: UnsafeMutablePointer<Float>, width: Int, frames: Int, gain: Float) {
+        for f in 0..<frames {
+            var x: Float = 0
+            for tap in taps { x += song[f * channels + tap.source] * tap.gain }
+            var y = Double(decorrelator.run(x))
+            for i in highPass.indices { y = highPass[i].run(y) }
+            out[f * width + output] += gain * Float(y)
+        }
+    }
+}
+
+/// A look-ahead limiter, each channel on its own. A channel that stays within full scale comes out sample for sample (later by
+/// the look-ahead, which `RoomRenderer` hides: the first frames out are dropped and `finish` hands out the last). One that would
+/// pass full scale is turned down over the look-ahead, so that the peak arrives at the ceiling, and let back up over 200 ms.
+struct RenderLimiter {
+    /// A sample above its channel's threshold is limited to this much of it (a hair under, so rounding never leaves it above).
+    static let ceiling: Float = 0.9999
+
+    let look: Int
+    private let channels: Int
+    private let releaseStep: Float
+    /// Per channel: the level it may not pass (1: full scale).
+    private let thresholds: [Float]
+    private var delay: [Float]
+    /// Per channel: the gain each of the last `look + 1` frames asked for, and the smallest of those at each of the last `look`.
+    private var need: [Float]
+    private var mins: [Float]
+    private var held: [Float]
+    /// Per channel: frames still to work through before its gain is exactly 1 again.
+    private var busy: [Int]
+    private var at = 0, needAt = 0
+    private var toDrop: Int
+
+    init(channels: Int, sampleRate: Double, thresholds: [Float] = []) {
+        self.channels = max(channels, 1)
+        self.thresholds = (0..<max(channels, 1)).map { $0 < thresholds.count && thresholds[$0].isFinite && thresholds[$0] > 0 ? thresholds[$0] : 1 }
+        look = max(8, Int((0.0015 * sampleRate).rounded()))
+        releaseStep = Float(1 / (0.2 * sampleRate))
+        delay = [Float](repeating: 0, count: look * self.channels)
+        need = [Float](repeating: 1, count: (look + 1) * self.channels)
+        mins = [Float](repeating: 1, count: look * self.channels)
+        held = [Float](repeating: 1, count: self.channels)
+        busy = [Int](repeating: 0, count: self.channels)
+        toDrop = look
+    }
+
+    /// Limits `frames` interleaved frames in place and appends those now ready to `output`.
+    mutating func process(_ x: UnsafeMutablePointer<Float>, frames: Int, into output: inout [Float]) {
+        for f in 0..<frames {
+            let row = x + f * channels
+            for c in 0..<channels {
+                let v = row[c], level = abs(v)
+                let asked = min(level > thresholds[c] ? Self.ceiling * thresholds[c] / level : 1, held[c] + releaseStep)
+                held[c] = asked
+                let old = delay[at * channels + c]
+                delay[at * channels + c] = v
+                if asked < 1 { busy[c] = 2 * look + 2 }
+                guard busy[c] > 0 else { row[c] = old; continue }
+                busy[c] -= 1
+                let n = c * (look + 1), m = c * look
+                need[n + needAt] = asked
+                var least: Float = 1
+                for k in 0...look { least = min(least, need[n + k]) }
+                mins[m + at] = least
+                var sum: Float = 0
+                for k in 0..<look { sum += mins[m + k] }
+                row[c] = old * min(sum / Float(look), 1)
+            }
+            at = (at + 1) % look
+            needAt = (needAt + 1) % (look + 1)
+        }
+        let skip = min(toDrop, frames)
+        toDrop -= skip
+        output.append(contentsOf: UnsafeBufferPointer(start: x + skip * channels, count: (frames - skip) * channels))
+    }
+
+    /// Hands out the frames still held.
+    mutating func finish(into output: inout [Float]) {
+        var silence = [Float](repeating: 0, count: look * channels)
+        silence.withUnsafeMutableBufferPointer { process($0.baseAddress!, frames: look, into: &output) }
     }
 }
 

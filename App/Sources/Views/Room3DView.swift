@@ -195,6 +195,13 @@ struct Room3DView: View {
             }
             if fillsRoom {
                 Text(verbatim: GroupPolicies.roomRenderDetail).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                if let style = GroupPolicies.roomRenderStyle(group) {
+                    Picker(selection: Binding(get: { style }, set: { group = GroupPolicies.setRoomRenderStyle($0, in: group) })) {
+                        ForEach(RoomRenderSettings.Style.allCases, id: \.self) { Text(verbatim: GroupPolicies.roomRenderStyleTitle($0)).tag($0) }
+                    } label: { Text(verbatim: GroupPolicies.roomRenderTitle) }
+                    .pickerStyle(.segmented).labelsHidden().fixedSize()
+                    Text(verbatim: GroupPolicies.roomRenderStyleDetail(style)).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                }
                 HStack {
                     Text("The lit part of the floor is where people listen. Drag it to move it, and its corner to size it.")
                         .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)

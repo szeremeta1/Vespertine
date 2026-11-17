@@ -1,6 +1,6 @@
 //
-// Vespertine: speaker groups: room render. Off unless chosen; the fronts keep the song's own samples; only what is not dry and
-// easy to place reaches the surrounds, later than the fronts and decorrelated; bass moves to the bass speakers at the level it
+// Vespertine: speaker groups: room render. Off unless chosen; the fronts keep the song's own samples; the surrounds add its
+// ambience, and the fill (RoomRenderFillTests) reaches them later than the fronts and decorrelated; bass moves to the bass speakers at the level it
 // had at the seat; a drawing that contradicts the speakers' names is overruled; the low room correction keeps to what holds
 // across the room; and the signal path says the song was rendered.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -191,10 +191,10 @@ struct RoomRenderTests {
         let front = Self.rms(Self.channel(out, 0, of: 4)[8_000...])
         let back = max(Self.rms(Self.channel(out, 2, of: 4)[8_000...]), Self.rms(Self.channel(out, 3, of: 4)[8_000...]))
         #expect(20 * log10(back / front) < -30)
-        // With the default fill it is there, 9 dB down (the all-passes keep the level).
+        // With the default fill it is there, 3 dB down (the all-passes keep the level).
         let (filled, _) = try Self.render(Self.interleave([x, x]), plan: Self.plan(Self.stereo, Self.quad(RoomRenderSettings(crossoverHz: 0))))
         let level = 20 * log10(Self.rms(Self.channel(filled, 2, of: 4)[8_000...]) / front)
-        #expect(abs(level + 9) < 1)
+        #expect(abs(level + 3) < 1)
     }
 
     @Test("The surrounds arrive after the fronts by the delay, and the two sides hardly correlate")
@@ -226,11 +226,11 @@ struct RoomRenderTests {
 
     // MARK: Surround songs
 
-    @Test("Surround songs: every channel stays on its speaker, at its time and level")
+    @Test("Surround songs: every channel stays on its speaker, at its time and level (the fill, left out here, is added to that)")
     func surroundUnchanged() throws {
         let frames = 8_000
         let chans = (0..<6).map { Self.noise(frames, seed: UInt64(10 + $0)) }
-        let (out, _) = try Self.render(Self.interleave(chans), plan: Self.plan(Self.surround51, Self.quad(RoomRenderSettings(crossoverHz: 0))))
+        let (out, _) = try Self.render(Self.interleave(chans), plan: Self.plan(Self.surround51, Self.quad(RoomRenderSettings(fillDB: -40, crossoverHz: 0))))
         let half = Float(0.5.squareRoot())
         #expect(Self.channel(out, 2, of: 4) == chans[4])
         #expect(Self.channel(out, 3, of: 4) == chans[5])
@@ -260,7 +260,7 @@ struct RoomRenderTests {
         #expect(!before.routes[5].contains { $0.output == 1 })
         let after = try #require(GroupContentPlan(source: Self.surround71, group: Self.misdrawn()))
         #expect(after.router.routes[5].contains { $0.output == 1 })
-        #expect(after.router.routes[7].map(\.output) == [1])
+        #expect(after.router.routes[7].filter { $0.kind != .fill }.map(\.output) == [1])
         #expect(after.render?.replaced == [.backRight])
     }
 
@@ -272,7 +272,7 @@ struct RoomRenderTests {
         func run(_ hz: Double, levels: [Double]) throws -> [[Float]] {
             var chans = [[Float]](repeating: [Float](repeating: 0, count: frames), count: 6)
             chans[4] = Self.sine(frames, hz)
-            let (out, _) = try Self.render(Self.interleave(chans), plan: Self.plan(Self.surround51, Self.quad(), levels: levels))
+            let (out, _) = try Self.render(Self.interleave(chans), plan: Self.plan(Self.surround51, Self.quad(RoomRenderSettings(fillDB: -40)), levels: levels))
             return (0..<4).map { Self.channel(out, $0, of: 4) }
         }
         for levels in [[Double](), [-11, -10.7, -2.3, 0]] {
@@ -345,7 +345,7 @@ struct RoomRenderTests {
         let path = GroupSignalPath.make(group: Self.quad(), applied: applied, source: source, plan: plan, stage: .none, content: content)
         #expect(path.folds && path.render != nil && !path.isBitPerfect)
         #expect(path.badges.contains("ROOM RENDER"))
-        #expect(path.rows.last == "Room render: ambience and a decorrelated fill on the surrounds, 15 ms after the fronts; bass below 90 Hz on the front pair")
+        #expect(path.rows.last == "Room render: the whole song on every speaker (the fill 3 dB down, 15 ms late); ambience on the surrounds; bass below 90 Hz on the front pair")
 
         let routed = GroupRouting.routed(plan, content: content, group: Self.quad(), source: source)
         #expect(routed.reason.contains("rendered for the room"))
