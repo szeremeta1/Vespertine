@@ -330,11 +330,12 @@ public final class PhoneRemote {
             case .system(let channels):
                 signal.surround = nil
                 signal.systemChannels = channels
-                signal.systemRendering = systemRendering
             case .discrete(let outputs):
                 signal.surround = nil
                 signal.discreteOutputs = outputs
             }
+            // What iOS says it renders the app's audio as, for every song: the fold's "Stereo" is as much a fact as Spatial Audio.
+            signal.systemRendering = systemRendering
             signal.volume = outputVolume
             signal.dacPassedAtRate = dopDACs.passed(at: stream.format.sampleRate, for: route?.uid)
             // ReplayGain multiplies every sample: the song is no longer the file's own samples while it does.
