@@ -1,5 +1,5 @@
 //
-// Vespertine: speaker groups: presets that lay out the speakers (Quad, ITU 5.1, Two pairs facing), and the readout of where each
+// Vespertine: speaker groups: presets that lay out the speakers (stereo up to 9.1.6), and the readout of where each
 // speaker stands and what that asks of it (distance, angle, delay, level). Pure; no view.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -90,9 +90,72 @@ struct GroupPresetsTests {
 
     @Test("Which presets fit a group: by its channels")
     func available() {
-        #expect(GroupPresets.available(for: quadGroup()) == [.quad, .twoPairsFacing])
-        #expect(GroupPresets.available(for: sixChannel()) == [.quad, .itu51, .twoPairsFacing])
+        #expect(GroupPresets.available(for: quadGroup()) == [.stereo, .stereoSub, .frontThreeSub, .quad, .twoPairsFacing])
+        #expect(GroupPresets.available(for: sixChannel()) == [.stereo, .stereoSub, .frontThreeSub, .quad, .twoPairsFacing, .itu51])
+        #expect(GroupPresets.available(for: channels(16)) == GroupPresets.Preset.allCases)
         #expect(GroupPresets.Preset.quad.title == "Quad" && GroupPresets.Preset.itu51.title == "ITU 5.1" && GroupPresets.Preset.twoPairsFacing.title == "Two pairs facing")
+        #expect(GroupPresets.Preset.surround714.title == "7.1.4" && GroupPresets.Preset.stereoSub.title == "2.1")
+    }
+
+    /// A group of two-channel DACs with that many channels, in a 6 by 6 m room with a 2.6 m ceiling and ears at 1.1 m.
+    private func channels(_ count: Int) -> SpeakerGroup {
+        SpeakerGroup(name: "Cinema",
+                     members: (0..<(count / 2)).map { SpeakerGroup.Member(deviceUID: "dac\($0)", name: "DAC \($0)", channelCount: 2) },
+                     clockLeaderUID: "dac0", listener: Listener(position: Point2D(), facingDegrees: 0, earHeight: 1.1),
+                     room: RoomOutline(width: 6, depth: 6, height: 2.6))
+    }
+
+    @Test("Every preset: as many speakers as its name counts, no place twice, each on a channel of its own, and a group that is valid",
+          arguments: GroupPresets.Preset.allCases)
+    func everyPreset(_ preset: GroupPresets.Preset) throws {
+        let g = try #require(GroupPresets.apply(preset, to: channels(16)))
+        let counted: [GroupPresets.Preset: Int] = [.stereo: 2, .stereoSub: 3, .frontThreeSub: 4, .quad: 4, .twoPairsFacing: 4, .itu51: 6, .surround71: 8,
+                                                   .surround512: 8, .surround514: 10, .surround712: 10, .surround714: 12, .surround916: 16]
+        #expect(g.speakers.count == counted[preset])
+        #expect(Set(g.speakers.map(\.role)).count == g.speakers.count, "no place twice")
+        #expect(Set(g.speakers.map { "\($0.deviceUID)/\($0.channel)" }).count == g.speakers.count, "a channel each")
+        #expect(g.isValid, "\(g.issues)")
+        #expect(GroupPresets.apply(preset, to: channels(g.speakers.count + (g.speakers.count % 2))) != nil, "it fits on just enough channels")
+        if g.speakers.count >= 4 { #expect(GroupPresets.apply(preset, to: channels(2)) == nil) }
+        // Left and right are mirrored about where the seat faces.
+        for s in g.speakers where s.position.x < -1e-9 {
+            #expect(g.speakers.contains { abs($0.position.x + s.position.x) < 1e-9 && abs($0.position.y - s.position.y) < 1e-9 && $0.height == s.height },
+                    "\(s.role) has no mirror")
+        }
+    }
+
+    @Test("Ceiling speakers go on the ceiling: 1.5 m above ears at 1.1 m under a 2.6 m ceiling, the front and back pairs 45° up, the middle pair steeper")
+    func ceilingSpeakers() throws {
+        let g = try #require(GroupPresets.apply(.surround916, to: channels(16)))
+        let tops = g.speakers.filter { $0.role.rawValue.hasPrefix("T") }
+        #expect(tops.count == 6 && tops.allSatisfy { abs(($0.height ?? 0) - 1.5) < 1e-9 })
+        #expect(g.speakers.filter { !$0.role.rawValue.hasPrefix("T") }.allSatisfy { $0.height == nil }, "the rest at the ears")
+        #expect(tops.allSatisfy { abs(g.heightAboveFloor(of: $0) - 2.6) < 1e-9 })
+        let front = try #require(place(g, .topFrontLeft)), middle = try #require(place(g, .topMiddleRight)), back = try #require(place(g, .topBackRight))
+        #expect(abs(front.distance - 1.5) < 1e-9 && abs(front.azimuth - -45) < 1e-9)
+        #expect(abs(middle.distance - 0.75) < 1e-9 && abs(middle.azimuth - 90) < 1e-9)
+        #expect(abs(back.distance - 1.5) < 1e-9 && abs(back.azimuth - 135) < 1e-9)
+        #expect(GroupPresets.Preset.surround512.hasCeilingSpeakers && !GroupPresets.Preset.surround71.hasCeilingSpeakers)
+        // With no ceiling height or ear height set, the usual ones: 2.4 m and 1.2 m.
+        var plain = channels(16)
+        plain.room = RoomOutline(width: 6, depth: 6)
+        plain.listener = Listener(position: Point2D(), facingDegrees: 0)
+        let usual = try #require(GroupPresets.apply(.surround514, to: plain))
+        #expect(usual.speakers.filter { $0.height != nil }.allSatisfy { abs(($0.height ?? 0) - 1.2) < 1e-9 })
+    }
+
+    @Test("7.1 puts the side pair beside the seat and the back pair at 150°; 9.1.6 adds the wide pair at 60°; each fills its Mac layout")
+    func larger() throws {
+        let seven = try #require(GroupPresets.apply(.surround71, to: channels(8)))
+        #expect(GroupChannelMap.rows(seven).map(\.role) == [.frontLeft, .frontRight, .center, .lfe, .sideLeft, .sideRight, .backLeft, .backRight])
+        let side = try #require(place(seven, .sideLeft)), back = try #require(place(seven, .backRight))
+        #expect(abs(side.azimuth - -90) < 1e-9 && abs(back.azimuth - 150) < 1e-9)
+        let nine = try #require(GroupPresets.apply(.surround916, to: channels(16)))
+        let wide = try #require(place(nine, .wideRight))
+        #expect(abs(wide.azimuth - 60) < 1e-9)
+        #expect(SystemOutputLayout.automatic(for: seven) == .surround71)
+        #expect(SystemOutputLayout.automatic(for: try #require(GroupPresets.apply(.surround714, to: channels(12)))) == .surround714)
+        #expect(SystemOutputLayout.automatic(for: nine) == .surround916)
     }
 
     // MARK: Readout
