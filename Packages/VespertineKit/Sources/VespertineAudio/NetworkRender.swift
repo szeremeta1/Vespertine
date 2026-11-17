@@ -17,6 +17,17 @@ public final class NetworkRender: @unchecked Sendable {
         case sourceRate24
         /// AirPlay: 44.1 kHz, 16 bits, at most two channels (resampled, downmixed and DSD→PCM by the engine's own converter).
         case airPlay
+        /// AirPlay to a receiver that takes another format: the same, at `sampleRate` and `bitDepth` (16 or 24).
+        case airPlayStream(sampleRate: Int, bitDepth: Int)
+
+        /// The one rate and word length of an AirPlay target; nil for a renderer's stream.
+        var airPlay: (rate: Double, bits: Int)? {
+            switch self {
+            case .sourceRate24: return nil
+            case .airPlay: return (rate: 44_100, bits: 16)
+            case .airPlayStream(let sampleRate, let bitDepth): return (rate: Double(sampleRate), bits: bitDepth == 24 ? 24 : 16)
+            }
+        }
     }
 
     /// What comes out: PCM at the plan's rate (the source's own for PCM, 44.1 kHz for AirPlay), at the target's word length,
@@ -47,13 +58,15 @@ public final class NetworkRender: @unchecked Sendable {
                 startSeconds: TimeInterval = 0, target: Target = .sourceRate24) throws {
         let probed = try SourceOpener.probe(url, area: item.sacdArea, dvd: item.dvd, audioStream: item.audioStream)
         let source = probed.format
-        let bits = target == .airPlay ? 16 : 24
-        let channels = target == .airPlay ? min(2, max(1, source.channels)) : max(1, source.channels)
-        let rates = target == .airPlay ? [44_100.0] : Self.rates
+        let airPlay = target.airPlay
+        let isAirPlay = airPlay != nil
+        let bits = airPlay?.bits ?? 24
+        let channels = isAirPlay ? min(2, max(1, source.channels)) : max(1, source.channels)
+        let rates = airPlay.map { [$0.rate] } ?? Self.rates
         let device = DeviceCapabilities(sampleRates: rates,
                                         physicalFormats: [PhysicalFormat(minRate: rates.min()!, maxRate: rates.max()!, bitDepth: bits, isInteger: true, isMixable: true,
-                                                                         channels: target == .airPlay ? 2 : channels)],
-                                        outputChannels: target == .airPlay ? 2 : channels, supportsDoP: false)
+                                                                         channels: isAirPlay ? 2 : channels)],
+                                        outputChannels: isAirPlay ? 2 : channels, supportsDoP: false)
         var plan = FormatPlanner.plan(source: source, device: device, policy: .matchSource)
         plan.integerSamples = false
         guard plan.mode == .pcm, let ring = nrt_ring_create(OutputSession.ringFrames(rate: plan.deviceSampleRate, channels: plan.channels, seconds: 4), UInt32(plan.channels)) else {
@@ -69,7 +82,7 @@ public final class NetworkRender: @unchecked Sendable {
         self.channels = plan.channels
         self.plan = plan
         let rate = plan.deviceSampleRate
-        format = SourceFormat(encoding: .pcm, codec: target == .airPlay ? "ALAC" : "FLAC", sampleRate: rate, bitDepth: bits, channels: plan.channels)
+        format = SourceFormat(encoding: .pcm, codec: isAirPlay ? "ALAC" : "FLAC", sampleRate: rate, bitDepth: bits, channels: plan.channels)
         do {
             let decoder = try SourceOpener.decoder(for: probed, plan: plan, item: item)
             if startSeconds > 0 {
@@ -87,7 +100,7 @@ public final class NetworkRender: @unchecked Sendable {
             nrt_ring_destroy(ring)
             throw error
         }
-        // PlaybackEngine.applyGain, with the stream's word length (24 bits, 16 for AirPlay).
+        // PlaybackEngine.applyGain, with the stream's word length (24 bits; for AirPlay, the stream's own).
         let db = digitalVolumeDB ?? 0
         nrt_context_set_gain(context, db == 0 ? 1.0 : pow(10, db / 20), UInt32(bits))
         let eq = equalizer.flatMap { $0.isFlat ? nil : $0 }
