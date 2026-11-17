@@ -81,7 +81,7 @@ struct RemoteView: View {
             .navigationSplitViewColumnWidth(min: sidebar.min, ideal: sidebar.ideal, max: sidebar.max)
             .toolbar {
                 ToolbarItem(placement: .bottomBar) {
-                    Button("Macs", systemImage: "desktopcomputer") { model.leave() }
+                    Button("Libraries", systemImage: "music.note.house") { model.leave() }
                 }
             }
         } detail: {
@@ -331,7 +331,7 @@ struct ConnectionBanner: View {
                     Button("Try Again") { model.rescanShare() }.disabled(status?.scan.isRunning ?? false)
                     if let folder = model.openFolder, !folder.isOwn { ChooseFolderAgainButton(folder: folder) }
                     Spacer(minLength: 0)
-                    Button("Macs") { model.leave() }
+                    Button("Libraries") { model.leave() }
                 }
                 .font(.footnote.weight(.medium))
             }
@@ -344,7 +344,7 @@ struct ConnectionBanner: View {
             } buttons: {
                 Button("Try Again") { model.rescanShare() }.font(.footnote.weight(.medium))
                     .disabled(status?.scan.isRunning ?? false)
-                Button("Macs") { model.leave() }.font(.footnote.weight(.medium))
+                Button("Libraries") { model.leave() }.font(.footnote.weight(.medium))
             }
             .accessibilityIdentifier("share-trouble")
         } else if let status, status.scanned == nil, case .scanning(let songs) = status.scan {
@@ -457,7 +457,7 @@ struct ConnectionBanner: View {
                     Button("Connection") { editing = true }
                 }
                 Spacer()
-                Button("Macs") { model.leave() }
+                Button("Libraries") { model.leave() }
             }
             .font(.footnote.weight(.medium))
         }
@@ -485,7 +485,7 @@ struct ConnectionBanner: View {
             if busy { ProgressView() }
             text.font(.footnote)
         } buttons: {
-            Button("Macs") { model.leave() }.font(.footnote.weight(.medium))
+            Button("Libraries") { model.leave() }.font(.footnote.weight(.medium))
         }
     }
 }

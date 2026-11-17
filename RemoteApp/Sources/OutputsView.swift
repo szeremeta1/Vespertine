@@ -156,12 +156,12 @@ struct OutputsView: View {
             .obsidianList()
             .navigationTitle("Output").screenTitleStyle()
             .toolbar {
-                // On an iPad's wide window the gear and "Macs" are in the window's own bars.
+                // On an iPad's wide window the gear and "Libraries" are in the window's own bars.
                 if sizeClass != .regular {
                     ToolbarItem(placement: .topBarTrailing) {
                         Menu {
                             Button { showingSettings = true } label: { Label("Settings", systemImage: "gearshape") }
-                            Button { model.leave() } label: { Label("Choose Another Mac", systemImage: "desktopcomputer") }
+                            Button { model.leave() } label: { Label("Choose Another Library", systemImage: "music.note.house") }
                         } label: {
                             Image(systemName: "gearshape")
                         }
