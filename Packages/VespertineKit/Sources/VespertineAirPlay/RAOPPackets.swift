@@ -37,7 +37,7 @@ public enum RAOPTiming {
     /// What the receiver plays behind real time, in frames (2 s, as iTunes): sync packets say 77 175 and receivers add the
     /// 11 025 they always add.
     public static let latencyFrames: UInt32 = 88_200
-    static let syncLatencyFrames: UInt32 = 77_175
+    public static let syncLatencyFrames: UInt32 = 77_175
 }
 
 public enum RAOPPacket {
