@@ -148,6 +148,10 @@ nonisolated enum RemoteLayout {
     /// line cut "Albums" and "Artists" down to the same stub.
     static func rowTitleLines(accessibilityText: Bool) -> Int? { accessibilityText ? nil : 1 }
 
+    /// Lines the demo bar's words may take: as many as they need at ordinary text sizes (two or three), and at the
+    /// accessibility sizes one until the bar is opened, so the bar leaves the screen to the list under it.
+    static func demoNoticeLines(accessibilityText: Bool, open: Bool) -> Int? { accessibilityText && !open ? 1 : nil }
+
     /// The largest text the mini player follows: past it, its buttons no longer fit beside a title of any length.
     static let miniPlayerLargestText = DynamicTypeSize.accessibility1
 
