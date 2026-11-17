@@ -597,6 +597,7 @@ struct TrackRows: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("song-row")
                 if let copies = track.copies, copies.count > 1 {
                     SongCopiesButton(session: session, track: track, list: tracks, index: index)
                 }

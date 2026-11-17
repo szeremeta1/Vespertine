@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import VespertinePhonePlayer
 import VespertineRemoteClient
 import VespertineRemoteProtocol
 
