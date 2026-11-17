@@ -69,12 +69,13 @@ import VespertineRemoteProtocol
 
     @Test func theOutputScreenNamesWhatIsDoneToASurroundSongOnHeadphones() {
         let pods = PhoneRoute(name: "AirPods Max", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true)
+        let wired = PhoneRoute(name: "Headphones", portType: "Headphones", sampleRate: 48_000, channels: 2, spatial: false)
+        // Vespertine's own rendering, for headphones iOS doesn't spatialize: never called iOS's Spatial Audio.
+        var own = signal(rate: 48_000, channels: 6, route: wired)
+        own.surround = .fixed
+        #expect(PlayTarget.badge(own) == "BINAURAL · FIXED")
+        #expect(PlayTarget.report(own, route: wired).first { $0.label == "Surround on Headphones" }?.value == "Rendered by Vespertine, fixed")
         var said = signal(rate: 48_000, channels: 6, route: pods)
-        said.surround = .fixed
-        #expect(PlayTarget.badge(said) == "SPATIAL AUDIO · FIXED")
-        #expect(PlayTarget.report(said, route: pods).first { $0.label == "Surround on Headphones" }?.value == "Fixed")
-        said.surround = .headTracked
-        #expect(PlayTarget.report(said, route: pods).first { $0.label == "Surround on Headphones" }?.value == "Head Tracked")
         said.surround = .off
         #expect(PlayTarget.badge(said) == "SURROUND FOLDED TO STEREO")
         #expect(PlayTarget.report(said, route: pods).first { $0.label == "Surround on Headphones" }?.value == "Off")
@@ -85,6 +86,42 @@ import VespertineRemoteProtocol
         var folded = signal(rate: 48_000, channels: 6, route: speaker)
         folded.surround = .off
         #expect(!PlayTarget.report(folded, route: speaker).contains { $0.label == "Surround on Headphones" })
+    }
+
+    // MARK: Surround handed to iOS (tf-1c99555e54, tf-4e0452d141, tf-a5b2a6dbdc)
+
+    @Test func spatialAudioIsClaimedOnlyWhenIOSSaysIt() {
+        let pods = PhoneRoute(name: "AirPods Max", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true)
+        var said = signal(rate: 48_000, channels: 6, route: pods)
+        said.systemChannels = 6
+        said.systemRendering = .spatialAudio
+        #expect(PlayTarget.badge(said) == "SPATIAL AUDIO")
+        let rows = PlayTarget.report(said, route: pods)
+        #expect(rows.first { $0.label == "Channels sent to iOS" }?.value == "6")
+        #expect(rows.first { $0.label == "iOS renders it as" }?.value == "Spatial Audio")
+        #expect(rows.first { $0.label == "Spatial Audio on this output" }?.value == "On")
+        #expect(rows.first { $0.label == "Surround on Headphones" }?.value == "Spatial Audio by iOS")
+        // Never "head tracked" or "fixed": that is Control Center's choice, which iOS doesn't tell apps.
+        #expect(!rows.contains { $0.value.localizedCaseInsensitiveContains("head tracked") || $0.value == "Fixed" })
+        said.systemRendering = .dolbyAtmos
+        #expect(PlayTarget.badge(said) == "SPATIAL AUDIO · DOLBY ATMOS")
+        said.systemRendering = .monoStereo
+        #expect(PlayTarget.badge(said) == "SURROUND · iOS PLAYS STEREO")
+        #expect(PlayTarget.report(said, route: pods).first { $0.label == "iOS renders it as" }?.value == "Stereo")
+        said.systemRendering = nil
+        #expect(PlayTarget.badge(said) == "SURROUND TO iOS · SPATIAL AUDIO ON")
+        var off = pods
+        off.spatial = false
+        var unspatial = signal(rate: 48_000, channels: 6, route: off)
+        unspatial.systemChannels = 6
+        unspatial.systemRendering = .spatialAudio
+        #expect(PlayTarget.badge(unspatial) == "SURROUND · 6 CHANNELS TO iOS")
+    }
+
+    @Test func thePickerOffersOffAndSpatialAudio() {
+        #expect(PlayTarget.surroundChoices == [.off, .fixed])
+        // A Head Tracked choice kept from build 7 is Spatial Audio now: head tracking is chosen in Control Center.
+        #expect(PlayTarget.pickerValue(.headTracked) == .fixed && PlayTarget.pickerValue(.fixed) == .fixed && PlayTarget.pickerValue(.off) == .off)
     }
 
     @Test func replayGainIsOffUntilChosenAndAChoiceIsKept() {
