@@ -134307,6 +134307,546 @@
         }
       }
     },
+    "Treat a song’s stereo and surround versions as one song": {
+      "comment": "Settings › Playback: a switch. A song the library holds in stereo and in surround (5.1, Dolby Atmos) counts as one song.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የአንድ ዘፈን የስቴሪዮና የሰራውንድ ስሪቶችን እንደ አንድ ዘፈን ቁጠር"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اعتبار إصدارَي الستيريو والصوت المحيطي للأغنية أغنية واحدة"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "একটি গানের স্টেরিও ও সারাউন্ড সংস্করণকে একটিই গান হিসেবে ধরুন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brát stereo a surround verze skladby jako jednu skladbu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Behandl en sangs stereo- og surroundversioner som én sang"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereo- und Surround-Versionen eines Titels als einen Titel behandeln"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Οι στερεοφωνικές και surround εκδοχές ενός τραγουδιού να θεωρούνται ένα τραγούδι"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tratar las versiones estéreo y envolvente de una canción como una sola canción"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نسخه‌های استریو و فراگیر یک آهنگ را یک آهنگ به حساب بیاور"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Käsittele kappaleen stereo- ja surround-versioita yhtenä kappaleena"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ituring na iisang kanta ang mga bersyong stereo at surround ng isang kanta"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traiter les versions stéréo et surround d’un morceau comme un seul morceau"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ગીતની સ્ટીરિયો અને સરાઉન્ડ આવૃત્તિઓને એક જ ગીત ગણો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ɗauki nau'ukan stereo da na kewaye na waƙa a matsayin waƙa ɗaya"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התייחס לגרסאות הסטריאו והסראונד של שיר כאל שיר אחד"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गीत के स्टीरियो और सराउंड संस्करणों को एक ही गीत मानें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Egy dal sztereó és surround változatai egy dalnak számítsanak"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anggap versi stereo dan surround sebuah lagu sebagai satu lagu"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Considera le versioni stereo e surround di un brano come un solo brano"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "曲のステレオ版とサラウンド版を1つの曲として扱う"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹಾಡಿನ ಸ್ಟೀರಿಯೋ ಮತ್ತು ಸರೌಂಡ್ ಆವೃತ್ತಿಗಳನ್ನು ಒಂದೇ ಹಾಡೆಂದು ಪರಿಗಣಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "노래의 스테레오 및 서라운드 버전을 하나의 노래로 취급"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഒരു പാട്ടിന്റെ സ്റ്റീരിയോ, സറൗണ്ട് പതിപ്പുകളെ ഒരേ പാട്ടായി കണക്കാക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "गाण्याच्या स्टिरिओ आणि सराउंड आवृत्त्या एकच गाणे माना"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anggap versi stereo dan bunyi keliling sesebuah lagu sebagai satu lagu"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Behandle stereo- og surroundversjonene av en sang som én sang"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stereo- en surroundversies van een nummer als één nummer behandelen"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਗੀਤ ਦੇ ਸਟੀਰੀਓ ਅਤੇ ਸਰਾਊਂਡ ਸੰਸਕਰਣਾਂ ਨੂੰ ਇੱਕੋ ਗੀਤ ਮੰਨੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traktuj wersje stereo i surround utworu jako jeden utwór"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tratar as versões estéreo e surround de uma música como uma só música"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tratar as versões estéreo e surround de uma música como uma só música"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tratează versiunile stereo și surround ale unei melodii ca pe o singură melodie"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Behandla en låts stereo- och surroundversioner som en låt"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chukulia matoleo ya stereo na ya kuzunguka ya wimbo kuwa wimbo mmoja"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒரு பாடலின் ஸ்டீரியோ மற்றும் சரவுண்ட் பதிப்புகளை ஒரே பாடலாகக் கருது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "పాట స్టీరియో, సరౌండ్ వెర్షన్‌లను ఒకే పాటగా పరిగణించు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ถือว่าเวอร์ชันสเตอริโอและเสียงรอบทิศทางของเพลงเป็นเพลงเดียวกัน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bir şarkının stereo ve surround sürümlerini tek şarkı say"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вважати стерео- та об’ємні версії пісні однією піснею"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گانے کے اسٹیریو اور سراؤنڈ ورژنز کو ایک ہی گانا سمجھیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coi phiên bản stereo và âm thanh vòm của một bài hát là một bài hát"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將歌曲嘅立體聲同環繞聲版本當作同一首歌曲"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将歌曲的立体声版本和环绕声版本视为同一首歌曲"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "將歌曲的立體聲與環繞聲版本視為同一首歌曲"
+          }
+        }
+      }
+    },
+    "A song you have in stereo and in surround or Dolby Atmos, on one album or on two editions of it, is listed once in Songs, Favorites and search, plays once in a shuffle, and plays the version the setting above picks for the output. A heart on one version is a heart on the song. To hear a particular version, open the song’s list of copies and play it there. Off, every file is listed and plays as itself.": {
+      "comment": "Settings › Playback: explains the switch “Treat a song’s stereo and surround versions as one song”. Songs and Favorites are the names of pages in the sidebar; “the setting above” is the picker “Stereo and surround versions”.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በስቴሪዮም በሰራውንድ ወይም በDolby Atmosም ያለህ ዘፈን፣ በአንድ አልበም ላይም ሆነ በሁለት የአልበሙ እትሞች ላይ፣ በዘፈኖች፣ በተወዳጆችና በፍለጋ ውስጥ አንድ ጊዜ ብቻ ይዘረዘራል፣ በውዝ ጊዜ አንድ ጊዜ ብቻ ይጫወታል፣ እና ከላይ ያለው ቅንብር ለውፅዓቱ የሚመርጠው ስሪት ይጫወታል። በአንድ ስሪት ላይ ያለ ልብ በዘፈኑ ላይ ያለ ልብ ነው። የተለየ ስሪት ለመስማት የዘፈኑን የቅጂዎች ዝርዝር ክፈትና እዚያ አጫውተው። ሲጠፋ እያንዳንዱ ፋይል ለብቻው ይዘረዘራል፣ እንደራሱም ይጫወታል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الأغنية التي لديك بالستيريو وبالصوت المحيطي أو Dolby Atmos، في ألبوم واحد أو في إصدارين منه، تُدرج مرة واحدة في الأغاني والمفضلة والبحث، وتُشغَّل مرة واحدة في التشغيل العشوائي، ويُشغَّل منها الإصدار الذي يختاره الإعداد أعلاه للمخرج. القلب على أحد الإصدارين قلب على الأغنية. لسماع إصدار بعينه، افتح قائمة نسخ الأغنية وشغّله من هناك. عند الإيقاف، يُدرج كل ملف ويُشغَّل كما هو."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "যে গান আপনার কাছে স্টেরিওতে এবং সারাউন্ড বা Dolby Atmos-এ আছে, একই অ্যালবামে বা অ্যালবামটির দুটি সংস্করণে, সেটি গান, পছন্দসই ও খোঁজার ফলাফলে একবারই তালিকাভুক্ত হয়, শাফলে একবারই বাজে, এবং উপরের সেটিং আউটপুটের জন্য যে সংস্করণ বেছে নেয় সেটিই বাজে। একটি সংস্করণে হার্ট দিলে তা গানটিরই হার্ট। নির্দিষ্ট কোনো সংস্করণ শুনতে গানটির কপির তালিকা খুলে সেখান থেকে বাজান। বন্ধ থাকলে প্রতিটি ফাইল আলাদাভাবে তালিকাভুক্ত হয় এবং নিজে যেমন তেমনই বাজে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skladba, kterou máte ve stereu i v surroundu nebo Dolby Atmos, na jednom albu nebo na dvou jeho edicích, je ve Skladbách, Oblíbených a ve vyhledávání uvedena jednou, při náhodném přehrávání zazní jednou a hraje ve verzi, kterou pro výstup vybere nastavení výše. Srdce u jedné verze je srdcem u skladby. Chcete-li slyšet určitou verzi, otevřete seznam kopií skladby a pusťte ji tam. Při vypnutí je každý soubor uveden zvlášť a hraje tak, jak je."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En sang, du har i stereo og i surround eller Dolby Atmos, på ét album eller på to udgaver af det, vises én gang i Sange, Favoritter og søgning, spilles én gang, når der blandes, og afspilles i den version, som indstillingen ovenfor vælger til outputtet. Et hjerte på én version er et hjerte på sangen. Vil du høre en bestemt version, skal du åbne sangens liste over kopier og afspille den der. Når det er slået fra, vises hver fil for sig og afspilles, som den er."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Titel, den du in Stereo und in Surround oder Dolby Atmos hast, auf einem Album oder auf zwei Ausgaben davon, erscheint in Titel, Favoriten und in der Suche nur einmal, läuft bei zufälliger Wiedergabe nur einmal und spielt in der Version, die die Einstellung darüber für die Ausgabe wählt. Ein Herz an einer Version ist ein Herz am Titel. Um eine bestimmte Version zu hören, öffne die Liste der Kopien des Titels und spiele sie dort ab. Ist dies aus, wird jede Datei einzeln aufgeführt und so abgespielt, wie sie ist."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ένα τραγούδι που έχετε σε στερεοφωνική και σε surround ή Dolby Atmos εκδοχή, στο ίδιο άλμπουμ ή σε δύο εκδόσεις του, εμφανίζεται μία φορά στα Τραγούδια, στα Αγαπημένα και στην αναζήτηση, παίζει μία φορά στην τυχαία σειρά και παίζει στην εκδοχή που επιλέγει για την έξοδο η παραπάνω ρύθμιση. Μια καρδιά σε μία εκδοχή είναι καρδιά στο τραγούδι. Για να ακούσετε μια συγκεκριμένη εκδοχή, ανοίξτε τη λίστα αντιγράφων του τραγουδιού και παίξτε την από εκεί. Όταν είναι ανενεργό, κάθε αρχείο εμφανίζεται χωριστά και παίζει ως έχει."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una canción que tienes en estéreo y en envolvente o Dolby Atmos, en un mismo álbum o en dos ediciones de él, aparece una sola vez en Canciones, Favoritos y la búsqueda, suena una sola vez en el modo aleatorio y se reproduce en la versión que el ajuste de arriba elige para la salida. Un corazón en una versión es un corazón en la canción. Para oír una versión concreta, abre la lista de copias de la canción y reprodúcela desde allí. Si está desactivado, cada archivo aparece por separado y suena tal cual."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آهنگی که هم به‌صورت استریو و هم به‌صورت فراگیر یا Dolby Atmos دارید، در یک آلبوم یا در دو ویرایش از آن، در آهنگ‌ها، علاقه‌مندی‌ها و جست‌وجو یک بار فهرست می‌شود، در پخش تصادفی یک بار پخش می‌شود و با نسخه‌ای پخش می‌شود که تنظیم بالا برای خروجی برمی‌گزیند. قلب روی یک نسخه، قلب روی خودِ آهنگ است. برای شنیدن نسخه‌ای خاص، فهرست نسخه‌های آهنگ را باز کنید و از همان‌جا پخشش کنید. در حالت خاموش، هر فایل جداگانه فهرست می‌شود و همان‌طور که هست پخش می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kappale, joka sinulla on sekä stereona että surroundina tai Dolby Atmos ‑versiona, samalla albumilla tai albumin kahdella eri painoksella, näkyy Kappaleissa, Suosikeissa ja haussa vain kerran, soi sekoitettaessa vain kerran ja toistetaan versiona, jonka yllä oleva asetus valitsee ulostulolle. Sydän yhdessä versiossa on sydän koko kappaleessa. Jos haluat kuulla tietyn version, avaa kappaleen kopioiden luettelo ja soita se sieltä. Kun asetus on pois päältä, jokainen tiedosto näkyy erikseen ja soi sellaisenaan."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang kantang mayroon ka sa stereo at sa surround o Dolby Atmos, sa iisang album man o sa dalawang edisyon nito, ay isang beses lang nakalista sa Mga Kanta, Mga Paborito, at sa paghahanap, isang beses lang tumutugtog kapag naka-shuffle, at tumutugtog sa bersyong pinipili ng setting sa itaas para sa output. Ang puso sa isang bersyon ay puso na sa kanta. Para marinig ang isang partikular na bersyon, buksan ang listahan ng mga kopya ng kanta at patugtugin ito roon. Kapag naka-off, hiwalay na nakalista ang bawat file at tumutugtog ito kung ano ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un morceau que vous avez en stéréo et en surround ou en Dolby Atmos, sur un même album ou sur deux éditions de celui-ci, n’apparaît qu’une fois dans Morceaux, Favoris et la recherche, n’est lu qu’une fois en lecture aléatoire, et est lu dans la version que le réglage ci-dessus choisit pour la sortie. Un cœur sur une version est un cœur sur le morceau. Pour écouter une version précise, ouvrez la liste des copies du morceau et lancez-la de là. Désactivé, chaque fichier est listé séparément et lu tel quel."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "જે ગીત તમારી પાસે સ્ટીરિયોમાં અને સરાઉન્ડ કે Dolby Atmosમાં છે, એક જ આલ્બમમાં કે તેની બે આવૃત્તિઓમાં, તે ગીતો, મનપસંદ અને શોધમાં એક જ વાર સૂચિબદ્ધ થાય છે, શફલમાં એક જ વાર વાગે છે, અને ઉપરનું સેટિંગ આઉટપુટ માટે જે આવૃત્તિ પસંદ કરે તે વાગે છે. એક આવૃત્તિ પરનું હાર્ટ એ ગીત પરનું હાર્ટ છે. કોઈ ચોક્કસ આવૃત્તિ સાંભળવા માટે ગીતની નકલોની સૂચિ ખોલો અને ત્યાંથી વગાડો. બંધ હોય ત્યારે દરેક ફાઇલ અલગથી સૂચિબદ્ધ થાય છે અને જેવી છે તેવી જ વાગે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waƙar da kake da ita a stereo da kuma a sautin kewaye ko Dolby Atmos, a kundi ɗaya ko a bugu biyu na kundin, ana jera ta sau ɗaya a Waƙoƙi, Waɗanda Aka Fi So da kuma bincike, tana kunnawa sau ɗaya idan an gauraya, kuma tana kunnawa da nau'in da saitin da ke sama ya zaɓa don fitarwa. Zuciya a kan nau'i ɗaya zuciya ce a kan waƙar. Don jin wani nau'i na musamman, buɗe jerin kwafe-kwafen waƙar ka kunna shi daga can. Idan an kashe, ana jera kowane fayil dabam kuma yana kunnawa yadda yake."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שיר שיש לך בסטריאו וגם בסראונד או ב‑Dolby Atmos, באלבום אחד או בשתי מהדורות שלו, מופיע פעם אחת בשירים, במועדפים ובחיפוש, מתנגן פעם אחת בערבוב, ומתנגן בגרסה שההגדרה שלמעלה בוחרת עבור הפלט. לב על גרסה אחת הוא לב על השיר. כדי לשמוע גרסה מסוימת, פתח את רשימת העותקים של השיר ונגן אותה משם. כשההגדרה כבויה, כל קובץ מופיע בנפרד ומתנגן כמות שהוא."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जो गीत आपके पास स्टीरियो में और सराउंड या Dolby Atmos में है, एक ही एल्बम में या उसके दो संस्करणों में, वह गीत, पसंदीदा और खोज में एक ही बार सूचीबद्ध होता है, शफ़ल में एक ही बार बजता है, और वही संस्करण बजता है जिसे ऊपर की सेटिंग आउटपुट के लिए चुनती है। एक संस्करण पर दिल, गीत पर दिल है। कोई ख़ास संस्करण सुनने के लिए गीत की कॉपियों की सूची खोलें और उसे वहीं से बजाएँ। बंद होने पर हर फ़ाइल अलग से सूचीबद्ध होती है और जैसी है वैसी ही बजती है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az a dal, amely sztereóban és surround vagy Dolby Atmos változatban is megvan, egy albumon vagy az album két kiadásán, a Dalok, a Kedvencek és a keresés listájában egyszer szerepel, keveréskor egyszer szól, és abban a változatban szól, amelyet a fenti beállítás a kimenethez választ. Az egyik változaton lévő szív a dal szíve. Ha egy bizonyos változatot szeretne hallani, nyissa meg a dal példányainak listáját, és onnan játssza le. Kikapcsolva minden fájl külön szerepel, és úgy szól, ahogy van."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagu yang Anda miliki dalam stereo dan dalam surround atau Dolby Atmos, di satu album atau di dua edisinya, dicantumkan sekali di Lagu, Favorit, dan pencarian, diputar sekali saat diacak, dan diputar dalam versi yang dipilih pengaturan di atas untuk output. Hati pada satu versi adalah hati pada lagunya. Untuk mendengar versi tertentu, buka daftar salinan lagu itu dan putar dari sana. Jika dimatikan, setiap file dicantumkan sendiri-sendiri dan diputar apa adanya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un brano che hai in stereo e in surround o Dolby Atmos, sullo stesso album o su due edizioni dell’album, compare una sola volta in Brani, Preferiti e nella ricerca, viene riprodotto una sola volta nella riproduzione casuale e suona nella versione che l’impostazione qui sopra sceglie per l’uscita. Un cuore su una versione è un cuore sul brano. Per ascoltare una versione precisa, apri l’elenco delle copie del brano e avviala da lì. Se disattivata, ogni file è elencato a sé e suona così com’è."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステレオ版とサラウンド版またはDolby Atmos版の両方を持っている曲は、同じアルバム内でも、アルバムの2つのエディションにまたがっていても、「曲」「お気に入り」と検索結果には1回だけ表示され、シャッフルでは1回だけ再生され、上の設定が出力に合わせて選ぶバージョンで再生されます。どちらかのバージョンに付けたハートは、その曲のハートになります。特定のバージョンを聴くには、曲のコピーのリストを開いてそこから再生してください。オフにすると、すべてのファイルが個別に表示され、そのまま再生されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮ್ಮ ಬಳಿ ಸ್ಟೀರಿಯೋದಲ್ಲಿ ಮತ್ತು ಸರೌಂಡ್ ಅಥವಾ Dolby Atmos ನಲ್ಲಿ ಇರುವ ಹಾಡು, ಒಂದೇ ಆಲ್ಬಮ್‌ನಲ್ಲಿರಲಿ ಅಥವಾ ಅದರ ಎರಡು ಆವೃತ್ತಿಗಳಲ್ಲಿರಲಿ, ಹಾಡುಗಳು, ಮೆಚ್ಚಿನವು ಮತ್ತು ಹುಡುಕಾಟದಲ್ಲಿ ಒಮ್ಮೆ ಮಾತ್ರ ಪಟ್ಟಿಯಾಗುತ್ತದೆ, ಷಫಲ್‌ನಲ್ಲಿ ಒಮ್ಮೆ ಮಾತ್ರ ಪ್ಲೇ ಆಗುತ್ತದೆ, ಮತ್ತು ಮೇಲಿನ ಸೆಟ್ಟಿಂಗ್ ಔಟ್‌ಪುಟ್‌ಗಾಗಿ ಆಯ್ಕೆ ಮಾಡುವ ಆವೃತ್ತಿಯಲ್ಲಿ ಪ್ಲೇ ಆಗುತ್ತದೆ. ಒಂದು ಆವೃತ್ತಿಯ ಮೇಲಿನ ಹೃದಯವು ಹಾಡಿನ ಮೇಲಿನ ಹೃದಯವೇ. ನಿರ್ದಿಷ್ಟ ಆವೃತ್ತಿಯನ್ನು ಕೇಳಲು, ಹಾಡಿನ ಪ್ರತಿಗಳ ಪಟ್ಟಿಯನ್ನು ತೆರೆದು ಅಲ್ಲಿಂದ ಪ್ಲೇ ಮಾಡಿ. ಆಫ್ ಆಗಿದ್ದಾಗ, ಪ್ರತಿ ಫೈಲ್ ಪ್ರತ್ಯೇಕವಾಗಿ ಪಟ್ಟಿಯಾಗುತ್ತದೆ ಮತ್ತು ಇರುವಂತೆಯೇ ಪ್ಲೇ ಆಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스테레오 버전과 서라운드 또는 Dolby Atmos 버전이 모두 있는 노래는, 한 앨범에 있든 그 앨범의 두 에디션에 있든, 노래, 즐겨찾기 및 검색에 한 번만 표시되고 셔플에서 한 번만 재생되며, 위 설정이 출력에 맞게 고르는 버전으로 재생됩니다. 한 버전에 붙인 하트는 그 노래의 하트입니다. 특정 버전을 들으려면 노래의 사본 목록을 열어 거기서 재생하십시오. 끄면 모든 파일이 따로 표시되고 그대로 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്റ്റീരിയോയിലും സറൗണ്ടിലോ Dolby Atmos-ലോ നിങ്ങളുടെ പക്കലുള്ള പാട്ട്, ഒരേ ആൽബത്തിലായാലും അതിന്റെ രണ്ട് പതിപ്പുകളിലായാലും, പാട്ടുകൾ, പ്രിയപ്പെട്ടവ, തിരയൽ എന്നിവയിൽ ഒരു തവണ മാത്രം ലിസ്റ്റ് ചെയ്യപ്പെടും, ഷഫിളിൽ ഒരു തവണ മാത്രം പ്ലേ ചെയ്യും, മുകളിലെ ക്രമീകരണം ഔട്ട്‌പുട്ടിനായി തിരഞ്ഞെടുക്കുന്ന പതിപ്പിൽ പ്ലേ ചെയ്യും. ഒരു പതിപ്പിലെ ഹൃദയം ആ പാട്ടിന്റെ തന്നെ ഹൃദയമാണ്. ഒരു പ്രത്യേക പതിപ്പ് കേൾക്കാൻ, പാട്ടിന്റെ പകർപ്പുകളുടെ ലിസ്റ്റ് തുറന്ന് അവിടെ നിന്ന് പ്ലേ ചെയ്യുക. ഓഫാക്കിയാൽ ഓരോ ഫയലും വെവ്വേറെ ലിസ്റ്റ് ചെയ്യപ്പെടുകയും അതേപടി പ്ലേ ചെയ്യുകയും ചെയ്യും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जे गाणे तुमच्याकडे स्टिरिओमध्ये आणि सराउंड किंवा Dolby Atmos मध्ये आहे, एकाच अल्बममध्ये किंवा त्याच्या दोन आवृत्त्यांमध्ये, ते गाणी, आवडते आणि शोध यांत एकदाच सूचीबद्ध होते, शफलमध्ये एकदाच वाजते, आणि वरील सेटिंग आउटपुटसाठी जी आवृत्ती निवडते ती वाजते. एका आवृत्तीवरील हृदय म्हणजे गाण्यावरील हृदय. एखादी विशिष्ट आवृत्ती ऐकण्यासाठी गाण्याच्या प्रतींची सूची उघडा आणि तिथून वाजवा. बंद असताना प्रत्येक फाइल स्वतंत्रपणे सूचीबद्ध होते आणि जशी आहे तशीच वाजते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagu yang anda miliki dalam stereo dan dalam bunyi keliling atau Dolby Atmos, pada satu album atau pada dua edisinya, disenaraikan sekali dalam Lagu, Kegemaran dan carian, dimainkan sekali apabila dikocok, dan dimainkan dalam versi yang dipilih oleh tetapan di atas untuk output. Hati pada satu versi ialah hati pada lagu itu. Untuk mendengar versi tertentu, buka senarai salinan lagu itu dan mainkannya dari situ. Apabila dimatikan, setiap fail disenaraikan berasingan dan dimainkan seadanya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En sang du har i stereo og i surround eller Dolby Atmos, på ett album eller på to utgaver av det, vises én gang i Sanger, Favoritter og søk, spilles én gang når du blander, og spilles i versjonen som innstillingen ovenfor velger for utgangen. Et hjerte på én versjon er et hjerte på sangen. Vil du høre en bestemt versjon, åpner du sangens liste over kopier og spiller den derfra. Når dette er av, vises hver fil for seg og spilles som den er."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een nummer dat je in stereo en in surround of Dolby Atmos hebt, op één album of op twee edities ervan, staat één keer in Nummers, Favorieten en de zoekresultaten, speelt één keer bij shuffle en speelt in de versie die de instelling hierboven voor de uitvoer kiest. Een hart bij één versie is een hart bij het nummer. Wil je een bepaalde versie horen, open dan de lijst met kopieën van het nummer en speel die daar af. Staat dit uit, dan wordt elk bestand apart vermeld en speelt het zoals het is."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜਿਹੜਾ ਗੀਤ ਤੁਹਾਡੇ ਕੋਲ ਸਟੀਰੀਓ ਵਿੱਚ ਅਤੇ ਸਰਾਊਂਡ ਜਾਂ Dolby Atmos ਵਿੱਚ ਹੈ, ਇੱਕੋ ਐਲਬਮ ਵਿੱਚ ਜਾਂ ਉਸ ਦੇ ਦੋ ਸੰਸਕਰਣਾਂ ਵਿੱਚ, ਉਹ ਗੀਤ, ਮਨਪਸੰਦ ਅਤੇ ਖੋਜ ਵਿੱਚ ਇੱਕੋ ਵਾਰ ਸੂਚੀਬੱਧ ਹੁੰਦਾ ਹੈ, ਸ਼ਫ਼ਲ ਵਿੱਚ ਇੱਕੋ ਵਾਰ ਵੱਜਦਾ ਹੈ, ਅਤੇ ਉਹੀ ਸੰਸਕਰਣ ਵੱਜਦਾ ਹੈ ਜੋ ਉੱਪਰਲੀ ਸੈਟਿੰਗ ਆਉਟਪੁੱਟ ਲਈ ਚੁਣਦੀ ਹੈ। ਇੱਕ ਸੰਸਕਰਣ ਉੱਤੇ ਦਿਲ, ਗੀਤ ਉੱਤੇ ਦਿਲ ਹੈ। ਕੋਈ ਖ਼ਾਸ ਸੰਸਕਰਣ ਸੁਣਨ ਲਈ ਗੀਤ ਦੀਆਂ ਕਾਪੀਆਂ ਦੀ ਸੂਚੀ ਖੋਲ੍ਹੋ ਅਤੇ ਉੱਥੋਂ ਵਜਾਓ। ਬੰਦ ਹੋਣ ’ਤੇ ਹਰ ਫ਼ਾਈਲ ਵੱਖਰੀ ਸੂਚੀਬੱਧ ਹੁੰਦੀ ਹੈ ਅਤੇ ਜਿਵੇਂ ਹੈ ਉਵੇਂ ਹੀ ਵੱਜਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utwór, który masz w stereo oraz w surround lub Dolby Atmos, na jednym albumie lub na dwóch jego wydaniach, jest wymieniony raz w Utworach, Ulubionych i wynikach wyszukiwania, gra raz przy odtwarzaniu losowym i gra w wersji, którą ustawienie powyżej wybiera dla wyjścia. Serce przy jednej wersji jest sercem przy utworze. Aby usłyszeć konkretną wersję, otwórz listę kopii utworu i odtwórz ją stamtąd. Po wyłączeniu każdy plik jest wymieniony osobno i gra taki, jaki jest."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma música que você tem em estéreo e em surround ou Dolby Atmos, em um mesmo álbum ou em duas edições dele, aparece uma só vez em Músicas, Favoritos e na busca, toca uma só vez no modo aleatório e toca na versão que o ajuste acima escolhe para a saída. Um coração em uma versão é um coração na música. Para ouvir uma versão específica, abra a lista de cópias da música e toque-a de lá. Desativado, cada arquivo aparece separadamente e toca como é."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma música que tem em estéreo e em surround ou Dolby Atmos, num mesmo álbum ou em duas edições dele, aparece uma só vez em Músicas, Favoritos e na pesquisa, toca uma só vez no modo aleatório e toca na versão que a definição acima escolhe para a saída. Um coração numa versão é um coração na música. Para ouvir uma versão específica, abra a lista de cópias da música e reproduza-a a partir daí. Desativado, cada ficheiro aparece separadamente e toca tal como é."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O melodie pe care o ai în stereo și în surround sau Dolby Atmos, pe același album sau pe două ediții ale lui, apare o singură dată în Melodii, Favorite și în căutare, se redă o singură dată la amestecare și se redă în versiunea pe care configurarea de mai sus o alege pentru ieșire. O inimă pe o versiune este o inimă pe melodie. Pentru a asculta o anumită versiune, deschide lista de copii a melodiei și redă-o de acolo. Dezactivat, fiecare fișier apare separat și se redă așa cum este."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En låt som du har i stereo och i surround eller Dolby Atmos, på ett album eller på två utgåvor av det, visas en gång i Låtar, Favoriter och sökningen, spelas en gång när du blandar och spelas i den version som inställningen ovan väljer för utgången. Ett hjärta på en version är ett hjärta på låten. Vill du höra en viss version öppnar du låtens lista över kopior och spelar den därifrån. När detta är av visas varje fil för sig och spelas som den är."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wimbo ulio nao katika stereo na katika sauti ya kuzunguka au Dolby Atmos, kwenye albamu moja au kwenye matoleo mawili ya albamu hiyo, huorodheshwa mara moja katika Nyimbo, Vipendwa na utafutaji, hucheza mara moja unapochanganya, na hucheza katika toleo ambalo mpangilio ulio hapo juu huchagua kwa kifaa cha kutoa sauti. Moyo kwenye toleo moja ni moyo kwenye wimbo. Ili kusikia toleo fulani, fungua orodha ya nakala za wimbo na ulicheze kutoka hapo. Ikizimwa, kila faili huorodheshwa peke yake na hucheza jinsi lilivyo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஸ்டீரியோவிலும் சரவுண்ட் அல்லது Dolby Atmos-இலும் உங்களிடம் உள்ள பாடல், ஒரே ஆல்பத்தில் இருந்தாலும் அதன் இரண்டு பதிப்புகளில் இருந்தாலும், பாடல்கள், பிடித்தவை மற்றும் தேடலில் ஒரு முறை மட்டுமே பட்டியலிடப்படும், கலக்கும்போது ஒரு முறை மட்டுமே இயங்கும், மேலும் மேலே உள்ள அமைப்பு வெளியீட்டிற்காகத் தேர்ந்தெடுக்கும் பதிப்பில் இயங்கும். ஒரு பதிப்பின் மீதான இதயம் அந்தப் பாடலின் மீதான இதயமே. குறிப்பிட்ட ஒரு பதிப்பைக் கேட்க, பாடலின் நகல்களின் பட்டியலைத் திறந்து அங்கிருந்து இயக்கவும். முடக்கினால், ஒவ்வொரு கோப்பும் தனித்தனியாகப் பட்டியலிடப்பட்டு உள்ளபடியே இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్టీరియోలోనూ, సరౌండ్ లేదా Dolby Atmosలోనూ మీ వద్ద ఉన్న పాట, ఒకే ఆల్బమ్‌లో ఉన్నా లేదా దాని రెండు ఎడిషన్‌లలో ఉన్నా, పాటలు, ఇష్టమైనవి, శోధనలో ఒక్కసారే జాబితా అవుతుంది, షఫుల్‌లో ఒక్కసారే ప్లే అవుతుంది, పైన ఉన్న సెట్టింగ్ అవుట్‌పుట్ కోసం ఎంచుకునే వెర్షన్‌లో ప్లే అవుతుంది. ఒక వెర్షన్‌పై ఉన్న హృదయం ఆ పాటపై ఉన్న హృదయమే. ఒక నిర్దిష్ట వెర్షన్ వినడానికి, పాట కాపీల జాబితాను తెరిచి అక్కడి నుండి ప్లే చేయండి. ఆఫ్ చేస్తే, ప్రతి ఫైల్ విడిగా జాబితా అవుతుంది, ఉన్నది ఉన్నట్టుగా ప్లే అవుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพลงที่คุณมีทั้งแบบสเตอริโอและแบบเสียงรอบทิศทางหรือ Dolby Atmos ไม่ว่าจะอยู่ในอัลบั้มเดียวกันหรือในอัลบั้มนั้นสองฉบับ จะแสดงเพียงครั้งเดียวในเพลง รายการโปรด และการค้นหา เล่นเพียงครั้งเดียวเมื่อสุ่ม และเล่นด้วยเวอร์ชันที่การตั้งค่าด้านบนเลือกให้ขาออก หัวใจที่เวอร์ชันหนึ่งคือหัวใจของเพลงนั้น หากต้องการฟังเวอร์ชันใดโดยเฉพาะ ให้เปิดรายการสำเนาของเพลงแล้วเล่นจากตรงนั้น เมื่อปิด ทุกไฟล์จะแสดงแยกกันและเล่นตามที่เป็น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aynı albümde ya da albümün iki baskısında, hem stereo hem de surround veya Dolby Atmos olarak sahip olduğunuz bir şarkı Şarkılar, Favoriler ve aramada bir kez listelenir, karıştırmada bir kez çalar ve yukarıdaki ayarın çıkış için seçtiği sürümle çalar. Bir sürümdeki kalp, şarkının kalbidir. Belirli bir sürümü dinlemek için şarkının kopya listesini açın ve oradan çalın. Kapalıyken her dosya ayrı listelenir ve olduğu gibi çalar."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пісня, яку ви маєте у стерео та в об’ємному звуку чи Dolby Atmos, на одному альбомі або на двох його виданнях, показується один раз у розділах «Пісні», «Вибране» та в пошуку, грає один раз під час перемішування і відтворюється у версії, яку параметр вище обирає для виходу. Серце на одній версії є серцем на пісні. Щоб почути певну версію, відкрийте список копій пісні та відтворіть її звідти. Якщо вимкнено, кожен файл показується окремо й грає як є."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جو گانا آپ کے پاس اسٹیریو میں اور سراؤنڈ یا Dolby Atmos میں ہے، ایک ہی البم میں یا اس کے دو ایڈیشنز میں، وہ گانے، پسندیدہ اور تلاش میں ایک ہی بار درج ہوتا ہے، شفل میں ایک ہی بار چلتا ہے، اور وہی ورژن چلتا ہے جو اوپر کی ترتیب آؤٹ پٹ کے لیے چنتی ہے۔ ایک ورژن پر دل، گانے پر دل ہے۔ کوئی خاص ورژن سننے کے لیے گانے کی کاپیوں کی فہرست کھولیں اور وہیں سے چلائیں۔ بند ہونے پر ہر فائل الگ درج ہوتی ہے اور جیسی ہے ویسی ہی چلتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bài hát mà bạn có ở dạng stereo và ở dạng âm thanh vòm hoặc Dolby Atmos, trong cùng một album hoặc trong hai ấn bản của album đó, chỉ được liệt kê một lần trong Bài hát, Mục ưa thích và kết quả tìm kiếm, chỉ phát một lần khi phát ngẫu nhiên, và phát ở phiên bản mà cài đặt phía trên chọn cho đầu ra. Trái tim trên một phiên bản là trái tim trên bài hát. Để nghe một phiên bản cụ thể, hãy mở danh sách các bản của bài hát và phát từ đó. Khi tắt, mỗi tệp được liệt kê riêng và phát đúng như chính nó."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一首歌曲如果同時有立體聲版本同環繞聲或者 Dolby Atmos 版本，無論係喺同一張專輯入面，定係喺嗰張專輯嘅兩個版本入面，都只會喺「歌曲」、「喜好項目」同搜尋入面列出一次，隨機播放嗰陣只會播放一次，並且以上面設定為輸出揀選嘅版本播放。畀其中一個版本加心心，就係畀呢首歌曲加心心。想聽某個特定版本，請打開歌曲嘅副本列表，喺嗰度播放。關閉之後，每個檔案都會分開列出，並且照原樣播放。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一首歌曲如果同时有立体声版本和环绕声或 Dolby Atmos 版本，无论是在同一张专辑里，还是在该专辑的两个版本里，都只会在“歌曲”、“个人收藏”和搜索中列出一次，随机播放时只播放一次，并以上方设置为输出选择的版本播放。给其中一个版本加红心，就是给这首歌曲加红心。要听某个特定版本，请打开歌曲的副本列表并从那里播放。关闭后，每个文件都单独列出，并按其本身播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一首歌曲如果同時有立體聲版本和環繞聲或 Dolby Atmos 版本，無論是在同一張專輯裡，還是在該專輯的兩個版本裡，都只會在「歌曲」、「喜好項目」和搜尋中列出一次，隨機播放時只播放一次，並以上方設定為輸出選擇的版本播放。為其中一個版本加上愛心，就是為這首歌曲加上愛心。若要聆聽某個特定版本，請打開歌曲的副本列表並從那裡播放。關閉後，每個檔案都會個別列出，並依其本身播放。"
+          }
+        }
+      }
+    },
     "bypassed": {
       "comment": "A signal path step (equalizer) is chosen but not applied to this stream",
       "localizations": {
@@ -368996,6 +369536,276 @@
           "stringUnit": {
             "state": "translated",
             "value": "「播放」會在此處播放那份副本，然後列表繼續。愛心只屬於那份副本。凡是此專輯副本合併播放的地方，都會播放加星號的副本。"
+          }
+        }
+      }
+    },
+    "Play plays that copy here, then the list goes on. A heart covers the song’s stereo and surround versions alike.": {
+      "comment": "In the list of a song's copies, when the song has stereo and surround copies and they share one heart (favorite). “Play” is the button's name.",
+      "extractionState": "manual",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አጫውት ያንን ቅጂ እዚህ ያጫውታል፣ ከዚያ ዝርዝሩ ይቀጥላል። ልብ የዘፈኑን የስቴሪዮና የሰራውንድ ስሪቶች በእኩል ይሸፍናል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يُشغِّل زر التشغيل تلك النسخة هنا ثم تستمر القائمة. القلب يشمل إصدارَي الستيريو والصوت المحيطي للأغنية معًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "বাজান সেই কপিটি এখানে বাজায়, তারপর তালিকা চলতে থাকে। একটি হার্ট গানটির স্টেরিও ও সারাউন্ড দুই সংস্করণের জন্যই প্রযোজ্য।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přehrát pustí tuto kopii tady a seznam pokračuje. Srdce platí pro stereo i surround verze skladby stejně."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afspil spiller den kopi her, og så fortsætter listen. Et hjerte gælder både sangens stereo- og surroundversioner."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abspielen spielt diese Kopie hier, dann geht die Liste weiter. Ein Herz gilt für die Stereo- und die Surround-Versionen des Titels gleichermaßen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η Αναπαραγωγή παίζει εκείνο το αντίγραφο εδώ και η λίστα συνεχίζει. Μια καρδιά καλύπτει εξίσου τις στερεοφωνικές και τις surround εκδοχές του τραγουδιού."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reproducir pone esa copia aquí y luego sigue la lista. Un corazón vale por igual para las versiones estéreo y envolvente de la canción."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پخش آن نسخه را همین‌جا پخش می‌کند و سپس فهرست ادامه می‌یابد. قلب، نسخه‌های استریو و فراگیر آهنگ را به یک اندازه در بر می‌گیرد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soita soittaa kopion tässä, ja sitten lista jatkuu. Sydän koskee yhtä lailla kappaleen stereo- ja surround-versioita."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tinutugtog ng Play ang kopyang iyon dito, at saka magpapatuloy ang listahan. Saklaw ng puso ang mga bersyong stereo at surround ng kanta nang magkapareho."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lire lance cette copie ici, puis la liste continue. Un cœur vaut à la fois pour les versions stéréo et surround du morceau."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વગાડો તે નકલ અહીં વગાડે છે, પછી સૂચિ આગળ વધે છે. હાર્ટ ગીતની સ્ટીરિયો અને સરાઉન્ડ બંને આવૃત્તિઓને સમાન રીતે લાગુ પડે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kunna yana kunna wannan kwafin a nan, sannan jerin ya ci gaba. Zuciya ta shafi nau'ukan stereo da na kewaye na waƙar daidai."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נגן מנגן את העותק הזה כאן, ואז הרשימה ממשיכה. לב חל באותה מידה על גרסאות הסטריאו והסראונד של השיר."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बजाएँ उस कॉपी को यहीं बजाता है, फिर सूची आगे चलती है। दिल गीत के स्टीरियो और सराउंड, दोनों संस्करणों पर समान रूप से लागू होता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Lejátszás ezt a példányt itt játssza, aztán a lista folytatódik. A szív a dal sztereó és surround változataira egyaránt vonatkozik."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Putar memutar salinan itu di sini, lalu daftar berlanjut. Hati berlaku sama untuk versi stereo dan surround lagu itu."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riproduci avvia quella copia qui, poi l’elenco prosegue. Un cuore vale allo stesso modo per le versioni stereo e surround del brano."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "再生を押すとそのコピーをここで再生し、続けてリストを再生します。ハートは曲のステレオ版とサラウンド版の両方に付きます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪ್ಲೇ ಆ ಪ್ರತಿಯನ್ನು ಇಲ್ಲೇ ಪ್ಲೇ ಮಾಡುತ್ತದೆ, ನಂತರ ಪಟ್ಟಿ ಮುಂದುವರಿಯುತ್ತದೆ. ಹೃದಯವು ಹಾಡಿನ ಸ್ಟೀರಿಯೋ ಮತ್ತು ಸರೌಂಡ್ ಆವೃತ್ತಿಗಳೆರಡಕ್ಕೂ ಸಮಾನವಾಗಿ ಅನ್ವಯಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "재생을 누르면 그 사본이 여기서 재생되고 목록이 이어집니다. 하트는 노래의 스테레오 버전과 서라운드 버전에 똑같이 붙습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പ്ലേ ആ പകർപ്പ് ഇവിടെ പ്ലേ ചെയ്യുന്നു, പിന്നെ ലിസ്റ്റ് തുടരുന്നു. ഹൃദയം പാട്ടിന്റെ സ്റ്റീരിയോ, സറൗണ്ട് പതിപ്പുകൾക്ക് ഒരുപോലെ ബാധകമാണ്."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वाजवा ती प्रत इथेच वाजवते, मग सूची पुढे चालते. हृदय गाण्याच्या स्टिरिओ आणि सराउंड दोन्ही आवृत्त्यांना सारखेच लागू होते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Main memainkan salinan itu di sini, kemudian senarai diteruskan. Hati meliputi versi stereo dan bunyi keliling lagu itu sama rata."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spill spiller den kopien her, og så fortsetter listen. Et hjerte gjelder både stereo- og surroundversjonene av sangen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speel speelt die kopie hier, daarna gaat de lijst verder. Een hart geldt voor de stereo- en de surroundversies van het nummer samen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਵਜਾਓ ਉਸ ਕਾਪੀ ਨੂੰ ਇੱਥੇ ਵਜਾਉਂਦਾ ਹੈ, ਫਿਰ ਸੂਚੀ ਅੱਗੇ ਚੱਲਦੀ ਹੈ। ਦਿਲ ਗੀਤ ਦੇ ਸਟੀਰੀਓ ਅਤੇ ਸਰਾਊਂਡ ਦੋਵਾਂ ਸੰਸਕਰਣਾਂ ਉੱਤੇ ਬਰਾਬਰ ਲਾਗੂ ਹੁੰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odtwórz gra tę kopię tutaj, a potem lista toczy się dalej. Serce obejmuje na równi wersje stereo i surround utworu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocar reproduz essa cópia aqui e depois a lista continua. Um coração vale igualmente para as versões estéreo e surround da música."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocar reproduz essa cópia aqui e depois a lista continua. Um coração vale igualmente para as versões estéreo e surround da música."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redă pornește acea copie aici, apoi lista continuă. O inimă acoperă deopotrivă versiunile stereo și surround ale melodiei."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spela spelar den kopian här, sedan fortsätter listan. Ett hjärta gäller både låtens stereo- och surroundversioner."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cheza huicheza nakala hiyo hapa, kisha orodha inaendelea. Moyo hujumuisha kwa usawa matoleo ya stereo na ya kuzunguka ya wimbo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இயக்கு அந்த நகலை இங்கேயே இயக்கும், பிறகு பட்டியல் தொடரும். இதயம் பாடலின் ஸ்டீரியோ மற்றும் சரவுண்ட் பதிப்புகள் இரண்டுக்கும் சமமாகப் பொருந்தும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ప్లే ఆ కాపీని ఇక్కడే ప్లే చేస్తుంది, తర్వాత జాబితా కొనసాగుతుంది. హృదయం పాట స్టీరియో, సరౌండ్ వెర్షన్‌లు రెండింటికీ సమానంగా వర్తిస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่นจะเล่นสำเนานั้นตรงนี้ แล้วรายการก็เล่นต่อ หัวใจครอบคลุมทั้งเวอร์ชันสเตอริโอและเสียงรอบทิศทางของเพลงเท่ากัน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çal o kopyayı burada çalar, sonra liste devam eder. Kalp, şarkının stereo ve surround sürümlerini eşit olarak kapsar."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Відтворити грає цю копію тут, а далі список продовжується. Серце однаково стосується стерео- та об’ємних версій пісні."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "چلائیں اس کاپی کو یہیں چلاتا ہے، پھر فہرست آگے چلتی ہے۔ دل گانے کے اسٹیریو اور سراؤنڈ دونوں ورژنز پر یکساں لاگو ہوتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phát sẽ phát bản đó tại đây, rồi danh sách tiếp tục. Trái tim áp dụng như nhau cho phiên bản stereo và âm thanh vòm của bài hát."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「播放」會喺呢度播放嗰份副本，之後列表繼續。心心同時適用於歌曲嘅立體聲同環繞聲版本。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“播放”会在此处播放那份副本，然后列表继续。红心同时适用于歌曲的立体声版本和环绕声版本。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「播放」會在此處播放那份副本，然後列表繼續。愛心同時適用於歌曲的立體聲與環繞聲版本。"
           }
         }
       }
