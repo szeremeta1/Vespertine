@@ -51,13 +51,15 @@ public struct AirPlayFormat: Sendable, Equatable, Hashable {
     /// 44.1 kHz is always taken, listed or not.
     ///
     /// The rate first, so that a song at 48 kHz or a multiple of it isn't resampled when it needn't be, and nothing at
-    /// 44.1 kHz or a multiple of it ever is; then 24 bits where they hold something 16 would lose.
+    /// 44.1 kHz or a multiple of it ever is; then 24 bits where they hold something 16 would lose (which they do when
+    /// a 48 kHz song has to go at 44.1 kHz after all).
     public static func choose(sourceRate: Double, wantsDepth: Bool, accepted: [AirPlayFormat]) -> AirPlayFormat {
         let taken = all.filter { $0 == cd || accepted.contains($0) }
         let rate = isMultiple(sourceRate, of: 44_100) || !isMultiple(sourceRate, of: 48_000) ? 44_100 : 48_000
         let atRate = taken.filter { $0.sampleRate == rate }
         let pool = atRate.isEmpty ? taken.filter { $0.sampleRate == 44_100 } : atRate
-        if wantsDepth, let deep = pool.first(where: { $0.bitDepth == 24 }) { return deep }
+        // A song that has to move to the other rate is resampled, and what that makes is worth 24 bits too.
+        if wantsDepth || atRate.isEmpty, let deep = pool.first(where: { $0.bitDepth == 24 }) { return deep }
         return pool.first { $0.bitDepth == 16 } ?? pool.first ?? cd
     }
 

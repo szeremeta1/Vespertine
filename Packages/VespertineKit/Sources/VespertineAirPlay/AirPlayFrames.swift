@@ -34,6 +34,17 @@ public enum AirPlayConversion {
     }
 }
 
+extension AirPlayConversion {
+    /// What a session opened with this song would send if the receiver takes it: the song's rate, and whether 16 bits
+    /// at the rate it would go at lose something (a deeper source, a rate that must be resampled, or samples the
+    /// chain changes).
+    public static func wish(source: SourceFormat, settings: RendererSettings, replayGainDB: Double?) -> AirPlayWish {
+        let rate = AirPlayFormat.choose(sourceRate: source.sampleRate, wantsDepth: false, accepted: AirPlayFormat.all).sampleRate
+        let atSixteen = steps(source: source, settings: settings, replayGainDB: replayGainDB, format: AirPlayFormat(sampleRate: rate, bitDepth: 16))
+        return AirPlayWish(sourceRate: source.sampleRate, wantsDepth: atSixteen.contains(.dithered))
+    }
+}
+
 public final class AirPlayFrames: @unchecked Sendable {
     public let source: SourceFormat
     /// What the frames are in.
