@@ -563,13 +563,22 @@ struct RemoteBridge {
 
     /// A stored cover file for `key` near `size`, read off the main thread. Keys are the library's own (hex and dashes);
     /// anything else is refused, so a key can never name a file outside the artwork folder.
+    ///
+    /// A size above the largest thumbnail is answered with the original, and a hi-res original can be more than one message
+    /// may carry; the largest thumbnail goes then, so the phone gets a cover and not an error.
     static func artwork(key: String, size: Int, store: ArtworkStore?) async -> (mimeType: String, data: Data)? {
         guard let store, !key.isEmpty, key.count <= 128,
               key.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }) else { return nil }
-        let url = store.url(for: key, minimumSize: min(max(size, 1), 2048))
+        let wanted = min(max(size, 1), 2048)
+        let first = store.url(for: key, minimumSize: wanted)
+        let thumbnails = ArtworkStore.thumbnailSizes.sorted(by: >).map { store.thumbnailURL(key, size: $0) }
+        let candidates = [first] + thumbnails.filter { $0 != first }
         return await Task.detached(priority: .userInitiated) { () -> (mimeType: String, data: Data)? in
-            guard let data = try? Data(contentsOf: url), data.count <= RemoteProtocol.maximumMessageSize / 2 else { return nil }
-            return (mimeType: mimeType(of: data), data: data)
+            for url in candidates {
+                guard let data = try? Data(contentsOf: url), data.count <= RemoteProtocol.maximumMessageSize / 2 else { continue }
+                return (mimeType: mimeType(of: data), data: data)
+            }
+            return nil
         }.value
     }
 

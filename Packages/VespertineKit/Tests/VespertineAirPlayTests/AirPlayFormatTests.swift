@@ -127,4 +127,29 @@ struct AirPlayFormatTests {
         #expect(unnamed["audioFormat"] as? Int == 0x40000)
         #expect(unnamed["sr"] as? Int == 44_100)
     }
+
+    @Test("A wish is plain when no receiver could do better than 16-bit at 44.1 kHz for it")
+    func wishes() {
+        #expect(AirPlayWish(sourceRate: 44_100, wantsDepth: false).isPlain)
+        #expect(AirPlayWish(sourceRate: 22_050, wantsDepth: false).isPlain)
+        #expect(!AirPlayWish(sourceRate: 44_100, wantsDepth: true).isPlain)
+        #expect(!AirPlayWish(sourceRate: 48_000, wantsDepth: false).isPlain)
+        #expect(!AirPlayWish(sourceRate: 96_000, wantsDepth: true).isPlain)
+        #expect(AirPlayWish(sourceRate: 96_000, wantsDepth: true).format(accepted: []) == .cd)
+        #expect(AirPlayWish(sourceRate: 96_000, wantsDepth: true).format(accepted: AirPlayFormat.all) == Self.deep48)
+    }
+
+    @Test("The two seconds behind, the sync packet's share of them and the least held, in frames of each rate")
+    func latency() {
+        #expect(AirPlayFormat.cd.latencyFrames == RAOPTiming.latencyFrames)
+        #expect(AirPlayFormat.cd.syncLatencyFrames == RAOPTiming.syncLatencyFrames)
+        #expect(AirPlayFormat.cd.latencyMin == 11_025)
+        #expect(Self.deep48.latencyFrames == 96_000)
+        #expect(Self.deep48.syncLatencyFrames == 84_000)
+        #expect(Self.deep48.latencyMin == 12_000)
+        let sync = RAOPPacket.sync(rtpNow: 100_000, ntp: 0, first: false, latency: Self.deep48.syncLatencyFrames)
+        #expect(RAOPPacket.read32(sync, 4) == 16_000)
+        #expect(RAOPPacket.read32(sync, 16) == 100_000)
+        #expect(RAOPPacket.read32(RAOPPacket.sync(rtpNow: 100_000, ntp: 0, first: false), 4) == 22_825)
+    }
 }

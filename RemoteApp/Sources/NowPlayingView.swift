@@ -63,34 +63,35 @@ struct NowPlayingView: View {
         .accessibilityHidden(true)
     }
 
+    /// The record or the flat cover: the same picture either way, and a tap anywhere on it switches between them. There is no
+    /// button for it; VoiceOver gets the same switch as the element's action.
     private var cover: some View {
-        ZStack(alignment: .topLeading) {
-            Group {
-                if model.settings.vinyl {
-                    VinylView(session: session)
-                        .transition(reduceMotion ? .opacity : .scale(scale: 0.92).combined(with: .opacity))
-                } else {
-                    ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: 1000, cornerRadius: 10)
-                        .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
-                        .shadow(color: .black.opacity(0.55), radius: 24, y: 14)
-                        .transition(reduceMotion ? .opacity : .scale(scale: 0.92).combined(with: .opacity))
-                }
+        Group {
+            if model.settings.vinyl {
+                VinylView(session: session)
+                    .transition(reduceMotion ? .opacity : .scale(scale: 0.92).combined(with: .opacity))
+            } else {
+                ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: NowPlayingArt.flatSize, cornerRadius: 10)
+                    .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
+                    .shadow(color: .black.opacity(0.55), radius: 24, y: 14)
+                    .transition(reduceMotion ? .opacity : .scale(scale: 0.92).combined(with: .opacity))
             }
-            Button {
-                withAnimation(reduceMotion ? nil : .spring(duration: 0.45)) { model.settings.vinyl.toggle() }
-            } label: {
-                Image(systemName: model.settings.vinyl ? "photo" : "record.circle")
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(Palette.text)
-                    .frame(width: 44, height: 44)
-                    .background(.ultraThinMaterial, in: Circle())
-                    .overlay(Circle().strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
-            }
-            .buttonStyle(.plain)
-            .padding(model.settings.vinyl ? 0 : 10)
-            .accessibilityLabel(model.settings.vinyl ? Text("Show the Cover") : Text("Show a Record"))
-            .sensoryFeedback(.selection, trigger: model.settings.vinyl)
         }
+        .contentShape(Rectangle())
+        .onTapGesture(perform: switchCover)
+        .accessibilityElement(children: .ignore)
+        .accessibilityIdentifier("now-playing-art")
+        .accessibilityLabel(Text(NowPlayingArt.label(vinyl: model.settings.vinyl)))
+        .accessibilityValue(model.settings.vinyl ? VinylView.turningValue(turning: VinylView.isTurning(player, reduceMotion: reduceMotion)) : Text(verbatim: ""))
+        .accessibilityHint(Text(NowPlayingArt.switchHint(vinyl: model.settings.vinyl)))
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction(.default, switchCover)
+        .accessibilityAction(named: Text(NowPlayingArt.switchHint(vinyl: model.settings.vinyl)), switchCover)
+        .sensoryFeedback(.selection, trigger: model.settings.vinyl)
+    }
+
+    private func switchCover() {
+        withAnimation(reduceMotion ? nil : .spring(duration: 0.45)) { model.settings.vinyl = NowPlayingArt.toggled(vinyl: model.settings.vinyl) }
     }
 
     private var controls: some View {

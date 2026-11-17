@@ -16451,6 +16451,275 @@
         }
       }
     },
+    "Cover": {
+      "comment": "VoiceOver label of the flat album cover in Now Playing (the record's label is “Record”). A tap on it switches to the record.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሽፋን"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الغلاف"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "কভার"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obal"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omslag"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cover"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Εξώφυλλο"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Portada"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جلد"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kansikuva"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cover"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pochette"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કવર"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bangon"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "עטיפה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कवर"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Borító"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sampul"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copertina"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "カバー"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಕವರ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "커버"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കവർ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कव्हर"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kulit Album"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omslag"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoes"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਵਰ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Okładka"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capa"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capa"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copertă"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Omslag"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jalada"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அட்டை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కవర్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ปก"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapak"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Обкладинка"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کور"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ảnh bìa"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "封面"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "封面"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "封面"
+          }
+        }
+      }
+    },
     "Cover Flow": {
       "comment": "Apple's name for the sideways-scrolling covers view; use the name usual in your language (often left in English).",
       "localizations": {
