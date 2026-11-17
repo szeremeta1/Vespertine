@@ -105,7 +105,7 @@ struct RemoteTests {
         let store = ArtworkStore(directory: folder)
         let thumbnail = Data([0xFF, 0xD8, 0xFF, 0xE0]) + Data(repeating: 7, count: 900)
         try thumbnail.write(to: store.thumbnailURL("big-cover", size: 600))
-        try Data([0xFF, 0xD8, 0xFF, 0xE0]).appending(Data(repeating: 1, count: RemoteProtocol.maximumMessageSize)).write(to: store.originalURL("big-cover"))
+        try (Data([0xFF, 0xD8, 0xFF, 0xE0]) + Data(repeating: 1, count: RemoteProtocol.maximumMessageSize)).write(to: store.originalURL("big-cover"))
         for size in [600, 1000, 2048] {
             let found = await RemoteBridge.artwork(key: "big-cover", size: size, store: store)
             #expect(found?.data == thumbnail, "size \(size)")
