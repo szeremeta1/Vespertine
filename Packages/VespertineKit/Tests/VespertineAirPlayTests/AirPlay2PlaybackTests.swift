@@ -126,6 +126,7 @@ struct AirPlay2PlaybackTests {
         p.play(PlayableItem(url: url), at: 0)
         await wait { !log.failures.isEmpty }
         #expect(log.failures.count == 1)
+        #expect(log.failures.first?.contains("code") == true)
         #expect(log.started.isEmpty)
         #expect(asked.withLock { $0 } == 1)
         #expect(receiver.requests.isEmpty)
@@ -191,7 +192,7 @@ struct AirPlay2PlaybackTests {
 
         // Only AirPlay 2: that is the session, at the `_airplay._tcp` service.
         let only = AirPlayDevice(deviceID: "AA0000000002", name: "Kitchen", raop: nil, airplay: homePod, airplayService: airplayService)
-        #expect(only.usesAirPlay2)
+        #expect(only.usesAirPlay2 && only.isSupported)
         #expect(only.metadata == [0, 1, 2])
         #expect(AirPlayPlayback.endpoint(for: only, airPlay2: only.usesAirPlay2) == .service(name: "Kitchen", type: "_airplay._tcp", domain: "local.", interface: nil))
         #expect(AirPlayPlayback(device: only) != nil)
@@ -199,18 +200,18 @@ struct AirPlay2PlaybackTests {
 
         // AirPlay 1 as Vespertine sends it, and AirPlay 2: it stays on AirPlay 1.
         let both = AirPlayDevice(deviceID: "AA0000000002", name: "Kitchen", raop: plain, airplay: homePod, service: raopService, airplayService: airplayService)
-        #expect(!both.usesAirPlay2)
+        #expect(!both.usesAirPlay2 && both.isSupported)
         #expect(both.metadata == [0])
         #expect(AirPlayPlayback.endpoint(for: both, airPlay2: both.usesAirPlay2) == .service(name: "AA0000000002@Kitchen", type: "_raop._tcp", domain: "local.", interface: nil))
 
         // An AirPlay 1 record Vespertine can't send to (FairPlay only), and AirPlay 2: AirPlay 2.
         let apple = AirPlayDevice(deviceID: "AA0000000002", name: "Kitchen", raop: fairPlay, airplay: homePod, service: raopService, airplayService: airplayService)
-        #expect(apple.usesAirPlay2)
+        #expect(apple.usesAirPlay2 && apple.support == .supported(.none))
         #expect(AirPlayPlayback.endpoint(for: apple, airPlay2: apple.usesAirPlay2) == .service(name: "Kitchen", type: "_airplay._tcp", domain: "local.", interface: nil))
 
         // A password, said either way, is not something an AirPlay 2 session can answer yet.
         let passworded = AirPlayDevice(deviceID: "AA0000000002", name: "Kitchen", raop: locked, airplay: homePod, service: raopService, airplayService: airplayService)
-        #expect(!passworded.usesAirPlay2 && passworded.airPlay2Entry == nil)
+        #expect(!passworded.usesAirPlay2 && passworded.airPlay2Entry == nil && !passworded.isSupported)
         #expect(AirPlayPlayback(device: passworded) == nil)
         #expect(AirPlayPINPairing(device: passworded) == nil)
 

@@ -2,7 +2,8 @@
 // Vespertine: what an AirPlay receiver says about itself on Bonjour. `_raop._tcp` (AirPlay 1) names the service
 // `<MAC>@<name>` and lists, in its TXT record, the encryptions (`et`), codecs (`cn`), format (`sr`, `ss`, `ch`), transports
 // (`tp`) and metadata (`md`) it takes; `_airplay._tcp` (AirPlay 2 and video) adds `deviceid`, `model` and `features`.
-// Vespertine sends ALAC 16/44.1 over RAOP, unencrypted (after `/auth-setup` for MFi receivers) or with RSA/AES; anything
+// Vespertine sends ALAC 16/44.1 over RAOP, unencrypted (after `/auth-setup` for MFi receivers) or with RSA/AES; to a
+// receiver that takes none of that but says it takes AirPlay 2 audio and pairing, it sends an AirPlay 2 session. Anything
 // else is listed as not supported yet.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -187,10 +188,10 @@ public struct AirPlayDevice: Sendable, Hashable, Identifiable {
         return airplay.asksForPIN ? .pin : .open
     }
 
-    /// A session with this receiver would be an AirPlay 2 one: it takes one, and doesn't take AirPlay 1 as Vespertine
-    /// sends it. A receiver that takes both stays on AirPlay 1.
+    /// A session with this receiver is an AirPlay 2 one: it takes one, and doesn't take AirPlay 1 as Vespertine sends it.
+    /// A receiver that takes both stays on AirPlay 1.
     public var usesAirPlay2: Bool {
-        if case .supported = support { return false }
+        if case .supported = airPlay1Support { return false }
         return airPlay2Entry != nil
     }
 
@@ -200,7 +201,16 @@ public struct AirPlayDevice: Sendable, Hashable, Identifiable {
         return raop?.metadata ?? []
     }
 
+    /// AirPlay 1 where the receiver takes it as Vespertine sends it; AirPlay 2 otherwise, where it takes that (the audio
+    /// then goes sealed, which is not one of the `RAOPEncryption`s: `.none` stands for it).
     public var support: Support {
+        let first = airPlay1Support
+        if case .unsupported = first, airPlay2Entry != nil { return .supported(.none) }
+        return first
+    }
+
+    /// What an AirPlay 1 session with this receiver would be.
+    var airPlay1Support: Support {
         guard let raop else { return .unsupported(Self.airPlay2Only) }
         // MFi receivers (`et` 4) take the audio as it is once the sender has introduced itself (`needsAuthSetup`).
         let encryption: RAOPEncryption
@@ -216,7 +226,7 @@ public struct AirPlayDevice: Sendable, Hashable, Identifiable {
     }
 
     static var airPlay2Only: String {
-        String(localized: "AirPlay 2 only — not supported yet", comment: "Output list: an AirPlay receiver that takes only AirPlay 2, which Vespertine can't send yet.")
+        String(localized: "AirPlay 2 only — not supported yet", comment: "Output list: an AirPlay receiver that takes only AirPlay 2 in a way Vespertine can't send yet (it asks for a password, or doesn't say it plays audio).")
     }
 
     static var formatUnsupported: String {

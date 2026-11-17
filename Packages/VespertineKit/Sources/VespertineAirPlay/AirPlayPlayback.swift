@@ -215,8 +215,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     /// For a device found on Bonjour (its `_raop._tcp` service, or its `_airplay._tcp` one when the session is an AirPlay 2
     /// one), or one with a known address.
     public convenience init?(device: AirPlayDevice, lead: TimeInterval = 0.25) {
-        let encryption: RAOPEncryption
-        if device.usesAirPlay2 { encryption = .none } else if case .supported(let stated) = device.support { encryption = stated } else { return nil }
+        guard case .supported(let encryption) = device.support else { return nil }
         guard let endpoint = Self.endpoint(for: device, airPlay2: device.usesAirPlay2) else { return nil }
         self.init(device: device, endpoint: endpoint, encryption: encryption, lead: lead)
     }
