@@ -241,8 +241,8 @@ public final class PhoneRemote {
         case .playCopy(let ids, let startAt):
             // The songs by their own IDs are the very copies asked for.
             return await play(.tracks(ids: ids)) { self.playback.play($0, startAt: startAt, shuffled: false) }
-        case .playPlaylist(let id, _, let shuffled):
-            return await play(.playlistTracks(id: id)) { self.playback.play($0, shuffled: shuffled) }
+        case .playPlaylist(let id, let startAt, let shuffled):
+            return await play(.playlistTracks(id: id)) { self.playback.play($0, startAt: startAt ?? 0, shuffled: shuffled) }
         case .playNext(let ids):
             return await play(.tracks(ids: ids)) { self.playback.playNext($0) }
         case .addToQueue(let ids):

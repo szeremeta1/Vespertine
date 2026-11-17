@@ -344,11 +344,14 @@ struct RemoteBridge {
             let tracks = ordered(ids)
             guard !tracks.isEmpty else { return notInLibrary }
             player.play(tracks, startAt: startAt, shuffled: shuffled)
-        case .playPlaylist(let id, _, let shuffled):
+        case .playPlaylist(let id, let startAt, let shuffled):
             guard let playlist = library.playlists.first(where: { $0.id == id }) else { return notInLibrary }
             let tracks = library.tracks(in: playlist)
             guard !tracks.isEmpty else { return notInLibrary }
-            player.play(tracks, shuffled: shuffled ?? false, transitions: library.transitions(of: playlist))
+            // A tapped song sends where to start, and nil shuffle (keep the setting, as a song row on the Mac does);
+            // the Play and Shuffle buttons send neither start nor nil.
+            player.play(tracks, startAt: startAt ?? 0, shuffled: startAt == nil ? (shuffled ?? false) : shuffled,
+                        transitions: library.transitions(of: playlist))
         case .playNext(let ids):
             let tracks = ordered(ids)
             guard !tracks.isEmpty else { return notInLibrary }
