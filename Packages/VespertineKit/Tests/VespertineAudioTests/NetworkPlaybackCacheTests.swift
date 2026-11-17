@@ -123,6 +123,45 @@ private final class NotingShare: PlaybackCacheReader, @unchecked Sendable {
     var bytesAsked: Int { lock.withLock { sizes.reduce(0, +) } }
 }
 
+/// A share whose reads come back only when the test says so: each read is noted the moment it is sent, and then stays "on
+/// the link" until it is answered. What is on the link at any moment is counted, not timed.
+private final class HeldShare: PlaybackCacheReader, @unchecked Sendable {
+    let bytes: Data
+    private let gate = NSCondition()
+    private var sizes: [Int] = []
+    /// Reads are answered in the order they were sent: the first `answerable` of them may come back.
+    private var answerable = 0
+    private var answered = 0
+    var size: Int64 { Int64(bytes.count) }
+    init(count: Int) { bytes = Data((0..<count).map { UInt8(truncatingIfNeeded: $0 &* 37 &+ ($0 >> 11)) }) }
+    func read(at offset: Int64, count: Int) throws -> Data {
+        gate.lock()
+        sizes.append(count)
+        let number = sizes.count
+        gate.broadcast()
+        while number > answerable { gate.wait() }
+        answered += 1
+        gate.unlock()
+        return bytes.subdata(in: Int(offset)..<min(Int(offset) + count, bytes.count))
+    }
+    /// Waits until `count` reads have been sent in all; false if they never are.
+    func waitForSent(_ count: Int, patience: TimeInterval = 60) -> Bool {
+        gate.lock(); defer { gate.unlock() }
+        let deadline = Date().addingTimeInterval(patience)
+        while sizes.count < count { if !gate.wait(until: deadline) { return false } }
+        return true
+    }
+    /// Lets the next `count` reads (in the order they were sent) come back.
+    func answer(_ count: Int) { gate.lock(); answerable += count; gate.broadcast(); gate.unlock() }
+    /// Every read comes back from now on.
+    func answerAll() { gate.lock(); answerable = .max; gate.broadcast(); gate.unlock() }
+    var readSizes: [Int] { gate.withLock { sizes } }
+    /// Reads sent and not yet answered, and their bytes.
+    var onTheLink: (reads: Int, bytes: Int) {
+        gate.withLock { (sizes.count - answered, sizes.suffix(sizes.count - answered).reduce(0, +)) }
+    }
+}
+
 struct NetworkPlaybackCacheTests {
     private func directory() throws -> URL {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
@@ -324,20 +363,30 @@ struct NetworkPlaybackCacheTests {
     @Test("A copy given up on as it begins leaves little on the link: no megabyte reads on their way")
     func cancelledStartLeavesLittleInFlight() throws {
         let dir = try directory(); defer { try? FileManager.default.removeItem(at: dir) }
-        // Every read takes 50 ms (a share far away). The copy is given up on 120 ms in, as a skip does to the song skipped past.
-        let share = NotingShare(count: 16 << 20, roundTrip: 0.05)
+        // A share far away, with the round trips in the test's hands: a read stays on the link until it is answered. So what is
+        // on the link when the copy is given up on (as a skip does to the song skipped past) is counted exactly, on any machine.
+        let share = HeldShare(count: 16 << 20)
+        defer { share.answerAll() }
+        let lanes = NetworkPlaybackCache.readsInFlight
+        let small = NetworkPlaybackCache.startReadBytes
         let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 1 << 20)
         let entry = try cache.entry(key: "skipped", url: URL(fileURLWithPath: "/share/skipped.flac"), reader: share)
-        Thread.sleep(forTimeInterval: 0.12)
-        let before = share.bytesAsked
+        // The copy's first reads go out, one a lane, and are answered; each lane sends its next and waits on it.
+        try #require(share.waitForSent(lanes), "the copy sent \(share.readSizes.count) reads")
+        share.answer(lanes)
+        try #require(share.waitForSent(2 * lanes), "the copy sent \(share.readSizes.count) reads")
+        // Given up on now, with every lane's read on its way.
+        let onTheLink = share.onTheLink
         entry.cancel()
-        Thread.sleep(forTimeInterval: 0.3)
-        let lanes = NetworkPlaybackCache.readsInFlight
-        #expect(share.readSizes.allSatisfy { $0 <= NetworkPlaybackCache.startReadBytes }, "only small reads were sent: largest \(share.readSizes.max() ?? 0)")
-        #expect(before <= 3 * lanes * NetworkPlaybackCache.startReadBytes, "asked for before it was given up on: \(before) bytes")
-        // A lane that had just looked may still send the one small read it was about to.
-        #expect(share.bytesAsked - before <= lanes * NetworkPlaybackCache.startReadBytes,
-                "asked for after it was given up on: \(share.bytesAsked - before) bytes")
+        #expect(onTheLink.reads == lanes)
+        #expect(onTheLink.bytes <= lanes * small, "on the link when it was given up on: \(onTheLink.bytes) bytes")
+        #expect(share.readSizes.allSatisfy { $0 <= small }, "only small reads were sent: largest \(share.readSizes.max() ?? 0)")
+        // Those reads come back, the lanes see that the copy is over and end. None sends another.
+        share.answerAll()
+        let deadline = Date().addingTimeInterval(60)
+        while entry.copyLanesRunning > 0, Date() < deadline { Thread.sleep(forTimeInterval: 0.002) }
+        #expect(entry.copyLanesRunning == 0, "the copy's lanes never ended")
+        #expect(share.readSizes.count == 2 * lanes, "reads sent after it was given up on: \(share.readSizes.count - 2 * lanes)")
     }
 
     @Test("Large DSD uses a local lead; a stalled producer cannot interrupt reads within that reserve")

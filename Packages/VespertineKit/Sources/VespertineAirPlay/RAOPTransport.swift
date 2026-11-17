@@ -40,6 +40,8 @@ public final class UDPSocket: @unchecked Sendable {
     private let lock = NSLock()
     private var closed = false
     private var reader: Thread?
+    /// A reader thread was started: it closes the descriptor when it stops (see `close`).
+    private var readerCloses = false
 
     public init(bind address: String = "0.0.0.0") throws {
         let fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
@@ -68,7 +70,11 @@ public final class UDPSocket: @unchecked Sendable {
         addr.sin_family = sa_family_t(AF_INET)
         addr.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
         addr.sin_port = port.bigEndian
-        guard inet_pton(AF_INET, host, &addr.sin_addr) == 1, lock.withLock({ !closed }) else { return false }
+        guard inet_pton(AF_INET, host, &addr.sin_addr) == 1 else { return false }
+        // Sent under the lock the descriptor is closed under: a closed descriptor's number is soon another socket's, and a
+        // datagram sent a moment after `close` would go out from that one. (A UDP send doesn't wait.)
+        lock.lock(); defer { lock.unlock() }
+        guard !closed else { return false }
         let sent = data.withUnsafeBytes { raw in
             withUnsafePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) {
                 sendto(fd, raw.baseAddress, raw.count, 0, $0, socklen_t(MemoryLayout<sockaddr_in>.size))
@@ -77,9 +83,16 @@ public final class UDPSocket: @unchecked Sendable {
         return sent == data.count
     }
 
-    /// Calls `handler` on a thread of its own for every datagram, with the sender's address and port, until closed.
+    /// Calls `handler` on a thread of its own for every datagram, with the sender's address and port, until closed. Once only.
     public func startReceiving(name: String, _ handler: @escaping @Sendable (Data, String, UInt16) -> Void) {
         let fd = self.fd
+        let lock = self.lock
+        let starts = lock.withLock { () -> Bool in
+            guard !closed, !readerCloses else { return false }
+            readerCloses = true
+            return true
+        }
+        guard starts else { return }
         let thread = Thread { [weak self] in
             var buffer = [UInt8](repeating: 0, count: 2048)
             while let self, !self.lock.withLock({ self.closed }) {
@@ -95,6 +108,8 @@ public final class UDPSocket: @unchecked Sendable {
                 inet_ntop(AF_INET, &from.sin_addr, &text, socklen_t(INET_ADDRSTRLEN))
                 handler(Data(buffer[0..<n]), String(cString: text), UInt16(bigEndian: from.sin_port))
             }
+            // Closed by the thread that reads it, once it has stopped reading: nothing is left that could use the number.
+            lock.withLock { _ = Darwin.close(fd) }
         }
         thread.name = name
         thread.qualityOfService = .userInteractive
@@ -103,14 +118,14 @@ public final class UDPSocket: @unchecked Sendable {
     }
 
     public func close() {
-        let go = lock.withLock { () -> Bool in
-            defer { closed = true }
-            return !closed
-        }
-        // The reader notices within its poll interval; the descriptor goes once it can't be used for a send any more.
-        if go {
-            let fd = self.fd
-            DispatchQueue.global().asyncAfter(deadline: .now() + 0.5) { Darwin.close(fd) }
+        // With a reader, the descriptor is the reader's to close: it notices within its poll interval, and closes it only
+        // when it has left its loop. Closing it from here, on a timer, let a reader that was late (a busy machine, a slow
+        // handler) poll and read a number that had become another socket's by then, and take that socket's datagrams.
+        // Without a reader nothing else uses it (a send holds this lock), so it is closed now.
+        lock.withLock {
+            guard !closed else { return }
+            closed = true
+            if !readerCloses { Darwin.close(fd) }
         }
     }
 }
