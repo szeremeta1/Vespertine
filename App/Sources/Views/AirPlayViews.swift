@@ -78,10 +78,94 @@ struct AirPlayPasswordSheet: View {
     }
 }
 
+/// Asks for the code an AirPlay receiver shows on its screen (an Apple TV set to ask): when one is chosen that was never
+/// paired with, and again when it has forgotten this Mac. The receiver is asked to show the code as the sheet comes up.
+struct AirPlayPairingSheet: View {
+    @Environment(AppModel.self) private var model
+    let request: AirPlayPairingRequest
+    @State private var code = ""
+    @State private var asking = true
+    @State private var wrong = false
+    @State private var failure: String?
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Code for “\(request.device.name)”", comment: "Title of the sheet that asks for the code an AirPlay receiver (an Apple TV) shows on its screen. %@ is the receiver's name.")
+                .font(.headline)
+            Text("This AirPlay receiver shows a code on its screen. Enter it once; Vespertine saves the pairing in your keychain.")
+                .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            if wrong {
+                Label(String(localized: "The receiver didn’t accept that code. It shows a new one.", comment: "In the sheet that asks for the code on an AirPlay receiver's screen, after a wrong one."),
+                      systemImage: "exclamationmark.triangle")
+                    .font(.callout).foregroundStyle(Palette.copper).fixedSize(horizontal: false, vertical: true)
+            }
+            if let failure {
+                Label(String(localized: "Pairing with “\(request.device.name)” didn’t work (\(failure)).", comment: "In the sheet that asks for the code on an AirPlay receiver's screen. %1$@ is the receiver's name, %2$@ the reason (for example “it can't be reached”)."),
+                      systemImage: "exclamationmark.triangle")
+                    .font(.callout).foregroundStyle(Palette.copper).fixedSize(horizontal: false, vertical: true)
+            }
+            TextField(String(localized: "Code", comment: "Placeholder of the field for the code an AirPlay receiver shows on its screen."), text: $code)
+                .textFieldStyle(.roundedBorder)
+                .focused($focused)
+                .onSubmit(pair)
+            HStack {
+                if asking { ProgressView().controlSize(.small) }
+                Spacer()
+                Button("Cancel", role: .cancel) { model.airPlay?.cancelPairing() }
+                    .keyboardShortcut(.cancelAction)
+                Button("Pair", action: pair)
+                    .keyboardShortcut(.defaultAction)
+                    .disabled(asking || entered.isEmpty)
+            }
+        }
+        .padding(20)
+        .frame(width: 360)
+        .onAppear { focused = true }
+        .task { await ask() }
+    }
+
+    private var entered: String { code.trimmingCharacters(in: .whitespaces) }
+
+    /// Has the receiver show its code (a new one each time).
+    private func ask() async {
+        asking = true
+        failure = await model.airPlay?.beginPairing()
+        asking = false
+    }
+
+    private func pair() {
+        guard !asking, !entered.isEmpty, let airPlay = model.airPlay else { return }
+        let typed = entered
+        asking = true
+        wrong = false
+        failure = nil
+        Task {
+            switch await airPlay.submit(code: typed, select: { model.selectDevice($0) }) {
+            case .paired: break
+            case .wrongCode:
+                code = ""
+                await ask()
+                wrong = true
+            case .failed(let reason):
+                await ask()
+                // Why the pairing failed says more than why a new code couldn't be shown.
+                failure = reason
+            }
+            asking = false
+        }
+    }
+}
+
 enum AirPlayText {
     /// The output list's second line for a receiver.
     static func detail(_ device: AirPlayDevice) -> String {
-        switch device.support {
+        if device.usesAirPlay2 {
+            return device.needsPairingCode
+                ? String(localized: "AIRPLAY 2 · ALAC 16/44.1 · CODE", comment: "Output list: an AirPlay 2 receiver (an Apple TV) that shows a code on its screen to be typed once before it plays (short, uppercase)")
+                : String(localized: "AIRPLAY 2 · ALAC 16/44.1", comment: "Output list: an AirPlay 2 receiver (a HomePod, an Apple TV) Vespertine sends ALAC 16-bit / 44.1 kHz to (short, uppercase)")
+        }
+        return switch device.support {
         case .supported(.none) where device.needsPassword:
             String(localized: "AIRPLAY · ALAC 16/44.1 · PASSWORD", comment: "Output list: an AirPlay receiver that asks for a password before it plays (short, uppercase)")
         case .supported(.none): String(localized: "AIRPLAY · ALAC 16/44.1", comment: "Output list: an AirPlay receiver Vespertine sends ALAC 16-bit / 44.1 kHz to (short, uppercase)")
@@ -113,10 +197,10 @@ struct AirPlayDetails: View {
                 .font(Typeface.ui(11.5)).foregroundStyle(Palette.text2).fixedSize(horizontal: false, vertical: true)
             VStack(alignment: .leading, spacing: 4) {
                 row(String(localized: "Model"), device.model ?? "")
-                row(String(localized: "Protocol"), String(localized: "AirPlay 1 (RAOP)"))
+                row(String(localized: "Protocol"), device.usesAirPlay2 ? "AirPlay 2" : String(localized: "AirPlay 1 (RAOP)"))
                 row(String(localized: "Sent as"), String(localized: "ALAC 16-bit / 44.1 kHz, stereo"))
-                row(String(localized: "Encryption"), device.support == .supported(.rsa) ? String(localized: "RSA / AES (the receiver asks for it)") : String(localized: "None"))
-                row(String(localized: "Titles"), raop?.metadata.contains(0) == true ? String(localized: "Sent") : String(localized: "Not taken by the receiver"))
+                row(String(localized: "Encryption"), encryption)
+                row(String(localized: "Titles"), device.metadata.contains(0) ? String(localized: "Sent") : String(localized: "Not taken by the receiver"))
                 if let version = raop?.version { row(String(localized: "Version"), version) }
                 row(String(localized: "Device ID"), device.deviceID)
             }
@@ -138,6 +222,17 @@ struct AirPlayDetails: View {
                 }
                 .controlSize(.small)
             }
+            if device.needsPairingCode, let airPlay = model.airPlay {
+                Button(String(localized: "Forget Pairing", comment: "Button under an AirPlay receiver that was paired with by the code on its screen: removes what was saved in the keychain, so the code is asked for again.")) {
+                    Task {
+                        await airPlay.forgetPairing(for: device)
+                        // Without its pairing it can't play. The song is not carried over to this Mac's own output.
+                        model.player.stopBeforeLeavingNetworkOutput()
+                        model.selectDevice(nil)
+                    }
+                }
+                .controlSize(.small)
+            }
             VStack(alignment: .leading, spacing: 4) {
                 Text("For the best result").font(Typeface.ui(12))
                 ForEach(AirPlayText.advice, id: \.self) { line in
@@ -146,6 +241,12 @@ struct AirPlayDetails: View {
             }
         }
         .padding(.horizontal, 8)
+    }
+
+    /// How the audio is sealed on its way: AirPlay 2 always is; AirPlay 1 only where the receiver asks.
+    private var encryption: String {
+        if device.usesAirPlay2 { return "ChaCha20-Poly1305" }
+        return device.support == .supported(.rsa) ? String(localized: "RSA / AES (the receiver asks for it)") : String(localized: "None")
     }
 
     /// Shown in place of a value the device didn't state.

@@ -499,6 +499,9 @@ private final class Pump: @unchecked Sendable {
     var send: @Sendable (Event) -> Void = { _ in }
 
     private let lock = NSLock()
+    /// Held while a buffer is handed to the node and while a new run starts, so audio of a run that is void can't reach the
+    /// node after it was emptied. Taken before `lock`, never inside it; the node's callbacks don't take it.
+    private let gate = NSLock()
     // Guarded by `lock`.
     private var generation = 0
     private var segments: [Segment] = []
@@ -560,7 +563,7 @@ private final class Pump: @unchecked Sendable {
     /// Starts a new run of the node's clock: everything scheduled before is void. With `id`, the song stays and its place is
     /// `frame` (a seek); without, the song goes too.
     func reset(keepingNext: Bool, id: String? = nil, at frame: Int64 = 0) -> Int {
-        let (mine, waiting): (Int, [any ByteSource]) = lock.withLock {
+        let (mine, waiting): (Int, [any ByteSource]) = gate.withLock { lock.withLock { () -> (Int, [any ByteSource]) in
             generation += 1
             scheduled = 0
             consumed = 0
@@ -580,7 +583,11 @@ private final class Pump: @unchecked Sendable {
             }
             if !keepingNext { next = nil }
             return (generation, waiting)
-        }
+        } }
+        // Emptied only now that nothing of the old run can be scheduled any more. Stopped before that, the node could be
+        // handed more of the old audio by a fill still at work (a song's first seconds are decoded while it already
+        // plays), and would play it first: the old place heard for a moment, and every place after it told wrong.
+        node.stop()
         // A decoder waiting for bytes must not hold up the seek or the next song.
         for source in waiting { source.interruptReads() }
         return mine
@@ -695,9 +702,14 @@ private final class Pump: @unchecked Sendable {
                 return true
             }
             guard live else { return }
-            node.scheduleBuffer(buffer, completionCallbackType: completion) { [weak self] _ in
-                self?.played(Int64(count), mine)
+            let handed: Bool = gate.withLock {
+                guard lock.withLock({ generation == mine }) else { return false }
+                node.scheduleBuffer(buffer, completionCallbackType: completion) { [weak self] _ in
+                    self?.played(Int64(count), mine)
+                }
+                return true
             }
+            guard handed else { return }
             made += 1
         }
     }

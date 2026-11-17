@@ -88,8 +88,11 @@ struct AirPlay2RecordTests {
         #expect(try device(features: "0x200").airPlay2Entry == nil)
         #expect(try device(features: nil).airPlay2Entry == nil)
         #expect(AirPlayDevice(deviceID: "B827EB000001", name: "moOde", raop: nil).airPlay2Entry == nil)
-        // Knowing how a session would begin doesn't make the receiver choosable by itself.
-        #expect(try device(features: Self.homePodFeatures).isSupported == false)
+        // A receiver a session can begin with can be chosen; one it can't begin with can't.
+        #expect(try device(features: Self.homePodFeatures).isSupported)
+        #expect(try device(features: Self.homePodFeatures, flags: "0x200").isSupported)
+        #expect(try device(features: Self.homePodFeatures, flags: "0x80").support == .unsupported(AirPlayDevice.airPlay2Only))
+        #expect(try device(features: "0x200").isSupported == false)
     }
 
     @Test("Discovery keeps the AirPlay 2 service beside the AirPlay 1 one, and alone when it is the only one")

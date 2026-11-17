@@ -17,7 +17,7 @@
 import CryptoKit
 import Foundation
 
-enum PairingError: Error, Equatable, Sendable {
+public enum PairingError: Error, Equatable, Sendable, LocalizedError {
     /// A message that isn't what this step of pairing expects, or a step taken out of order.
     case malformed
     /// The receiver says no: a wrong PIN in pair-setup, a pairing it no longer knows in pair-verify.
@@ -30,6 +30,17 @@ enum PairingError: Error, Equatable, Sendable {
     case notAuthentic
     /// Pair-verify was answered by a receiver other than the one paired with.
     case wrongReceiver
+
+    public var errorDescription: String? {
+        switch self {
+        case .authentication:
+            String(localized: "it needs the code on its screen", comment: "Why an AirPlay receiver couldn't play, or couldn't be paired with: goes in “%1$@ couldn't play the song (%2$@).” The code is the one an Apple TV shows on its screen for AirPlay.")
+        case .tryLater:
+            String(localized: "it asks to wait before another try", comment: "Why an AirPlay receiver couldn't be paired with (too many wrong codes): goes in “%1$@ couldn't play the song (%2$@).”")
+        case .malformed, .refused, .notAuthentic, .wrongReceiver:
+            String(localized: "it refused the pairing", comment: "Why an AirPlay receiver couldn't play, or couldn't be paired with: goes in “%1$@ couldn't play the song (%2$@).”")
+        }
+    }
 }
 
 /// This Mac as receivers know it once paired: a name of its own making and an Ed25519 key. Kept for good (in the keychain).
