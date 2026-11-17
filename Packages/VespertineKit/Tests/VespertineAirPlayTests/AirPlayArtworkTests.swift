@@ -14,7 +14,7 @@ import VespertineUPnP
 private let jpegCover = Data([0xFF, 0xD8, 0xFF, 0xE0]) + Data((0..<4000).map { UInt8(truncatingIfNeeded: $0 &* 31) })
 private let pngCover = Data([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]) + Data(repeating: 7, count: 64)
 
-@Suite("AirPlay artwork", .serialized) @MainActor
+@Suite("AirPlay artwork", .serialized, .timeLimit(.minutes(2))) @MainActor
 struct AirPlayArtworkTests {
     func playback(_ receiver: FakeRAOPReceiver, md: String) -> (AirPlayPlayback, EventLog) {
         let record = RAOPRecord.parse(serviceName: "B827EB000002@Fake", txt: ["et": "0", "md": md, "cn": "1"])!
@@ -25,10 +25,7 @@ struct AirPlayArtworkTests {
         return (p, log)
     }
 
-    func wait(_ condition: () -> Bool, seconds: Double = 8) async {
-        let end = Date().addingTimeInterval(seconds)
-        while !condition(), Date() < end { try? await Task.sleep(for: .milliseconds(25)) }
-    }
+    func wait(_ condition: @MainActor () -> Bool) async { await untilTrue(condition) }
 
     func pictures(_ receiver: FakeRAOPReceiver) -> [RTSPMessage] {
         receiver.requests.filter { $0.method == "SET_PARAMETER" && ($0["Content-Type"] ?? "").hasPrefix("image/") }
