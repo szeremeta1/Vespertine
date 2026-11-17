@@ -74,15 +74,16 @@ final class KeptShelf {
         keeper.client = PhoneStreamClient(session: session)
         Task {
             for list in keeper.store.lists {
-                let command: RemoteCommand
+                let answer: RemoteReply
                 switch list.kind {
-                case .album: command = .albumTracks(key: list.reference)
+                case .album: answer = await session.send(.albumTracks(key: list.reference))
                 case .playlist:
                     guard let id = Int64(list.reference) else { continue }
-                    command = .playlistTracks(id: id)
+                    // A page at a time, as the playlist's page reads it: a long one whole would be more than a reply holds.
+                    answer = await PlaylistPages.load(id: id, ask: { await session.send($0) })
                 }
                 // An empty answer is more likely a Mac whose source is offline than a list that lost every song.
-                if case .tracks(let items) = await session.send(command), !items.isEmpty { keeper.update(list.id, tracks: items) }
+                if case .tracks(let items) = answer, !items.isEmpty { keeper.update(list.id, tracks: items) }
             }
             keeper.resume()
         }
@@ -245,6 +246,8 @@ struct KeptListPage: View {
                         let here = track.id.map { keeper.store.kept($0) != nil } ?? false
                         Button { PlayTarget.shared.playKept(list.tracks, startAt: index, shuffled: nil, session: session) } label: {
                             MediaRow(title: track.title, subtitle: list.kind == .album ? track.format : "\(track.artist) — \(track.album)") {
+                                // A playlist's songs are from many albums: each shows its own cover, as on the playlist's page.
+                                if list.kind == .playlist { ArtworkView(key: track.artworkKey, size: 120, cornerRadius: 4).frame(width: 44) }
                             } trailing: {
                                 state(of: track, here: here, keeper: keeper)
                                 Text(formatTime(track.duration)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)

@@ -27,6 +27,10 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         asked.append(command)
         switch command {
         case .albumTracks(let key): return albums[key].map { .tracks(items: $0) } ?? .failed(reason: "That isn't in the library any more.")
+        case .playlistTracks(_, let offset?, let limit?):
+            // A newer Mac: a page at a time.
+            let start = min(offset, playlist.count)
+            return .songs(items: Array(playlist[start..<min(start + limit, playlist.count)]), total: playlist.count)
         case .playlistTracks: return .tracks(items: playlist)
         case .tracks(let ids):
             let all = Dictionary(albums.values.flatMap { $0 }.map { ($0.id!, $0) }, uniquingKeysWith: { a, _ in a })
@@ -121,6 +125,15 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         let (remote, _) = try made()
         #expect(await remote.run(.playPlaylist(id: 5, startAt: 1, shuffled: nil)) == .ok)
         #expect(remote.queueState.current?.track.id == 2 && remote.queueState.continuing.isEmpty)
+        remote.playback.stop()
+    }
+
+    @Test func aPlaylistIsReadAPageAtATime() async throws {
+        // TestFlight feedback AOf1M7oLiLlxngkwwaWog5Y: a long playlist must fit in the Mac's replies.
+        let (remote, library) = try made()
+        #expect(await remote.run(.playPlaylist(id: 5, shuffled: false)) == .ok)
+        #expect(library.asked.first == .playlistTracks(id: 5, offset: 0, limit: PlaylistPages.pageSize))
+        #expect(remote.queueState.current?.track.id == 11 && remote.queueState.continuing.map(\.track.id) == [2])
         remote.playback.stop()
     }
 
