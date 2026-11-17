@@ -274,7 +274,8 @@
           "SMB, NFS veya WebDAV üzerinden ağ paylaşımları; önbellekleme, Çevrimdışı Tut ve yavaş sunucular için tasarlanmış oynatma: parçalar çalmadan önce Mac’inizde arabelleğe alınır, bu sırada oynatma düğmesinde bir yükleme halkası görünür.",
           "“Bu Mac’teki Müzikleri Bul”, gerçek müziğinizi bulmak için her sürücüyü tarar ve karmaşayı geride bırakır. İlk açılıştaki kısa kurulum çıkışınızı seçer ve özel erişimin ve ReplayGain’in ne işe yaradığını açıklar.",
           "Çıkış başına parametrik EQ; AutoEQ ve Equalizer APO ön ayarlarını içe aktarır. Varsayılan olarak kapalıdır; açıkken sinyal yolunda <span class=\"mono nowrap\">EKOLAYZIR</span> yerine <span class=\"mono nowrap\">BIT-PERFECT</span> yazar.",
-          "Mini Oynatıcı, menü çubuğu öğesi, medya tuşları, ReplayGain ve otomatik, imzalı güncellemeler."
+          "Mini Oynatıcı, menü çubuğu öğesi, medya tuşları, ReplayGain ve otomatik, imzalı güncellemeler.",
+          "İsteğe bağlı ve siz açana kadar kapalı: çıkış olarak ağ oynatıcıları (UPnP) ve AirPlay alıcıları, kenar çubuğunda kendi OpenSubsonic sunucunuz, telefonunuz veya ağınızdaki herhangi bir tarayıcı için uzaktan kumanda, bir görselleştirici ve şarkılar arası geçişler."
         ],
         "links": [
           "Tüm özellikler, ayrıntılı olarak"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Qobuz, TIDAL veya Apple Music’ten akış yapıyor mu?",
-          "a": "Hayır. Vespertine, Mac’inizdeki, harici disklerdeki veya bir ağ paylaşımındaki, sahibi olduğunuz müziği çalar. DRM korumalı Apple Music abonelik indirmeleri çalınamaz."
+          "a": "Ticari bir servisten hayır: Vespertine’de Qobuz, TIDAL veya Apple Music istemcisi yoktur ve DRM korumalı Apple Music indirmeleri çalınamaz. Mac’inizdeki, harici disklerdeki veya bir ağ paylaşımındaki, sahibi olduğunuz müziği çalar. İsteğe bağlı iki beta özellik, kendi OpenSubsonic sunucunuzu (Navidrome ve diğerleri) ve UPnP kumanda uygulamalarının gönderdiği müziği ekler."
         },
         {
           "q": "Gerçekten bit-perfect olduğunu nasıl bilebilirim?",

@@ -274,7 +274,8 @@
           "Zasoby sieciowe przez SMB, NFS lub WebDAV, z buforowaniem, opcją Zachowaj offline i odtwarzaniem przystosowanym do wolnych serwerów: utwory są buforowane na Macu, zanim zaczną grać, a w tym czasie na przycisku odtwarzania widać pierścień ładowania.",
           "Funkcja Znajdź muzykę przeszukuje wszystkie dyski w poszukiwaniu twojej prawdziwej muzyki i pomija zbędne pliki. Krótka konfiguracja przy pierwszym uruchomieniu wybiera wyjście i wyjaśnia, do czego służą wyłączny dostęp i ReplayGain.",
           "Parametryczny korektor dla każdego wyjścia, importujący presety AutoEQ i Equalizer APO. Domyślnie wyłączony; gdy jest włączony, ścieżka sygnału pokazuje <span class=\"mono nowrap\">KOREKTOR</span> zamiast <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Miniodtwarzacz, ikona na pasku menu, klawisze multimedialne, ReplayGain oraz automatyczne, podpisane uaktualnienia."
+          "Miniodtwarzacz, ikona na pasku menu, klawisze multimedialne, ReplayGain oraz automatyczne, podpisane uaktualnienia.",
+          "Opcjonalne i wyłączone, dopóki ich nie włączysz: odtwarzacze sieciowe (UPnP) i odbiorniki AirPlay jako wyjścia, własny serwer OpenSubsonic na pasku bocznym, pilot na telefon lub dowolną przeglądarkę w twojej sieci, wizualizator i przejścia między utworami."
         ],
         "links": [
           "Wszystkie funkcje w szczegółach"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Czy odtwarza strumieniowo z Qobuz, TIDAL lub Apple Music?",
-          "a": "Nie. Vespertine odtwarza muzykę, którą masz na własność: na Macu, na dyskach zewnętrznych lub w zasobie sieciowym. Chronionych DRM plików pobranych w ramach subskrypcji Apple Music nie można odtworzyć."
+          "a": "Nie z serwisu komercyjnego: Vespertine nie ma klienta Qobuz, TIDAL ani Apple Music, a chronionych DRM plików pobranych z Apple Music nie można odtworzyć. Odtwarza muzykę, którą masz na własność: na Macu, na dyskach zewnętrznych lub w zasobie sieciowym. Dwie opcjonalne funkcje beta dodają własny serwer OpenSubsonic (Navidrome i inne) oraz muzykę wysyłaną przez aplikacje sterujące UPnP."
         },
         {
           "q": "Skąd mam wiedzieć, że to naprawdę bit-perfect?",

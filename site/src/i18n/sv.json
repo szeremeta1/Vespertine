@@ -274,7 +274,8 @@
           "Nätverksresurser via SMB, NFS eller WebDAV, med cachning, Behåll offline och uppspelning anpassad för långsamma servrar: spåren buffras på din Mac innan de spelas, med en laddningsring på uppspelningsknappen medan det pågår.",
           "Hitta musik söker igenom alla diskar efter din riktiga musik och lämnar skräpet. En kort konfiguration vid första start väljer din utgång och förklarar vad exklusiv åtkomst och ReplayGain gör.",
           "Parametrisk EQ per utgång som importerar förinställningar från AutoEQ och Equalizer APO. Av som standard; när den är på visar signalvägen <span class=\"mono nowrap\">EQUALIZER</span> i stället för <span class=\"mono nowrap\">BITPERFEKT</span>.",
-          "Minispelare, menyradsobjekt, medietangenter, ReplayGain och automatiska, signerade uppdateringar."
+          "Minispelare, menyradsobjekt, medietangenter, ReplayGain och automatiska, signerade uppdateringar.",
+          "Valfritt, och avstängt tills du slår på det: nätverksspelare (UPnP) och AirPlay-mottagare som utgångar, din egen OpenSubsonic-server i sidofältet, en fjärrkontroll för telefonen eller valfri webbläsare i ditt nätverk, en visualiserare och övergångar mellan låtar."
         ],
         "links": [
           "Varje funktion i detalj"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Strömmar den från Qobuz, TIDAL eller Apple Music?",
-          "a": "Nej. Vespertine spelar musik du äger, på din Mac, på externa diskar eller på en nätverksresurs. DRM-skyddade nedladdningar från en Apple Music-prenumeration kan inte spelas."
+          "a": "Inte från en kommersiell tjänst: Vespertine har ingen klient för Qobuz, TIDAL eller Apple Music, och DRM-skyddade nedladdningar från Apple Music kan inte spelas. Den spelar musik du äger, på din Mac, på externa diskar eller på en nätverksresurs. Två valfria betafunktioner lägger till din egen OpenSubsonic-server (Navidrome med flera) och musik som skickas från UPnP-kontrollappar."
         },
         {
           "q": "Hur vet jag att den verkligen är bitperfekt?",

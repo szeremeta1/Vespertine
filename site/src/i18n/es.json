@@ -274,7 +274,8 @@
           "Recursos compartidos de red por SMB, NFS o WebDAV, con caché, Mantener sin conexión y una reproducción pensada para servidores lentos: las pistas se almacenan en búfer en tu Mac antes de reproducirse, con un anillo de carga en el botón de reproducción mientras tanto.",
           "«Buscar música» explora todas las unidades en busca de tu música real y deja de lado lo que sobra. Una breve configuración en el primer inicio elige tu salida y explica qué hacen el acceso exclusivo y ReplayGain.",
           "EQ paramétrico por salida que importa preajustes de AutoEQ y Equalizer APO. Desactivado por defecto; cuando está activado, la ruta de señal indica <span class=\"mono nowrap\">ECUALIZADOR</span> en lugar de <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Minirreproductor, icono en la barra de menús, teclas multimedia, ReplayGain y actualizaciones automáticas y firmadas."
+          "Minirreproductor, icono en la barra de menús, teclas multimedia, ReplayGain y actualizaciones automáticas y firmadas.",
+          "Opcionales, y desactivados hasta que los actives: reproductores de red (UPnP) y receptores AirPlay como salidas, tu propio servidor OpenSubsonic en la barra lateral, un control remoto para tu teléfono o cualquier navegador de tu red, un visualizador y transiciones entre canciones."
         ],
         "links": [
           "Todas las funciones, en detalle"
@@ -525,7 +526,7 @@
         },
         {
           "q": "¿Reproduce en streaming desde Qobuz, TIDAL o Apple Music?",
-          "a": "No. Vespertine reproduce la música que tienes: en tu Mac, en discos externos o en un recurso compartido de red. Las descargas de la suscripción a Apple Music protegidas con DRM no se pueden reproducir."
+          "a": "No desde un servicio comercial: Vespertine no tiene cliente para Qobuz, TIDAL ni Apple Music, y las descargas de Apple Music protegidas con DRM no se pueden reproducir. Reproduce la música que tienes: en tu Mac, en discos externos o en un recurso compartido de red. Dos funciones beta opcionales añaden tu propio servidor OpenSubsonic (Navidrome y otros) y la música que envían las apps de control UPnP."
         },
         {
           "q": "¿Cómo sé que de verdad es bit-perfect?",

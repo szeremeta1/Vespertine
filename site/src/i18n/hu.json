@@ -274,7 +274,8 @@
           "SMB-, NFS- vagy WebDAV-hálózati megosztások, gyorsítótárazással, Megtartás offline funkcióval és lassú szerverekhez tervezett lejátszással: a számok lejátszás előtt pufferelődnek a Macen, és eközben töltésjelző gyűrű látszik a lejátszás gombon.",
           "A Zene keresése funkció minden meghajtón megkeresi a valódi zenéit, a felesleges fájlokat pedig kihagyja. Az első indítás rövid beállítása során kiválaszthatja a kimenetet, és megtudhatja, mire való a kizárólagos hozzáférés és a ReplayGain.",
           "Kimenetenkénti parametrikus hangszínszabályzó, amely AutoEQ- és Equalizer APO-beállításokat importál. Alapértelmezés szerint ki van kapcsolva; bekapcsolva a jelút <span class=\"mono nowrap\">HANGSZÍNSZABÁLYZÓ</span> feliratot mutat a <span class=\"mono nowrap\">BIT-PERFECT</span> helyett.",
-          "Minilejátszó, menüsoros kiegészítő, médiabillentyűk, ReplayGain és automatikus, aláírt frissítések."
+          "Minilejátszó, menüsoros kiegészítő, médiabillentyűk, ReplayGain és automatikus, aláírt frissítések.",
+          "Választható, és kikapcsolva marad, amíg be nem kapcsolja: hálózati lejátszók (UPnP) és AirPlay-vevők kimenetként, saját OpenSubsonic-szervere az oldalsávon, távirányító a telefonjára vagy a hálózat bármely böngészőjébe, vizualizáló és átmenetek a dalok között."
         ],
         "links": [
           "Minden funkció részletesen"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Streamel a Qobuzról, a TIDAL-ról vagy az Apple Musicról?",
-          "a": "Nem. A Vespertine az Ön saját zenéjét játssza le, a Macről, külső meghajtókról vagy hálózati megosztásról. A DRM-védett Apple Music-előfizetéses letöltések nem játszhatók le."
+          "a": "Kereskedelmi szolgáltatásból nem: a Vespertine-ben nincs kliens a Qobuzhoz, a TIDAL-hoz vagy az Apple Musichoz, és a DRM-védett Apple Music-letöltések nem játszhatók le. Az Ön saját zenéjét játssza le, a Macről, külső meghajtókról vagy hálózati megosztásról. Két választható béta funkció hozzáadja a saját OpenSubsonic-szerverét (Navidrome és mások), valamint az UPnP-vezérlőappokból küldött zenét."
         },
         {
           "q": "Honnan tudhatom, hogy tényleg bit-perfect?",

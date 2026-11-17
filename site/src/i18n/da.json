@@ -274,7 +274,8 @@
           "Netværksdelinger via SMB, NFS eller WebDAV med caching, Behold offline og afspilning bygget til langsomme servere: numre bufres på din Mac, før de afspilles, og imens viser afspilningsknappen en indlæsningsring.",
           "Find musik gennemsøger alle drev efter din rigtige musik og lader rodet ligge. En kort opsætning ved første start vælger dit output og forklarer, hvad eksklusiv adgang og ReplayGain gør.",
           "Parametrisk EQ pr. output, der importerer AutoEQ- og Equalizer APO-forudindstillinger. Fra som standard; når den er slået til, viser signalvejen <span class=\"mono nowrap\">EQUALIZER</span> i stedet for <span class=\"mono nowrap\">BITPERFEKT</span>.",
-          "Miniafspiller, menulinjeikon, medietaster, ReplayGain og automatiske, signerede opdateringer."
+          "Miniafspiller, menulinjeikon, medietaster, ReplayGain og automatiske, signerede opdateringer.",
+          "Valgfrit, og slået fra, indtil du slår det til: netværksafspillere (UPnP) og AirPlay-modtagere som udgange, din egen OpenSubsonic-server i sidepanelet, en fjernbetjening til din telefon eller en hvilken som helst browser på dit netværk, en visualisering og overgange mellem sange."
         ],
         "links": [
           "Alle funktioner i detaljer"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Kan den streame fra Qobuz, TIDAL eller Apple Music?",
-          "a": "Nej. Vespertine afspiller musik, du ejer, på din Mac, på eksterne drev eller på en netværksdeling. DRM-beskyttede downloads fra et Apple Music-abonnement kan ikke afspilles."
+          "a": "Ikke fra en kommerciel tjeneste: Vespertine har ingen klient til Qobuz, TIDAL eller Apple Music, og DRM-beskyttede downloads fra Apple Music kan ikke afspilles. Den afspiller musik, du ejer, på din Mac, på eksterne drev eller på en netværksdeling. To valgfrie betafunktioner tilføjer din egen OpenSubsonic-server (Navidrome og andre) og musik sendt fra UPnP-kontrolapps."
         },
         {
           "q": "Hvordan ved jeg, at den faktisk er bitperfekt?",

@@ -274,7 +274,8 @@
           "Partages réseau en SMB, NFS ou WebDAV, avec mise en cache, « Conserver hors ligne » et une lecture conçue pour les serveurs lents : les morceaux sont mis en mémoire tampon sur votre Mac avant d’être lus, et un anneau de chargement s’affiche sur le bouton de lecture pendant ce temps.",
           "« Rechercher de la musique sur ce Mac » parcourt tous les disques à la recherche de votre vraie musique et laisse le fouillis de côté. Une courte configuration au premier lancement vous fait choisir votre sortie et explique le rôle de l’accès exclusif et de ReplayGain.",
           "Égaliseur paramétrique par sortie, qui importe les préréglages AutoEQ et Equalizer APO. Désactivé par défaut ; une fois activé, le chemin du signal affiche <span class=\"mono nowrap\">ÉGALISEUR</span> au lieu de <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Mini-lecteur, icône dans la barre des menus, touches multimédias, ReplayGain et mises à jour automatiques et signées."
+          "Mini-lecteur, icône dans la barre des menus, touches multimédias, ReplayGain et mises à jour automatiques et signées.",
+          "En option, et désactivés tant que vous ne les activez pas : des lecteurs réseau (UPnP) et des récepteurs AirPlay comme sorties, votre propre serveur OpenSubsonic dans la barre latérale, une télécommande pour votre téléphone ou n’importe quel navigateur de votre réseau, un visualiseur et des transitions entre les morceaux."
         ],
         "links": [
           "Toutes les fonctionnalités en détail"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Permet-il d’écouter Qobuz, TIDAL ou Apple Music en streaming ?",
-          "a": "Non. Vespertine lit la musique que vous possédez, sur votre Mac, sur des disques externes ou sur un partage réseau. Les téléchargements de l’abonnement Apple Music protégés par DRM ne peuvent pas être lus."
+          "a": "Pas depuis un service commercial : Vespertine n’a pas de client pour Qobuz, TIDAL ou Apple Music, et les téléchargements Apple Music protégés par DRM ne peuvent pas être lus. Il lit la musique que vous possédez, sur votre Mac, sur des disques externes ou sur un partage réseau. Deux fonctions bêta en option ajoutent votre propre serveur OpenSubsonic (Navidrome et d’autres) et la musique envoyée par des apps de contrôle UPnP."
         },
         {
           "q": "Comment savoir s’il est vraiment bit-perfect ?",

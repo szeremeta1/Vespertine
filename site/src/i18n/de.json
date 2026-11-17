@@ -274,7 +274,8 @@
           "Netzwerkfreigaben über SMB, NFS oder WebDAV, mit Caching, „Offline behalten“ und einer Wiedergabe, die für langsame Server ausgelegt ist: Titel werden vor dem Abspielen auf deinem Mac gepuffert, und solange das dauert, erscheint ein Ladering auf der Wiedergabetaste.",
           "„Musik finden“ durchsucht alle Laufwerke nach deiner echten Musik und lässt den Kram links liegen. Eine kurze Einrichtung beim ersten Start wählt deine Ausgabe und erklärt, was exklusiver Zugriff und ReplayGain bewirken.",
           "Parametrischer EQ pro Ausgabe, der Presets von AutoEQ und Equalizer APO importiert. Standardmäßig aus; ist er an, zeigt der Signalweg <span class=\"mono nowrap\">EQUALIZER</span> statt <span class=\"mono nowrap\">BIT-PERFEKT</span>.",
-          "Mini-Player, Menüleisten-Extra, Medientasten, ReplayGain und automatische, signierte Updates."
+          "Mini-Player, Menüleisten-Extra, Medientasten, ReplayGain und automatische, signierte Updates.",
+          "Optional und aus, bis du sie einschaltest: Netzwerkplayer (UPnP) und AirPlay-Empfänger als Ausgänge, dein eigener OpenSubsonic-Server in der Seitenleiste, eine Fernbedienung für dein Telefon oder jeden Browser in deinem Netzwerk, ein Visualizer und Übergänge zwischen Titeln."
         ],
         "links": [
           "Alle Funktionen im Detail"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Streamt es von Qobuz, TIDAL oder Apple Music?",
-          "a": "Nein. Vespertine spielt Musik, die dir gehört – auf deinem Mac, auf externen Laufwerken oder auf einer Netzwerkfreigabe. DRM-geschützte Downloads aus einem Apple-Music-Abo können nicht wiedergegeben werden."
+          "a": "Nicht von einem kommerziellen Dienst: Vespertine hat keinen Client für Qobuz, TIDAL oder Apple Music, und DRM-geschützte Downloads von Apple Music können nicht wiedergegeben werden. Es spielt Musik, die dir gehört – auf deinem Mac, auf externen Laufwerken oder auf einer Netzwerkfreigabe. Zwei optionale Betas ergänzen deinen eigenen OpenSubsonic-Server (Navidrome und andere) und Musik, die UPnP-Steuer-Apps schicken."
         },
         {
           "q": "Woher weiß ich, dass es wirklich bit-perfekt ist?",

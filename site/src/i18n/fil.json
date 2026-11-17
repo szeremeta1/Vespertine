@@ -274,7 +274,8 @@
           "Mga network share sa SMB, NFS o WebDAV, na may caching, Panatilihing Offline at playback na ginawa para sa mabagal na server: bina-buffer muna sa Mac mo ang mga track bago tumugtog, at may loading ring sa play button habang ginagawa ito.",
           "Hinahanap ng “Maghanap ng Musika” sa bawat drive ang totoong musika mo at iniiwan ang kalat. Sa unang pagbukas, pinipili ng isang maikling setup ang output mo at ipinapaliwanag kung ano ang ginagawa ng eksklusibong access at ReplayGain.",
           "Parametric EQ kada output na nag-i-import ng mga preset ng AutoEQ at Equalizer APO. Naka-off bilang default; kapag naka-on, <span class=\"mono nowrap\">EQUALIZER</span> ang sinasabi ng signal path sa halip na <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Mini Player, menu-bar extra, mga media key, ReplayGain at mga awtomatiko at naka-sign na update."
+          "Mini Player, menu-bar extra, mga media key, ReplayGain at mga awtomatiko at naka-sign na update.",
+          "Opsyonal, at naka-off hangga't hindi mo ino-on: mga network player (UPnP) at AirPlay receiver bilang output, ang sarili mong OpenSubsonic server sa sidebar, remote para sa telepono mo o anumang browser sa network mo, visualizer, at mga transition sa pagitan ng mga kanta."
         ],
         "links": [
           "Bawat feature, nang detalyado"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Nag-i-stream ba ito mula sa Qobuz, TIDAL o Apple Music?",
-          "a": "Hindi. Pine-play ng Vespertine ang musikang pag-aari mo, sa Mac mo, sa mga external drive o sa isang network share. Hindi mape-play ang mga download mula sa Apple Music subscription na protektado ng DRM."
+          "a": "Hindi mula sa komersyal na serbisyo: walang client ang Vespertine para sa Qobuz, TIDAL o Apple Music, at hindi mape-play ang mga download mula sa Apple Music na protektado ng DRM. Pine-play nito ang musikang pag-aari mo, sa Mac mo, sa mga external drive o sa isang network share. May dalawang opsyonal na beta na nagdaragdag ng sarili mong OpenSubsonic server (Navidrome at iba pa) at ng musikang ipinapadala ng mga UPnP control app."
         },
         {
           "q": "Paano ko malalaman na bit-perfect talaga ito?",

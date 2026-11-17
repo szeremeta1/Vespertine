@@ -274,7 +274,8 @@
           "Verkkojaot SMB:n, NFS:n tai WebDAVin kautta, välimuistilla, Pidä offline-tilassa -toiminnolla ja hitaille palvelimille suunnitellulla toistolla: kappaleet puskuroidaan Macillesi ennen toistoa, ja sillä aikaa toistopainikkeessa näkyy latausrengas.",
           "Etsi musiikkia käy läpi kaikki asemat, löytää todellisen musiikkisi ja jättää sotkun pois. Lyhyt käyttöönotto ensimmäisellä käynnistyskerralla valitsee ulostulosi ja kertoo, mitä yksinomainen käyttö ja ReplayGain tekevät.",
           "Ulostulokohtainen parametrinen EQ, joka tuo AutoEQ- ja Equalizer APO -esiasetuksia. Oletuksena pois päältä; kun se on päällä, signaalipolussa lukee <span class=\"mono nowrap\">TAAJUUSKORJAIN</span> eikä <span class=\"mono nowrap\">BITTITARKKA</span>.",
-          "Minisoitin, valikkorivin lisäke, medianäppäimet, ReplayGain sekä automaattiset, allekirjoitetut päivitykset."
+          "Minisoitin, valikkorivin lisäke, medianäppäimet, ReplayGain sekä automaattiset, allekirjoitetut päivitykset.",
+          "Valinnaisia ja pois päältä, kunnes otat ne käyttöön: verkkosoittimet (UPnP) ja AirPlay-vastaanottimet lähtöinä, oma OpenSubsonic-palvelimesi sivupalkissa, kaukosäädin puhelimelle tai mille tahansa verkkosi selaimelle, visualisoija ja kappaleiden väliset siirtymät."
         ],
         "links": [
           "Kaikki ominaisuudet yksityiskohtaisesti"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Toistaako se Qobuzista, TIDALista tai Apple Musicista?",
-          "a": "Ei. Vespertine toistaa omistamaasi musiikkia: Macillasi, ulkoisilla asemilla tai verkkojaossa. DRM-suojattuja Apple Music -tilauksen latauksia ei voi toistaa."
+          "a": "Ei kaupallisesta palvelusta: Vespertinessä ei ole Qobuz-, TIDAL- tai Apple Music -asiakasohjelmaa, eikä DRM-suojattuja Apple Music -latauksia voi toistaa. Se toistaa omistamaasi musiikkia: Macillasi, ulkoisilla asemilla tai verkkojaossa. Kaksi valinnaista betatoimintoa lisää oman OpenSubsonic-palvelimesi (Navidrome ja muut) sekä UPnP-ohjaussovellusten lähettämän musiikin."
         },
         {
           "q": "Mistä tiedän, että se on todella bittitarkka?",

@@ -274,7 +274,8 @@
           "Foldojin cibiyar sadarwa ta SMB, NFS ko WebDAV, tare da ajiyar wucin gadi, Riƙe don Wajen Layi da kunnawa da aka gina don sabobin da ba su da sauri: ana fara loda waƙoƙi a Mac ɗinku kafin su fara kunnawa, tare da zoben lodi a maɓallin kunnawa yayin da hakan ke gudana.",
           "Nemo Waƙoƙi yana bincika kowane faifan ajiya don gano ainihin kiɗanku kuma ya bar tarkace. Ɗan gajeren saiti a buɗewar farko yana zaɓar fitarwarku kuma yana bayyana abin da Amfani na keɓe da ReplayGain suke yi.",
           "EQ na parametric ga kowace fitarwa wanda yake shigo da saitattun AutoEQ da Equalizer APO. A kashe tun farko; idan yana kunne, Hanyar Sigina tana cewa <span class=\"mono nowrap\">EQ</span> maimakon <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Ƙaramin Mai Kunnawa, ƙarin sarrafawa a sandar menu, maɓallan kafofin watsa labarai, ReplayGain da sabuntawa na atomatik masu sa hannu."
+          "Ƙaramin Mai Kunnawa, ƙarin sarrafawa a sandar menu, maɓallan kafofin watsa labarai, ReplayGain da sabuntawa na atomatik masu sa hannu.",
+          "Na zaɓi ne, kuma a kashe suke har sai kun kunna su: masu kunnawa na cibiyar sadarwa (UPnP) da masu karɓa na AirPlay a matsayin fitarwa, sabar OpenSubsonic taku a gefen taga, rimot don wayarku ko kowane burauza a cibiyar sadarwarku, mai nuna sauti, da sauye-sauye tsakanin waƙoƙi."
         ],
         "links": [
           "Kowane fasali, dalla-dalla"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Yana yaɗa kiɗa daga Qobuz, TIDAL ko Apple Music?",
-          "a": "A'a. Vespertine yana kunna kiɗan da kuka mallaka, a Mac ɗinku, a ma'ajiyoyin waje ko a Folda ta cibiyar sadarwa. Ba zai iya kunna abubuwan da aka sauke ta rajistar Apple Music masu kariyar DRM ba."
+          "a": "Ba daga sabis na kasuwanci ba: Vespertine ba shi da manhajar Qobuz, TIDAL ko Apple Music a cikinsa, kuma ba zai iya kunna abubuwan da aka sauke daga Apple Music masu kariyar DRM ba. Yana kunna kiɗan da kuka mallaka, a Mac ɗinku, a ma'ajiyoyin waje ko a Folda ta cibiyar sadarwa. Fasaloli biyu na beta na zaɓi suna ƙara sabar OpenSubsonic taku (Navidrome da sauransu) da kiɗan da manhajojin sarrafa UPnP suke aikowa."
         },
         {
           "q": "Ta yaya zan san cewa da gaske bit-perfect ne?",

@@ -274,7 +274,8 @@
           "支援透過 SMB、NFS 或 WebDAV 的網路共享，具備快取、「保留離線拷貝」，以及專為慢速伺服器設計的播放機制：曲目會先在你的 Mac 上緩衝再播放，緩衝期間播放按鈕上會顯示載入圓環。",
           "「在這部 Mac 上尋找音樂」會搜尋每個磁碟，找出你真正的音樂，略過雜亂檔案。首次啟動時的簡短設定會帶你選擇輸出裝置，並說明獨佔存取與 ReplayGain 的作用。",
           "可依輸出裝置設定的參數式 EQ，能匯入 AutoEQ 與 Equalizer APO 預設組。預設為關閉；開啟時，訊號路徑會顯示 <span class=\"mono nowrap\">等化器</span>，而非 <span class=\"mono nowrap\">位元完美</span>。",
-          "迷你播放器、選單列附加項目、媒體鍵、ReplayGain，以及自動、經簽署的更新。"
+          "迷你播放器、選單列附加項目、媒體鍵、ReplayGain，以及自動、經簽署的更新。",
+          "選用功能，開啟前皆為關閉：作為輸出的網路播放器（UPnP）與 AirPlay 接收器、側邊欄中你自己的 OpenSubsonic 伺服器、可在手機或網路中任何瀏覽器上使用的遙控、視覺效果，以及歌曲之間的轉場。"
         ],
         "links": [
           "所有功能詳解"
@@ -525,7 +526,7 @@
         },
         {
           "q": "可以串流 Qobuz、TIDAL 或 Apple Music 嗎？",
-          "a": "不行。Vespertine 播放的是你擁有的音樂，無論存放在 Mac、外接磁碟或網路共享上。受 DRM 保護的 Apple Music 訂閱下載內容無法播放。"
+          "a": "無法串流商業服務：Vespertine 沒有 Qobuz、TIDAL 或 Apple Music 的用戶端，受 DRM 保護的 Apple Music 下載內容也無法播放。它播放的是你擁有的音樂，無論存放在 Mac、外接磁碟或網路共享上。兩項選用的測試版功能可接入你自己的 OpenSubsonic 伺服器（Navidrome 等），以及接收 UPnP 控制 App 傳來的音樂。"
         },
         {
           "q": "怎麼知道它真的是位元完美？",

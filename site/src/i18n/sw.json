@@ -274,7 +274,8 @@
           "Folda za mtandao kupitia SMB, NFS au WebDAV, zenye akiba ya faili, Hifadhi Nje ya Mtandao na uchezaji ulioundwa kwa ajili ya seva za polepole: nyimbo huhifadhiwa kwa muda kwenye Mac yako kabla ya kuchezwa, huku pete ya upakiaji ikionekana kwenye kitufe cha kucheza wakati huo.",
           "Tafuta Muziki hutafuta kila diski ili kupata muziki wako halisi na huacha takataka nyuma. Mipangilio mifupi wakati wa kufungua kwa mara ya kwanza huchagua kifaa chako cha kutoa sauti na hueleza ufikiaji wa kipekee na ReplayGain hufanya nini.",
           "EQ ya parametric kwa kila kifaa cha kutoa sauti, inayoingiza mipangilio iliyoandaliwa tayari ya AutoEQ na Equalizer APO. Imezimwa kwa chaguo-msingi; ikiwashwa, njia ya mawimbi husema <span class=\"mono nowrap\">KISAWAZISHI</span> badala ya <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Kicheza Kidogo, kipengele cha upau wa menyu, vitufe vya media, ReplayGain na masasisho ya kiotomatiki yaliyotiwa sahihi."
+          "Kicheza Kidogo, kipengele cha upau wa menyu, vitufe vya media, ReplayGain na masasisho ya kiotomatiki yaliyotiwa sahihi.",
+          "Vya hiari, na huwa vimezimwa hadi uviwashe: vichezaji vya mtandao (UPnP) na vipokezi vya AirPlay kama pato, seva yako mwenyewe ya OpenSubsonic kwenye upau wa pembeni, rimoti kwa simu yako au kivinjari chochote kwenye mtandao wako, kionyeshi, na mipito kati ya nyimbo."
         ],
         "links": [
           "Kila kipengele, kwa undani"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Je, inatiririsha kutoka Qobuz, TIDAL au Apple Music?",
-          "a": "Hapana. Vespertine hucheza muziki unaoumiliki, kwenye Mac yako, kwenye diski za nje au kwenye folda ya mtandao. Vipakuliwa vya usajili wa Apple Music vilivyolindwa kwa DRM haviwezi kuchezwa."
+          "a": "Si kutoka huduma ya kibiashara: Vespertine haina programu teja ya Qobuz, TIDAL wala Apple Music, na vipakuliwa vya Apple Music vilivyolindwa kwa DRM haviwezi kuchezwa. Hucheza muziki unaoumiliki, kwenye Mac yako, kwenye diski za nje au kwenye folda ya mtandao. Vipengele viwili vya beta vya hiari huongeza seva yako mwenyewe ya OpenSubsonic (Navidrome na nyinginezo) na muziki unaotumwa na programu za kudhibiti za UPnP."
         },
         {
           "q": "Nitajuaje kuwa ni bit-perfect kweli?",
