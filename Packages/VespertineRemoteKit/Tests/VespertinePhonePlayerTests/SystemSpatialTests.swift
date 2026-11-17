@@ -106,9 +106,9 @@ final class FakeSink: PlayerSink, @unchecked Sendable {
         #expect(speaker.surroundPath(wanted: .fixed) == .fold)
         #expect(interface.surroundPath(wanted: .fixed) == .discrete)
         #expect(interface.surroundPath(wanted: .off) == .discrete)
-        // A speaker iOS says it spatializes (it can, for multichannel) is given the channels too.
+        // The iPhone's speaker says it spatializes (measured on an iPhone 15 Pro Max): it still gets the fold the setting promises.
         let spatialSpeaker = PhoneRoute(name: "Speaker", portType: "Speaker", sampleRate: 48_000, channels: 2, spatial: true)
-        #expect(spatialSpeaker.surroundPath(wanted: .fixed) == .system)
+        #expect(spatialSpeaker.surroundPath(wanted: .fixed) == .fold)
     }
 }
 

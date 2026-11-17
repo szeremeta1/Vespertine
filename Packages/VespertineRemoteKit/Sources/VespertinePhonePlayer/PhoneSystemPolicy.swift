@@ -261,11 +261,13 @@ extension PhoneRoute {
     /// spatializes (`spatial`: AirPods or Beats with Spatial Audio on), the channels go to iOS as they are and iOS renders
     /// them, Fixed or Head Tracked as chosen in Control Center: no app on iOS can choose that for the system's renderer
     /// (the intended-spatial-experience APIs are visionOS-only in the iOS 27 SDK). Other headphones get Vespertine's own
-    /// fixed rendering; speakers iOS doesn't spatialize get the fold.
+    /// fixed rendering; speakers (even one iOS says it spatializes) get the fold.
     public func surroundPath(wanted: SpatialModeChoice, canTrackHead: Bool = true) -> SurroundPath {
         if isMultichannel { return .discrete }
         guard wanted != .off else { return .fold }
-        if spatial { return .system }
+        // Headphones only: an iPhone's own speaker says it spatializes too (iPhone 15 Pro Max, iOS 26.3.1), but this is
+        // the setting for headphones, and speakers keep the fold it promises.
+        if spatial && isHeadphones { return .system }
         return surroundMode(wanted: wanted, canTrackHead: canTrackHead) == .off ? .fold : .binaural
     }
 
