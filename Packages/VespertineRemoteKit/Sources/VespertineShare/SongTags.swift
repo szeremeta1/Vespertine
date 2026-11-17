@@ -312,7 +312,7 @@ public enum SongTagReader {
         guard b.count == moovSize else { return nil }
 
         var tags: SongTags?
-        var items: Range<Int>?
+        var metas: [Range<Int>] = []
         var movieDuration = 0.0
         for box in boxes(b, 8..<b.count) {
             switch box.type {
@@ -327,43 +327,149 @@ public enum SongTagReader {
                 let length = inside.first { $0.type == "mdhd" }.map { duration(b, $0.body) }
                 tags = soundEntry(b, stsd.body, length: length)
             case "udta":
-                if let meta = boxes(b, box.body).first(where: { $0.type == "meta" }) {
-                    items = boxes(b, (meta.body.lowerBound + 4)..<meta.body.upperBound).first { $0.type == "ilst" }?.body
-                }
+                metas += boxes(b, box.body).filter { $0.type == "meta" }.map(\.body)
+            case "meta":
+                // QuickTime's own place for it: beside the tracks, not inside `udta`.
+                metas.append(box.body)
             default: break
             }
         }
         guard var tags else { return nil }
         if tags.duration <= 0 { tags.duration = movieDuration }
         if tags.bitDepth == nil, tags.duration > 0 { tags.bitRate = Int((Double(file.size) * 8 / tags.duration / 1000).rounded()) }
-        if let items {
-            var gain = GainTags()
-            for item in boxes(b, items) {
-                guard let data = boxes(b, item.body).first(where: { $0.type == "data" }), data.body.count >= 8 else { continue }
-                let payload = (data.body.lowerBound + 8)..<data.body.upperBound
-                var text: String? { clean(String(decoding: b[payload], as: UTF8.self)) }
-                switch item.type {
-                case "\u{A9}nam": tags.title = text
-                case "\u{A9}ART": tags.artist = text
-                case "aART": tags.albumArtist = text
-                case "\u{A9}alb": tags.album = text
-                case "\u{A9}gen": tags.genre = text
-                case "\u{A9}day": tags.year = yearIn(text)
-                case "trkn": tags.track = be16(b, payload.lowerBound + 2) > 0 ? be16(b, payload.lowerBound + 2) : nil
-                case "disk": tags.disc = be16(b, payload.lowerBound + 2) > 0 ? be16(b, payload.lowerBound + 2) : nil
-                case "covr" where tags.pictureOffset == nil && !payload.isEmpty:
-                    tags.pictureOffset = moovAt + Int64(payload.lowerBound)
-                    tags.pictureLength = payload.count
-                case "----":
-                    // A tag with a name of its own: the name is in a box beside the value, after four bytes of flags.
-                    guard let name = boxes(b, item.body).first(where: { $0.type == "name" }), name.body.count > 4 else { break }
-                    gain.take(String(decoding: b[(name.body.lowerBound + 4)..<name.body.upperBound], as: UTF8.self), text)
-                default: break
-                }
+        var gain = GainTags()
+        var named: [(keys: [String], items: Range<Int>)] = []
+        for meta in metas {
+            let inside = metaBoxes(b, meta)
+            guard let items = inside.first(where: { $0.type == "ilst" })?.body else { continue }
+            if let keys = inside.first(where: { $0.type == "keys" }) {
+                named.append((metadataKeys(b, keys.body), items))
+            } else {
+                apply(itemList: items, of: b, at: moovAt, to: &tags, gain: &gain)
             }
-            tags.replayGain = gain.values
         }
+        // Tags under QuickTime's own names fill in whatever the iTunes kind left unsaid.
+        for list in named { apply(namedItems: list.items, keys: list.keys, of: b, at: moovAt, to: &tags, gain: &gain) }
+        tags.replayGain = gain.values
         return tags
+    }
+
+    /// The boxes inside a `meta` box. MPEG-4 starts it with four bytes of version and flags; QuickTime's own files
+    /// go straight to the first box, which is the handler.
+    private static func metaBoxes(_ b: [UInt8], _ body: Range<Int>) -> [(type: String, body: Range<Int>)] {
+        guard body.count >= 8 else { return [] }
+        let plain = tag(b, body.lowerBound + 4) == "hdlr"
+        return boxes(b, (plain ? body.lowerBound : body.lowerBound + 4)..<body.upperBound)
+    }
+
+    /// The iTunes kind of tags: each item's four-letter type says what it is.
+    private static func apply(itemList items: Range<Int>, of b: [UInt8], at moovAt: Int64, to tags: inout SongTags, gain: inout GainTags) {
+        for item in boxes(b, items) {
+            guard let data = boxes(b, item.body).first(where: { $0.type == "data" }), data.body.count >= 8 else { continue }
+            let payload = (data.body.lowerBound + 8)..<data.body.upperBound
+            var text: String? { clean(String(decoding: b[payload], as: UTF8.self)) }
+            switch item.type {
+            case "\u{A9}nam": tags.title = text
+            case "\u{A9}ART": tags.artist = text
+            case "aART": tags.albumArtist = text
+            case "\u{A9}alb": tags.album = text
+            case "\u{A9}gen": tags.genre = text
+            case "\u{A9}day": tags.year = yearIn(text)
+            case "trkn": tags.track = be16(b, payload.lowerBound + 2) > 0 ? be16(b, payload.lowerBound + 2) : nil
+            case "disk": tags.disc = be16(b, payload.lowerBound + 2) > 0 ? be16(b, payload.lowerBound + 2) : nil
+            case "covr" where tags.pictureOffset == nil && !payload.isEmpty:
+                tags.pictureOffset = moovAt + Int64(payload.lowerBound)
+                tags.pictureLength = payload.count
+            case "----":
+                // A tag with a name of its own: the name is in a box beside the value, after four bytes of flags.
+                guard let name = boxes(b, item.body).first(where: { $0.type == "name" }), name.body.count > 4 else { break }
+                gain.take(String(decoding: b[(name.body.lowerBound + 4)..<name.body.upperBound], as: UTF8.self), text)
+            default: break
+            }
+        }
+    }
+
+    /// A `keys` box: the names QuickTime metadata goes by, in lower case, in the order the items count them from 1.
+    /// A name from a namespace other than `mdta` is left empty, and so matches nothing.
+    private static func metadataKeys(_ b: [UInt8], _ body: Range<Int>) -> [String] {
+        var names: [String] = []
+        guard body.count >= 8 else { return names }
+        let count = be32(b, body.lowerBound + 4)
+        var at = body.lowerBound + 8
+        for _ in 0..<min(count, 4096) {
+            guard at + 8 <= body.upperBound else { break }
+            let size = be32(b, at)
+            guard size >= 8, at + size <= body.upperBound else { break }
+            let isName = tag(b, at + 4) == "mdta"
+            names.append(isName ? String(decoding: b[(at + 8)..<(at + size)], as: UTF8.self).lowercased() : "")
+            at += size
+        }
+        return names
+    }
+
+    /// The value of a QuickTime metadata item as text: text as it is, a whole number as its digits.
+    private static func namedValue(_ b: [UInt8], _ data: Range<Int>) -> String? {
+        let payload = (data.lowerBound + 8)..<data.upperBound
+        switch be32(b, data.lowerBound) & 0xFF_FFFF {
+        case 1:
+            return clean(String(decoding: b[payload], as: UTF8.self))
+        case 2:
+            var units: [UInt16] = []
+            var at = payload.lowerBound
+            while at + 2 <= payload.upperBound {
+                units.append(UInt16(be16(b, at)))
+                at += 2
+            }
+            return clean(String(decoding: units, as: UTF16.self))
+        case 21, 22:
+            guard (1...4).contains(payload.count) else { return nil }
+            var value = 0
+            for byte in b[payload] { value = value << 8 | Int(byte) }
+            return String(value)
+        default:
+            return nil
+        }
+    }
+
+    /// QuickTime's own kind of tags (FFmpeg's `-movflags use_metadata_tags`, and what Apple's apps write in movies):
+    /// each item's type is a number, counting into `keys` from 1. Only what is still unknown is taken.
+    private static func apply(namedItems items: Range<Int>, keys: [String], of b: [UInt8], at moovAt: Int64, to tags: inout SongTags, gain: inout GainTags) {
+        for item in boxes(b, items) {
+            var index = 0
+            for scalar in item.type.unicodeScalars { index = index << 8 | Int(scalar.value) }
+            guard index >= 1, index <= keys.count else { continue }
+            guard let data = boxes(b, item.body).first(where: { $0.type == "data" }), data.body.count >= 8 else { continue }
+            let key = keys[index - 1]
+            if key == "com.apple.quicktime.artwork" {
+                let kind = be32(b, data.body.lowerBound) & 0xFF_FFFF
+                if tags.pictureOffset == nil, data.body.count > 8, kind == 13 || kind == 14 {
+                    tags.pictureOffset = moovAt + Int64(data.body.lowerBound + 8)
+                    tags.pictureLength = data.body.count - 8
+                }
+                continue
+            }
+            guard let text = namedValue(b, data.body) else { continue }
+            switch key {
+            case "title", "com.apple.quicktime.title", "com.apple.quicktime.displayname":
+                tags.title = tags.title ?? text
+            case "artist", "com.apple.quicktime.artist":
+                tags.artist = tags.artist ?? text
+            case "album_artist", "albumartist", "album artist":
+                tags.albumArtist = tags.albumArtist ?? text
+            case "album", "com.apple.quicktime.album":
+                tags.album = tags.album ?? text
+            case "genre", "com.apple.quicktime.genre":
+                tags.genre = tags.genre ?? text
+            case "date", "year", "originaldate", "com.apple.quicktime.year", "com.apple.quicktime.creationdate":
+                tags.year = tags.year ?? yearIn(text)
+            case "track", "tracknumber":
+                tags.track = tags.track ?? leadingNumber(text)
+            case "disc", "discnumber":
+                tags.disc = tags.disc ?? leadingNumber(text)
+            default:
+                gain.take(key, text)
+            }
+        }
     }
 
     /// A `mvhd` or `mdhd` box: its time scale and its length.
