@@ -25,7 +25,9 @@ public enum RAOPError: Error, Equatable, LocalizedError {
         case .timeout: String(localized: "it didn't answer in time")
         case .closed: String(localized: "it closed the connection")
         case .socket(let e): String(localized: "network error: \(String(cString: strerror(e)))")
-        case .refused(let what, let status): status == 453 ? String(localized: "it is busy with another sender") : String(localized: "it refused \(what) (\(status))")
+        case .refused(_, 453): String(localized: "it is busy with another sender")
+        case .refused(_, 401): String(localized: "it didn't accept the password", comment: "Why an AirPlay receiver couldn't play: goes in “%1$@ couldn't play the song (%2$@).”")
+        case .refused(let what, let status): String(localized: "it refused \(what) (\(status))")
         case .badResponse(let what): String(localized: "it answered \(what) in a way Vespertine doesn't understand")
         }
     }

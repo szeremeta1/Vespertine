@@ -18,6 +18,84 @@ func packets(_ count: Int, seed: UInt64 = 9) -> [[Int16]] {
 
 @Suite("RAOP session", .serialized)
 struct RAOPSessionTests {
+    @Test("The digest is RFC 2617's (no qop), and a challenge is read with or without quotes and spaces")
+    func digest() {
+        // RFC 2617's own example values, without qop: MD5(HA1:nonce:HA2).
+        let c = RTSPDigest.Challenge(realm: "testrealm@host.com", nonce: "dcd98b7102dd2f0e8b11d0f600bfb0c093")
+        #expect(RTSPDigest.md5("iTunes:raop:secret", uppercase: false).count == 32)
+        #expect(RTSPDigest.md5("", uppercase: false) == "d41d8cd98f00b204e9800998ecf8427e")
+        #expect(RTSPDigest.md5("", uppercase: true) == "D41D8CD98F00B204E9800998ECF8427E")
+        let lower = RTSPDigest.response(c, password: "secret", method: "ANNOUNCE", uri: "rtsp://10.0.0.2/1", uppercase: false)
+        let ha1 = RTSPDigest.md5("iTunes:testrealm@host.com:secret", uppercase: false), ha2 = RTSPDigest.md5("ANNOUNCE:rtsp://10.0.0.2/1", uppercase: false)
+        #expect(lower == RTSPDigest.md5("\(ha1):\(c.nonce):\(ha2)", uppercase: false))
+        #expect(RTSPDigest.response(c, password: "secret", method: "ANNOUNCE", uri: "rtsp://10.0.0.2/1", uppercase: true) != lower.uppercased())
+        #expect(RTSPDigest.Challenge.parse("Digest realm=\"raop\", nonce=\"abc,def\"") == RTSPDigest.Challenge(realm: "raop", nonce: "abc,def"))
+        #expect(RTSPDigest.Challenge.parse("digest nonce=abc ,realm = raop") == RTSPDigest.Challenge(realm: "raop", nonce: "abc"))
+        #expect(RTSPDigest.Challenge.parse("Basic realm=\"raop\"") == nil)
+        #expect(RTSPDigest.Challenge.parse("Digest realm=\"raop\"") == nil)
+        let header = RTSPDigest.authorization(c, password: "secret", method: "SETUP", uri: "u", uppercase: false)
+        let fields = RTSPDigest.parameters(String(header.dropFirst("Digest".count)))
+        #expect(fields["username"] == "iTunes" && fields["realm"] == c.realm && fields["nonce"] == c.nonce && fields["uri"] == "u")
+        #expect(!header.contains("secret"))
+    }
+
+    @Test("A receiver with a password takes the session once its challenge is answered; every later request carries the digest")
+    func password() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.password = "open sesame"
+        let session = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none, password: "open sesame")
+        try await session.connect(volumeDB: -20)
+        // OPTIONS twice (refused, then answered); the rest once each.
+        #expect(receiver.methods == ["OPTIONS", "OPTIONS", "ANNOUNCE", "SETUP", "RECORD", "SET_PARAMETER"])
+        #expect(receiver.requests[0]["Authorization"] == nil)
+        #expect(receiver.requests.dropFirst().allSatisfy { $0["Authorization"]?.hasPrefix("Digest username=\"iTunes\"") == true })
+        #expect(!receiver.requests.contains { ($0["Authorization"] ?? "").contains("open sesame") })
+        // Numbered in order, the refused one included.
+        #expect(receiver.requests.compactMap { $0["CSeq"] } == ["1", "2", "3", "4", "5", "6"])
+        await session.teardown()
+    }
+
+    @Test("A receiver that wants the digest in capitals gets it on the second try, and from then on at once")
+    func passwordCapitals() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.password = "pw"
+        receiver.capitalDigits = true
+        let session = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none, password: "pw")
+        try await session.connect(volumeDB: nil)
+        #expect(receiver.methods == ["OPTIONS", "OPTIONS", "OPTIONS", "ANNOUNCE", "SETUP", "RECORD"])
+        await session.teardown()
+    }
+
+    @Test("A nonce that went stale is answered again, in the case the receiver already took")
+    func passwordStaleNonce() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.password = "pw"
+        receiver.nonceLife = 2
+        let session = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none, password: "pw")
+        try await session.connect(volumeDB: nil)
+        #expect(session.isConnected)
+        // SETUP met the new nonce: refused, tried in capitals, then answered as before.
+        #expect(receiver.methods == ["OPTIONS", "OPTIONS", "ANNOUNCE", "SETUP", "SETUP", "SETUP", "RECORD"])
+        await session.teardown()
+    }
+
+    @Test("A wrong password, or none, is refused with 401 after the tries, and the session is closed")
+    func passwordWrong() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.password = "right"
+        let wrong = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none, password: "wrong")
+        await #expect(throws: RAOPError.refused("OPTIONS", 401)) { try await wrong.connect(volumeDB: nil) }
+        #expect(receiver.methods == ["OPTIONS", "OPTIONS", "OPTIONS", "OPTIONS"])
+        #expect(!wrong.isConnected)
+        let none = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none)
+        await #expect(throws: RAOPError.refused("OPTIONS", 401)) { try await none.connect(volumeDB: nil) }
+        #expect(receiver.methods.count == 5)
+    }
+
     @Test("An MFi receiver is sent auth-setup after OPTIONS: 0x01 and a 32-byte key, new each time; then the session as usual")
     func authSetup() async throws {
         let receiver = try FakeRAOPReceiver()

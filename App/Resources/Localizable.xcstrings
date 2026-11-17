@@ -97822,6 +97822,275 @@
         }
       }
     },
+    "AIRPLAY · ALAC 16/44.1 · PASSWORD": {
+      "comment": "Output list: an AirPlay receiver that asks for a password before it plays (short, uppercase)",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · የይለፍ ቃል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · كلمة سر"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · পাসওয়ার্ড"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · HESLO"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · ADGANGSKODE"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · PASSWORT"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · ΣΥΝΘΗΜΑΤΙΚΟ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · CONTRASEÑA"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC ۱۶/۴۴٫۱ · گذرواژه"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · SALASANA"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · PASSWORD"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · MOT DE PASSE"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · પાસવર્ડ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · KALMAR SIRRI"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · סיסמה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · पासवर्ड"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · JELSZÓ"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · KATA SANDI"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · PASSWORD"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · パスワード"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · ಪಾಸ್‌ವರ್ಡ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · 암호"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · പാസ്‌വേഡ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · पासवर्ड"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · KATA LALUAN"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · PASSORD"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · WACHTWOORD"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · ਪਾਸਵਰਡ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · HASŁO"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · SENHA"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · PALAVRA-PASSE"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · PAROLĂ"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · LÖSENORD"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · NENOSIRI"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · கடவுச்சொல்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · పాస్‌వర్డ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · รหัสผ่าน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · PAROLA"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · ПАРОЛЬ"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · پاس ورڈ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · MẬT KHẨU"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · 密碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · 密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY · ALAC 16/44.1 · 密碼"
+          }
+        }
+      }
+    },
     "AIRPLAY · IDLE": {
       "comment": "Device chip: an AirPlay receiver chosen, nothing playing (short, uppercase)",
       "localizations": {
@@ -221957,6 +222226,275 @@
         }
       }
     },
+    "Forget Password": {
+      "comment": "Button under an AirPlay receiver that has a password: removes the saved password from the keychain.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የይለፍ ቃሉን እርሳ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نسيان كلمة السر"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "পাসওয়ার্ড ভুলে যান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapomenout heslo"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glem adgangskode"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passwort vergessen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Διαγραφή συνθηματικού"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Olvidar contraseña"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فراموش کردن گذرواژه"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unohda salasana"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalimutan ang Password"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oublier le mot de passe"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "પાસવર્ડ ભૂલી જાઓ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manta Kalmar Sirri"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שכח סיסמה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पासवर्ड भूल जाएँ"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jelszó elfelejtése"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lupakan Kata Sandi"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimentica password"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "パスワードを削除"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪಾಸ್‌ವರ್ಡ್ ಮರೆತುಬಿಡಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "암호 지우기"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പാസ്‌വേഡ് മറക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पासवर्ड विसरा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lupakan Kata Laluan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glem passord"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergeet wachtwoord"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਪਾਸਵਰਡ ਭੁੱਲ ਜਾਓ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapomnij hasło"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esquecer Senha"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esquecer palavra-passe"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uită parola"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glöm lösenord"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sahau Nenosiri"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "கடவுச்சொல்லை மற"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "పాస్‌వర్డ్‌ను మరచిపో"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เลิกจำรหัสผ่าน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parolayı Unut"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Забути пароль"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پاس ورڈ بھول جائیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quên mật khẩu"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "忘記密碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "忘记密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "忘記密碼"
+          }
+        }
+      }
+    },
     "Format": {
       "localizations": {
         "am": {
@@ -257312,6 +257850,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "歌曲無法開啟"
+          }
+        }
+      }
+    },
+    "it didn't accept the password": {
+      "comment": "Why an AirPlay receiver couldn't play: goes in “%1$@ couldn't play the song (%2$@).”",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የይለፍ ቃሉን አልተቀበለም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يقبل كلمة السر"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এটি পাসওয়ার্ড গ্রহণ করেনি"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nepřijal heslo"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den accepterede ikke adgangskoden"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "das Gerät hat das Passwort nicht akzeptiert"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "δεν αποδέχτηκε το συνθηματικό"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "el dispositivo no ha aceptado la contraseña"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دستگاه گذرواژه را نپذیرفت"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "laite ei hyväksynyt salasanaa"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hindi nito tinanggap ang password"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "il n’a pas accepté le mot de passe"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તેણે પાસવર્ડ સ્વીકાર્યો નહીં"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bai karɓi kalmar sirri ba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הוא לא קיבל את הסיסמה"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "उसने पासवर्ड स्वीकार नहीं किया"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "az eszköz nem fogadta el a jelszót"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "perangkat tidak menerima kata sandi"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "non ha accettato la password"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デバイスがパスワードを受け付けませんでした"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಾಧನ ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ಸ್ವೀಕರಿಸಲಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기기가 암호를 승인하지 않음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഉപകരണം പാസ്‌വേഡ് സ്വീകരിച്ചില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "डिव्हाइसने पासवर्ड स्वीकारला नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "peranti tidak menerima kata laluan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den godtok ikke passordet"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "het apparaat heeft het wachtwoord niet geaccepteerd"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ ਨੇ ਪਾਸਵਰਡ ਸਵੀਕਾਰ ਨਹੀਂ ਕੀਤਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "urządzenie nie zaakceptowało hasła"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "o dispositivo não aceitou a senha"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "não aceitou a palavra-passe"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "nu a acceptat parola"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den godtog inte lösenordet"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "hakikukubali nenosiri"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அது கடவுச்சொல்லை ஏற்கவில்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "పరికరం పాస్‌వర్డ్‌ను అంగీకరించలేదు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อุปกรณ์ไม่ยอมรับรหัสผ่าน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aygıt parolayı kabul etmedi"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "пристрій не прийняв пароль"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ڈیوائس نے پاس ورڈ قبول نہیں کیا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "thiết bị không chấp nhận mật khẩu"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "裝置不接受該密碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设备不接受该密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "裝置不接受該密碼"
           }
         }
       }
@@ -302351,6 +303158,275 @@
         }
       }
     },
+    "Password for “%@”": {
+      "comment": "Title of the sheet that asks for an AirPlay receiver's password. %@ is the receiver's name.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የ“%@” የይለፍ ቃል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كلمة السر لـ ”%@“"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”-এর পাসওয়ার্ড"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Heslo pro „%@“"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adgangskode til “%@”"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passwort für „%@“"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Συνθηματικό για «%@»"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contraseña de «%@»"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گذرواژهٔ «%@»"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salasana kohteelle ”%@”"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password para sa “%@”"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mot de passe pour « %@ »"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” માટે પાસવર્ડ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalmar sirri ta “%@”"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "סיסמה עבור ״%@״"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” के लिए पासवर्ड"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jelszó ehhez: „%@”"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kata Sandi untuk “%@”"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password per “%@”"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”のパスワード"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ಗಾಗಿ ಪಾಸ್‌ವರ್ಡ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”의 암호"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” എന്നതിനുള്ള പാസ്‌വേഡ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” साठी पासवर्ड"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kata Laluan untuk “%@”"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passord for «%@»"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wachtwoord voor ‘%@’"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ਲਈ ਪਾਸਵਰਡ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hasło do „%@”"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senha de “%@”"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Palavra-passe de “%@”"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parolă pentru „%@”"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lösenord för ”%@”"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nenosiri la “%@”"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”-க்கான கடவுச்சொல்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” కోసం పాస్‌వర్డ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รหัสผ่านสำหรับ “%@”"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” için Parola"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пароль для «%@»"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”%@“ کا پاس ورڈ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mật khẩu cho “%@”"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」的密碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”的密码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」的密碼"
+          }
+        }
+      }
+    },
     "Play to other players on your network, take music from other apps, or add your own music server. Each stays off until you switch it on, here or in Settings.": {
       "comment": "Setup assistant, More ways to play page: the sentence under the heading. The four switches below it are network players (UPnP), AirPlay players, Receive from Other Apps and Music Servers.",
       "localizations": {
@@ -312070,275 +313146,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "需要檢查"
-          }
-        }
-      }
-    },
-    "Needs a password — not supported yet": {
-      "comment": "Output list: an AirPlay receiver protected by a password (Vespertine can't send to it yet).",
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "የይለፍ ቃል ያስፈልገዋል — ገና አይደገፍም"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يتطلب كلمة سر — غير مدعوم بعد"
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "পাসওয়ার্ড দরকার — এখনো সমর্থিত নয়"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vyžaduje heslo – zatím nepodporováno"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kræver adgangskode – understøttes ikke endnu"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Passwort erforderlich – noch nicht unterstützt"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Απαιτεί συνθηματικό — δεν υποστηρίζεται ακόμη"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Requiere contraseña: todavía no se admite"
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "گذرواژه لازم دارد — هنوز پشتیبانی نمی‌شود"
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vaatii salasanan – ei vielä tuettu"
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kailangan ng password — hindi pa suportado"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mot de passe requis — pas encore pris en charge"
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "પાસવર્ડ જરૂરી છે — હજી સપોર્ટ નથી"
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yana buƙatar kalmar sirri — ba a goyon baya tukuna"
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "נדרשת סיסמה — עדיין לא נתמך"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "पासवर्ड चाहिए — अभी समर्थित नहीं"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jelszót kér – még nem támogatott"
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Perlu kata sandi — belum didukung"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Richiede una password — non ancora supportato"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "パスワードが必要 — 未対応"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ಪಾಸ್‌ವರ್ಡ್ ಬೇಕು — ಇನ್ನೂ ಬೆಂಬಲವಿಲ್ಲ"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "암호 필요 — 아직 지원되지 않음"
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "പാസ്‌വേഡ് ആവശ്യമാണ് — ഇതുവരെ പിന്തുണയില്ല"
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "पासवर्ड आवश्यक — अद्याप समर्थित नाही"
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Memerlukan kata laluan — belum disokong"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Krever passord – støttes ikke ennå"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wachtwoord vereist – nog niet ondersteund"
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਪਾਸਵਰਡ ਲੋੜੀਂਦਾ ਹੈ — ਹਾਲੇ ਸਮਰਥਿਤ ਨਹੀਂ"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wymaga hasła — jeszcze nieobsługiwane"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Requer senha — ainda não compatível"
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Requer palavra-passe — ainda não suportado"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Necesită parolă — încă nu este acceptat"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kräver lösenord – stöds inte än"
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kinahitaji nenosiri — bado hakiwezi kutumika"
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "கடவுச்சொல் தேவை — இன்னும் ஆதரிக்கப்படவில்லை"
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "పాస్‌వర్డ్ అవసరం — ఇంకా మద్దతు లేదు"
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ต้องใช้รหัสผ่าน — ยังไม่รองรับ"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Parola gerekiyor — henüz desteklenmiyor"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Потрібен пароль — поки що не підтримується"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "پاس ورڈ درکار ہے — ابھی معاون نہیں"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cần mật khẩu — chưa được hỗ trợ"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "需要密码 — 尚不支持"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "需要密碼 — 尚未支援"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "需要密碼 — 尚未支援"
           }
         }
       }
@@ -475972,6 +476779,275 @@
         }
       }
     },
+    "The receiver didn’t accept that password.": {
+      "comment": "In the sheet that asks for an AirPlay receiver's password, after a wrong one.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ተቀባዩ ያንን የይለፍ ቃል አልተቀበለም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يقبل المستقبِل كلمة السر هذه."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "রিসিভার ওই পাসওয়ার্ড গ্রহণ করেনি।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přijímač toto heslo nepřijal."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modtageren accepterede ikke den adgangskode."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Empfänger hat dieses Passwort nicht akzeptiert."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ο δέκτης δεν αποδέχτηκε αυτό το συνθηματικό."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El receptor no ha aceptado esa contraseña."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گیرنده آن گذرواژه را نپذیرفت."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vastaanotin ei hyväksynyt tätä salasanaa."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi tinanggap ng receiver ang password na iyon."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le récepteur n’a pas accepté ce mot de passe."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "રિસીવરે તે પાસવર્ડ સ્વીકાર્યો નહીં."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risivar ba ta karɓi wannan kalmar sirri ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המקלט לא קיבל את הסיסמה הזאת."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रिसीवर ने वह पासवर्ड स्वीकार नहीं किया।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A vevő nem fogadta el ezt a jelszót."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receiver tidak menerima kata sandi tersebut."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il ricevitore non ha accettato la password."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レシーバーはそのパスワードを受け付けませんでした。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ರಿಸೀವರ್ ಆ ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ಸ್ವೀಕರಿಸಲಿಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "리시버가 해당 암호를 승인하지 않았습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "റിസീവർ ആ പാസ്‌വേഡ് സ്വീകരിച്ചില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रिसीव्हरने तो पासवर्ड स्वीकारला नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penerima tidak menerima kata laluan itu."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mottakeren godtok ikke det passordet."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De ontvanger heeft dat wachtwoord niet geaccepteerd."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਰਿਸੀਵਰ ਨੇ ਉਹ ਪਾਸਵਰਡ ਸਵੀਕਾਰ ਨਹੀਂ ਕੀਤਾ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odbiornik nie zaakceptował tego hasła."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O receptor não aceitou essa senha."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O recetor não aceitou essa palavra-passe."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receptorul nu a acceptat această parolă."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mottagaren godtog inte lösenordet."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kipokezi hakikukubali nenosiri hilo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ரிசீவர் அந்தக் கடவுச்சொல்லை ஏற்கவில்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "రిసీవర్ ఆ పాస్‌వర్డ్‌ను అంగీకరించలేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ตัวรับสัญญาณไม่ยอมรับรหัสผ่านนั้น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alıcı bu parolayı kabul etmedi."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Приймач не прийняв цей пароль."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریسیور نے وہ پاس ورڈ قبول نہیں کیا۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bộ thu không chấp nhận mật khẩu đó."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接收器不接受該密碼。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接收器不接受该密码。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接收器不接受該密碼。"
+          }
+        }
+      }
+    },
     "The receiver keeps in step with this Mac's clock by adding or dropping samples now and then. On shairport-sync (moOde, Volumio), “disable_synchronization” or the pipe backend leaves them alone.": {
       "comment": "Advice shown under “For the best result” in a n AirPlay receiver's details. Technical names in “quotes” are setting names of the receiver software: keep them exactly. shairport-sync, moOde and Volumio are product names.",
       "localizations": {
@@ -492417,6 +493493,274 @@
           "stringUnit": {
             "state": "translated",
             "value": "此位址使用 http，因此你的使用者名稱、密碼和音樂會以未加密方式在網路上傳輸。若伺服器支援，請使用 https。"
+          }
+        }
+      }
+    },
+    "This AirPlay receiver asks for a password. Vespertine saves it in your keychain.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ የAirPlay ተቀባይ የይለፍ ቃል ይጠይቃል። Vespertine በKeychain ውስጥ ያስቀምጠዋል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يطلب مستقبِل AirPlay هذا كلمة سر. يحفظها Vespertine في سلسلة المفاتيح."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই AirPlay রিসিভার পাসওয়ার্ড চায়। Vespertine এটি আপনার কীচেইনে সংরক্ষণ করে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tento přijímač AirPlay vyžaduje heslo. Vespertine ho uloží do Klíčenky."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne AirPlay-modtager beder om en adgangskode. Vespertine gemmer den i din nøglering."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser AirPlay-Empfänger verlangt ein Passwort. Vespertine sichert es in deinem Schlüsselbund."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτός ο δέκτης AirPlay ζητά συνθηματικό. Το Vespertine το αποθηκεύει στην κλειδοθήκη σας."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este receptor AirPlay pide una contraseña. Vespertine la guarda en tu llavero."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این گیرندهٔ AirPlay گذرواژه می‌خواهد. Vespertine آن را در Keychain شما ذخیره می‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tämä AirPlay-vastaanotin pyytää salasanaa. Vespertine tallentaa sen avainnippuusi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Humihingi ng password ang AirPlay receiver na ito. Sine-save ito ng Vespertine sa keychain mo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce récepteur AirPlay demande un mot de passe. Vespertine l’enregistre dans votre trousseau."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ AirPlay રિસીવર પાસવર્ડ માગે છે. Vespertine તેને તમારા Keychain માં સાચવે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan risivar AirPlay tana neman kalmar sirri. Vespertine yana adana ta a keychain ɗinka."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מקלט AirPlay זה מבקש סיסמה. Vespertine שומר אותה במחזיק המפתחות שלך."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यह AirPlay रिसीवर पासवर्ड माँगता है। Vespertine इसे आपके कीचेन में सहेजता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez az AirPlay-vevő jelszót kér. A Vespertine a kulcskarikádba menti."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receiver AirPlay ini meminta kata sandi. Vespertine menyimpannya di rantai kunci Anda."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo ricevitore AirPlay richiede una password. Vespertine la salva nel tuo portachiavi."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このAirPlayレシーバーはパスワードを必要とします。Vespertineがキーチェーンに保存します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ AirPlay ರಿಸೀವರ್ ಪಾಸ್‌ವರ್ಡ್ ಕೇಳುತ್ತದೆ. Vespertine ಅದನ್ನು ನಿಮ್ಮ ಕೀಚೈನ್‌ನಲ್ಲಿ ಉಳಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 AirPlay 리시버는 암호를 요구합니다. Vespertine이 암호를 키체인에 저장합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ AirPlay റിസീവർ പാസ്‌വേഡ് ആവശ്യപ്പെടുന്നു. Vespertine അത് നിങ്ങളുടെ കീചെയിനിൽ സൂക്ഷിക്കുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हा AirPlay रिसीव्हर पासवर्ड मागतो. Vespertine तो तुमच्या Keychain मध्ये सेव्ह करते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penerima AirPlay ini meminta kata laluan. Vespertine menyimpannya dalam rantai kunci anda."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne AirPlay-mottakeren ber om et passord. Vespertine arkiverer det i nøkkelringen din."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze AirPlay-ontvanger vraagt om een wachtwoord. Vespertine bewaart het in je sleutelhanger."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਹ AirPlay ਰਿਸੀਵਰ ਪਾਸਵਰਡ ਮੰਗਦਾ ਹੈ। Vespertine ਇਸਨੂੰ ਤੁਹਾਡੀ Keychain ਵਿੱਚ ਸੰਭਾਲਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ten odbiornik AirPlay wymaga hasła. Vespertine zachowuje je w Twoim pęku kluczy."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este receptor AirPlay pede uma senha. O Vespertine a salva nas suas Chaves."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este recetor AirPlay pede uma palavra-passe. O Vespertine guarda-a no seu porta-chaves."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acest receptor AirPlay cere o parolă. Vespertine o salvează în portchei."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den här AirPlay-mottagaren kräver ett lösenord. Vespertine sparar det i din nyckelring."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kipokezi hiki cha AirPlay kinaomba nenosiri. Vespertine hulihifadhi kwenye keychain yako."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த AirPlay ரிசீவர் கடவுச்சொல்லைக் கேட்கிறது. Vespertine அதை உங்கள் Keychain-இல் சேமிக்கிறது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ AirPlay రిసీవర్ పాస్‌వర్డ్ అడుగుతుంది. Vespertine దాన్ని మీ కీచైన్‌లో సేవ్ చేస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ตัวรับสัญญาณ AirPlay นี้ต้องใช้รหัสผ่าน Vespertine จะบันทึกไว้ในพวงกุญแจของคุณ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu AirPlay alıcısı parola istiyor. Vespertine parolayı anahtar zincirinize kaydeder."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей приймач AirPlay вимагає пароль. Vespertine зберігає його у вашій Зв’язці ключів."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ AirPlay ریسیور پاس ورڈ مانگتا ہے۔ Vespertine اسے آپ کی Keychain میں محفوظ کرتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bộ thu AirPlay này yêu cầu mật khẩu. Vespertine lưu mật khẩu trong chuỗi khóa của bạn."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 AirPlay 接收器需要密碼。Vespertine 會將密碼儲存在你的鑰匙圈中。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 AirPlay 接收器需要密码。Vespertine 会将密码存储在你的钥匙串中。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 AirPlay 接收器需要密碼。Vespertine 會將密碼儲存在你的鑰匙圈中。"
           }
         }
       }
