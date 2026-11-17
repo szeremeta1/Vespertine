@@ -105,6 +105,28 @@ final class AdaptiveNavigationTests: XCTestCase {
         XCTAssertFalse(app.buttons["Leave Demo"].exists)
     }
 
+    /// At the largest text size the demo bar is one line and a button, not half the screen; a tap on the line opens it.
+    func testDemoNoticeStaysSmallAtTheLargestTextSize() {
+        launch(screen: "output", largeText: true)
+        let notice = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Demo: a made-up library")).firstMatch
+        XCTAssertTrue(notice.waitForExistence(timeout: 15))
+        let leave = app.buttons["Leave Demo"]
+        XCTAssertTrue(leave.exists)
+        let closed = notice.frame.height
+        XCTAssertLessThan(leave.frame.maxY - notice.frame.minY, app.windows.firstMatch.frame.height * 0.2)
+        notice.tap()
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            // The bar opens over a moment: look until it has, for five seconds at most.
+            var looks = 0
+            while notice.frame.height <= closed * 1.5, looks < 20 {
+                usleep(250_000)
+                looks += 1
+            }
+            XCTAssertGreaterThan(notice.frame.height, closed * 1.5)
+        }
+        XCTAssertTrue(leave.exists)
+    }
+
     func testNarrowWindowUsesTabsNotSidebar() throws {
         try XCTSkipUnless(UIDevice.current.userInterfaceIdiom == .pad, "iPad window-width harness")
         // Exercises real views constrained to 440 pt; this is not an OS Split View test, and the system still reports a

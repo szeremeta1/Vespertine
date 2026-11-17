@@ -18,6 +18,9 @@ struct VespertineRemoteApp: App {
                 .modifier(TestWindowWidth())
                 .environment(model)
                 .onOpenURL { url in model.open(url) }
+                #if DEBUG
+                .task { await BenchLaunch.runIfAsked() }
+                #endif
                 .tint(Color.accentColor)
                 .foregroundStyle(Palette.text)
         }

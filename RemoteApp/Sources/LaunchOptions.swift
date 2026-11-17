@@ -8,6 +8,9 @@
 //   -VTPlay YES                  start the demo playing
 //   -VTScreenshot YES            an App Store capture: the demo notice bar is hidden (the demo library itself stays)
 //   -VTOpenFile <path>           a music file handed to the app as "Open in Vespertine" does (the Simulator won't open file links)
+//   -VTBench YES|<folder>        the phone bench (docs/IOS-AUDIO-BENCH.md, "Measured without a listener"): plays the test songs in
+//                                Library/VTBench/music (or <folder>, from the app's home folder), measures the joins and
+//                                ReplayGain, prints the report, writes it to Library/VTBench/results and quits
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
@@ -23,6 +26,7 @@ enum LaunchOptions {
     static var screenshot: Bool { defaults.bool(forKey: "VTScreenshot") }
     static var play: Bool { defaults.bool(forKey: "VTPlay") }
     static var openFile: String? { defaults.string(forKey: "VTOpenFile") }
+    static var bench: String? { defaults.string(forKey: "VTBench") }
     static var vinyl: Bool? { defaults.object(forKey: "VTVinyl") == nil ? nil : defaults.bool(forKey: "VTVinyl") }
 
     static var tilt: Tilt? {

@@ -141,6 +141,14 @@ public enum ShareScanner {
         return Int64(hash & 0x1f_ffff_ffff_ffff) | 1
     }
 
+    /// An MPEG-4 file an earlier scan found no title, artist or album in is read again though it has not changed: it may
+    /// be tagged the QuickTime way, which earlier versions could not read. A file with no tags at all costs one small
+    /// read more per scan.
+    static func readsAgain(_ old: ShareSong, type: String) -> Bool {
+        guard ["m4a", "mp4", "m4b"].contains(type) else { return false }
+        return old.tags.title == nil && old.tags.artist == nil && old.tags.album == nil
+    }
+
     /// Walks `files` from the top and returns its library. `previous`: the last scan, whose tags are reused for files
     /// with the same size and date. A folder that can't be opened is passed over; a share that stops answering ends the
     /// scan with the error (and `previous` stays what the app has).
@@ -190,7 +198,7 @@ public enum ShareScanner {
                 let decoded = decoders?.extensions.contains(type) ?? false
                 if !decoded, SongTagReader.needsTheMac.contains(type) { library.count(MacNeed.named(type) ?? .other); continue }
                 guard decoded || SongTagReader.playable.contains(type), entry.size > 0 else { continue }
-                if let old = known[path], old.size == entry.size, old.modified == entry.modified {
+                if let old = known[path], old.size == entry.size, old.modified == entry.modified, !readsAgain(old, type: type) {
                     used.insert(old.id)
                     library.songs.append(old)
                     continue

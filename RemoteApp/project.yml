@@ -40,6 +40,8 @@ targets:
         product: VespertineShare
       - package: VespertineDecoders
         product: VespertineDecoders
+      - package: VespertineRemoteKit
+        product: VespertinePhoneBench
     info:
       path: Info.plist
       properties:

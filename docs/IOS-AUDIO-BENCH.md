@@ -27,6 +27,7 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B13 | The queue comes back after the app is closed | not run | | | |
 | B14 | Music on the phone: a folder from Files, iCloud Drive, a USB drive | not run | | | |
 | B15 | ReplayGain: off by default, on, and never on DoP | not run | | | |
+| M1 | Measured by the app: MP3, AAC and FLAC joins, and what ReplayGain does to the level | not run | | | |
 
 ## Before any script
 
@@ -68,6 +69,7 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 6. Repeat steps 1 and 2 with a gapless album in MP3 and one in AAC (a live album or a continuous mix, ripped as it was sold): no
    silence and no click between songs. The package tests show the delay and padding are left out to the frame; this step is the
    same thing heard on real albums.
+   Without a listener: M1 measures the same joins on the phone.
 
 ## B4. Surround on AirPods Max (5 min)
 
@@ -228,3 +230,51 @@ and album gain from the tagger first.
 6. Choose Off: the row goes. Close the app and open it again: the choice made last is still the one shown.
 7. Keep a tagged album on this device (B11's setup), turn the Mac off, and play it with Track chosen: the row shows the same gain as in step 2.
 8. On a share (if one is set up): a tagged FLAC, MP3 and M4A each show their gain in the row.
+   Without a listener: M1 measures steps 2 and 3's levels on the phone (not the DoP step, which needs the DAC).
+
+## M1. Measured without a listener (5 min, nobody touches the phone)
+
+For the Mac the phone is plugged into: no ear, no microphone and no recording. A debug build of the app plays test songs
+through its own player, the way it plays a folder chosen in Files, keeps what the player hands to iOS (a tap on the
+engine's mixer, after decoding, the join between songs, ReplayGain and the mixer's conversion to the output's rate) and
+measures it. What iOS, a Bluetooth link or a DAC do after that isn't in the capture, so this stands in for B3 step 6 and
+B15 steps 2 and 3 as far as the app's own output goes, and no further. The sound does come out of the phone while it runs.
+
+The test songs are one 1 kHz tone cut into songs, so a join played right is one unbroken tone:
+
+```sh
+docs/fixtures/make-phone-bench-fixtures.sh /tmp/vtbench-music     # needs ffmpeg with libmp3lame
+```
+
+Any folder of albums laid out the same way does as well (a folder for each album, songs in the order of their names).
+Songs whose files carry ReplayGain values are measured for level and not for joins; they need seven seconds of steady tone.
+
+1. Install a **Debug** build on the phone (the bench isn't in Release builds) and unlock the phone.
+2. Find the phone and the app: `xcrun devicectl list devices`, and the bundle id the build was installed under.
+3. Put the songs in the app's folder:
+   `xcrun devicectl device copy to --device <phone> --domain-type appDataContainer --domain-identifier <bundle id> --source /tmp/vtbench-music --destination Library/VTBench/music`
+4. Run it and read the report as it is printed (the command returns when the app quits, after about two minutes):
+   `xcrun devicectl device process launch --device <phone> --console --terminate-existing <bundle id> -VTBench YES`
+5. The same report as JSON, and each capture as a WAV file, are on the phone in `Library/VTBench/results`:
+   `xcrun devicectl device copy from --device <phone> --domain-type appDataContainer --domain-identifier <bundle id> --source Library/VTBench/results --destination ./vtbench-results`
+
+What to expect, a line for each pair of neighbouring songs and each tagged song:
+
+- `tone-flac`, `tone-mp3`, `tone-aac`: **GAPLESS**, gap 0.00 ms, slip within half a sample, level step within 0.2 dB.
+- `gap-30-80`: **GAP** 30 ms, then **GAP** 80 ms (to a tenth of a millisecond). This is the control: it shows the meter
+  reports a silence when there is one.
+- `replaygain/tagged.flac` and `tagged.mp3`: **MATCHES**, Track measured −6.20 dB and Album −3.50 dB.
+  `held.flac` asks for +9 dB with a peak that leaves room for +6.02 dB: **MATCHES** at +6.02 dB, "held by the peak".
+
+How to read a join's numbers. *Gap*: the longest silence where the songs meet. *Slip*: how far the second song's tone is
+out of step with the first's, in samples; a frame of encoder delay or padding left in, or a buffer dropped, shows here even
+with no silence (it can't see a slip of a whole number of the tone's cycles, 44.1 samples for these songs). *Level step*:
+the change of level across the join. *Residual*: how rough the join is against the rest of the capture, in dB relative to
+the tone. Between lossless songs the join must be as clean as the rest, or it is a **CLICK**. An MP3 or AAC song brings its
+encoder's edge with it, each song having been encoded by itself (around −30 dB for these files, on any player), so a lossy
+join is held to no silence, no slip and no level step, and its residual is given for the record. **INCONCLUSIVE** comes
+with its reason: a silence away from the join (the song waited for its bytes) or a capture that skipped.
+
+On a Mac, with no sound and no phone, the same bench runs over the same folder with the same decoders:
+`VTBENCH_FOLDER=/tmp/vtbench-music swift test --package-path Packages/VespertineRemoteKit --filter aFolderNamedFromOutside`.
+It says what the files themselves are good for before the phone is asked.

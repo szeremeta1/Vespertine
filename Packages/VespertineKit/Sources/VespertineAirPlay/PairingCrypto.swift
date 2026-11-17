@@ -25,6 +25,11 @@ enum PairingCrypto {
                                outputByteCount: 32)
     }
 
+    /// The same 32 bytes as plain data, for the values pairing signs rather than seals with.
+    static func bytes(secret: Data, salt: String, info: String) -> Data {
+        key(secret: secret, salt: salt, info: info).withUnsafeBytes { Data($0) }
+    }
+
     /// The nonce for a labelled message, such as "PS-Msg05".
     static func nonce(_ label: String) -> Data {
         padded(Data(label.utf8))
