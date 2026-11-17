@@ -29632,6 +29632,813 @@
         }
       }
     },
+    "Music Plays On": {
+      "comment": "Header above the Mac / This iPhone switch on the iPhone's Output screen, and the switch's name for VoiceOver. The switch chooses whether the Mac plays the music (the app is its remote) or this device plays it.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሙዚቃ የሚጫወትበት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تُشغَّل الموسيقى على"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সংগীত যেখানে চলে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hudba hraje na"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musikken afspilles på"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musik spielt auf"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η μουσική παίζει σε"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La música suena en"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "محل پخش موسیقی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musiikki soi laitteessa"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tumutugtog ang Musika sa"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La musique est lue sur"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "સંગીત અહીં વાગે છે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inda Kiɗa Ke Kunnawa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המוזיקה מתנגנת ב־"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "संगीत यहाँ चलता है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A zene itt szól"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musik Diputar di"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La musica suona su"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音楽を再生する場所"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಂಗೀತ ಪ್ಲೇ ಆಗುವ ಸ್ಥಳ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음악 재생 위치"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സംഗീതം പ്ലേ ചെയ്യുന്ന ഇടം"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "संगीत येथे वाजते"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muzik Dimainkan pada"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musikken spilles på"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muziek speelt af op"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਸੰਗੀਤ ਇੱਥੇ ਚੱਲਦਾ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muzyka gra na"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A música toca em"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A música toca em"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muzica se redă pe"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Musiken spelas på"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muziki Huchezwa kwenye"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இசை இயங்கும் இடம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "సంగీతం ప్లే అయ్యే చోటు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เล่นเพลงที่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Müziğin Çaldığı Yer"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Музика відтворюється на"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موسیقی یہاں چلتی ہے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhạc phát trên"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音乐播放位置"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音樂播放位置"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音樂播放位置"
+          }
+        }
+      }
+    },
+    "Remote: “%@” plays the music, and this device controls it.": {
+      "comment": "Under the Mac / This iPhone switch on the iPhone's Output screen, when the Mac is chosen. %@ is the Mac's name.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሪሞት፦ «%@» ሙዚቃውን ያጫውታል፣ ይህ መሣሪያ ደግሞ ይቆጣጠረዋል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ريموت: يشغّل “%@” الموسيقى، وهذا الجهاز يتحكم به."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "রিমোট: “%@” সংগীত চালায়, আর এই ডিভাইস সেটি নিয়ন্ত্রণ করে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ovladač: hudbu přehrává „%@“ a toto zařízení ho ovládá."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjernbetjening: “%@” afspiller musikken, og denne enhed styrer den."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fernbedienung: „%@“ spielt die Musik, und dieses Gerät steuert ihn."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τηλεχειριστήριο: το «%@» παίζει τη μουσική και αυτή η συσκευή το ελέγχει."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mando: “%@” reproduce la música y este dispositivo lo controla."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریموت: «%@» موسیقی را پخش می‌کند و این دستگاه آن را کنترل می‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kaukosäädin: ”%@” toistaa musiikin, ja tämä laite ohjaa sitä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remote: ang “%@” ang nagpe-play ng musika, at kinokontrol ito ng device na ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Télécommande : « %@ » lit la musique et cet appareil le contrôle."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "રિમોટ: “%@” સંગીત વગાડે છે, અને આ ડિવાઇસ તેને નિયંત્રિત કરે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rimot: “%@” ce ke kunna kiɗan, wannan na'ura kuma tana sarrafa ta."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שלט: “%@” מנגן את המוזיקה, ומכשיר זה שולט בו."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रिमोट: “%@” संगीत चलाता है, और यह डिवाइस उसे नियंत्रित करता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Távirányító: a zenét a(z) „%@” játssza, ez az eszköz pedig vezérli."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remote: “%@” memutar musik, dan perangkat ini mengendalikannya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telecomando: “%@” riproduce la musica e questo dispositivo lo controlla."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "リモコン：「%@」が音楽を再生し、このデバイスで操作します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ರಿಮೋಟ್: “%@” ಸಂಗೀತವನ್ನು ಪ್ಲೇ ಮಾಡುತ್ತದೆ, ಮತ್ತು ಈ ಸಾಧನ ಅದನ್ನು ನಿಯಂತ್ರಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "리모컨: ‘%@’이(가) 음악을 재생하고 이 기기가 제어합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "റിമോട്ട്: “%@” സംഗീതം പ്ലേ ചെയ്യുന്നു, ഈ ഉപകരണം അതിനെ നിയന്ത്രിക്കുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रिमोट: “%@” संगीत वाजवतो, आणि हे डिव्हाइस त्याचे नियंत्रण करते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kawalan jauh: “%@” memainkan muzik, dan peranti ini mengawalnya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjernkontroll: «%@» spiller musikken, og denne enheten styrer den."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afstandsbediening: ‘%@’ speelt de muziek af en dit apparaat bedient hem."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਰਿਮੋਟ: “%@” ਸੰਗੀਤ ਚਲਾਉਂਦਾ ਹੈ, ਅਤੇ ਇਹ ਡਿਵਾਈਸ ਉਸਨੂੰ ਕੰਟਰੋਲ ਕਰਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilot: muzykę odtwarza „%@”, a to urządzenie nim steruje."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Controle remoto: “%@” toca a música, e este dispositivo o controla."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comando: “%@” reproduz a música e este dispositivo controla-o."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telecomandă: „%@” redă muzica, iar acest dispozitiv îl controlează."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjärrkontroll: ”%@” spelar musiken och den här enheten styr den."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rimoti: “%@” hucheza muziki, na kifaa hiki huidhibiti."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ரிமோட்: “%@” இசையை இயக்கும்; இந்தச் சாதனம் அதைக் கட்டுப்படுத்தும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "రిమోట్: “%@” సంగీతాన్ని ప్లే చేస్తుంది, ఈ పరికరం దాన్ని నియంత్రిస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รีโมต: “%@” เป็นเครื่องเล่นเพลง และอุปกรณ์เครื่องนี้ใช้ควบคุม"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kumanda: Müziği “%@” çalar, bu aygıt da onu denetler."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пульт: музику відтворює «%@», а цей пристрій керує ним."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریموٹ: “%@” موسیقی چلاتا ہے، اور یہ ڈیوائس اسے کنٹرول کرتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Điều khiển từ xa: “%@” phát nhạc, còn thiết bị này điều khiển."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "遥控：由“%@”播放音乐，此设备负责控制。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "遙控：由「%@」播放音樂，此裝置負責控制。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "遙控：由「%@」播放音樂，此裝置負責控制。"
+          }
+        }
+      }
+    },
+    "This device plays the music, and “%@” sends it the songs.": {
+      "comment": "Under the Mac / This iPhone switch on the iPhone's Output screen, when this device is chosen. %@ is the Mac's name.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ መሣሪያ ሙዚቃውን ያጫውታል፣ «%@» ደግሞ ዘፈኖቹን ይልክለታል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يشغّل هذا الجهاز الموسيقى، ويرسل “%@” الأغاني إليه."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই ডিভাইস সংগীত চালায়, আর “%@” এতে গানগুলো পাঠায়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hudbu přehrává toto zařízení a „%@“ mu posílá skladby."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne enhed afspiller musikken, og “%@” sender sangene til den."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieses Gerät spielt die Musik, und „%@“ sendet ihm die Titel."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτή η συσκευή παίζει τη μουσική και το «%@» της στέλνει τα τραγούδια."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este dispositivo reproduce la música y “%@” le envía las canciones."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این دستگاه موسیقی را پخش می‌کند و «%@» آهنگ‌ها را برایش می‌فرستد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tämä laite toistaa musiikin, ja ”%@” lähettää sille kappaleet."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang device na ito ang nagpe-play ng musika, at ipinapadala rito ng “%@” ang mga kanta."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet appareil lit la musique et « %@ » lui envoie les morceaux."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ ડિવાઇસ સંગીત વગાડે છે, અને “%@” તેને ગીતો મોકલે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan na'ura ce ke kunna kiɗan, “%@” kuma tana aika mata waƙoƙin."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מכשיר זה מנגן את המוזיקה, ו־“%@” שולח אליו את השירים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यह डिवाइस संगीत चलाता है, और “%@” इसे गीत भेजता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A zenét ez az eszköz játssza, a dalokat pedig a(z) „%@” küldi neki."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perangkat ini memutar musik, dan “%@” mengirimkan lagunya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo dispositivo riproduce la musica e “%@” gli invia i brani."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このデバイスが音楽を再生し、「%@」が曲を送信します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ ಸಾಧನ ಸಂಗೀತವನ್ನು ಪ್ಲೇ ಮಾಡುತ್ತದೆ, ಮತ್ತು “%@” ಅದಕ್ಕೆ ಹಾಡುಗಳನ್ನು ಕಳುಹಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 기기가 음악을 재생하고 ‘%@’이(가) 노래를 보냅니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ ഉപകരണം സംഗീതം പ്ലേ ചെയ്യുന്നു, “%@” അതിലേക്ക് പാട്ടുകൾ അയയ്ക്കുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हे डिव्हाइस संगीत वाजवते, आणि “%@” त्याला गाणी पाठवतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peranti ini memainkan muzik, dan “%@” menghantar lagu kepadanya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne enheten spiller musikken, og «%@» sender sangene til den."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dit apparaat speelt de muziek af en ‘%@’ stuurt de nummers."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਹ ਡਿਵਾਈਸ ਸੰਗੀਤ ਚਲਾਉਂਦਾ ਹੈ, ਅਤੇ “%@” ਇਸਨੂੰ ਗੀਤ ਭੇਜਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muzykę odtwarza to urządzenie, a „%@” wysyła mu utwory."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este dispositivo toca a música, e “%@” envia as músicas para ele."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este dispositivo reproduz a música e “%@” envia-lhe as músicas."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acest dispozitiv redă muzica, iar „%@” îi trimite melodiile."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den här enheten spelar musiken och ”%@” skickar låtarna till den."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kifaa hiki hucheza muziki, na “%@” hukitumia nyimbo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்தச் சாதனம் இசையை இயக்கும்; “%@” அதற்குப் பாடல்களை அனுப்பும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ పరికరం సంగీతాన్ని ప్లే చేస్తుంది, “%@” దానికి పాటలను పంపుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อุปกรณ์เครื่องนี้เป็นเครื่องเล่นเพลง และ “%@” เป็นผู้ส่งเพลงมาให้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Müziği bu aygıt çalar, şarkıları da “%@” gönderir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Музику відтворює цей пристрій, а «%@» надсилає йому пісні."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ ڈیوائس موسیقی چلاتی ہے، اور “%@” اسے گانے بھیجتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thiết bị này phát nhạc, còn “%@” gửi bài hát cho thiết bị."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由此设备播放音乐，“%@”向其发送歌曲。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由此裝置播放音樂，「%@」向其傳送歌曲。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "由此裝置播放音樂，「%@」向其傳送歌曲。"
+          }
+        }
+      }
+    },
     "mac-name.tailnet.ts.net": {
       "shouldTranslate": false
     },
@@ -80953,274 +81760,6 @@
         }
       }
     },
-    "Use the volume buttons on this device.": {
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "በዚህ መሣሪያ ላይ ያሉትን የድምፅ መጠን አዝራሮች ይጠቀሙ።"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "استخدم زرَّي مستوى الصوت على هذا الجهاز."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "এই ডিভাইসের ভলিউম বোতাম ব্যবহার করুন।"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Použijte tlačítka hlasitosti na tomto zařízení."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Brug lydstyrkeknapperne på denne enhed."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Verwende die Lautstärketasten an diesem Gerät."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Χρησιμοποιήστε τα κουμπιά έντασης ήχου αυτής της συσκευής."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usa los botones de volumen de este dispositivo."
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "از دکمه‌های بلندی صدای این دستگاه استفاده کنید."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Käytä tämän laitteen äänenvoimakkuuspainikkeita."
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gamitin ang mga volume button sa device na ito."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Utilisez les boutons de volume de cet appareil."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "આ ડિવાઇસનાં વૉલ્યૂમ બટનનો ઉપયોગ કરો."
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yi amfani da maɓallan ƙara na wannan na'ura."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "השתמש בכפתורי עוצמת הקול של מכשיר זה."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "इस डिवाइस के वॉल्यूम बटन का उपयोग करें।"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Használja az eszköz hangerőgombjait."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gunakan tombol volume di perangkat ini."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Usa i tasti del volume di questo dispositivo."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "このデバイスの音量ボタンを使用してください。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ಈ ಸಾಧನದ ವಾಲ್ಯೂಮ್ ಬಟನ್‌ಗಳನ್ನು ಬಳಸಿ."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "이 기기의 음량 버튼을 사용하십시오."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ഈ ഉപകരണത്തിലെ വോളിയം ബട്ടണുകൾ ഉപയോഗിക്കുക."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "या डिव्हाइसवरील व्हॉल्यूम बटणे वापरा."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gunakan butang kelantangan pada peranti ini."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bruk volumknappene på denne enheten."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gebruik de volumeknoppen van dit apparaat."
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਇਸ ਡਿਵਾਈਸ ਦੇ ਵੌਲਿਊਮ ਬਟਨ ਵਰਤੋ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Użyj przycisków głośności na tym urządzeniu."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Use os botões de volume deste dispositivo."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Use os botões de volume deste dispositivo."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Utilizați butoanele de volum ale acestui dispozitiv."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Använd volymknapparna på den här enheten."
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tumia vitufe vya sauti kwenye kifaa hiki."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "இந்தச் சாதனத்தின் ஒலியளவு பட்டன்களைப் பயன்படுத்தவும்."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ఈ పరికరంలోని వాల్యూమ్ బటన్‌లను ఉపయోగించండి."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ใช้ปุ่มปรับระดับเสียงบนอุปกรณ์เครื่องนี้"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bu aygıttaki ses düğmelerini kullanın."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Користуйтеся кнопками гучності на цьому пристрої."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اس ڈیوائس کے والیوم بٹن استعمال کریں۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hãy dùng các nút âm lượng trên thiết bị này."
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "請使用此裝置的音量按鈕。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "请使用此设备的音量按钮。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "請使用此裝置的音量按鈕。"
-          }
-        }
-      }
-    },
     "Usually not needed: with Tailscale on both the Mac and this device, Vespertine finds the Mac by itself once they have connected at home. Type an address only for a way the Mac can’t tell on its own, such as a forwarded port. The Mac must be awake with Vespertine open; Settings › Remote on the Mac can keep it awake.": {
       "comment": "Shown on the iPhone or iPad. Footer under the field where an address for the Mac can be typed by hand. “Settings › Remote” is a path in the Mac app: use the Mac app's established names.",
       "localizations": {
@@ -84445,275 +84984,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "音量 %@"
-          }
-        }
-      }
-    },
-    "Volume %@. Use the volume buttons on this device.": {
-      "comment": "Now Playing on the iPhone: %@ is the device's volume as a percentage, e.g. “62%”.",
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "የድምፅ መጠን %@። በዚህ መሣሪያ ላይ ያሉትን የድምፅ መጠን አዝራሮች ይጠቀሙ።"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "مستوى الصوت %@. استخدم زرَّي مستوى الصوت على هذا الجهاز."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ভলিউম %@। এই ডিভাইসের ভলিউম বোতাম ব্যবহার করুন।"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hlasitost %@. Použijte tlačítka hlasitosti na tomto zařízení."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lydstyrke %@. Brug lydstyrkeknapperne på denne enhed."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lautstärke %@. Verwende die Lautstärketasten an diesem Gerät."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ένταση ήχου %@. Χρησιμοποιήστε τα κουμπιά έντασης ήχου αυτής της συσκευής."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volumen: %@. Usa los botones de volumen de este dispositivo."
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "بلندی صدا %@. از دکمه‌های بلندی صدای این دستگاه استفاده کنید."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Äänenvoimakkuus %@. Käytä tämän laitteen äänenvoimakkuuspainikkeita."
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volume %@. Gamitin ang mga volume button sa device na ito."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volume : %@. Utilisez les boutons de volume de cet appareil."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "વૉલ્યૂમ %@. આ ડિવાઇસનાં વૉલ્યૂમ બટનનો ઉપયોગ કરો."
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ƙarar sauti %@. Yi amfani da maɓallan ƙara na wannan na'ura."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "עוצמת קול %@. השתמש בכפתורי עוצמת הקול של מכשיר זה."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "वॉल्यूम %@। इस डिवाइस के वॉल्यूम बटन का उपयोग करें।"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hangerő: %@. Használja az eszköz hangerőgombjait."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volume %@. Gunakan tombol volume di perangkat ini."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volume %@. Usa i tasti del volume di questo dispositivo."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音量%@。このデバイスの音量ボタンを使用してください。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ವಾಲ್ಯೂಮ್ %@. ಈ ಸಾಧನದ ವಾಲ್ಯೂಮ್ ಬಟನ್‌ಗಳನ್ನು ಬಳಸಿ."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "음량 %@. 이 기기의 음량 버튼을 사용하십시오."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "വോളിയം %@. ഈ ഉപകരണത്തിലെ വോളിയം ബട്ടണുകൾ ഉപയോഗിക്കുക."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "व्हॉल्यूम %@. या डिव्हाइसवरील व्हॉल्यूम बटणे वापरा."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kelantangan %@. Gunakan butang kelantangan pada peranti ini."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volum %@. Bruk volumknappene på denne enheten."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volume %@. Gebruik de volumeknoppen van dit apparaat."
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਵੌਲਿਊਮ %@। ਇਸ ਡਿਵਾਈਸ ਦੇ ਵੌਲਿਊਮ ਬਟਨ ਵਰਤੋ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Głośność %@. Użyj przycisków głośności na tym urządzeniu."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volume %@. Use os botões de volume deste dispositivo."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volume %@. Use os botões de volume deste dispositivo."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volum %@. Utilizați butoanele de volum ale acestui dispozitiv."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Volym %@. Använd volymknapparna på den här enheten."
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kiwango cha sauti %@. Tumia vitufe vya sauti kwenye kifaa hiki."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ஒலியளவு %@. இந்தச் சாதனத்தின் ஒலியளவு பட்டன்களைப் பயன்படுத்தவும்."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "వాల్యూమ్ %@. ఈ పరికరంలోని వాల్యూమ్ బటన్‌లను ఉపయోగించండి."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ระดับเสียง %@ ใช้ปุ่มปรับระดับเสียงบนอุปกรณ์เครื่องนี้"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ses düzeyi %@. Bu aygıttaki ses düğmelerini kullanın."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Гучність: %@. Користуйтеся кнопками гучності на цьому пристрої."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "والیوم %@۔ اس ڈیوائس کے والیوم بٹن استعمال کریں۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Âm lượng %@. Hãy dùng các nút âm lượng trên thiết bị này."
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音量 %@。請使用此裝置的音量按鈕。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音量 %@。请使用此设备的音量按钮。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "音量 %@。請使用此裝置的音量按鈕。"
           }
         }
       }

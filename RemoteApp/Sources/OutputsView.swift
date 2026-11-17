@@ -20,6 +20,17 @@ struct OutputsView: View {
     var body: some View {
         NavigationStack {
             List {
+                if PlayMode.offersSwitch(share: session.isShare) {
+                    Section {
+                        PlayModeSwitch(session: session)
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
+                    } header: {
+                        Text("Music Plays On")
+                    } footer: {
+                        Text(PlayModeSwitch.explanation(PlayMode.current(playsHere: playsHere), mac: session.server?.name ?? session.pairing.name))
+                    }
+                }
                 Section {
                     HStack(spacing: 4) {
                         Button { PlayTarget.shared.choose(thisDevice: true) } label: {

@@ -20,22 +20,31 @@ struct NowPlayingView: View {
     var body: some View {
         GeometryReader { geometry in
             let wide = RemoteLayout.playerColumns(width: geometry.size.width, height: geometry.size.height, accessibilityText: typeSize.isAccessibilitySize)
-            let side = RemoteLayout.coverSide(width: geometry.size.width, height: geometry.size.height, columns: wide)
+            let tight = RemoteLayout.playerIsTight(height: geometry.size.height, columns: wide)
+            let spacing = RemoteLayout.playerSpacing(tight: tight)
+            // Stacked, the switch above the cover takes its height from what the cover may have.
+            let switchHeight: CGFloat = !wide && PlayMode.offersSwitch(share: session.isShare) ? RemoteLayout.playModeSwitchHeight(tight: tight) : 0
+            let side = RemoteLayout.coverSide(width: geometry.size.width, height: geometry.size.height - switchHeight, columns: wide, tight: tight)
             ScrollView {
                 Group {
                     if wide {
                         HStack(alignment: .center, spacing: 32) {
                             cover.frame(width: side, height: side)
-                            controls
+                            VStack(spacing: spacing.controls) {
+                                PlayModeSwitch(session: session).frame(maxWidth: 560)
+                                controls(spacing: spacing.controls)
+                            }
                         }
                     } else {
-                        VStack(spacing: 22) {
+                        VStack(spacing: spacing.parts) {
+                            // Who plays, the Mac or this device: in sight before anything else, and one tap to change.
+                            PlayModeSwitch(session: session).frame(maxWidth: RemoteLayout.controlsWidth(width: geometry.size.width))
                             cover.frame(width: side, height: side)
-                            controls
+                            controls(spacing: spacing.controls)
                         }
                     }
                 }
-                .padding(.horizontal, 24).padding(.vertical, 12)
+                .padding(.horizontal, 24).padding(.vertical, tight ? 6 : 12)
                 .frame(maxWidth: 1160)
                 .frame(maxWidth: .infinity, minHeight: geometry.size.height)
             }
@@ -94,8 +103,8 @@ struct NowPlayingView: View {
         withAnimation(reduceMotion ? nil : .spring(duration: 0.45)) { model.settings.vinyl = NowPlayingArt.toggled(vinyl: model.settings.vinyl) }
     }
 
-    private var controls: some View {
-        VStack(spacing: 18) {
+    private func controls(spacing: CGFloat) -> some View {
+        VStack(spacing: spacing) {
             titles
             scrubber
             transport
@@ -262,13 +271,6 @@ struct NowPlayingView: View {
         .accessibilityValue(value ?? (on ? Text("On") : Text("Off")))
     }
 
-    /// The volume line when music plays on this device: its level (below 100% the samples are scaled by iOS) and how to set it.
-    static func deviceVolume(_ level: Double?) -> String {
-        guard let level else { return String(localized: "Use the volume buttons on this device.") }
-        let percent = level.formatted(.percent.precision(.fractionLength(0)))
-        return String(localized: "Volume \(percent). Use the volume buttons on this device.", comment: "Now Playing on the iPhone: %@ is the device's volume as a percentage, e.g. “62%”.")
-    }
-
     /// What Now Playing says while the Mac turns a song into a form this device can play (DSD, WavPack, Vorbis and the like),
     /// with how far along it is when the Mac knows.
     static func converting(progress: Double?) -> String {
@@ -322,15 +324,7 @@ struct NowPlayingView: View {
         if let volume = player?.volume {
             switch volume.route {
             case .fixed where session.phone != nil:
-                HStack(spacing: 8) {
-                    Label(Self.deviceVolume(volume.level), systemImage: "speaker.wave.2")
-                        .font(.caption).foregroundStyle(Palette.text2)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    if RoutePickerPlacement.shows(playsHere: session.phone != nil) {
-                        RoutePickerButton().frame(width: 44, height: 44)
-                            .accessibilityIdentifier("airplay")
-                    }
-                }
+                DeviceVolumeRow(reported: volume.level)
             case .fixed:
                 Label("Fixed volume: set the level on your amplifier or DAC", systemImage: "speaker.slash")
                     .font(.caption).foregroundStyle(Palette.text2)
