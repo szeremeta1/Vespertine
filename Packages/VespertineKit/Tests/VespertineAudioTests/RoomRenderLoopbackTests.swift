@@ -106,6 +106,17 @@ struct RoomRenderLoopbackTests {
         let found = members.map(nominal)
         defer { for (d, r) in zip(members, found) { try? DeviceControl.setNominalRate(r, on: d.id) } }
         let before = Set(DeviceQuery.allDeviceIDs())
+        // A virtual device's own volume scales what comes back from it: full for the test, then as it was found.
+        let volumes: [AudioObjectPropertyAddress] = [.output(kAudioDevicePropertyVolumeScalar), .input(kAudioDevicePropertyVolumeScalar)]
+        var foundVolumes: [(AudioObjectID, AudioObjectPropertyAddress, Float32)] = []
+        for d in members {
+            for address in volumes {
+                guard let v = try? HAL.get(d.id, address, initial: Float32(-1)), v >= 0, v != 1 else { continue }
+                foundVolumes.append((d.id, address, v))
+                try? HAL.set(d.id, address, Float32(1))
+            }
+        }
+        defer { for (id, address, v) in foundVolumes { try? HAL.set(id, address, v) } }
         let front = members[0].uid, back = members[1].uid
         func group(_ render: RoomRenderSettings?) -> SpeakerGroup {
             SpeakerGroup(name: "Vespertine test group",
