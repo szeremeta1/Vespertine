@@ -67,7 +67,7 @@ public final class UDPSocket: @unchecked Sendable {
         var local = sockaddr_in()
         _ = withUnsafeMutablePointer(to: &local) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { getsockname(fd, $0, &length) } }
         self.fd = fd
-        port = UInt16(bigEndian: local.sin_port)
+        self.port = UInt16(bigEndian: local.sin_port)
     }
 
     deinit { close() }

@@ -26,7 +26,7 @@ public final class PTPClock: @unchecked Sendable {
         public var eventPort: UInt16
         public var generalPort: UInt16
 
-        public init(host: String, eventPort: UInt16 = PTPMessage.eventPort, generalPort: UInt16 = PTPMessage.generalPort) {
+        public init(host: String, eventPort: UInt16 = 319, generalPort: UInt16 = 320) {
             self.host = host
             self.eventPort = eventPort
             self.generalPort = generalPort
@@ -58,7 +58,7 @@ public final class PTPClock: @unchecked Sendable {
 
     /// `eventPort`, `generalPort`: 319 and 320 for a real session; 0 for any free ones (tests). `now`: the clock read,
     /// in nanoseconds. Throws when a port can't be had.
-    public init(identity: UInt64, eventPort: UInt16 = PTPMessage.eventPort, generalPort: UInt16 = PTPMessage.generalPort,
+    public init(identity: UInt64, eventPort: UInt16 = 319, generalPort: UInt16 = 320,
                 now: @escaping @Sendable () -> UInt64 = { NTPClock.nanosecondsNow() }) throws {
         self.identity = identity
         self.now = now
@@ -70,7 +70,7 @@ public final class PTPClock: @unchecked Sendable {
     deinit { stop() }
 
     /// The moment `uptime` (a `NTPClock.nanosecondsNow()` reading) is on this clock.
-    public static func time(uptime: UInt64) -> PTPTimestamp { PTPTimestamp(totalNanoseconds: uptime) }
+    static func time(uptime: UInt64) -> PTPTimestamp { PTPTimestamp(totalNanoseconds: uptime) }
 
     /// Who is told the time from now on.
     public func setPeers(_ peers: [Peer]) {
