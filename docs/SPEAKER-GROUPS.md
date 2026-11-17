@@ -46,6 +46,8 @@ A switch in the group's editor, off by default, for a room where people listen f
 - A limiter on each speaker keeps a fill added to a loud channel from clipping. It does nothing to a speaker that stays within full scale.
 - What other apps play through [Mac Sound Output (beta)](MAC-SOUND-OUTPUT.md) gets the same fill as a plain mix, with no delay, all-pass or limiter, so that a film stays in step with its picture.
 
+Under the switch there are two styles. **Stage in front** is everything above, and is what a group gets when the switch is turned on. **Even everywhere** is for a room where no seat matters more than the rest: the fill plays at the routed sound's own level and at the same time, with no all-pass and no ambience, so every speaker of a side plays the same thing. That is the most even around the room; at the seat the sound is all around the listener and not in front, and between two speakers playing the same channel some frequencies cancel more than with the first style. Bass management and the limiter are the same in both.
+
 While the switch is on, it takes the place of the group's choice for stereo songs in Vespertine's own playback, and nothing the group plays is bit-perfect.
 
 What it cannot do: a few speakers cannot make every spot in a room the best seat. The image a stereo pair draws exists only between its two speakers; anywhere else a listener hears the nearest speaker first. Fill the room makes sure that what they hear there is the whole song at a similar level. It does not measure the room: the speakers' levels are the ones set in the group. It has not been measured or listened to on real DACs yet.

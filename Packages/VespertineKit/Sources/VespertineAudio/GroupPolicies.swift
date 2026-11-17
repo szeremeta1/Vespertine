@@ -158,7 +158,32 @@ public enum GroupPolicies {
     }
 
     public static let roomRenderTitle = String(localized: "Fill the room")
-    public static let roomRenderDetail = String(localized: "For listening anywhere in the room, not only at the seat: every speaker plays the whole song, or the whole film, so nothing is missing wherever you are. At the seat the sound still comes from the front. Songs are no longer bit-perfect.")
+    public static let roomRenderDetail = String(localized: "For listening anywhere in the room, not only at the seat: every speaker plays the whole song, or the whole film, so nothing is missing wherever you are. Songs are no longer bit-perfect.")
+
+    /// The style the room is filled in; nil while Fill the room is off.
+    public static func roomRenderStyle(_ group: SpeakerGroup) -> RoomRenderSettings.Style? { group.roomRender?.style }
+
+    /// Only while Fill the room is on.
+    public static func setRoomRenderStyle(_ style: RoomRenderSettings.Style, in group: SpeakerGroup) -> SpeakerGroup {
+        guard group.roomRender != nil else { return group }
+        var result = group
+        result.roomRender?.style = style
+        return result
+    }
+
+    public static func roomRenderStyleTitle(_ style: RoomRenderSettings.Style) -> String {
+        switch style {
+        case .frontLed: String(localized: "Stage in front")
+        case .even: String(localized: "Even everywhere")
+        }
+    }
+
+    public static func roomRenderStyleDetail(_ style: RoomRenderSettings.Style) -> String {
+        switch style {
+        case .frontLed: String(localized: "The other speakers play their share a little quieter and a moment later, so at the seat the sound still comes from the front.")
+        case .even: String(localized: "Every speaker plays at the same level and at the same time. The most even around the room; at the seat the sound is all around you, not in front.")
+        }
+    }
 
     // MARK: A lost output
 

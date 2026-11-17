@@ -205167,6 +205167,274 @@
         }
       }
     },
+    "Even everywhere": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በሁሉም ቦታ እኩል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "متساوٍ في كل مكان"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সবখানে সমান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Všude stejně"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ens overalt"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überall gleich"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ομοιόμορφα παντού"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniforme en toda la sala"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یکنواخت در همه‌جا"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasaisesti kaikkialla"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pantay kahit saan"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniforme partout"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "બધે એકસરખું"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daidai a ko'ina"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אחיד בכל מקום"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हर जगह एक समान"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mindenhol egyenletes"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Merata di mana saja"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniforme ovunque"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "どこでも均一"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಎಲ್ಲೆಡೆ ಸಮಾನ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "어디서나 고르게"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "എല്ലായിടത്തും ഒരുപോലെ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सगळीकडे समान"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sekata di mana-mana"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jevnt overalt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overal gelijk"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹਰ ਥਾਂ ਇੱਕੋ ਜਿਹਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Równo wszędzie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniforme em todo lugar"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniforme em todo o lado"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniform peste tot"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jämnt överallt"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sawa kila mahali"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "எங்கும் சமமாக"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అంతటా సమానంగా"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สม่ำเสมอทั่วทั้งห้อง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her yerde eşit"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Рівномірно всюди"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہر جگہ یکساں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đều ở mọi nơi"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "處處均勻"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "处处均匀"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "處處均勻"
+          }
+        }
+      }
+    },
     "Evens out loudness between songs or whole albums, using the ReplayGain tags in your files. Off keeps playback bit-perfect.": {
       "extractionState": "manual",
       "localizations": {
@@ -207046,6 +207314,274 @@
           "stringUnit": {
             "state": "translated",
             "value": "所有揚聲器"
+          }
+        }
+      }
+    },
+    "Every speaker plays at the same level and at the same time. The most even around the room; at the seat the sound is all around you, not in front.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እያንዳንዱ ስፒከር በተመሳሳይ መጠንና በተመሳሳይ ጊዜ ያጫውታል። በክፍሉ ዙሪያ እጅግ እኩል የሆነው፤ በመቀመጫው ላይ ድምፁ ከፊት ሳይሆን በዙሪያዎ ነው።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كل سماعة تعمل بالمستوى نفسه وفي الوقت نفسه. الأكثر تساويًا في أنحاء الغرفة؛ وعند المقعد يحيط بك الصوت بدل أن يأتي من الأمام."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "প্রতিটি স্পিকার একই মাত্রায় ও একই সময়ে বাজে। ঘরজুড়ে সবচেয়ে সমান; আসনে শব্দ সামনে নয়, আপনার চারপাশে থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Každý reproduktor hraje stejně hlasitě a ve stejný okamžik. Nejvyrovnanější po celé místnosti; na místě poslechu je zvuk všude kolem vás, ne vpředu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hver højttaler spiller på samme niveau og på samme tid. Det mest ensartede rundt i rummet; på lyttepladsen er lyden hele vejen omkring dig, ikke foran."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jeder Lautsprecher spielt gleich laut und zur gleichen Zeit. Am gleichmäßigsten im ganzen Raum; am Hörplatz ist der Klang rings um Sie, nicht vorn."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κάθε ηχείο παίζει στην ίδια στάθμη και την ίδια στιγμή. Το πιο ομοιόμορφο σε όλο το δωμάτιο· στη θέση ακρόασης ο ήχος είναι γύρω σας, όχι μπροστά."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos los altavoces suenan al mismo nivel y al mismo tiempo. Lo más uniforme por toda la sala; en el asiento el sonido te rodea en lugar de venir de frente."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هر بلندگو با همان سطح و در همان لحظه پخش می‌کند. یکنواخت‌ترین حالت در سراسر اتاق؛ در جای نشستن صدا دورتادور شماست، نه در جلو."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jokainen kaiutin soi samalla tasolla ja samaan aikaan. Tasaisin koko huoneessa; kuuntelupaikalla ääni on ympärilläsi, ei edessä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tumutugtog ang bawat speaker sa parehong lakas at sa parehong oras. Pinakapantay sa buong kuwarto; sa upuan, nasa paligid mo ang tunog, hindi sa harap."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaque enceinte joue au même niveau et au même moment. Le plus uniforme dans toute la pièce ; à la place d'écoute, le son vous entoure au lieu de venir de l'avant."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "દરેક સ્પીકર એક જ સ્તરે અને એક જ સમયે વાગે છે. આખા ઓરડામાં સૌથી એકસરખું; બેઠક પર અવાજ આગળ નહીં, તમારી ચારે બાજુ હોય છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kowace lasifika tana kunnawa da matakin sauti ɗaya kuma a lokaci ɗaya. Mafi daidaito a ko'ina cikin ɗakin; a wurin zama sautin yana kewaye da kai, ba a gaba ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כל רמקול מנגן באותה עוצמה ובאותו זמן. האחיד ביותר ברחבי החדר; במקום הישיבה הצליל מקיף אתכם ואינו מגיע מלפנים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हर स्पीकर एक ही स्तर पर और एक ही समय पर बजता है। पूरे कमरे में सबसे समान; बैठने की जगह पर आवाज़ सामने नहीं, आपके चारों ओर होती है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minden hangszóró ugyanazon a szinten és ugyanabban a pillanatban szól. A szobában ez a legegyenletesebb; a hallgatási helyen a hang körülvesz, nem elölről jön."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setiap speaker berbunyi pada tingkat yang sama dan pada waktu yang sama. Paling merata di seluruh ruangan; di tempat duduk, suara mengelilingi Anda, bukan di depan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ogni diffusore suona allo stesso livello e nello stesso momento. Il più uniforme in tutta la stanza; al posto d'ascolto il suono ti circonda invece di arrivare da davanti."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべてのスピーカーが同じ音量で同時に再生します。部屋全体でもっとも均一になりますが、リスニング位置では音が前方ではなく周囲から聴こえます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪ್ರತಿಯೊಂದು ಸ್ಪೀಕರ್ ಒಂದೇ ಮಟ್ಟದಲ್ಲಿ ಮತ್ತು ಒಂದೇ ಸಮಯದಲ್ಲಿ ನುಡಿಸುತ್ತದೆ. ಕೋಣೆಯಾದ್ಯಂತ ಅತ್ಯಂತ ಸಮಾನ; ಆಸನದಲ್ಲಿ ಧ್ವನಿ ಮುಂದೆ ಅಲ್ಲ, ನಿಮ್ಮ ಸುತ್ತಲೂ ಇರುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 스피커가 같은 음량으로 동시에 재생합니다. 방 전체에서 가장 고르지만, 청취 위치에서는 소리가 앞쪽이 아니라 주위를 감쌉니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഓരോ സ്പീക്കറും ഒരേ ലെവലിലും ഒരേ സമയത്തും പ്ലേ ചെയ്യുന്നു. മുറിയിലുടനീളം ഏറ്റവും ഒരുപോലെ; ഇരിപ്പിടത്തിൽ ശബ്ദം മുന്നിലല്ല, നിങ്ങളുടെ ചുറ്റുമാണ്."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रत्येक स्पीकर एकाच पातळीवर आणि एकाच वेळी वाजतो. संपूर्ण खोलीत सर्वांत समान; बसण्याच्या जागी आवाज समोर नाही, तुमच्या भोवती असतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setiap pembesar suara berbunyi pada tahap yang sama dan pada masa yang sama. Paling sekata di seluruh bilik; di tempat duduk, bunyi mengelilingi anda, bukan di hadapan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hver høyttaler spiller på samme nivå og til samme tid. Jevnest rundt i rommet; på lytteplassen er lyden rundt deg, ikke foran."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elke luidspreker speelt even hard en op hetzelfde moment. Het gelijkmatigst door de hele kamer; op de luisterplek is het geluid om je heen, niet vooraan."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹਰ ਸਪੀਕਰ ਇੱਕੋ ਪੱਧਰ 'ਤੇ ਅਤੇ ਇੱਕੋ ਸਮੇਂ ਵੱਜਦਾ ਹੈ। ਪੂਰੇ ਕਮਰੇ ਵਿੱਚ ਸਭ ਤੋਂ ਇੱਕੋ ਜਿਹਾ; ਬੈਠਣ ਵਾਲੀ ਥਾਂ 'ਤੇ ਆਵਾਜ਼ ਸਾਹਮਣੇ ਨਹੀਂ, ਤੁਹਾਡੇ ਚਾਰੇ ਪਾਸੇ ਹੁੰਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Każdy głośnik gra z tym samym poziomem i w tym samym momencie. Najrówniej w całym pokoju; w miejscu odsłuchu dźwięk otacza słuchacza, zamiast dochodzić z przodu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as caixas tocam no mesmo nível e ao mesmo tempo. O mais uniforme pelo ambiente; na posição de escuta, o som fica ao seu redor, não à frente."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as colunas tocam ao mesmo nível e ao mesmo tempo. O mais uniforme por toda a sala; no lugar de audição, o som fica à sua volta, não à frente."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fiecare boxă redă la același nivel și în același moment. Cel mai uniform în toată camera; în locul de ascultare sunetul vă înconjoară, nu vine din față."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varje högtalare spelar på samma nivå och samtidigt. Jämnast runt om i rummet; på lyssningsplatsen är ljudet runt omkring dig, inte framför."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kila spika hucheza kwa kiwango kilekile na kwa wakati uleule. Sawa zaidi chumbani kote; kitini sauti inakuzunguka, haiko mbele."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒவ்வொரு ஸ்பீக்கரும் ஒரே அளவிலும் ஒரே நேரத்திலும் இயங்குகிறது. அறை முழுவதும் மிகச் சமமானது; இருக்கையில் ஒலி முன்புறத்தில் அல்ல, உங்களைச் சுற்றிலும் இருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ప్రతి స్పీకర్ ఒకే స్థాయిలో, ఒకే సమయంలో ప్లే చేస్తుంది. గది అంతటా అత్యంత సమానంగా ఉంటుంది; కూర్చునే చోట ధ్వని ముందు కాకుండా మీ చుట్టూ ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ลำโพงทุกตัวเล่นด้วยระดับเสียงเท่ากันและพร้อมกัน สม่ำเสมอที่สุดทั่วทั้งห้อง แต่ที่ตำแหน่งนั่งฟัง เสียงจะอยู่รอบตัวคุณ ไม่ใช่ด้านหน้า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her hoparlör aynı seviyede ve aynı anda çalar. Odanın her yerinde en eşit olanı; dinleme yerinde ses önünüzde değil, çevrenizdedir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кожна колонка грає з однаковим рівнем і одночасно. Найрівномірніше по всій кімнаті; на місці слухача звук довкола вас, а не попереду."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہر اسپیکر ایک ہی سطح پر اور ایک ہی وقت میں چلتا ہے۔ پورے کمرے میں سب سے یکساں؛ نشست پر آواز سامنے نہیں، آپ کے چاروں طرف ہوتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mọi loa phát cùng mức và cùng lúc. Đều nhất trong khắp phòng; tại chỗ ngồi, âm thanh bao quanh bạn chứ không ở phía trước."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每個喇叭以相同音量同時播放。整個房間最為均勻；在聆聽位，聲音會環繞着你，而不是在前方。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每只音箱以相同音量同时播放。整个房间最为均匀；在聆听位，声音会环绕着你，而不是在前方。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每個喇叭以相同音量同時播放。整個房間最為均勻；在聆聽位，聲音會環繞著你，而不是在前方。"
           }
         }
       }
@@ -223036,270 +223572,270 @@
         }
       }
     },
-    "For listening anywhere in the room, not only at the seat: every speaker plays the whole song, or the whole film, so nothing is missing wherever you are. At the seat the sound still comes from the front. Songs are no longer bit-perfect.": {
+    "For listening anywhere in the room, not only at the seat: every speaker plays the whole song, or the whole film, so nothing is missing wherever you are. Songs are no longer bit-perfect.": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "በመቀመጫው ብቻ ሳይሆን በክፍሉ ውስጥ በየትኛውም ቦታ ለማዳመጥ፦ እያንዳንዱ ስፒከር ሙሉውን ዘፈን ወይም ሙሉውን ፊልም ያጫውታል፣ ስለዚህ የትም ብትሆኑ ምንም አይጎድልም። በመቀመጫው ላይ ድምፁ አሁንም ከፊት ይመጣል። ዘፈኖች ከእንግዲህ ቢት-ፍጹም አይደሉም።"
+            "value": "በመቀመጫው ብቻ ሳይሆን በክፍሉ ውስጥ በየትኛውም ቦታ ለማዳመጥ፦ እያንዳንዱ ስፒከር ሙሉውን ዘፈን ወይም ሙሉውን ፊልም ያጫውታል፣ ስለዚህ የትም ብትሆኑ ምንም አይጎድልም። ዘፈኖች ከእንግዲህ ቢት-ፍጹም አይደሉም።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "للاستماع من أي مكان في الغرفة، لا من المقعد وحده: كل سماعة تشغّل الأغنية كاملة أو الفيلم كاملًا، فلا ينقص شيء أينما كنت. وعند المقعد يظل الصوت آتيًا من الأمام. لم تعد الأغاني مطابقة بت ببت."
+            "value": "للاستماع من أي مكان في الغرفة، لا من المقعد وحده: كل سماعة تشغّل الأغنية كاملة أو الفيلم كاملًا، فلا ينقص شيء أينما كنت. لم تعد الأغاني مطابقة بت ببت."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "শুধু আসনে নয়, ঘরের যেকোনো জায়গা থেকে শোনার জন্য: প্রতিটি স্পিকার পুরো গান বা পুরো চলচ্চিত্র বাজায়, তাই আপনি যেখানেই থাকুন কিছুই বাদ পড়ে না। আসনে শব্দ আগের মতোই সামনে থেকে আসে। গান আর বিট-পারফেক্ট থাকে না।"
+            "value": "শুধু আসনে নয়, ঘরের যেকোনো জায়গা থেকে শোনার জন্য: প্রতিটি স্পিকার পুরো গান বা পুরো চলচ্চিত্র বাজায়, তাই আপনি যেখানেই থাকুন কিছুই বাদ পড়ে না। গান আর বিট-পারফেক্ট থাকে না।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pro poslech kdekoli v místnosti, nejen na místě poslechu: každý reproduktor hraje celou skladbu nebo celý film, takže nikde nic nechybí. Na místě poslechu zvuk dál přichází zepředu. Skladby už nejsou bitově přesné."
+            "value": "Pro poslech kdekoli v místnosti, nejen na místě poslechu: každý reproduktor hraje celou skladbu nebo celý film, takže nikde nic nechybí. Skladby už nejsou bitově přesné."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Til at lytte hvor som helst i rummet, ikke kun fra lyttepladsen: hver højttaler spiller hele nummeret eller hele filmen, så intet mangler, uanset hvor du er. På lyttepladsen kommer lyden stadig forfra. Numrene er ikke længere bit-perfekte."
+            "value": "Til at lytte hvor som helst i rummet, ikke kun fra lyttepladsen: hver højttaler spiller hele nummeret eller hele filmen, så intet mangler, uanset hvor du er. Numrene er ikke længere bit-perfekte."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zum Hören überall im Raum, nicht nur am Hörplatz: Jeder Lautsprecher spielt den ganzen Titel oder den ganzen Film, sodass nirgends etwas fehlt. Am Hörplatz kommt der Klang weiterhin von vorn. Titel sind dann nicht mehr bitgenau."
+            "value": "Zum Hören überall im Raum, nicht nur am Hörplatz: Jeder Lautsprecher spielt den ganzen Titel oder den ganzen Film, sodass nirgends etwas fehlt. Titel sind dann nicht mehr bitgenau."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Για ακρόαση οπουδήποτε στο δωμάτιο, όχι μόνο στη θέση ακρόασης: κάθε ηχείο παίζει ολόκληρο το τραγούδι ή ολόκληρη την ταινία, ώστε να μη λείπει τίποτα όπου κι αν βρίσκεστε. Στη θέση ακρόασης ο ήχος εξακολουθεί να έρχεται από μπροστά. Τα τραγούδια δεν είναι πλέον bit-perfect."
+            "value": "Για ακρόαση οπουδήποτε στο δωμάτιο, όχι μόνο στη θέση ακρόασης: κάθε ηχείο παίζει ολόκληρο το τραγούδι ή ολόκληρη την ταινία, ώστε να μη λείπει τίποτα όπου κι αν βρίσκεστε. Τα τραγούδια δεν είναι πλέον bit-perfect."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para escuchar desde cualquier punto de la sala, no solo desde el asiento: cada altavoz reproduce la canción entera o la película entera, así que no falta nada estés donde estés. En el asiento el sonido sigue llegando de frente. Las canciones dejan de ser bit-perfect."
+            "value": "Para escuchar desde cualquier punto de la sala, no solo desde el asiento: cada altavoz reproduce la canción entera o la película entera, así que no falta nada estés donde estés. Las canciones dejan de ser bit-perfect."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "برای شنیدن از هر جای اتاق، نه فقط از جای نشستن: هر بلندگو کل آهنگ یا کل فیلم را پخش می‌کند، پس هر جا باشید چیزی کم نیست. در جای نشستن صدا همچنان از جلو می‌آید. آهنگ‌ها دیگر بیت‌به‌بیت دقیق نیستند."
+            "value": "برای شنیدن از هر جای اتاق، نه فقط از جای نشستن: هر بلندگو کل آهنگ یا کل فیلم را پخش می‌کند، پس هر جا باشید چیزی کم نیست. آهنگ‌ها دیگر بیت‌به‌بیت دقیق نیستند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kuunteluun missä tahansa huoneessa, ei vain kuuntelupaikalla: jokainen kaiutin toistaa koko kappaleen tai koko elokuvan, joten mitään ei puutu, missä ikinä oletkin. Kuuntelupaikalla ääni tulee edelleen edestä. Kappaleet eivät ole enää bittitarkkoja."
+            "value": "Kuunteluun missä tahansa huoneessa, ei vain kuuntelupaikalla: jokainen kaiutin toistaa koko kappaleen tai koko elokuvan, joten mitään ei puutu, missä ikinä oletkin. Kappaleet eivät ole enää bittitarkkoja."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para makinig kahit saan sa kuwarto, hindi lang sa upuan: pinapatugtog ng bawat speaker ang buong kanta o ang buong pelikula, kaya walang kulang nasaan ka man. Sa upuan, mula pa rin sa harap ang tunog. Hindi na bit-perfect ang mga kanta."
+            "value": "Para makinig kahit saan sa kuwarto, hindi lang sa upuan: pinapatugtog ng bawat speaker ang buong kanta o ang buong pelikula, kaya walang kulang nasaan ka man. Hindi na bit-perfect ang mga kanta."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pour écouter n'importe où dans la pièce, pas seulement à la place d'écoute : chaque enceinte joue le morceau entier, ou le film entier, si bien que rien ne manque où que vous soyez. À la place d'écoute, le son vient toujours de l'avant. Les morceaux ne sont plus bit-perfect."
+            "value": "Pour écouter n'importe où dans la pièce, pas seulement à la place d'écoute : chaque enceinte joue le morceau entier, ou le film entier, si bien que rien ne manque où que vous soyez. Les morceaux ne sont plus bit-perfect."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "ફક્ત બેઠક પરથી નહીં, ઓરડામાં ક્યાંય પણ સાંભળવા માટે: દરેક સ્પીકર આખું ગીત અથવા આખી ફિલ્મ વગાડે છે, તેથી તમે જ્યાં પણ હો ત્યાં કશું ખૂટતું નથી. બેઠક પર અવાજ હજી પણ આગળથી આવે છે. ગીતો હવે બિટ-પરફેક્ટ રહેતાં નથી."
+            "value": "ફક્ત બેઠક પરથી નહીં, ઓરડામાં ક્યાંય પણ સાંભળવા માટે: દરેક સ્પીકર આખું ગીત અથવા આખી ફિલ્મ વગાડે છે, તેથી તમે જ્યાં પણ હો ત્યાં કશું ખૂટતું નથી. ગીતો હવે બિટ-પરફેક્ટ રહેતાં નથી."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Don sauraro a ko'ina cikin ɗakin, ba a wurin zama kaɗai ba: kowace lasifika tana kunna dukan waƙar ko dukan fim ɗin, don haka babu abin da ya ɓace a duk inda kake. A wurin zama sautin yana ci gaba da fitowa daga gaba. Waƙoƙi ba su zama bit-perfect ba kuma."
+            "value": "Don sauraro a ko'ina cikin ɗakin, ba a wurin zama kaɗai ba: kowace lasifika tana kunna dukan waƙar ko dukan fim ɗin, don haka babu abin da ya ɓace a duk inda kake. Waƙoƙi ba su zama bit-perfect ba kuma."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "להאזנה מכל מקום בחדר, לא רק ממקום הישיבה: כל רמקול מנגן את השיר כולו או את הסרט כולו, כך ששום דבר לא חסר בכל מקום שבו תהיו. במקום הישיבה הצליל עדיין מגיע מלפנים. השירים כבר אינם מדויקים ברמת הביט."
+            "value": "להאזנה מכל מקום בחדר, לא רק ממקום הישיבה: כל רמקול מנגן את השיר כולו או את הסרט כולו, כך ששום דבר לא חסר בכל מקום שבו תהיו. השירים כבר אינם מדויקים ברמת הביט."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "सिर्फ़ बैठने की जगह पर नहीं, कमरे में कहीं से भी सुनने के लिए: हर स्पीकर पूरा गाना या पूरी फ़िल्म बजाता है, इसलिए आप जहाँ भी हों कुछ नहीं छूटता। बैठने की जगह पर आवाज़ अब भी सामने से आती है। गाने अब बिट-परफ़ेक्ट नहीं रहते।"
+            "value": "सिर्फ़ बैठने की जगह पर नहीं, कमरे में कहीं से भी सुनने के लिए: हर स्पीकर पूरा गाना या पूरी फ़िल्म बजाता है, इसलिए आप जहाँ भी हों कुछ नहीं छूटता। गाने अब बिट-परफ़ेक्ट नहीं रहते।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hogy a szobában bárhol jól szóljon, ne csak a hallgatási helyen: minden hangszóró a teljes dalt vagy a teljes filmet játssza, így sehol sem hiányzik semmi. A hallgatási helyen a hang továbbra is elölről érkezik. A dalok így már nem bitpontosak."
+            "value": "Hogy a szobában bárhol jól szóljon, ne csak a hallgatási helyen: minden hangszóró a teljes dalt vagy a teljes filmet játssza, így sehol sem hiányzik semmi. A dalok így már nem bitpontosak."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Untuk mendengarkan di mana saja di ruangan, bukan hanya di tempat duduk: setiap speaker memutar seluruh lagu atau seluruh film, jadi tidak ada yang hilang di mana pun Anda berada. Di tempat duduk, suara tetap datang dari depan. Lagu tidak lagi bit-perfect."
+            "value": "Untuk mendengarkan di mana saja di ruangan, bukan hanya di tempat duduk: setiap speaker memutar seluruh lagu atau seluruh film, jadi tidak ada yang hilang di mana pun Anda berada. Lagu tidak lagi bit-perfect."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Per ascoltare da qualsiasi punto della stanza, non solo dal posto d'ascolto: ogni diffusore riproduce l'intero brano o l'intero film, così non manca nulla ovunque ti trovi. Al posto d'ascolto il suono continua ad arrivare da davanti. I brani non sono più bit-perfect."
+            "value": "Per ascoltare da qualsiasi punto della stanza, non solo dal posto d'ascolto: ogni diffusore riproduce l'intero brano o l'intero film, così non manca nulla ovunque ti trovi. I brani non sono più bit-perfect."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "リスニング位置だけでなく、部屋のどこで聴いてもよいように：すべてのスピーカーが曲全体、または映画全体を再生するので、どこにいても欠ける音がありません。リスニング位置では、音はこれまでどおり前方から聴こえます。曲はビットパーフェクトではなくなります。"
+            "value": "リスニング位置だけでなく、部屋のどこで聴いてもよいように：すべてのスピーカーが曲全体、または映画全体を再生するので、どこにいても欠ける音がありません。曲はビットパーフェクトではなくなります。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಆಸನದಲ್ಲಿ ಮಾತ್ರವಲ್ಲ, ಕೋಣೆಯ ಎಲ್ಲಿಂದಲಾದರೂ ಕೇಳಲು: ಪ್ರತಿಯೊಂದು ಸ್ಪೀಕರ್ ಇಡೀ ಹಾಡನ್ನು ಅಥವಾ ಇಡೀ ಚಲನಚಿತ್ರವನ್ನು ನುಡಿಸುತ್ತದೆ, ಆದ್ದರಿಂದ ನೀವು ಎಲ್ಲೇ ಇದ್ದರೂ ಏನೂ ತಪ್ಪುವುದಿಲ್ಲ. ಆಸನದಲ್ಲಿ ಧ್ವನಿ ಈಗಲೂ ಮುಂದಿನಿಂದಲೇ ಬರುತ್ತದೆ. ಹಾಡುಗಳು ಇನ್ನು ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಆಗಿರುವುದಿಲ್ಲ."
+            "value": "ಆಸನದಲ್ಲಿ ಮಾತ್ರವಲ್ಲ, ಕೋಣೆಯ ಎಲ್ಲಿಂದಲಾದರೂ ಕೇಳಲು: ಪ್ರತಿಯೊಂದು ಸ್ಪೀಕರ್ ಇಡೀ ಹಾಡನ್ನು ಅಥವಾ ಇಡೀ ಚಲನಚಿತ್ರವನ್ನು ನುಡಿಸುತ್ತದೆ, ಆದ್ದರಿಂದ ನೀವು ಎಲ್ಲೇ ಇದ್ದರೂ ಏನೂ ತಪ್ಪುವುದಿಲ್ಲ. ಹಾಡುಗಳು ಇನ್ನು ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಆಗಿರುವುದಿಲ್ಲ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "청취 위치뿐 아니라 방 어디에서나 들을 수 있도록: 모든 스피커가 곡 전체 또는 영화 전체를 재생하므로 어디에 있든 빠지는 소리가 없습니다. 청취 위치에서는 소리가 여전히 앞쪽에서 들립니다. 곡은 더 이상 비트 퍼펙트가 아닙니다."
+            "value": "청취 위치뿐 아니라 방 어디에서나 들을 수 있도록: 모든 스피커가 곡 전체 또는 영화 전체를 재생하므로 어디에 있든 빠지는 소리가 없습니다. 곡은 더 이상 비트 퍼펙트가 아닙니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "ഇരിപ്പിടത്തിൽ മാത്രമല്ല, മുറിയിൽ എവിടെനിന്നും കേൾക്കാൻ: ഓരോ സ്പീക്കറും മുഴുവൻ പാട്ടും അല്ലെങ്കിൽ മുഴുവൻ സിനിമയും പ്ലേ ചെയ്യുന്നു, അതിനാൽ നിങ്ങൾ എവിടെയായാലും ഒന്നും നഷ്ടമാകില്ല. ഇരിപ്പിടത്തിൽ ശബ്ദം ഇപ്പോഴും മുന്നിൽനിന്നുതന്നെ വരുന്നു. പാട്ടുകൾ ഇനി ബിറ്റ്-പെർഫെക്റ്റ് ആയിരിക്കില്ല."
+            "value": "ഇരിപ്പിടത്തിൽ മാത്രമല്ല, മുറിയിൽ എവിടെനിന്നും കേൾക്കാൻ: ഓരോ സ്പീക്കറും മുഴുവൻ പാട്ടും അല്ലെങ്കിൽ മുഴുവൻ സിനിമയും പ്ലേ ചെയ്യുന്നു, അതിനാൽ നിങ്ങൾ എവിടെയായാലും ഒന്നും നഷ്ടമാകില്ല. പാട്ടുകൾ ഇനി ബിറ്റ്-പെർഫെക്റ്റ് ആയിരിക്കില്ല."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "फक्त बसण्याच्या जागी नव्हे, खोलीत कुठूनही ऐकण्यासाठी: प्रत्येक स्पीकर संपूर्ण गाणे किंवा संपूर्ण चित्रपट वाजवतो, त्यामुळे तुम्ही कुठेही असलात तरी काहीही सुटत नाही. बसण्याच्या जागी आवाज अजूनही समोरूनच येतो. गाणी आता बिट-परफेक्ट राहत नाहीत."
+            "value": "फक्त बसण्याच्या जागी नव्हे, खोलीत कुठूनही ऐकण्यासाठी: प्रत्येक स्पीकर संपूर्ण गाणे किंवा संपूर्ण चित्रपट वाजवतो, त्यामुळे तुम्ही कुठेही असलात तरी काहीही सुटत नाही. गाणी आता बिट-परफेक्ट राहत नाहीत."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Untuk mendengar di mana-mana dalam bilik, bukan hanya di tempat duduk: setiap pembesar suara memainkan keseluruhan lagu atau keseluruhan filem, jadi tiada apa yang tertinggal di mana-mana pun anda berada. Di tempat duduk, bunyi masih datang dari hadapan. Lagu tidak lagi bit-perfect."
+            "value": "Untuk mendengar di mana-mana dalam bilik, bukan hanya di tempat duduk: setiap pembesar suara memainkan keseluruhan lagu atau keseluruhan filem, jadi tiada apa yang tertinggal di mana-mana pun anda berada. Lagu tidak lagi bit-perfect."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "For å lytte hvor som helst i rommet, ikke bare fra lytteplassen: hver høyttaler spiller hele låten eller hele filmen, så ingenting mangler uansett hvor du er. På lytteplassen kommer lyden fortsatt forfra. Låtene er ikke lenger bitperfekte."
+            "value": "For å lytte hvor som helst i rommet, ikke bare fra lytteplassen: hver høyttaler spiller hele låten eller hele filmen, så ingenting mangler uansett hvor du er. Låtene er ikke lenger bitperfekte."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Om overal in de kamer te luisteren, niet alleen op de luisterplek: elke luidspreker speelt het hele nummer of de hele film, zodat er nergens iets ontbreekt. Op de luisterplek komt het geluid nog steeds van voren. Nummers zijn dan niet meer bit-perfect."
+            "value": "Om overal in de kamer te luisteren, niet alleen op de luisterplek: elke luidspreker speelt het hele nummer of de hele film, zodat er nergens iets ontbreekt. Nummers zijn dan niet meer bit-perfect."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਸਿਰਫ਼ ਬੈਠਣ ਵਾਲੀ ਥਾਂ ਤੋਂ ਨਹੀਂ, ਕਮਰੇ ਵਿੱਚ ਕਿਤੋਂ ਵੀ ਸੁਣਨ ਲਈ: ਹਰ ਸਪੀਕਰ ਪੂਰਾ ਗੀਤ ਜਾਂ ਪੂਰੀ ਫ਼ਿਲਮ ਵਜਾਉਂਦਾ ਹੈ, ਇਸ ਲਈ ਤੁਸੀਂ ਜਿੱਥੇ ਵੀ ਹੋਵੋ ਕੁਝ ਨਹੀਂ ਛੁੱਟਦਾ। ਬੈਠਣ ਵਾਲੀ ਥਾਂ 'ਤੇ ਆਵਾਜ਼ ਹਾਲੇ ਵੀ ਸਾਹਮਣੇ ਤੋਂ ਆਉਂਦੀ ਹੈ। ਗੀਤ ਹੁਣ ਬਿਟ-ਪਰਫੈਕਟ ਨਹੀਂ ਰਹਿੰਦੇ।"
+            "value": "ਸਿਰਫ਼ ਬੈਠਣ ਵਾਲੀ ਥਾਂ ਤੋਂ ਨਹੀਂ, ਕਮਰੇ ਵਿੱਚ ਕਿਤੋਂ ਵੀ ਸੁਣਨ ਲਈ: ਹਰ ਸਪੀਕਰ ਪੂਰਾ ਗੀਤ ਜਾਂ ਪੂਰੀ ਫ਼ਿਲਮ ਵਜਾਉਂਦਾ ਹੈ, ਇਸ ਲਈ ਤੁਸੀਂ ਜਿੱਥੇ ਵੀ ਹੋਵੋ ਕੁਝ ਨਹੀਂ ਛੁੱਟਦਾ। ਗੀਤ ਹੁਣ ਬਿਟ-ਪਰਫੈਕਟ ਨਹੀਂ ਰਹਿੰਦੇ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Do słuchania w dowolnym miejscu pokoju, nie tylko w miejscu odsłuchu: każdy głośnik gra cały utwór lub cały film, więc nigdzie niczego nie brakuje. W miejscu odsłuchu dźwięk nadal dochodzi z przodu. Utwory nie są już bit-perfect."
+            "value": "Do słuchania w dowolnym miejscu pokoju, nie tylko w miejscu odsłuchu: każdy głośnik gra cały utwór lub cały film, więc nigdzie niczego nie brakuje. Utwory nie są już bit-perfect."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para ouvir de qualquer lugar do ambiente, não só da posição de escuta: cada caixa toca a música inteira ou o filme inteiro, então nada falta onde quer que você esteja. Na posição de escuta, o som continua vindo da frente. As músicas deixam de ser bit-perfect."
+            "value": "Para ouvir de qualquer lugar do ambiente, não só da posição de escuta: cada caixa toca a música inteira ou o filme inteiro, então nada falta onde quer que você esteja. As músicas deixam de ser bit-perfect."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para ouvir em qualquer ponto da sala, não só no lugar de audição: cada coluna reproduz a música inteira ou o filme inteiro, pelo que nada falta onde quer que esteja. No lugar de audição, o som continua a vir da frente. As músicas deixam de ser bit-perfect."
+            "value": "Para ouvir em qualquer ponto da sala, não só no lugar de audição: cada coluna reproduz a música inteira ou o filme inteiro, pelo que nada falta onde quer que esteja. As músicas deixam de ser bit-perfect."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pentru ascultare oriunde în cameră, nu doar din locul de ascultare: fiecare boxă redă melodia întreagă sau filmul întreg, așa că nu lipsește nimic oriunde v-ați afla. În locul de ascultare, sunetul vine în continuare din față. Melodiile nu mai sunt bit-perfect."
+            "value": "Pentru ascultare oriunde în cameră, nu doar din locul de ascultare: fiecare boxă redă melodia întreagă sau filmul întreg, așa că nu lipsește nimic oriunde v-ați afla. Melodiile nu mai sunt bit-perfect."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "För att lyssna var som helst i rummet, inte bara från lyssningsplatsen: varje högtalare spelar hela låten eller hela filmen, så inget saknas var du än är. På lyssningsplatsen kommer ljudet fortfarande framifrån. Låtarna är inte längre bitperfekta."
+            "value": "För att lyssna var som helst i rummet, inte bara från lyssningsplatsen: varje högtalare spelar hela låten eller hela filmen, så inget saknas var du än är. Låtarna är inte längre bitperfekta."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kwa kusikiliza popote chumbani, si kitini pekee: kila spika hucheza wimbo mzima au filamu nzima, kwa hiyo hakuna kinachokosekana popote ulipo. Kitini sauti bado hutoka mbele. Nyimbo hazitakuwa tena bit-perfect."
+            "value": "Kwa kusikiliza popote chumbani, si kitini pekee: kila spika hucheza wimbo mzima au filamu nzima, kwa hiyo hakuna kinachokosekana popote ulipo. Nyimbo hazitakuwa tena bit-perfect."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "இருக்கையில் மட்டுமல்ல, அறையில் எங்கிருந்தும் கேட்க: ஒவ்வொரு ஸ்பீக்கரும் முழுப் பாடலையும் அல்லது முழுத் திரைப்படத்தையும் இயக்குகிறது, எனவே நீங்கள் எங்கிருந்தாலும் எதுவும் விடுபடாது. இருக்கையில் ஒலி இப்போதும் முன்புறத்திலிருந்தே வருகிறது. பாடல்கள் இனி பிட்-பர்ஃபெக்ட் ஆக இருக்காது."
+            "value": "இருக்கையில் மட்டுமல்ல, அறையில் எங்கிருந்தும் கேட்க: ஒவ்வொரு ஸ்பீக்கரும் முழுப் பாடலையும் அல்லது முழுத் திரைப்படத்தையும் இயக்குகிறது, எனவே நீங்கள் எங்கிருந்தாலும் எதுவும் விடுபடாது. பாடல்கள் இனி பிட்-பர்ஃபெக்ட் ஆக இருக்காது."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "కూర్చునే చోటే కాకుండా గదిలో ఎక్కడి నుంచైనా వినడానికి: ప్రతి స్పీకర్ మొత్తం పాటను లేదా మొత్తం సినిమాను ప్లే చేస్తుంది, కాబట్టి మీరు ఎక్కడ ఉన్నా ఏదీ తప్పిపోదు. కూర్చునే చోట ధ్వని ఇప్పటికీ ముందు నుంచే వస్తుంది. పాటలు ఇకపై బిట్-పర్ఫెక్ట్ కావు."
+            "value": "కూర్చునే చోటే కాకుండా గదిలో ఎక్కడి నుంచైనా వినడానికి: ప్రతి స్పీకర్ మొత్తం పాటను లేదా మొత్తం సినిమాను ప్లే చేస్తుంది, కాబట్టి మీరు ఎక్కడ ఉన్నా ఏదీ తప్పిపోదు. పాటలు ఇకపై బిట్-పర్ఫెక్ట్ కావు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "สำหรับฟังได้ทุกที่ในห้อง ไม่ใช่แค่ที่ตำแหน่งนั่งฟัง: ลำโพงทุกตัวเล่นเพลงทั้งเพลงหรือภาพยนตร์ทั้งเรื่อง จึงไม่มีเสียงใดขาดหายไม่ว่าคุณจะอยู่ตรงไหน ที่ตำแหน่งนั่งฟัง เสียงยังคงมาจากด้านหน้า เพลงจะไม่เป็นบิตเพอร์เฟกต์อีกต่อไป"
+            "value": "สำหรับฟังได้ทุกที่ในห้อง ไม่ใช่แค่ที่ตำแหน่งนั่งฟัง: ลำโพงทุกตัวเล่นเพลงทั้งเพลงหรือภาพยนตร์ทั้งเรื่อง จึงไม่มีเสียงใดขาดหายไม่ว่าคุณจะอยู่ตรงไหน เพลงจะไม่เป็นบิตเพอร์เฟกต์อีกต่อไป"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yalnızca dinleme yerinden değil, odanın her yerinden dinlemek için: her hoparlör şarkının tamamını veya filmin tamamını çalar, böylece nerede olursanız olun hiçbir şey eksik kalmaz. Dinleme yerinde ses yine önden gelir. Şarkılar artık bit-perfect olmaz."
+            "value": "Yalnızca dinleme yerinden değil, odanın her yerinden dinlemek için: her hoparlör şarkının tamamını veya filmin tamamını çalar, böylece nerede olursanız olun hiçbir şey eksik kalmaz. Şarkılar artık bit-perfect olmaz."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Для прослуховування будь-де в кімнаті, а не лише на місці слухача: кожна колонка відтворює всю пісню або весь фільм, тож ніде нічого не бракує. На місці слухача звук і далі йде спереду. Пісні більше не бітоточні."
+            "value": "Для прослуховування будь-де в кімнаті, а не лише на місці слухача: кожна колонка відтворює всю пісню або весь фільм, тож ніде нічого не бракує. Пісні більше не бітоточні."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "صرف نشست پر نہیں، کمرے میں کہیں سے بھی سننے کے لیے: ہر اسپیکر پورا گانا یا پوری فلم چلاتا ہے، اس لیے آپ جہاں بھی ہوں کچھ کم نہیں ہوتا۔ نشست پر آواز اب بھی سامنے سے آتی ہے۔ گانے اب بٹ پرفیکٹ نہیں رہتے۔"
+            "value": "صرف نشست پر نہیں، کمرے میں کہیں سے بھی سننے کے لیے: ہر اسپیکر پورا گانا یا پوری فلم چلاتا ہے، اس لیے آپ جہاں بھی ہوں کچھ کم نہیں ہوتا۔ گانے اب بٹ پرفیکٹ نہیں رہتے۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Để nghe ở bất kỳ đâu trong phòng, không chỉ ở chỗ ngồi: mỗi loa phát toàn bộ bài hát hoặc toàn bộ bộ phim, nên dù bạn ở đâu cũng không thiếu gì. Tại chỗ ngồi, âm thanh vẫn đến từ phía trước. Bài hát không còn bit-perfect nữa."
+            "value": "Để nghe ở bất kỳ đâu trong phòng, không chỉ ở chỗ ngồi: mỗi loa phát toàn bộ bài hát hoặc toàn bộ bộ phim, nên dù bạn ở đâu cũng không thiếu gì. Bài hát không còn bit-perfect nữa."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "讓房間內任何位置都能好好聆聽，而不只是聆聽位：每個喇叭都會播放整首歌曲或整部電影，無論你在哪裏都不會缺少任何聲音。在聆聽位，聲音仍然來自前方。歌曲將不再是位元完美。"
+            "value": "讓房間內任何位置都能好好聆聽，而不只是聆聽位：每個喇叭都會播放整首歌曲或整部電影，無論你在哪裏都不會缺少任何聲音。歌曲將不再是位元完美。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "让房间里任何位置都能好好聆听，而不只是聆听位：每只音箱都会播放整首歌曲或整部电影，无论你在哪里都不会缺少任何声音。在聆听位，声音仍然来自前方。歌曲将不再是比特完美。"
+            "value": "让房间里任何位置都能好好聆听，而不只是聆听位：每只音箱都会播放整首歌曲或整部电影，无论你在哪里都不会缺少任何声音。歌曲将不再是比特完美。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "讓房間裡任何位置都能好好聆聽，而不只是聆聽位：每個喇叭都會播放整首歌曲或整部電影，無論你在哪裡都不會缺少任何聲音。在聆聽位，聲音仍然來自前方。歌曲將不再是位元完美。"
+            "value": "讓房間裡任何位置都能好好聆聽，而不只是聆聽位：每個喇叭都會播放整首歌曲或整部電影，無論你在哪裡都不會缺少任何聲音。歌曲將不再是位元完美。"
           }
         }
       }
@@ -447245,6 +447781,274 @@
         }
       }
     },
+    "Stage in front": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "መድረኩ ከፊት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المسرح الصوتي في الأمام"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "মঞ্চ সামনে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scéna vpředu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scenen foran"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bühne vorn"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Σκηνή μπροστά"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escena al frente"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صحنه در جلو"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Äänikuva edessä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entablado sa harap"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scène à l'avant"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "મંચ આગળ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dandali a gaba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הבמה מלפנים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मंच सामने"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Színpad elöl"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panggung di depan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scena davanti"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前方にステージ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ವೇದಿಕೆ ಮುಂದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앞쪽에 무대"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "വേദി മുന്നിൽ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मंच समोर"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pentas di hadapan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scenen foran"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Podium vooraan"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਮੰਚ ਸਾਹਮਣੇ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scena z przodu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Palco à frente"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Palco à frente"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scena în față"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scenen framför"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jukwaa mbele"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "மேடை முன்புறம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "వేదిక ముందు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เวทีเสียงอยู่ด้านหน้า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sahne önde"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сцена попереду"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسٹیج سامنے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sân khấu ở phía trước"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聲場在前方"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "声场在前方"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聲場在前方"
+          }
+        }
+      }
+    },
     "Standard channel-layout mix (centre and surrounds folded in)": {
       "localizations": {
         "am": {
@@ -479737,6 +480541,274 @@
           "stringUnit": {
             "state": "translated",
             "value": "原始檔案的位元組，原封不動，來自 Vespertine 的伺服器"
+          }
+        }
+      }
+    },
+    "The other speakers play their share a little quieter and a moment later, so at the seat the sound still comes from the front.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሌሎቹ ስፒከሮች ድርሻቸውን በትንሹ ዝቅ ባለ ድምፅና ከአፍታ በኋላ ያጫውታሉ፣ ስለዚህ በመቀመጫው ላይ ድምፁ አሁንም ከፊት ይመጣል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تشغّل السماعات الأخرى نصيبها بمستوى أخفض قليلًا وبعد لحظة، فيظل الصوت عند المقعد آتيًا من الأمام."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অন্য স্পিকারগুলো তাদের অংশ একটু আস্তে ও এক মুহূর্ত পরে বাজায়, তাই আসনে শব্দ আগের মতোই সামনে থেকে আসে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ostatní reproduktory hrají svůj díl o něco tišeji a o okamžik později, takže na místě poslechu zvuk dál přichází zepředu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De andre højttalere spiller deres del lidt svagere og et øjeblik senere, så lyden stadig kommer forfra på lyttepladsen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die anderen Lautsprecher spielen ihren Anteil etwas leiser und einen Moment später, sodass der Klang am Hörplatz weiterhin von vorn kommt."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τα άλλα ηχεία παίζουν το μερίδιό τους λίγο πιο χαμηλά και μια στιγμή αργότερα, ώστε στη θέση ακρόασης ο ήχος να εξακολουθεί να έρχεται από μπροστά."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los demás altavoces reproducen su parte un poco más bajo y un instante después, así que en el asiento el sonido sigue llegando de frente."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلندگوهای دیگر سهم خود را کمی آهسته‌تر و لحظه‌ای دیرتر پخش می‌کنند، پس در جای نشستن صدا همچنان از جلو می‌آید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muut kaiuttimet toistavat osuutensa hieman hiljempaa ja hetkeä myöhemmin, joten kuuntelupaikalla ääni tulee edelleen edestä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinapatugtog ng ibang speaker ang bahagi nila nang medyo mas mahina at saglit na mas huli, kaya sa upuan ay mula pa rin sa harap ang tunog."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les autres enceintes jouent leur part un peu moins fort et un instant plus tard, si bien qu'à la place d'écoute le son vient toujours de l'avant."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "બીજાં સ્પીકર પોતાનો ભાગ થોડો ધીમો અને ક્ષણભર મોડો વગાડે છે, તેથી બેઠક પર અવાજ હજી પણ આગળથી આવે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sauran lasifikoki suna kunna nasu kason da ɗan ƙaramin sauti kuma bayan ɗan lokaci kaɗan, don haka a wurin zama sautin yana ci gaba da fitowa daga gaba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הרמקולים האחרים מנגנים את חלקם מעט חלש יותר ורגע מאוחר יותר, כך שבמקום הישיבה הצליל עדיין מגיע מלפנים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बाक़ी स्पीकर अपना हिस्सा थोड़ा धीमा और एक पल बाद बजाते हैं, इसलिए बैठने की जगह पर आवाज़ अब भी सामने से आती है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A többi hangszóró a maga részét kicsit halkabban és egy pillanattal később játssza, így a hallgatási helyen a hang továbbra is elölről érkezik."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaker lain memutar bagiannya sedikit lebih pelan dan sesaat lebih lambat, jadi di tempat duduk suara tetap datang dari depan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gli altri diffusori riproducono la loro parte un po' più piano e un istante dopo, così al posto d'ascolto il suono continua ad arrivare da davanti."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ほかのスピーカーは担当分を少し小さく、わずかに遅らせて再生するので、リスニング位置では音がこれまでどおり前方から聴こえます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಉಳಿದ ಸ್ಪೀಕರ್‌ಗಳು ತಮ್ಮ ಪಾಲನ್ನು ಸ್ವಲ್ಪ ಕಡಿಮೆ ಧ್ವನಿಯಲ್ಲಿ ಮತ್ತು ಕ್ಷಣಕಾಲ ತಡವಾಗಿ ನುಡಿಸುತ್ತವೆ, ಆದ್ದರಿಂದ ಆಸನದಲ್ಲಿ ಧ್ವನಿ ಈಗಲೂ ಮುಂದಿನಿಂದಲೇ ಬರುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 스피커는 맡은 소리를 조금 작게, 아주 조금 늦게 재생하므로 청취 위치에서는 소리가 여전히 앞쪽에서 들립니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മറ്റ് സ്പീക്കറുകൾ അവയുടെ പങ്ക് അൽപ്പം താഴ്ന്ന ശബ്ദത്തിലും ഒരു നിമിഷം വൈകിയും പ്ലേ ചെയ്യുന്നു, അതിനാൽ ഇരിപ്പിടത്തിൽ ശബ്ദം ഇപ്പോഴും മുന്നിൽനിന്നുതന്നെ വരുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इतर स्पीकर त्यांचा वाटा थोडा हळू आणि क्षणभर उशिरा वाजवतात, त्यामुळे बसण्याच्या जागी आवाज अजूनही समोरूनच येतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pembesar suara lain memainkan bahagiannya sedikit lebih perlahan dan seketika kemudian, jadi di tempat duduk bunyi masih datang dari hadapan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De andre høyttalerne spiller sin del litt svakere og et øyeblikk senere, så lyden fortsatt kommer forfra på lytteplassen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De andere luidsprekers spelen hun deel iets zachter en een moment later, zodat het geluid op de luisterplek nog steeds van voren komt."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਬਾਕੀ ਸਪੀਕਰ ਆਪਣਾ ਹਿੱਸਾ ਥੋੜ੍ਹਾ ਹੌਲੀ ਅਤੇ ਪਲ ਭਰ ਬਾਅਦ ਵਜਾਉਂਦੇ ਹਨ, ਇਸ ਲਈ ਬੈਠਣ ਵਾਲੀ ਥਾਂ 'ਤੇ ਆਵਾਜ਼ ਹਾਲੇ ਵੀ ਸਾਹਮਣੇ ਤੋਂ ਆਉਂਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pozostałe głośniki grają swoją część nieco ciszej i chwilę później, więc w miejscu odsłuchu dźwięk nadal dochodzi z przodu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As outras caixas tocam a parte delas um pouco mais baixo e um instante depois, então na posição de escuta o som continua vindo da frente."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As outras colunas reproduzem a sua parte um pouco mais baixo e um instante depois, pelo que no lugar de audição o som continua a vir da frente."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Celelalte boxe își redau partea puțin mai încet și o clipă mai târziu, așa că în locul de ascultare sunetul vine în continuare din față."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De andra högtalarna spelar sin del lite svagare och ett ögonblick senare, så på lyssningsplatsen kommer ljudet fortfarande framifrån."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spika nyingine hucheza sehemu yake kwa sauti ya chini kidogo na baadaye kidogo, kwa hiyo kitini sauti bado hutoka mbele."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "மற்ற ஸ்பீக்கர்கள் தங்கள் பங்கைச் சற்று மெதுவாகவும் ஒரு கணம் தாமதமாகவும் இயக்குகின்றன, எனவே இருக்கையில் ஒலி இப்போதும் முன்புறத்திலிருந்தே வருகிறது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మిగతా స్పీకర్లు తమ వంతును కొంచెం తక్కువ స్థాయిలో, క్షణం ఆలస్యంగా ప్లే చేస్తాయి, కాబట్టి కూర్చునే చోట ధ్వని ఇప్పటికీ ముందు నుంచే వస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ลำโพงตัวอื่นจะเล่นส่วนของตนเบาลงเล็กน้อยและช้ากว่าเสี้ยววินาที ดังนั้นที่ตำแหน่งนั่งฟัง เสียงยังคงมาจากด้านหน้า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diğer hoparlörler kendi paylarını biraz daha kısık ve bir an sonra çalar, böylece dinleme yerinde ses yine önden gelir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Інші колонки відтворюють свою частку трохи тихіше й на мить пізніше, тож на місці слухача звук і далі йде спереду."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "باقی اسپیکر اپنا حصہ ذرا آہستہ اور ایک لمحہ بعد چلاتے ہیں، اس لیے نشست پر آواز اب بھی سامنے سے آتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Các loa còn lại phát phần của mình nhỏ hơn một chút và trễ hơn một thoáng, nên tại chỗ ngồi âm thanh vẫn đến từ phía trước."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他喇叭會以稍低的音量、稍遲一點播放各自的部分，因此在聆聽位，聲音仍然來自前方。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他音箱会以稍低的音量、稍晚一点播放各自的部分，因此在聆听位，声音仍然来自前方。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他喇叭會以稍低的音量、稍晚一點播放各自的部分，因此在聆聽位，聲音仍然來自前方。"
           }
         }
       }

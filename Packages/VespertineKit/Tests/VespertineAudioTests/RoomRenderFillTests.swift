@@ -151,6 +151,56 @@ struct RoomRenderFillTests {
         #expect(kept == loud.map { $0 * 0.99 })
     }
 
+    // MARK: Even everywhere
+
+    @Test("Even everywhere: every speaker of a side plays that side's own samples, at one level and at one time, with no ambience")
+    func even() throws {
+        let settings = RoomRenderSettings(crossoverHz: 0, style: .even)
+        let plan = try T.plan(T.stereo, Self.reported(settings))
+        #expect(!plan.upmixes)
+        #expect(RoomRender.summary(plan).contains("at one level and at one time"))
+        let l = T.noise(Self.frames, seed: 5).map { $0 * 0.5 }, r = T.noise(Self.frames, seed: 6).map { $0 * 0.5 }
+        let (out, width) = try T.render(T.interleave([l, r]), plan: plan)
+        #expect(width == 4)
+        // Back left, back right, front left, front right: no delay, no all-pass, no level change, nothing of the other side.
+        #expect(T.channel(out, 0, of: 4) == l)
+        #expect(T.channel(out, 1, of: 4) == r)
+        #expect(T.channel(out, 2, of: 4) == l)
+        #expect(T.channel(out, 3, of: 4) == r)
+        // The fill's level setting belongs to the other style: here it is always the routed sound's level.
+        #expect(RoomRenderSettings(fillDB: -40, style: .even).fillGain == 1)
+        #expect(RoomRenderSettings(fillDB: -40).fillGain == 0)
+        // A film: the dialogue is as loud on the back pair as on the front pair.
+        var chans = [[Float]](repeating: [Float](repeating: 0, count: Self.frames), count: 6)
+        chans[2] = T.noise(Self.frames, seed: 7).map { $0 * 0.5 }
+        let (film, _) = try T.render(T.interleave(chans), plan: T.plan(T.surround51, Self.reported(settings)))
+        for back in [0, 1] { #expect(abs(Self.dB(Self.level(film, back), over: Self.level(film, 2))) < 0.01) }
+        // Mac Sound Output: the same fill at the routed sound's level.
+        let on = Self.reported(settings)
+        let bl = try #require(on.aggregateChannels[.backLeft])
+        let matrix = try #require(SystemOutputRouting.matrix(input: T.surround51, group: on, content: .multichannel, stereo: .upmix))
+        #expect(abs(matrix[bl * 6 + 2] - Self.fold) < 1e-5 && matrix[bl * 6 + 0] == 1)
+    }
+
+    @Test("The style is saved with the group, a group saved before there were styles keeps the stage in front, and the choice only acts while the switch is on")
+    func styleChoice() throws {
+        #expect(try JSONDecoder().decode(RoomRenderSettings.self, from: Data("{\"fillDB\": -3, \"revision\": 2}".utf8)).style == .frontLed)
+        #expect(try JSONDecoder().decode(RoomRenderSettings.self, from: Data("{\"style\": \"later\"}".utf8)).style == .frontLed)
+        #expect(try JSONDecoder().decode(RoomRenderSettings.self, from: JSONEncoder().encode(RoomRenderSettings(style: .even))).style == .even)
+        #expect(RoomRenderSettings(style: .even).clamped.style == .even)
+        let off = Self.reported(nil)
+        #expect(GroupPolicies.roomRenderStyle(off) == nil)
+        #expect(GroupPolicies.setRoomRenderStyle(.even, in: off) == off)
+        var on = GroupPolicies.setRoomRender(true, in: off)
+        #expect(GroupPolicies.roomRenderStyle(on) == .frontLed)
+        on = GroupPolicies.setRoomRenderStyle(.even, in: on)
+        #expect(GroupPolicies.roomRenderStyle(on) == .even)
+        #expect(on != GroupPolicies.setRoomRenderStyle(.frontLed, in: on))
+        for style in RoomRenderSettings.Style.allCases {
+            #expect(!GroupPolicies.roomRenderStyleTitle(style).isEmpty && !GroupPolicies.roomRenderStyleDetail(style).isEmpty)
+        }
+    }
+
     // MARK: Mac Sound Output
 
     @Test("Mac Sound Output follows the switch: what other apps play reaches every speaker too; off, its routing is as it was")

@@ -27,6 +27,9 @@
 //   · Room correction (`roomWide`): below 200 Hz the profile's cuts keep 75 % of their depth and its boosts are left out. A room
 //     mode is at the same frequency everywhere in the room, but how strong it is changes from seat to seat, and a boost into a
 //     dip only fills that dip at the one seat it was measured at.
+//   · Two styles (`RoomRenderSettings.Style`). Stage in front is all of the above. Even everywhere is for a room with no seat
+//     that matters more than the rest: the fill is at the routed sound's own level and in time with it, with no all-pass and no
+//     ambience, so each speaker of a side plays the same thing. Bass management, placement and the limiter are the same.
 // What it can't do: four speakers can't make every seat the best seat. The image a stereo pair draws exists only between its
 // two speakers; elsewhere a listener hears the nearer speakers first. The fill makes sure that what they hear is the whole song.
 // Runs on the decode thread, never on the I/O thread. Output frame n is input frame n: a song comes out exactly as long as it
@@ -46,6 +49,15 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
         case all
     }
 
+    /// What the group is filled for.
+    public enum Style: String, Codable, CaseIterable, Sendable {
+        /// The seat keeps its stage in front: the fill is quieter (`fillDB`), later and decorrelated, and a stereo song's ambience
+        /// goes to the surrounds.
+        case frontLed
+        /// No seat comes first: the fill plays at the routed sound's level, in time with it and as it is.
+        case even
+    }
+
     /// Level of the extracted ambience on the surrounds, dB.
     public var ambienceDB: Double
     /// Level of the fill (the rest of the song on each speaker, decorrelated and late), dB; at `fillRange.lowerBound` or below
@@ -59,6 +71,7 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
     /// Below `lowCorrectionBelowHz`, the share of each room-correction cut that is kept (0…1); boosts there are left out.
     public var lowCorrectionDepth: Double
     public var lowCorrectionBelowHz: Double
+    public var style: Style
     /// Which defaults these settings were saved under (`currentRevision`); a file without it is from revision 1.
     public var revision = RoomRenderSettings.currentRevision
 
@@ -75,7 +88,8 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
     public static let lowCorrectionRange: ClosedRange<Double> = 0...500
 
     public init(ambienceDB: Double = -6, fillDB: Double = -3, surroundDelayMs: Double = 15, crossoverHz: Double = 90,
-                bassSpeakers: BassSpeakers = .front, lowCorrectionDepth: Double = 0.75, lowCorrectionBelowHz: Double = 200) {
+                bassSpeakers: BassSpeakers = .front, lowCorrectionDepth: Double = 0.75, lowCorrectionBelowHz: Double = 200,
+                style: Style = .frontLed) {
         self.ambienceDB = ambienceDB
         self.fillDB = fillDB
         self.surroundDelayMs = surroundDelayMs
@@ -83,6 +97,7 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
         self.bassSpeakers = bassSpeakers
         self.lowCorrectionDepth = lowCorrectionDepth
         self.lowCorrectionBelowHz = lowCorrectionBelowHz
+        self.style = style
     }
 
     /// A field missing from a saved group takes its default, so later fields don't make older files unreadable.
@@ -96,6 +111,7 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
         bassSpeakers = (try? c.decodeIfPresent(BassSpeakers.self, forKey: .bassSpeakers)) ?? d.bassSpeakers
         lowCorrectionDepth = try c.decodeIfPresent(Double.self, forKey: .lowCorrectionDepth) ?? d.lowCorrectionDepth
         lowCorrectionBelowHz = try c.decodeIfPresent(Double.self, forKey: .lowCorrectionBelowHz) ?? d.lowCorrectionBelowHz
+        style = (try? c.decodeIfPresent(Style.self, forKey: .style)) ?? d.style
         // The switch never had a control for the fill: a group saved with the old default takes the new one.
         let saved = try c.decodeIfPresent(Int.self, forKey: .revision) ?? 1
         if saved < 2, fillDB == Self.revisionOneFillDB { fillDB = d.fillDB }
@@ -117,7 +133,8 @@ public struct RoomRenderSettings: Codable, Hashable, Sendable {
     }
 
     var ambienceGain: Float { Float(pow(10, clamped.ambienceDB / 20)) }
-    var fillGain: Float { clamped.fillDB <= Self.fillRange.lowerBound ? 0 : Float(pow(10, clamped.fillDB / 20)) }
+    /// The fill's gain: the routed sound's own level when the room is filled evenly, else `fillDB`.
+    var fillGain: Float { style == .even ? 1 : clamped.fillDB <= Self.fillRange.lowerBound ? 0 : Float(pow(10, clamped.fillDB / 20)) }
 }
 
 /// What room render does with one song on one group: worked out before playback, so the plan, the signal path and the decoder
@@ -152,7 +169,7 @@ public enum RoomRender {
         let roles = source.map { SpeakerRole(label: ChannelLayouts.canonical($0)) }
         let isStereo = source.count == 2 && roles.contains(.frontLeft) && roles.contains(.frontRight)
         let isMono = source.count == 1
-        let upmixes = hasSurrounds && (isStereo || isMono)
+        let upmixes = hasSurrounds && (isStereo || isMono) && settings.style == .frontLed
         var routed = placed
         routed.stereoPolicy = .frontOnly
         return RoomRenderPlan(settings: settings, group: routed, source: source, upmixes: upmixes,
@@ -282,7 +299,9 @@ public enum RoomRender {
     public static func summary(_ plan: RoomRenderPlan) -> String {
         let s = plan.settings
         var parts: [String] = []
-        if s.fillGain > 0 {
+        if s.style == .even {
+            parts.append("the whole song on every speaker, at one level and at one time")
+        } else if s.fillGain > 0 {
             parts.append("the whole song on every speaker (the fill \(Int(-s.fillDB.rounded())) dB down, \(Int(s.surroundDelayMs.rounded())) ms late)")
         }
         if plan.upmixes { parts.append("ambience on the surrounds") }
@@ -417,7 +436,8 @@ struct FillVoice {
     static let centreStages: [[Double]] = [[2.7, 3.9, 5.7], [1.7, 3.1, 4.5]]
 
     /// A voice for every output with something to fill, in the outputs' order. The left side is `surroundDelayMs` late, the
-    /// right 3 ms more and the centre 1.5 ms more, so no two sides arrive together.
+    /// right 3 ms more and the centre 1.5 ms more, so no two sides arrive together. Filled evenly, a voice is neither late nor
+    /// decorrelated.
     static func bank(taps: [[PositionRouter.Tap]], group: SpeakerGroup, settings: RoomRenderSettings, sampleRate: Double) -> [FillVoice] {
         let roleOf = Dictionary(group.aggregateChannels.map { ($0.value, $0.key) }, uniquingKeysWith: { a, _ in a })
         var used: [RoomRender.Side: Int] = [:]
@@ -431,10 +451,11 @@ struct FillVoice {
             case .right: (rightStages, 3)
             case .centre: (centreStages, 1.5)
             }
-            let delay = Int(((settings.surroundDelayMs + later) / 1000 * sampleRate).rounded())
+            let even = settings.style == .even
+            let delay = even ? 0 : Int(((settings.surroundDelayMs + later) / 1000 * sampleRate).rounded())
             let f = settings.crossoverHz
             voices.append(FillVoice(output: output, taps: list,
-                                    decorrelator: Decorrelator(sampleRate: sampleRate, delayFrames: delay, stagesMs: sets[n % sets.count]),
+                                    decorrelator: Decorrelator(sampleRate: sampleRate, delayFrames: delay, stagesMs: even ? [] : sets[n % sets.count]),
                                     highPass: f > 0 ? [RenderBiquad(highPass: true, frequency: f, sampleRate: sampleRate),
                                                        RenderBiquad(highPass: true, frequency: f, sampleRate: sampleRate)] : []))
         }
