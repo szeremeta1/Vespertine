@@ -13,7 +13,14 @@ struct VinylView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var player: PlayerState? { session.shownPlayer }
-    private var spinning: Bool { player?.playback == .playing && player?.loading != true && !reduceMotion }
+    private var spinning: Bool { Self.isTurning(player, reduceMotion: reduceMotion) }
+
+    /// Whether the record turns: the song plays (not still loading) and Reduce Motion is off.
+    static func isTurning(_ player: PlayerState?, reduceMotion: Bool) -> Bool {
+        player?.playback == .playing && player?.loading != true && !reduceMotion
+    }
+
+    static func turningValue(turning: Bool) -> Text { turning ? Text("Turning") : Text("Still") }
 
     var body: some View {
         GeometryReader { geometry in
@@ -39,9 +46,6 @@ struct VinylView: View {
             .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .aspectRatio(1, contentMode: .fit)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Record"))
-        .accessibilityValue(spinning ? Text("Turning") : Text("Still"))
     }
 
     private func record(diameter: CGFloat, angle: Double) -> some View {
@@ -76,7 +80,7 @@ struct VinylView: View {
                 .blendMode(.screen)
             // The label turns: the cover, with a paper ring and the spindle hole.
             ZStack {
-                ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: 600, cornerRadius: 0)
+                ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: NowPlayingArt.recordSize, cornerRadius: 0)
                     .clipShape(Circle())
                 Circle().strokeBorder(Color.black.opacity(0.35), lineWidth: 1)
                 Circle().fill(Palette.base).frame(width: diameter * 0.035, height: diameter * 0.035)
