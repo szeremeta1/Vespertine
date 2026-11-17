@@ -264,6 +264,74 @@ private final class SlowMac: @unchecked Sendable {
         #expect(!source.isComplete, "the part asked for came before the gap behind it")
     }
 
+    // TestFlight AGWqTwVAvOJJl42tjue-P-M: "scrubbing to a point mid-song appears to be utterly nonfunctional", on an ALAC
+    // 24/96 file sent as it is from the Mac. The same case here: an ALAC file in an .m4a, still arriving, sought to its
+    // middle while it plays.
+    @Test func seekingMidSongInAnALACFileThatIsStillArrivingPlaysFromThere() async throws {
+        let rate = 96_000.0, seconds = 20.0
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("phoneplayer-\(UUID()).m4a")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let frames = Int(seconds * rate)
+        do {
+            let settings: [String: Any] = [AVFormatIDKey: kAudioFormatAppleLossless, AVSampleRateKey: rate, AVNumberOfChannelsKey: 2, AVEncoderBitDepthHintKey: 24]
+            let file = try AVAudioFile(forWriting: url, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
+            let buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: AVAudioFrameCount(frames))!
+            buffer.frameLength = AVAudioFrameCount(frames)
+            // A tone that rises in pitch, so every place in the song sounds different from every other.
+            for c in 0..<2 {
+                for i in 0..<frames {
+                    let t = Double(i) / rate
+                    buffer.floatChannelData![c][i] = Float(0.4 * sin(2 * Double.pi * (220 + 20 * t + 55 * Double(c)) * t))
+                }
+            }
+            try file.write(from: buffer)
+        }
+        // What the file decodes to, to compare with.
+        let decoded = try AVAudioFile(forReading: url, commonFormat: .pcmFormatFloat32, interleaved: false)
+        let whole = AVAudioPCMBuffer(pcmFormat: decoded.processingFormat, frameCapacity: AVAudioFrameCount(decoded.length))!
+        try decoded.read(into: whole)
+        let expected = Array(UnsafeBufferPointer(start: whole.floatChannelData![0], count: Int(whole.frameLength)))
+        #expect(expected.count == frames)
+
+        let format = StreamFormat(codec: "ALAC", container: "m4a", sampleRate: rate, bitDepth: 24, channels: 2, channelLabels: nil, lossless: true)
+        let mac = SlowMac(data: try Data(contentsOf: url), delay: .milliseconds(5))
+        let descriptor = StreamDescriptor(stream: 1, kind: .original, byteSize: Int64(mac.data.count), format: format, frames: nil, tag: "t", chunkSize: 8_192)
+        let cache = FileManager.default.temporaryDirectory.appendingPathComponent("phoneplayer-\(UUID()).m4a")
+        let source = try StreamSource(descriptor: descriptor, file: cache, read: mac.read, window: 2)
+        defer { source.close(); try? FileManager.default.removeItem(at: cache) }
+        source.start()
+        let engine = try offlineEngine(rate: rate)
+        let player = PhonePlayer(engine: engine)
+        player.scheduleAhead = 0.5
+        var failures: [Error] = []
+        player.onFailure = { failures.append($0) }
+        player.start(.init(id: "s", source: source, format: format), playing: true)
+        try await wait { player.state == .playing }
+        #expect(abs(player.duration - seconds) < 0.01)
+        _ = try render(engine, frames: 9_600)
+        #expect(!source.isComplete, "the middle of the song is still on the Mac")
+
+        try player.seek(to: 11.0)
+        #expect(abs(player.position - 11.0) < 0.05, "the playhead is where it was put, at \(player.position)")
+        #expect(player.state == .playing)
+        // The part asked for is fetched and decoded; until it is, the output is silent. Then it is the song from 11 s.
+        var out: [Float] = []
+        var looks = 0
+        while out.filter({ abs($0) > 1e-4 }).count < 4_000, looks < 500 {
+            looks += 1
+            out += try render(engine, frames: 4_096)[0]
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        #expect(failures.isEmpty, "\(failures)")
+        let first = try #require(out.firstIndex { abs($0) > 1e-4 }, "sound came after the seek")
+        let start = Int(11.0 * rate)
+        let from = try #require(expected[start...].firstIndex { abs($0) > 1e-4 })
+        let heard = Array(out[first..<min(first + 2_000, out.count)])
+        let wanted = Array(expected[from..<from + heard.count])
+        #expect(worst(heard, wanted) < 1e-4, "what plays after the seek is the song from 11 s on")
+        #expect(player.position > 11.0 && player.position < 13.0, "and the playhead moves on from there, at \(player.position)")
+    }
+
     @Test func aStreamThatStopsArrivingIsReportedNotSilentlyStuck() async throws {
         let (url, _) = try makeFile(seconds: 1)
         defer { try? FileManager.default.removeItem(at: url) }
