@@ -35,6 +35,8 @@ public struct PositionRouter: Hashable, Sendable {
         case lfe
         /// A stereo song on speakers beyond the front pair, by the group's stereo policy.
         case policy
+        /// Fill the room: the rest of the song on a speaker that would not play it otherwise (`RoomRender.fillTaps`).
+        case fill
     }
 
     public struct Route: Hashable, Sendable {
@@ -114,6 +116,27 @@ public struct PositionRouter: Hashable, Sendable {
             for route in list where route.output < rows.count { rows[route.output].append(Tap(source: s, gain: route.gain)) }
         }
         self.rows = rows
+    }
+
+    private init(sourceChannels: Int, outputChannels: Int, routes: [[Route]], rows: [[Tap]]) {
+        self.sourceChannels = sourceChannels
+        self.outputChannels = outputChannels
+        self.routes = routes
+        self.rows = rows
+    }
+
+    /// This router with `fill` mixed in at `gain`: for each output, more of the song's channels (`RoomRender.fillTaps`). The same
+    /// router when there is nothing to add.
+    public func adding(fill: [[Tap]], gain: Float) -> PositionRouter {
+        guard gain > 0, fill.contains(where: { !$0.isEmpty }) else { return self }
+        var routes = routes, rows = rows
+        for (output, taps) in fill.enumerated() where output < rows.count {
+            for tap in taps where tap.source < routes.count && tap.gain > 0 {
+                rows[output].append(Tap(source: tap.source, gain: tap.gain * gain))
+                routes[tap.source].append(Route(output: output, gain: tap.gain * gain, kind: .fill))
+            }
+        }
+        return PositionRouter(sourceChannels: sourceChannels, outputChannels: outputChannels, routes: routes, rows: rows)
     }
 
     // MARK: What it makes of the song

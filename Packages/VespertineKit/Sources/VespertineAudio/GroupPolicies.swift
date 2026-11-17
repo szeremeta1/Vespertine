@@ -158,7 +158,7 @@ public enum GroupPolicies {
     }
 
     public static let roomRenderTitle = String(localized: "Fill the room")
-    public static let roomRenderDetail = String(localized: "For listening anywhere in the room, not only at the seat: stereo songs add their ambience on the back pair, and the bass moves to the front pair. Songs are no longer bit-perfect.")
+    public static let roomRenderDetail = String(localized: "For listening anywhere in the room, not only at the seat: every speaker plays the whole song, or the whole film, so nothing is missing wherever you are. At the seat the sound still comes from the front. Songs are no longer bit-perfect.")
 
     // MARK: A lost output
 
