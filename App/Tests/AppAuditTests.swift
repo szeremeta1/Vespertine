@@ -274,8 +274,10 @@ struct AppAuditTests {
         #expect(library.transitions(of: nil) == nil, "a list that isn't a playlist never gets one")
     }
 
-    /// A copy plays as itself, on any output, unless the album's copies are bundled; then the output picks, except for a
-    /// copy asked for by hand. Album playback takes one copy, never every copy of every song.
+    /// A song's stereo and surround versions follow the output while versions are combined (the default), and a copy among
+    /// several in one layout plays as itself. With versions not combined every copy plays as itself, on any output, unless
+    /// the album's copies are bundled; then the output picks, except for a copy asked for by hand. Album playback takes one
+    /// copy, never every copy of every song.
     @Test func copiesPlayAsChosen() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-copies-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
@@ -318,10 +320,40 @@ struct AppAuditTests {
         let download = Array(inserted[0...1]), vinyl = Array(inserted[2...3]), surround = Array(inserted[4...5])
         player.wantsMultichannel = { true }
 
-        // Separate copies (the default): the vinyl transfer plays as itself, even on a surround output.
+        // Versions combined (the default): asked for the vinyl transfer, a surround output plays the song's 5.1 version,
+        // and a stereo output the vinyl transfer itself, not the download beside it.
+        #expect(library.combinesVersions)
+        player.play(vinyl)
+        #expect(player.queue.map(\.track.location) == surround.map(\.location))
+        player.wantsMultichannel = { false }
+        player.resolveVersions()
+        #expect(player.queue[1].track.location == vinyl[1].location, "upcoming songs follow the output, back to the copy asked for")
+        player.play(vinyl)
+        #expect(player.queue.map(\.track.location) == vinyl.map(\.location))
+        // A shuffle of everything plays each song once: its stereo and 5.1 versions are one entry, while two stereo copies
+        // asked for together both play, as they always did.
+        player.play(vinyl + surround, shuffled: false)
+        #expect(player.queue.map(\.track.location) == vinyl.map(\.location))
+        player.wantsMultichannel = { true }
+        player.play(surround + download + vinyl, shuffled: false)
+        #expect(player.queue.map(\.track.location) == surround.map(\.location), "the stereo copies are the same entries as the 5.1 ones")
+        player.play(download + vinyl, shuffled: false)
+        #expect(player.queue.map(\.track.location) == surround.map(\.location), "both stereo copies give way to the one 5.1 version, once")
+        player.wantsMultichannel = { false }
+        player.play(download + vinyl, shuffled: false)
+        #expect(player.queue.count == 4, "two stereo copies of a song are two entries unless the album's copies are bundled")
+        player.wantsMultichannel = { true }
+        // A version picked by hand plays as itself.
+        player.play(vinyl, exactly: Set(vinyl.map(\.location)))
+        #expect(player.queue.map(\.track.location) == vinyl.map(\.location))
+
+        // Versions not combined, copies separate: the vinyl transfer plays as itself, even on a surround output.
+        library.combinesVersions = false
         player.play(vinyl)
         #expect(player.queue.map(\.track.location) == vinyl.map(\.location))
         #expect(player.queue.allSatisfy { $0.versions.isEmpty })
+        player.play(vinyl + surround, shuffled: false)
+        #expect(player.queue.count == 4, "every file is its own song")
 
         // The album has three copies, each whole, every song in all three.
         let copies = library.albumCopies(albumKey: download[0].albumKey)

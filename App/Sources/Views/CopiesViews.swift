@@ -193,8 +193,12 @@ struct SongCopiesPopover: View {
                 row(copy, edition: analyzed.copy(of: copy)?.edition)
                 Hairline()
             }
+            // Combined versions share a heart across layouts: say so where the song has copies in both.
+            let sharesHearts = model.library.combinesVersions && Set(copies.map(\.isMultichannel)).count > 1
             Text(bundled
                  ? "This album's copies are bundled: the song plays the starred copy when your output supports it, else the best one it supports."
+                 : sharesHearts
+                 ? "Play plays that copy here, then the list goes on. A heart covers the song’s stereo and surround versions alike."
                  : "Play plays that copy here, then the list goes on. A heart is for that copy only. The starred copy plays wherever this album's copies are bundled.")
                 .font(Typeface.ui(11)).foregroundStyle(Palette.text3)
                 .lineLimit(4)

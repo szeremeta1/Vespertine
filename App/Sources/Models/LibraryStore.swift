@@ -24,6 +24,7 @@ final class LibraryStore {
         didSet {
             genres = Genres.summarize(albums)
             albumsByKey = Dictionary(albums.map { ($0.key, $0) }, uniquingKeysWith: { a, _ in a })
+            knownEditions = nil
             countCopies()
         }
     }
@@ -90,13 +91,56 @@ final class LibraryStore {
 
     func isPreferredCopy(_ track: Track) -> Bool { track.id.map(preferredCopyIDs.contains) ?? false }
 
-    /// For each track, the versions playback may pick among: every copy of its song when its album's copies are bundled,
-    /// else just the track (a copy chosen plays as itself, on any output).
-    func playbackVersions(of tracks: [Track]) -> [[Track]] {
+    /// Settings › Playback › "Treat a song's stereo and surround versions as one song": a song in stereo and in surround
+    /// (on one album, or on an album and its "(Dolby Atmos)" edition: `SongVersions`) is one song in lists and queues,
+    /// the output picking the version that plays, and a heart on one version is a heart on the song. On by default.
+    var combinesVersions = true {
+        didSet { if combinesVersions != oldValue { revision += 1; favoriteVersions() } }
+    }
+    /// The editions of each album that has several (`SongVersions.editions`), worked out when first asked for after the
+    /// albums change.
+    @ObservationIgnored private var knownEditions: [String: [String]]?
+    private var editions: [String: [String]] {
+        if let knownEditions { return knownEditions }
+        let editions = SongVersions.editions(albums)
+        knownEditions = editions
+        return editions
+    }
+
+    /// A song as playback takes it: the versions it may pick among, and what tells the song from other songs when it has
+    /// several tracks (`key`, nil for a song that is just the track asked for).
+    struct PlaybackSong {
+        var versions: [Track]
+        var key: String?
+        /// Every copy of the song is one entry in a queue (an album whose copies are bundled); otherwise only its stereo
+        /// and surround versions are, and two copies in one layout asked for together both play.
+        var mergesCopies = false
+    }
+
+    /// For each track, the versions playback may pick among. On an album whose copies are bundled: every copy of its
+    /// song. Elsewhere, while versions are combined: the track and its song's versions in the other layout, so the track
+    /// plays as itself on an output of its own kind and gives way to the surround (or stereo) version on the other
+    /// kind. A track of an album with a copy chosen on its page plays as itself, and so does every track with versions
+    /// not combined. `acrossEditions` false keeps to the track's own album (an album played from its own page is that
+    /// edition).
+    func playbackSongs(of tracks: [Track], acrossEditions: Bool = true) -> [PlaybackSong] {
         let bundled = tracks.map { isBundled(albumKey: $0.albumKey) }
-        guard bundled.contains(true) else { return tracks.map { [$0] } }
-        let songs = versions(of: tracks)
-        return zip(tracks, zip(bundled, songs)).map { t, b in b.0 ? b.1 : [t] }
+        guard combinesVersions || bundled.contains(true) else { return tracks.map { PlaybackSong(versions: [$0]) } }
+        let songs = versions(of: tracks, acrossEditions: acrossEditions)
+        return zip(tracks, zip(bundled, songs)).map { t, b in
+            let (bundled, song) = b
+            guard song.count > 1 else { return PlaybackSong(versions: [t]) }
+            let key = song.map(\.location).sorted().joined(separator: "\u{1F}")
+            if bundled { return PlaybackSong(versions: song, key: key, mergesCopies: true) }
+            guard combinesVersions else { return PlaybackSong(versions: [t]) }
+            if case .copy = copyChoice(albumKey: t.albumKey) { return PlaybackSong(versions: [t]) }
+            let versions = SongVersions.followingOutput(t, in: song)
+            return PlaybackSong(versions: versions, key: versions.count > 1 ? key : nil)
+        }
+    }
+
+    func playbackVersions(of tracks: [Track], acrossEditions: Bool = true) -> [[Track]] {
+        playbackSongs(of: tracks, acrossEditions: acrossEditions).map(\.versions)
     }
 
     private func countCopies() {
@@ -133,13 +177,27 @@ final class LibraryStore {
         }
         return (path as NSString).abbreviatingWithTildeInPath
     }
-    /// For each track, every version and copy of its song on its album (stereo and multichannel, the same song
-    /// in two places), or just the track. The albums are read at once, so a whole library queues in one read.
-    func versions(of tracks: [Track]) -> [[Track]] {
-        let albumTracks = self.tracks(albumKeys: Array(Set(tracks.map(\.albumKey))))
+    /// For each track, every version and copy of its song (stereo and multichannel, the same song in two places), or
+    /// just the track: on its album, and while versions are combined (and `acrossEditions`) on the album's other
+    /// editions too (`SongVersions`). The albums are read at once, so a whole library queues in one read; albums known to
+    /// be in one copy and one edition (nearly all of them) aren't read at all.
+    func versions(of tracks: [Track], acrossEditions: Bool = true) -> [[Track]] {
+        let editions = acrossEditions && combinesVersions ? self.editions : [:]
+        var keys: [String] = [], seen = Set<String>()
+        for t in tracks {
+            let key = t.albumKey
+            guard !seen.contains(key), !copyCountsReady || copyCounts[key] != nil || editions[key] != nil else { continue }
+            for k in editions[key] ?? [key] where seen.insert(k).inserted { keys.append(k) }
+        }
+        guard !keys.isEmpty else { return tracks.map { [$0] } }
+        let byAlbum = Dictionary(grouping: self.tracks(albumKeys: keys), by: \.albumKey)
         var songByLocation: [String: [Track]] = [:]
-        for songs in Dictionary(grouping: albumTracks, by: \.albumKey).values.map(TrackVersions.group) {
-            for song in songs { for t in song { songByLocation[t.location] = song } }
+        var done = Set<String>()
+        for key in keys where !done.contains(key) {
+            let family = editions[key] ?? [key]
+            family.forEach { done.insert($0) }
+            let songs = family.count > 1 ? SongVersions.group(family.flatMap { byAlbum[$0] ?? [] }) : TrackVersions.group(byAlbum[key] ?? [])
+            for song in songs where song.count > 1 { for t in song { songByLocation[t.location] = song } }
         }
         return tracks.map { songByLocation[$0.location] ?? [$0] }
     }
@@ -833,8 +891,10 @@ final class LibraryStore {
         favoriteVersionsTask = Task { [weak self] in
             if !first { try? await Task.sleep(for: .milliseconds(300)) }
             guard !Task.isCancelled else { return }
-            let bundled = self?.bundlesCopiesByDefault ?? false
-            let songs = await Task.detached(priority: .utility) { try? database.favoriteEveryVersion(bundledByDefault: bundled) }.value
+            let bundled = self?.bundlesCopiesByDefault ?? false, combined = self?.combinesVersions ?? true
+            let songs = await Task.detached(priority: .utility) {
+                try? database.favoriteEveryVersion(bundledByDefault: bundled, combiningVersions: combined)
+            }.value
             guard !Task.isCancelled, let songs else { return }
             self?.favoriteCount = songs
         }
