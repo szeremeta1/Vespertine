@@ -24,7 +24,9 @@ struct AirPlay2SessionTests {
     /// A 24-bit song at 48 kHz: there is something to gain if the receiver takes it.
     static let deepWish = AirPlayWish(sourceRate: 48_000, wantsDepth: true)
     /// What a receiver that takes 24-bit at 48 kHz and 16-bit at 44.1 kHz on a realtime stream says of itself.
-    static let deepInfo: [String: Any] = ["name": "Fake", "audioFormats": [["type": 96, "audioInputFormats": 0x240000, "audioOutputFormats": 0x240000]]]
+    static var deepInfo: [String: Any] {
+        ["name": "Fake", "audioFormats": [["type": 96, "audioInputFormats": 0x240000, "audioOutputFormats": 0x240000]]]
+    }
 
     /// Packets of 24-bit samples: a tone with the low bits in use.
     static func deepPackets(_ count: Int, seed: UInt64 = 11) -> [[Int32]] {
