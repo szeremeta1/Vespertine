@@ -93,3 +93,110 @@ enum AirPlay2Buffered {
         return (blocks, at)
     }
 }
+
+/// A moment on the clock a buffered stream is timed by: whole seconds and a fraction of one in 64 bits, as
+/// SETRATEANCHORTIME says it.
+struct AirPlay2NetworkTime: Equatable, Sendable {
+    var seconds: UInt64
+    /// The part of a second, where 2^64 would be a whole one.
+    var fraction: UInt64
+
+    init(seconds: UInt64, fraction: UInt64) {
+        self.seconds = seconds
+        self.fraction = fraction
+    }
+
+    init(nanoseconds: UInt64) {
+        let (whole, rest) = nanoseconds.quotientAndRemainder(dividingBy: 1_000_000_000)
+        seconds = whole
+        // rest * 2^64 / 10^9: the remainder is below 10^9, so the quotient fits.
+        fraction = UInt64(1_000_000_000).dividingFullWidth((high: rest, low: 0)).quotient
+    }
+
+    /// To the nanosecond below.
+    var nanoseconds: UInt64 {
+        seconds &* 1_000_000_000 &+ fraction.multipliedFullWidth(by: 1_000_000_000).high
+    }
+}
+
+extension AirPlay2Message {
+    /// ALAC, 48 kHz, 24-bit, stereo: the `audioFormat` of the one buffered stream Vespertine makes.
+    static let bufferedFormat = 0x200000
+
+    /// The first SETUP of a session that will carry a buffered stream: as `sessionSetup`, but the receiver is to follow
+    /// this Mac's PTP clock, found at `addresses` (the first is given as its name), and the session is a group of its
+    /// own. Receivers time a buffered stream by PTP only.
+    static func bufferedSessionSetup(sender: AirPlay2Sender, sessionUUID: UUID, groupUUID: UUID, addresses: [String]) -> Data {
+        encode([
+            "deviceID": sender.deviceID,
+            "macAddress": sender.deviceID,
+            "sessionUUID": sessionUUID.uuidString,
+            "timingProtocol": "PTP",
+            "timingPeerInfo": ["Addresses": addresses, "ID": addresses.first ?? ""] as [String: Any],
+            "groupUUID": groupUUID.uuidString,
+            "groupContainsGroupLeader": false,
+            "name": sender.name,
+            "model": sender.model,
+            "osName": "macOS",
+            "osVersion": sender.osVersion,
+            "sourceVersion": AirPlay2Sender.sourceVersion,
+            "isMultiSelectAirPlay": true,
+            "senderSupportsRelay": false,
+            "statsCollectionEnabled": false,
+        ])
+    }
+
+    /// The second SETUP for a buffered stream. `key`: 32 bytes the blocks are sealed with.
+    static func bufferedStreamSetup(key: Data, connectionID: UInt32, kind: AirPlay2Buffered.Kind) -> Data {
+        let stream: [String: Any] = [
+            "type": AirPlay2Buffered.streamType,
+            "audioFormat": bufferedFormat,
+            "ct": alac,
+            "audioMode": "default",
+            "isMedia": true,
+            "shk": key,
+            "spf": RAOPTiming.framesPerPacket,
+            "sr": kind.format.sampleRate,
+            "supportsDynamicStreamID": false,
+            "streamConnectionID": Int(connectionID),
+        ]
+        return encode(["streams": [stream]])
+    }
+
+    /// Where the receiver takes a buffered stream's blocks (a TCP port) and how many bytes of them it will hold, from
+    /// the second SETUP's answer. nil unless the answer is for a buffered stream.
+    static func bufferedStream(in reply: Data) -> (dataPort: UInt16, bufferSize: Int)? {
+        guard let streams = decode(reply)?["streams"] as? [[String: Any]], let stream = streams.first,
+              stream["type"] as? Int == AirPlay2Buffered.streamType, let data = port(stream["dataPort"]),
+              let size = stream["audioBufferSize"] as? Int, size > 0 else { return nil }
+        return (data, size)
+    }
+
+    /// SETPEERS: the addresses of every clock in the session, this Mac's among them. A bare list, not a dictionary.
+    static func peers(_ addresses: [String]) -> Data {
+        (try? PropertyListSerialization.data(fromPropertyList: addresses, format: .binary, options: 0)) ?? Data()
+    }
+
+    /// SETRATEANCHORTIME to play: the frame with timestamp `rtpTime` is to sound at `time` on the clock called `clock`
+    /// (this Mac's PTP clock identity). Numbers that fill 64 bits are written bit for bit.
+    static func play(rtpTime: UInt32, at time: AirPlay2NetworkTime, clock: UInt64) -> Data {
+        encode([
+            "rate": 1,
+            "rtpTime": Int(rtpTime),
+            "networkTimeSecs": Int(Int64(bitPattern: time.seconds)),
+            "networkTimeFrac": Int(Int64(bitPattern: time.fraction)),
+            "networkTimeTimelineID": Int(Int64(bitPattern: clock)),
+        ])
+    }
+
+    /// SETRATEANCHORTIME to pause: what the receiver holds stays held.
+    static func pause() -> Data {
+        encode(["rate": 0])
+    }
+
+    /// FLUSHBUFFERED: drop what the receiver holds before block `untilSequence` (whose first frame is
+    /// `untilTimestamp`), at once.
+    static func flushBuffered(untilSequence: UInt32, untilTimestamp: UInt32) -> Data {
+        encode(["flushUntilSeq": Int(untilSequence & AirPlay2Buffered.sequenceMask), "flushUntilTS": Int(untilTimestamp)])
+    }
+}

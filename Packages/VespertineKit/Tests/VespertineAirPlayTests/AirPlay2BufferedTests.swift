@@ -119,4 +119,98 @@ struct AirPlay2BufferedTests {
         let decoder = try ALACDecoder(config: format.alac)
         #expect(try decoder.decode(samples: read.payload) == samples)
     }
+
+    let sender = AirPlay2Sender(deviceID: AirPlay2Sender.deviceID([0x02, 0x1A, 0xFF, 0x00, 0x9C, 0x07]), name: "Vespertine", model: "Mac14,5", osVersion: "15.1")
+
+    @Test("A moment is whole seconds and a 64-bit fraction, and comes back to the nanosecond")
+    func networkTime() {
+        #expect(AirPlay2NetworkTime(nanoseconds: 0) == AirPlay2NetworkTime(seconds: 0, fraction: 0))
+        #expect(AirPlay2NetworkTime(nanoseconds: 1_500_000_000) == AirPlay2NetworkTime(seconds: 1, fraction: 1 << 63))
+        #expect(AirPlay2NetworkTime(nanoseconds: 250_000_000) == AirPlay2NetworkTime(seconds: 0, fraction: 1 << 62))
+        #expect(AirPlay2NetworkTime(seconds: 7, fraction: 1 << 63).nanoseconds == 7_500_000_000)
+        // Rounded down on the way out, so never more than a nanosecond short on the way back.
+        for nanos: UInt64 in [1, 999_999_999, 1_000_000_001, 1_763_400_000_123_456_789, 86_400_000_000_000 - 1] {
+            let back = AirPlay2NetworkTime(nanoseconds: nanos).nanoseconds
+            #expect(back == nanos || back == nanos - 1, "\(nanos)")
+        }
+    }
+
+    @Test("The first SETUP of a buffered session names this Mac's PTP clock and a group, and no NTP port")
+    func sessionSetup() throws {
+        let uuid = try #require(UUID(uuidString: "6E1F4C0A-3B7D-4E55-9C21-0A1B2C3D4E5F"))
+        let group = try #require(UUID(uuidString: "0A1B2C3D-4E5F-4A6B-8C7D-9E0F1A2B3C4D"))
+        let body = AirPlay2Message.bufferedSessionSetup(sender: sender, sessionUUID: uuid, groupUUID: group, addresses: ["192.168.1.20", "fe80::1"])
+        let said = try #require(AirPlay2Message.decode(body))
+        #expect(said["timingProtocol"] as? String == "PTP")
+        #expect(said["timingPort"] == nil)
+        let peer = try #require(said["timingPeerInfo"] as? [String: Any])
+        #expect(peer["Addresses"] as? [String] == ["192.168.1.20", "fe80::1"])
+        #expect(peer["ID"] as? String == "192.168.1.20")
+        #expect(said["groupUUID"] as? String == "0A1B2C3D-4E5F-4A6B-8C7D-9E0F1A2B3C4D")
+        #expect(said["groupContainsGroupLeader"] as? Bool == false)
+        #expect(said["sessionUUID"] as? String == "6E1F4C0A-3B7D-4E55-9C21-0A1B2C3D4E5F")
+        #expect(said["deviceID"] as? String == "02:1A:FF:00:9C:07")
+        #expect(said["name"] as? String == "Vespertine")
+    }
+
+    @Test("The stream SETUP asks for a buffered stream of 24-bit ALAC at 48 kHz, and its answer gives the port and the room")
+    func streamSetup() throws {
+        let body = AirPlay2Message.bufferedStreamSetup(key: Data(0..<32), connectionID: 0xDEAD_BEEF, kind: deep)
+        let streams = try #require(AirPlay2Message.decode(body)?["streams"] as? [[String: Any]])
+        #expect(streams.count == 1)
+        let stream = streams[0]
+        #expect(stream["type"] as? Int == 103)
+        #expect(stream["audioFormat"] as? Int == 0x200000)
+        #expect(stream["ct"] as? Int == 2)
+        #expect(stream["sr"] as? Int == 48_000)
+        #expect(stream["spf"] as? Int == 352)
+        #expect(stream["shk"] as? Data == Data(0..<32))
+        #expect(stream["streamConnectionID"] as? Int == 0xDEAD_BEEF)
+        // A buffered stream has no control port and no latency to agree: the sender says when each frame plays.
+        #expect(stream["controlPort"] == nil)
+        #expect(stream["latencyMin"] == nil)
+
+        let answer: [String: Any] = ["streams": [["type": 103, "dataPort": 40_123, "audioBufferSize": 8_388_608]]]
+        let read = try #require(AirPlay2Message.bufferedStream(in: AirPlay2Message.encode(answer)))
+        #expect(read.dataPort == 40_123)
+        #expect(read.bufferSize == 8_388_608)
+        // An answer for a realtime stream, one with no room, and one with no port are not this.
+        let realtime: [String: Any] = ["streams": [["type": 96, "dataPort": 40_123, "controlPort": 40_124]]]
+        #expect(AirPlay2Message.bufferedStream(in: AirPlay2Message.encode(realtime)) == nil)
+        let noRoom: [String: Any] = ["streams": [["type": 103, "dataPort": 40_123, "audioBufferSize": 0]]]
+        #expect(AirPlay2Message.bufferedStream(in: AirPlay2Message.encode(noRoom)) == nil)
+        let noPort: [String: Any] = ["streams": [["type": 103, "audioBufferSize": 8_388_608]]]
+        #expect(AirPlay2Message.bufferedStream(in: AirPlay2Message.encode(noPort)) == nil)
+        #expect(AirPlay2Message.bufferedStream(in: Data()) == nil)
+    }
+
+    @Test("Play names a frame, the moment it sounds and the clock, bit for bit; pause and flush say only what they mean")
+    func anchors() throws {
+        // A fraction and a clock identity with the top bit set: both must arrive as the same 64 bits.
+        let time = AirPlay2NetworkTime(seconds: 1_763_400_000, fraction: 0xC000_0000_0000_0001)
+        let clock: UInt64 = 0xF0_18_98_FF_FE_12_34_56
+        let said = try #require(AirPlay2Message.decode(AirPlay2Message.play(rtpTime: 4_000_000_000, at: time, clock: clock)))
+        #expect(said["rate"] as? Int == 1)
+        #expect(said["rtpTime"] as? Int == 4_000_000_000)
+        #expect(said["networkTimeSecs"] as? Int == 1_763_400_000)
+        #expect((said["networkTimeFrac"] as? Int).map { UInt64(bitPattern: Int64($0)) } == 0xC000_0000_0000_0001)
+        #expect((said["networkTimeTimelineID"] as? Int).map { UInt64(bitPattern: Int64($0)) } == clock)
+
+        let paused = try #require(AirPlay2Message.decode(AirPlay2Message.pause()))
+        #expect(paused["rate"] as? Int == 0)
+        #expect(paused.count == 1)
+
+        let flush = try #require(AirPlay2Message.decode(AirPlay2Message.flushBuffered(untilSequence: 0x80_0005, untilTimestamp: 4_100_000_000)))
+        #expect(flush["flushUntilSeq"] as? Int == 5)
+        #expect(flush["flushUntilTS"] as? Int == 4_100_000_000)
+        #expect(flush.count == 2)
+    }
+
+    @Test("The clocks of a session are told as a bare list of addresses")
+    func peers() throws {
+        let body = AirPlay2Message.peers(["192.168.1.20", "192.168.1.31"])
+        #expect(body.prefix(8) == Data("bplist00".utf8))
+        let list = try PropertyListSerialization.propertyList(from: body, format: nil) as? [String]
+        #expect(list == ["192.168.1.20", "192.168.1.31"])
+    }
 }
