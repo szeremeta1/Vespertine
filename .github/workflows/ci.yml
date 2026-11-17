@@ -124,10 +124,13 @@ jobs:
           restore-keys: spm-kit-${{ runner.os }}-
       # Release only: it is what ships, the kit has no debug-only checks (no assert, no #if DEBUG), and a second, debug
       # build of the kit and its C dependencies cost 4 to 10 minutes of macOS time. The App job still builds it in Debug.
-      # Building and testing take about 5 minutes; a hang prints the test process's stacks after 15 instead of waiting
-      # out the job.
+      # Built on its own, so the watchdog below times the tests and not the compiler: a change to the package's
+      # dependencies misses the cache, and that build alone has taken 13 minutes on a slow runner.
+      - name: VespertineKit build (release)
+        run: swift build --package-path Packages/VespertineKit -c release --build-tests
+      # The tests take a few minutes; a hang prints the test process's stacks after 15 instead of waiting out the job.
       - name: VespertineKit tests (release)
-        run: scripts/run-with-watchdog.sh 900 swift test --package-path Packages/VespertineKit -c release --skip VespertineUPnPTests --skip VespertineAirPlayTests
+        run: scripts/run-with-watchdog.sh 900 swift test --package-path Packages/VespertineKit -c release --skip-build --skip VespertineUPnPTests --skip VespertineAirPlayTests
       # The network player and AirPlay tests play to a fake renderer and a fake receiver over the loopback, against the
       # deadlines the app really uses (a player that doesn't start, a receiver that goes quiet). Among the kit's other
       # 1,900 tests every test waits tens of seconds for a thread on a three-core runner, which those deadlines would
