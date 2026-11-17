@@ -73,8 +73,10 @@ enum NTLM {
     static let extendedSecurity: UInt32 = 0x0008_0000
     static let targetInfo: UInt32 = 0x0080_0000
     static let key128: UInt32 = 0x2000_0000
+    /// The session's key is one this side makes up and sends wrapped in the key the password gives ("key exchange").
+    static let keyExchange: UInt32 = 0x4000_0000
     static let key56: UInt32 = 0x8000_0000
-    static let asked: UInt32 = unicode | requestTarget | sign | ntlm | alwaysSign | extendedSecurity | targetInfo | key128 | key56
+    static let asked: UInt32 = unicode | requestTarget | sign | ntlm | alwaysSign | extendedSecurity | targetInfo | key128 | keyExchange | key56
 
     /// The first message: what this client can do.
     static func negotiate() -> [UInt8] {
@@ -120,20 +122,31 @@ enum NTLM {
     struct Answer {
         /// The third message.
         var message: [UInt8]
-        /// The key the session's messages are signed with.
+        /// The key the session's messages are signed with: the one made up here when the server takes a key exchange,
+        /// otherwise the one the password and the challenge give.
         var sessionKey: [UInt8]
+        /// With a key exchange NTLM's own signatures are scrambled as well, with this key (already cut to the strength
+        /// agreed); nil without one.
+        var sealingKey: [UInt8]?
         /// The message carries a digest of all three messages (the server sent its time, so it expects one). The SPNEGO
         /// wrapping then has to be signed as well: see `listSignature`.
         var carriesDigest: Bool
 
-        /// NTLM's signature over the list of mechanisms offered (MS-NLMP 3.4.4.2, first message from this side, no
-        /// key exchange): what SPNEGO asks for once the NTLM messages are themselves protected by a digest.
+        /// NTLM's signature over the list of mechanisms offered (MS-NLMP 3.4.4.2, the first message signed from this
+        /// side): what SPNEGO asks for once the NTLM messages are themselves protected by a digest. After a key
+        /// exchange the digest in it goes through RC4 under the sealing key, which is how a server reads it then.
         func listSignature(_ list: [UInt8]) -> [UInt8] {
-            let magic = Array("session key to client-to-server signing key magic constant".utf8) + [0]
-            let key = ShareDigests.md5(sessionKey + magic)
+            let key = ShareDigests.md5(sessionKey + NTLM.magic("signing"))
             let sequence: [UInt8] = [0, 0, 0, 0]
-            return [1, 0, 0, 0] + ShareDigests.hmacMD5(key: key, sequence + list).prefix(8) + sequence
+            var digest = Array(ShareDigests.hmacMD5(key: key, sequence + list).prefix(8))
+            if let sealingKey { digest = ShareDigests.rc4(key: sealingKey, digest) }
+            return [1, 0, 0, 0] + digest + sequence
         }
+    }
+
+    /// The text a session key is hashed with for the client's signing or sealing key (MS-NLMP 3.4.5.2, 3.4.5.3).
+    static func magic(_ purpose: String) -> [UInt8] {
+        Array("session key to client-to-server \(purpose) key magic constant".utf8) + [0]
     }
 
     static let anonymous: UInt32 = 0x0000_0800
@@ -153,7 +166,7 @@ enum NTLM {
         put(0, header)       // no user
         put(0, header + 1)   // no workstation
         put(0, header + 1)   // no session key
-        w.u32(asked & (parsed.flags | unicode | ntlm) | anonymous)
+        w.u32(asked & ~keyExchange & (parsed.flags | unicode | ntlm) | anonymous)   // nobody has a key to exchange
         w.zeros(8)           // version
         w.zeros(16)          // no digest of the three messages: there is no key to make one with
         w.u8(0)
@@ -165,8 +178,9 @@ enum NTLM {
     ///   - negotiate, challenge: the first two messages exactly as sent and received (the answer carries a digest of all three).
     ///   - clientChallenge: 8 random bytes.
     ///   - time: now, as a Windows file time; used only when the server didn't send its own.
+    ///   - newKey: 16 random bytes: the session's key, when the server takes a key exchange.
     static func authenticate(user: String, domain: String, password: String, negotiate: [UInt8], challenge: [UInt8],
-                             clientChallenge: [UInt8], time: UInt64) throws -> Answer {
+                             clientChallenge: [UInt8], time: UInt64, newKey: [UInt8]) throws -> Answer {
         let parsed = try parseChallenge(challenge)
         let hash = ShareDigests.md4(password.utf16LE)
         let key = ShareDigests.hmacMD5(key: hash, (user.uppercased() + domain).utf16LE)
@@ -196,7 +210,15 @@ enum NTLM {
 
         let proof = ShareDigests.hmacMD5(key: key, parsed.serverChallenge + temp.bytes)
         let ntResponse = proof + temp.bytes
-        let sessionKey = ShareDigests.hmacMD5(key: key, proof)
+        let baseKey = ShareDigests.hmacMD5(key: key, proof)
+        // A server that offers a key exchange gets one: the session's key is made up here and sent under the key only
+        // the password gives (MS-NLMP 3.1.5.1.2). Windows, Samba and a Mac all offer it, and every other client takes
+        // it. A Mac goes further and reads the sign-in as if it had been taken whether it was or not, so a client that
+        // leaves it out is refused there with the right password.
+        let flags = asked & (parsed.flags | unicode | ntlm)
+        let exchanges = flags & keyExchange != 0 && newKey.count == 16
+        let sessionKey = exchanges ? newKey : baseKey
+        let wrappedKey = exchanges ? ShareDigests.rc4(key: baseKey, newKey) : []
         // With the server's time in hand the older LM answer is left empty, as the protocol says.
         let lmResponse = serverTime != nil ? [UInt8](repeating: 0, count: 24)
             : ShareDigests.hmacMD5(key: key, parsed.serverChallenge + clientChallenge) + clientChallenge
@@ -207,30 +229,34 @@ enum NTLM {
         w.raw(signature)
         w.u32(3)
         var offset = header
-        // The payload order: domain, user, workstation (none), LM answer, NT answer, session key (none).
+        // The payload order: domain, user, workstation (none), LM answer, NT answer, the wrapped session key (if any).
         let domainAt = offset; offset += domainBytes.count
         let userAt = offset; offset += userBytes.count
         let lmAt = offset; offset += lmResponse.count
         let ntAt = offset; offset += ntResponse.count
+        let keyAt = offset; offset += wrappedKey.count
         func put(_ w: inout ByteWriter, _ count: Int, _ at: Int) { w.u16(UInt16(count)); w.u16(UInt16(count)); w.u32(UInt32(at)) }
         put(&w, lmResponse.count, lmAt)
         put(&w, ntResponse.count, ntAt)
         put(&w, domainBytes.count, domainAt)
         put(&w, userBytes.count, userAt)
         put(&w, 0, offset)   // workstation
-        put(&w, 0, offset)   // no separate session key
-        w.u32(asked & (parsed.flags | unicode | ntlm))
+        put(&w, wrappedKey.count, keyAt)
+        w.u32(exchanges ? flags : flags & ~keyExchange)
         w.zeros(8)           // version
         let micAt = w.bytes.count
         w.zeros(16)          // the digest of the three messages, filled in below
-        w.raw(domainBytes); w.raw(userBytes); w.raw(lmResponse); w.raw(ntResponse)
+        w.raw(domainBytes); w.raw(userBytes); w.raw(lmResponse); w.raw(ntResponse); w.raw(wrappedKey)
 
         var message = w.bytes
         if withDigest {
             let mic = ShareDigests.hmacMD5(key: sessionKey, negotiate + challenge + message)
             message.replaceSubrange(micAt..<(micAt + 16), with: mic)
         }
-        return Answer(message: message, sessionKey: sessionKey, carriesDigest: withDigest)
+        // The sealing key is made from as much of the session's key as the strength agreed (MS-NLMP 3.4.5.3).
+        let strength = flags & key128 != 0 ? 16 : flags & key56 != 0 ? 7 : 5
+        let sealingKey = exchanges ? ShareDigests.md5(Array(sessionKey.prefix(strength)) + magic("sealing")) : nil
+        return Answer(message: message, sessionKey: sessionKey, sealingKey: sealingKey, carriesDigest: withDigest)
     }
 }
 

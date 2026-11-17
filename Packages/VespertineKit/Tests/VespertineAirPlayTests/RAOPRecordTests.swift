@@ -64,13 +64,17 @@ struct RAOPRecordTests {
         #expect(AirPlayDevice(deviceID: ap2.deviceID, name: ap2.name, raop: nil, airplay: ap2).support == .unsupported(AirPlayDevice.airPlay2Only))
     }
 
-    @Test("A password, another sample size or no ALAC is not supported")
+    @Test("Another sample size or no ALAC is not supported; a receiver with a password is, and says it has one")
     func otherLimits() throws {
         func support(_ txt: [String: String]) throws -> AirPlayDevice.Support {
             let r = try #require(RAOPRecord.parse(serviceName: "AABBCCDDEEFF@X", txt: txt))
             return AirPlayDevice(deviceID: r.deviceID, name: r.name, raop: r).support
         }
-        #expect(try support(["et": "0", "pw": "true"]) != .supported(.none))
+        #expect(try support(["et": "0", "pw": "true"]) == .supported(.none))
+        let locked = try #require(RAOPRecord.parse(serviceName: "AABBCCDDEEFF@X", txt: ["et": "0", "pw": "true"]))
+        #expect(AirPlayDevice(deviceID: locked.deviceID, name: locked.name, raop: locked).needsPassword)
+        let open = try #require(RAOPRecord.parse(serviceName: "AABBCCDDEEFF@X", txt: ["et": "0", "pw": "false"]))
+        #expect(!AirPlayDevice(deviceID: open.deviceID, name: open.name, raop: open).needsPassword)
         #expect(try support(["et": "0", "ss": "24"]) == .unsupported(AirPlayDevice.formatUnsupported))
         #expect(try support(["et": "0", "cn": "0,2"]) == .unsupported(AirPlayDevice.formatUnsupported))
         #expect(try support(["et": "0", "tp": "TCP"]) == .unsupported(AirPlayDevice.formatUnsupported))

@@ -63,6 +63,22 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         set { lock.withLock { _stall = newValue } }
     }
     private var _stall: [String: TimeInterval] = [:]
+    /// A receiver with a password: every request without its digest gets 401 and a challenge. `capitalDigits`: it takes
+    /// the digest only with capital hex digits (as iTunes sends it).
+    var password: String? {
+        get { lock.withLock { _password } }
+        set { lock.withLock { _password = newValue } }
+    }
+    private var _password: String?
+    var capitalDigits: Bool {
+        get { lock.withLock { _capitalDigits } }
+        set { lock.withLock { _capitalDigits = newValue } }
+    }
+    private var _capitalDigits = false
+    /// The challenge's nonce changes after this many accepted requests (a receiver whose nonces go stale); 0: never.
+    var nonceLife = 0
+    private var nonceCount = 1
+    private var nonceUses = 0
     /// An MFi receiver: every request but OPTIONS is refused (403) until the sender has done `POST /auth-setup`.
     var requiresAuthSetup: Bool {
         get { lock.withLock { _requiresAuthSetup } }
@@ -179,6 +195,19 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         var headers: [(String, String)] = [("CSeq", cseq), ("Server", "AirTunes/366.0")]
         if let wait = stall[request.method ?? ""] { Thread.sleep(forTimeInterval: wait) }
         if let status = refuse[request.method ?? ""] { return .response(status, "Refused", headers: headers) }
+        if let password {
+            let (nonce, capitals) = lock.withLock { () -> (String, Bool) in
+                if nonceLife > 0, nonceUses >= nonceLife { nonceCount += 1; nonceUses = 0 }
+                return ("nonce-\(nonceCount)", _capitalDigits)
+            }
+            let challenge = RTSPDigest.Challenge(realm: "raop", nonce: nonce)
+            let given = request["Authorization"].map { RTSPDigest.parameters(String($0.dropFirst("Digest".count))) } ?? [:]
+            let wanted = RTSPDigest.response(challenge, password: password, method: request.method ?? "", uri: request.url ?? "", uppercase: capitals)
+            guard given["username"] == RTSPDigest.username, given["nonce"] == nonce, given["uri"] == request.url, given["response"] == wanted else {
+                return .response(401, "Unauthorized", headers: headers + [("WWW-Authenticate", "Digest realm=\"raop\", nonce=\"\(nonce)\"")])
+            }
+            lock.withLock { nonceUses += 1 }
+        }
         if request.method == "POST", request.url == "/auth-setup" {
             // 0x01 (unencrypted) and a 32-byte key; the answer is the receiver's key, then a certificate and signature
             // (stand-ins here: the sender reads none of it).

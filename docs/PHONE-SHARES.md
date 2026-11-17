@@ -88,7 +88,10 @@ sockets only; no third-party code), because the libraries that exist are under l
   AES-128-CCM on SMB 3.1.1, AES-128-CCM on SMB 3.0 and 3.0.2. Not AES-256: a server set to accept nothing else is not supported. The
   client does not turn encryption on by itself for a server that doesn't ask.
 - Sign-in: NTLMv2 inside SPNEGO, with the message integrity code and the mechanism-list signature. `user`, `DOMAIN\user` and
-  `user@domain` are accepted. No Kerberos.
+  `user@domain` are accepted. No Kerberos. Where the server offers NTLM's key exchange (Windows, Samba and a Mac all do), the client
+  takes it: the session's key is 16 random bytes made on the phone and sent wrapped in the key the password gives. A Mac's File
+  Sharing needs this: it checks the mechanism-list signature as it stands after a key exchange whether one was made or not, and
+  refused the sign-in without one.
 - Guests: with no account typed, the client signs in under the name `guest` with an empty password (what a NAS with its guest account
   on, a Mac, Windows, and Samba set to `map to guest = Bad User` take), and where that name is refused, with no name at all (which
   Samba takes for a share with `guest ok`). A guest session has no keys: nothing in it is signed or encrypted, so a server or share
@@ -108,8 +111,11 @@ favorites beside it; covers are fetched when first shown and kept at the sizes a
 ## How it is tested
 
 - Digests, ciphers and keys against the published vectors (RFC 1320, 1321, 2202, 3610, 4231, 4493, FIPS 180 and 197, SP 800-38C, the
-  GCM specification's test cases), NTLMv2 against the example in MS-NLMP 4.2.4, and the system's CryptoKit/CommonCrypto against the
-  portable code where both exist.
+  GCM specification's test cases, RFC 6229), NTLMv2 against the example in MS-NLMP 4.2.4 with and without its key exchange, and the
+  system's CryptoKit/CommonCrypto against the portable code where both exist.
+- The sign-in against a Mac's side of it written out from Apple's published source (`MacSignInTests.swift`): the challenge a Mac
+  builds and each check it makes on the answer, in its order. The sign-in without a key exchange is refused there, at the check that
+  refused it on macOS 27; with one it is taken.
 - SMB 3's own steps against the vectors Microsoft published from Windows talking to Windows (`SMBVectors.swift`): the running digest
   of the opening messages, the signing and encryption keys made from it, the signature on the last sign-in answer, and whole encrypted
   messages in AES-128-GCM and AES-128-CCM, for SMB 3.1.1 and SMB 3.0.
