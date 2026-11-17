@@ -856,12 +856,15 @@ Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE filePath 
     /// A favorite is the copy that was hearted: a 24/96 vinyl transfer, not the 24/192 download beside it. Where an
     /// album's copies are bundled (AlbumCopyChoice.bundled, or `bundledByDefault` for albums with no choice) the song
     /// is one favorite whichever copy plays, so every copy of a favorite song there is a favorite too, from the date
-    /// the song first was. Those other copies' hearts are borrowed: kept apart from the copies hearted themselves and
-    /// dropped again when the album stops being bundled or the song's own favorite goes, so toggling bundling never
-    /// changes which copy was hearted. Returns how many favorite songs there are (present files only; copies of one
-    /// song count once), the number the sidebar shows.
+    /// the song first was. With `combiningVersions` (a song's stereo and surround versions are one song, the output
+    /// picking which plays: `SongVersions`), a favorite song's versions in the other layout are favorites too, on its
+    /// album and on the album's other editions: hearted in stereo on headphones, its Dolby Atmos version is the same
+    /// favorite on the speakers. Those other copies' hearts are borrowed: kept apart from the copies hearted themselves
+    /// and dropped again when the reason for them goes (the album stops being bundled, versions stop being combined, the
+    /// song's own favorite goes), so neither switch ever changes which copy was hearted. Returns how many favorite
+    /// songs there are (present files only; copies of one song count once), the number the sidebar shows.
     @discardableResult
-    func favoriteEveryVersion(bundledByDefault: Bool = false) throws -> Int {
+    func favoriteEveryVersion(bundledByDefault: Bool = false, combiningVersions: Bool = false) throws -> Int {
         try writer.write { db in
             let rows = try Row.fetchAll(db, sql: """
                 SELECT track.albumKey AS album, favorite.trackId AS id, favorite.favoritedAt AS date, favorite.borrowed AS borrowed
@@ -874,22 +877,37 @@ Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE filePath 
                 dates[id] = date
                 if row["borrowed"] as Bool { borrowed.insert(id) } else { own[id] = date }
             }
-            let albumKeys = Array(Set(rows.compactMap { $0["album"] as String? }))
+            let favoriteAlbums = Array(Set(rows.compactMap { $0["album"] as String? }))
+            // Combining versions, a favorite's song reaches into its album's other editions.
+            let editions = combiningVersions ? SongVersions.editions(try albums(db)) : [:]
+            var families: [[String]] = [], placed = Set<String>()
+            for key in favoriteAlbums where !placed.contains(key) {
+                let family = editions[key] ?? [key]
+                family.forEach { placed.insert($0) }
+                families.append(family)
+            }
+            let albumKeys = families.flatMap { $0 }
             let choices = try Self.copyChoices(db)
-            let tracks = Self.inAlbumOrder(try self.tracks(db, albumKeys: albumKeys), albumKeys: albumKeys)
+            let byAlbum = Dictionary(grouping: Self.inAlbumOrder(try self.tracks(db, albumKeys: albumKeys), albumKeys: albumKeys), by: \.albumKey)
             var songs = 0
-            for album in Dictionary(grouping: tracks, by: \.albumKey).values {
-                let bundled = (choices[album[0].albumKey] ?? (bundledByDefault ? .bundled : .automatic)) == .bundled
-                for song in TrackVersions.group(album) {
-                    let ids = song.compactMap(\.id)
-                    let date = ids.compactMap { own[$0] }.min()
+            for family in families {
+                let tracks = family.flatMap { byAlbum[$0] ?? [] }
+                guard !tracks.isEmpty else { continue }
+                for song in family.count > 1 ? SongVersions.group(tracks) : TrackVersions.group(tracks) {
+                    let owners = song.filter { t in t.id.map { own[$0] != nil } ?? false }
+                    let date = owners.compactMap { t in t.id.flatMap { own[$0] } }.min()
                     if date != nil { songs += 1 }
-                    for id in ids where borrowed.contains(id) && !(bundled && date != nil) {
-                        try db.execute(sql: "DELETE FROM favorite WHERE trackId = ? AND borrowed = 1", arguments: [id])
-                    }
-                    guard bundled, let date else { continue }
-                    for id in ids where dates[id] == nil {
-                        try db.execute(sql: "INSERT OR IGNORE INTO favorite (trackId, favoritedAt, borrowed) VALUES (?, ?, 1)", arguments: [id, date])
+                    for t in song {
+                        guard let id = t.id, own[id] == nil else { continue }
+                        let bundled = (choices[t.albumKey] ?? (bundledByDefault ? .bundled : .automatic)) == .bundled
+                        // Bundled: every copy on the album of a copy hearted there. Combined: the versions in the other layout.
+                        let lent = date != nil && ((bundled && owners.contains { $0.albumKey == t.albumKey })
+                                                   || (combiningVersions && owners.contains { $0.isMultichannel != t.isMultichannel }))
+                        if borrowed.contains(id), !lent {
+                            try db.execute(sql: "DELETE FROM favorite WHERE trackId = ? AND borrowed = 1", arguments: [id])
+                        } else if lent, dates[id] == nil, let date {
+                            try db.execute(sql: "INSERT OR IGNORE INTO favorite (trackId, favoritedAt, borrowed) VALUES (?, ?, 1)", arguments: [id, date])
+                        }
                     }
                 }
             }

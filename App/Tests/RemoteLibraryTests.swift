@@ -140,6 +140,8 @@ struct RemoteLibraryTests {
         let (library, root) = try await library(songs: ["Evening (2021) [ALAC 24-96]/Harbor", "Evening (2021) [Dolby Atmos]/Harbor",
                                                         "Evening (2021) [ALAC 24-96]/Lanterns"])
         defer { try? FileManager.default.removeItem(at: root) }
+        // Each copy keeps its own heart here; hearts shared by a song's versions have their own test below.
+        library.combinesVersions = false
         try await set("album = 'Evening', albumArtist = 'The Vesper Quartet', codec = 'ALAC', isLossless = 1, bitDepth = 24, sampleRate = 96000",
                       whereIn: "[ALAC 24-96]", of: library)
         try await set("album = 'Evening', albumArtist = 'The Vesper Quartet', codec = 'Dolby Atmos', isLossless = 0, bitDepth = NULL, bitrate = 768, channels = 6, sampleRate = 48000",
@@ -187,6 +189,66 @@ struct RemoteLibraryTests {
         #expect(one.shown.id == alac.id)
         let other = try #require(RemoteBridge.copies(of: one, in: library)?.first { $0.id == atmos.id })
         #expect(!other.favorite)
+    }
+
+    @Test("A song on an album and on the album's Dolby Atmos edition is one song: listed once, one favorite, and the output picks the version")
+    func versionsAcrossEditionsAreOneSong() async throws {
+        // The stereo album and its Atmos mix tagged as an album of its own, as stores sell them, and a song only one has.
+        let (library, root) = try await library(songs: ["Evening/Harbor", "Evening Atmos/Harbor", "Evening/Lanterns"])
+        defer { try? FileManager.default.removeItem(at: root) }
+        try await set("album = 'Evening', albumArtist = 'The Vesper Quartet', codec = 'ALAC', isLossless = 1, bitDepth = 24, sampleRate = 96000",
+                      whereIn: "/Evening/", of: library)
+        try await set("album = 'Evening (Dolby Atmos)', albumArtist = 'The Vesper Quartet', codec = 'Dolby Atmos', isLossless = 0, bitDepth = NULL, bitrate = 768, channels = 6, sampleRate = 48000",
+                      whereIn: "/Evening Atmos/", of: library)
+        for _ in 0..<200 where Set(library.albums.map(\.title)) != ["Evening", "Evening (Dolby Atmos)"] { try await Task.sleep(for: .milliseconds(25)) }
+        #expect(Set(library.albums.map(\.title)) == ["Evening", "Evening (Dolby Atmos)"])
+        let all = library.allTracks()
+        let stereo = try #require(all.first { $0.title == "Harbor" && $0.codec == "ALAC" })
+        let atmos = try #require(all.first { $0.title == "Harbor" && $0.codec == "Dolby Atmos" })
+        let single = try #require(all.first { $0.title == "Lanterns" })
+        #expect(stereo.albumKey != atmos.albumKey)
+        #expect(library.combinesVersions, "on unless switched off")
+        let stereoID = try #require(stereo.id), atmosID = try #require(atmos.id)
+
+        // One song, two versions; the album's own songs when only its own edition is asked about.
+        #expect(Set(library.versions(of: [stereo])[0].map(\.id)) == [stereo.id, atmos.id])
+        #expect(library.versions(of: [stereo], acrossEditions: false)[0].map(\.id) == [stereo.id])
+        #expect(library.versions(of: [single])[0].map(\.id) == [single.id])
+        // Listed once: two songs, not three files.
+        #expect(library.songs(listing: all).count == 2)
+
+        // Playback may pick either version for the song, whichever was asked for, and they are the same queue entry.
+        let asked = library.playbackSongs(of: [stereo, atmos, single])
+        #expect(asked[0].versions.map(\.id) == [stereo.id, atmos.id])
+        #expect(asked[1].versions.map(\.id) == [atmos.id, stereo.id])
+        #expect(asked[0].key != nil && asked[0].key == asked[1].key && !asked[0].mergesCopies)
+        #expect(asked[2].versions.map(\.id) == [single.id] && asked[2].key == nil)
+        #expect(TrackVersions.choose(asked[0].versions, multichannel: true)?.id == atmos.id)
+        #expect(TrackVersions.choose(asked[0].versions, multichannel: false)?.id == stereo.id)
+        // Several songs of one album are that edition as it was opened; one song by itself, or songs of both, follow the output.
+        #expect(PlayerController.keepsToOneAlbum([stereo, single]))
+        #expect(!PlayerController.keepsToOneAlbum([stereo]))
+        #expect(!PlayerController.keepsToOneAlbum([stereo, atmos]))
+
+        // Hearted in stereo on headphones: the Atmos version is the same favorite, and the song counts once.
+        library.setFavorite(true, trackIDs: [stereoID])
+        for _ in 0..<200 where library.favoriteIDs.count != 2 { try await Task.sleep(for: .milliseconds(25)) }
+        #expect(library.favoriteIDs == [stereoID, atmosID])
+        for _ in 0..<200 where library.favoriteCount != 1 { try await Task.sleep(for: .milliseconds(25)) }
+        #expect(library.favoriteCount == 1)
+        func favorites(multichannel: Bool) -> [RemoteBridge.ListedSong] {
+            RemoteBridge.favoriteSongs(in: library) { TrackVersions.choose($0, multichannel: multichannel) ?? $0[0] }
+        }
+        #expect(favorites(multichannel: true).map(\.shown.id) == [atmos.id], "on speakers, Favorites shows and plays the Atmos version")
+        #expect(favorites(multichannel: false).map(\.shown.id) == [stereo.id], "on headphones, the stereo one")
+        #expect(favorites(multichannel: false).first.flatMap { RemoteBridge.copies(of: $0, in: library) }?.count == 2, "both a tap away")
+
+        // Switched off, every file is its own song again and the heart is back on the copy that was hearted.
+        library.combinesVersions = false
+        for _ in 0..<200 where library.favoriteIDs.count != 1 { try await Task.sleep(for: .milliseconds(25)) }
+        #expect(library.favoriteIDs == [stereoID])
+        #expect(library.songs(listing: all).count == 3)
+        #expect(library.playbackSongs(of: [stereo]).map { $0.versions.map(\.id) } == [[stereo.id]])
     }
 
     @Test("Genres, Recently Added and Sources list what the Mac's own pages list")

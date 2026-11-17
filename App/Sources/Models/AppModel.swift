@@ -349,6 +349,7 @@ final class AppModel {
         // Which groups are published decides how long a pause keeps one from the other apps.
         systemOutput.onPublishedChanged = { [weak self] in self?.syncEngine() }
         library.bundlesCopiesByDefault = settings.bundleCopies
+        library.combinesVersions = settings.combineVersions
         if settings.speakerGroupsFeature {
             speakerGroups = SpeakerGroupsSwitch.apply(true, to: settings, current: nil, onChange: groupsChanged)
             speakerGroups?.followUSBPorts(amongUIDs: devices.devices.map(\.uid))
@@ -853,7 +854,8 @@ final class AppModel {
 
     /// Adds songs to Favorites, or removes them when every one already is a favorite. A favorite is the copy hearted
     /// (the 24/96 vinyl transfer, not the 24/192 download beside it); where an album's copies are bundled, a song is
-    /// all its copies: favoriting its stereo copy on headphones favorites its 5.1 one too. Undoable in the
+    /// all its copies: favoriting its stereo copy on headphones favorites its 5.1 one too. While a song's stereo and
+    /// surround versions are combined (Settings), its versions in the other layout go with it on any album. Undoable in the
     /// window you're in (⌘Z brings back a heart clicked by mistake); SwiftUI's own undo manager is nil in
     /// these windows, so it's the AppKit window's.
     func toggleFavorite(_ tracks: [Track]) {

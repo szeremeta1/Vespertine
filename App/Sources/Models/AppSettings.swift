@@ -71,6 +71,9 @@ final class AppSettings {
     /// Albums in several copies (a download, a vinyl transfer, an Atmos mix) play as one, each song in the copy the
     /// output supports best, unless an album has its own choice. Off by default: one copy plays and the others stay copies.
     var bundleCopies: Bool { didSet { defaults.set(bundleCopies, forKey: "bundleCopies") } }
+    /// A song in stereo and in surround (on one album or on two editions of it) is one song: listed once, queued once,
+    /// one favorite, and the output picks the version (`versionPreference`). On by default; off, every file is its own song.
+    var combineVersions: Bool { didSet { defaults.set(combineVersions, forKey: "combineVersions") } }
     var releaseAfterPause: Double { didSet { defaults.set(releaseAfterPause, forKey: "releaseAfterPause") } }
     var selectedDeviceUID: String? { didSet { defaults.set(selectedDeviceUID, forKey: "selectedDeviceUID") } }
     /// The chosen output as last seen, to name it while it's unplugged and find it again under a new UID.
@@ -250,7 +253,7 @@ final class AppSettings {
             "networkCache": true, "networkCacheLimitGB": 20.0, "networkPrefetch": 3,
             "autoAnalyze": false, "analyzeNetworkShares": false, "systemOutputFollowsPlayback": true, "relayVolumeKeys": false,
             "deviceOnQuit": "restore", "visualizerEnabled": false, "transitionsFeature": false, "speakerGroupsFeature": false, "upnpRenderersFeature": false, "airPlayPlayersFeature": false,
-            "upnpReceiverFeature": false, "upnpReceiverVolume": false, "upnpReceiverOwnNetworks": true, "bundleCopies": false,
+            "upnpReceiverFeature": false, "upnpReceiverVolume": false, "upnpReceiverOwnNetworks": true, "bundleCopies": false, "combineVersions": true,
         ])
         // Every streaming provider's switch, and its play reports, start off.
         StreamingCore.registerDefaults(defaults, providers: StreamingModel.ids)
@@ -259,6 +262,7 @@ final class AppSettings {
         atmosBySystem = defaults.bool(forKey: "atmosBySystem")
         versionPreference = TrackVersions.Preference(rawValue: defaults.string(forKey: "versionPreference") ?? "") ?? .matchOutput
         bundleCopies = defaults.bool(forKey: "bundleCopies")
+        combineVersions = defaults.bool(forKey: "combineVersions")
         integerMode = defaults.bool(forKey: "integerMode")
         matchSixteenBit = defaults.bool(forKey: "matchSixteenBit")
         releaseAfterPause = defaults.double(forKey: "releaseAfterPause")
