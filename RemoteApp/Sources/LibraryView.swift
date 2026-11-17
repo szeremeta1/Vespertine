@@ -153,12 +153,7 @@ private struct SearchPage: View {
             if !found.playlists.isEmpty {
                 Section("Playlists") {
                     ForEach(found.playlists) { playlist in
-                        NavigationLink {
-                            TrackListView(session: session, title: Text(playlist.name), load: .playlistTracks(id: playlist.id),
-                                          play: SongTap.playlist(id: playlist.id))
-                        } label: {
-                            Label(playlist.name, systemImage: playlist.smart ? "gearshape" : "music.note.list")
-                        }
+                        NavigationLink { PlaylistView(session: session, playlist: playlist) } label: { PlaylistRow(playlist: playlist) }
                     }
                 }
             }
@@ -474,20 +469,37 @@ struct PlaylistsList: View {
 
     var body: some View {
         List(playlists) { playlist in
-            NavigationLink {
-                TrackListView(session: session, title: Text(playlist.name), load: .playlistTracks(id: playlist.id),
-                              play: SongTap.playlist(id: playlist.id),
-                              keep: { tracks in
-                                  KeptList(id: KeptList.playlistID(playlist.id), kind: .playlist, reference: String(playlist.id), title: playlist.name, subtitle: "",
-                                           artworkKey: tracks.first?.artworkKey, tracks: tracks, smaller: KeptShelf.shared.smaller)
-                              }, keepID: KeptList.playlistID(playlist.id))
-            } label: {
-                Label(playlist.name, systemImage: playlist.smart ? "gearshape" : "music.note.list")
-            }
+            NavigationLink { PlaylistView(session: session, playlist: playlist) } label: { PlaylistRow(playlist: playlist) }
+                .accessibilityIdentifier("playlist-\(playlist.id)")
         }
         .obsidianList()
         .navigationTitle("Playlists").screenTitleStyle()
+        .accessibilityIdentifier("playlists-list")
+        // Again each time the list shows: a song added to a playlist since then shows in its count.
         .task(id: session.isConnected) { if case .playlists(let items) = await session.send(.playlists) { playlists = items } }
+        .refreshable { if case .playlists(let items) = await session.send(.playlists) { playlists = items } }
+    }
+}
+
+/// A playlist in a list: its cover, its name, how many songs (from a Mac that says), and a gear for a smart one.
+struct PlaylistRow: View {
+    let playlist: PlaylistSummary
+
+    var body: some View {
+        MediaRow(title: playlist.name, subtitle: playlist.trackCount.map { String(localized: "\($0) songs") }, spread: false) {
+            Group {
+                if let keys = playlist.artworkKeys, !keys.isEmpty {
+                    PlaylistCover(keys: keys, cornerRadius: 6)
+                } else {
+                    Image(systemName: playlist.smart ? "gearshape" : "music.note.list").font(.title3).foregroundStyle(Palette.text3)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity).background(Palette.raised)
+                        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                }
+            }
+            .frame(width: 44, height: 44)
+        } trailing: {
+            if playlist.smart { Image(systemName: "gearshape").font(.caption).foregroundStyle(.secondary) }
+        }
     }
 }
 
@@ -517,22 +529,32 @@ struct TrackListView: View {
     let load: RemoteCommand
     /// How to play from a row (nil: play these songs from that row).
     let play: ((Int) -> RemoteCommand)?
-    /// For a list that can be kept on this device (a playlist): makes the kept list from its songs.
-    var keep: (([TrackSummary]) -> KeptList)? = nil
-    var keepID: String? = nil
     @State private var tracks: [TrackSummary] = []
+    @State private var feedback = CommandFeedback()
 
     var body: some View {
         List {
+            // Play and Shuffle, as a playlist's page has them (Favorites is a list of songs like one).
+            if !tracks.isEmpty {
+                HStack {
+                    Button { feedback.run(session, .playTracks(ids: tracks.compactMap(\.id), startAt: 0, shuffled: false)) } label: {
+                        Label("Play", systemImage: "play.fill").lineLimit(1).frame(maxWidth: .infinity)
+                    }
+                    .accessibilityIdentifier("list-play")
+                    Button { feedback.run(session, .playTracks(ids: tracks.compactMap(\.id), startAt: 0, shuffled: true)) } label: {
+                        Label("Shuffle", systemImage: "shuffle").lineLimit(1).frame(maxWidth: .infinity)
+                    }
+                    .accessibilityIdentifier("list-shuffle")
+                }
+                .buttonStyle(.bordered)
+                .disabled(!session.isConnected)
+                .listRowBackground(Color.clear)
+            }
             TrackRows(session: session, tracks: tracks, play: play ?? SongTap.songs(tracks))
         }
+        .feedback(feedback)
         .obsidianList()
         .navigationTitle(title).screenTitleStyle()
-        .toolbar {
-            if let keep, let keepID {
-                ToolbarItem(placement: .topBarTrailing) { KeepButton(session: session, id: keepID) { tracks.isEmpty ? nil : keep(tracks) } }
-            }
-        }
         .task(id: session.isConnected) { if case .tracks(let items) = await session.send(load) { tracks = items } }
     }
 }
@@ -575,6 +597,7 @@ struct TrackRows: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .accessibilityIdentifier("song-row")
                 if let copies = track.copies, copies.count > 1 {
                     SongCopiesButton(session: session, track: track, list: tracks, index: index)
                 }
@@ -582,7 +605,10 @@ struct TrackRows: View {
             .contextMenu {
                 if let id = track.id {
                     Button { feedback.run(session, .playNext(ids: [id])) } label: { Label("Play Next", systemImage: "text.insert") }
-                    Button { feedback.run(session, .addToQueue(ids: [id])) } label: { Label("Add to Queue", systemImage: "text.append") }
+                    // Apple Music's Play Last: after the songs already added, ahead of the rest of what's playing.
+                    Button { feedback.run(session, .addToQueue(ids: [id])) } label: {
+                        Label { Text("Play Later"); Text("Add to Queue") } icon: { Image(systemName: "text.append") }
+                    }
                     Button { feedback.run(session, .setFavorite(ids: [id], on: !track.favorite)) } label: {
                         Label(track.favorite ? LocalizedStringKey("Remove from Favorites") : LocalizedStringKey("Add to Favorites"), systemImage: track.favorite ? "heart.slash" : "heart")
                     }

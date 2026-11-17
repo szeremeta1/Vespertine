@@ -110,6 +110,9 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     }
 
     private struct State {
+        /// What the open session's stream holds, and so what every song is made into: 16-bit at 44.1 kHz unless an
+        /// AirPlay 2 receiver said it takes more for the song the session was opened with.
+        var streamFormat = AirPlayFormat.cd
         var snapshot = EngineSnapshot()
         var settings = RendererSettings()
         var receiverVolumeDB: Double = 0
@@ -345,7 +348,9 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
 
     /// The frame heard now, on the timeline (nil while nothing is).
     private func heardTimestamp() -> UInt32? {
-        session?.clockTimestamp().map { $0 &- RAOPTiming.latencyFrames }
+        guard let session else { return nil }
+        let latency = session.format.latencyFrames
+        return session.clockTimestamp().map { $0 &- latency }
     }
 
     public var snapshot: EngineSnapshot {
@@ -356,7 +361,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             // The song heard now: the last one whose first frame has been reached.
             guard let segment = s.segments.last(where: { $0.start.map { Int32(bitPattern: heard &- $0) >= 0 } ?? false }) ?? s.segments.first,
                   let start = segment.start else { return snap }
-            let into = Double(Int32(bitPattern: heard &- start)) / Double(RAOPTiming.sampleRate)
+            let into = Double(Int32(bitPattern: heard &- start)) / Double(s.streamFormat.sampleRate)
             snap.position = segment.offset + max(0, into)
             if segment.duration > 0 { snap.position = min(snap.position, segment.duration) }
             return snap
@@ -483,7 +488,9 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
 
     private func begin(_ item: PlayableItem, at seconds: TimeInterval, announce: Bool, generation g: Int) async {
         await halt()
-        let segment: Segment
+        // A session still open keeps its stream's format; a new one starts from the format every receiver takes.
+        if session?.isConnected != true { state.withLock { $0.streamFormat = .cd } }
+        var segment: Segment
         do { segment = try await prepare(item, at: seconds, announces: announce) } catch {
             if generation.withLock({ $0 }) == g { fail(item, error) }
             return
@@ -503,7 +510,9 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             if !open {
                 let made = RAOPSession(name: device.name, endpoint: endpoint, encryption: encryption, rsaKey: rsaKey,
                                        authSetup: device.needsAuthSetup, password: device.needsPassword ? passwordProvider?() : nil,
-                                       pairing: try sessionPairing(), sender: sender)
+                                       pairing: try sessionPairing(), sender: sender,
+                                       wish: AirPlayConversion.wish(source: segment.frames.source, settings: state.withLock { $0.settings },
+                                                                    replayGainDB: item.replayGainDB))
                 made.onLost = { [weak self] in self?.enqueue.yield(.lost) }
                 let volume = state.withLock { $0.receiverVolumeDB }
                 try await made.connect(volumeDB: volume)
@@ -521,8 +530,20 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             return
         }
         guard generation.withLock({ $0 }) == g, let session else { return }
+        // The stream's format is the session's: a receiver that took more than 16-bit at 44.1 kHz (or a session kept
+        // from a song that got it) has the song made again in that format, from the file already opened.
+        let format = session.format
+        state.withLock { $0.streamFormat = format }
+        if segment.frames.format != format {
+            do { segment = try await prepare(item, at: seconds, announces: announce, reusing: segment) } catch {
+                if generation.withLock({ $0 }) == g { fail(item, error) }
+                return
+            }
+            guard generation.withLock({ $0 }) == g else { return }
+        }
+        let first = segment
         state.withLock { s in
-            s.segments = [segment]
+            s.segments = [first]
             s.prepared = nil
             s.preparing = nil
             s.awaiting = nil
@@ -530,9 +551,9 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             s.queueDone = false
             s.endAnnounced = false
             s.snapshot.item = item
-            s.snapshot.signalPath = segment.path
+            s.snapshot.signalPath = first.path
             s.snapshot.position = seconds
-            s.snapshot.duration = segment.duration
+            s.snapshot.duration = first.duration
             s.snapshot.lastError = nil
             s.snapshot.state = .playing
         }
@@ -540,14 +561,15 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                           tick: { [weak self] in self?.tick() })
         self.pacer = pacer
         pacer.start()
-        prepareNext(after: segment.item)
+        prepareNext(after: first.item)
     }
 
-    /// Opens `item` for sending, off the cooperative pool (opening a file can block on a share).
-    private func prepare(_ item: PlayableItem, at seconds: TimeInterval, announces: Bool) async throws -> Segment {
+    /// Opens `item` for sending, off the cooperative pool (opening a file can block on a share). `reusing`: the same
+    /// song opened before in another format, whose staged copy (a stream's) is read again and not fetched again.
+    private func prepare(_ item: PlayableItem, at seconds: TimeInterval, announces: Bool, reusing: Segment? = nil) async throws -> Segment {
         try await withCheckedThrowingContinuation { continuation in
             Self.preparation.async {
-                continuation.resume(with: Result { try self.makeSegment(item, at: seconds, announces: announces) })
+                continuation.resume(with: Result { try self.makeSegment(item, at: seconds, announces: announces, reusing: reusing) })
             }
         }
     }
@@ -555,19 +577,20 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     /// Concurrent: a song stuck opening on a hung share mustn't hold up the one after it.
     private static let preparation = DispatchQueue(label: "org.szeremeta.vespertine.airplay.prepare", qos: .userInitiated, attributes: .concurrent)
 
-    private func makeSegment(_ item: PlayableItem, at seconds: TimeInterval, announces: Bool) throws -> Segment {
+    private func makeSegment(_ item: PlayableItem, at seconds: TimeInterval, announces: Bool, reusing: Segment? = nil) throws -> Segment {
         onOpen?(Thread.current.name == Pacer.threadName)
         if let delay = openDelay?(item), delay > 0 { Thread.sleep(forTimeInterval: delay) }
         let resolved = urlResolver?(item) ?? item.url
         // A stream is copied whole first: the frames are decoded from a local file.
-        let staged = resolved.isFileURL ? nil : try StagedRemoteFile.stage(item)
+        let staged = resolved.isFileURL ? nil : try reusing?.staged ?? StagedRemoteFile.stage(item)
         let url = staged?.url ?? resolved
-        let (settings, receiverDB) = state.withLock { ($0.settings, $0.receiverVolumeDB) }
-        let frames = try AirPlayFrames(item: item, url: url, settings: settings, startSeconds: seconds)
+        let (settings, receiverDB, format) = state.withLock { ($0.settings, $0.receiverVolumeDB, $0.streamFormat) }
+        let frames = try AirPlayFrames(item: item, url: url, settings: settings, startSeconds: seconds, format: format)
         let info = metadataProvider?(item)
         let warnings = Self.receiverWarnings(receiverDB)
         let stage = SignalPath.RendererStage(name: device.name, protocolName: "AirPlay", processing: frames.steps, sentCodec: "ALAC",
-                                             sentSampleRate: 44_100, sentBitDepth: 16, sentChannels: 2, gapless: true, warnings: warnings,
+                                             sentSampleRate: Double(frames.format.sampleRate), sentBitDepth: frames.format.bitDepth, sentChannels: 2,
+                                             gapless: true, warnings: warnings,
                                              transport: .airPlay)
         let steps = frames.steps
         let path = SignalPath.renderer(stage, source: frames.source, decoderName: frames.decoderName,
@@ -621,7 +644,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     /// The next `count` stereo frames of the timeline, crossing into the next song; `done` once the queue has none left;
     /// `waiting` while the next song is still being opened (never here: this is the pacer's real-time thread).
     private func frames(_ count: Int) -> PacerFeed {
-        var out: [Int16] = []
+        var out: [Int32] = []
         out.reserveCapacity(count * 2)
         while out.count < count * 2 {
             guard let segment = state.withLock({ $0.segments.last }), !state.withLock({ $0.queueDone }) else { break }
@@ -629,7 +652,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             let held = max(0, RAOPTiming.framesPerPacket - count)
             let head = (session?.nextTimestamp ?? 0) &+ UInt32(held + out.count / 2)
             state.withLock { _ in if segment.start == nil { segment.start = head } }
-            let chunk = segment.frames.next(maxFrames: count - out.count / 2)
+            let chunk = segment.frames.nextSamples(maxFrames: count - out.count / 2)
             if !chunk.isEmpty { out += chunk; continue }
             state.withLock { _ in segment.end = head }
             // A decoder that stopped on an error is the song cut short, not its end: said once, and the queue goes on.
@@ -797,8 +820,9 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             try? await session.setArtwork(image, rtptime: start)
         }
         if shown.contains(2), segment.duration > 0 {
-            let songStart = start &- UInt32(segment.offset * Double(RAOPTiming.sampleRate))
-            let end = songStart &+ UInt32(segment.duration * Double(RAOPTiming.sampleRate))
+            let rate = Double(session.format.sampleRate)
+            let songStart = start &- UInt32(segment.offset * rate)
+            let end = songStart &+ UInt32(segment.duration * rate)
             try? await session.setProgress(start: songStart, current: start, end: end)
         }
     }
@@ -807,12 +831,13 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
 /// What the pacer gets for a packet: frames (and whether the queue is done), frames so far while it waits for the next song to
 /// open, or frames to send before it stops (a hold that ran too long).
 enum PacerFeed {
-    case frames([Int16], done: Bool)
-    case wait([Int16])
-    case gap([Int16])
+    case frames([Int32], done: Bool)
+    case wait([Int32])
+    case gap([Int32])
 }
 
-/// Sends a packet every 352 frames of real time (with a lead), sync packets about once a second; stops on request.
+/// Sends a packet every 352 frames of real time at the session's rate (with a lead), sync packets about once a second;
+/// stops on request.
 final class Pacer: @unchecked Sendable {
     private let lead: TimeInterval
     private let session: RAOPSession
@@ -848,12 +873,12 @@ final class Pacer: @unchecked Sendable {
     private func run() {
         defer { finished.signal() }
         let packet = RAOPTiming.framesPerPacket
-        let nanosPerPacket = Double(packet) * 1e9 / Double(RAOPTiming.sampleRate)
+        let nanosPerPacket = Double(packet) * 1e9 / Double(session.format.sampleRate)
         let anchor = NTPClock.nanosecondsNow() + UInt64(lead * 1e9)
         var index: UInt64 = 0
         var draining = false
         /// Frames of the packet being filled, held while the next song is being opened.
-        var pending: [Int16] = []
+        var pending: [Int32] = []
         while !stopped.withLock({ $0 }) {
             let due = anchor + UInt64(Double(index) * nanosPerPacket)
             let sendAt = due >= UInt64(lead * 1e9) ? due - UInt64(lead * 1e9) : 0
@@ -876,8 +901,8 @@ final class Pacer: @unchecked Sendable {
                     // The end of the song before goes out, then this stream stops (the playback starts a fresh one).
                     pending += samples
                     if !pending.isEmpty {
-                        pending += [Int16](repeating: 0, count: max(0, packet * 2 - pending.count))
-                        session.send(pending, startNanos: anchor)
+                        pending += [Int32](repeating: 0, count: max(0, packet * 2 - pending.count))
+                        session.send(samples: pending, startNanos: anchor)
                     }
                     return
                 case .frames(let samples, let isDone):
@@ -885,8 +910,8 @@ final class Pacer: @unchecked Sendable {
                     done = isDone
                 }
                 if !pending.isEmpty {
-                    if pending.count < packet * 2 { pending += [Int16](repeating: 0, count: packet * 2 - pending.count) }
-                    session.send(pending, startNanos: anchor)
+                    if pending.count < packet * 2 { pending += [Int32](repeating: 0, count: packet * 2 - pending.count) }
+                    session.send(samples: pending, startNanos: anchor)
                     pending = []
                     if index % 125 == 124 { session.sendSync() }
                 }

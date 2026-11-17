@@ -274,7 +274,9 @@ public final class PhoneRemote {
                 self.playback.play($0, startAt: startAt, shuffled: false)
             }
         case .playPlaylist(let id, let startAt, let shuffled):
-            return await play(.playlistTracks(id: id)) { self.start($0, startAt: startAt ?? 0, shuffled: shuffled) }
+            // A page at a time: a long playlist in one reply would be more than a message holds.
+            let songs = await PlaylistPages.load(id: id, ask: library)
+            return await play(songs) { self.start($0, startAt: startAt ?? 0, shuffled: shuffled) }
         case .playNext(let ids):
             return await play(.tracks(ids: ids)) { self.playback.playNext(self.adding($0)) }
         case .addToQueue(let ids):
@@ -319,7 +321,11 @@ public final class PhoneRemote {
     }
 
     private func play(_ ask: RemoteCommand, then start: ([TrackSummary]) -> Void) async -> RemoteReply {
-        switch await library(ask) {
+        await play(await library(ask), then: start)
+    }
+
+    private func play(_ answer: RemoteReply, then start: ([TrackSummary]) -> Void) async -> RemoteReply {
+        switch answer {
         case .tracks(let items) where !items.isEmpty:
             start(items)
             return .ok

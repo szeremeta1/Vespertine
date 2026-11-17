@@ -82,6 +82,21 @@ struct RemoteLibraryTests {
         #expect(night.albums.isEmpty && night.artists.isEmpty)
     }
 
+    @Test("A playlist is listed a page at a time to a newer phone, and whole to an older one (TestFlight feedback AOf1M7oLiLlxngkwwaWog5Y)")
+    func playlistPages() {
+        let songs = Array(1...1_234)
+        let summary = { (n: Int) in
+            TrackSummary(id: Int64(n), title: "\(n)", artist: "", album: "", albumKey: "", duration: 1, trackNumber: nil, discNumber: nil,
+                         format: "", artworkKey: nil, favorite: false)
+        }
+        guard case .tracks(let whole) = RemoteBridge.playlistTracks(songs, offset: nil, limit: nil, summary: summary) else { Issue.record("not whole"); return }
+        #expect(whole.count == 1_234)
+        guard case .songs(let page, let total) = RemoteBridge.playlistTracks(songs, offset: 1_000, limit: 5_000, summary: summary) else { Issue.record("no page"); return }
+        #expect(total == 1_234 && page.map(\.id) == (1_001...1_234).map(Int64.init))
+        guard case .songs(let past, _) = RemoteBridge.playlistTracks(songs, offset: 9_999, limit: 10, summary: summary) else { Issue.record("no page"); return }
+        #expect(past.isEmpty)
+    }
+
     @Test("Songs are added to a playlist in the order sent, a new playlist is listed at once, and bad requests are refused")
     func playlists() async throws {
         let (library, root) = try await library(songs: ["One", "Two", "Three"])

@@ -126,6 +126,28 @@ struct AirPlayFramesTests {
         #expect(allSamples(frames) == samples)
     }
 
+    @Test("The wish a song opens a session with: plain only when 16-bit at 44.1 kHz sends it untouched")
+    func wishes() {
+        let none = RendererSettings()
+        func source(_ rate: Double, _ bits: Int, encoding: SourceFormat.Encoding = .pcm) -> SourceFormat {
+            SourceFormat(encoding: encoding, codec: "FLAC", sampleRate: rate, bitDepth: bits, channels: 2)
+        }
+        let plain = AirPlayConversion.wish(source: source(44_100, 16), settings: none, replayGainDB: nil)
+        #expect(plain == AirPlayWish(sourceRate: 44_100, wantsDepth: false))
+        #expect(plain.isPlain)
+        // The chain changes the samples: 24 bits hold what it makes.
+        #expect(AirPlayConversion.wish(source: source(44_100, 16), settings: RendererSettings(digitalVolumeDB: -6), replayGainDB: nil).wantsDepth)
+        #expect(AirPlayConversion.wish(source: source(44_100, 16), settings: none, replayGainDB: -3).wantsDepth)
+        #expect(AirPlayConversion.wish(source: source(44_100, 24), settings: none, replayGainDB: nil) == AirPlayWish(sourceRate: 44_100, wantsDepth: true))
+        // 16-bit at 48 kHz is whole in 16 bits at 48 kHz, and still worth asking for.
+        let plain48 = AirPlayConversion.wish(source: source(48_000, 16), settings: none, replayGainDB: nil)
+        #expect(plain48 == AirPlayWish(sourceRate: 48_000, wantsDepth: false))
+        #expect(!plain48.isPlain)
+        // Resampled from 96 kHz, or made from DSD: 24 bits.
+        #expect(AirPlayConversion.wish(source: source(96_000, 16), settings: none, replayGainDB: nil).wantsDepth)
+        #expect(AirPlayConversion.wish(source: source(2_822_400, 1, encoding: .dsd), settings: none, replayGainDB: nil).wantsDepth)
+    }
+
     @Test("The steps for a format: its own rate isn't resampling, and its own depth isn't dither")
     func stepsForFormat() {
         let none = RendererSettings()

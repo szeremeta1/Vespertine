@@ -94,7 +94,9 @@ public final class UDPSocket: @unchecked Sendable {
         }
         guard starts else { return }
         let thread = Thread { [weak self] in
-            var buffer = [UInt8](repeating: 0, count: 2048)
+            // Room for the largest audio packet whole: 352 frames of 24-bit stereo that would not compress are 2112 bytes
+            // before the header, the seal and the nonce. A shorter buffer would cut such a packet and it would not open.
+            var buffer = [UInt8](repeating: 0, count: 4096)
             while let self, !self.lock.withLock({ self.closed }) {
                 var poller = pollfd(fd: fd, events: Int16(POLLIN), revents: 0)
                 guard poll(&poller, 1, 200) > 0 else { continue }

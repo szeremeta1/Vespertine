@@ -441,9 +441,14 @@ struct RemoteBridge {
             return .albums(items: albums.map(albumSummary), total: albums.count)
         case .playlists:
             return .playlists(items: library.playlists.compactMap { Self.playlistSummary($0, in: library, artworkKey: { model.artworkKey($0) }) })
-        case .playlistTracks(let id):
+        case .playlistTracks(let id, let offset, let limit):
             guard let playlist = library.playlists.first(where: { $0.id == id }) else { return notInLibrary }
-            return .tracks(items: trackSummaries(library.tracks(in: playlist)))
+            // Each song's other version goes with it (`trackSummaries`), a page's worth at a time.
+            let tracks = library.tracks(in: playlist)
+            guard let offset else { return .tracks(items: trackSummaries(tracks)) }
+            let start = min(max(0, offset), tracks.count)
+            let end = min(start + min(max(1, limit ?? PlaylistPages.pageSize), PlaylistPages.pageSize), tracks.count)
+            return .songs(items: trackSummaries(Array(tracks[start..<end])), total: tracks.count)
         case .favorites:
             return .tracks(items: trackSummaries(Self.favoriteSongs(in: library, choose: model.listedCopy)))
         case .library:
@@ -557,6 +562,15 @@ struct RemoteBridge {
     private func ordered(_ ids: [Int64]) -> [Track] {
         let byID = Dictionary(library.tracks(ids: ids).compactMap { t in t.id.map { ($0, t) } }, uniquingKeysWith: { a, _ in a })
         return ids.compactMap { byID[$0] }
+    }
+
+    /// A playlist's songs for `RemoteCommand.playlistTracks`: a page of them (a newer phone, which asks that way because a long
+    /// playlist whole would be more than one message holds), or all of them (an older phone, the web remote).
+    static func playlistTracks<Song>(_ songs: [Song], offset: Int?, limit: Int?, summary: (Song) -> TrackSummary) -> RemoteReply {
+        guard let offset else { return .tracks(items: songs.map(summary)) }
+        let start = min(max(0, offset), songs.count)
+        let end = min(start + min(max(1, limit ?? PlaylistPages.pageSize), PlaylistPages.pageSize), songs.count)
+        return .songs(items: songs[start..<end].map(summary), total: songs.count)
     }
 
     // MARK: Artwork

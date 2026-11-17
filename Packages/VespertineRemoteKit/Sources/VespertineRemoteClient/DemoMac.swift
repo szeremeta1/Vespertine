@@ -297,9 +297,12 @@ public final class DemoMac: RemoteChannel {
             return .albums(items: theirs, total: theirs.count)
         case .playlists:
             return .playlists(items: playlists.map(summary))
-        case .playlistTracks(let id):
+        case .playlistTracks(let id, let offset, let limit):
             guard let playlist = playlists.first(where: { $0.0.id == id }) else { return notInLibrary }
-            return .tracks(items: playlist.1.compactMap { tracks[$0] })
+            let songs = playlist.1.compactMap { tracks[$0] }
+            guard let offset else { return .tracks(items: songs) }
+            let start = min(max(0, offset), songs.count)
+            return .songs(items: Array(songs[start..<min(start + min(max(1, limit ?? 500), 500), songs.count)]), total: songs.count)
         case .favorites:
             // A song in two copies is listed once, with its copies beside it.
             let hidden = Set(otherCopies.values)
@@ -476,7 +479,14 @@ public final class DemoMac: RemoteChannel {
 
     private func play(_ ids: [Int64], startAt: Int, shuffled: Bool?) {
         if let shuffled { shuffle = shuffled }
-        load(ids, startAt: startAt)
+        // Shuffle (the button, not a tapped song with shuffle on) plays every song, from a random one, as a Mac does.
+        if shuffled == true {
+            var all = ids
+            all.shuffle()
+            load(all, startAt: 0)
+        } else {
+            load(ids, startAt: startAt)
+        }
         moveTo(0)
         playback = .playing
         bump()
@@ -580,6 +590,17 @@ public final class DemoMac: RemoteChannel {
                                     duration: copy.duration, favorite: copy.favorite, preferred: false) }
         }
         return listed
+    }
+
+    /// Adds a playlist of `songs` songs, the library's own over and over (0: an empty one), for trying the playlist page with a
+    /// long or an empty playlist (the app's `-VTTestPlaylists`, its UI tests). Answers its ID.
+    @discardableResult
+    public func addTestPlaylist(name: String, songs: Int) -> Int64 {
+        let all = allTracks.compactMap(\.id)
+        let id = (playlists.map(\.0.id).max() ?? 0) + 1
+        let ids = all.isEmpty ? [] : (0..<max(0, songs)).map { all[$0 % all.count] }
+        playlists.append((PlaylistSummary(id: id, name: name, smart: false), ids))
+        return id
     }
 
     // MARK: The made-up library
