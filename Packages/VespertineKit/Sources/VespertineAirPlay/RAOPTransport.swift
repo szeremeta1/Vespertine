@@ -33,7 +33,7 @@ public enum RAOPError: Error, Equatable, LocalizedError {
     }
 }
 
-/// A UDP socket on an ephemeral port.
+/// A UDP socket, on an ephemeral port unless one is named.
 public final class UDPSocket: @unchecked Sendable {
     public let port: UInt16
     private let fd: Int32
@@ -43,13 +43,21 @@ public final class UDPSocket: @unchecked Sendable {
     /// A reader thread was started: it closes the descriptor when it stops (see `close`).
     private var readerCloses = false
 
-    public init(bind address: String = "0.0.0.0") throws {
+    /// `port`: 0 for any free one. A named port may be shared with another socket that also asks to share it (a PTP
+    /// clock's ports are the same on every machine, and the system may have one of its own). `shared` says so for a
+    /// port that wasn't named, so that a second socket can be given its number.
+    public init(bind address: String = "0.0.0.0", port: UInt16 = 0, shared: Bool? = nil) throws {
         let fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)
         guard fd >= 0 else { throw RAOPError.socket(errno) }
+        if shared ?? (port != 0) {
+            var yes: Int32 = 1
+            setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &yes, socklen_t(MemoryLayout<Int32>.size))
+            setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &yes, socklen_t(MemoryLayout<Int32>.size))
+        }
         var addr = sockaddr_in()
         addr.sin_family = sa_family_t(AF_INET)
         addr.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
-        addr.sin_port = 0
+        addr.sin_port = port.bigEndian
         inet_pton(AF_INET, address, &addr.sin_addr)
         let bound = withUnsafePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { Darwin.bind(fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) } }
         guard bound == 0 else { let e = errno; Darwin.close(fd); throw RAOPError.socket(e) }
