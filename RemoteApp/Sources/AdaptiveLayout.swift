@@ -148,6 +148,34 @@ nonisolated enum RemoteLayout {
     /// line cut "Albums" and "Artists" down to the same stub.
     static func rowTitleLines(accessibilityText: Bool) -> Int? { accessibilityText ? nil : 1 }
 
+    /// A row's quieter second line: one line, or up to three at the accessibility sizes.
+    static func rowDetailLines(accessibilityText: Bool) -> Int { accessibilityText ? 3 : 1 }
+
+    /// At the accessibility sizes a row's name, its second line and what trails it are stacked, without the picture.
+    static func rowStacks(accessibilityText: Bool) -> Bool { accessibilityText }
+
+    /// Whether an album's Play and Shuffle sit one over the other: beside the cover, and at the accessibility sizes.
+    static func albumButtonsStack(besideCover: Bool, accessibilityText: Bool) -> Bool { besideCover || accessibilityText }
+
+    /// The width of a row's symbol column at the ordinary text size (it grows with the text).
+    static let rowIconWidth: CGFloat = 28
+
+    /// The sidebar's width: wider at the accessibility text sizes, where 250 points broke "Queue" and "Songs" in two.
+    static func sidebarWidth(accessibilityText: Bool) -> (min: CGFloat, ideal: CGFloat, max: CGFloat) {
+        accessibilityText ? (320, 400, 460) : (220, 250, 300)
+    }
+
+    /// The largest text a banner above the screens follows. Past it, a notice took two fifths of a small screen and was
+    /// still cut short.
+    static let bannerLargestText = DynamicTypeSize.accessibility1
+
+    /// A banner's words and its buttons sit side by side, or the buttons go under the words at the accessibility sizes.
+    static func bannerStacks(accessibilityText: Bool) -> Bool { accessibilityText }
+
+    /// A song row with several copies shows its "2 COPIES" button; on a narrow window the length gives way to it (the
+    /// copies list shows each length), so the name isn't cut to a few letters.
+    static func rowShowsLength(copies: Int, regularWidth: Bool) -> Bool { copies <= 1 || regularWidth }
+
     /// Lines the demo bar's words may take: as many as they need at ordinary text sizes (two or three), and at the
     /// accessibility sizes one until the bar is opened, so the bar leaves the screen to the list under it.
     static func demoNoticeLines(accessibilityText: Bool, open: Bool) -> Int? { accessibilityText && !open ? 1 : nil }

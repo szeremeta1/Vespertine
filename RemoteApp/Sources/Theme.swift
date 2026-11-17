@@ -19,6 +19,10 @@ enum Palette {
     static let brass = Color(uiColor: brassUI)
     static let brassHi = adaptive(light: 0x7C6541, dark: 0xE7CD98)
     static let brassLo = Color(hex: 0x7C6541)
+    /// Words and symbols on the accent colour (the sidebar's chosen row): ink on the dark appearance's bright brass,
+    /// white on the light appearance's deep brass.
+    static let onBrass = Color(uiColor: onBrassUI)
+    static let onBrassUI = dynamic(light: 0xFFFFFF, dark: 0x1A140A)
     static let copper = adaptive(light: 0x7C6541, dark: 0xC98B5B)
     // The transport is always a brass object, with dark ink in both appearances.
     static let brassGradient = LinearGradient(colors: [Color(hex: 0xE7CD98), Color(hex: 0xC8A66A)], startPoint: .top, endPoint: .bottom)
@@ -84,6 +88,66 @@ extension View {
     /// A list drawn on obsidian, with surface-coloured rows.
     func obsidianList() -> some View {
         scrollContentBackground(.hidden).background(Palette.base.ignoresSafeArea()).clearsMiniPlayer()
+    }
+}
+
+extension View {
+    /// The column a row's symbol (or track number) sits in: 28 points at the ordinary text size, growing with the text so
+    /// a symbol never runs into the words beside it. At the accessibility sizes the symbol steps aside altogether: the
+    /// words say the same thing and need the width ("Studio Mac mini" broke in the middle of "Studio" beside it).
+    func rowIconColumn(alignment: Alignment = .center) -> some View { modifier(RowIconColumn(alignment: alignment)) }
+}
+
+private struct RowIconColumn: ViewModifier {
+    let alignment: Alignment
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @ScaledMetric(relativeTo: .body) private var width: CGFloat = RemoteLayout.rowIconWidth
+
+    func body(content: Content) -> some View {
+        if !RemoteLayout.rowStacks(accessibilityText: typeSize.isAccessibilitySize) {
+            content.frame(width: width, alignment: alignment)
+        }
+    }
+}
+
+/// A list row for a song, an album or an artist: a picture or number, a name over a quieter line, and what trails it
+/// (a heart, a length). At the accessibility text sizes the picture steps aside and the pieces stack, so the name is
+/// read whole instead of being cut to a stub beside them.
+struct MediaRow<Leading: View, Trailing: View>: View {
+    @Environment(\.dynamicTypeSize) private var typeSize
+    let title: String
+    var subtitle: String? = nil
+    var titleFont: Font? = nil
+    var subtitleStyle: Color = .secondary
+    /// Push what trails to the far edge (rows that fill the width); off for rows a chevron already ends.
+    var spread = true
+    @ViewBuilder var leading: Leading
+    @ViewBuilder var trailing: Trailing
+
+    var body: some View {
+        let stacked = RemoteLayout.rowStacks(accessibilityText: typeSize.isAccessibilitySize)
+        if stacked {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title).font(titleFont)
+                if let subtitle, !subtitle.isEmpty {
+                    Text(subtitle).font(.caption).foregroundStyle(subtitleStyle).lineLimit(RemoteLayout.rowDetailLines(accessibilityText: true))
+                }
+                HStack(spacing: 10) { trailing }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            HStack(spacing: 12) {
+                leading
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title).font(titleFont).lineLimit(RemoteLayout.rowTitleLines(accessibilityText: false))
+                    if let subtitle, !subtitle.isEmpty {
+                        Text(subtitle).font(.caption).foregroundStyle(subtitleStyle).lineLimit(RemoteLayout.rowDetailLines(accessibilityText: false))
+                    }
+                }
+                if spread { Spacer() }
+                trailing
+            }
+        }
     }
 }
 

@@ -60,13 +60,9 @@ struct QueueView: View {
 
     private func row(_ item: QueueItem) -> some View {
         Button { feedback.run(session, .jump(entry: item.entry)) } label: {
-            HStack(spacing: 12) {
+            MediaRow(title: item.track.title, subtitle: item.track.artist) {
                 ArtworkView(key: item.track.artworkKey, size: 120, cornerRadius: 4).frame(width: 44)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(item.track.title).lineLimit(1)
-                    Text(item.track.artist).font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                }
-                Spacer()
+            } trailing: {
                 Text(formatTime(item.track.duration)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
             }
             .contentShape(Rectangle())

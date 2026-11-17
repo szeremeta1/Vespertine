@@ -25,7 +25,7 @@ struct OutputsView: View {
                         Button { PlayTarget.shared.choose(thisDevice: true) } label: {
                             HStack {
                                 Image(systemName: UIDevice.current.userInterfaceIdiom == .pad ? "ipad" : "iphone")
-                                    .frame(width: 28)
+                                    .rowIconColumn()
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(PlayTarget.deviceName)
                                     Text(hereDetail).font(.caption).foregroundStyle(Color.secondary)
@@ -103,7 +103,7 @@ struct OutputsView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: icon(output.kind))
-                                        .frame(width: 28)
+                                        .rowIconColumn()
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(output.name)
                                         Text(output.detail).font(.caption.monospaced()).foregroundStyle(output.ready ? Color.secondary : Color.orange)
@@ -114,6 +114,7 @@ struct OutputsView: View {
                                 .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
+                            .accessibilityAddTraits(output.selected && !playsHere ? .isSelected : [])
                         }
                     } footer: {
                         Text("Choose one of these and Vespertine on the Mac plays there.")
