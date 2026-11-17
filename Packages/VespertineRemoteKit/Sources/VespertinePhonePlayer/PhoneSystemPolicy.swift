@@ -11,6 +11,23 @@ public enum SpatialModeChoice: String, Sendable, Equatable, CaseIterable, Codabl
     case off, fixed, headTracked
 }
 
+/// Where a surround song's channels go (`PhoneRoute.surroundPath`).
+public enum SurroundPath: Equatable, Sendable {
+    /// Folded to stereo by the app.
+    case fold
+    /// Handed to iOS with all its channels and their layout: iOS's Spatial Audio renders it.
+    case system
+    /// Rendered for headphones by the app (Apple's spatial mixer, fixed), for headphones iOS doesn't spatialize.
+    case binaural
+    /// A channel to each output of an interface.
+    case discrete
+}
+
+/// What iOS says it does with the app's audio (`AVAudioSession.renderingMode`, iOS 17.2 and later), in the same order.
+public enum SystemRenderingMode: Int, Equatable, Sendable {
+    case notApplicable = 0, monoStereo, surround, spatialAudio, dolbyAudio, dolbyAtmos
+}
+
 /// A call, Siri or an alarm takes the sound: music that was playing pauses, and comes back when iOS says it may, unless
 /// you paused or played it yourself in between.
 public struct InterruptionPolicy: Sendable, Equatable {
@@ -237,6 +254,19 @@ extension PhoneRoute {
         guard isUSB || portType == "HDMI", songChannels > 2, maximumChannels > channels else { return nil }
         let wanted = min(songChannels, maximumChannels)
         return wanted > channels ? wanted : nil
+    }
+
+    /// Where a surround song's channels go on this output when you asked for `wanted` (anything but Off means "Spatial
+    /// Audio"). An interface with more than two outputs gets a channel on each. Off folds to stereo. Where iOS says it
+    /// spatializes (`spatial`: AirPods or Beats with Spatial Audio on), the channels go to iOS as they are and iOS renders
+    /// them, Fixed or Head Tracked as chosen in Control Center: no app on iOS can choose that for the system's renderer
+    /// (the intended-spatial-experience APIs are visionOS-only in the iOS 27 SDK). Other headphones get Vespertine's own
+    /// fixed rendering; speakers iOS doesn't spatialize get the fold.
+    public func surroundPath(wanted: SpatialModeChoice, canTrackHead: Bool = true) -> SurroundPath {
+        if isMultichannel { return .discrete }
+        guard wanted != .off else { return .fold }
+        if spatial { return .system }
+        return surroundMode(wanted: wanted, canTrackHead: canTrackHead) == .off ? .fold : .binaural
     }
 
     /// How a surround song is played on this output when you asked for `wanted`: rendered for headphones only on
