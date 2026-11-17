@@ -25,6 +25,7 @@ final class LibraryStore {
             genres = Genres.summarize(albums)
             albumsByKey = Dictionary(albums.map { ($0.key, $0) }, uniquingKeysWith: { a, _ in a })
             knownEditions = nil
+            copyCountsCurrent = false
             countCopies()
         }
     }
@@ -61,6 +62,9 @@ final class LibraryStore {
     private(set) var copyCounts: [String: Int] = [:]
     /// Whether `copyCounts` has been worked out once.
     private(set) var copyCountsReady = false
+    /// Whether `copyCounts` was worked out from the library as it is now: false from the moment the albums or the tracks
+    /// change until they are counted again. Only then may an album missing from `copyCounts` be taken for one in one copy.
+    @ObservationIgnored private var copyCountsCurrent = false
     /// Settings › Playback › "Bundle copies of an album": albums with no choice of their own play as one, the output picking
     /// the copy. Off by default: one copy plays, the best for the output, and every other copy stays a copy.
     var bundlesCopiesByDefault = false {
@@ -163,6 +167,7 @@ final class LibraryStore {
             guard !Task.isCancelled, let self else { return }
             self.copyCountsReady = true
             if self.copyCounts != counts { self.copyCounts = counts }
+            self.copyCountsCurrent = true
         }
     }
 
@@ -180,13 +185,14 @@ final class LibraryStore {
     /// For each track, every version and copy of its song (stereo and multichannel, the same song in two places), or
     /// just the track: on its album, and while versions are combined (and `acrossEditions`) on the album's other
     /// editions too (`SongVersions`). The albums are read at once, so a whole library queues in one read; albums known to
-    /// be in one copy and one edition (nearly all of them) aren't read at all.
+    /// be in one copy and one edition (nearly all of them) aren't read at all. Nothing is taken as known while the library
+    /// has changed since its copies were last counted: every album asked about is read then.
     func versions(of tracks: [Track], acrossEditions: Bool = true) -> [[Track]] {
         let editions = acrossEditions && combinesVersions ? self.editions : [:]
         var keys: [String] = [], seen = Set<String>()
         for t in tracks {
             let key = t.albumKey
-            guard !seen.contains(key), !copyCountsReady || copyCounts[key] != nil || editions[key] != nil else { continue }
+            guard !seen.contains(key), !copyCountsCurrent || copyCounts[key] != nil || editions[key] != nil else { continue }
             for k in editions[key] ?? [key] where seen.insert(k).inserted { keys.append(k) }
         }
         guard !keys.isEmpty else { return tracks.map { [$0] } }
@@ -244,7 +250,10 @@ final class LibraryStore {
     /// With the local library off there are no files, and the servers' music is what they list.
     var libraryStats: LibraryDatabase.Stats { streamedAccounts.isEmpty || !filesOn ? stats : fileStats }
     /// Bumped whenever tracks change, so detail views can reload.
-    private(set) var revision = 0
+    private(set) var revision = 0 {
+        // A changed track may be a new copy of a song: the albums' copies are counted again.
+        didSet { copyCountsCurrent = false; countCopies() }
+    }
     /// Counts the changes that can alter a song's cover without its queue entry knowing (tag edits, reverts, enrichment).
     private(set) var artworkRevision = 0
 
