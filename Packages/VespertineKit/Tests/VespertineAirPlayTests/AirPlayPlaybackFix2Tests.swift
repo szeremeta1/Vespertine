@@ -12,7 +12,7 @@ import VespertineAudio
 import VespertineUPnP
 @testable import VespertineAirPlay
 
-@Suite("AirPlay playback, fix round 2", .serialized) @MainActor
+@Suite("AirPlay playback, fix round 2", .serialized, .timeLimit(.minutes(2))) @MainActor
 struct AirPlayPlaybackFix2Tests {
     func make(_ receiver: FakeRAOPReceiver) -> (AirPlayPlayback, EventLog) {
         let device = AirPlayDevice(deviceID: "B827EB000001", name: "Fake", raop: AirPlayPlaybackTests.record, host: "127.0.0.1", port: receiver.port)
@@ -22,10 +22,7 @@ struct AirPlayPlaybackFix2Tests {
         return (p, log)
     }
 
-    func wait(_ condition: () -> Bool, seconds: Double = 8) async {
-        let end = Date().addingTimeInterval(seconds)
-        while !condition(), Date() < end { try? await Task.sleep(for: .milliseconds(25)) }
-    }
+    func wait(_ condition: @MainActor () -> Bool) async { await untilTrue(condition) }
 
     @Test("A next song that can't be opened fails by name once the song before it has played, and the one after it plays")
     func unopenableNext() async throws {
@@ -40,7 +37,7 @@ struct AirPlayPlaybackFix2Tests {
         let first = PlayableItem(url: a), second = PlayableItem(url: missing), third = PlayableItem(url: c)
         p.nextItemProvider = { $0.id == first.id ? second : $0.id == second.id ? third : nil }
         p.play(first, at: 0)
-        await wait({ log.ended }, seconds: 15)
+        await wait { log.ended }
         #expect(log.ended)
         #expect(log.failures.count == 1, "\(log.failures)")
         #expect(log.started == [first.id, third.id])

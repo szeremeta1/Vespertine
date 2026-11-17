@@ -19,7 +19,7 @@ final class EventLog {
     var failures: [String] { events.compactMap { if case .failed(_, let m) = $0 { m } else { nil } } }
 }
 
-@Suite("AirPlay playback", .serialized) @MainActor
+@Suite("AirPlay playback", .serialized, .timeLimit(.minutes(2))) @MainActor
 struct AirPlayPlaybackTests {
     static let record = RAOPRecord.parse(serviceName: "B827EB000001@Fake", txt: ["et": "0", "md": "0,2", "cn": "1"])!
 
@@ -31,10 +31,7 @@ struct AirPlayPlaybackTests {
         return (p, log)
     }
 
-    func wait(_ condition: () -> Bool, seconds: Double = 8) async {
-        let end = Date().addingTimeInterval(seconds)
-        while !condition(), Date() < end { try? await Task.sleep(for: .milliseconds(25)) }
-    }
+    func wait(_ condition: @MainActor () -> Bool) async { await untilTrue(condition) }
 
     @Test("A 16/44.1 song reaches the receiver sample for sample; heard, it starts; the queue's end is heard too")
     func exact() async throws {
