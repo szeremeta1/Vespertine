@@ -616,6 +616,9 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         var isWaiting: Bool { storage.condition.withLock { storage.starting || storage.waiters > 0 } }
         /// How many reads are parked waiting for bytes that are not on disk yet (each has stamped the start of its wait).
         var readsWaiting: Int { storage.condition.withLock { storage.waiters } }
+        /// How many of the copy's lanes are still running (the tests wait for a copy that was given up on to end, not for a
+        /// length of time).
+        var copyLanesRunning: Int { storage.condition.withLock { storage.activeLanes.count } }
         /// Seconds since a byte last arrived while the listener waits on this copy (its start, or a read of bytes not on disk yet);
         /// nil when nobody does: a prefetched next song, a copy that is finished, failed or cancelled, a lead being read from disk.
         var silence: TimeInterval? { storage.condition.withLock { storage.silence() } }

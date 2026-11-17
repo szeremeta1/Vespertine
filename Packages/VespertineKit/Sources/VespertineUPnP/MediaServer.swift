@@ -41,18 +41,45 @@ public final class GrowingFile: @unchecked Sendable {
     /// The writer gave up: readers stop where the file ends.
     public func fail() { lock.withLock { finished = true; failed = true } }
 
-    /// Up to `max` bytes from `offset`, waiting for them while the file is still being written; nil at its end.
-    public func read(from offset: Int64, max: Int) async -> Data? {
+    /// The file has bytes a reader could not get at, however often it tried.
+    public struct Unreadable: Error {
+        public let underlying: (any Error)?
+    }
+
+    /// How a reader opens the file (the tests make it fail).
+    var openForReading: @Sendable (URL) throws -> FileHandle = { try FileHandle(forReadingFrom: $0) }
+    /// How many times in a row a reader may fail to get at bytes that are there before it gives up, looking every 20 ms: two
+    /// seconds, far longer than a process stays out of file descriptors and far shorter than a renderer waits for audio.
+    var readAttempts = 100
+    private var reached: Int64 = 0
+    /// The furthest byte handed to a reader so far (the tests pace a writer by it, not by a length of time).
+    var furthestRead: Int64 { lock.withLock { reached } }
+
+    /// Up to `max` bytes from `offset`, waiting for them while the file is still being written; nil at its end, and only there.
+    /// Bytes that are there and can't be read (the file won't open, the read fails) are tried again, and are an error after
+    /// `readAttempts` tries: a reader told "nil" sends the renderer the end of the song, and a song cut short must never look
+    /// like a whole one.
+    public func read(from offset: Int64, max: Int) async throws -> Data? {
+        var failures = 0
         while !Task.isCancelled {
             let done = isFinished
             let available = size - offset
             if available > 0 {
-                guard let handle = try? FileHandle(forReadingFrom: url) else { return nil }
-                defer { try? handle.close() }
-                try? handle.seek(toOffset: UInt64(offset))
-                return try? handle.read(upToCount: Int(min(Int64(max), available)))
+                var failure: (any Error)?
+                do {
+                    let handle = try openForReading(url)
+                    defer { try? handle.close() }
+                    try handle.seek(toOffset: UInt64(offset))
+                    if let data = try handle.read(upToCount: Int(min(Int64(max), available))), !data.isEmpty {
+                        lock.withLock { reached = Swift.max(reached, offset + Int64(data.count)) }
+                        return data
+                    }
+                } catch { failure = error }
+                failures += 1
+                if failures >= readAttempts { throw Unreadable(underlying: failure) }
+            } else if done {
+                return nil
             }
-            if done { return nil }
             try? await Task.sleep(for: .milliseconds(20))
         }
         return nil
