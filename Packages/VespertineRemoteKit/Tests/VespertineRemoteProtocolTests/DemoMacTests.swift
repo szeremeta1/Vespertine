@@ -232,6 +232,12 @@ struct DemoMacTests {
             firsts.insert(shuffled.current?.track.id)
         }
         #expect(firsts.count > 1, "Shuffle starts from a random song, not always the first")
+
+        // A long playlist (the UI tests' -VTTestPlaylists) is listed a page at a time, and an empty one has no songs.
+        let long = mac.addTestPlaylist(name: "Long Mix", songs: 1_200), empty = mac.addTestPlaylist(name: "Nothing Yet", songs: 0)
+        guard case .songs(let last, let count) = try await ask(mac, .playlistTracks(id: long, offset: 1_000, limit: 500)) else { Issue.record("no page"); return }
+        #expect(count == 1_200 && last.count == 200)
+        #expect(try await ask(mac, .playlistTracks(id: empty, offset: 0, limit: 500)) == .songs(items: [], total: 0))
         mac.close()
     }
 

@@ -592,6 +592,17 @@ public final class DemoMac: RemoteChannel {
         return listed
     }
 
+    /// Adds a playlist of `songs` songs, the library's own over and over (0: an empty one), for trying the playlist page with a
+    /// long or an empty playlist (the app's `-VTTestPlaylists`, its UI tests). Answers its ID.
+    @discardableResult
+    public func addTestPlaylist(name: String, songs: Int) -> Int64 {
+        let all = allTracks.compactMap(\.id)
+        let id = (playlists.map(\.0.id).max() ?? 0) + 1
+        let ids = all.isEmpty ? [] : (0..<max(0, songs)).map { all[$0 % all.count] }
+        playlists.append((PlaylistSummary(id: id, name: name, smart: false), ids))
+        return id
+    }
+
     // MARK: The made-up library
 
     private func makeLibrary() {
