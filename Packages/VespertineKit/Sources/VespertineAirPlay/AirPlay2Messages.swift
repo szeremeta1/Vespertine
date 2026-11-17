@@ -72,11 +72,12 @@ enum AirPlay2Message {
     }
 
     /// The second SETUP: one stream of audio. `key`: 32 bytes the packets are sealed with. `connectionID`: a number
-    /// for this stream.
-    static func streamSetup(controlPort: UInt16, key: Data, connectionID: UInt32) -> Data {
+    /// for this stream. `format`: what the packets hold; one AirPlay has no name for is announced as 16-bit at 44.1 kHz.
+    static func streamSetup(controlPort: UInt16, key: Data, connectionID: UInt32, format: AirPlayFormat = .cd) -> Data {
+        let named = format.streamFormat == nil ? AirPlayFormat.cd : format
         let stream: [String: Any] = [
             "type": realtime,
-            "audioFormat": alacFormat,
+            "audioFormat": named.streamFormat ?? alacFormat,
             "ct": alac,
             "audioMode": "default",
             "controlPort": Int(controlPort),
@@ -85,7 +86,7 @@ enum AirPlay2Message {
             "latencyMax": latencyMax,
             "shk": key,
             "spf": RAOPTiming.framesPerPacket,
-            "sr": RAOPTiming.sampleRate,
+            "sr": named.sampleRate,
             "supportsDynamicStreamID": false,
             "streamConnectionID": Int(connectionID),
         ]

@@ -1,8 +1,12 @@
 //
-// Vespertine: Apple Lossless packets of 352 frames, 16-bit stereo at 44.1 kHz, as RAOP carries them. Encoded with Apple's own
-// encoder (AudioConverter, kAudioFormatAppleLossless), whose configuration must be the one the SDP announces; when it can't
-// be had, the "verbatim" ALAC frame (the samples uncompressed in an ALAC element, as OwnTone sends it) is lossless by
-// construction. The decoder is for the test receiver and the round-trip checks.
+// Vespertine: Apple Lossless packets of 352 stereo frames, as RAOP carries them: 16-bit at 44.1 kHz, which is all AirPlay 1
+// has, and the 24-bit and 48 kHz ones an AirPlay 2 stream can name. Encoded with Apple's own encoder (AudioConverter,
+// kAudioFormatAppleLossless), whose configuration must be the one announced; when it can't be had, the "verbatim" ALAC
+// frame (the samples uncompressed in an ALAC element, as OwnTone sends it) is lossless by construction. The decoder is
+// for the test receiver and the round-trip checks.
+//
+// 24-bit samples go to and from Apple's converter as three bytes each, the form its ALAC codec takes as it is, so that
+// nothing stands between the samples and the codec that could change one.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
 
@@ -64,6 +68,60 @@ enum PCM16 {
     }
 }
 
+/// The two sides of a conversion for a configuration: stereo samples of its depth (two bytes each at 16 bits, three at
+/// 24), and ALAC packets of its frame length.
+enum ALACStream {
+    static func isSupported(_ config: ALACConfig) -> Bool {
+        (config.bitDepth == 16 || config.bitDepth == 24) && config.channels == 2 && config.frameLength > 0
+    }
+
+    static func bytesPerSample(_ config: ALACConfig) -> Int { Int(config.bitDepth) / 8 }
+
+    static func pcm(_ config: ALACConfig) -> AudioStreamBasicDescription {
+        let frame = UInt32(bytesPerSample(config)) * 2
+        return AudioStreamBasicDescription(mSampleRate: Double(config.sampleRate), mFormatID: kAudioFormatLinearPCM,
+                                           mFormatFlags: kAudioFormatFlagIsSignedInteger | kAudioFormatFlagIsPacked, mBytesPerPacket: frame,
+                                           mFramesPerPacket: 1, mBytesPerFrame: frame, mChannelsPerFrame: 2,
+                                           mBitsPerChannel: UInt32(config.bitDepth), mReserved: 0)
+    }
+
+    static func alac(_ config: ALACConfig) -> AudioStreamBasicDescription {
+        let flag = config.bitDepth == 24 ? kAppleLosslessFormatFlag_24BitSourceData : kAppleLosslessFormatFlag_16BitSourceData
+        return AudioStreamBasicDescription(mSampleRate: Double(config.sampleRate), mFormatID: kAudioFormatAppleLossless, mFormatFlags: flag,
+                                           mBytesPerPacket: 0, mFramesPerPacket: config.frameLength, mBytesPerFrame: 0, mChannelsPerFrame: 2,
+                                           mBitsPerChannel: 0, mReserved: 0)
+    }
+
+    /// The samples as the converter takes them: little-endian, `bytesPerSample` bytes each.
+    static func bytes(_ samples: [Int32], config: ALACConfig) -> Data {
+        let width = bytesPerSample(config)
+        var data = Data(capacity: samples.count * width)
+        for sample in samples {
+            let bits = UInt32(bitPattern: sample)
+            for byte in 0..<width { data.append(UInt8((bits >> UInt32(8 * byte)) & 0xff)) }
+        }
+        return data
+    }
+
+    /// The samples the converter gave, sign-extended.
+    static func samples(_ data: Data, config: ALACConfig) -> [Int32] {
+        let width = bytesPerSample(config)
+        let bytes = [UInt8](data)
+        let unused = UInt32(32 - 8 * width)
+        return (0..<(bytes.count / width)).map { index in
+            var bits: UInt32 = 0
+            for byte in 0..<width { bits |= UInt32(bytes[index * width + byte]) << UInt32(8 * byte) }
+            return Int32(bitPattern: bits << unused) >> Int32(unused)
+        }
+    }
+
+    /// Whether every sample fits the configuration's depth.
+    static func fits(_ samples: [Int32], config: ALACConfig) -> Bool {
+        let limit = Int32(1) << Int32(config.bitDepth - 1)
+        return samples.allSatisfy { $0 >= -limit && $0 < limit }
+    }
+}
+
 /// The input proc's state: one packet of samples, handed over once.
 private final class ConverterInput {
     static let capacity = 16 * 1024
@@ -72,6 +130,8 @@ private final class ConverterInput {
     let packet = UnsafeMutablePointer<AudioStreamPacketDescription>.allocate(capacity: 1)
     var given = false
     var isPacketized = false
+    /// Bytes in one stereo frame of the samples held (when they aren't a packet).
+    var bytesPerFrame = 4
 
     deinit {
         buffer.deallocate()
@@ -108,19 +168,23 @@ private let inputProc: AudioConverterComplexInputDataProc = { _, ioPackets, ioDa
         outDescriptions?.pointee = input.packet
     } else {
         ioData.pointee.mBuffers.mNumberChannels = 2
-        ioPackets.pointee = UInt32(input.count / 4)
+        ioPackets.pointee = UInt32(input.count / input.bytesPerFrame)
     }
     return noErr
 }
 
-/// Apple's ALAC encoder, one 352-frame packet at a time.
+/// Apple's ALAC encoder, one packet (352 frames, unless the configuration says otherwise) at a time.
 public final class ALACEncoder: @unchecked Sendable {
+    public let config: ALACConfig
     private let converter: AudioConverterRef
     private let maxPacket: UInt32
     private let input = ConverterInput()
 
     public init(config: ALACConfig = ALACConfig()) throws {
-        var source = PCM16.format(), target = PCM16.alac()
+        guard ALACStream.isSupported(config) else { throw ALACError.badInput }
+        self.config = config
+        let frameBytes = ALACStream.bytesPerSample(config) * 2
+        var source = ALACStream.pcm(config), target = ALACStream.alac(config)
         var made: AudioConverterRef?
         let status = AudioConverterNew(&source, &target, &made)
         guard status == noErr, let made else { throw ALACError.converter(status) }
@@ -131,7 +195,9 @@ public final class ALACEncoder: @unchecked Sendable {
         let got = cookie.withUnsafeMutableBytes { AudioConverterGetProperty(made, kAudioConverterCompressionMagicCookie, &size, $0.baseAddress!) }
         var max: UInt32 = 0, maxSize = UInt32(MemoryLayout<UInt32>.size)
         AudioConverterGetProperty(made, kAudioConverterPropertyMaximumOutputPacketSize, &maxSize, &max)
-        maxPacket = Swift.max(max, 2048)
+        // Room for a packet that didn't compress, whatever the converter says: 352 frames of 24 bits are 2112 bytes.
+        maxPacket = Swift.max(max, UInt32(Int(config.frameLength) * frameBytes) + 64, 2048)
+        input.bytesPerFrame = frameBytes
         // What the receiver decodes with is the SDP's configuration: the encoder must be using the same one.
         guard got == noErr, config.decodesLike(cookie: cookie) else {
             AudioConverterDispose(made)
@@ -141,10 +207,17 @@ public final class ALACEncoder: @unchecked Sendable {
 
     deinit { AudioConverterDispose(converter) }
 
-    /// One ALAC packet for 352 interleaved stereo frames (704 samples).
+    /// One ALAC packet for 352 interleaved stereo frames (704 samples) of a 16-bit configuration.
     public func encode(_ samples: [Int16]) throws -> Data {
-        guard samples.count == 704 else { throw ALACError.badInput }
-        _ = input.set(samples.withUnsafeBufferPointer { Data(buffer: $0) })
+        guard config.bitDepth == 16 else { throw ALACError.badInput }
+        return try encode(samples: samples.map { Int32($0) })
+    }
+
+    /// One ALAC packet for a packet's worth of interleaved stereo frames, each sample a value of the configuration's
+    /// depth (a 24-bit sample is between -8 388 608 and 8 388 607).
+    public func encode(samples: [Int32]) throws -> Data {
+        guard samples.count == Int(config.frameLength) * 2, ALACStream.fits(samples, config: config) else { throw ALACError.badInput }
+        guard input.set(ALACStream.bytes(samples, config: config)) else { throw ALACError.badInput }
         var out = Data(count: Int(maxPacket))
         var packets: UInt32 = 1
         var description = AudioStreamPacketDescription()
@@ -160,6 +233,11 @@ public final class ALACEncoder: @unchecked Sendable {
 /// The uncompressed ("escape") ALAC frame: stereo element, no shift, the samples big-endian, the end tag.
 public enum ALACVerbatim {
     public static func encode(_ samples: [Int16]) -> Data {
+        encode(samples: samples.map { Int32($0) }, bitDepth: 16)
+    }
+
+    /// The same frame for samples of `bitDepth` bits (16 or 24), each written in that many bits.
+    public static func encode(samples: [Int32], bitDepth: Int) -> Data {
         var w = BitWriter()
         w.write(1, bits: 3)        // ID_CPE: a channel pair
         w.write(0, bits: 4)        // element instance
@@ -167,7 +245,8 @@ public enum ALACVerbatim {
         w.write(0, bits: 1)        // no frame size: the full 352
         w.write(0, bits: 2)        // no shifted bytes
         w.write(1, bits: 1)        // escape: not compressed
-        for s in samples { w.write(UInt32(UInt16(bitPattern: s)), bits: 16) }
+        let mask: UInt32 = bitDepth >= 32 ? .max : (UInt32(1) << UInt32(bitDepth)) - 1
+        for s in samples { w.write(UInt32(bitPattern: s) & mask, bits: bitDepth) }
         w.write(7, bits: 3)        // ID_END
         return w.data
     }
@@ -187,12 +266,14 @@ public enum ALACVerbatim {
 
 /// Apple's ALAC decoder, for the configuration an SDP announces.
 public final class ALACDecoder: @unchecked Sendable {
+    public let config: ALACConfig
     private let converter: AudioConverterRef
     private let input = ConverterInput()
 
     public init(config: ALACConfig = ALACConfig()) throws {
-        var source = PCM16.alac(), target = PCM16.format()
-        source.mFramesPerPacket = config.frameLength
+        guard ALACStream.isSupported(config) else { throw ALACError.badInput }
+        self.config = config
+        var source = ALACStream.alac(config), target = ALACStream.pcm(config)
         var made: AudioConverterRef?
         let status = AudioConverterNew(&source, &target, &made)
         guard status == noErr, let made else { throw ALACError.converter(status) }
@@ -205,16 +286,23 @@ public final class ALACDecoder: @unchecked Sendable {
 
     deinit { AudioConverterDispose(converter) }
 
-    /// The interleaved samples of one packet.
+    /// The interleaved samples of one packet of a 16-bit configuration.
     public func decode(_ packet: Data) throws -> [Int16] {
+        guard config.bitDepth == 16 else { throw ALACError.badInput }
+        return try decode(samples: packet).map { Int16(truncatingIfNeeded: $0) }
+    }
+
+    /// The interleaved samples of one packet, each a value of the configuration's depth.
+    public func decode(samples packet: Data) throws -> [Int32] {
         guard input.set(packet) else { throw ALACError.badInput }
-        var out = [Int16](repeating: 0, count: 352 * 2)
-        var frames: UInt32 = 352
+        let frameBytes = ALACStream.bytesPerSample(config) * 2
+        var out = Data(count: Int(config.frameLength) * frameBytes)
+        var frames = config.frameLength
         let status = out.withUnsafeMutableBytes { raw -> OSStatus in
             var list = AudioBufferList(mNumberBuffers: 1, mBuffers: AudioBuffer(mNumberChannels: 2, mDataByteSize: UInt32(raw.count), mData: raw.baseAddress))
             return AudioConverterFillComplexBuffer(converter, inputProc, Unmanaged.passUnretained(input).toOpaque(), &frames, &list, nil)
         }
         guard status == noErr || status == noMoreInputNow else { throw ALACError.converter(status) }
-        return Array(out.prefix(Int(frames) * 2))
+        return ALACStream.samples(Data(out.prefix(Int(frames) * frameBytes)), config: config)
     }
 }
