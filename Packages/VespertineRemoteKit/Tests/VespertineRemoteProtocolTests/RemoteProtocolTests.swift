@@ -62,7 +62,7 @@ private let copied: TrackSummary = {
             .moveInQueue(entries: ["E2"], before: "E1"), .clearUpcoming, .playAlbum(key: "k", startAt: 2, shuffled: nil),
             .playTracks(ids: [1, 2], startAt: 1, shuffled: true), .playPlaylist(id: 9, shuffled: false), .playPlaylist(id: 9, startAt: 2, shuffled: nil), .playNext(ids: [3]),
             .addToQueue(ids: [4]), .setFavorite(ids: [5], on: false), .albums(offset: 0, limit: 100), .albumTracks(key: "k"),
-            .artists, .artistAlbums(name: "Miles Davis"), .playlists, .playlistTracks(id: 2), .favorites,
+            .artists, .artistAlbums(name: "Miles Davis"), .playlists, .playlistTracks(id: 2), .playlistTracks(id: 2, offset: 500, limit: 500), .favorites,
             .search(text: "blue", limit: 50), .artwork(key: "abc", size: 600), .selectOutput(uid: "u"), .selectOutput(uid: nil),
             .volume(action: .mute), .setVolume(level: 0.5), .setTransitions(on: true),
             .songs(offset: 200, limit: 100), .find(text: "blue", limit: 20), .addToPlaylist(id: 2, ids: [4, 5]),
@@ -117,6 +117,14 @@ private let copied: TrackSummary = {
         #expect(try json(RemoteCommand.addToPlaylist(id: 2, ids: [4, 5])) == #"{"addToPlaylist":{"id":2,"ids":[4,5]}}"#)
         #expect(try json(RemoteCommand.createPlaylist(name: "Sunday", ids: [])) == #"{"createPlaylist":{"ids":[],"name":"Sunday"}}"#)
         #expect(try json(RemoteReply.songs(items: [], total: 0)) == #"{"songs":{"items":[],"total":0}}"#)
+    }
+
+    @Test func aPlaylistIsAskedForAPageAtATime() throws {
+        // Without a page (an older phone, the web remote) the message is as it always was, and gets every song.
+        #expect(try json(RemoteCommand.playlistTracks(id: 2)) == #"{"playlistTracks":{"id":2}}"#)
+        #expect(try json(RemoteCommand.playlistTracks(id: 2, offset: 500, limit: 500)) == #"{"playlistTracks":{"id":2,"limit":500,"offset":500}}"#)
+        let old = try RemoteProtocol.decoder().decode(RemoteCommand.self, from: Data(#"{"playlistTracks":{"id":2}}"#.utf8))
+        #expect(old == .playlistTracks(id: 2))
     }
 
     @Test func theLibrarySectionCommandsKeepTheirShape() throws {

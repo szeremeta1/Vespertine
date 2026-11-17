@@ -297,9 +297,12 @@ public final class DemoMac: RemoteChannel {
             return .albums(items: theirs, total: theirs.count)
         case .playlists:
             return .playlists(items: playlists.map(summary))
-        case .playlistTracks(let id):
+        case .playlistTracks(let id, let offset, let limit):
             guard let playlist = playlists.first(where: { $0.0.id == id }) else { return notInLibrary }
-            return .tracks(items: playlist.1.compactMap { tracks[$0] })
+            let songs = playlist.1.compactMap { tracks[$0] }
+            guard let offset else { return .tracks(items: songs) }
+            let start = min(max(0, offset), songs.count)
+            return .songs(items: Array(songs[start..<min(start + min(max(1, limit ?? 500), 500), songs.count)]), total: songs.count)
         case .favorites:
             // A song in two copies is listed once, with its copies beside it.
             let hidden = Set(otherCopies.values)
@@ -476,7 +479,14 @@ public final class DemoMac: RemoteChannel {
 
     private func play(_ ids: [Int64], startAt: Int, shuffled: Bool?) {
         if let shuffled { shuffle = shuffled }
-        load(ids, startAt: startAt)
+        // Shuffle (the button, not a tapped song with shuffle on) plays every song, from a random one, as a Mac does.
+        if shuffled == true {
+            var all = ids
+            all.shuffle()
+            load(all, startAt: 0)
+        } else {
+            load(ids, startAt: startAt)
+        }
         moveTo(0)
         playback = .playing
         bump()

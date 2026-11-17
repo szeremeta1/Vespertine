@@ -403,9 +403,9 @@ struct RemoteBridge {
             return .albums(items: albums.map(albumSummary), total: albums.count)
         case .playlists:
             return .playlists(items: library.playlists.compactMap { Self.playlistSummary($0, in: library, artworkKey: { model.artworkKey($0) }) })
-        case .playlistTracks(let id):
+        case .playlistTracks(let id, let offset, let limit):
             guard let playlist = library.playlists.first(where: { $0.id == id }) else { return notInLibrary }
-            return .tracks(items: library.tracks(in: playlist).map(trackSummary))
+            return Self.playlistTracks(library.tracks(in: playlist), offset: offset, limit: limit, summary: trackSummary)
         case .favorites:
             return .tracks(items: Self.favoriteSongs(in: library, choose: model.listedCopy).map(trackSummary))
         case .library:
@@ -520,6 +520,15 @@ struct RemoteBridge {
 
     /// A stored cover file for `key` near `size`, read off the main thread. Keys are the library's own (hex and dashes);
     /// anything else is refused, so a key can never name a file outside the artwork folder.
+    /// A playlist's songs for `RemoteCommand.playlistTracks`: a page of them (a newer phone, which asks that way because a long
+    /// playlist whole would be more than one message holds), or all of them (an older phone, the web remote).
+    static func playlistTracks<Song>(_ songs: [Song], offset: Int?, limit: Int?, summary: (Song) -> TrackSummary) -> RemoteReply {
+        guard let offset else { return .tracks(items: songs.map(summary)) }
+        let start = min(max(0, offset), songs.count)
+        let end = min(start + min(max(1, limit ?? PlaylistPages.pageSize), PlaylistPages.pageSize), songs.count)
+        return .songs(items: songs[start..<end].map(summary), total: songs.count)
+    }
+
     static func artwork(key: String, size: Int, store: ArtworkStore?) async -> (mimeType: String, data: Data)? {
         guard let store, !key.isEmpty, key.count <= 128,
               key.allSatisfy({ $0.isASCII && ($0.isLetter || $0.isNumber || $0 == "-" || $0 == "_") }) else { return nil }
