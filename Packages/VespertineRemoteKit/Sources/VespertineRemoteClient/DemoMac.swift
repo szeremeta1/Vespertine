@@ -255,9 +255,9 @@ public final class DemoMac: RemoteChannel {
             let known = ids.filter { tracks[$0] != nil }
             guard !known.isEmpty else { return notInLibrary }
             play(known, startAt: min(startAt, known.count - 1), shuffled: shuffled)
-        case .playPlaylist(let id, let shuffled):
+        case .playPlaylist(let id, let startAt, let shuffled):
             guard let playlist = playlists.first(where: { $0.0.id == id }) else { return notInLibrary }
-            play(playlist.1, startAt: 0, shuffled: shuffled)
+            play(playlist.1, startAt: startAt ?? 0, shuffled: shuffled)
         case .playNext(let ids):
             playingNext.insert(contentsOf: items(ids), at: 0)
             bump()

@@ -155,7 +155,7 @@ private struct SearchPage: View {
                     ForEach(found.playlists) { playlist in
                         NavigationLink {
                             TrackListView(session: session, title: Text(playlist.name), load: .playlistTracks(id: playlist.id),
-                                          play: { _ in .playPlaylist(id: playlist.id, shuffled: false) })
+                                          play: SongTap.playlist(id: playlist.id))
                         } label: {
                             Label(playlist.name, systemImage: playlist.smart ? "gearshape" : "music.note.list")
                         }
@@ -164,7 +164,7 @@ private struct SearchPage: View {
             }
             if !found.tracks.isEmpty {
                 Section("Songs") {
-                    TrackRows(session: session, tracks: found.tracks, play: { index in .playTracks(ids: found.tracks.compactMap(\.id), startAt: index, shuffled: nil) })
+                    TrackRows(session: session, tracks: found.tracks, play: SongTap.songs(found.tracks))
                 }
             }
             if searched, found.tracks.isEmpty, found.albums.isEmpty, found.artists.isEmpty, found.playlists.isEmpty {
@@ -400,7 +400,7 @@ struct AlbumView: View {
                 .frame(maxWidth: .infinity)
                 .listRowBackground(Color.clear)
             }
-            TrackRows(session: session, tracks: tracks, play: { .playAlbum(key: album.key, startAt: $0, shuffled: false) }, numbered: true)
+            TrackRows(session: session, tracks: tracks, play: SongTap.album(key: album.key), numbered: true)
         }
         .obsidianList()
         .navigationBarTitleDisplayMode(.inline)
@@ -476,7 +476,7 @@ struct PlaylistsList: View {
         List(playlists) { playlist in
             NavigationLink {
                 TrackListView(session: session, title: Text(playlist.name), load: .playlistTracks(id: playlist.id),
-                              play: { _ in .playPlaylist(id: playlist.id, shuffled: false) },
+                              play: SongTap.playlist(id: playlist.id),
                               keep: { tracks in
                                   KeptList(id: KeptList.playlistID(playlist.id), kind: .playlist, reference: String(playlist.id), title: playlist.name, subtitle: "",
                                            artworkKey: tracks.first?.artworkKey, tracks: tracks, smaller: KeptShelf.shared.smaller)
@@ -488,6 +488,25 @@ struct PlaylistsList: View {
         .obsidianList()
         .navigationTitle("Playlists").screenTitleStyle()
         .task(id: session.isConnected) { if case .playlists(let items) = await session.send(.playlists) { playlists = items } }
+    }
+}
+
+/// What tapping the song at a row of a list sends: play that list from the song tapped.
+enum SongTap {
+    /// A playlist's songs (with the playlist's own transitions on the Mac). Nil shuffle keeps the setting, as a song row
+    /// does everywhere else; the start is the song tapped (it once was always the first: TestFlight feedback tf-7adda59b4b).
+    static func playlist(id: Int64) -> (Int) -> RemoteCommand {
+        { index in .playPlaylist(id: id, startAt: index, shuffled: nil) }
+    }
+
+    /// Songs listed by their IDs (search results, Songs, Favorites).
+    static func songs(_ tracks: [TrackSummary]) -> (Int) -> RemoteCommand {
+        { index in .playTracks(ids: tracks.compactMap(\.id), startAt: index, shuffled: nil) }
+    }
+
+    /// An album's songs.
+    static func album(key: String) -> (Int) -> RemoteCommand {
+        { index in .playAlbum(key: key, startAt: index, shuffled: false) }
     }
 }
 
@@ -505,7 +524,7 @@ struct TrackListView: View {
 
     var body: some View {
         List {
-            TrackRows(session: session, tracks: tracks, play: play ?? { index in .playTracks(ids: tracks.compactMap(\.id), startAt: index, shuffled: nil) })
+            TrackRows(session: session, tracks: tracks, play: play ?? SongTap.songs(tracks))
         }
         .obsidianList()
         .navigationTitle(title).screenTitleStyle()

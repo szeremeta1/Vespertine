@@ -60,7 +60,7 @@ private let copied: TrackSummary = {
             .playPause, .play, .pause, .next, .previous, .stop, .seek(seconds: 12), .setShuffle(on: true), .setRepeat(mode: .one),
             .jump(entry: "E1"), .removeFromQueue(entries: ["E1", "E2"]), .moveInQueue(entries: ["E2"], before: nil),
             .moveInQueue(entries: ["E2"], before: "E1"), .clearUpcoming, .playAlbum(key: "k", startAt: 2, shuffled: nil),
-            .playTracks(ids: [1, 2], startAt: 1, shuffled: true), .playPlaylist(id: 9, shuffled: false), .playNext(ids: [3]),
+            .playTracks(ids: [1, 2], startAt: 1, shuffled: true), .playPlaylist(id: 9, shuffled: false), .playPlaylist(id: 9, startAt: 2, shuffled: nil), .playNext(ids: [3]),
             .addToQueue(ids: [4]), .setFavorite(ids: [5], on: false), .albums(offset: 0, limit: 100), .albumTracks(key: "k"),
             .artists, .artistAlbums(name: "Miles Davis"), .playlists, .playlistTracks(id: 2), .favorites,
             .search(text: "blue", limit: 50), .artwork(key: "abc", size: 600), .selectOutput(uid: "u"), .selectOutput(uid: nil),
@@ -150,6 +150,18 @@ private let copied: TrackSummary = {
         #expect(try json(old) == #"{"id":7,"name":"Late","smart":false}"#)
         let new = PlaylistSummary(id: 7, name: "Late", smart: false, trackCount: 3, artworkKeys: ["a"])
         #expect(try json(new) == #"{"artworkKeys":["a"],"id":7,"name":"Late","smart":false,"trackCount":3}"#)
+    }
+
+    @Test func aPlaylistPlaysFromTheSongTappedAndAnOlderPhoneStillFromTheFirst() throws {
+        // A tapped song in a playlist says where to start (TestFlight feedback tf-7adda59b4b: it always played the first).
+        #expect(try json(ClientMessage(id: 1, command: .playPlaylist(id: 9, startAt: 3, shuffled: nil)))
+                == #"{"command":{"playPlaylist":{"id":9,"startAt":3}},"id":1}"#)
+        #expect(try roundTrip(ClientMessage(id: 1, command: .playPlaylist(id: 9, startAt: 3, shuffled: false))).command
+                == .playPlaylist(id: 9, startAt: 3, shuffled: false))
+        // The Play button and an older phone or the web remote send no `startAt`: the first song, and the same JSON as before.
+        #expect(try json(ClientMessage(id: 2, command: .playPlaylist(id: 9, shuffled: false))) == #"{"command":{"playPlaylist":{"id":9,"shuffled":false}},"id":2}"#)
+        let old = try RemoteProtocol.decoder().decode(ClientMessage.self, from: Data(#"{"id":2,"command":{"playPlaylist":{"id":9,"shuffled":true}}}"#.utf8))
+        #expect(old.command == .playPlaylist(id: 9, startAt: nil, shuffled: true))
     }
 
     @Test func theProtocolVersionIsTwoAndOneIsStillServed() {
