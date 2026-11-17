@@ -79,7 +79,8 @@ public struct RTSPParser: Sendable {
         buffer = Data(buffer[bodyEnd...])
         let parts = start.split(separator: " ", maxSplits: 2).map(String.init)
         guard parts.count >= 2 else { throw RTSPParseError.malformed }
-        if parts[0].hasPrefix("RTSP/") {
+        // Answers to pairing's POSTs come as RTSP from most receivers and as HTTP from some.
+        if parts[0].hasPrefix("RTSP/") || parts[0].hasPrefix("HTTP/") {
             guard let status = Int(parts[1]) else { throw RTSPParseError.malformed }
             return .response(status, parts.count > 2 ? parts[2] : "", headers: headers, body: body)
         }

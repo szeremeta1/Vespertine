@@ -87,6 +87,25 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private var _requiresAuthSetup = false
     private var introduced = false
 
+    /// A receiver that must be paired with (HomePod, Apple TV): it answers pairing's POSTs, seals the connection once
+    /// pairing is done, and until then refuses everything else (470).
+    var pairing: FakePairing? {
+        get { lock.withLock { _pairing } }
+        set { lock.withLock { _pairing = newValue } }
+    }
+    private var _pairing: FakePairing?
+    /// For each request in `requests`, whether it came sealed.
+    var sealed: [Bool] { lock.withLock { _sealed } }
+    private var _sealed: [Bool] = []
+    /// Keys the connection changes to once the answer under way has gone out.
+    private var nextKeys: PairingChannelKeys?
+    /// Spoil the next sealed answer (a frame that won't open).
+    var spoilNextAnswer: Bool {
+        get { lock.withLock { _spoil } }
+        set { lock.withLock { _spoil = newValue } }
+    }
+    private var _spoil = false
+
     /// The RTP times of the packets that came with the marker (the first of each stream after RECORD or FLUSH).
     var markerTimestamps: [UInt32] { lock.withLock { _markerTimestamps } }
     private var _markerTimestamps: [UInt32] = []
@@ -175,21 +194,33 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private func serve(_ fd: Int32) {
         var parser = RTSPParser()
         var buffer = [UInt8](repeating: 0, count: 65_536)
+        var channel: PairingChannel?
         defer { close(fd) }
         while true {
             let n = read(fd, &buffer, buffer.count)
             guard n > 0 else { return }
-            parser.append(Data(buffer[0..<n]))
+            var data = Data(buffer[0..<n])
+            if channel != nil {
+                guard let plain = try? channel?.open(data) else { return }
+                data = plain
+            }
+            parser.append(data)
             while let request = try? parser.next() {
-                let response = handle(request)
-                let bytes = response.encoded()
+                let response = handle(request, sealed: channel != nil)
+                var bytes = response.encoded()
+                if channel != nil {
+                    guard var out = try? channel?.seal(bytes) else { return }
+                    if lock.withLock({ defer { _spoil = false }; return _spoil }) { out[out.count - 1] ^= 1 }
+                    bytes = out
+                }
                 _ = bytes.withUnsafeBytes { write(fd, $0.baseAddress, $0.count) }
+                if let keys = lock.withLock({ defer { nextKeys = nil }; return nextKeys }) { channel = PairingChannel(keys: keys) }
             }
         }
     }
 
-    private func handle(_ request: RTSPMessage) -> RTSPMessage {
-        lock.withLock { _requests.append(request) }
+    private func handle(_ request: RTSPMessage, sealed: Bool = false) -> RTSPMessage {
+        lock.withLock { _requests.append(request); _sealed.append(sealed) }
         var cseq = request["CSeq"] ?? "0"
         if wrongCSeq.contains(request.method ?? "") { cseq = String((Int(cseq) ?? 0) + 7) }
         var headers: [(String, String)] = [("CSeq", cseq), ("Server", "AirTunes/366.0")]
@@ -207,6 +238,20 @@ final class FakeRAOPReceiver: @unchecked Sendable {
                 return .response(401, "Unauthorized", headers: headers + [("WWW-Authenticate", "Digest realm=\"raop\", nonce=\"\(nonce)\"")])
             }
             lock.withLock { nonceUses += 1 }
+        }
+        if let pairing {
+            let binary = ("Content-Type", "application/octet-stream")
+            switch (request.method ?? "", request.url ?? "") {
+            case ("POST", "/pair-pin-start"):
+                pairing.showPIN()
+                return .response(200, "OK", headers: headers)
+            case ("POST", "/pair-setup"), ("POST", "/pair-verify"):
+                let (answer, keys) = pairing.answer(path: request.url ?? "", body: request.body)
+                lock.withLock { nextKeys = keys }
+                return .response(200, "OK", headers: headers + [binary], body: answer)
+            default:
+                if !sealed { return .response(470, "Connection Authorization Required", headers: headers) }
+            }
         }
         if request.method == "POST", request.url == "/auth-setup" {
             // 0x01 (unencrypted) and a 32-byte key; the answer is the receiver's key, then a certificate and signature

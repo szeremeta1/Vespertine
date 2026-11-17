@@ -176,6 +176,19 @@ public actor RTSPConnection {
         if waiting.isEmpty { busy = false } else { waiting.removeFirst().resume() }
     }
 
+    /// Once a receiver has been paired with, everything on the connection is sealed (`PairingChannel`), both ways.
+    private var channel: PairingChannel?
+
+    /// From the next request on, the connection is sealed with `keys`. Waits its turn behind a request under way, so the
+    /// answer to that one is still read in the clear.
+    func secure(keys: PairingChannelKeys) async {
+        await acquire()
+        defer { release() }
+        channel = PairingChannel(keys: keys)
+    }
+
+    var isSecured: Bool { channel != nil }
+
     /// Sends `request` and waits for its answer.
     public func send(_ request: RTSPMessage) async throws -> RTSPMessage {
         await acquire()
@@ -185,9 +198,15 @@ public actor RTSPConnection {
 
     private func exchange(_ request: RTSPMessage) async throws -> RTSPMessage {
         let connection = self.connection
+        var bytes = request.encoded()
+        if channel != nil {
+            guard let sealed = try? channel?.seal(bytes) else { throw RAOPError.closed }
+            bytes = sealed
+        }
+        let outgoing = bytes
         try await withTimeout {
             try await withCheckedThrowingContinuation { (c: CheckedContinuation<Void, Error>) in
-                connection.send(content: request.encoded(), completion: .contentProcessed { error in
+                connection.send(content: outgoing, completion: .contentProcessed { error in
                     if error != nil { c.resume(throwing: RAOPError.closed) } else { c.resume() }
                 })
             }
@@ -201,7 +220,16 @@ public actor RTSPConnection {
                     }
                 }
             }
-            parser.append(data)
+            if channel != nil {
+                // A frame that doesn't open: the connection is of no more use (the counts on the two sides have parted).
+                guard let plain = try? channel?.open(data) else {
+                    connection.cancel()
+                    throw RAOPError.closed
+                }
+                parser.append(plain)
+            } else {
+                parser.append(data)
+            }
         }
     }
 
