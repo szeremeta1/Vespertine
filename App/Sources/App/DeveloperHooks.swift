@@ -176,10 +176,44 @@ enum DeveloperHooks {
         // top|back|side` and `-VespertineRoomSelect FL` choose the room's view and a speaker there.
         if let layout = d.string(forKey: "VespertineSpeakerGroupsDemo"), d.string(forKey: "VespertineDataDirectory") != nil {
             model.setSpeakerGroupsFeature(true)
-            let group = demoSpeakerGroup(layout, fillsRoom: d.bool(forKey: "VespertineSpeakerGroupsFill"))
+            var group = demoSpeakerGroup(layout, fillsRoom: d.bool(forKey: "VespertineSpeakerGroupsFill"))
+            // `-VespertineSpeakerGroupsPreset surround714` (a `GroupPresets.Preset`): lays it out with that preset instead, on as many
+            // pretend DACs as it takes.
+            if let preset = d.string(forKey: "VespertineSpeakerGroupsPreset").flatMap(GroupPresets.Preset.init(rawValue:)) {
+                let names = ["Fosi Audio ZD3", "FiiO K11", "Topping E30 II", "SMSL SU-1", "Schiit Modi", "iFi Zen DAC", "Cambridge DacMagic", "Topping D10s"]
+                group.members = (0..<(preset.speakerCount + 1) / 2).map { SpeakerGroup.Member(deviceUID: "demo-dac-\($0)", name: names[$0 % names.count], channelCount: 2) }
+                group = GroupPresets.apply(preset, to: group) ?? group
+            }
             model.speakerGroups?.upsert(group)
-            if d.bool(forKey: "VespertineEditSpeakerGroup"), let groups = model.speakerGroups {
+            if let part = d.string(forKey: "VespertineEditSpeakerGroup"), part == "lower" || part == "policies", let groups = model.speakerGroups {
+                // `-VespertineEditSpeakerGroup lower|policies`: the editor's sections below the room (outputs and channels, or volume and
+                // policies), which a snapshot of the editor doesn't reach.
+                showForQA(titled: "Speaker Group Editor", width: 820, height: 940, model: model) {
+                    SpeakerGroupEditorLowerHalf(groups: groups, group: group, policies: part == "policies")
+                }
+            } else if d.bool(forKey: "VespertineEditSpeakerGroup"), let groups = model.speakerGroups {
                 showForQA(titled: "Speaker Group Editor", width: 820, height: 940, model: model) { SpeakerGroupEditor(groups: groups, group: group) }
+            }
+            // `-VespertineSystemOutputPreview notInstalled|notLoaded|outdated|ready|playing|failed|approval`: draws Mac Sound Output as if
+            // its driver and helper were in that state (nothing is installed or published on a test library).
+            if let state = d.string(forKey: "VespertineSystemOutputPreview") {
+                let driver: SystemOutputModel.DriverState = switch state {
+                case "notInstalled": .notInstalled
+                case "notLoaded": .notLoaded
+                case "outdated": .outdated
+                default: .ready
+                }
+                var status: SystemOutputStatus?
+                if ["ready", "playing", "failed", "approval"].contains(state) {
+                    model.systemOutput.setChoice(SystemOutputChoice(published: true, layout: .automatic, stereo: state == "playing" ? .upmix : .asGroup), for: group.id)
+                    let row: [String: Any] = ["groupID": group.id.uuidString, "name": group.name, "state": state == "approval" ? "ready" : state, "isDefault": state == "playing",
+                                              "sampleRate": 48_000, "latencyMs": 21, "message": "The FiiO K11 is not connected."]
+                    let whole: [String: Any] = ["driverLoaded": true, "groups": [row], "menuBarItem": true, "updated": "2026-01-01T00:00:00Z"]
+                    let decoder = JSONDecoder()
+                    decoder.dateDecodingStrategy = .iso8601
+                    status = (try? JSONSerialization.data(withJSONObject: whole)).flatMap { try? decoder.decode(SystemOutputStatus.self, from: $0) }
+                }
+                model.systemOutput.previewForQA(driver: driver, helper: state == "approval" ? .needsApproval : (driver == .ready ? .on : .off), status: status)
             }
             if d.bool(forKey: "VespertineSpeakerGroupsSettings") {
                 showForQA(titled: "Speaker Groups Settings", width: 560, height: 760, model: model) {
@@ -547,5 +581,28 @@ enum DeveloperHooks {
         NSApp.terminate(nil)
         try? await Task.sleep(for: .seconds(3))
         exit(0)
+    }
+}
+
+/// QA only (`-VespertineEditSpeakerGroup lower|policies`): the speaker group editor's sections under the room, as the editor shows them.
+private struct SpeakerGroupEditorLowerHalf: View {
+    let groups: SpeakerGroupsModel
+    @State var group: SpeakerGroup
+    var policies = false
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                if policies {
+                    MemberVolumeView(group: group)
+                    SpeakerPoliciesView(group: $group)
+                } else {
+                    GroupOutputsView(group: $group)
+                    ChannelMapGrid(group: $group)
+                }
+            }
+            .padding(20)
+        }
+        .onChange(of: group) { _, new in groups.upsert(new) }
     }
 }

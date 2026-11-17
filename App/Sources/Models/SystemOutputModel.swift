@@ -53,6 +53,9 @@ final class SystemOutputModel {
     /// Tests: stands in for `setHelperRunning` (the real one asks macOS's service manager, and registers a launch agent).
     @ObservationIgnored var helperRunner: ((Bool) -> Void)?
 
+    /// QA only: the Settings section is drawn as if the driver and the helper were in a state (`previewForQA`), on a test library.
+    private(set) var preview = false
+
     static let choicesKey = "systemOutputChoices"
     static let menuBarKey = "systemOutputMenuBarItem"
     static let helperBundleSuffix = ".SoundHelper"
@@ -71,6 +74,16 @@ final class SystemOutputModel {
         observer = DistributedNotificationCenter.default().addObserver(forName: SystemOutputHandOff.statusChanged, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated { self?.readStatus() }
         }
+    }
+
+    /// QA only, and only on a test library, where nothing is installed, registered or published: shows the section in that state so it
+    /// can be looked at. The buttons still do nothing there.
+    func previewForQA(driver: DriverState, helper: HelperState, status: SystemOutputStatus?) {
+        guard isolated else { return }
+        preview = true
+        self.driver = driver
+        self.helper = helper
+        self.status = status
     }
 
     // MARK: Choices

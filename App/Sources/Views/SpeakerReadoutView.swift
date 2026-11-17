@@ -14,11 +14,13 @@ struct SpeakerPresetMenu: View {
         let presets = GroupPresets.available(for: group)
         Menu {
             ForEach(presets) { preset in
+                // The surround layouts under a line of their own.
+                if preset == .itu51 { Divider() }
                 Button { if let laid = GroupPresets.apply(preset, to: group) { group = laid } } label: { Text(verbatim: preset.title) }
             }
         } label: { Text("Lay out with a preset…") }
         .disabled(presets.isEmpty)
-        .help(presets.isEmpty ? Text("A preset needs at least four channels.") : Text("Places the speakers on the channels in order, around the seat."))
+        .help(Text("Places the speakers on the channels in order, around the seat."))
     }
 }
 

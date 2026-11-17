@@ -43,15 +43,26 @@ struct SystemOutputTests {
         #expect(SystemOutputLayout.automatic(for: group([(.frontLeft, -30), (.frontRight, 30), (.wideLeft, -60), (.wideRight, 60)])) == .surround916)
     }
 
-    @Test("A new group starts laid out: ITU 5.1 on six channels or more, a quad on four or five, nothing on fewer")
+    @Test("A new group starts laid out with the largest usual layout its channels hold: stereo on two, a quad on four, 5.1 on six, up to 9.1.6 on sixteen")
     func startingPresets() {
         func made(_ counts: [Int]) -> SpeakerGroup {
             SpeakerGroup(id: UUID(), name: "New", members: counts.enumerated().map { SpeakerGroup.Member(deviceUID: "dac\($0.offset)", name: "DAC", channelCount: $0.element) },
                          clockLeaderUID: "dac0")
         }
-        #expect(GroupPresets.startingPreset(for: made([1, 1])) == nil)
+        #expect(GroupPresets.startingPreset(for: made([1])) == nil)
+        #expect(GroupPresets.startingPreset(for: made([1, 1])) == .stereo)
+        #expect(GroupPresets.startingPreset(for: made([2, 1])) == .stereo)
         #expect(GroupPresets.startingPreset(for: made([2, 2])) == .quad)
         #expect(GroupPresets.startingPreset(for: made([2, 2, 2])) == .itu51)
+        #expect(GroupPresets.startingPreset(for: made([8])) == .surround71)
+        #expect(GroupPresets.startingPreset(for: made([8, 2])) == .surround514)
+        #expect(GroupPresets.startingPreset(for: made([8, 2, 2])) == .surround714)
+        #expect(GroupPresets.startingPreset(for: made([16])) == .surround916)
+        for counts in [[1, 1], [2, 2], [2, 2, 2], [4, 4], [8, 2], [8, 2, 2], [8, 8]] {
+            let group = made(counts)
+            let placed = GroupPresets.startingPreset(for: group).flatMap { GroupPresets.apply($0, to: group) }
+            #expect(placed?.isValid == true, "\(counts)")
+        }
         let quad = GroupPresets.apply(.quad, to: made([2, 2]))
         #expect(quad?.speakers.map(\.role) == [.frontLeft, .frontRight, .backLeft, .backRight])
         #expect(quad.map { SystemOutputLayout.automatic(for: $0) } == .surround71)
