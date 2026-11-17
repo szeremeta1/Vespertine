@@ -81,7 +81,7 @@ struct RemoteView: View {
             .navigationSplitViewColumnWidth(min: sidebar.min, ideal: sidebar.ideal, max: sidebar.max)
             .toolbar {
                 ToolbarItem(placement: .bottomBar) {
-                    Button("Libraries", systemImage: "music.note.house") { model.leave() }
+                    Button("Libraries", systemImage: "music.note.house") { model.leave() }.labelStyle(.titleAndIcon)
                 }
             }
         } detail: {
