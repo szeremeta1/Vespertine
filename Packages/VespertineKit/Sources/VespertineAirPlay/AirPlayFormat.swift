@@ -67,6 +67,13 @@ public struct AirPlayFormat: Sendable, Equatable, Hashable {
         return abs(rate - times * base) <= 0.5
     }
 
+    /// What the receiver plays behind real time, in frames: two seconds, as at 44.1 kHz (`RAOPTiming.latencyFrames`).
+    public var latencyFrames: UInt32 { UInt32(sampleRate) * 2 }
+    /// What a sync packet says of it: the quarter second receivers always add taken off.
+    var syncLatencyFrames: UInt32 { UInt32(sampleRate) * 7 / 4 }
+    /// The least a receiver may hold before it plays, in frames: a quarter second.
+    var latencyMin: Int { sampleRate / 4 }
+
     /// The ALAC configuration of 352-frame packets in this format.
     public var alac: ALACConfig {
         var config = ALACConfig()
@@ -74,6 +81,27 @@ public struct AirPlayFormat: Sendable, Equatable, Hashable {
         config.sampleRate = UInt32(sampleRate)
         return config
     }
+}
+
+/// What a session would send if the receiver takes it: enough of the first song to choose a format by.
+public struct AirPlayWish: Sendable, Equatable {
+    /// The song's own rate.
+    public var sourceRate: Double
+    /// 16 bits would lose something (a deeper source, or samples the chain changes).
+    public var wantsDepth: Bool
+
+    public init(sourceRate: Double, wantsDepth: Bool) {
+        self.sourceRate = sourceRate
+        self.wantsDepth = wantsDepth
+    }
+
+    /// The format for a receiver that takes `accepted`.
+    public func format(accepted: [AirPlayFormat]) -> AirPlayFormat {
+        AirPlayFormat.choose(sourceRate: sourceRate, wantsDepth: wantsDepth, accepted: accepted)
+    }
+
+    /// Nothing but 16-bit at 44.1 kHz would be chosen whatever the receiver takes: there is nothing to ask it.
+    public var isPlain: Bool { format(accepted: AirPlayFormat.all) == .cd }
 }
 
 extension AirPlay2Message {

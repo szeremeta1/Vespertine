@@ -46,6 +46,8 @@ public final class RAOPSession: @unchecked Sendable {
     private let password: String?
     private let pairing: AirPlay2Pairing
     private let sender: AirPlay2Sender
+    /// AirPlay 2: what would be sent if the receiver says it takes it (nil: 16-bit at 44.1 kHz, and nothing is asked).
+    private let wish: AirPlayWish?
     /// An AirPlay 2 session: paired first, set up with property lists, its audio sealed, kept open with /feedback.
     private var usesPairing: Bool { if case .none = pairing { false } else { true } }
     private let log = Logger(subsystem: "org.szeremeta.vespertine.player", category: "airplay")
@@ -62,6 +64,8 @@ public final class RAOPSession: @unchecked Sendable {
         var events: NWConnection?
         /// AirPlay 2: the key each audio packet is sealed with.
         var audioKey: SymmetricKey?
+        /// AirPlay 2, a stream in another format than 16-bit at 44.1 kHz: Apple's encoder for it.
+        var streamEncoder: ALACEncoder?
         var keepAlive: Task<Void, Never>?
         var localAddress = "0.0.0.0"
         var aesKey = Data()
@@ -75,6 +79,8 @@ public final class RAOPSession: @unchecked Sendable {
 
     private struct State {
         var connected = false
+        /// What the audio packets hold: 16-bit at 44.1 kHz unless an AirPlay 2 receiver said it takes more and took it.
+        var format = AirPlayFormat.cd
         var host = ""
         var ports = RAOPTransport(server: 0, control: 0, timing: nil)
         var session: String?
@@ -126,12 +132,15 @@ public final class RAOPSession: @unchecked Sendable {
     }
 
     /// `pairing`: for a receiver that must be paired with; the session is then an AirPlay 2 one, and `encryption`,
-    /// `rsaKey` and `authSetup` play no part. `sender`: this Mac as such a receiver is told of it.
+    /// `rsaKey` and `authSetup` play no part. `sender`: this Mac as such a receiver is told of it. `wish`: what to send
+    /// such a receiver if it says it takes it; without one, or for one that 16-bit at 44.1 kHz serves as well, the
+    /// receiver is asked nothing and gets that.
     init(name: String, endpoint: NWEndpoint, encryption: RAOPEncryption, rsaKey: SecKey? = nil, authSetup: Bool = false,
-         password: String? = nil, pairing: AirPlay2Pairing, sender: AirPlay2Sender) {
+         password: String? = nil, pairing: AirPlay2Pairing, sender: AirPlay2Sender, wish: AirPlayWish? = nil) {
         self.name = name
         self.pairing = pairing
         self.sender = sender
+        self.wish = wish
         self.password = password.flatMap { $0.isEmpty ? nil : $0 }
         self.endpoint = endpoint
         self.encryption = encryption
@@ -150,7 +159,10 @@ public final class RAOPSession: @unchecked Sendable {
     }
 
     public var isConnected: Bool { state.withLock { $0.connected } }
-    public var usesAppleEncoder: Bool { encoder != nil }
+    public var usesAppleEncoder: Bool { format == .cd ? encoder != nil : parts.withLock { $0.streamEncoder != nil } }
+    /// What the audio packets hold. Settled by `connect`: 16-bit at 44.1 kHz before it, and after it unless the
+    /// receiver said it takes the format wished for and then took it.
+    public var format: AirPlayFormat { state.withLock { $0.format } }
     /// Packets sent again on the receiver's request.
     public var resentPackets: Int { state.withLock { $0.resent } }
 
@@ -257,6 +269,14 @@ public final class RAOPSession: @unchecked Sendable {
     /// AirPlay 2's way to the same place as OPTIONS, ANNOUNCE and SETUP: pairing (which seals the connection), a SETUP that
     /// introduces this Mac and is answered with the event port, the event connection, and a SETUP for the audio.
     private func setUpPaired(_ rtsp: RTSPConnection, host: String) async throws {
+        // What the receiver takes is asked before pairing, in the clear, as it answers anyone; and only when there is
+        // something to gain by it. No answer, or one that doesn't list the format, leaves 16-bit at 44.1 kHz.
+        var format = AirPlayFormat.cd
+        if let wish, !wish.isPlain {
+            let info = try? await request("GET", url: "/info")
+            let accepted = info.flatMap { AirPlay2Message.acceptedFormats(info: $0.body) } ?? []
+            format = wish.format(accepted: accepted)
+        }
         let exchange = PairingExchange(connection: rtsp, cseq: state.withLock { $0.cseq })
         let secret: Data
         switch pairing {
@@ -277,9 +297,25 @@ public final class RAOPSession: @unchecked Sendable {
         guard let eventPort = AirPlay2Message.eventPort(in: introduced.body) else { throw RAOPError.badResponse("SETUP") }
         let events = try await Self.openEvents(host: host, port: eventPort)
         parts.withLock { $0.events = events }
-        let stream = try await request("SETUP", headers: plist, body: AirPlay2Message.streamSetup(controlPort: control.port, key: audioKey, connectionID: sessionID))
+        let stream: RTSPMessage
+        do {
+            stream = try await request("SETUP", headers: plist, body: AirPlay2Message.streamSetup(controlPort: control.port, key: audioKey,
+                                                                                                 connectionID: sessionID, format: format))
+        } catch RAOPError.refused(_, let status) where format != .cd {
+            // It listed the format and then refused it: the stream every receiver takes.
+            let refused = format
+            log.info("AirPlay \(self.name, privacy: .public) refused \(refused.bitDepth)-bit at \(refused.sampleRate) Hz (\(status)); sending 16-bit at 44.1 kHz")
+            format = .cd
+            stream = try await request("SETUP", headers: plist, body: AirPlay2Message.streamSetup(controlPort: control.port, key: audioKey,
+                                                                                                 connectionID: sessionID))
+        }
         guard let ports = AirPlay2Message.streamPorts(in: stream.body) else { throw RAOPError.badResponse("SETUP") }
-        state.withLock { $0.ports = RAOPTransport(server: ports.data, control: ports.control, timing: nil) }
+        let chosen = format
+        // Apple's encoder for the format if it can be had; the verbatim frame otherwise (lossless either way).
+        var streamEncoder: ALACEncoder?
+        if chosen != .cd { streamEncoder = try? ALACEncoder(config: chosen.alac) }
+        parts.withLock { $0.streamEncoder = streamEncoder }
+        state.withLock { $0.ports = RAOPTransport(server: ports.data, control: ports.control, timing: nil); $0.format = chosen }
     }
 
     /// The event connection, open and being read (what arrives is sealed, and dropped unread).
@@ -418,7 +454,7 @@ public final class RAOPSession: @unchecked Sendable {
             // Signed: before the anchor (the packets sent ahead of the clock) the frame being "sent now" is behind it.
             let elapsed = Int64(bitPattern: nanoseconds &- anchor.nanos)
             // In Double: an Int64 product would overflow after about 58 hours on one anchor.
-            let frames = Int64((Double(elapsed) * Double(RAOPTiming.sampleRate) / 1e9).rounded(.down))
+            let frames = Int64((Double(elapsed) * Double(s.format.sampleRate) / 1e9).rounded(.down))
             return anchor.rtp &+ UInt32(truncatingIfNeeded: frames)
         }
     }
@@ -427,8 +463,21 @@ public final class RAOPSession: @unchecked Sendable {
     /// (when its first frame counts as sent) and goes with a first sync packet.
     @discardableResult
     public func send(_ samples: [Int16], startNanos: UInt64 = NTPClock.nanosecondsNow()) -> Bool {
+        send(samples: samples.map { Int32($0) }, startNanos: startNanos)
+    }
+
+    /// The same for samples of the session's `format`: each a value of its depth (what `AirPlayFrames.nextSamples` gives
+    /// for that format).
+    @discardableResult
+    public func send(samples: [Int32], startNanos: UInt64 = NTPClock.nanosecondsNow()) -> Bool {
+        let format = self.format
+        let encoder = format == .cd ? self.encoder : parts.withLock { $0.streamEncoder }
         var payload: Data
-        if let encoder, let encoded = try? encoder.encode(samples) { payload = encoded } else { payload = ALACVerbatim.encode(samples) }
+        if let encoder, let encoded = try? encoder.encode(samples: samples) {
+            payload = encoded
+        } else {
+            payload = ALACVerbatim.encode(samples: samples, bitDepth: format.bitDepth)
+        }
         if encryption == .rsa, !usesPairing {
             let (key, iv) = parts.withLock { ($0.aesKey, $0.aesIV) }
             guard (try? AESCBC.apply(&payload, key: key, iv: iv, encrypt: true)) != nil else { return false }
@@ -461,8 +510,8 @@ public final class RAOPSession: @unchecked Sendable {
     public func sendSync(first: Bool = false) {
         let nanos = NTPClock.nanosecondsNow()
         guard let rtp = clockTimestamp(nanoseconds: nanos) else { return }
-        let (host, port) = state.withLock { ($0.host, $0.ports.control) }
-        control?.send(RAOPPacket.sync(rtpNow: rtp, ntp: NTPClock.ntp(nanoseconds: nanos), first: first), to: host, port: port)
+        let (host, port, latency) = state.withLock { ($0.host, $0.ports.control, $0.format.syncLatencyFrames) }
+        control?.send(RAOPPacket.sync(rtpNow: rtp, ntp: NTPClock.ntp(nanoseconds: nanos), first: first, latency: latency), to: host, port: port)
     }
 
     private func answerTiming(_ data: Data, from: String, port: UInt16) {

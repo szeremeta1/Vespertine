@@ -17,7 +17,7 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private let listener: Int32
     private let lock = NSLock()
     private var _requests: [RTSPMessage] = []
-    private var _packets: [UInt32: [Int16]] = [:]
+    private var _packets: [UInt32: [Int32]] = [:]
     private var _firstTimestamp: UInt32?
     private var _syncs: [Data] = []
     private var _timingReplies: [Data] = []
@@ -113,6 +113,21 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private var audioKey: SymmetricKey?
     var unopened: Int { lock.withLock { _unopened } }
     private var _unopened = 0
+    /// AirPlay 2: what GET /info is answered with, to anyone, paired or not (nil: no such answer, as before).
+    var info: [String: Any]? {
+        get { lock.withLock { _info } }
+        set { lock.withLock { _info = newValue } }
+    }
+    private var _info: [String: Any]?
+    /// AirPlay 2: stream formats (their `audioFormat` bits) refused with 415 though listed.
+    var refusedFormats: Set<Int> {
+        get { lock.withLock { _refusedFormats } }
+        set { lock.withLock { _refusedFormats = newValue } }
+    }
+    private var _refusedFormats: Set<Int> = []
+    /// AirPlay 2: the format of the stream that was set up.
+    var streamFormat: AirPlayFormat? { lock.withLock { _streamFormat } }
+    private var _streamFormat: AirPlayFormat?
     /// AirPlay 2: answer the first SETUP without an event port.
     var withholdEventPort = false
 
@@ -216,8 +231,11 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     var markers: Int { lock.withLock { _markers } }
     var resent: Int { lock.withLock { _resent } }
     var packetCount: Int { lock.withLock { _packets.count } }
-    /// Every frame received, in RTP order.
-    var samples: [Int16] {
+    /// Every frame received, in RTP order (a 16-bit stream's).
+    var samples: [Int16] { deepSamples.map { Int16(truncatingIfNeeded: $0) } }
+
+    /// Every frame received, in RTP order, each sample a value of the stream's depth.
+    var deepSamples: [Int32] {
         lock.withLock {
             guard let first = _firstTimestamp else { return [] }
             return _packets.sorted { ($0.key &- first) < ($1.key &- first) }.flatMap(\.value)
@@ -229,6 +247,7 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         lock.withLock {
             guard let first = _firstTimestamp else { return [] }
             return _packets.filter { ($0.key &- first) >= (timestamp &- first) }.sorted { ($0.key &- first) < ($1.key &- first) }.flatMap(\.value)
+                .map { Int16(truncatingIfNeeded: $0) }
         }
     }
 
@@ -302,6 +321,9 @@ final class FakeRAOPReceiver: @unchecked Sendable {
             }
             lock.withLock { nonceUses += 1 }
         }
+        if request.method == "GET", request.url == "/info", let info {
+            return .response(200, "OK", headers: headers + [("Content-Type", AirPlay2Message.contentType)], body: AirPlay2Message.encode(info))
+        }
         if let pairing {
             let binary = ("Content-Type", "application/octet-stream")
             switch (request.method ?? "", request.url ?? "") {
@@ -341,6 +363,11 @@ final class FakeRAOPReceiver: @unchecked Sendable {
             lock.withLock { _setups.append(said) }
             let plist = ("Content-Type", AirPlay2Message.contentType)
             if let stream = (said["streams"] as? [[String: Any]])?.first {
+                // The format it names decides how the packets decode; one this receiver is set to refuse is refused.
+                let named = stream["audioFormat"] as? Int ?? AirPlay2Message.alacFormat
+                guard !refusedFormats.contains(named), let format = AirPlayFormat.all.first(where: { $0.streamFormat == named }) else {
+                    return .response(415, "Unsupported Media Type", headers: headers)
+                }
                 // The stream: its key, and where this receiver takes audio and control packets.
                 guard let key = stream["shk"] as? Data, key.count == 32, let port = stream["controlPort"] as? Int,
                       let audio = try? UDPSocket(bind: "127.0.0.1"), let control = try? UDPSocket(bind: "127.0.0.1") else {
@@ -349,7 +376,8 @@ final class FakeRAOPReceiver: @unchecked Sendable {
                 lock.withLock {
                     audioKey = SymmetricKey(data: key)
                     clientControl = UInt16(port)
-                    decoder = try? ALACDecoder(config: ALACConfig())
+                    _streamFormat = format
+                    decoder = try? ALACDecoder(config: format.alac)
                     sockets += [audio, control]
                     controlSocket = control
                 }
@@ -459,7 +487,7 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         let (key, iv, decoder) = lock.withLock { (aesKey, aesIV, self.decoder) }
         if let key, let iv { try? AESCBC.apply(&payload, key: key, iv: iv, encrypt: false) }
         // The audio and control threads both decode: one at a time.
-        let samples = decodeLock.withLock { try? decoder?.decode(payload) }
+        let samples = decodeLock.withLock { try? decoder?.decode(samples: payload) }
         lock.withLock {
             if marked { _markers += 1; _markerTimestamps.append(packet.timestamp) }
             guard let samples else { return }
