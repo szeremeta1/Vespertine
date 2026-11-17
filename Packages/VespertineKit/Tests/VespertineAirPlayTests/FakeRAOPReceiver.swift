@@ -441,12 +441,16 @@ final class FakeRAOPReceiver: @unchecked Sendable {
             guard let plain = RAOPPacket.parseAudio(data) else { return }
             packet = plain
         }
+        // A packet's marker is counted in the same moment its audio is kept (below), never before: a test that waits for the
+        // marker and then reads the audio must find it. Only a packet lost on purpose, whose audio is not kept, counts here.
+        let marked = !resent && data[data.startIndex + 1] == 0xE0
         let lost = lock.withLock { () -> Bool in
-            if !resent, data[data.startIndex + 1] == 0xE0 { _markers += 1; _markerTimestamps.append(packet.timestamp) }
             if !resent { received += 1 }
-            if !resent, _drop.contains(packet.seq) { _drop.remove(packet.seq); return true }
-            if !resent, let l = loseAfter, received > l.count, received <= l.count + l.lose { return true }
-            return false
+            var lost = false
+            if !resent, _drop.contains(packet.seq) { _drop.remove(packet.seq); lost = true }
+            else if !resent, let l = loseAfter, received > l.count, received <= l.count + l.lose { lost = true }
+            if lost, marked { _markers += 1; _markerTimestamps.append(packet.timestamp) }
+            return lost
         }
         if lost {
             let (control, port) = lock.withLock { (controlSocket, clientControl) }
@@ -457,8 +461,10 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         let (key, iv, decoder) = lock.withLock { (aesKey, aesIV, self.decoder) }
         if let key, let iv { try? AESCBC.apply(&payload, key: key, iv: iv, encrypt: false) }
         // The audio and control threads both decode: one at a time.
-        guard let samples = decodeLock.withLock({ try? decoder?.decode(payload) }) else { return }
+        let samples = decodeLock.withLock { try? decoder?.decode(payload) }
         lock.withLock {
+            if marked { _markers += 1; _markerTimestamps.append(packet.timestamp) }
+            guard let samples else { return }
             if _firstTimestamp == nil { _firstTimestamp = packet.timestamp }
             if resent { _resent += 1 }
             _packets[packet.timestamp] = samples
