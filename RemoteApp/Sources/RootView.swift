@@ -232,6 +232,9 @@ struct MacsView: View {
             Text("A remote for Vespertine on your Mac, and a player in its own right.")
                 .font(.footnote).foregroundStyle(Palette.text2)
                 .multilineTextAlignment(.center)
+                // Two lines on a phone: without this the row held it to one and cut both ends off.
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 24)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 12).padding(.bottom, 8)
