@@ -169,6 +169,11 @@ public final class PhonePlayer {
     /// Seconds of audio decoded ahead of what is being heard: what plays on if the Mac went away now.
     public var decodedAhead: Double { pump.ahead() }
 
+    /// Returns once any fill already running on the decoding queue has handed its buffers to the output. `decodedAhead` counts a
+    /// buffer a moment before it is handed over, so a test that waits on it and then renders must settle first, or a slow machine
+    /// renders silence where the last buffer was about to be. Never called from the decoding queue.
+    func settle() { pump.queue.sync {} }
+
     /// Where the song is, in seconds.
     public var position: Double {
         if state == .paused, let held { return held }
