@@ -30,25 +30,16 @@ actor PairingExchange {
         _ = try await post("/pair-pin-start", transient: false)
     }
 
-<<<<<<< HEAD
     /// Pairs with a receiver that asks for no PIN and seals the connection; gives the session's secret. `secret`: SRP's
     /// private number (random unless a test gives one).
     @discardableResult
     func withoutPIN(secret: Data? = nil) async throws -> Data {
-=======
-    /// Pairs with a receiver that asks for no PIN and seals the connection. `secret`: SRP's private number (random unless
-    /// a test gives one).
-    func withoutPIN(secret: Data? = nil) async throws {
->>>>>>> origin/main
         var setup = PairSetup.withoutPIN(secret: secret)
         let m2 = try await post("/pair-setup", transient: true, body: setup.start)
         let m4 = try await post("/pair-setup", transient: true, body: try setup.proof(answering: m2))
         let key = try setup.finish(answering: m4)
         await connection.secure(keys: .control(secret: key))
-<<<<<<< HEAD
         return key
-=======
->>>>>>> origin/main
     }
 
     /// Pairs for good with a receiver whose screen shows `pin`: gives its name and key, to keep with `identity`. The
@@ -63,25 +54,16 @@ actor PairingExchange {
     }
 
     /// Proves to a receiver paired with before that this is the same Mac, checks that it is the same receiver, and seals
-<<<<<<< HEAD
     /// the connection; gives the session's secret.
     @discardableResult
     func verify(identity: PairingIdentity, receiver: PairedReceiver,
                 seed: Data = Curve25519.KeyAgreement.PrivateKey().rawRepresentation) async throws -> Data {
-=======
-    /// the connection.
-    func verify(identity: PairingIdentity, receiver: PairedReceiver,
-                seed: Data = Curve25519.KeyAgreement.PrivateKey().rawRepresentation) async throws {
->>>>>>> origin/main
         var verify = PairVerify(identity: identity, receiver: receiver, seed: seed)
         let m2 = try await post("/pair-verify", transient: false, body: verify.start)
         let m4 = try await post("/pair-verify", transient: false, body: try verify.proof(answering: m2))
         let secret = try verify.finish(answering: m4)
         await connection.secure(keys: .control(secret: secret))
-<<<<<<< HEAD
         return secret
-=======
->>>>>>> origin/main
     }
 
     /// One POST; the answer's body. `X-Apple-HKP` says which kind of pairing the sender is doing (3: with a PIN, and
