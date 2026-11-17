@@ -139,8 +139,11 @@ public final class AirPlayDiscovery: @unchecked Sendable {
         }
         for r in results where r.service.type.hasPrefix(AirPlayServiceType.airplay) {
             guard let record = AirPlayRecord.parse(serviceName: r.service.name, txt: r.txt) else { continue }
-            if byID[record.deviceID] != nil { byID[record.deviceID]?.airplay = record } else {
-                byID[record.deviceID] = AirPlayDevice(deviceID: record.deviceID, name: record.name, raop: nil, airplay: record)
+            if byID[record.deviceID] != nil {
+                byID[record.deviceID]?.airplay = record
+                byID[record.deviceID]?.airplayService = r.service
+            } else {
+                byID[record.deviceID] = AirPlayDevice(deviceID: record.deviceID, name: record.name, raop: nil, airplay: record, airplayService: r.service)
             }
         }
         return byID.values.filter { $0.name != excluded }
