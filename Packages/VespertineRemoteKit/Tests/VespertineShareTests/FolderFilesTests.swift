@@ -72,7 +72,7 @@ private final class Counting: ShareFiles, @unchecked Sendable {
         try put(SongFixtures.wav, "Loose/Wave Album/Wave.wav", in: root)
         try put(SongFixtures.aiff, "Loose/Aiff Album/Aiff.aiff", in: root)
         try put(SongFixtures.cover, "Loose/Aiff Album/cover.jpg", in: root)
-        try put(Data("DSD ".utf8), "Loose/sacd.dsf", in: root)
+        try put(Data("DTS ".utf8), "Loose/film.dts", in: root)
         try put(Data("notes".utf8), "Loose/notes.txt", in: root)
         try put(SongFixtures.flac2496, "Loose/.hidden.flac", in: root)
         return root
@@ -384,9 +384,9 @@ private final class Counting: ShareFiles, @unchecked Sendable {
     @Test func aFileThePhoneCantOpenItselfIsRefusedNotCopied() throws {
         let own = try scratch("Documents")
         let elsewhere = try scratch("Downloads")
-        try put(Data("DSD ".utf8), "sacd.dsf", in: elsewhere)
+        try put(Data("DTS ".utf8), "film.dts", in: elsewhere)
         try put(Data("pdf".utf8), "booklet.pdf", in: elsewhere)
-        #expect(OpenedFiles.take(elsewhere.appendingPathComponent("sacd.dsf"), into: own) == .notPlayable)
+        #expect(OpenedFiles.take(elsewhere.appendingPathComponent("film.dts"), into: own) == .notPlayable)
         #expect(OpenedFiles.take(elsewhere.appendingPathComponent("booklet.pdf"), into: own) == .notPlayable)
         #expect(OpenedFiles.take(elsewhere.appendingPathComponent("gone.flac"), into: own) == .failed)
         #expect(!OpenedFiles.holdsAnything(own))

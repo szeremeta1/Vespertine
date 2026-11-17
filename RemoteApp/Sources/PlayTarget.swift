@@ -152,6 +152,9 @@ final class PlayTarget {
         if signal.cut {
             return String(localized: "CUT ON THE MAC", comment: "Signal badge on the iPhone: the song is one track cut out of a longer lossless file (a CUE sheet album) by the Mac, with its sound unchanged. Same style as CONVERTED ON THE MAC.")
         }
+        if signal.convertedHere {
+            return String(localized: "CONVERTED ON THIS DEVICE", comment: "Signal badge on the iPhone or iPad (short, uppercase): the song is a DSD file that this device converted to PCM itself, with no Mac involved. Same style as CONVERTED ON THE MAC.")
+        }
         if signal.converted {
             return String(localized: "CONVERTED ON THE MAC", comment: "Signal badge: the Mac converted this song to a format the iPhone can play.")
         }

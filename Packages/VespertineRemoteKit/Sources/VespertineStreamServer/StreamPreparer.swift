@@ -90,6 +90,9 @@ public actor StreamPreparer {
         let plan = StreamPlanner.plan(facts, maxSampleRate: maxSampleRate, smaller: smaller, dop: dop)
         guard let kind = plan.kind, var delivered = plan.delivered else { return .failed(plan.macOnlyReason ?? StreamWords.say(.cannotStream)) }
         switch kind {
+        case .pcm:
+            // The phone's own way with a file it reads itself: a Mac never plans it.
+            return .failed(StreamWords.say(.cannotStream))
         case .original:
             let url = facts.url
             guard let handle = StreamFile(url) else { return .failed(StreamWords.say(.cannotReadNow)) }

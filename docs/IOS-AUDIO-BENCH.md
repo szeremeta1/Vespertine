@@ -140,6 +140,9 @@ knob down first.
 12. With either of those badges showing, each of these must bring back plain **ORIGINAL FILE** within a second or so: one step down
     on the phone's volume; unplugging the DAC so the speaker or AirPods take over; a song at a rate the DAC won't run at (Resampled by
     iOS: Yes). Back at 100% on the DAC at the song's rate, the stronger badge returns.
+13. From an SMB share, no Mac involved (Your Shares): play a DSD64 `.dsf` or `.dff` on the DAC that passed. Expect **NATIVE DSD · DoP**
+    and the DAC showing DSD64. Unplug the DAC and play it on the phone's speaker: expect **CONVERTED ON THIS DEVICE**, clean sound at a
+    normal level, and seeking that lands where asked. Any hiss or noise is a FAIL.
 
 | DAC | 176.4 kHz | 192 kHz | 352.8 kHz | 384 kHz | Date, device, iOS, build |
 |---|---|---|---|---|---|

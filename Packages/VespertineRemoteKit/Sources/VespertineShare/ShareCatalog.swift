@@ -94,8 +94,8 @@ public struct ShareCatalog: Sendable {
             albums.append(Album(
                 summary: AlbumSummary(key: key, title: first.album, artist: first.albumArtist, year: members.compactMap(\.song.tags.year).min(),
                                       trackCount: ids.count, duration: total, format: Self.format(best), artworkKey: artworkKey,
-                                      hiRes: AlbumFilter.countsAsHiRes(aboveCD: aboveCD, dsd: false, maxSampleRate: best.sampleRate),
-                                      dsd: false, multichannel: members.contains { $0.song.tags.channels > 2 }),
+                                      hiRes: AlbumFilter.countsAsHiRes(aboveCD: aboveCD, dsd: best.dsd != nil, maxSampleRate: best.sampleRate),
+                                      dsd: best.dsd != nil, multichannel: members.contains { $0.song.tags.channels > 2 }),
                 tracks: ids, genre: members.lazy.compactMap(\.song.tags.genre).first, newest: members.map(\.song.modified).max() ?? .distantPast))
         }
         func before(_ a: String, _ b: String) -> ComparisonResult { a.compare(b, options: [.caseInsensitive, .diacriticInsensitive, .numeric]) }
@@ -118,7 +118,11 @@ public struct ShareCatalog: Sendable {
     /// "FLAC · 24/96", "MP3 · 320k", "FLAC · 24/96 · 5.1": the Mac's words for a format.
     public static func format(_ tags: SongTags) -> String {
         var text = tags.codec
-        if let depth = tags.bitDepth {
+        if tags.dsd != nil {
+            // "DSD64", "DSD128": the rate as a multiple of a CD's (the 48 kHz family is named the same way).
+            let base = tags.sampleRate.truncatingRemainder(dividingBy: 44_100) == 0 ? 44_100.0 : 48_000.0
+            text += String(Int((tags.sampleRate / base).rounded()))
+        } else if let depth = tags.bitDepth {
             let rate = tags.sampleRate.truncatingRemainder(dividingBy: 1000) == 0 ? String(Int(tags.sampleRate / 1000))
                 : String((tags.sampleRate / 100).rounded() / 10)
             text += " · \(depth)/\(rate)"
@@ -136,7 +140,8 @@ public struct ShareCatalog: Sendable {
     }
 
     private static func weight(_ tags: SongTags) -> Double {
-        (tags.lossless ? 1e9 : 0) + tags.sampleRate * Double(tags.bitDepth ?? 1)
+        if tags.dsd != nil { return 2e9 + tags.sampleRate }
+        return (tags.lossless ? 1e9 : 0) + tags.sampleRate * Double(tags.bitDepth ?? 1)
     }
 
     /// "03 Night Ferry.flac" → ("Night Ferry", 3); "1-07 - Lanterns.m4a" → ("Lanterns", 7).

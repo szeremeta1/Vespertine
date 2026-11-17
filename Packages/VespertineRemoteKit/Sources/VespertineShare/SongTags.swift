@@ -1,7 +1,8 @@
 //
 // Vespertine: what a song file says about itself (its tags, its format, its length, where its cover is), read with as
 // few and as small reads as the file allows: a share is on the far side of a network, and a library has thousands of
-// files. Covers the kinds of file the phone opens itself: FLAC, ALAC and AAC in MPEG-4, WAV, AIFF and MP3.
+// files. Covers the kinds of file the phone opens itself: FLAC, ALAC and AAC in MPEG-4, WAV, AIFF, MP3, and DSD in DSF and
+// DSDIFF files (DSDFile.swift).
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
@@ -31,6 +32,8 @@ public struct SongTags: Codable, Equatable, Sendable {
     /// Where the embedded cover's bytes are in the file, when it has one.
     public var pictureOffset: Int64?
     public var pictureLength: Int?
+    /// For a DSD file (DSF, DSDIFF): where its audio is. `sampleRate` is then the DSD rate and `bitDepth` 1.
+    public var dsd: DSDLayout?
     /// The file's ReplayGain tags, when it has any. nil too in an index made before these were read.
     public var replayGain: ReplayGain?
 
@@ -150,9 +153,10 @@ struct GainTags {
 
 public enum SongTagReader {
     /// The kinds of file the phone opens itself, by extension (lowercase).
-    public static let playable: Set<String> = ["flac", "m4a", "mp4", "m4b", "wav", "wave", "aif", "aiff", "aifc", "mp3"]
-    /// Kinds of music file the phone can't open without the Mac converting them.
-    public static let needsTheMac: Set<String> = ["dsf", "dff", "ape", "wv", "tta", "ogg", "oga", "opus", "wma", "dts", "thd", "mlp", "mka", "iso", "ac3", "ec3", "tak"]
+    public static let playable: Set<String> = ["flac", "m4a", "mp4", "m4b", "wav", "wave", "aif", "aiff", "aifc", "mp3", "dsf", "dff"]
+    /// Kinds of music file the phone can't open without the Mac converting them. (A DSD file in surround, or packed with
+    /// DST, is another: `DSDLayout.playsHere`.)
+    public static let needsTheMac: Set<String> = ["ape", "wv", "tta", "ogg", "oga", "opus", "wma", "dts", "thd", "mlp", "mka", "iso", "ac3", "ec3", "tak"]
 
     public static func fileExtension(_ name: String) -> String {
         guard let dot = name.lastIndex(of: "."), dot != name.startIndex else { return "" }
@@ -169,6 +173,8 @@ public enum SongTagReader {
         case "wav", "wave": return try wave(window)
         case "aif", "aiff", "aifc": return try aiff(window)
         case "mp3": return try mp3(window)
+        case "dsf": return try dsf(window)
+        case "dff": return try dff(window)
         default: return nil
         }
     }
