@@ -229,8 +229,9 @@ struct MacsView: View {
             Text(verbatim: "vespertine")
                 .font(.system(size: 30, weight: .light, design: .serif))
                 .foregroundStyle(Palette.text)
-            Text("The companion to Vespertine on your Mac")
+            Text("A remote for Vespertine on your Mac, and a player in its own right.")
                 .font(.footnote).foregroundStyle(Palette.text2)
+                .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 12).padding(.bottom, 8)
