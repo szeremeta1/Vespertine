@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
+#include <new>
 #include <vector>
 
 namespace {
@@ -65,6 +66,27 @@ struct ApeState {
     bool unsigned8 = false;
 };
 
+// A decoder's state is always the C allocator's, as in the C decoders beside this one, so this one is built in place in
+// such a block and handed back to it the same way.
+struct ApeStateDrop {
+    void operator()(ApeState *state) const {
+        if (!state) return;
+        state->~ApeState();
+        std::free(state);
+    }
+};
+
+std::unique_ptr<ApeState, ApeStateDrop> makeApeState() {
+    void *block = std::calloc(1, sizeof(ApeState));
+    if (!block) throw std::bad_alloc();
+    try {
+        return std::unique_ptr<ApeState, ApeStateDrop>(new (block) ApeState());
+    } catch (...) {
+        std::free(block);
+        throw;
+    }
+}
+
 const int kChunk = 4096;
 
 int64_t apeRead(vsp_decoder *decoder, int64_t count, uint8_t *out) {
@@ -98,7 +120,7 @@ int apeSeek(vsp_decoder *decoder, int64_t frame) {
 }
 
 void apeClose(vsp_decoder *decoder) {
-    delete static_cast<ApeState *>(decoder->state);
+    ApeStateDrop()(static_cast<ApeState *>(decoder->state));
     decoder->state = nullptr;
 }
 
@@ -115,7 +137,7 @@ void addTag(vsp_decoder *decoder, APE::IAPETag *tag, const wchar_t *field, const
 
 extern "C" int vsp_open_ape(vsp_decoder *decoder) {
     try {
-        auto state = std::make_unique<ApeState>();
+        auto state = makeApeState();
         state->io = std::make_unique<CursorIO>(&decoder->cursor);
         int error = ERROR_SUCCESS;
         state->decompress.reset(CreateIAPEDecompressEx(state->io.get(), &error));
