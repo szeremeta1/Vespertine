@@ -361,6 +361,9 @@ jobs:
         with:
           path: verification-carriers
           key: verification-carriers-${{ github.run_id }}-${{ github.run_attempt }}
+          # A re-run of only the failed jobs does not run the macOS job again when it passed, so this attempt has no
+          # cache of its own: the newest one an earlier attempt of this run saved is the same commit's carriers.
+          restore-keys: verification-carriers-${{ github.run_id }}-
           enableCrossOsArchive: true
           fail-on-cache-miss: true
       - name: FFmpeg 6.1.1 (the version the oracle record pins)
