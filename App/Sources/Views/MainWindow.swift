@@ -113,7 +113,7 @@ struct MainWindow: View {
     }
 }
 
-/// The sheet that asks for an AirPlay receiver's password. Kept out of `MainWindow.body` for the same reason as the
+/// The sheets that ask for an AirPlay receiver's password, or the code on its screen. Kept out of `MainWindow.body` for the same reason as the
 /// alert below: one more modifier there and the type-checker gives up.
 private struct AirPlayPasswordPrompt: ViewModifier {
     @Environment(AppModel.self) private var model
@@ -122,10 +122,18 @@ private struct AirPlayPasswordPrompt: ViewModifier {
         Binding(get: { model.airPlay?.passwordRequest }, set: { if $0 == nil { model.airPlay?.cancelPassword() } })
     }
 
+    private var pairing: Binding<AirPlayPairingRequest?> {
+        Binding(get: { model.airPlay?.pairingRequest }, set: { if $0 == nil { model.airPlay?.cancelPairing() } })
+    }
+
     func body(content: Content) -> some View {
-        content.sheet(item: request) { (request: AirPlayPasswordRequest) in
-            AirPlayPasswordSheet(request: request).environment(model)
-        }
+        content
+            .sheet(item: request) { (request: AirPlayPasswordRequest) in
+                AirPlayPasswordSheet(request: request).environment(model)
+            }
+            .sheet(item: pairing) { (request: AirPlayPairingRequest) in
+                AirPlayPairingSheet(request: request).environment(model)
+            }
     }
 }
 

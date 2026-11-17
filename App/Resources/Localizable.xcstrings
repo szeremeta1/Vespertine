@@ -650088,6 +650088,2964 @@
           }
         }
       }
+    },
+    "Code for “%@”": {
+      "comment": "Title of the sheet that asks for the code an AirPlay receiver (an Apple TV) shows on its screen. %@ is the receiver's name.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የ“%@” ኮድ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الرمز لـ ”%@“"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”-এর কোড"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kód pro „%@“"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kode til “%@”"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code für „%@“"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κωδικός για «%@»"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código de «%@»"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کد «%@»"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koodi kohteelle ”%@”"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code para sa “%@”"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code pour « %@ »"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” માટે કોડ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lambar “%@”"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קוד עבור ״%@״"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” के लिए कोड"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kód ehhez: „%@”"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kode untuk “%@”"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codice per “%@”"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”のコード"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ಗಾಗಿ ಕೋಡ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”의 코드"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” എന്നതിനുള്ള കോഡ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” साठी कोड"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod untuk “%@”"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kode for «%@»"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code voor ‘%@’"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” ਲਈ ਕੋਡ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod do „%@”"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código de “%@”"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código de “%@”"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cod pentru „%@”"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod för ”%@”"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Msimbo wa “%@”"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”-க்கான குறியீடு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” కోసం కోడ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รหัสสำหรับ “%@”"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” için Kod"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Код для «%@»"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”%@“ کا کوڈ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mã cho “%@”"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」的代碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”的代码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「%@」的代碼"
+          }
+        }
+      }
+    },
+    "This AirPlay receiver shows a code on its screen. Enter it once; Vespertine saves the pairing in your keychain.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ይህ የAirPlay ተቀባይ በማያ ገጹ ላይ ኮድ ያሳያል። አንድ ጊዜ ያስገቡት፤ Vespertine ማጣመሩን በKeychain ውስጥ ያስቀምጠዋል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يعرض مستقبِل AirPlay هذا رمزًا على شاشته. أدخله مرة واحدة؛ يحفظ Vespertine الإقران في سلسلة المفاتيح."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এই AirPlay রিসিভার তার স্ক্রিনে একটি কোড দেখায়। একবার সেটি লিখুন; Vespertine পেয়ারিংটি আপনার কীচেইনে সংরক্ষণ করে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tento přijímač AirPlay zobrazuje na obrazovce kód. Zadejte ho jednou; Vespertine uloží spárování do Klíčenky."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne AirPlay-modtager viser en kode på sin skærm. Skriv den én gang; Vespertine gemmer parringen i din nøglering."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser AirPlay-Empfänger zeigt einen Code auf seinem Bildschirm an. Gib ihn einmal ein; Vespertine sichert die Kopplung in deinem Schlüsselbund."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτός ο δέκτης AirPlay εμφανίζει έναν κωδικό στην οθόνη του. Εισαγάγετέ τον μία φορά· το Vespertine αποθηκεύει τη σύζευξη στην κλειδοθήκη σας."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este receptor AirPlay muestra un código en su pantalla. Introdúcelo una vez; Vespertine guarda el enlace en tu llavero."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این گیرندهٔ AirPlay کدی را روی صفحهٔ خود نشان می‌دهد. یک بار آن را وارد کنید؛ Vespertine جفت کردن را در Keychain شما ذخیره می‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tämä AirPlay-vastaanotin näyttää koodin näytöllään. Syötä se kerran; Vespertine tallentaa parituksen avainnippuusi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nagpapakita ng code sa screen nito ang AirPlay receiver na ito. Ilagay ito nang isang beses; sine-save ng Vespertine ang pag-pair sa keychain mo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce récepteur AirPlay affiche un code sur son écran. Saisissez-le une fois ; Vespertine enregistre le jumelage dans votre trousseau."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આ AirPlay રિસીવર તેની સ્ક્રીન પર કોડ બતાવે છે. તેને એકવાર દાખલ કરો; Vespertine પેરિંગને તમારા Keychain માં સાચવે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan risivar AirPlay tana nuna lamba a allonta. Shigar da ita sau ɗaya; Vespertine yana adana haɗawar a keychain ɗinka."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מקלט AirPlay זה מציג קוד על המסך שלו. יש להזין אותו פעם אחת; Vespertine שומר את הצימוד במחזיק המפתחות שלך."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "यह AirPlay रिसीवर अपनी स्क्रीन पर एक कोड दिखाता है। इसे एक बार दर्ज करें; Vespertine पेयरिंग को आपके कीचेन में सहेजता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez az AirPlay-vevő kódot jelenít meg a képernyőjén. Írd be egyszer; a Vespertine a párosítást a kulcskarikádba menti."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receiver AirPlay ini menampilkan kode di layarnya. Masukkan sekali; Vespertine menyimpan pemasangan di rantai kunci Anda."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo ricevitore AirPlay mostra un codice sul suo schermo. Inseriscilo una volta; Vespertine salva l’abbinamento nel tuo portachiavi."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このAirPlayレシーバーは画面にコードを表示します。一度入力すれば、Vespertineがペアリングをキーチェーンに保存します。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಈ AirPlay ರಿಸೀವರ್ ತನ್ನ ಪರದೆಯಲ್ಲಿ ಕೋಡ್ ತೋರಿಸುತ್ತದೆ. ಅದನ್ನು ಒಮ್ಮೆ ನಮೂದಿಸಿ; Vespertine ಜೋಡಣೆಯನ್ನು ನಿಮ್ಮ ಕೀಚೈನ್‌ನಲ್ಲಿ ಉಳಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 AirPlay 리시버는 화면에 코드를 표시합니다. 한 번만 입력하면 Vespertine이 페어링을 키체인에 저장합니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഈ AirPlay റിസീവർ അതിന്റെ സ്ക്രീനിൽ ഒരു കോഡ് കാണിക്കുന്നു. അത് ഒരിക്കൽ നൽകുക; Vespertine ജോടിയാക്കൽ നിങ്ങളുടെ കീചെയിനിൽ സൂക്ഷിക്കുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हा AirPlay रिसीव्हर त्याच्या स्क्रीनवर कोड दाखवतो. तो एकदा टाका; Vespertine पेअरिंग तुमच्या Keychain मध्ये सेव्ह करते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penerima AirPlay ini memaparkan kod pada skrinnya. Masukkannya sekali; Vespertine menyimpan pemasangan dalam rantai kunci anda."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Denne AirPlay-mottakeren viser en kode på skjermen sin. Skriv den inn én gang; Vespertine arkiverer sammenkoblingen i nøkkelringen din."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deze AirPlay-ontvanger toont een code op zijn scherm. Voer die één keer in; Vespertine bewaart de koppeling in je sleutelhanger."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਹ AirPlay ਰਿਸੀਵਰ ਆਪਣੀ ਸਕਰੀਨ ’ਤੇ ਕੋਡ ਦਿਖਾਉਂਦਾ ਹੈ। ਇਸਨੂੰ ਇੱਕ ਵਾਰ ਦਰਜ ਕਰੋ; Vespertine ਪੇਅਰਿੰਗ ਨੂੰ ਤੁਹਾਡੀ Keychain ਵਿੱਚ ਸੰਭਾਲਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ten odbiornik AirPlay wyświetla kod na swoim ekranie. Wpisz go raz; Vespertine zachowuje parowanie w Twoim pęku kluczy."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este receptor AirPlay mostra um código na tela. Digite-o uma vez; o Vespertine salva o emparelhamento nas suas Chaves."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este recetor AirPlay mostra um código no ecrã. Introduza-o uma vez; o Vespertine guarda o emparelhamento no seu porta-chaves."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acest receptor AirPlay afișează un cod pe ecranul său. Introduceți-l o singură dată; Vespertine salvează asocierea în portchei."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Den här AirPlay-mottagaren visar en kod på sin skärm. Ange den en gång; Vespertine sparar parkopplingen i din nyckelring."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kipokezi hiki cha AirPlay kinaonyesha msimbo kwenye skrini yake. Uweke mara moja; Vespertine huhifadhi uoanishaji kwenye keychain yako."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "இந்த AirPlay ரிசீவர் அதன் திரையில் ஒரு குறியீட்டைக் காட்டுகிறது. அதை ஒருமுறை உள்ளிடவும்; Vespertine ஜோடியாக்கலை உங்கள் Keychain-இல் சேமிக்கிறது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ఈ AirPlay రిసీవర్ దాని స్క్రీన్‌పై కోడ్‌ను చూపుతుంది. దాన్ని ఒకసారి నమోదు చేయండి; Vespertine జతను మీ కీచైన్‌లో సేవ్ చేస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ตัวรับสัญญาณ AirPlay นี้แสดงรหัสบนหน้าจอ ป้อนรหัสเพียงครั้งเดียว Vespertine จะบันทึกการจับคู่ไว้ในพวงกุญแจของคุณ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu AirPlay alıcısı ekranında bir kod gösteriyor. Kodu bir kez girin; Vespertine eşlemeyi anahtar zincirinize kaydeder."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цей приймач AirPlay показує код на своєму екрані. Введіть його один раз; Vespertine зберігає пару у вашій Зв’язці ключів."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یہ AirPlay ریسیور اپنی اسکرین پر ایک کوڈ دکھاتا ہے۔ اسے ایک بار درج کریں؛ Vespertine پیئرنگ کو آپ کی Keychain میں محفوظ کرتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bộ thu AirPlay này hiển thị một mã trên màn hình. Nhập mã một lần; Vespertine lưu ghép đôi trong chuỗi khóa của bạn."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 AirPlay 接收器會在螢幕上顯示代碼。輸入一次即可；Vespertine 會將配對儲存在你的鑰匙圈中。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 AirPlay 接收器会在屏幕上显示代码。输入一次即可；Vespertine 会将配对存储在你的钥匙串中。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 AirPlay 接收器會在螢幕上顯示代碼。輸入一次即可；Vespertine 會將配對儲存在你的鑰匙圈中。"
+          }
+        }
+      }
+    },
+    "The receiver didn’t accept that code. It shows a new one.": {
+      "comment": "In the sheet that asks for the code on an AirPlay receiver's screen, after a wrong one.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ተቀባዩ ያንን ኮድ አልተቀበለም። አዲስ ኮድ እያሳየ ነው።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يقبل المستقبِل هذا الرمز. يعرض الآن رمزًا جديدًا."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "রিসিভার ওই কোড গ্রহণ করেনি। এটি একটি নতুন কোড দেখাচ্ছে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přijímač tento kód nepřijal. Zobrazuje nový."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modtageren accepterede ikke den kode. Den viser en ny."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Empfänger hat diesen Code nicht akzeptiert. Er zeigt einen neuen an."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ο δέκτης δεν αποδέχτηκε αυτόν τον κωδικό. Εμφανίζει έναν νέο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El receptor no ha aceptado ese código. Muestra uno nuevo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "گیرنده آن کد را نپذیرفت. کد تازه‌ای نشان می‌دهد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vastaanotin ei hyväksynyt tätä koodia. Se näyttää uuden."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi tinanggap ng receiver ang code na iyon. Nagpapakita ito ng bago."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le récepteur n’a pas accepté ce code. Il en affiche un nouveau."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "રિસીવરે તે કોડ સ્વીકાર્યો નહીં. તે નવો કોડ બતાવે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risivar ba ta karɓi wannan lambar ba. Tana nuna sabuwa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "המקלט לא קיבל את הקוד הזה. הוא מציג קוד חדש."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रिसीवर ने वह कोड स्वीकार नहीं किया। वह नया कोड दिखा रहा है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A vevő nem fogadta el ezt a kódot. Újat jelenít meg."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receiver tidak menerima kode tersebut. Receiver menampilkan kode baru."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il ricevitore non ha accettato il codice. Ne mostra uno nuovo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "レシーバーはそのコードを受け付けませんでした。新しいコードが表示されています。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ರಿಸೀವರ್ ಆ ಕೋಡ್ ಅನ್ನು ಸ್ವೀಕರಿಸಲಿಲ್ಲ. ಅದು ಹೊಸ ಕೋಡ್ ತೋರಿಸುತ್ತಿದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "리시버가 해당 코드를 승인하지 않았습니다. 새 코드가 표시됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "റിസീവർ ആ കോഡ് സ്വീകരിച്ചില്ല. അത് പുതിയ ഒരു കോഡ് കാണിക്കുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "रिसीव्हरने तो कोड स्वीकारला नाही. तो नवीन कोड दाखवत आहे."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penerima tidak menerima kod itu. Penerima memaparkan kod baharu."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mottakeren godtok ikke den koden. Den viser en ny."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De ontvanger heeft die code niet geaccepteerd. Hij toont een nieuwe."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਰਿਸੀਵਰ ਨੇ ਉਹ ਕੋਡ ਸਵੀਕਾਰ ਨਹੀਂ ਕੀਤਾ। ਇਹ ਨਵਾਂ ਕੋਡ ਦਿਖਾ ਰਿਹਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odbiornik nie zaakceptował tego kodu. Wyświetla nowy."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O receptor não aceitou esse código. Ele mostra um novo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O recetor não aceitou esse código. Mostra um novo."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Receptorul nu a acceptat acest cod. Afișează unul nou."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mottagaren godtog inte koden. Den visar en ny."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kipokezi hakikukubali msimbo huo. Kinaonyesha mpya."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ரிசீவர் அந்தக் குறியீட்டை ஏற்கவில்லை. அது புதிய குறியீட்டைக் காட்டுகிறது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "రిసీవర్ ఆ కోడ్‌ను అంగీకరించలేదు. అది కొత్త కోడ్‌ను చూపుతోంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ตัวรับสัญญาณไม่ยอมรับรหัสนั้น และกำลังแสดงรหัสใหม่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alıcı bu kodu kabul etmedi. Yeni bir kod gösteriyor."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Приймач не прийняв цей код. Він показує новий."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ریسیور نے وہ کوڈ قبول نہیں کیا۔ وہ نیا کوڈ دکھا رہا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bộ thu không chấp nhận mã đó. Bộ thu đang hiển thị mã mới."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接收器不接受該代碼。它正在顯示新的代碼。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接收器不接受该代码。它正在显示新的代码。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "接收器不接受該代碼。它正在顯示新的代碼。"
+          }
+        }
+      }
+    },
+    "Code": {
+      "comment": "Placeholder of the field for the code an AirPlay receiver shows on its screen.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ኮድ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الرمز"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "কোড"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kód"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kode"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κωδικός"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کد"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koodi"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કોડ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lamba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "קוד"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कोड"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kód"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kode"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codice"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "コード"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಕೋಡ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "코드"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "കോഡ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कोड"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kode"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕੋਡ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cod"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Msimbo"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "குறியீடு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "కోడ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รหัส"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Код"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوڈ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mã"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "代碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "代码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "代碼"
+          }
+        }
+      }
+    },
+    "Forget Pairing": {
+      "comment": "Button under an AirPlay receiver that was paired with by the code on its screen: removes what was saved in the keychain, so the code is asked for again.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ማጣመሩን እርሳ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نسيان الإقران"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "পেয়ারিং ভুলে যান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapomenout spárování"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glem parring"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopplung vergessen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Διαγραφή σύζευξης"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Olvidar enlace"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لغو جفت کردن"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unohda paritus"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kalimutan ang Pag-pair"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oublier le jumelage"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "પેરિંગ ભૂલી જાઓ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manta Haɗawa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שכח צימוד"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पेयरिंग भूल जाएँ"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Párosítás elfelejtése"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lupakan Pemasangan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dimentica abbinamento"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ペアリングを削除"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಜೋಡಣೆ ಮರೆತುಬಿಡಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "페어링 지우기"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ജോടിയാക്കൽ മറക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "पेअरिंग विसरा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lupakan Pemasangan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glem sammenkobling"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vergeet koppeling"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਪੇਅਰਿੰਗ ਭੁੱਲ ਜਾਓ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zapomnij parowanie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esquecer Emparelhamento"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esquecer emparelhamento"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uită asocierea"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Glöm parkoppling"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sahau Uoanishaji"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஜோடியாக்கலை மற"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "జతను మరచిపో"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เลิกจำการจับคู่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşlemeyi Unut"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Забути пару"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پیئرنگ بھول جائیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quên ghép đôi"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "忘記配對"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "忘记配对"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "忘記配對"
+          }
+        }
+      }
+    },
+    "it needs the code on its screen": {
+      "comment": "Why an AirPlay receiver couldn't play, or couldn't be paired with: goes in “%1$@ couldn't play the song (%2$@).” The code is the one an Apple TV shows on its screen for AirPlay.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በማያ ገጹ ላይ ያለውን ኮድ ይፈልጋል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يحتاج إلى الرمز المعروض على شاشته"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এটির স্ক্রিনে দেখানো কোডটি প্রয়োজন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "vyžaduje kód ze své obrazovky"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den skal bruge koden på sin skærm"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "das Gerät braucht den Code von seinem Bildschirm"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "χρειάζεται τον κωδικό που εμφανίζει στην οθόνη του"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "el dispositivo necesita el código de su pantalla"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دستگاه به کد روی صفحه‌اش نیاز دارد"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "laite tarvitsee näytöllään näkyvän koodin"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kailangan nito ang code na nasa screen nito"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "il a besoin du code affiché sur son écran"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તેને તેની સ્ક્રીન પરનો કોડ જોઈએ છે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yana buƙatar lambar da ke kan allonsa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הוא צריך את הקוד שמוצג על המסך שלו"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "उसे अपनी स्क्रीन पर दिख रहा कोड चाहिए"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "az eszköznek a képernyőjén látható kód kell"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "perangkat memerlukan kode di layarnya"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "richiede il codice mostrato sul suo schermo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デバイスの画面に表示されているコードが必要です"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಾಧನಕ್ಕೆ ಅದರ ಪರದೆಯಲ್ಲಿರುವ ಕೋಡ್ ಬೇಕು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기기 화면에 표시된 코드가 필요함"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഉപകരണത്തിന് അതിന്റെ സ്ക്രീനിലെ കോഡ് ആവശ്യമാണ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "डिव्हाइसला त्याच्या स्क्रीनवरील कोड हवा आहे"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "peranti memerlukan kod pada skrinnya"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den trenger koden på skjermen sin"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "het apparaat heeft de code op zijn scherm nodig"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸਨੂੰ ਆਪਣੀ ਸਕਰੀਨ ਵਾਲਾ ਕੋਡ ਚਾਹੀਦਾ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "urządzenie wymaga kodu ze swojego ekranu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "o dispositivo precisa do código mostrado na tela dele"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "precisa do código mostrado no seu ecrã"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "are nevoie de codul de pe ecranul său"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den behöver koden på sin skärm"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kinahitaji msimbo ulio kwenye skrini yake"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அதன் திரையில் உள்ள குறியீடு அதற்குத் தேவை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "పరికరానికి దాని స్క్రీన్‌పై ఉన్న కోడ్ అవసరం"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อุปกรณ์ต้องใช้รหัสที่แสดงบนหน้าจอ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aygıt ekranındaki kodu istiyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "пристрою потрібен код з його екрана"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ڈیوائس کو اپنی اسکرین پر دکھایا گیا کوڈ درکار ہے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "thiết bị cần mã trên màn hình của nó"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "裝置需要其螢幕上顯示的代碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设备需要其屏幕上显示的代码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "裝置需要其螢幕上顯示的代碼"
+          }
+        }
+      }
+    },
+    "it asks to wait before another try": {
+      "comment": "Why an AirPlay receiver couldn't be paired with (too many wrong codes): goes in “%1$@ couldn't play the song (%2$@).”",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እንደገና ከመሞከር በፊት መጠበቅን ይጠይቃል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يطلب الانتظار قبل محاولة أخرى"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এটি আবার চেষ্টার আগে অপেক্ষা করতে বলছে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "žádá před dalším pokusem počkat"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den beder om at vente før næste forsøg"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "das Gerät verlangt eine Wartezeit vor dem nächsten Versuch"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ζητά αναμονή πριν από νέα προσπάθεια"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "el dispositivo pide esperar antes de otro intento"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دستگاه می‌خواهد پیش از تلاش دوباره صبر کنید"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "laite pyytää odottamaan ennen uutta yritystä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "humihiling itong maghintay bago sumubok ulit"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "il demande d’attendre avant un nouvel essai"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તે ફરી પ્રયાસ કરતા પહેલાં રાહ જોવાનું કહે છે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "yana neman a jira kafin a sake gwadawa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הוא מבקש להמתין לפני ניסיון נוסף"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वह दोबारा कोशिश से पहले प्रतीक्षा करने को कहता है"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "az eszköz várakozást kér a következő próbálkozás előtt"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "perangkat meminta menunggu sebelum mencoba lagi"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "chiede di attendere prima di un altro tentativo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デバイスが次の試行まで待つよう求めています"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಾಧನವು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸುವ ಮೊದಲು ಕಾಯಲು ಕೇಳುತ್ತದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기기가 다시 시도하기 전에 기다릴 것을 요청함"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "വീണ്ടും ശ്രമിക്കുന്നതിന് മുമ്പ് കാത്തിരിക്കാൻ ഉപകരണം ആവശ്യപ്പെടുന്നു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "डिव्हाइस पुन्हा प्रयत्न करण्यापूर्वी थांबायला सांगत आहे"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "peranti meminta anda menunggu sebelum mencuba lagi"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den ber om å vente før neste forsøk"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "het apparaat vraagt te wachten voor een nieuwe poging"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਹ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਤੋਂ ਪਹਿਲਾਂ ਉਡੀਕ ਕਰਨ ਲਈ ਕਹਿੰਦਾ ਹੈ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "urządzenie prosi o odczekanie przed kolejną próbą"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "o dispositivo pede para aguardar antes de outra tentativa"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pede para aguardar antes de outra tentativa"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cere o pauză înainte de o nouă încercare"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den ber dig vänta före nästa försök"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kinaomba usubiri kabla ya kujaribu tena"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "மீண்டும் முயலும் முன் காத்திருக்குமாறு அது கேட்கிறது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మళ్లీ ప్రయత్నించే ముందు వేచి ఉండమని పరికరం అడుగుతోంది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อุปกรณ์ขอให้รอก่อนลองอีกครั้ง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aygıt yeni denemeden önce beklenmesini istiyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "пристрій просить зачекати перед наступною спробою"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ڈیوائس دوبارہ کوشش سے پہلے انتظار کرنے کو کہتی ہے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "thiết bị yêu cầu chờ trước khi thử lại"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "裝置要求等待後再試"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设备要求等待后再试"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "裝置要求等待後再試"
+          }
+        }
+      }
+    },
+    "it refused the pairing": {
+      "comment": "Why an AirPlay receiver couldn't play, or couldn't be paired with: goes in “%1$@ couldn't play the song (%2$@).”",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ማጣመሩን አልተቀበለም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "رفض الإقران"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "এটি পেয়ারিং প্রত্যাখ্যান করেছে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "odmítl spárování"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den afviste parringen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "das Gerät hat die Kopplung abgelehnt"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "απέρριψε τη σύζευξη"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "el dispositivo ha rechazado el enlace"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "دستگاه جفت کردن را رد کرد"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "laite hylkäsi parituksen"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "tinanggihan nito ang pag-pair"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "il a refusé le jumelage"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તેણે પેરિંગ નકાર્યું"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ya ƙi haɗawar"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הוא דחה את הצימוד"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "उसने पेयरिंग अस्वीकार कर दी"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "az eszköz elutasította a párosítást"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "perangkat menolak pemasangan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ha rifiutato l’abbinamento"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "デバイスがペアリングを拒否しました"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಸಾಧನ ಜೋಡಣೆಯನ್ನು ನಿರಾಕರಿಸಿತು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "기기가 페어링을 거부함"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഉപകരണം ജോടിയാക്കൽ നിരസിച്ചു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "डिव्हाइसने पेअरिंग नाकारले"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "peranti menolak pemasangan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den avviste sammenkoblingen"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "het apparaat heeft de koppeling geweigerd"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਇਸ ਨੇ ਪੇਅਰਿੰਗ ਰੱਦ ਕਰ ਦਿੱਤੀ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "urządzenie odrzuciło parowanie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "o dispositivo recusou o emparelhamento"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "recusou o emparelhamento"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "a refuzat asocierea"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "den avvisade parkopplingen"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kilikataa uoanishaji"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அது ஜோடியாக்கலை நிராகரித்தது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "పరికరం జత చేయడాన్ని తిరస్కరించింది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อุปกรณ์ปฏิเสธการจับคู่"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "aygıt eşlemeyi reddetti"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "пристрій відхилив створення пари"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ڈیوائس نے پیئرنگ مسترد کر دی"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "thiết bị từ chối ghép đôi"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "裝置拒絕了配對"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设备拒绝了配对"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "裝置拒絕了配對"
+          }
+        }
+      }
+    },
+    "Pairing with “%@” didn’t work (%@).": {
+      "comment": "In the sheet that asks for the code on an AirPlay receiver's screen. %1$@ is the receiver's name, %2$@ the reason (for example “it can't be reached”).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ከ“%1$@” ጋር ማጣመር አልተሳካም (%2$@)።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم ينجح الإقران مع ”%1$@“ (%2$@)."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@”-এর সাথে পেয়ারিং সফল হয়নি (%2$@)।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spárování s „%1$@“ se nezdařilo (%2$@)."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parringen med “%1$@” lykkedes ikke (%2$@)."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Koppeln mit „%1$@“ hat nicht funktioniert (%2$@)."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Η σύζευξη με «%1$@» δεν πέτυχε (%2$@)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El enlace con «%1$@» no ha funcionado (%2$@)."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جفت کردن با «%1$@» انجام نشد (%2$@)."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paritus kohteen ”%1$@” kanssa ei onnistunut (%2$@)."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi gumana ang pag-pair sa “%1$@” (%2$@)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le jumelage avec « %1$@ » n’a pas fonctionné (%2$@)."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@” સાથે પેરિંગ સફળ થયું નહીં (%2$@)."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haɗawa da “%1$@” bai yi nasara ba (%2$@)."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הצימוד עם ״%1$@״ לא הצליח (%2$@)."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@” के साथ पेयरिंग नहीं हो सकी (%2$@)।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A párosítás ezzel nem sikerült: „%1$@” (%2$@)."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pemasangan dengan “%1$@” tidak berhasil (%2$@)."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L’abbinamento con “%1$@” non è riuscito (%2$@)."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@”とペアリングできませんでした（%2$@）。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@” ಜೊತೆ ಜೋಡಣೆ ಆಗಲಿಲ್ಲ (%2$@)."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@”와(과) 페어링하지 못했습니다(%2$@)."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@” എന്നതുമായുള്ള ജോടിയാക്കൽ നടന്നില്ല (%2$@)."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@” शी पेअरिंग झाले नाही (%2$@)."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pemasangan dengan “%1$@” tidak berjaya (%2$@)."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sammenkoblingen med «%1$@» fungerte ikke (%2$@)."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koppelen met ‘%1$@’ is niet gelukt (%2$@)."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@” ਨਾਲ ਪੇਅਰਿੰਗ ਨਹੀਂ ਹੋ ਸਕੀ (%2$@)।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parowanie z „%1$@” nie powiodło się (%2$@)."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O emparelhamento com “%1$@” não funcionou (%2$@)."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O emparelhamento com “%1$@” não funcionou (%2$@)."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Asocierea cu „%1$@” nu a reușit (%2$@)."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parkopplingen med ”%1$@” fungerade inte (%2$@)."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kuoanisha na “%1$@” hakukufaulu (%2$@)."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@” உடன் ஜோடியாக்கல் நடக்கவில்லை (%2$@)."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@”తో జత చేయడం కుదరలేదు (%2$@)."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "จับคู่กับ “%1$@” ไม่สำเร็จ (%2$@)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%1$@” ile eşleme yapılamadı (%2$@)."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Не вдалося створити пару з «%1$@» (%2$@)."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "”%1$@“ کے ساتھ پیئرنگ نہیں ہو سکی (%2$@)۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghép đôi với “%1$@” không thành công (%2$@)."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "與「%1$@」配對未成功（%2$@）。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与“%1$@”配对未成功（%2$@）。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "與「%1$@」配對未成功（%2$@）。"
+          }
+        }
+      }
+    },
+    "AIRPLAY 2 · ALAC 16/44.1": {
+      "comment": "Output list: an AirPlay 2 receiver (a HomePod, an Apple TV) Vespertine sends ALAC 16-bit / 44.1 kHz to (short, uppercase)",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC ۱۶/۴۴٫۱"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1"
+          }
+        }
+      }
+    },
+    "AIRPLAY 2 · ALAC 16/44.1 · CODE": {
+      "comment": "Output list: an AirPlay 2 receiver (an Apple TV) that shows a code on its screen to be typed once before it plays (short, uppercase)",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · ኮድ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · رمز"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · কোড"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · KÓD"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · KODE"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · CODE"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · ΚΩΔΙΚΟΣ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · CÓDIGO"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC ۱۶/۴۴٫۱ · کد"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · KOODI"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · CODE"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · CODE"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · કોડ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · LAMBA"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · קוד"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · कोड"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · KÓD"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · KODE"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · CODICE"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · コード"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · ಕೋಡ್"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · 코드"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · കോഡ്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · कोड"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · KOD"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · KODE"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · CODE"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · ਕੋਡ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · KOD"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · CÓDIGO"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · CÓDIGO"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · COD"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · KOD"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · MSIMBO"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · குறியீடு"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · కోడ్"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · รหัส"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · KOD"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · КОД"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · کوڈ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · MÃ"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · 代碼"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · 代码"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AIRPLAY 2 · ALAC 16/44.1 · 代碼"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

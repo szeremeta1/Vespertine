@@ -1,5 +1,5 @@
 //
-// Vespertine: AirPlay receivers as outputs (AirPlay 1 / RAOP, ALAC 16/44.1), behind Settings › Playback › AirPlay Players
+// Vespertine: AirPlay receivers as outputs (AirPlay 1 / RAOP, or AirPlay 2 for those that take only that; ALAC 16/44.1), behind Settings › Playback › AirPlay Players
 // (beta), off by default. The model exists only while the switch is on; until then nothing is browsed on Bonjour and no
 // socket is opened. macOS's own AirPlay devices (Core Audio) are listed with the other devices as before.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -26,6 +26,12 @@ final class AirPlayOutputModel {
     var passwordRequest: AirPlayPasswordRequest?
     /// Where receivers' passwords are kept.
     @ObservationIgnored var passwords = AirPlayPasswords.keychain
+    /// A receiver that shows a code on its screen, which the listener is being asked to type (the sheet is up while this is set).
+    var pairingRequest: AirPlayPairingRequest?
+    /// Where what pairing gave is kept.
+    @ObservationIgnored var pairings = AirPlayPairings.keychain
+    /// How a receiver is paired with.
+    @ObservationIgnored var pairer = AirPlayPairer.live
     /// A song's cover file by its library key, for receivers that show one.
     @ObservationIgnored var artwork: (@Sendable (String) -> Data?)? {
         didSet { playback?.artworkProvider = artwork }
@@ -61,8 +67,16 @@ final class AirPlayOutputModel {
     }
 
     /// The listener chose `device` in the output list: it becomes the output (`select`), after its password has been
-    /// asked for when it has one and none is saved.
+    /// asked for when it has one and none is saved, or the code on its screen when it shows one and was never paired with.
     func choose(_ device: AirPlayDevice, select: @escaping @MainActor (String) -> Void) {
+        if device.needsPairingCode {
+            let pairings = self.pairings
+            Task {
+                let paired = await Task.detached { pairings.read(device.deviceID) != nil }.value
+                if paired { select(device.uid) } else { pairingRequest = AirPlayPairingRequest(device: device) }
+            }
+            return
+        }
         guard device.needsPassword else { return select(device.uid) }
         let passwords = self.passwords
         Task {
@@ -86,6 +100,52 @@ final class AirPlayOutputModel {
     func forgetPassword(for device: AirPlayDevice) async {
         let passwords = self.passwords
         await Task.detached { passwords.write(nil, device.deviceID) }.value
+    }
+
+    /// The sheet is up: the receiver is asked to show its code. nil: it is showing one; otherwise why it isn't.
+    func beginPairing() async -> String? {
+        guard let request = pairingRequest else { return nil }
+        do {
+            try await pairer.begin(request.device)
+            return nil
+        } catch {
+            return Self.reason(error)
+        }
+    }
+
+    /// The listener typed the code: keys are traded and kept, and the receiver becomes (or stays) the output.
+    func submit(code: String, select: @escaping @MainActor (String) -> Void) async -> AirPlayPairingOutcome {
+        guard let request = pairingRequest else { return .paired }
+        let pairings = self.pairings
+        do {
+            let identity = await Task.detached { pairings.identity() }.value
+            let keys = try await pairer.finish(code, identity)
+            await Task.detached { pairings.write(keys, request.device.deviceID) }.value
+            // Cancelled while the receiver was answering: the pairing is kept, nothing is chosen.
+            guard pairingRequest == request else { return .paired }
+            pairingRequest = nil
+            select(request.device.uid)
+            return .paired
+        } catch PairingError.authentication {
+            return .wrongCode
+        } catch {
+            return .failed(Self.reason(error))
+        }
+    }
+
+    func cancelPairing() {
+        pairingRequest = nil
+        let pairer = self.pairer
+        Task { await pairer.cancel() }
+    }
+
+    func forgetPairing(for device: AirPlayDevice) async {
+        let pairings = self.pairings
+        await Task.detached { pairings.write(nil, device.deviceID) }.value
+    }
+
+    static func reason(_ error: Error) -> String {
+        (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
     }
 
     func device(uid: String?) -> AirPlayDevice? {
@@ -122,6 +182,12 @@ final class AirPlayOutputModel {
         made.passwordRefused = { [weak self] in
             Task { @MainActor in self?.passwordRequest = AirPlayPasswordRequest(device: device, refused: true) }
         }
+        let pairings = self.pairings
+        made.pairingProvider = { pairings.read(device.deviceID) }
+        // Never paired with (chosen from the phone, say), or the receiver has forgotten this Mac: the listener is asked.
+        made.pairingRefused = { [weak self] in
+            Task { @MainActor in self?.pairingRequest = AirPlayPairingRequest(device: device) }
+        }
         made.artworkProvider = artwork
         playback = made
         return made
@@ -154,6 +220,117 @@ nonisolated struct AirPlayPasswords: Sendable {
         return AirPlayPasswords(read: { id in box.withLock { $0[id] } },
                                 write: { password, id in box.withLock { $0[id] = (password?.isEmpty == false) ? password : nil } })
     }
+}
+
+extension AirPlayDevice {
+    /// The receiver shows a code on its screen that must be typed once before it plays (an Apple TV set to ask).
+    nonisolated var needsPairingCode: Bool { usesAirPlay2 && airPlay2Entry == .pin }
+}
+
+/// The listener is asked for the code a receiver shows: on choosing it when it was never paired with, or after it
+/// refused what was kept.
+nonisolated struct AirPlayPairingRequest: Identifiable, Equatable, Sendable {
+    let device: AirPlayDevice
+    var id: String { device.uid }
+}
+
+nonisolated enum AirPlayPairingOutcome: Equatable, Sendable {
+    case paired
+    /// The receiver refused the code (it shows a new one when asked again).
+    case wrongCode
+    /// Why it didn't work, in words.
+    case failed(String)
+}
+
+/// What pairing with receivers gave, by device id, and this Mac's own identity for all of them: the keychain in the app,
+/// a dictionary in tests. The calls can block (the keychain may put up macOS's own prompt), so they are made off the
+/// main thread.
+nonisolated struct AirPlayPairings: Sendable {
+    /// This Mac as receivers know it: read, or made and kept the first time.
+    var identity: @Sendable () -> AirPlayPairingIdentity
+    var read: @Sendable (_ deviceID: String) -> AirPlayPairingKeys?
+    /// nil removes it.
+    var write: @Sendable (_ keys: AirPlayPairingKeys?, _ deviceID: String) -> Void
+
+    static let identityAccount = "airplay-pairing-identity"
+    static func account(_ deviceID: String) -> String { "airplay-pairing-" + deviceID }
+
+    /// Kept as JSON text.
+    static func encode<Value: Encodable>(_ value: Value) -> String? {
+        (try? JSONEncoder().encode(value)).map { String(decoding: $0, as: UTF8.self) }
+    }
+
+    static func decode<Value: Decodable>(_ type: Value.Type, _ text: String?) -> Value? {
+        text.flatMap { try? JSONDecoder().decode(type, from: Data($0.utf8)) }
+    }
+
+    static let keychain = AirPlayPairings(
+        identity: {
+            if let kept = AirPlayPairings.decode(AirPlayPairingIdentity.self, Keychain.read(AirPlayPairings.identityAccount).value) { return kept }
+            let made = AirPlayPairingIdentity()
+            _ = Keychain.write(AirPlayPairings.encode(made), account: AirPlayPairings.identityAccount)
+            return made
+        },
+        read: { id in AirPlayPairings.decode(AirPlayPairingKeys.self, Keychain.read(AirPlayPairings.account(id)).value) },
+        write: { keys, id in
+            let text = keys.flatMap { AirPlayPairings.encode($0) }
+            _ = Keychain.write(text, account: AirPlayPairings.account(id))
+        })
+
+    /// Kept in memory only.
+    static func memory() -> AirPlayPairings {
+        let box = Locked<[String: String]>([:])
+        return AirPlayPairings(
+            identity: {
+                box.withLock { kept -> AirPlayPairingIdentity in
+                    if let identity = decode(AirPlayPairingIdentity.self, kept[identityAccount]) { return identity }
+                    let made = AirPlayPairingIdentity()
+                    kept[identityAccount] = encode(made)
+                    return made
+                }
+            },
+            read: { id in box.withLock { decode(AirPlayPairingKeys.self, $0[account(id)]) } },
+            write: { keys, id in
+                let text = keys.flatMap { encode($0) }
+                box.withLock { $0[account(id)] = text }
+            })
+    }
+}
+
+/// Pairing with a receiver by the code on its screen: the real exchange in the app, a stand-in in tests.
+nonisolated struct AirPlayPairer: Sendable {
+    /// Asks the receiver to show its code.
+    var begin: @Sendable (AirPlayDevice) async throws -> Void
+    /// Trades keys with the receiver asked last, which is showing `code`.
+    var finish: @Sendable (_ code: String, AirPlayPairingIdentity) async throws -> AirPlayPairingKeys
+    var cancel: @Sendable () async -> Void
+
+    static let live: AirPlayPairer = {
+        let open = Locked<AirPlayPINPairing?>(nil)
+        return AirPlayPairer(
+            begin: { device in
+                guard let pairing = AirPlayPINPairing(device: device) else { throw RAOPError.unreachable }
+                let before = open.withLock { current -> AirPlayPINPairing? in
+                    let old = current
+                    current = pairing
+                    return old
+                }
+                await before?.cancel()
+                try await pairing.begin()
+            },
+            finish: { code, identity in
+                guard let pairing = open.withLock({ $0 }) else { throw RAOPError.closed }
+                return try await pairing.finish(pin: code, identity: identity)
+            },
+            cancel: {
+                let before = open.withLock { current -> AirPlayPINPairing? in
+                    let old = current
+                    current = nil
+                    return old
+                }
+                await before?.cancel()
+            })
+    }()
 }
 
 /// The cover an AirPlay receiver is sent: the library's stored picture near the size a receiver's display uses.

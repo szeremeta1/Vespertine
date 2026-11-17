@@ -2,7 +2,8 @@
 // Vespertine: what an AirPlay receiver says about itself on Bonjour. `_raop._tcp` (AirPlay 1) names the service
 // `<MAC>@<name>` and lists, in its TXT record, the encryptions (`et`), codecs (`cn`), format (`sr`, `ss`, `ch`), transports
 // (`tp`) and metadata (`md`) it takes; `_airplay._tcp` (AirPlay 2 and video) adds `deviceid`, `model` and `features`.
-// Vespertine sends ALAC 16/44.1 over RAOP, unencrypted (after `/auth-setup` for MFi receivers) or with RSA/AES; anything
+// Vespertine sends ALAC 16/44.1 over RAOP, unencrypted (after `/auth-setup` for MFi receivers) or with RSA/AES; to a
+// receiver that takes none of that but says it takes AirPlay 2 audio and pairing, it sends an AirPlay 2 session. Anything
 // else is listed as not supported yet.
 // SPDX-License-Identifier: GPL-3.0-or-later
 //
@@ -104,6 +105,16 @@ public struct AirPlayRecord: Sendable, Hashable {
     /// It is set to ask for a password (`flags` 0x80).
     public var asksForPassword: Bool { (flags ?? 0) & 0x80 != 0 }
 
+    /// What it shows of a song, numbered as `_raop._tcp` numbers them: 0 text (`features` bit 17), 1 artwork (15),
+    /// 2 progress (16).
+    public var metadata: Set<Int> {
+        var kinds: Set<Int> = []
+        if has(17) { kinds.insert(0) }
+        if has(15) { kinds.insert(1) }
+        if has(16) { kinds.insert(2) }
+        return kinds
+    }
+
     private func has(_ bit: UInt64) -> Bool { (features ?? 0) >> bit & 1 == 1 }
 }
 
@@ -173,11 +184,33 @@ public struct AirPlayDevice: Sendable, Hashable, Identifiable {
     /// How an AirPlay 2 session with this receiver would begin; nil when it doesn't say it takes one (no `_airplay._tcp`
     /// record, no audio, or no pairing an open sender can do). A receiver set to ask for a password is not one yet.
     public var airPlay2Entry: AirPlay2Entry? {
-        guard let airplay, airplay.playsAudio, airplay.pairs, !airplay.asksForPassword else { return nil }
+        guard let airplay, airplay.playsAudio, airplay.pairs, !airplay.asksForPassword, raop?.needsPassword != true else { return nil }
         return airplay.asksForPIN ? .pin : .open
     }
 
+    /// A session with this receiver is an AirPlay 2 one: it takes one, and doesn't take AirPlay 1 as Vespertine sends it.
+    /// A receiver that takes both stays on AirPlay 1.
+    public var usesAirPlay2: Bool {
+        if case .supported = airPlay1Support { return false }
+        return airPlay2Entry != nil
+    }
+
+    /// What the receiver shows of a song: 0 text, 1 artwork, 2 progress.
+    public var metadata: Set<Int> {
+        if usesAirPlay2 { return airplay?.metadata ?? [] }
+        return raop?.metadata ?? []
+    }
+
+    /// AirPlay 1 where the receiver takes it as Vespertine sends it; AirPlay 2 otherwise, where it takes that (the audio
+    /// then goes sealed, which is not one of the `RAOPEncryption`s: `.none` stands for it).
     public var support: Support {
+        let first = airPlay1Support
+        if case .unsupported = first, airPlay2Entry != nil { return .supported(.none) }
+        return first
+    }
+
+    /// What an AirPlay 1 session with this receiver would be.
+    var airPlay1Support: Support {
         guard let raop else { return .unsupported(Self.airPlay2Only) }
         // MFi receivers (`et` 4) take the audio as it is once the sender has introduced itself (`needsAuthSetup`).
         let encryption: RAOPEncryption
@@ -193,7 +226,7 @@ public struct AirPlayDevice: Sendable, Hashable, Identifiable {
     }
 
     static var airPlay2Only: String {
-        String(localized: "AirPlay 2 only — not supported yet", comment: "Output list: an AirPlay receiver that takes only AirPlay 2, which Vespertine can't send yet.")
+        String(localized: "AirPlay 2 only — not supported yet", comment: "Output list: an AirPlay receiver that takes only AirPlay 2 in a way Vespertine can't send yet (it asks for a password, or doesn't say it plays audio).")
     }
 
     static var formatUnsupported: String {

@@ -12,7 +12,7 @@ import VespertineAudio
 import VespertineUPnP
 @testable import VespertineAirPlay
 
-@Suite("AirPlay playback, fix round 1", .serialized) @MainActor
+@Suite("AirPlay playback, fix round 1", .serialized, .timeLimit(.minutes(2))) @MainActor
 struct AirPlayPlaybackFixTests {
     func make(_ receiver: FakeRAOPReceiver) -> (AirPlayPlayback, EventLog) {
         let device = AirPlayDevice(deviceID: "B827EB000001", name: "Fake", raop: AirPlayPlaybackTests.record, host: "127.0.0.1", port: receiver.port)
@@ -22,10 +22,7 @@ struct AirPlayPlaybackFixTests {
         return (p, log)
     }
 
-    func wait(_ condition: () -> Bool, seconds: Double = 8) async {
-        let end = Date().addingTimeInterval(seconds)
-        while !condition(), Date() < end { try? await Task.sleep(for: .milliseconds(25)) }
-    }
+    func wait(_ condition: @MainActor () -> Bool) async { await untilTrue(condition) }
 
     @Test("The same settings again, a volume step and a queue change that keeps the next song keep the song opened ahead")
     func preparedSurvives() async throws {
@@ -160,7 +157,7 @@ struct AirPlayPlaybackFixTests {
         p.metadataProvider = { RendererTrackInfo(title: $0.id == second.id ? "Second" : "First") }
         p.openDelay = { $0.id == second.id ? 3 : 0 }
         p.play(first, at: 0)
-        await wait({ log.ended }, seconds: 12)
+        await wait { log.ended }
         #expect(log.ended)
         #expect(log.events.contains { if case .notice(let m) = $0 { m == "Gap before Second: it took too long to open." } else { false } })
         #expect(log.started == [first.id, second.id], "\(log.started.map { $0 == first.id ? "A" : $0 == second.id ? "B" : "?" })")
@@ -189,7 +186,7 @@ struct AirPlayPlaybackFixTests {
         p.openDelay = { $0.id == second.id ? 30 : 0 }
         p.openTimeout = 2
         p.play(first, at: 0)
-        await wait({ log.ended }, seconds: 15)
+        await wait { log.ended }
         #expect(log.failures.count == 1)
         #expect(log.failures.first?.contains("took too long to open") == true)
         #expect(log.started == [first.id, third.id])
