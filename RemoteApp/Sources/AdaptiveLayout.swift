@@ -139,11 +139,18 @@ nonisolated enum RemoteLayout {
     }
     /// Width of the player's text and controls column (the cover matches it when stacked).
     static func controlsWidth(width: CGFloat) -> CGFloat { max(0, min(560, width - 48)) }
-    static func coverSide(width: CGFloat, height: CGFloat, columns: Bool) -> CGFloat {
+    static func coverSide(width: CGFloat, height: CGFloat, columns: Bool, tight: Bool = false) -> CGFloat {
         let available = max(0, width - 48)
         if columns { return max(0, min(520, (available - 32) * 0.48, height - 24)) }
-        return max(0, min(controlsWidth(width: width), max(160, height - 440)))
+        return max(0, min(controlsWidth(width: width), max(tight ? 120 : 160, height - 440)))
     }
+    /// A short screen (an iPhone SE upright): Now Playing's cover and gaps give up room, so the transport and the volume
+    /// are on the screen without scrolling.
+    static func playerIsTight(height: CGFloat, columns: Bool) -> Bool { !columns && height < 600 }
+    /// The gaps between Now Playing's parts: the cover and the controls, and the controls themselves.
+    static func playerSpacing(tight: Bool) -> (parts: CGFloat, controls: CGFloat) { tight ? (12, 10) : (22, 18) }
+    /// The room the Mac / This iPhone switch takes above Now Playing's cover, with the gap under it.
+    static func playModeSwitchHeight(tight: Bool) -> CGFloat { 40 + playerSpacing(tight: tight).parts }
     /// Lines a row's name may take: one at ordinary text sizes, as many as it needs at the accessibility sizes, where one
     /// line cut "Albums" and "Artists" down to the same stub.
     static func rowTitleLines(accessibilityText: Bool) -> Int? { accessibilityText ? nil : 1 }

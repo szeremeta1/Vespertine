@@ -67,6 +67,13 @@ struct SettingsView: View {
                 } footer: {
                     Text("Albums and playlists you keep are fetched whole from your Mac and play without it. With smaller copies, lossless songs above 48 kHz are converted on the Mac to 44.1 or 48 kHz before they’re kept; everything else is kept as it is. This applies to what you keep from now on.")
                 }
+                Section {
+                    Button("Setup Assistant…") {
+                        dismiss()
+                        SetupAssistant.shared.runAgain()
+                    }
+                    .accessibilityIdentifier("setup-again")
+                }
                 Section("About") {
                     LabeledContent("Version", value: Self.version)
                     if let url = URL(string: "https://github.com/szeremeta1/Vespertine") {

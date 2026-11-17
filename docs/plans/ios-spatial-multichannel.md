@@ -134,3 +134,30 @@ Each line is a yes/no/notes entry for `docs/IOS-AUDIO-BENCH.md` (M0 in the plan)
 - Up to 8 channels. Heights/Atmos objects and 9+ channel sets aren't streamed as multichannel.
 - Whether iOS's environment node renders identically to the Mac's AUSpatialMixer, and whether personalized HRTF is applied on the engine path, are untested.
 - Sound parameters for Spatialize stereo (ambience level, centre strength, LFE) still need the listening session the Mac doc asks for.
+
+---
+
+## 7. What shipped after build 7 (2026-11-17)
+
+TestFlight build 7 used the engine path only: a 5.1 song went through `AVAudioEnvironmentNode` to two binaural channels, and the
+engine's output on AirPods runs with two channels. iOS saw stereo: Control Center said **Stereo**, the Output screen read
+"Output's channels 2", the in-app Off / Fixed / Head Tracked changed nothing iOS could see, and the badge still said
+"SPATIAL AUDIO · HEAD TRACKED" (feedback tf-1c99555e54, tf-4e0452d141, tf-a5b2a6dbdc).
+
+Now (`PhoneRoute.surroundPath`):
+
+- **Headphones iOS says spatialize** (`isSpatialAudioEnabled`, AirPods and Beats with Spatial Audio on) and the setting on
+  **Spatial Audio**: the system path. The decoded channels, with their layout, go to an `AVSampleBufferAudioRenderer` driven by
+  an `AVSampleBufferRenderSynchronizer` (`PlayerSink.swift`); the session says `setSupportsMultichannelContent(true)`. Fixed or
+  Head Tracked is Control Center's: every API that lets an app choose it (`setIntendedSpatialExperience`,
+  `CASpatialAudioExperience`, `intendedSpatialAudioExperience` on the synchronizer, `AVPlayer` and `AVAudioOutputNode`) is
+  `API_UNAVAILABLE(ios)` in the iOS 27.1 SDK. So the in-app picker is Off / Spatial Audio.
+- **Other headphones**: the engine path, fixed (head tracking needs AirPods or Beats, which take the system path).
+- **Off, or speakers**: folded to stereo. **Interfaces**: a channel per output (unchanged).
+- The badge says SPATIAL AUDIO only when iOS's `renderingMode` says Spatial Audio / Dolby Atmos / Dolby Audio on a route with
+  Spatial Audio on; otherwise what iOS did say ("SURROUND TO iOS · SPATIAL AUDIO ON", "· iOS PLAYS STEREO").
+- Measured (bench row M2): on an iPhone 15 Pro Max, iOS 26.3.1, the renderer took six channels and played them on its clock;
+  `renderingMode` stayed "not applicable" on the speaker. AirPods are bench item B4.
+- Still open: Dolby Atmos files (E-AC-3 JOC in an M4A) are decoded on the phone to their 5.1 bed before they reach the
+  renderer, so iOS spatializes the bed, not the Atmos objects. Handing the renderer the E-AC-3 packets themselves would give iOS
+  the objects; not done here.
