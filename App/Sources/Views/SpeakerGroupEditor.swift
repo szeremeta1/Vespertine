@@ -29,7 +29,7 @@ struct SpeakerGroupEditor: View {
                 }
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    RoomCanvasView(group: $group)
+                    Room3DView(group: $group)
                     SpeakerReadoutView(group: $group)
                     ChannelMapGrid(group: $group)
                     MemberVolumeView(group: group)
@@ -45,7 +45,7 @@ struct SpeakerGroupEditor: View {
             }
         }
         .padding(20)
-        .frame(minWidth: 520, minHeight: 360)
+        .frame(minWidth: 760, idealWidth: 820, minHeight: 520, idealHeight: 860)
         .onChange(of: group) { _, new in groups.upsert(new) }
     }
 }
