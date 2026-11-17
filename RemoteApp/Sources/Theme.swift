@@ -14,14 +14,18 @@ enum Palette {
     static let hairline = adaptive(light: 0x09090A, dark: 0xECE6DA).opacity(0.07)
     static let hairlineStrong = adaptive(light: 0x09090A, dark: 0xECE6DA).opacity(0.12)
     static let text = adaptive(light: 0x09090A, dark: 0xECE6DA)
-    static let text2 = adaptive(light: 0x69645C, dark: 0xA29B8F)
+    static let text2 = Color(uiColor: text2UI)
     static let text3 = adaptive(light: 0x69645C, dark: 0x8C867C)
-    static let brass = adaptive(light: 0x7C6541, dark: 0xC8A66A)
+    static let brass = Color(uiColor: brassUI)
     static let brassHi = adaptive(light: 0x7C6541, dark: 0xE7CD98)
     static let brassLo = Color(hex: 0x7C6541)
     static let copper = adaptive(light: 0x7C6541, dark: 0xC98B5B)
     // The transport is always a brass object, with dark ink in both appearances.
     static let brassGradient = LinearGradient(colors: [Color(hex: 0xE7CD98), Color(hex: 0xC8A66A)], startPoint: .top, endPoint: .bottom)
+
+    // The same two tokens for the few UIKit controls the app shows (the AirPlay button).
+    static let text2UI = dynamic(light: 0x69645C, dark: 0xA29B8F)
+    static let brassUI = dynamic(light: 0x7C6541, dark: 0xC8A66A)
 
     private static func adaptive(light: UInt32, dark: UInt32) -> Color {
         Color(uiColor: dynamic(light: light, dark: dark))

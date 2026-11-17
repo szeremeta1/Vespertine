@@ -89,15 +89,20 @@ func unhex(_ text: String) -> [UInt8] {
         challenge.raw(NTLM.signature)
         challenge.u32(2)
         challenge.zeros(8)
-        challenge.u32(NTLM.asked)
+        challenge.u32(NTLM.asked & ~NTLM.keyExchange)   // this server offers no key exchange
         challenge.raw(unhex("0123456789abcdef"))
         challenge.zeros(8)
         challenge.u16(UInt16(info.count)); challenge.u16(UInt16(info.count)); challenge.u32(56)
         challenge.zeros(8)
         challenge.raw(info)
         let answer = try NTLM.authenticate(user: "User", domain: "Domain", password: "Password", negotiate: NTLM.negotiate(), challenge: challenge.bytes,
-                                           clientChallenge: [UInt8](repeating: 0xaa, count: 8), time: 0)
+                                           clientChallenge: [UInt8](repeating: 0xaa, count: 8), time: 0, newKey: [UInt8](repeating: 0x55, count: 16))
+        // No exchange was offered, so none is made: the session's key is the one the password gives, nothing is wrapped
+        // and signatures aren't scrambled.
         #expect(hex(answer.sessionKey) == "8de40ccadbc14a82f15cb0ad0de95ca3")
+        #expect(answer.sealingKey == nil)
+        #expect(try ByteReader(answer.message).u16(52) == 0)
+        #expect(try ByteReader(answer.message).u32(60) & NTLM.keyExchange == 0)
         let r = ByteReader(answer.message)
         let lm = try r.slice(Int(r.u32(16)), Int(r.u16(12)))
         let nt = try r.slice(Int(r.u32(24)), Int(r.u16(20)))

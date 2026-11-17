@@ -41,7 +41,7 @@ let package = Package(
         .testTarget(name: "VespertineRemoteProtocolTests", dependencies: ["VespertineRemoteProtocol", "VespertineRemoteClient"]),
         .testTarget(name: "VespertineStreamServerTests", dependencies: ["VespertineStreamServer", "VespertineRemoteProtocol", "VespertineRemoteClient", "VespertinePhonePlayer"]),
         .testTarget(name: "VespertineChannelsTests", dependencies: ["VespertineChannels"]),
-        .testTarget(name: "VespertineShareTests", dependencies: ["VespertineShare", "VespertineRemoteProtocol", "VespertineRemoteClient"]),
+        .testTarget(name: "VespertineShareTests", dependencies: ["VespertineShare", "VespertineRemoteProtocol", "VespertineRemoteClient", "VespertinePhonePlayer"]),
         .testTarget(name: "VespertinePhoneBenchTests", dependencies: ["VespertinePhoneBench", "VespertinePhonePlayer", "VespertineRemoteProtocol"]),
         .testTarget(name: "VespertinePhonePlayerTests", dependencies: ["VespertinePhonePlayer", "VespertineRemoteProtocol", "VespertineRemoteClient"]),
     ]

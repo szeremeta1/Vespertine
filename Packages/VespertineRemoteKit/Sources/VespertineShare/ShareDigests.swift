@@ -1,5 +1,5 @@
 //
-// Vespertine: the few digests and the one cipher signing in to an SMB server needs (MD4 and HMAC-MD5 for NTLMv2,
+// Vespertine: the few digests and ciphers signing in to an SMB server needs (MD4, HMAC-MD5 and RC4 for NTLMv2,
 // HMAC-SHA-256 and AES-CMAC for signing messages, SHA-512 for SMB 3.1.1's digest of the messages that came before the
 // sign-in). Written out in plain Swift so the SMB client is the same code on the
 // phone and on Linux, where it is tested against a real server. None of this protects anything on its own: it is what
@@ -199,6 +199,29 @@ enum ShareDigests {
     }
 
     static func hmacMD5(key: [UInt8], _ message: [UInt8]) -> [UInt8] { hmac(md5, key: key, message) }
+
+    /// RC4, from the start of its stream: NTLM wraps a session key in it, and scrambles its own signatures with it.
+    /// Nothing of the share's goes through it.
+    static func rc4(key: [UInt8], _ data: [UInt8]) -> [UInt8] {
+        guard !key.isEmpty else { return data }
+        var box = [UInt8](0...255)
+        var j = 0
+        for i in 0..<256 {
+            j = (j + Int(box[i]) + Int(key[i % key.count])) & 0xff
+            box.swapAt(i, j)
+        }
+        var out = [UInt8]()
+        out.reserveCapacity(data.count)
+        var i = 0
+        j = 0
+        for byte in data {
+            i = (i + 1) & 0xff
+            j = (j + Int(box[i])) & 0xff
+            box.swapAt(i, j)
+            out.append(byte ^ box[(Int(box[i]) + Int(box[j])) & 0xff])
+        }
+        return out
+    }
     /// Every message of an SMB 2 session is signed with this, a megabyte at a time while a song plays: on Apple's
     /// systems the system's own (much faster) one does it. `plain` asks for the one written here, for comparing the two.
     static func hmacSHA256(key: [UInt8], _ message: [UInt8], plain: Bool = false) -> [UInt8] {

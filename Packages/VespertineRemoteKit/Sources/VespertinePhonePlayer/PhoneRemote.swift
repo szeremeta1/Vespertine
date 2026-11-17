@@ -52,6 +52,8 @@ public struct PhoneRoute: Equatable, Sendable {
 public struct PhoneSignal: Equatable, Sendable {
     /// The Mac made a FLAC of the song (a format the phone can't open), rather than sending the file as it is.
     public var converted: Bool
+    /// The conversion was made on this device, from a file it read itself (a DSD file on a share), not by a Mac.
+    public var convertedHere: Bool
     /// The Mac only cut the song out of a longer lossless file (a CUE track): its samples are the file's own.
     public var cut: Bool
     public var lossless: Bool
@@ -115,6 +117,7 @@ public struct PhoneSignal: Equatable, Sendable {
         dsdRate = stream.dsdRate
         original = stream.kind == .original
         converted = stream.kind != .original
+        convertedHere = stream.kind == .pcm
         cut = stream.kind != .original && stream.cut == true
         lossless = stream.format.lossless
         streamRate = stream.format.sampleRate
