@@ -165,7 +165,7 @@
         "links": [
           "Grupy głośników szczegółowo"
         ],
-        "alt": "Edytor grup głośników w Vespertine dla quada: rysunek pokoju z góry z czterema głośnikami wokół miejsca odsłuchu oraz odległość, kąt, opóźnienie i poziom każdego z nich.",
+        "alt": "Edytor grup głośników w Vespertine dla quada: pokój narysowany w trzech wymiarach z czterema głośnikami na stojakach wokół miejsca odsłuchu oraz szerokość, głębokość i wysokość sufitu pokoju.",
         "floatAlt": "Mapa kanałów: każdy kanał każdego wyjścia przypisany do głośnika, z przyciskiem „Identify” i polem „Inverted” przy każdym kanale.",
         "floatCaption": "Mapa kanałów"
       },

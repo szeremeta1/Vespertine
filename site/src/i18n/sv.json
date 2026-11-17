@@ -165,7 +165,7 @@
         "links": [
           "Högtalargrupper i detalj"
         ],
-        "alt": "Vespertines redigerare för högtalargrupper för en quad: en ritning av rummet uppifrån med fyra högtalare runt lyssningsplatsen, och varje högtalares avstånd, vinkel, fördröjning och nivå.",
+        "alt": "Vespertines redigerare för högtalargrupper för en quad: ett rum ritat i tre dimensioner med fyra högtalare på stativ runt lyssningsplatsen, och rummets bredd, djup och takhöjd.",
         "floatAlt": "Kanalkartan: varje kanal på varje utgång är tilldelad en högtalare, med en knapp ”Identify” och en ruta ”Inverted” vid varje kanal.",
         "floatCaption": "Kanalkarta"
       },

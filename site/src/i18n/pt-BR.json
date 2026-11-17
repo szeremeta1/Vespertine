@@ -165,7 +165,7 @@
         "links": [
           "Grupos de alto-falantes em detalhe"
         ],
-        "alt": "O editor de grupos de alto-falantes do Vespertine para um quadrifônico: um desenho da sala visto de cima com quatro alto-falantes ao redor do assento de audição, e a distância, o ângulo, o atraso e o nível de cada um.",
+        "alt": "O editor de grupos de alto-falantes do Vespertine para um quadrifônico: uma sala desenhada em três dimensões com quatro alto-falantes em pedestais ao redor do assento de audição, e a largura, a profundidade e a altura do teto da sala.",
         "floatAlt": "O mapa de canais: cada canal de cada saída atribuído a um alto-falante, com um botão “Identify” e uma caixa “Inverted” em cada canal.",
         "floatCaption": "Mapa de canais"
       },

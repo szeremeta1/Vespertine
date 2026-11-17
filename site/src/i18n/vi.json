@@ -165,7 +165,7 @@
         "links": [
           "Nhóm loa chi tiết"
         ],
-        "alt": "Trình chỉnh sửa nhóm loa của Vespertine cho một quad: bản vẽ căn phòng nhìn từ trên xuống với bốn loa quanh chỗ nghe, cùng khoảng cách, góc, độ trễ và mức âm của từng loa.",
+        "alt": "Trình chỉnh sửa nhóm loa của Vespertine cho một quad: căn phòng được vẽ ba chiều với bốn loa đặt trên chân đế quanh chỗ nghe, cùng chiều rộng, chiều sâu và chiều cao trần của phòng.",
         "floatAlt": "Sơ đồ kênh: mỗi kênh của mỗi đầu ra được gán cho một loa, có nút “Identify” và ô “Inverted” ở mỗi kênh.",
         "floatCaption": "Sơ đồ kênh"
       },

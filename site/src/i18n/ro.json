@@ -165,7 +165,7 @@
         "links": [
           "Grupurile de boxe în detaliu"
         ],
-        "alt": "Editorul de grupuri de boxe din Vespertine pentru un quad: un desen al camerei văzut de sus, cu patru boxe în jurul locului de ascultare, și distanța, unghiul, întârzierea și nivelul fiecăreia.",
+        "alt": "Editorul de grupuri de boxe din Vespertine pentru un quad: o cameră desenată în trei dimensiuni, cu patru boxe pe stative în jurul locului de ascultare, și lățimea, adâncimea și înălțimea tavanului camerei.",
         "floatAlt": "Harta canalelor: fiecare canal al fiecărei ieșiri atribuit unei boxe, cu un buton „Identify” și o casetă „Inverted” la fiecare canal.",
         "floatCaption": "Harta canalelor"
       },

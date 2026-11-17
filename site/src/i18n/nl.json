@@ -165,7 +165,7 @@
         "links": [
           "Luidsprekergroepen in detail"
         ],
-        "alt": "De luidsprekergroep-editor van Vespertine voor een quad: een tekening van de kamer van bovenaf met vier luidsprekers rond de luisterplek, en de afstand, hoek, vertraging en het niveau van elke luidspreker.",
+        "alt": "De luidsprekergroep-editor van Vespertine voor een quad: een kamer in drie dimensies getekend met vier luidsprekers op standaards rond de luisterplek, en de breedte, diepte en plafondhoogte van de kamer.",
         "floatAlt": "De kanaalindeling: elk kanaal van elke uitgang is aan een luidspreker toegewezen, met een knop “Identify” en een vakje “Inverted” bij elk kanaal.",
         "floatCaption": "Kanaalindeling"
       },

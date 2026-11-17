@@ -165,7 +165,7 @@
         "links": [
           "Grupos de altavoces en detalle"
         ],
-        "alt": "El editor de grupos de altavoces de Vespertine para un cuadrafónico: un plano de la sala visto desde arriba con cuatro altavoces alrededor del asiento de escucha, y la distancia, el ángulo, el retardo y el nivel de cada uno.",
+        "alt": "El editor de grupos de altavoces de Vespertine para un cuadrafónico: una sala dibujada en tres dimensiones con cuatro altavoces sobre soportes alrededor del asiento de escucha, y la anchura, la profundidad y la altura del techo de la sala.",
         "floatAlt": "El mapa de canales: cada canal de cada salida asignado a un altavoz, con un botón «Identify» y una casilla «Inverted» en cada canal.",
         "floatCaption": "Mapa de canales"
       },

@@ -165,7 +165,7 @@
         "links": [
           "Les groupes d’enceintes en détail"
         ],
-        "alt": "L’éditeur de groupe d’enceintes de Vespertine pour un quad : un plan de la pièce vu de dessus avec quatre enceintes autour du siège d’écoute, et la distance, l’angle, le retard et le niveau de chacune.",
+        "alt": "L’éditeur de groupe d’enceintes de Vespertine pour un quad : une pièce dessinée en trois dimensions avec quatre enceintes sur pied autour du siège d’écoute, et la largeur, la profondeur et la hauteur sous plafond de la pièce.",
         "floatAlt": "La table des canaux : chaque canal de chaque sortie est attribué à une enceinte, avec un bouton « Identify » et une case « Inverted » sur chaque canal.",
         "floatCaption": "Table des canaux"
       },

@@ -165,7 +165,7 @@
         "links": [
           "Grup speaker secara rinci"
         ],
-        "alt": "Editor grup speaker Vespertine untuk quad: gambar ruangan dari atas dengan empat speaker mengelilingi posisi dengar, serta jarak, sudut, penundaan, dan level tiap speaker.",
+        "alt": "Editor grup speaker Vespertine untuk quad: ruangan yang digambar dalam tiga dimensi dengan empat speaker di atas penyangga mengelilingi posisi dengar, serta lebar, kedalaman, dan tinggi langit-langit ruangan.",
         "floatAlt": "Peta kanal: setiap kanal pada setiap output ditetapkan ke sebuah speaker, dengan tombol “Identify” dan kotak “Inverted” di tiap kanal.",
         "floatCaption": "Peta kanal"
       },

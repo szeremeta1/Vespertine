@@ -165,7 +165,7 @@
         "links": [
           "Kaiutinryhmät tarkemmin"
         ],
-        "alt": "Vespertinen kaiutinryhmän muokkain quadille: huoneen piirros ylhäältä nähtynä, neljä kaiutinta kuuntelupaikan ympärillä sekä kunkin kaiuttimen etäisyys, kulma, viive ja taso.",
+        "alt": "Vespertinen kaiutinryhmän muokkain quadille: kolmiulotteisesti piirretty huone, jossa neljä kaiutinta jalustoilla kuuntelupaikan ympärillä, sekä huoneen leveys, syvyys ja kattokorkeus.",
         "floatAlt": "Kanavakartta: jokaisen lähdön jokainen kanava on osoitettu kaiuttimelle, ja jokaisella kanavalla on painike ”Identify” ja valintaruutu ”Inverted”.",
         "floatCaption": "Kanavakartta"
       },

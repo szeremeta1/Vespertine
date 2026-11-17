@@ -165,7 +165,7 @@
         "links": [
           "Grupos de altifalantes em detalhe"
         ],
-        "alt": "O editor de grupos de altifalantes do Vespertine para um quadrifónico: um desenho da sala visto de cima com quatro altifalantes à volta do lugar de audição, e a distância, o ângulo, o atraso e o nível de cada um.",
+        "alt": "O editor de grupos de altifalantes do Vespertine para um quadrifónico: uma sala desenhada em três dimensões com quatro altifalantes em suportes à volta do lugar de audição, e a largura, a profundidade e a altura do teto da sala.",
         "floatAlt": "O mapa de canais: cada canal de cada saída atribuído a um altifalante, com um botão “Identify” e uma caixa “Inverted” em cada canal.",
         "floatCaption": "Mapa de canais"
       },

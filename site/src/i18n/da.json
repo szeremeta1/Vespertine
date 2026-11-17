@@ -165,7 +165,7 @@
         "links": [
           "Højttalergrupper i detaljer"
         ],
-        "alt": "Vespertines redigering af højttalergrupper til en quad: en tegning af rummet set oppefra med fire højttalere rundt om lyttepladsen, og hver højttalers afstand, vinkel, forsinkelse og niveau.",
+        "alt": "Vespertines redigering af højttalergrupper til en quad: et rum tegnet i tre dimensioner med fire højttalere på stativer rundt om lyttepladsen, og rummets bredde, dybde og loftshøjde.",
         "floatAlt": "Kanalkortet: hver kanal på hver udgang er tildelt en højttaler, med en knap “Identify” og et felt “Inverted” ved hver kanal.",
         "floatCaption": "Kanalkort"
       },

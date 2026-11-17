@@ -165,7 +165,7 @@
         "links": [
           "Hangszórócsoportok részletesen"
         ],
-        "alt": "A Vespertine hangszórócsoport-szerkesztője egy quadhoz: a szoba felülnézeti rajza négy hangfallal a hallgatási hely körül, valamint minden hangfal távolsága, szöge, késleltetése és szintje.",
+        "alt": "A Vespertine hangszórócsoport-szerkesztője egy quadhoz: három dimenzióban megrajzolt szoba négy állványos hangfallal a hallgatási hely körül, valamint a szoba szélessége, mélysége és belmagassága.",
         "floatAlt": "A csatornatérkép: minden kimenet minden csatornája egy hangfalhoz rendelve, minden csatornánál „Identify” gombbal és „Inverted” jelölőnégyzettel.",
         "floatCaption": "Csatornatérkép"
       },

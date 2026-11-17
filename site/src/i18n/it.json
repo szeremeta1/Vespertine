@@ -165,7 +165,7 @@
         "links": [
           "I gruppi di altoparlanti nel dettaglio"
         ],
-        "alt": "L’editor dei gruppi di altoparlanti di Vespertine per un quad: un disegno della stanza visto dall’alto con quattro altoparlanti attorno alla posizione d’ascolto, e distanza, angolo, ritardo e livello di ciascuno.",
+        "alt": "L’editor dei gruppi di altoparlanti di Vespertine per un quad: una stanza disegnata in tre dimensioni con quattro altoparlanti su stativi attorno alla posizione d’ascolto, e larghezza, profondità e altezza del soffitto della stanza.",
         "floatAlt": "La mappa dei canali: ogni canale di ogni uscita assegnato a un altoparlante, con un pulsante «Identify» e una casella «Inverted» su ogni canale.",
         "floatCaption": "Mappa dei canali"
       },

@@ -165,7 +165,7 @@
         "links": [
           "Speaker Groups in detail"
         ],
-        "alt": "Vespertine’s speaker group editor for a quad: a top-down drawing of the room with four speakers around the listening seat, and each speaker’s distance, angle, delay and level.",
+        "alt": "Vespertine’s speaker group editor for a quad: a room drawn in three dimensions with four speakers on stands around the listening seat, and the room’s width, depth and ceiling height.",
         "floatAlt": "The channel map: every channel of each output assigned to a speaker, with an Identify button and an Inverted box on each channel.",
         "floatCaption": "Channel map"
       },

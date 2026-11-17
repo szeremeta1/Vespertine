@@ -165,7 +165,7 @@
         "links": [
           "Skupiny reproduktorů podrobně"
         ],
-        "alt": "Editor skupin reproduktorů ve Vespertine pro quad: nákres místnosti shora se čtyřmi reproduktory kolem místa poslechu a vzdálenost, úhel, zpoždění a hlasitost každého z nich.",
+        "alt": "Editor skupin reproduktorů ve Vespertine pro quad: místnost nakreslená ve třech rozměrech se čtyřmi reproduktory na stojanech kolem místa poslechu a šířka, hloubka a výška stropu místnosti.",
         "floatAlt": "Mapa kanálů: každý kanál každého výstupu přiřazený k reproduktoru, s tlačítkem „Identify“ a políčkem „Inverted“ u každého kanálu.",
         "floatCaption": "Mapa kanálů"
       },

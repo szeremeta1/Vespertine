@@ -165,7 +165,7 @@
         "links": [
           "Lautsprechergruppen im Detail"
         ],
-        "alt": "Vespertines Editor für Lautsprechergruppen bei einem Quad: eine Zeichnung des Raums von oben mit vier Lautsprechern um den Hörplatz sowie Abstand, Winkel, Verzögerung und Pegel jedes Lautsprechers.",
+        "alt": "Vespertines Editor für Lautsprechergruppen bei einem Quad: ein dreidimensional gezeichneter Raum mit vier Lautsprechern auf Ständern um den Hörplatz sowie Breite, Tiefe und Deckenhöhe des Raums.",
         "floatAlt": "Die Kanalzuordnung: Jeder Kanal jedes Ausgangs ist einem Lautsprecher zugewiesen, mit einer Schaltfläche „Identify“ und einem Kästchen „Inverted“ je Kanal.",
         "floatCaption": "Kanalzuordnung"
       },

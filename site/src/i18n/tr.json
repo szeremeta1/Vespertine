@@ -165,7 +165,7 @@
         "links": [
           "Hoparlör grupları ayrıntılı"
         ],
-        "alt": "Vespertine’in bir quad için hoparlör grubu düzenleyicisi: dinleme koltuğunun çevresinde dört hoparlörlü, yukarıdan görünen oda çizimi ve her hoparlörün mesafesi, açısı, gecikmesi ve seviyesi.",
+        "alt": "Vespertine’in bir quad için hoparlör grubu düzenleyicisi: dinleme koltuğunun çevresinde ayaklı dört hoparlörün bulunduğu, üç boyutlu çizilmiş oda ve odanın genişliği, derinliği ve tavan yüksekliği.",
         "floatAlt": "Kanal haritası: her çıkışın her kanalı bir hoparlöre atanmış, her kanalda bir “Identify” düğmesi ve bir “Inverted” kutusu var.",
         "floatCaption": "Kanal haritası"
       },

@@ -165,7 +165,7 @@
         "links": [
           "Mga speaker group nang detalyado"
         ],
-        "alt": "Ang editor ng speaker group ng Vespertine para sa isang quad: drawing ng kuwarto mula sa itaas na may apat na speaker sa paligid ng upuan sa pakikinig, at ang layo, anggulo, delay at antas ng bawat speaker.",
+        "alt": "Ang editor ng speaker group ng Vespertine para sa isang quad: kuwartong iginuhit sa tatlong dimensyon na may apat na speaker sa mga patungan sa paligid ng upuan sa pakikinig, at ang lapad, lalim at taas ng kisame ng kuwarto.",
         "floatAlt": "Ang channel map: bawat channel ng bawat output ay itinakda sa isang speaker, na may button na “Identify” at checkbox na “Inverted” sa bawat channel.",
         "floatCaption": "Mapa ng mga channel"
       },
