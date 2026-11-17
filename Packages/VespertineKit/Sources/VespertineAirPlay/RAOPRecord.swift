@@ -63,12 +63,56 @@ public struct AirPlayRecord: Sendable, Hashable {
     public var deviceID: String
     public var name: String
     public var model: String?
+    /// `features`: what the receiver can do, one bit each ("0x4A7FCA00,0xBC354BD0": the low 32 bits, then the high).
+    /// nil: not stated, or not readable.
+    public var features: UInt64?
+    /// `flags`: how the receiver is set just now, one bit each ("0x4"). nil: not stated.
+    public var flags: UInt64?
+
+    public init(deviceID: String, name: String, model: String? = nil, features: UInt64? = nil, flags: UInt64? = nil) {
+        self.deviceID = deviceID
+        self.name = name
+        self.model = model
+        self.features = features
+        self.flags = flags
+    }
 
     public static func parse(serviceName: String, txt: [String: String]) -> AirPlayRecord? {
         let t = Dictionary(txt.map { ($0.key.lowercased(), $0.value) }, uniquingKeysWith: { a, _ in a })
         guard let id = t["deviceid"]?.uppercased().filter({ $0.isHexDigit }), !id.isEmpty else { return nil }
-        return AirPlayRecord(deviceID: id, name: serviceName, model: t["model"])
+        return AirPlayRecord(deviceID: id, name: serviceName, model: t["model"], features: t["features"].flatMap(bits), flags: t["flags"].flatMap(bits))
     }
+
+    /// "0x1,0x2" as one number: the first part is the low 32 bits, the second (when there is one) the high.
+    static func bits(_ text: String) -> UInt64? {
+        let parts = text.split(separator: ",", omittingEmptySubsequences: false).map { part -> UInt64? in
+            let digits = part.trimmingCharacters(in: .whitespaces).lowercased()
+            return UInt64(digits.hasPrefix("0x") ? String(digits.dropFirst(2)) : digits, radix: 16)
+        }
+        guard let low = parts.first ?? nil, parts.count <= 2 else { return nil }
+        guard parts.count == 2 else { return low }
+        guard let high = parts[1], low <= UInt64(UInt32.max), high <= UInt64(UInt32.max) else { return nil }
+        return high << 32 | low
+    }
+
+    /// The receiver plays audio sent by AirPlay (`features` bit 9).
+    public var playsAudio: Bool { has(9) }
+    /// It can be paired with the way AirPlay 2 senders do (any of `features` bits 38, 43, 46, 48).
+    public var pairs: Bool { has(38) || has(43) || has(46) || has(48) }
+    /// It is set to ask for the PIN on its screen: each time (`flags` 0x8) or once (0x200).
+    public var asksForPIN: Bool { (flags ?? 0) & 0x208 != 0 }
+    /// It is set to ask for a password (`flags` 0x80).
+    public var asksForPassword: Bool { (flags ?? 0) & 0x80 != 0 }
+
+    private func has(_ bit: UInt64) -> Bool { (features ?? 0) >> bit & 1 == 1 }
+}
+
+/// How a receiver that takes AirPlay 2 lets a sender in.
+public enum AirPlay2Entry: Sendable, Hashable {
+    /// Anyone on the network may play: paired afresh, with no PIN, every session.
+    case open
+    /// The PIN on its screen, once; this Mac is remembered after.
+    case pin
 }
 
 public enum RAOPEncryption: String, Sendable, Hashable {
@@ -93,6 +137,8 @@ public struct AirPlayDevice: Sendable, Hashable, Identifiable {
     public var airplay: AirPlayRecord?
     /// The `_raop._tcp` service to connect to (nil: only AirPlay 2 was seen).
     public var service: BonjourService?
+    /// The `_airplay._tcp` service, where an AirPlay 2 session connects (nil: none was seen).
+    public var airplayService: BonjourService?
     /// Where to connect when not through Bonjour (tests, a known address).
     public var host: String?
     public var port: UInt16?
@@ -104,7 +150,8 @@ public struct AirPlayDevice: Sendable, Hashable, Identifiable {
     public static func isAirPlayUID(_ uid: String?) -> Bool { uid?.hasPrefix(uidPrefix) == true }
 
     public init(deviceID: String, name: String, raop: RAOPRecord?, airplay: AirPlayRecord? = nil, service: BonjourService? = nil,
-                host: String? = nil, port: UInt16? = nil) {
+                airplayService: BonjourService? = nil, host: String? = nil, port: UInt16? = nil) {
+        self.airplayService = airplayService
         self.deviceID = deviceID
         self.name = name
         self.raop = raop
@@ -122,6 +169,13 @@ public struct AirPlayDevice: Sendable, Hashable, Identifiable {
     /// The receiver lists MFi authentication (`et` 4: most licensed third-party speakers and AV receivers). It expects the
     /// sender's `POST /auth-setup` before anything else, and refuses what follows without it.
     public var needsAuthSetup: Bool { raop?.encryptions.contains(4) == true }
+
+    /// How an AirPlay 2 session with this receiver would begin; nil when it doesn't say it takes one (no `_airplay._tcp`
+    /// record, no audio, or no pairing an open sender can do). A receiver set to ask for a password is not one yet.
+    public var airPlay2Entry: AirPlay2Entry? {
+        guard let airplay, airplay.playsAudio, airplay.pairs, !airplay.asksForPassword else { return nil }
+        return airplay.asksForPIN ? .pin : .open
+    }
 
     public var support: Support {
         guard let raop else { return .unsupported(Self.airPlay2Only) }
