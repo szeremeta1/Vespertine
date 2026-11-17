@@ -15,7 +15,7 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B1 | Stereo to the speaker and to AirPods | not run | | | |
 | B2 | Lock screen, Control Center, calls and Siri | not run | | | |
 | B3 | Gapless album | not run | | | |
-| B4 | 5.1 and 7.1 on AirPods Max: Fixed, Head Tracked, Off | not run | | | |
+| B4 | 5.1, 7.1 and Dolby Atmos on AirPods Max: Spatial Audio (Fixed and Head Tracked in Control Center), Off | not run | | | |
 | B5 | Spatial double-processing check | not run | | | |
 | B6 | DSD 5.1 from the Mac | not run | | | |
 | B7 | USB DAC: rates and the label | not run | | | |
@@ -28,6 +28,7 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B14 | Music on the phone: a folder from Files, iCloud Drive, a USB drive | not run | | | |
 | B15 | ReplayGain: off by default, on, and never on DoP | not run | | | |
 | M1 | Measured by the app: MP3, AAC and FLAC joins, and what ReplayGain does to the level | passed | 2026-11-16 | iPhone 15 Pro Max (iPhone16,2), iOS 26.3.1 (23D8133), Debug build of 8a1797a (#381 branch) | 14 joins and 9 tagged songs on the phone's speaker path at 48,000 Hz, phone volume 0. Every `tone-*` join GAPLESS (gap 0.00 ms, slip within 0.01 samples, level step within 0.01 dB); `gap-30-80` GAP 30.02 and 80.02 ms; every GAIN line MATCHES within 0.01 dB. Not covered: anything after the app's mixer, and the DoP step of B15. Lines below. |
+| M2 | Surround reaches iOS whole (`-VTSpatialProbe`): silent 5.1 through the sample buffer renderer | passed (speaker only) | 2026-11-17 | iPhone 15 Pro Max (iPhone16,2), iOS 26.3.1 (23D8133), Debug build of the fix/ios-spatial-headphones branch | Digital silence, nothing audible. Path `system(channels: 6)`, renderer status 1 (rendering) with no error, clock 3.086 s in 3 s; `supportsMultichannelContent` false before, true after; route Speaker `spatialAudioEnabled=true`, `outputNumberOfChannels=2`, `maximumOutputNumberOfChannels=2`; `renderingMode` stayed 0 (not applicable) throughout. Not covered: AirPods (none on this phone): what Control Center shows and what is heard is B4. |
 
 ## Before any script
 
@@ -73,27 +74,35 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 
 ## B4. Surround on AirPods Max (5 min)
 
-0. On a fresh install (or after deleting the app), Output › Surround on Headphones reads **Off**, and a 5.1 song shows the badge
-   **SURROUND FOLDED TO STEREO**: the spatial rendering is asked for, never the starting point. A choice made in an earlier build
-   is kept. On iOS 17 the picker offers Off and Fixed only (the mixer can't follow the head before iOS 18).
-1. AirPods Max on, Output › Surround on Headphones: **Head Tracked**. Play the channel-identification file (5.1, then 7.1).
-2. Each voice should come from its speaker's direction: left surround behind-left, and so on. LFE is heard, not placed.
-3. Turn your head: the scene should stay put. Badge: **SPATIAL AUDIO · HEAD TRACKED**.
-4. Choose **Fixed**: the scene turns with your head. Badge: **SPATIAL AUDIO · FIXED**.
-5. Choose **Off**: every voice is still heard, in plain stereo. Badge: **SURROUND FOLDED TO STEREO**.
-6. On the phone's own speaker and over AirPlay: every voice heard, folded to stereo.
-7. With Head Tracked chosen, open Control Center, long-press the volume slider and turn the AirPods' Spatial Audio off, then on.
-   Output › What Reaches the Output › **Surround on Headphones** and the badge should follow: Fixed while it is off, Head Tracked
-   again when it is on, without changing songs.
-8. A stereo album and (on a DAC that passed the DoP test) a DSD album, with Head Tracked still chosen: badges **ORIGINAL FILE** and
-   **NATIVE DSD · DoP**, never a SPATIAL AUDIO badge. Two-channel songs don't go through the spatial mixer whatever is chosen.
+Since build 8 (TestFlight feedback tf-1c99555e54, tf-4e0452d141, tf-a5b2a6dbdc): a surround song goes to iOS with all its
+channels and their layout (an `AVSampleBufferAudioRenderer`), and iOS's own Spatial Audio renders it, as for Apple Music. Build 7
+rendered it to two channels inside the app, so iOS only ever saw stereo. Fixed or Head Tracked is chosen in Control Center: the
+API that lets an app choose it is visionOS-only in the iOS 27 SDK.
+
+0. On a fresh install, Output › Surround on Headphones reads **Off**, and a 5.1 song shows **SURROUND FOLDED TO STEREO**. A choice
+   made in an earlier build is kept (Fixed or Head Tracked both read **Spatial Audio** now).
+1. AirPods Max on, Output › Surround on Headphones: **Spatial Audio**. Play the channel-identification file (5.1, then 7.1), or any
+   5.1 / Dolby Atmos song.
+2. Open Control Center, touch and hold the volume slider. Expect the AirPods' panel to say **Spatial Audio** (not "Stereo"), with
+   **Fixed** and **Head Tracked** offered. Choose Head Tracked: turn your head, the scene stays put. Choose Fixed: it turns with you.
+3. Each voice should come from its speaker's direction: left surround behind-left, and so on. LFE is heard, not placed.
+4. Badge: **SPATIAL AUDIO** (or **SPATIAL AUDIO · DOLBY ATMOS**) only if iOS's rendering mode says so; otherwise
+   **SURROUND TO iOS · SPATIAL AUDIO ON** (iOS says Spatial Audio is on for the AirPods and was handed six channels). Never
+   "head tracked" or "fixed": iOS doesn't tell apps which. Output › What Reaches the Output: **Channels sent to iOS 6**,
+   **Spatial Audio on this output On**, **Surround on Headphones Spatial Audio by iOS**, and **Output's channels 2** (the two your
+   ears get: iOS makes them from the six).
+5. Choose **Off** in the app: every voice is still heard, in plain stereo; Control Center says **Stereo**. Badge **SURROUND FOLDED
+   TO STEREO**; Channels sent to iOS disappears.
+6. In Control Center turn the AirPods' Spatial Audio off with the app on Spatial Audio: the song moves back into the app (Vespertine's
+   own fixed rendering), badge **BINAURAL · FIXED**; on again, back to iOS. No song change needed.
+7. A stereo album and (on a DAC that passed the DoP test) a DSD album: badges **ORIGINAL FILE** and **NATIVE DSD · DoP**, never a
+   surround badge. Two-channel songs never go to the renderer whatever is chosen.
 
 ## B5. Double processing (3 min)
 
-With B4 step 1 playing, open Control Center, long-press the volume slider. Note what the Spatial Audio button offers (Off / Fixed /
-Head Tracked, or "Spatialize Stereo") and whether the app's sound changes when it is switched. If the system spatializes what the app
-already rendered, the sound becomes diffuse and echoey: record which combination does it. This decides whether the app's own
-renderer or the system's stays the default (open question Q3).
+No longer a risk in the default path: the app no longer renders binaurally anything it hands to iOS. With the AirPods' Spatial
+Audio off (B4 step 6), the app renders; with it on, iOS does. Check once that "Spatialize Stereo" in Control Center doesn't change a
+surround song (it applies to stereo).
 
 ## B6. DSD 5.1 (3 min)
 

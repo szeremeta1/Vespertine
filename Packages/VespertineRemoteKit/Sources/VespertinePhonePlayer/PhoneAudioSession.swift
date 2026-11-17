@@ -32,7 +32,29 @@ public enum PhoneAudioSession {
     public static func activate() throws {
         let session = AVAudioSession.sharedInstance()
         try session.setCategory(.playback, mode: .default)
+        // Tells iOS this app supplies multichannel audio (surround songs, handed over whole through a sample buffer
+        // renderer): what iOS asks of a "Now Playing" app before it offers Spatial Audio for it.
+        if !session.supportsMultichannelContent { try? session.setSupportsMultichannelContent(true) }
         try session.setActive(true)
+    }
+
+    /// What iOS says it renders the app's audio as right now (iOS 17.2 and later); nil before.
+    public static func renderingMode() -> SystemRenderingMode? {
+        guard #available(iOS 17.2, *) else { return nil }
+        return SystemRenderingMode(rawValue: AVAudioSession.sharedInstance().renderingMode.rawValue)
+    }
+
+    /// Everything iOS says about spatial and multichannel output, as words for a log line (the bench and the probe).
+    public static func readback() -> String {
+        let session = AVAudioSession.sharedInstance()
+        let outputs = session.currentRoute.outputs.map {
+            "\($0.portName) [\($0.portType.rawValue)] channels=\($0.channels?.count ?? 0) spatialAudioEnabled=\($0.isSpatialAudioEnabled)"
+        }
+        var mode = "n/a"
+        if #available(iOS 17.2, *) { mode = "\(session.renderingMode.rawValue) (\(renderingMode().map { "\($0)" } ?? "?"))" }
+        return "route=\(outputs) sampleRate=\(session.sampleRate) outputNumberOfChannels=\(session.outputNumberOfChannels) "
+            + "maximumOutputNumberOfChannels=\(session.maximumOutputNumberOfChannels) supportsMultichannelContent=\(session.supportsMultichannelContent) "
+            + "renderingMode=\(mode)"
     }
 
     public static func currentRoute() -> Route? {

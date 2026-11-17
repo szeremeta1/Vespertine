@@ -109,7 +109,7 @@ enum AirPlay2Message {
         (try? PropertyListSerialization.propertyList(from: data, format: nil)) as? [String: Any]
     }
 
-    private static func port(_ value: Any?) -> UInt16? {
+    static func port(_ value: Any?) -> UInt16? {
         guard let number = value as? Int, number > 0, number <= Int(UInt16.max) else { return nil }
         return UInt16(number)
     }

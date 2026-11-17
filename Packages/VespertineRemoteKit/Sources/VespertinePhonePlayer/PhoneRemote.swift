@@ -69,6 +69,38 @@ public struct PhoneSignal: Equatable, Sendable {
     public var surround: SpatialModeChoice?
     /// For a surround song on an interface with more than two outputs: how many outputs it plays on, a channel each.
     public var discreteOutputs: Int?
+    /// For a surround song handed to iOS whole (`SurroundPath.system`): how many channels iOS is given. nil otherwise.
+    public var systemChannels: Int?
+    /// What iOS says it renders the app's audio as, read back while it plays. nil: not read.
+    public var systemRendering: SystemRenderingMode?
+    /// The route can spatialize and Spatial Audio is on for it, as iOS says (`isSpatialAudioEnabled`).
+    public var routeSpatial = false
+
+    /// What iOS does with a surround song handed to it whole, in iOS's own words; nil when none was handed over.
+    public enum SystemSurround: Equatable, Sendable {
+        /// iOS says it renders it as Spatial Audio (or Dolby Atmos / Dolby Audio) on a route where Spatial Audio is on.
+        case spatial
+        /// iOS has the channels but doesn't say it spatializes them.
+        case surround
+        /// iOS says it plays it as stereo.
+        case stereo
+        /// Handed over to an output iOS says has Spatial Audio on, and iOS's rendering mode doesn't say more. Measured on
+        /// an iPhone 15 Pro Max (iOS 26.3.1, speaker): the rendering mode stays "not applicable" for a sample buffer
+        /// renderer's six channels, so this is what the badge usually shows; it says what iOS reported, nothing more.
+        case pending
+    }
+
+    /// Spatial only when iOS says so twice: the route has Spatial Audio on, and the rendering mode it resolved is a
+    /// spatial one. Never from what the app asked for.
+    public var systemSurround: SystemSurround? {
+        guard let sent = systemChannels, sent > 2 else { return nil }
+        switch systemRendering {
+        case nil, .notApplicable?: return routeSpatial ? .pending : .surround
+        case .monoStereo?: return .stereo
+        case .surround?: return .surround
+        case .spatialAudio?, .dolbyAudio?, .dolbyAtmos?: return routeSpatial ? .spatial : .surround
+        }
+    }
     /// The channels the output runs with, when known.
     public var outputChannels: Int?
     /// The device's own volume, 0…1, when known.
@@ -102,7 +134,7 @@ public struct PhoneSignal: Equatable, Sendable {
     /// at the DAC. Anything unknown (the rate, the volume) counts against it, and so does Bluetooth, AirPlay or the
     /// speaker, where iOS always converts.
     public var untouched: Bool {
-        guard original, lossless, dsdRate == nil, !processed, surround == nil, discreteOutputs == nil, onDAC else { return false }
+        guard original, lossless, dsdRate == nil, !processed, surround == nil, discreteOutputs == nil, systemChannels == nil, onDAC else { return false }
         guard let outputRate, outputRate > 0, !resampled, outputChannels == channels else { return false }
         guard let volume, volume >= 0.995 else { return false }
         return true
@@ -126,6 +158,7 @@ public struct PhoneSignal: Equatable, Sendable {
         channels = stream.format.channels
         outputRate = route.map(\.sampleRate)
         outputChannels = route.map(\.channels)
+        routeSpatial = route?.spatial ?? false
         onDAC = route.map { !$0.hasFixedRate } ?? false
     }
 
@@ -166,14 +199,19 @@ public final class PhoneRemote {
     /// decides what it gets (`PhoneRoute.surroundMode`).
     public var surroundChoice: SpatialModeChoice = .off { didSet { applySurround() } }
 
+    /// What iOS says it renders the app's audio as (the app keeps it current from the audio session).
+    public var systemRendering: SystemRenderingMode?
+
     private func applySurround() {
-        let mode = route.map { $0.surroundMode(wanted: surroundChoice, canTrackHead: playback.player.canTrackHead) } ?? surroundChoice
-        let wanted: SpatialMode = switch mode {
-        case .off: .off
-        case .fixed: .fixed
-        case .headTracked: .headTracked
+        let path = route.map { $0.surroundPath(wanted: surroundChoice, canTrackHead: playback.player.canTrackHead) }
+            ?? (surroundChoice == .off ? .fold : .binaural)
+        // Vespertine's own rendering is only ever Fixed: head tracking needs AirPods or Beats, and on those iOS renders.
+        let wanted: SpatialMode = path == .binaural ? .fixed : .off
+        let system = path == .system
+        // Both at once, so the song is connected once for the new path.
+        if playback.player.spatialMode != wanted || playback.player.systemSpatial != system {
+            playback.player.setSurround(spatialMode: wanted, systemSpatial: system)
         }
-        if playback.player.spatialMode != wanted { playback.player.spatialMode = wanted }
         // An interface with more than two outputs gets a surround song's channels on outputs of their own.
         let speakers = route.flatMap { $0.isMultichannel ? ChannelLayouts.outputSpeakers(channels: $0.channels, described: $0.channelLabels) : nil }
         if playback.player.outputSpeakers != speakers { playback.player.outputSpeakers = speakers }
@@ -297,10 +335,15 @@ public final class PhoneRemote {
             case .untouched: signal.surround = nil
             case .downmix: signal.surround = .off
             case .spatial(let tracked): signal.surround = tracked ? .headTracked : .fixed
+            case .system(let channels):
+                signal.surround = nil
+                signal.systemChannels = channels
             case .discrete(let outputs):
                 signal.surround = nil
                 signal.discreteOutputs = outputs
             }
+            // What iOS says it renders the app's audio as, for every song: the fold's "Stereo" is as much a fact as Spatial Audio.
+            signal.systemRendering = systemRendering
             signal.volume = outputVolume
             signal.dacPassedAtRate = dopDACs.passed(at: stream.format.sampleRate, for: route?.uid)
             // ReplayGain multiplies every sample: the song is no longer the file's own samples while it does.
