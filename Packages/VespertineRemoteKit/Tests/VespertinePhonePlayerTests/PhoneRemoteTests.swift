@@ -198,12 +198,22 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         remote.route = pods
         #expect(remote.surroundChoice == .off)
         #expect(remote.playback.player.spatialMode == .off, "nobody chose a spatial rendering")
+        #expect(!remote.playback.player.systemSpatial)
         remote.surroundChoice = .fixed
-        #expect(remote.playback.player.spatialMode == .fixed)
+        // AirPods with Spatial Audio on: the channels go to iOS, which renders them; the app's own mixer stays out.
+        #expect(remote.playback.player.systemSpatial && remote.playback.player.spatialMode == .off)
+        remote.surroundChoice = .headTracked
+        #expect(remote.playback.player.systemSpatial && remote.playback.player.spatialMode == .off)
+        // Wired headphones iOS doesn't spatialize: the app's own fixed rendering.
+        remote.route = PhoneRoute(name: "Headphones", portType: "Headphones", sampleRate: 48_000, channels: 2, spatial: false)
+        #expect(!remote.playback.player.systemSpatial && remote.playback.player.spatialMode == .fixed)
         remote.route = PhoneRoute(name: "K11", portType: "USBAudio", sampleRate: 48_000, channels: 6, spatial: false, maximumChannels: 6)
-        #expect(remote.playback.player.spatialMode == .off, "an interface gets the channels")
+        #expect(remote.playback.player.spatialMode == .off && !remote.playback.player.systemSpatial, "an interface gets the channels")
         remote.route = PhoneRoute(name: "Speaker", portType: "Speaker", sampleRate: 48_000, channels: 2, spatial: false)
-        #expect(remote.playback.player.spatialMode == .off)
+        #expect(remote.playback.player.spatialMode == .off && !remote.playback.player.systemSpatial)
+        remote.route = pods
+        remote.surroundChoice = .off
+        #expect(remote.playback.player.spatialMode == .off && !remote.playback.player.systemSpatial, "Off folds")
     }
 
     @Test func theSignalSaysWhatTheOutputGaveAndWhetherTheVolumeIsAtItsTop() {

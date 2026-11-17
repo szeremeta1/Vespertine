@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>Vespertine</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>
@@ -19,8 +21,6 @@
 			</array>
 		</dict>
 	</array>
-	<key>CFBundleDisplayName</key>
-	<string>Vespertine</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -59,7 +59,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Vespertine uses the camera only to scan the pairing code that the Vespertine app shows on your Mac.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Vespertine looks for Macs running Vespertine on your network, and connects only to the ones you pair with.</string>
+	<string>Vespertine looks for Macs running Vespertine on your network, and connects only to the Macs you pair with and the shares you add.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
