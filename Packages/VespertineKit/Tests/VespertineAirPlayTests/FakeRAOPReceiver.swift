@@ -25,7 +25,14 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private var _resent = 0
     private var stopped = false
     private var sockets: [UDPSocket] = []
+    /// The RTSP connections being served. A descriptor is on this list exactly as long as it is this receiver's: the thread
+    /// that serves it takes it off (under the lock) before it closes it. A closed descriptor's number is at once free to be
+    /// another socket's, of any test running in this process, and must never be touched again.
     private var clientSockets: [Int32] = []
+    /// The event connections accepted (AirPlay 2): nobody reads them, so `stop` closes them.
+    private var eventSockets: [Int32] = []
+    /// Signalled by each accepting thread when it has closed its listener.
+    private let accepting = DispatchSemaphore(value: 0)
     private var decoder: ALACDecoder?
     private var aesKey: Data?
     private var aesIV: Data?
@@ -101,7 +108,7 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     /// AirPlay 2: how many times the event connection was opened.
     var eventConnections: Int { lock.withLock { _eventConnections } }
     private var _eventConnections = 0
-    private var eventListener: Int32 = -1
+    private var eventPortsOpened: [UInt16] = []
     /// AirPlay 2: the key the audio packets are sealed with (the stream SETUP's), and how many packets didn't open.
     private var audioKey: SymmetricKey?
     var unopened: Int { lock.withLock { _unopened } }
@@ -146,21 +153,60 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         _ = withUnsafeMutablePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { getsockname(fd, $0, &length) } }
         listener = fd
         port = UInt16(bigEndian: addr.sin_port)
-        let thread = Thread { [weak self] in self?.acceptLoop() }
+        let thread = Thread { [self] in acceptLoop() }
         thread.start()
     }
 
     func stop() {
-        let (socks, clients) = lock.withLock { () -> ([UDPSocket], [Int32]) in
+        // Under the lock, so every descriptor touched here is still this receiver's (see `clientSockets`).
+        let (first, socks, events) = lock.withLock { () -> (Bool, [UDPSocket], [UInt16]) in
+            guard !stopped else { return (false, [], []) }
             stopped = true
-            return (sockets, clientSockets)
+            for c in clientSockets { shutdown(c, SHUT_RDWR) }
+            for c in eventSockets { close(c) }
+            eventSockets = []
+            return (true, sockets, eventPortsOpened)
         }
-        shutdown(listener, SHUT_RDWR)
-        close(listener)
-        let events = lock.withLock { eventListener }
-        if events >= 0 { shutdown(events, SHUT_RDWR); close(events) }
-        for c in clients { shutdown(c, SHUT_RDWR) }
+        guard first else { return }
+        // A listener is closed by the thread that accepts on it, and by no one else: closed from here, its number could be
+        // another test's listener by the time that thread calls accept again, and it would take that test's connections.
+        // The thread is woken by a connection, sees that the receiver has stopped and closes the listener.
+        for wake in [port] + events {
+            if Self.knock(wake) { _ = accepting.wait(timeout: .now() + 30) }
+        }
         socks.forEach { $0.close() }
+    }
+
+    /// Connects to `port` on this Mac and hangs up; false if nothing listens there.
+    private static func knock(_ port: UInt16) -> Bool {
+        let fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)
+        guard fd >= 0 else { return false }
+        defer { close(fd) }
+        var addr = sockaddr_in()
+        addr.sin_family = sa_family_t(AF_INET)
+        addr.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+        addr.sin_port = port.bigEndian
+        inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr)
+        return withUnsafePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { connect(fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) } } == 0
+    }
+
+    /// Accepts on `listener` until the receiver is stopped, then closes it. `take` is given each connection, under the lock.
+    private static func accept(on listener: Int32, for receiver: FakeRAOPReceiver, take: (FakeRAOPReceiver, Int32) -> Void) {
+        while true {
+            let client = Darwin.accept(listener, nil, nil)
+            if client < 0, errno == EINTR || errno == ECONNABORTED { continue }
+            let goesOn = receiver.lock.withLock { () -> Bool in
+                guard client >= 0, !receiver.stopped else { return false }
+                take(receiver, client)
+                return true
+            }
+            if !goesOn {
+                if client >= 0 { close(client) }
+                close(listener)
+                receiver.accepting.signal()
+                return
+            }
+        }
     }
 
     var requests: [RTSPMessage] { lock.withLock { _requests } }
@@ -197,13 +243,11 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     // MARK: RTSP
 
     private func acceptLoop() {
-        while true {
-            let client = accept(listener, nil, nil)
-            guard client >= 0 else { return }
+        Self.accept(on: listener, for: self) { receiver, client in
             var on: Int32 = 1
             setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &on, socklen_t(MemoryLayout<Int32>.size))
-            lock.withLock { clientSockets.append(client) }
-            let thread = Thread { [weak self] in self?.serve(client) }
+            receiver.clientSockets.append(client)
+            let thread = Thread { receiver.serve(client) }
             thread.start()
         }
     }
@@ -212,7 +256,11 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         var parser = RTSPParser()
         var buffer = [UInt8](repeating: 0, count: 65_536)
         var channel: PairingChannel?
-        defer { close(fd) }
+        // Off the list first, then closed: `stop` shuts down only what is on the list.
+        defer {
+            lock.withLock { clientSockets.removeAll { $0 == fd } }
+            close(fd)
+        }
         while true {
             let n = read(fd, &buffer, buffer.count)
             guard n > 0 else { return }
@@ -358,16 +406,21 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         guard bound == 0, listen(fd, 4) == 0 else { close(fd); return nil }
         var length = socklen_t(MemoryLayout<sockaddr_in>.size)
         _ = withUnsafeMutablePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { getsockname(fd, $0, &length) } }
-        lock.withLock { eventListener = fd }
-        let thread = Thread { [weak self] in
-            while true {
-                let client = accept(fd, nil, nil)
-                guard client >= 0, let self else { return }
-                self.lock.withLock { self._eventConnections += 1; self.clientSockets.append(client) }
+        let port = UInt16(bigEndian: addr.sin_port)
+        // Stopped meanwhile: no thread is started for a listener nobody would wake.
+        guard lock.withLock({ () -> Bool in
+            guard !stopped else { return false }
+            eventPortsOpened.append(port)
+            return true
+        }) else { close(fd); return nil }
+        let thread = Thread { [self] in
+            Self.accept(on: fd, for: self) { receiver, client in
+                receiver._eventConnections += 1
+                receiver.eventSockets.append(client)
             }
         }
         thread.start()
-        return UInt16(bigEndian: addr.sin_port)
+        return port
     }
 
     private var controlSocket: UDPSocket?
