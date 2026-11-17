@@ -168,6 +168,30 @@ enum DeveloperHooks {
                                                        request: ProviderSignIn(server: address, user: "listener", secret: .password("demo")))
             print("[qa] streaming demo: \(failure ?? "signed in")")
         }
+        // `-VespertineSpeakerGroupsDemo quad|5.1|7.1.4`: on a test library only (`-VespertineDataDirectory`), turns Speaker Groups on
+        // and saves a group of pretend DACs laid out that way, so its screens can be looked at with no DAC attached and nothing
+        // played. `-VespertineSpeakerGroupsFill YES` has it fill the room, in a listening area. `-VespertineEditSpeakerGroup YES`
+        // shows its editor and `-VespertineSpeakerGroupsSettings YES` the two Settings › Playback sections about groups, each in a
+        // window of its own (in Settings they are far down a list, where a snapshot doesn't reach). `-VespertineRoomView
+        // top|back|side` and `-VespertineRoomSelect FL` choose the room's view and a speaker there.
+        if let layout = d.string(forKey: "VespertineSpeakerGroupsDemo"), d.string(forKey: "VespertineDataDirectory") != nil {
+            model.setSpeakerGroupsFeature(true)
+            let group = demoSpeakerGroup(layout, fillsRoom: d.bool(forKey: "VespertineSpeakerGroupsFill"))
+            model.speakerGroups?.upsert(group)
+            if d.bool(forKey: "VespertineEditSpeakerGroup"), let groups = model.speakerGroups {
+                showForQA(titled: "Speaker Group Editor", width: 820, height: 940, model: model) { SpeakerGroupEditor(groups: groups, group: group) }
+            }
+            if d.bool(forKey: "VespertineSpeakerGroupsSettings") {
+                showForQA(titled: "Speaker Groups Settings", width: 560, height: 760, model: model) {
+                    Form {
+                        SpeakerGroupsSettingsSection()
+                        SystemOutputSettingsSection()
+                    }
+                    .formStyle(.grouped)
+                }
+            }
+            print("[qa] speaker group demo: \(group.name), \(group.speakers.count) speakers, issues \(group.issues)")
+        }
         // `-VespertineOpenSettings playback|library|network|online|remote`: opens Settings on that tab.
         if let tab = d.string(forKey: "VespertineOpenSettings") {
             switch tab {
@@ -371,6 +395,55 @@ enum DeveloperHooks {
             }
         default: break
         }
+    }
+
+    private static var qaWindows: [NSWindow] = []
+
+    /// A view of the app in a window of its own, for a snapshot. The window is kept for as long as the app runs.
+    private static func showForQA(titled title: String, width: Double, height: Double, model: AppModel, @ViewBuilder content: () -> some View) {
+        let window = NSWindow(contentViewController: NSHostingController(rootView: content().environment(model).preferredColorScheme(.dark)))
+        window.title = title
+        window.styleMask = [.titled, .closable, .resizable]
+        window.isReleasedWhenClosed = false
+        window.setContentSize(NSSize(width: width, height: height))
+        window.makeKeyAndOrderFront(nil)
+        qaWindows.append(window)
+    }
+
+    /// A group of pretend two-channel DACs for `-VespertineSpeakerGroupsDemo`: a quad on two, a 5.1 on three, a 7.1.4 on six, in a
+    /// 5.2 by 4.4 m room with a 2.5 m ceiling, the seat a little behind its middle.
+    private static func demoSpeakerGroup(_ layout: String, fillsRoom: Bool) -> SpeakerGroup {
+        // Role, degrees from straight ahead, metres from the seat across the floor, metres above the floor (nil: at the ears).
+        let places: [(SpeakerRole, Double, Double, Double?)] = switch layout {
+        case "7.1.4":
+            [(.frontLeft, -30, 2.2, nil), (.frontRight, 30, 2.2, nil), (.center, 0, 2.1, 1.0), (.lfe, 18, 2.3, 0.2), (.sideLeft, -90, 1.9, nil),
+             (.sideRight, 90, 1.9, nil), (.backLeft, -145, 1.9, nil), (.backRight, 145, 1.9, nil), (.topFrontLeft, -40, 1.5, 2.5),
+             (.topFrontRight, 40, 1.5, 2.5), (.topBackLeft, -140, 1.4, 2.5), (.topBackRight, 140, 1.4, 2.5)]
+        case "5.1":
+            [(.frontLeft, -30, 2.2, nil), (.frontRight, 30, 2.2, nil), (.center, 0, 2.1, 1.0), (.lfe, 18, 2.3, 0.2), (.sideLeft, -110, 1.8, 1.5),
+             (.sideRight, 110, 1.8, 1.5)]
+        default:
+            [(.frontLeft, -32, 2.2, nil), (.frontRight, 32, 2.2, nil), (.backLeft, -140, 1.8, 1.6), (.backRight, 140, 1.8, 1.6)]
+        }
+        let names = ["Fosi Audio ZD3", "FiiO K11", "Topping E30 II", "SMSL SU-1", "Schiit Modi", "iFi Zen DAC"]
+        let members = (0..<(places.count + 1) / 2).map { SpeakerGroup.Member(deviceUID: "demo-dac-\($0)", name: names[$0 % names.count], channelCount: 2) }
+        var group = SpeakerGroup(id: UUID(uuidString: "5EA4E700-0000-4000-8000-00000000D3A0")!, name: layout == "quad" || places.count == 4 ? "Living Room" : "Cinema",
+                                 members: members, clockLeaderUID: members[0].deviceUID,
+                                 listener: Listener(position: Point2D(x: 0, y: -0.4)), room: RoomOutline(width: 5.2, depth: 4.4, height: 2.5))
+        for (index, place) in places.enumerated() {
+            let bearing = place.1 * .pi / 180
+            let speaker = SpeakerGroup.Speaker(role: place.0, deviceUID: members[index / 2].deviceUID, channel: index % 2,
+                                               position: Point2D(x: group.listener.position.x + place.2 * sin(bearing), y: group.listener.position.y + place.2 * cos(bearing)))
+            group.speakers.append(speaker)
+            group = RoomCanvas.move(speaker: speaker.id, to: speaker.position, in: group)
+            if let height = place.3 { group = RoomCanvas.setHeight(speaker: speaker.id, aboveFloor: height, in: group) }
+        }
+        if fillsRoom {
+            group = GroupPolicies.setRoomRender(true, in: group)
+            group = RoomCanvas.sizeListeningArea(width: 3.4, depth: 2.6, in: group)
+            group = RoomCanvas.moveListeningArea(to: Point2D(x: 0, y: -0.5), in: group)
+        }
+        return group
     }
 
     /// The visualizer window, when there is one on screen.

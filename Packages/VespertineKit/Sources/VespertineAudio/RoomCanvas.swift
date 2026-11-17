@@ -17,7 +17,7 @@ public enum DistanceUnit: String, Codable, CaseIterable, Sendable {
     static let metresPerFoot = 0.3048
 
     /// The unit's number for a distance in metres.
-    func value(_ metres: Double) -> Double { self == .feet ? metres / Self.metresPerFoot : metres }
+    public func value(_ metres: Double) -> Double { self == .feet ? metres / Self.metresPerFoot : metres }
 
     /// Metres from a number typed in this unit.
     public func metres(from value: Double) -> Double { self == .feet ? value * Self.metresPerFoot : value }
@@ -27,8 +27,11 @@ public enum DistanceUnit: String, Codable, CaseIterable, Sendable {
         return v == v.rounded() ? String(Int(v)) : String(v)
     }
 
+    /// "m" or "ft"
+    public var symbol: String { self == .feet ? "ft" : "m" }
+
     /// "2.1 m", "6.9 ft"
-    public func format(_ metres: Double) -> String { "\(number(metres)) \(self == .feet ? "ft" : "m")" }
+    public func format(_ metres: Double) -> String { "\(number(metres)) \(symbol)" }
 
     /// "2.1 metres", "1 foot"
     public func spoken(_ metres: Double) -> String {
@@ -77,7 +80,7 @@ public enum RoomCanvas {
     public static let snapWithin = 5.0
 
     /// The room as drawn, or one that holds every speaker and the seat with a metre to spare, at least 4 m each way.
-    static func room(of group: SpeakerGroup) -> (width: Double, depth: Double) {
+    public static func room(of group: SpeakerGroup) -> (width: Double, depth: Double) {
         if let room = group.room, room.width > 0, room.depth > 0 { return (room.width, room.depth) }
         let points = group.speakers.map(\.position) + [group.listener.position]
         let halfWidth = max(2, (points.map { abs($0.x) }.max() ?? 0) + 1)

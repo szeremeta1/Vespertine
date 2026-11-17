@@ -40,25 +40,61 @@ public enum LossPolicy: String, Codable, Hashable, Sendable {
     case continueOnRemaining
 }
 
-/// The room, for the drawing: width across, depth front to back, in metres.
+/// The room, for the drawing: width across, depth front to back and, for the view in three dimensions, floor to ceiling, in metres.
 public struct RoomOutline: Codable, Hashable, Sendable {
+    /// The ceiling a room is drawn with until its height is given.
+    public static let defaultHeight = 2.4
+    public static let heightRange: ClosedRange<Double> = 1.5...20
+
     public var width: Double
     public var depth: Double
+    /// Floor to ceiling; nil: not given, drawn as `defaultHeight`. Older files have none.
+    public var height: Double?
 
-    public init(width: Double, depth: Double) {
+    public init(width: Double, depth: Double, height: Double? = nil) {
         self.width = width
         self.depth = depth
+        self.height = height
     }
+
+    /// The ceiling as drawn.
+    public var ceiling: Double { height ?? Self.defaultHeight }
 }
 
 /// The listening seat: where it is, and which way the listener faces (degrees clockwise from the room's forward).
 public struct Listener: Codable, Hashable, Sendable {
+    /// A seated listener's ears above the floor, in metres: what a seat has until its own is given.
+    public static let defaultEarHeight = 1.2
+    public static let earHeightRange: ClosedRange<Double> = 0.3...2.5
+
     public var position: Point2D
     public var facingDegrees: Double
+    /// The listener's ears above the floor; nil: not given, taken as `defaultEarHeight`. Every speaker's `height` is counted from here.
+    public var earHeight: Double?
 
-    public init(position: Point2D = Point2D(), facingDegrees: Double = 0) {
+    public init(position: Point2D = Point2D(), facingDegrees: Double = 0, earHeight: Double? = nil) {
         self.position = position
         self.facingDegrees = facingDegrees
+        self.earHeight = earHeight
+    }
+
+    /// The ears above the floor, as counted.
+    public var ears: Double { earHeight ?? Self.defaultEarHeight }
+}
+
+/// The part of the room people listen in when a group fills the room (`SpeakerGroup.roomRender`): a rectangle on the floor, its
+/// sides along the room's. For the drawing; a renderer may read it.
+public struct ListeningArea: Codable, Hashable, Sendable {
+    public static let smallest = 0.5
+
+    public var center: Point2D
+    public var width: Double
+    public var depth: Double
+
+    public init(center: Point2D = Point2D(), width: Double, depth: Double) {
+        self.center = center
+        self.width = width
+        self.depth = depth
     }
 }
 
@@ -90,6 +126,9 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
     public var alignmentProfileID: UUID?
     /// Room render (`RoomRender`): songs played to fill the room from every speaker. nil: off, songs play as routed.
     public var roomRender: RoomRenderSettings?
+    /// Where people listen while the group fills the room; nil: anywhere in the room. It means nothing while `roomRender` is nil
+    /// (the group is then aligned for the one seat, `listener`), and is kept for when it is turned on again.
+    public var listeningArea: ListeningArea?
 
     public struct Member: Codable, Hashable, Sendable {
         public var deviceUID: String
@@ -216,7 +255,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
     public init(id: UUID = UUID(), name: String, members: [Member], clockLeaderUID: String, speakers: [Speaker] = [],
                 listener: Listener = Listener(), room: RoomOutline? = nil, stereoPolicy: StereoPolicy = .frontOnly,
                 lfePolicy: LFEPolicy = .drop, onMemberLoss: LossPolicy = .pause, alignmentProfileID: UUID? = nil,
-                roomRender: RoomRenderSettings? = nil) {
+                roomRender: RoomRenderSettings? = nil, listeningArea: ListeningArea? = nil) {
         self.id = id
         self.name = name
         self.members = members
@@ -229,6 +268,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
         self.onMemberLoss = onMemberLoss
         self.alignmentProfileID = alignmentProfileID
         self.roomRender = roomRender
+        self.listeningArea = listeningArea
     }
 
     public init(from decoder: Decoder) throws {
@@ -246,6 +286,7 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
         onMemberLoss = try c.decodeIfPresent(LossPolicy.self, forKey: .onMemberLoss) ?? .pause
         alignmentProfileID = try c.decodeIfPresent(UUID.self, forKey: .alignmentProfileID)
         roomRender = try c.decodeIfPresent(RoomRenderSettings.self, forKey: .roomRender)
+        listeningArea = try c.decodeIfPresent(ListeningArea.self, forKey: .listeningArea)
     }
 
     // MARK: Identity
@@ -378,12 +419,27 @@ public struct SpeakerGroup: Codable, Identifiable, Hashable, Sendable {
             }
             if !Self.trimRangeDB.contains(speaker.trimDB) || !Self.delayTrimRangeMs.contains(speaker.delayTrimMs) { found.append(.trimInvalid(speaker.id)) }
         }
-        if !Self.isPlace(listener.position) || !listener.facingDegrees.isFinite { found.append(.listenerInvalid) }
-        if let room, !(room.width > 0 && room.depth > 0 && room.width <= Self.maxDistance * 2 && room.depth <= Self.maxDistance * 2) { found.append(.roomInvalid) }
+        if !Self.isPlace(listener.position) || !listener.facingDegrees.isFinite
+            || !(listener.earHeight.map { $0.isFinite && $0 >= 0 && $0 <= Self.maxDistance } ?? true) { found.append(.listenerInvalid) }
+        var roomFits = true
+        if let room {
+            roomFits = room.width > 0 && room.depth > 0 && room.width <= Self.maxDistance * 2 && room.depth <= Self.maxDistance * 2
+                && (room.height.map { $0 > 0 && $0 <= Self.maxDistance } ?? true)
+        }
+        if let area = listeningArea {
+            roomFits = roomFits && Self.isPlace(area.center) && area.width > 0 && area.depth > 0
+                && area.width <= Self.maxDistance * 2 && area.depth <= Self.maxDistance * 2
+        }
+        if !roomFits { found.append(.roomInvalid) }
         return found
     }
 
     public var isValid: Bool { issues.isEmpty }
+
+    // MARK: Heights
+
+    /// How high a speaker stands above the floor, in metres: the ears' height and the speaker's own above (or below) them.
+    public func heightAboveFloor(of speaker: Speaker) -> Double { listener.ears + (speaker.height ?? 0) }
 
     private static func isPlace(_ point: Point2D) -> Bool {
         point.isFinite && abs(point.x) <= maxDistance && abs(point.y) <= maxDistance
