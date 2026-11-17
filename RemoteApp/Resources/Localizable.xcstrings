@@ -64547,271 +64547,271 @@
         }
       }
     },
-    "SURROUND SENT TO iOS": {
-      "comment": "Signal badge on the iPhone: a surround song was handed to iOS with all its channels, and iOS hasn't said yet how it renders it. iOS stays as it is.",
+    "SURROUND TO iOS · SPATIAL AUDIO ON": {
+      "comment": "Signal badge on the iPhone: a surround song was handed to iOS with all its channels, and iOS says Spatial Audio is on for this output; iOS hasn't said how it renders the song. iOS stays as it is.",
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "ሰራውንድ ወደ iOS ተልኳል"
+            "value": "ሰራውንድ ወደ iOS · Spatial Audio በርቷል"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "صوت محيطي أُرسل إلى iOS"
+            "value": "صوت محيطي إلى iOS · الصوت المكاني مفعّل"
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "সারাউন্ড iOS-এ পাঠানো হয়েছে"
+            "value": "সারাউন্ড iOS-এ · স্পেশিয়াল অডিও চালু"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND ODESLÁN DO iOS"
+            "value": "SURROUND DO iOS · PROSTOROVÝ ZVUK ZAPNUTÝ"
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND SENDT TIL iOS"
+            "value": "SURROUND TIL iOS · RUMLIG LYD TIL"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND AN iOS GESENDET"
+            "value": "SURROUND AN iOS · 3D-AUDIO AN"
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND ΣΤΑΛΘΗΚΕ ΣΤΟ iOS"
+            "value": "SURROUND ΣΤΟ iOS · ΧΩΡΙΚΌΣ ΉΧΟΣ ΕΝΕΡΓΟΣ"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "ENVOLVENTE ENVIADO A iOS"
+            "value": "ENVOLVENTE A iOS · AUDIO ESPACIAL ACTIVADO"
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "فراگیر به iOS فرستاده شد"
+            "value": "فراگیر به iOS · صدای فضایی روشن"
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND LÄHETETTY iOS:LLE"
+            "value": "SURROUND iOS:LLE · TILAÄÄNI PÄÄLLÄ"
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "NAIPADALA SA iOS ANG SURROUND"
+            "value": "SURROUND SA iOS · NAKA-ON ANG SPATIAL AUDIO"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND ENVOYÉ À iOS"
+            "value": "SURROUND VERS iOS · AUDIO SPATIAL ACTIVÉ"
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "સરાઉન્ડ iOS ને મોકલ્યું"
+            "value": "સરાઉન્ડ iOS ને · સ્પેશિયલ ઑડિયો ચાલુ"
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "AN AIKA SAUTIN KEWAYE ZUWA iOS"
+            "value": "SAUTIN KEWAYE ZUWA iOS · AN KUNNA SPATIAL AUDIO"
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "סראונד נשלח ל-iOS"
+            "value": "סראונד ל-iOS · שמע מרחבי פועל"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "सराउंड iOS को भेजा गया"
+            "value": "सराउंड iOS को · स्पेशियल ऑडियो चालू"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND ELKÜLDVE AZ iOS-NEK"
+            "value": "SURROUND AZ iOS-NEK · TÉRHATÁSÚ HANG BE"
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND DIKIRIM KE iOS"
+            "value": "SURROUND KE iOS · AUDIO SPASIAL AKTIF"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND INVIATO A iOS"
+            "value": "SURROUND A iOS · AUDIO SPAZIALE ATTIVO"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "サラウンドをiOSへ送信済み"
+            "value": "サラウンドをiOSへ · 空間オーディオオン"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಸರೌಂಡ್ iOS ಗೆ ಕಳುಹಿಸಲಾಗಿದೆ"
+            "value": "ಸರೌಂಡ್ iOS ಗೆ · ಸ್ಪೇಷಿಯಲ್ ಆಡಿಯೋ ಆನ್"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "서라운드를 iOS로 보냄"
+            "value": "서라운드를 iOS로 · 공간 음향 켬"
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "സറൗണ്ട് iOS-ലേക്ക് അയച്ചു"
+            "value": "സറൗണ്ട് iOS-ലേക്ക് · സ്പേഷ്യൽ ഓഡിയോ ഓൺ"
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "सराउंड iOS ला पाठवले"
+            "value": "सराउंड iOS ला · स्पेशियल ऑडिओ चालू"
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "BUNYI KELILING DIHANTAR KE iOS"
+            "value": "BUNYI KELILING KE iOS · AUDIO RUANG HIDUP"
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND SENDT TIL iOS"
+            "value": "SURROUND TIL iOS · ROMLIG LYD PÅ"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND NAAR iOS GESTUURD"
+            "value": "SURROUND NAAR iOS · RUIMTELIJKE AUDIO AAN"
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਸਰਾਊਂਡ iOS ਨੂੰ ਭੇਜਿਆ"
+            "value": "ਸਰਾਊਂਡ iOS ਨੂੰ · ਸਪੇਸ਼ੀਅਲ ਆਡੀਓ ਚਾਲੂ"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND WYSŁANY DO iOS"
+            "value": "SURROUND DO iOS · DŹWIĘK PRZESTRZENNY WŁĄCZONY"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND ENVIADO AO iOS"
+            "value": "SURROUND PARA O iOS · ÁUDIO ESPACIAL ATIVADO"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND ENVIADO PARA O iOS"
+            "value": "SURROUND PARA O iOS · ÁUDIO ESPACIAL ATIVADO"
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND TRIMIS CĂTRE iOS"
+            "value": "SURROUND CĂTRE iOS · AUDIO SPAȚIAL ACTIVAT"
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND SKICKAT TILL iOS"
+            "value": "SURROUND TILL iOS · RUMSLIGT LJUD PÅ"
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "SAUTI YA KUZUNGUKA IMETUMWA KWA iOS"
+            "value": "SAUTI YA KUZUNGUKA KWA iOS · SPATIAL AUDIO IMEWASHWA"
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "சரவுண்ட் iOS-க்கு அனுப்பப்பட்டது"
+            "value": "சரவுண்ட் iOS-க்கு · ஸ்பேஷியல் ஆடியோ இயக்கத்தில்"
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "సరౌండ్ iOS‌కు పంపబడింది"
+            "value": "సరౌండ్ iOS‌కు · స్పేషియల్ ఆడియో ఆన్"
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "ส่งเสียงรอบทิศทางไปยัง iOS แล้ว"
+            "value": "เสียงรอบทิศทางไปยัง iOS · เสียงตามตำแหน่งเปิดอยู่"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "SURROUND iOS'A GÖNDERİLDİ"
+            "value": "SURROUND iOS'A · UZAMSAL SES AÇIK"
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "ОБ’ЄМНИЙ ЗВУК НАДІСЛАНО ДО iOS"
+            "value": "ОБ’ЄМНИЙ ЗВУК ДО iOS · ПРОСТОРОВЕ АУДІО УВІМК."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "سراؤنڈ iOS کو بھیجا گیا"
+            "value": "سراؤنڈ iOS کو · اسپیشل آڈیو آن"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "ĐÃ GỬI ÂM THANH VÒM ĐẾN iOS"
+            "value": "ÂM THANH VÒM ĐẾN iOS · ÂM THANH KHÔNG GIAN BẬT"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "環繞聲已傳送至 iOS"
+            "value": "環繞聲傳送至 iOS · 空間音訊已開啟"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "环绕声已发送到 iOS"
+            "value": "环绕声发送到 iOS · 空间音频已打开"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "環繞聲已傳送至 iOS"
+            "value": "環繞聲傳送至 iOS · 空間音訊已開啟"
           }
         }
       }

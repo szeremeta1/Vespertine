@@ -84,7 +84,9 @@ public struct PhoneSignal: Equatable, Sendable {
         case surround
         /// iOS says it plays it as stereo.
         case stereo
-        /// Handed over; iOS hasn't said yet.
+        /// Handed over to an output iOS says has Spatial Audio on, and iOS's rendering mode doesn't say more. Measured on
+        /// an iPhone 15 Pro Max (iOS 26.3.1, speaker): the rendering mode stays "not applicable" for a sample buffer
+        /// renderer's six channels, so this is what the badge usually shows; it says what iOS reported, nothing more.
         case pending
     }
 

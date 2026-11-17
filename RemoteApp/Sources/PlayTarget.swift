@@ -158,7 +158,7 @@ final class PlayTarget {
         case .stereo?:
             return String(localized: "SURROUND · iOS PLAYS STEREO", comment: "Signal badge on the iPhone: a surround song is handed to iOS with all its channels, and iOS says it plays it as stereo. iOS stays as it is.")
         case .pending?:
-            return String(localized: "SURROUND SENT TO iOS", comment: "Signal badge on the iPhone: a surround song was handed to iOS with all its channels, and iOS hasn't said yet how it renders it. iOS stays as it is.")
+            return String(localized: "SURROUND TO iOS · SPATIAL AUDIO ON", comment: "Signal badge on the iPhone: a surround song was handed to iOS with all its channels, and iOS says Spatial Audio is on for this output; iOS hasn't said how it renders the song. iOS stays as it is.")
         case nil: break
         }
         switch signal.surround {

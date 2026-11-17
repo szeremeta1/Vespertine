@@ -109,7 +109,7 @@ import VespertineRemoteProtocol
         #expect(PlayTarget.badge(said) == "SURROUND · iOS PLAYS STEREO")
         #expect(PlayTarget.report(said, route: pods).first { $0.label == "iOS renders it as" }?.value == "Stereo")
         said.systemRendering = nil
-        #expect(PlayTarget.badge(said) == "SURROUND SENT TO iOS")
+        #expect(PlayTarget.badge(said) == "SURROUND TO iOS · SPATIAL AUDIO ON")
         var off = pods
         off.spatial = false
         var unspatial = signal(rate: 48_000, channels: 6, route: off)
