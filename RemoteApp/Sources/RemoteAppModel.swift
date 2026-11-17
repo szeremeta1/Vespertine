@@ -192,6 +192,7 @@ final class RemoteAppModel {
         session.onConnected = { [weak session] _, _ in
             if let session { KeptShelf.shared.connected(session) }
         }
+        mac.combinesVersions = settings.combineVersions
         shareMac = mac
         shareStatus = ShareStatus(mac, folder: session.isFolder)
         self.session = session
@@ -485,6 +486,12 @@ final class RemoteAppModel {
     private func save(_ pairing: SavedPairing) {
         guard !transientPairings.contains(pairing.serverID) else { return }
         keychain.upsert(pairing)
+    }
+
+    /// The versions switch in Settings was changed: the player picks by the output or not, and a share's lists follow.
+    func versionsSettingChanged() {
+        PlayTarget.shared.combinesVersions = settings.combineVersions
+        shareMac?.combinesVersions = settings.combineVersions
     }
 
     /// The cellular switch in Settings was changed: applies it to the network in use now.

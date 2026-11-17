@@ -27,6 +27,8 @@ final class PlayTarget {
         }
     }
     private static let surroundKey = "surroundOnThisDevice"
+    /// A song the library has in stereo and in surround plays here as the version for the output (the app's setting).
+    var combinesVersions = UserDefaults.standard.object(forKey: "combineVersions") as? Bool ?? true { didSet { made?.remote.combinesVersions = combinesVersions } }
 
     /// The choice kept from an earlier launch, or Off for someone who never made one: the spatial rendering is asked for,
     /// never the starting point.
@@ -104,6 +106,7 @@ final class PlayTarget {
         let remote = PhoneRemote(playback: playback) { [weak session] command in await session?.send(command) ?? .failed(reason: "") }
         remote.words = { signal in (Self.badge(signal), Self.output(signal)) }
         remote.surroundChoice = surround
+        remote.combinesVersions = combinesVersions
         // Which DACs passed the DoP test here: kept between launches, by each DAC's own identifier.
         remote.dopDACs = DoPDACs.load()
         remote.onDoPDACsChanged = { $0.save() }

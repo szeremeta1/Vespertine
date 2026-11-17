@@ -169,11 +169,13 @@ struct RemoteBridge {
         }
     }
 
-    /// A song listed once with its copies beside it (Favorites).
-    func trackSummary(_ song: Self.ListedSong) -> TrackSummary {
-        var summary = trackSummary(song.shown)
-        summary.copies = Self.copies(of: song, in: library)
-        return summary
+    /// Songs listed once with their copies beside them (Favorites, Songs), and each one's version in the other layout.
+    func trackSummaries(_ songs: [Self.ListedSong]) -> [TrackSummary] {
+        zip(trackSummaries(songs.map(\.shown)), songs).map { summary, song in
+            var summary = summary
+            summary.copies = Self.copies(of: song, in: library)
+            return summary
+        }
     }
 
     func albumSummary(_ album: Album) -> AlbumSummary {
@@ -443,7 +445,7 @@ struct RemoteBridge {
             guard let playlist = library.playlists.first(where: { $0.id == id }) else { return notInLibrary }
             return .tracks(items: trackSummaries(library.tracks(in: playlist)))
         case .favorites:
-            return .tracks(items: Self.favoriteSongs(in: library, choose: model.listedCopy).map(trackSummary))
+            return .tracks(items: trackSummaries(Self.favoriteSongs(in: library, choose: model.listedCopy)))
         case .library:
             return .library(Self.overview(of: library, connecting: { $0.isNetwork && model.shares.status(of: $0) == .connecting }))
         case .genres:
@@ -471,7 +473,7 @@ struct RemoteBridge {
             let page = Array(songs[start..<end])
             guard library.combinesVersions else { return .songs(items: page.map(trackSummary), total: songs.count) }
             let listed = zip(page, library.versions(of: page)).map { Self.ListedSong(shown: $0, copies: $1) }
-            return .songs(items: listed.map(trackSummary), total: songs.count)
+            return .songs(items: trackSummaries(listed), total: songs.count)
         case .find(let text, let limit):
             return .found(Self.find(text, limit: limit, in: library, track: trackSummary, album: albumSummary, artworkKey: { model.artworkKey($0) },
                                     oneCopyEach: model.oneCopyEach))

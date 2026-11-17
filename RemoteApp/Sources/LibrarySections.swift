@@ -283,7 +283,12 @@ struct SongCopiesSheet: View {
                     }
                     .padding(.bottom, 6)
                 } footer: {
-                    Text("Play plays that copy here, then the list goes on. A heart is for that copy; where an album’s copies are bundled on the Mac, it is for all of them.")
+                    // A song whose stereo and surround versions are one song has one heart for both.
+                    if track.otherLayout != nil {
+                        Text("Play plays that copy here, then the list goes on. A heart covers the song’s stereo and surround versions alike.")
+                    } else {
+                        Text("Play plays that copy here, then the list goes on. A heart is for that copy; where an album’s copies are bundled on the Mac, it is for all of them.")
+                    }
                 }
             }
             .obsidianList()

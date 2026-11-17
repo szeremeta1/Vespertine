@@ -49,6 +49,11 @@ struct SettingsView: View {
                     Text("When music plays on this device, its songs come from your Mac. Lossless and hi-res songs are large: an album can be several hundred megabytes. The count is since the app was opened.")
                 }
                 Section {
+                    Toggle("Combine Stereo and Surround Versions", isOn: Binding(get: { settings.combineVersions }, set: { settings.combineVersions = $0; model.versionsSettingChanged() }))
+                } footer: {
+                    Text("A song you have in stereo and in surround or Dolby Atmos plays on this device as the version that fits the output: the surround one on a surround output or with Surround on Headphones, the stereo one everywhere else. From a share or a folder, such a song is listed once, and a heart on one version is a heart on the song. To hear a particular version, open the song’s copies and play it there. Off, every file plays as itself.")
+                }
+                Section {
                     Picker("Room for Kept Music", selection: $shelf.limitGigabytes) {
                         ForEach(KeptShelf.limitChoices, id: \.self) { gigabytes in
                             if gigabytes == 0 { Text("No Limit").tag(gigabytes) } else {
