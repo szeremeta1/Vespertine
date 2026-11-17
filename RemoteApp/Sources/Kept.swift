@@ -244,12 +244,8 @@ struct KeptListPage: View {
                     ForEach(Array(list.tracks.enumerated()), id: \.offset) { index, track in
                         let here = track.id.map { keeper.store.kept($0) != nil } ?? false
                         Button { PlayTarget.shared.playKept(list.tracks, startAt: index, shuffled: nil, session: session) } label: {
-                            HStack(spacing: 12) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(track.title).lineLimit(1)
-                                    Text(list.kind == .album ? track.format : "\(track.artist) — \(track.album)").font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                                }
-                                Spacer()
+                            MediaRow(title: track.title, subtitle: list.kind == .album ? track.format : "\(track.artist) — \(track.album)") {
+                            } trailing: {
                                 state(of: track, here: here, keeper: keeper)
                                 Text(formatTime(track.duration)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
                             }

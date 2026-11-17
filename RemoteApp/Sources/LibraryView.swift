@@ -132,10 +132,9 @@ private struct SearchPage: View {
                 Section("Artists") {
                     ForEach(found.artists) { artist in
                         NavigationLink { AlbumsGrid(session: session, listing: .artist(artist.name)) } label: {
-                            HStack {
+                            MediaRow(title: artist.name, spread: false) {
                                 ArtworkView(key: artist.artworkKey, size: 120, cornerRadius: 22).frame(width: 44)
-                                Text(artist.name)
-                            }
+                            } trailing: {}
                         }
                     }
                 }
@@ -144,13 +143,9 @@ private struct SearchPage: View {
                 Section("Albums") {
                     ForEach(found.albums) { album in
                         NavigationLink { AlbumView(session: session, album: album) } label: {
-                            HStack {
+                            MediaRow(title: album.title, subtitle: album.artist, spread: false) {
                                 ArtworkView(key: album.artworkKey, size: 120, cornerRadius: 4).frame(width: 44)
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(album.title).lineLimit(1)
-                                    Text(album.artist).font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                                }
-                            }
+                            } trailing: {}
                         }
                     }
                 }
@@ -322,8 +317,10 @@ struct AlbumsGrid: View {
                             VStack(alignment: .leading, spacing: 4) {
                                 ArtworkView(key: album.artworkKey)
                                     .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
-                                Text(album.title).font(.serif(.subheadline, weight: .medium)).foregroundStyle(Palette.text).lineLimit(1)
-                                Text(album.artist).font(.caption).foregroundStyle(Palette.text2).lineLimit(1)
+                                Text(album.title).font(.serif(.subheadline, weight: .medium)).foregroundStyle(Palette.text)
+                                    .lineLimit(RemoteLayout.rowDetailLines(accessibilityText: typeSize.isAccessibilitySize))
+                                Text(album.artist).font(.caption).foregroundStyle(Palette.text2)
+                                    .lineLimit(RemoteLayout.rowDetailLines(accessibilityText: typeSize.isAccessibilitySize))
                             }
                             .accessibilityElement(children: .combine)
                         }
@@ -422,23 +419,32 @@ struct AlbumView: View {
     private func albumInfo(leading: Bool) -> some View {
         VStack(alignment: leading ? .leading : .center, spacing: 10) {
             Text(album.title).font(.serif(leading ? .title2 : .title3, weight: .semibold)).multilineTextAlignment(leading ? .leading : .center)
+                .fixedSize(horizontal: false, vertical: true)
             Text(album.artist).foregroundStyle(Palette.text2)
             FlowLayout(spacing: 6, lineSpacing: 6) {
                 Chip(text: album.format, highlighted: album.hiRes || album.dsd)
                 if let year = album.year { Chip(text: String(year)) }
             }
-            HStack {
-                Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: false)) } label: {
-                    Label("Play", systemImage: "play.fill").frame(maxWidth: .infinity)
-                }
-                Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: true)) } label: {
-                    Label("Shuffle", systemImage: "shuffle").frame(maxWidth: .infinity)
-                }
-            }
+            // Side by side under the cover; one over the other beside it (an iPad with its sidebar open leaves the two
+            // words no room on one line) and at the largest text sizes. Chosen outright, never measured: a one-line
+            // label "fits" anywhere by losing its word to an ellipsis.
+            let buttons = RemoteLayout.albumButtonsStack(besideCover: leading, accessibilityText: typeSize.isAccessibilitySize)
+                ? AnyLayout(VStackLayout(spacing: 8)) : AnyLayout(HStackLayout())
+            buttons { playButtons }
+                .frame(maxWidth: leading ? 240 : .infinity)
             .buttonStyle(.bordered)
             .disabled(!session.isConnected)
         }
         .frame(maxWidth: .infinity)
+    }
+
+    @ViewBuilder private var playButtons: some View {
+        Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: false)) } label: {
+            Label("Play", systemImage: "play.fill").lineLimit(1).frame(maxWidth: .infinity)
+        }
+        Button { feedback.run(session, .playAlbum(key: album.key, startAt: 0, shuffled: true)) } label: {
+            Label("Shuffle", systemImage: "shuffle").lineLimit(1).frame(maxWidth: .infinity)
+        }
     }
 }
 
@@ -450,13 +456,9 @@ struct ArtistsList: View {
     var body: some View {
         List(artists.filter { filter.isEmpty || $0.name.localizedCaseInsensitiveContains(filter) }) { artist in
             NavigationLink { AlbumsGrid(session: session, listing: .artist(artist.name)) } label: {
-                HStack {
+                MediaRow(title: artist.name, subtitle: String(localized: "Albums: \(artist.albumCount)"), spread: false) {
                     ArtworkView(key: artist.artworkKey, size: 120, cornerRadius: 22).frame(width: 44)
-                    VStack(alignment: .leading) {
-                        Text(artist.name)
-                        Text("Albums: \(artist.albumCount)").font(.caption).foregroundStyle(.secondary)
-                    }
-                }
+                } trailing: {}
             }
         }
         .obsidianList()
@@ -523,27 +525,33 @@ struct TrackRows: View {
     let tracks: [TrackSummary]
     let play: (Int) -> RemoteCommand
     var numbered = false
+    @Environment(\.horizontalSizeClass) private var sizeClass
+    @Environment(\.dynamicTypeSize) private var typeSize
     @State private var feedback = CommandFeedback()
     /// The song being added to a playlist.
     @State private var adding: PlaylistAddition?
 
     var body: some View {
         ForEach(Array(tracks.enumerated()), id: \.offset) { index, track in
-            HStack(spacing: 10) {
+            // At the accessibility sizes the copies button goes under the song, which keeps the row's whole width.
+            let row = RemoteLayout.rowStacks(accessibilityText: typeSize.isAccessibilitySize)
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4)) : AnyLayout(HStackLayout(spacing: 10))
+            row {
                 Button { feedback.run(session, play(index)) } label: {
-                    HStack(spacing: 12) {
+                    MediaRow(title: track.title, subtitle: numbered ? track.format : "\(track.artist) — \(track.album)") {
                         if numbered {
-                            Text(track.trackNumber.map(String.init) ?? "").font(.callout.monospacedDigit()).foregroundStyle(.secondary).frame(width: 28, alignment: .trailing)
+                            Text(track.trackNumber.map(String.init) ?? "").font(.callout.monospacedDigit()).foregroundStyle(.secondary).rowIconColumn(alignment: .trailing)
                         } else {
                             ArtworkView(key: track.artworkKey, size: 120, cornerRadius: 4).frame(width: 44)
                         }
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(track.title).lineLimit(1)
-                            Text(numbered ? track.format : "\(track.artist) — \(track.album)").font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                    } trailing: {
+                        if track.favorite {
+                            Image(systemName: "heart.fill").font(.caption).foregroundStyle(.secondary)
+                                .accessibilityLabel(Text("Favorites"))
                         }
-                        Spacer()
-                        if track.favorite { Image(systemName: "heart.fill").font(.caption).foregroundStyle(.secondary) }
-                        Text(formatTime(track.duration)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                        if RemoteLayout.rowShowsLength(copies: track.copies?.count ?? 0, regularWidth: sizeClass == .regular) {
+                            Text(formatTime(track.duration)).font(.caption.monospacedDigit()).foregroundStyle(.secondary)
+                        }
                     }
                     .contentShape(Rectangle())
                 }

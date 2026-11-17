@@ -56,6 +56,35 @@ final class AdaptiveLayoutTests: XCTestCase {
         XCTAssertLessThan(RemoteLayout.miniPlayerLargestText, .accessibility3)
     }
 
+    func testRowsStackAndBannersStopGrowingAtAccessibilityTextSizes() {
+        XCTAssertFalse(RemoteLayout.rowStacks(accessibilityText: false))
+        XCTAssertTrue(RemoteLayout.rowStacks(accessibilityText: true))
+        XCTAssertEqual(RemoteLayout.rowDetailLines(accessibilityText: false), 1)
+        XCTAssertEqual(RemoteLayout.rowDetailLines(accessibilityText: true), 3)
+        XCTAssertFalse(RemoteLayout.bannerStacks(accessibilityText: false))
+        XCTAssertTrue(RemoteLayout.bannerStacks(accessibilityText: true))
+        XCTAssertTrue(RemoteLayout.bannerLargestText.isAccessibilitySize)
+        XCTAssertLessThan(RemoteLayout.bannerLargestText, .accessibility3)
+    }
+
+    func testAnAlbumsPlayAndShuffleStackBesideTheCoverAndAtAccessibilityTextSizes() {
+        XCTAssertFalse(RemoteLayout.albumButtonsStack(besideCover: false, accessibilityText: false))
+        XCTAssertTrue(RemoteLayout.albumButtonsStack(besideCover: true, accessibilityText: false))
+        XCTAssertTrue(RemoteLayout.albumButtonsStack(besideCover: false, accessibilityText: true))
+    }
+
+    func testTheSidebarIsWiderAtAccessibilityTextSizes() {
+        XCTAssertEqual(RemoteLayout.sidebarWidth(accessibilityText: false).ideal, 250)
+        XCTAssertGreaterThan(RemoteLayout.sidebarWidth(accessibilityText: true).min, RemoteLayout.sidebarWidth(accessibilityText: false).max)
+    }
+
+    func testASongWithCopiesGivesItsLengthsPlaceToTheCopiesButtonOnANarrowWindow() {
+        XCTAssertTrue(RemoteLayout.rowShowsLength(copies: 0, regularWidth: false))
+        XCTAssertTrue(RemoteLayout.rowShowsLength(copies: 1, regularWidth: false))
+        XCTAssertFalse(RemoteLayout.rowShowsLength(copies: 2, regularWidth: false))
+        XCTAssertTrue(RemoteLayout.rowShowsLength(copies: 2, regularWidth: true))
+    }
+
     func testAlbumGridAdaptsWithoutTinyCovers() {
         XCTAssertEqual(RemoteLayout.albumColumns(width: 320, accessibilityText: false), 1)
         XCTAssertEqual(RemoteLayout.albumColumns(width: 440, accessibilityText: false), 2)
