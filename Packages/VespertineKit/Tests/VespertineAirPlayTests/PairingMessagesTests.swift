@@ -74,17 +74,22 @@ struct PairingMessagesTests {
         #expect(setup.sharedKey == hex(srpKey))
 
         // M5 as the receiver reads it: this Mac's name and key, signed over the value both sides derive.
-        let m5 = try #require(PairingTLV(decoding: try setup.exchange(me)))
+        let traded = try setup.exchange(me)
+        let m5 = try #require(PairingTLV(decoding: traded))
         #expect(m5.byte(.state) == 5)
-        let inner = try #require(PairingTLV(decoding: try PairingCrypto.open(try #require(m5[.encryptedData]), key: Accessory.setupKey, nonce: PairingCrypto.nonce("PS-Msg05"))))
+        let sealed = try #require(m5[.encryptedData])
+        let opened = try PairingCrypto.open(sealed, key: Accessory.setupKey, nonce: PairingCrypto.nonce("PS-Msg05"))
+        let inner = try #require(PairingTLV(decoding: opened))
         #expect(inner[.identifier] == Data(me.id.utf8))
         #expect(inner[.publicKey] == me.publicKey && me.publicKey.count == 32)
         let x = PairingCrypto.bytes(secret: hex(srpKey), salt: "Pair-Setup-Controller-Sign-Salt", info: "Pair-Setup-Controller-Sign-Info")
         let mine = try Curve25519.Signing.PublicKey(rawRepresentation: me.publicKey)
-        #expect(mine.isValidSignature(try #require(inner[.signature]), for: x + Data(me.id.utf8) + me.publicKey))
+        let signature = try #require(inner[.signature])
+        #expect(mine.isValidSignature(signature, for: x + Data(me.id.utf8) + me.publicKey))
 
         let accessory = Accessory()
-        #expect(try setup.receiver(answering: try accessory.m6()) == accessory.paired)
+        let kept = try setup.receiver(answering: try accessory.m6())
+        #expect(kept == accessory.paired)
     }
 
     @Test("A receiver with no PIN: the short form says so in the first message and ends with SRP's key as the secret")
@@ -167,11 +172,14 @@ struct PairingMessagesTests {
         let m3 = try #require(PairingTLV(decoding: sent))
         #expect(m3.byte(.state) == 3)
         let key = try accessory.verifyKey(with: session.publicKey)
-        let inner = try #require(PairingTLV(decoding: try PairingCrypto.open(try #require(m3[.encryptedData]), key: key, nonce: PairingCrypto.nonce("PV-Msg03"))))
+        let sealed = try #require(m3[.encryptedData])
+        let opened = try PairingCrypto.open(sealed, key: key, nonce: PairingCrypto.nonce("PV-Msg03"))
+        let inner = try #require(PairingTLV(decoding: opened))
         #expect(inner[.identifier] == Data(me.id.utf8))
         let mine = try Curve25519.Signing.PublicKey(rawRepresentation: me.publicKey)
         let signed = session.publicKey + Data(me.id.utf8) + accessory.session.publicKey.rawRepresentation
-        #expect(mine.isValidSignature(try #require(inner[.signature]), for: signed))
+        let signature = try #require(inner[.signature])
+        #expect(mine.isValidSignature(signature, for: signed))
 
         let secret = try session.finish(answering: Accessory.message([.state: Data([4])]))
         let theirs = try accessory.secret(with: session.publicKey)
