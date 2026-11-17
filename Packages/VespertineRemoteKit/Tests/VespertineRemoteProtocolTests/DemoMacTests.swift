@@ -228,6 +228,9 @@ struct DemoMacTests {
         #expect(try await ask(mac, .createPlaylist(name: " ", ids: [])) != .ok)
         #expect(try await ask(mac, .playPlaylist(id: sunday.id, shuffled: false)) == .ok)
         #expect(pushes.lastQueue?.current?.track.id == ids[0])
+        // From the song tapped, not the first (TestFlight feedback tf-7adda59b4b).
+        #expect(try await ask(mac, .playPlaylist(id: sunday.id, startAt: 1, shuffled: nil)) == .ok)
+        #expect(pushes.lastQueue?.current?.track.id == ids[1])
     }
 
     @Test func theDemoSpeaksTheWordsItIsGiven() async throws {

@@ -344,7 +344,7 @@ struct RemoteBridge {
             let tracks = ordered(ids)
             guard !tracks.isEmpty else { return notInLibrary }
             player.play(tracks, startAt: startAt, shuffled: shuffled)
-        case .playPlaylist(let id, let shuffled):
+        case .playPlaylist(let id, _, let shuffled):
             guard let playlist = library.playlists.first(where: { $0.id == id }) else { return notInLibrary }
             let tracks = library.tracks(in: playlist)
             guard !tracks.isEmpty else { return notInLibrary }
