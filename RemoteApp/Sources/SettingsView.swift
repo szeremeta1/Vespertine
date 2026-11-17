@@ -67,6 +67,7 @@ struct SettingsView: View {
                     if let url = URL(string: "https://github.com/szeremeta1/Vespertine") {
                         Link("Source Code", destination: url)
                     }
+                    NavigationLink("Licenses") { LicensesView() }
                     Text("Vespertine is free software under the GNU General Public License, version 3 or later, with an exception for the App Store. It has no accounts, no ads and no tracking, and connects only to the Macs you pair it with and the shares you add.")
                         .font(.footnote).foregroundStyle(Palette.text2)
                 }
@@ -85,5 +86,35 @@ struct SettingsView: View {
         let version = info?["CFBundleShortVersionString"] as? String ?? ""
         let build = info?["CFBundleVersion"] as? String ?? ""
         return build.isEmpty ? version : "\(version) (\(build))"
+    }
+}
+
+/// The licenses of the decoder libraries inside the app (Monkey's Audio, WavPack, Ogg, Vorbis, Opus), as each asks of a
+/// copy handed on in binary form. The texts are the ones the Mac app carries (App/Licenses).
+struct LicensesView: View {
+    /// The library as its license names it, and the file with its text.
+    private static let libraries = [("Monkey’s Audio", "MonkeysAudio"), ("WavPack", "WavPack"), ("Ogg", "Ogg"), ("Vorbis", "Vorbis"), ("Opus", "Opus")]
+
+    static func text(_ file: String, in bundle: Bundle = .main) -> String? {
+        bundle.url(forResource: file, withExtension: "txt").flatMap { try? String(contentsOf: $0, encoding: .utf8) }
+    }
+
+    var body: some View {
+        List {
+            ForEach(Self.libraries, id: \.1) { name, file in
+                Section {
+                    // A license is a legal text in English: shown as it is, never translated.
+                    Text(verbatim: Self.text(file) ?? "").font(.caption.monospaced()).foregroundStyle(Palette.text2).textSelection(.enabled)
+                } header: {
+                    Text(verbatim: name)
+                }
+            }
+            Section {} footer: {
+                Text("Vespertine opens APE, WavPack, Ogg Vorbis and Opus files with these libraries. Each is used under its own license.")
+            }
+        }
+        .obsidianList()
+        .navigationTitle("Licenses")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

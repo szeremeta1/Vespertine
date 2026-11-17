@@ -10,6 +10,9 @@ options:
 packages:
   VespertineRemoteKit:
     path: ../Packages/VespertineRemoteKit
+  # Decoders for a share's APE, WavPack, Ogg Vorbis and Opus files (BSD-3-Clause libraries; see THIRD-PARTY-NOTICES.md).
+  VespertineDecoders:
+    path: ../Packages/VespertineDecoders
 settings:
   base:
     SWIFT_VERSION: "6.0"
@@ -22,6 +25,10 @@ targets:
     sources:
       - path: Sources
       - path: Resources
+      # The licenses of the decoder libraries inside the app (Settings › About › Licenses): the Mac app's copies.
+      - path: ../App/Licenses
+        includes: [MonkeysAudio.txt, WavPack.txt, Ogg.txt, Vorbis.txt, Opus.txt]
+        buildPhase: resources
     dependencies:
       - package: VespertineRemoteKit
         product: VespertineRemoteProtocol
@@ -31,6 +38,8 @@ targets:
         product: VespertinePhonePlayer
       - package: VespertineRemoteKit
         product: VespertineShare
+      - package: VespertineDecoders
+        product: VespertineDecoders
       - package: VespertineRemoteKit
         product: VespertinePhoneBench
     info:

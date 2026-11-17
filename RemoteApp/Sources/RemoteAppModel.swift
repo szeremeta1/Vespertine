@@ -7,6 +7,7 @@ import Network
 import Observation
 import SwiftUI
 import UIKit
+import VespertineDecoders
 import VespertineRemoteClient
 import VespertineRemoteProtocol
 import VespertineShare
@@ -175,7 +176,7 @@ final class RemoteAppModel {
         closeShare()
         // Two connections: a song being played never waits behind a scan or a cover.
         let mac = ShareMac(id: share.id, name: share.name, files: share.files(), playback: share.files(), store: share.store,
-                           sayings: ShareWording.sayings, shrink: { data, size in ShareCovers.shrink(data, to: size) })
+                           sayings: ShareWording.sayings, decoders: PhoneDecoders(), shrink: { data, size in ShareCovers.shrink(data, to: size) })
         open(mac, id: share.id, name: share.name, device: "share")
     }
 
@@ -279,7 +280,7 @@ final class RemoteAppModel {
             playback = FolderFiles(at: own)
         }
         let mac = ShareMac(id: folder.id, name: folder.name, files: files, playback: playback, store: folder.store,
-                           sayings: FolderWording.sayings, shrink: { data, size in ShareCovers.shrink(data, to: size) })
+                           sayings: FolderWording.sayings, decoders: PhoneDecoders(), shrink: { data, size in ShareCovers.shrink(data, to: size) })
         // Looking at a folder on the device costs little: every time it is opened, and when a file turns out changed.
         mac.rescanAfter = 0
         mac.mendsItself = true
@@ -340,7 +341,7 @@ final class RemoteAppModel {
             let outcome = await Task.detached(priority: .userInitiated) {
                 let scoped = url.startAccessingSecurityScopedResource()
                 defer { if scoped { url.stopAccessingSecurityScopedResource() } }
-                return OpenedFiles.take(url, into: own)
+                return OpenedFiles.take(url, into: own, also: PhoneDecoders().extensions)
             }.value
             guard let self else { return }
             switch outcome {

@@ -192,10 +192,10 @@ public enum OpenedFiles {
 
     /// Copies `file` into `folder`. A file already there with the same name and size is taken to be the same one and
     /// replaced; with another size, the new one gets a number after its name. A file the system left in the folder's
-    /// own `Inbox` is moved rather than copied.
-    public static func take(_ file: URL, into folder: URL) -> Outcome {
-        let name = file.lastPathComponent
-        guard SongTagReader.playable.contains(SongTagReader.fileExtension(name)), !name.hasPrefix(".") else { return .notPlayable }
+    /// own `Inbox` is moved rather than copied. `also` names the kinds the app has a decoder for (`ShareDecoders.extensions`).
+    public static func take(_ file: URL, into folder: URL, also decoded: Set<String> = []) -> Outcome {
+        let name = file.lastPathComponent, ending = SongTagReader.fileExtension(name)
+        guard SongTagReader.playable.contains(ending) || decoded.contains(ending), !name.hasPrefix(".") else { return .notPlayable }
         let manager = FileManager.default
         func size(_ url: URL) -> Int64? { ((try? manager.attributesOfItem(atPath: url.path))?[.size] as? NSNumber)?.int64Value }
         guard let incoming = size(file) else { return .failed }

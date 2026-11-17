@@ -26,7 +26,7 @@ Music files (FLAC, ALAC, AAC, WAV, AIFF, MP3) can be opened in Vespertine from F
 apps. The file is copied into the app's own folder, listed under **Opened Files**, and played. The app's folder shows in Files
 under On My iPhone › Vespertine: music can be put there directly, and deleting a file there removes it from the app.
 
-A file the phone can't open by itself (APE, WavPack and the rest) is refused with an alert, not copied.
+A file the phone can't open by itself (DTS, TrueHD and the rest) is refused with an alert, not copied.
 
 ## Not yet seen on a real device
 

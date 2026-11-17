@@ -388,8 +388,13 @@ private final class Counting: ShareFiles, @unchecked Sendable {
         try put(Data("pdf".utf8), "booklet.pdf", in: elsewhere)
         #expect(OpenedFiles.take(elsewhere.appendingPathComponent("film.dts"), into: own) == .notPlayable)
         #expect(OpenedFiles.take(elsewhere.appendingPathComponent("booklet.pdf"), into: own) == .notPlayable)
+        #expect(OpenedFiles.take(elsewhere.appendingPathComponent("film.dts"), into: own, also: ["ape"]) == .notPlayable)
         #expect(OpenedFiles.take(elsewhere.appendingPathComponent("gone.flac"), into: own) == .failed)
         #expect(!OpenedFiles.holdsAnything(own))
+        // A kind the app brings a decoder for is taken.
+        try put(Data("MAC ".utf8), "monkey.ape", in: elsewhere)
+        #expect(OpenedFiles.take(elsewhere.appendingPathComponent("monkey.ape"), into: own) == .notPlayable)
+        #expect(OpenedFiles.take(elsewhere.appendingPathComponent("monkey.ape"), into: own, also: ["ape"]) == .added("monkey.ape"))
     }
 
     // MARK: Bookmarks

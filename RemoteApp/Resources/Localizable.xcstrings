@@ -3349,271 +3349,271 @@
         }
       }
     },
-    "A scan reads only new and changed files, and runs by itself once a day when the share is opened. This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; APE, WavPack and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.": {
-      "comment": "Shown on the iPhone or iPad. An “SMB share” is a shared network folder of music (on a NAS or another computer) that the iPhone reads by itself, without a Mac. Output screen, footer under the share's details. Keep all format names (FLAC, ALAC, WAV, AIFF, MP3, AAC, APE, WavPack) as they are. “listed here” = shown in this app's library.",
+    "A scan reads only new and changed files, and runs by itself once a day when the share is opened. This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; DTS, TrueHD and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.": {
+      "comment": "Shown on the iPhone or iPad. An “SMB share” is a shared network folder of music (on a NAS or another computer) that the iPhone reads by itself, without a Mac. Output screen, footer under the share's details. Keep all format names (FLAC, ALAC, WAV, AIFF, MP3, AAC, DTS, TrueHD) as they are. “listed here” = shown in this app's library.",
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "ቅኝት የሚያነበው አዲስና የተቀየሩ ፋይሎችን ብቻ ነው፣ ማጋሪያው ሲከፈትም በቀን አንድ ጊዜ በራሱ ይካሄዳል። ይህ መሣሪያ የFLAC፣ ALAC፣ WAV፣ AIFF፣ MP3 እና AAC ፋይሎችን ራሱ ይከፍታል፤ APE፣ WavPack እና ሌሎች ቅርጸቶች ለመቀየር በMac ላይ ያለ Vespertine ያስፈልጋቸዋል፣ ስለዚህ እዚህ አይዘረዘሩም።"
+            "value": "ቅኝት የሚያነበው አዲስና የተቀየሩ ፋይሎችን ብቻ ነው፣ ማጋሪያው ሲከፈትም በቀን አንድ ጊዜ በራሱ ይካሄዳል። ይህ መሣሪያ የFLAC፣ ALAC፣ WAV፣ AIFF፣ MP3 እና AAC ፋይሎችን ራሱ ይከፍታል፤ DTS፣ TrueHD እና ሌሎች ቅርጸቶች ለመቀየር በMac ላይ ያለ Vespertine ያስፈልጋቸዋል፣ ስለዚህ እዚህ አይዘረዘሩም።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "لا يقرأ الفحص إلا الملفات الجديدة والمتغيّرة، ويجري تلقائيًا مرة في اليوم عند فتح المشاركة. يفتح هذا الجهاز ملفات FLAC و ALAC و WAV و AIFF و MP3 و AAC بنفسه؛ أما APE و WavPack والتنسيقات الأخرى فتحتاج إلى Vespertine على Mac لتحويلها، ولذلك لا تظهر هنا."
+            "value": "لا يقرأ الفحص إلا الملفات الجديدة والمتغيّرة، ويجري تلقائيًا مرة في اليوم عند فتح المشاركة. يفتح هذا الجهاز ملفات FLAC و ALAC و WAV و AIFF و MP3 و AAC بنفسه؛ أما DTS و TrueHD والتنسيقات الأخرى فتحتاج إلى Vespertine على Mac لتحويلها، ولذلك لا تظهر هنا."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "স্ক্যানে শুধু নতুন ও পরিবর্তিত ফাইলগুলো পড়া হয়, এবং শেয়ারটি খোলা হলে দিনে একবার এটি নিজে থেকেই চলে। এই ডিভাইস FLAC, ALAC, WAV, AIFF, MP3 ও AAC ফাইল নিজেই খোলে; APE, WavPack ও অন্যান্য ফরম্যাট রূপান্তর করতে Mac-এ Vespertine দরকার, তাই সেগুলো এখানে দেখানো হয় না।"
+            "value": "স্ক্যানে শুধু নতুন ও পরিবর্তিত ফাইলগুলো পড়া হয়, এবং শেয়ারটি খোলা হলে দিনে একবার এটি নিজে থেকেই চলে। এই ডিভাইস FLAC, ALAC, WAV, AIFF, MP3 ও AAC ফাইল নিজেই খোলে; DTS, TrueHD ও অন্যান্য ফরম্যাট রূপান্তর করতে Mac-এ Vespertine দরকার, তাই সেগুলো এখানে দেখানো হয় না।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Prohledání čte jen nové a změněné soubory a jednou denně se při otevření sdílení spustí samo. Toto zařízení samo otevírá soubory FLAC, ALAC, WAV, AIFF, MP3 a AAC; formáty APE, WavPack a další musí převést Vespertine na Macu, proto zde nejsou uvedeny."
+            "value": "Prohledání čte jen nové a změněné soubory a jednou denně se při otevření sdílení spustí samo. Toto zařízení samo otevírá soubory FLAC, ALAC, WAV, AIFF, MP3 a AAC; formáty DTS, TrueHD a další musí převést Vespertine na Macu, proto zde nejsou uvedeny."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "En scanning læser kun nye og ændrede filer og kører af sig selv en gang om dagen, når delingen åbnes. Denne enhed åbner selv FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer; APE, WavPack og andre formater skal konverteres af Vespertine på en Mac, så de vises ikke her."
+            "value": "En scanning læser kun nye og ændrede filer og kører af sig selv en gang om dagen, når delingen åbnes. Denne enhed åbner selv FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer; DTS, TrueHD og andre formater skal konverteres af Vespertine på en Mac, så de vises ikke her."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein Scan liest nur neue und geänderte Dateien und läuft einmal täglich von selbst, wenn die Freigabe geöffnet wird. Dieses Gerät öffnet FLAC-, ALAC-, WAV-, AIFF-, MP3- und AAC-Dateien selbst; APE, WavPack und andere Formate müssen von Vespertine auf einem Mac konvertiert werden und werden deshalb hier nicht aufgeführt."
+            "value": "Ein Scan liest nur neue und geänderte Dateien und läuft einmal täglich von selbst, wenn die Freigabe geöffnet wird. Dieses Gerät öffnet FLAC-, ALAC-, WAV-, AIFF-, MP3- und AAC-Dateien selbst; DTS, TrueHD und andere Formate müssen von Vespertine auf einem Mac konvertiert werden und werden deshalb hier nicht aufgeführt."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Η σάρωση διαβάζει μόνο τα νέα και τα αλλαγμένα αρχεία και εκτελείται αυτόματα μία φορά την ημέρα, όταν ανοίγει ο κοινόχρηστος φάκελος. Αυτή η συσκευή ανοίγει η ίδια αρχεία FLAC, ALAC, WAV, AIFF, MP3 και AAC· τα APE, WavPack και άλλες μορφές χρειάζονται το Vespertine σε Mac για τη μετατροπή τους, οπότε δεν εμφανίζονται εδώ."
+            "value": "Η σάρωση διαβάζει μόνο τα νέα και τα αλλαγμένα αρχεία και εκτελείται αυτόματα μία φορά την ημέρα, όταν ανοίγει ο κοινόχρηστος φάκελος. Αυτή η συσκευή ανοίγει η ίδια αρχεία FLAC, ALAC, WAV, AIFF, MP3 και AAC· τα DTS, TrueHD και άλλες μορφές χρειάζονται το Vespertine σε Mac για τη μετατροπή τους, οπότε δεν εμφανίζονται εδώ."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un escaneo solo lee los archivos nuevos y modificados, y se ejecuta por sí solo una vez al día al abrir el recurso compartido. Este dispositivo abre por sí mismo los archivos FLAC, ALAC, WAV, AIFF, MP3 y AAC; APE, WavPack y otros formatos necesitan que Vespertine los convierta en un Mac, así que no aparecen aquí."
+            "value": "Un escaneo solo lee los archivos nuevos y modificados, y se ejecuta por sí solo una vez al día al abrir el recurso compartido. Este dispositivo abre por sí mismo los archivos FLAC, ALAC, WAV, AIFF, MP3 y AAC; DTS, TrueHD y otros formatos necesitan que Vespertine los convierta en un Mac, así que no aparecen aquí."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "اسکن فقط فایل‌های جدید و تغییرکرده را می‌خواند و روزی یک بار، هنگام باز شدن اشتراک، خودکار انجام می‌شود. این دستگاه فایل‌های FLAC، ALAC، WAV، AIFF، MP3 و AAC را خودش باز می‌کند؛ APE، WavPack و قالب‌های دیگر برای تبدیل به Vespertine در Mac نیاز دارند و به همین دلیل اینجا فهرست نمی‌شوند."
+            "value": "اسکن فقط فایل‌های جدید و تغییرکرده را می‌خواند و روزی یک بار، هنگام باز شدن اشتراک، خودکار انجام می‌شود. این دستگاه فایل‌های FLAC، ALAC، WAV، AIFF، MP3 و AAC را خودش باز می‌کند؛ DTS، TrueHD و قالب‌های دیگر برای تبدیل به Vespertine در Mac نیاز دارند و به همین دلیل اینجا فهرست نمی‌شوند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Skannaus lukee vain uudet ja muuttuneet tiedostot, ja se käynnistyy itsestään kerran päivässä, kun jako avataan. Tämä laite avaa FLAC-, ALAC-, WAV-, AIFF-, MP3- ja AAC-tiedostot itse; APE, WavPack ja muut muodot vaativat, että Vespertine muuntaa ne Macissa, joten niitä ei näytetä täällä."
+            "value": "Skannaus lukee vain uudet ja muuttuneet tiedostot, ja se käynnistyy itsestään kerran päivässä, kun jako avataan. Tämä laite avaa FLAC-, ALAC-, WAV-, AIFF-, MP3- ja AAC-tiedostot itse; DTS, TrueHD ja muut muodot vaativat, että Vespertine muuntaa ne Macissa, joten niitä ei näytetä täällä."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ang mga bago at nabagong file lang ang binabasa ng scan, at kusa itong tumatakbo isang beses kada araw kapag binuksan ang share. Ang device na ito mismo ang nagbubukas ng mga FLAC, ALAC, WAV, AIFF, MP3 at AAC file; kailangan ng APE, WavPack at iba pang format ang Vespertine sa Mac para i-convert ang mga ito, kaya hindi nakalista ang mga iyon dito."
+            "value": "Ang mga bago at nabagong file lang ang binabasa ng scan, at kusa itong tumatakbo isang beses kada araw kapag binuksan ang share. Ang device na ito mismo ang nagbubukas ng mga FLAC, ALAC, WAV, AIFF, MP3 at AAC file; kailangan ng DTS, TrueHD at iba pang format ang Vespertine sa Mac para i-convert ang mga ito, kaya hindi nakalista ang mga iyon dito."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Une indexation ne lit que les fichiers nouveaux ou modifiés, et se lance d’elle-même une fois par jour à l’ouverture du partage. Cet appareil ouvre lui-même les fichiers FLAC, ALAC, WAV, AIFF, MP3 et AAC ; les formats APE, WavPack et autres doivent être convertis par Vespertine sur un Mac, et ne figurent donc pas ici."
+            "value": "Une indexation ne lit que les fichiers nouveaux ou modifiés, et se lance d’elle-même une fois par jour à l’ouverture du partage. Cet appareil ouvre lui-même les fichiers FLAC, ALAC, WAV, AIFF, MP3 et AAC ; les formats DTS, TrueHD et autres doivent être convertis par Vespertine sur un Mac, et ne figurent donc pas ici."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "સ્કૅન માત્ર નવી અને બદલાયેલી ફાઇલો વાંચે છે, અને શેર ખોલવામાં આવે ત્યારે દિવસમાં એક વાર આપમેળે ચાલે છે. આ ડિવાઇસ FLAC, ALAC, WAV, AIFF, MP3 અને AAC ફાઇલો જાતે ખોલે છે; APE, WavPack અને અન્ય ફૉર્મેટને રૂપાંતરિત કરવા માટે Mac પર Vespertine જોઈએ, તેથી તે અહીં બતાવાતાં નથી."
+            "value": "સ્કૅન માત્ર નવી અને બદલાયેલી ફાઇલો વાંચે છે, અને શેર ખોલવામાં આવે ત્યારે દિવસમાં એક વાર આપમેળે ચાલે છે. આ ડિવાઇસ FLAC, ALAC, WAV, AIFF, MP3 અને AAC ફાઇલો જાતે ખોલે છે; DTS, TrueHD અને અન્ય ફૉર્મેટને રૂપાંતરિત કરવા માટે Mac પર Vespertine જોઈએ, તેથી તે અહીં બતાવાતાં નથી."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bincike yana karanta sababbin fayiloli da waɗanda suka canza ne kawai, kuma yana gudana da kansa sau ɗaya a rana idan aka buɗe folda ta cibiyar sadarwa. Wannan na'ura tana buɗe fayilolin FLAC, ALAC, WAV, AIFF, MP3 da AAC da kanta; APE, WavPack da sauran tsare-tsare suna buƙatar Vespertine a kan Mac don ya juya su, don haka ba a nuna su a nan ba."
+            "value": "Bincike yana karanta sababbin fayiloli da waɗanda suka canza ne kawai, kuma yana gudana da kansa sau ɗaya a rana idan aka buɗe folda ta cibiyar sadarwa. Wannan na'ura tana buɗe fayilolin FLAC, ALAC, WAV, AIFF, MP3 da AAC da kanta; DTS, TrueHD da sauran tsare-tsare suna buƙatar Vespertine a kan Mac don ya juya su, don haka ba a nuna su a nan ba."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "סריקה קוראת רק קבצים חדשים וקבצים שהשתנו, ומתבצעת מעצמה פעם ביום כשהשיתוף נפתח. מכשיר זה פותח בעצמו קובצי FLAC, ALAC, WAV, AIFF, MP3 ו־AAC; APE, WavPack ופורמטים אחרים דורשים את Vespertine ב־Mac כדי להמיר אותם, ולכן הם אינם מופיעים כאן."
+            "value": "סריקה קוראת רק קבצים חדשים וקבצים שהשתנו, ומתבצעת מעצמה פעם ביום כשהשיתוף נפתח. מכשיר זה פותח בעצמו קובצי FLAC, ALAC, WAV, AIFF, MP3 ו־AAC; DTS, TrueHD ופורמטים אחרים דורשים את Vespertine ב־Mac כדי להמיר אותם, ולכן הם אינם מופיעים כאן."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "स्कैन में केवल नई और बदली हुई फ़ाइलें पढ़ी जाती हैं, और शेयर खोलने पर यह दिन में एक बार अपने आप चलता है। यह डिवाइस FLAC, ALAC, WAV, AIFF, MP3 और AAC फ़ाइलें ख़ुद खोलता है; APE, WavPack और अन्य फ़ॉर्मैट को रूपांतरित करने के लिए Mac पर Vespertine चाहिए, इसलिए वे यहाँ नहीं दिखाए जाते।"
+            "value": "स्कैन में केवल नई और बदली हुई फ़ाइलें पढ़ी जाती हैं, और शेयर खोलने पर यह दिन में एक बार अपने आप चलता है। यह डिवाइस FLAC, ALAC, WAV, AIFF, MP3 और AAC फ़ाइलें ख़ुद खोलता है; DTS, TrueHD और अन्य फ़ॉर्मैट को रूपांतरित करने के लिए Mac पर Vespertine चाहिए, इसलिए वे यहाँ नहीं दिखाए जाते।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A beolvasás csak az új és a módosult fájlokat olvassa be, és naponta egyszer magától elindul, amikor megnyitja a megosztást. Ez az eszköz a FLAC-, ALAC-, WAV-, AIFF-, MP3- és AAC-fájlokat maga nyitja meg; az APE, a WavPack és más formátumok átalakításához a Macen futó Vespertine szükséges, ezért ezek itt nem jelennek meg."
+            "value": "A beolvasás csak az új és a módosult fájlokat olvassa be, és naponta egyszer magától elindul, amikor megnyitja a megosztást. Ez az eszköz a FLAC-, ALAC-, WAV-, AIFF-, MP3- és AAC-fájlokat maga nyitja meg; a DTS, a TrueHD és más formátumok átalakításához a Macen futó Vespertine szükséges, ezért ezek itt nem jelennek meg."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pemindaian hanya membaca file baru dan yang berubah, dan berjalan sendiri sekali sehari saat share dibuka. Perangkat ini dapat membuka sendiri file FLAC, ALAC, WAV, AIFF, MP3, dan AAC; APE, WavPack, dan format lain memerlukan Vespertine di Mac untuk mengonversinya, sehingga tidak dicantumkan di sini."
+            "value": "Pemindaian hanya membaca file baru dan yang berubah, dan berjalan sendiri sekali sehari saat share dibuka. Perangkat ini dapat membuka sendiri file FLAC, ALAC, WAV, AIFF, MP3, dan AAC; DTS, TrueHD, dan format lain memerlukan Vespertine di Mac untuk mengonversinya, sehingga tidak dicantumkan di sini."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Una scansione legge solo i file nuovi e modificati e parte da sola una volta al giorno quando la condivisione viene aperta. Questo dispositivo apre direttamente i file FLAC, ALAC, WAV, AIFF, MP3 e AAC; APE, WavPack e altri formati devono essere convertiti da Vespertine su un Mac, quindi non sono elencati qui."
+            "value": "Una scansione legge solo i file nuovi e modificati e parte da sola una volta al giorno quando la condivisione viene aperta. Questo dispositivo apre direttamente i file FLAC, ALAC, WAV, AIFF, MP3 e AAC; DTS, TrueHD e altri formati devono essere convertiti da Vespertine su un Mac, quindi non sono elencati qui."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "スキャンでは新しいファイルと変更されたファイルだけを読み込みます。共有を開いたときに、1日に1回自動的に実行されます。このデバイスはFLAC、ALAC、WAV、AIFF、MP3、AACのファイルを直接開けます。APE、WavPackなどのフォーマットは、Mac上のVespertineで変換する必要があるため、ここには表示されません。"
+            "value": "スキャンでは新しいファイルと変更されたファイルだけを読み込みます。共有を開いたときに、1日に1回自動的に実行されます。このデバイスはFLAC、ALAC、WAV、AIFF、MP3、AACのファイルを直接開けます。DTS、TrueHDなどのフォーマットは、Mac上のVespertineで変換する必要があるため、ここには表示されません。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಸ್ಕ್ಯಾನ್ ಹೊಸ ಮತ್ತು ಬದಲಾದ ಫೈಲ್‌ಗಳನ್ನು ಮಾತ್ರ ಓದುತ್ತದೆ, ಮತ್ತು ಶೇರ್ ತೆರೆದಾಗ ದಿನಕ್ಕೊಮ್ಮೆ ತಾನಾಗಿಯೇ ನಡೆಯುತ್ತದೆ. ಈ ಸಾಧನ FLAC, ALAC, WAV, AIFF, MP3 ಮತ್ತು AAC ಫೈಲ್‌ಗಳನ್ನು ತಾನೇ ತೆರೆಯುತ್ತದೆ; APE, WavPack ಮತ್ತು ಇತರ ಫಾರ್ಮ್ಯಾಟ್‌ಗಳನ್ನು ಪರಿವರ್ತಿಸಲು Mac ನಲ್ಲಿ Vespertine ಬೇಕು, ಆದ್ದರಿಂದ ಅವುಗಳನ್ನು ಇಲ್ಲಿ ಪಟ್ಟಿ ಮಾಡಲಾಗುವುದಿಲ್ಲ."
+            "value": "ಸ್ಕ್ಯಾನ್ ಹೊಸ ಮತ್ತು ಬದಲಾದ ಫೈಲ್‌ಗಳನ್ನು ಮಾತ್ರ ಓದುತ್ತದೆ, ಮತ್ತು ಶೇರ್ ತೆರೆದಾಗ ದಿನಕ್ಕೊಮ್ಮೆ ತಾನಾಗಿಯೇ ನಡೆಯುತ್ತದೆ. ಈ ಸಾಧನ FLAC, ALAC, WAV, AIFF, MP3 ಮತ್ತು AAC ಫೈಲ್‌ಗಳನ್ನು ತಾನೇ ತೆರೆಯುತ್ತದೆ; DTS, TrueHD ಮತ್ತು ಇತರ ಫಾರ್ಮ್ಯಾಟ್‌ಗಳನ್ನು ಪರಿವರ್ತಿಸಲು Mac ನಲ್ಲಿ Vespertine ಬೇಕು, ಆದ್ದರಿಂದ ಅವುಗಳನ್ನು ಇಲ್ಲಿ ಪಟ್ಟಿ ಮಾಡಲಾಗುವುದಿಲ್ಲ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "스캔은 새로운 파일과 변경된 파일만 읽으며, 공유를 열 때 하루에 한 번 자동으로 실행됩니다. 이 기기는 FLAC, ALAC, WAV, AIFF, MP3 및 AAC 파일을 직접 엽니다. APE, WavPack 및 기타 포맷은 Mac의 Vespertine에서 변환해야 하므로 여기에 표시되지 않습니다."
+            "value": "스캔은 새로운 파일과 변경된 파일만 읽으며, 공유를 열 때 하루에 한 번 자동으로 실행됩니다. 이 기기는 FLAC, ALAC, WAV, AIFF, MP3 및 AAC 파일을 직접 엽니다. DTS, TrueHD 및 기타 포맷은 Mac의 Vespertine에서 변환해야 하므로 여기에 표시되지 않습니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "സ്കാൻ പുതിയതും മാറിയതുമായ ഫയലുകൾ മാത്രമേ വായിക്കൂ; ഷെയർ തുറക്കുമ്പോൾ ദിവസത്തിലൊരിക്കൽ അത് സ്വയം നടക്കും. ഈ ഉപകരണം FLAC, ALAC, WAV, AIFF, MP3, AAC ഫയലുകൾ സ്വയം തുറക്കുന്നു; APE, WavPack എന്നിവയും മറ്റ് ഫോർമാറ്റുകളും പരിവർത്തനം ചെയ്യാൻ Mac-ലെ Vespertine വേണം, അതിനാൽ അവ ഇവിടെ പട്ടികപ്പെടുത്തുന്നില്ല."
+            "value": "സ്കാൻ പുതിയതും മാറിയതുമായ ഫയലുകൾ മാത്രമേ വായിക്കൂ; ഷെയർ തുറക്കുമ്പോൾ ദിവസത്തിലൊരിക്കൽ അത് സ്വയം നടക്കും. ഈ ഉപകരണം FLAC, ALAC, WAV, AIFF, MP3, AAC ഫയലുകൾ സ്വയം തുറക്കുന്നു; DTS, TrueHD എന്നിവയും മറ്റ് ഫോർമാറ്റുകളും പരിവർത്തനം ചെയ്യാൻ Mac-ലെ Vespertine വേണം, അതിനാൽ അവ ഇവിടെ പട്ടികപ്പെടുത്തുന്നില്ല."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "स्कॅनमध्ये फक्त नवीन आणि बदललेल्या फाइल वाचल्या जातात, आणि शेअर उघडल्यावर ते दिवसातून एकदा आपोआप चालते. हे डिव्हाइस FLAC, ALAC, WAV, AIFF, MP3 आणि AAC फाइल स्वतः उघडते; APE, WavPack आणि इतर फॉरमॅट रूपांतरित करण्यासाठी Mac वरील Vespertine लागते, त्यामुळे ते येथे दाखवले जात नाहीत."
+            "value": "स्कॅनमध्ये फक्त नवीन आणि बदललेल्या फाइल वाचल्या जातात, आणि शेअर उघडल्यावर ते दिवसातून एकदा आपोआप चालते. हे डिव्हाइस FLAC, ALAC, WAV, AIFF, MP3 आणि AAC फाइल स्वतः उघडते; DTS, TrueHD आणि इतर फॉरमॅट रूपांतरित करण्यासाठी Mac वरील Vespertine लागते, त्यामुळे ते येथे दाखवले जात नाहीत."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Imbasan hanya membaca fail baharu dan yang berubah, dan berjalan dengan sendirinya sekali sehari apabila perkongsian dibuka. Peranti ini membuka sendiri fail FLAC, ALAC, WAV, AIFF, MP3 dan AAC; APE, WavPack dan format lain memerlukan Vespertine pada Mac untuk menukarnya, jadi ia tidak disenaraikan di sini."
+            "value": "Imbasan hanya membaca fail baharu dan yang berubah, dan berjalan dengan sendirinya sekali sehari apabila perkongsian dibuka. Peranti ini membuka sendiri fail FLAC, ALAC, WAV, AIFF, MP3 dan AAC; DTS, TrueHD dan format lain memerlukan Vespertine pada Mac untuk menukarnya, jadi ia tidak disenaraikan di sini."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "En skanning leser bare nye og endrede filer og kjører av seg selv én gang om dagen når delingen åpnes. Denne enheten åpner FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer selv; APE, WavPack og andre formater må konverteres av Vespertine på en Mac, så de vises ikke her."
+            "value": "En skanning leser bare nye og endrede filer og kjører av seg selv én gang om dagen når delingen åpnes. Denne enheten åpner FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer selv; DTS, TrueHD og andre formater må konverteres av Vespertine på en Mac, så de vises ikke her."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Een scan leest alleen nieuwe en gewijzigde bestanden en wordt één keer per dag vanzelf uitgevoerd wanneer de share wordt geopend. Dit apparaat opent FLAC-, ALAC-, WAV-, AIFF-, MP3- en AAC-bestanden zelf; APE, WavPack en andere formaten moeten door Vespertine op een Mac worden omgezet en staan hier daarom niet in de lijst."
+            "value": "Een scan leest alleen nieuwe en gewijzigde bestanden en wordt één keer per dag vanzelf uitgevoerd wanneer de share wordt geopend. Dit apparaat opent FLAC-, ALAC-, WAV-, AIFF-, MP3- en AAC-bestanden zelf; DTS, TrueHD en andere formaten moeten door Vespertine op een Mac worden omgezet en staan hier daarom niet in de lijst."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਸਕੈਨ ਵਿੱਚ ਸਿਰਫ਼ ਨਵੀਆਂ ਅਤੇ ਬਦਲੀਆਂ ਫ਼ਾਈਲਾਂ ਪੜ੍ਹੀਆਂ ਜਾਂਦੀਆਂ ਹਨ, ਅਤੇ ਸ਼ੇਅਰ ਖੋਲ੍ਹਣ ’ਤੇ ਇਹ ਦਿਨ ਵਿੱਚ ਇੱਕ ਵਾਰ ਆਪਣੇ-ਆਪ ਚੱਲਦਾ ਹੈ। ਇਹ ਡਿਵਾਈਸ FLAC, ALAC, WAV, AIFF, MP3 ਅਤੇ AAC ਫ਼ਾਈਲਾਂ ਆਪ ਖੋਲ੍ਹਦਾ ਹੈ; APE, WavPack ਅਤੇ ਹੋਰ ਫ਼ਾਰਮੈਟਾਂ ਨੂੰ ਬਦਲਣ ਲਈ Mac ’ਤੇ Vespertine ਚਾਹੀਦਾ ਹੈ, ਇਸ ਲਈ ਉਹ ਇੱਥੇ ਨਹੀਂ ਦਿਖਾਏ ਜਾਂਦੇ।"
+            "value": "ਸਕੈਨ ਵਿੱਚ ਸਿਰਫ਼ ਨਵੀਆਂ ਅਤੇ ਬਦਲੀਆਂ ਫ਼ਾਈਲਾਂ ਪੜ੍ਹੀਆਂ ਜਾਂਦੀਆਂ ਹਨ, ਅਤੇ ਸ਼ੇਅਰ ਖੋਲ੍ਹਣ ’ਤੇ ਇਹ ਦਿਨ ਵਿੱਚ ਇੱਕ ਵਾਰ ਆਪਣੇ-ਆਪ ਚੱਲਦਾ ਹੈ। ਇਹ ਡਿਵਾਈਸ FLAC, ALAC, WAV, AIFF, MP3 ਅਤੇ AAC ਫ਼ਾਈਲਾਂ ਆਪ ਖੋਲ੍ਹਦਾ ਹੈ; DTS, TrueHD ਅਤੇ ਹੋਰ ਫ਼ਾਰਮੈਟਾਂ ਨੂੰ ਬਦਲਣ ਲਈ Mac ’ਤੇ Vespertine ਚਾਹੀਦਾ ਹੈ, ਇਸ ਲਈ ਉਹ ਇੱਥੇ ਨਹੀਂ ਦਿਖਾਏ ਜਾਂਦੇ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Skanowanie odczytuje tylko nowe i zmienione pliki, a raz dziennie uruchamia się samo przy otwarciu zasobu. To urządzenie samo otwiera pliki FLAC, ALAC, WAV, AIFF, MP3 i AAC; APE, WavPack i inne formaty wymagają konwersji przez Vespertine na Macu, więc nie są tutaj wyświetlane."
+            "value": "Skanowanie odczytuje tylko nowe i zmienione pliki, a raz dziennie uruchamia się samo przy otwarciu zasobu. To urządzenie samo otwiera pliki FLAC, ALAC, WAV, AIFF, MP3 i AAC; DTS, TrueHD i inne formaty wymagają konwersji przez Vespertine na Macu, więc nie są tutaj wyświetlane."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Um escaneamento lê somente os arquivos novos e alterados e é executado sozinho uma vez por dia quando o compartilhamento é aberto. Este dispositivo abre sozinho arquivos FLAC, ALAC, WAV, AIFF, MP3 e AAC; APE, WavPack e outros formatos precisam que o Vespertine em um Mac os converta, por isso não aparecem aqui."
+            "value": "Um escaneamento lê somente os arquivos novos e alterados e é executado sozinho uma vez por dia quando o compartilhamento é aberto. Este dispositivo abre sozinho arquivos FLAC, ALAC, WAV, AIFF, MP3 e AAC; DTS, TrueHD e outros formatos precisam que o Vespertine em um Mac os converta, por isso não aparecem aqui."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uma análise lê apenas os ficheiros novos e alterados e é executada automaticamente uma vez por dia quando a partilha é aberta. Este dispositivo abre sozinho ficheiros FLAC, ALAC, WAV, AIFF, MP3 e AAC; APE, WavPack e outros formatos precisam que o Vespertine num Mac os converta, pelo que não aparecem aqui."
+            "value": "Uma análise lê apenas os ficheiros novos e alterados e é executada automaticamente uma vez por dia quando a partilha é aberta. Este dispositivo abre sozinho ficheiros FLAC, ALAC, WAV, AIFF, MP3 e AAC; DTS, TrueHD e outros formatos precisam que o Vespertine num Mac os converta, pelo que não aparecem aqui."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "O scanare citește doar fișierele noi și cele modificate și rulează automat o dată pe zi, la deschiderea partajării. Acest dispozitiv deschide singur fișierele FLAC, ALAC, WAV, AIFF, MP3 și AAC; APE, WavPack și alte formate au nevoie de Vespertine pe un Mac pentru a fi convertite, așa că nu apar aici."
+            "value": "O scanare citește doar fișierele noi și cele modificate și rulează automat o dată pe zi, la deschiderea partajării. Acest dispozitiv deschide singur fișierele FLAC, ALAC, WAV, AIFF, MP3 și AAC; DTS, TrueHD și alte formate au nevoie de Vespertine pe un Mac pentru a fi convertite, așa că nu apar aici."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "En skanning läser bara nya och ändrade filer och körs av sig själv en gång om dagen när resursen öppnas. Den här enheten öppnar FLAC-, ALAC-, WAV-, AIFF-, MP3- och AAC-filer själv; APE, WavPack och andra format måste konverteras av Vespertine på en Mac, så de visas inte här."
+            "value": "En skanning läser bara nya och ändrade filer och körs av sig själv en gång om dagen när resursen öppnas. Den här enheten öppnar FLAC-, ALAC-, WAV-, AIFF-, MP3- och AAC-filer själv; DTS, TrueHD och andra format måste konverteras av Vespertine på en Mac, så de visas inte här."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Uchanganuzi husoma faili mpya na zilizobadilika pekee, na hufanyika wenyewe mara moja kwa siku folda ya mtandao inapofunguliwa. Kifaa hiki chenyewe hufungua faili za FLAC, ALAC, WAV, AIFF, MP3 na AAC; APE, WavPack na miundo mingine huhitaji Vespertine kwenye Mac ili kuzigeuza, kwa hivyo hazijaorodheshwa hapa."
+            "value": "Uchanganuzi husoma faili mpya na zilizobadilika pekee, na hufanyika wenyewe mara moja kwa siku folda ya mtandao inapofunguliwa. Kifaa hiki chenyewe hufungua faili za FLAC, ALAC, WAV, AIFF, MP3 na AAC; DTS, TrueHD na miundo mingine huhitaji Vespertine kwenye Mac ili kuzigeuza, kwa hivyo hazijaorodheshwa hapa."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "ஸ்கேன் புதிய மற்றும் மாற்றப்பட்ட கோப்புகளை மட்டுமே படிக்கும்; பகிர்வு திறக்கப்படும்போது நாளுக்கு ஒரு முறை தானாகவே இயங்கும். இந்தச் சாதனம் FLAC, ALAC, WAV, AIFF, MP3, AAC கோப்புகளைத் தானே திறக்கும்; APE, WavPack மற்றும் பிற வடிவங்களை மாற்ற Mac-இல் Vespertine தேவை, எனவே அவை இங்கே பட்டியலிடப்படாது."
+            "value": "ஸ்கேன் புதிய மற்றும் மாற்றப்பட்ட கோப்புகளை மட்டுமே படிக்கும்; பகிர்வு திறக்கப்படும்போது நாளுக்கு ஒரு முறை தானாகவே இயங்கும். இந்தச் சாதனம் FLAC, ALAC, WAV, AIFF, MP3, AAC கோப்புகளைத் தானே திறக்கும்; DTS, TrueHD மற்றும் பிற வடிவங்களை மாற்ற Mac-இல் Vespertine தேவை, எனவே அவை இங்கே பட்டியலிடப்படாது."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "స్కాన్ కొత్త, మారిన ఫైల్‌లను మాత్రమే చదువుతుంది; షేర్‌ను తెరిచినప్పుడు రోజుకు ఒకసారి దానంతట అదే నడుస్తుంది. ఈ పరికరం FLAC, ALAC, WAV, AIFF, MP3, AAC ఫైల్‌లను తానే తెరుస్తుంది; APE, WavPack, ఇతర ఫార్మాట్‌లను మార్చడానికి Macలో Vespertine అవసరం, కాబట్టి అవి ఇక్కడ జాబితాలో కనిపించవు."
+            "value": "స్కాన్ కొత్త, మారిన ఫైల్‌లను మాత్రమే చదువుతుంది; షేర్‌ను తెరిచినప్పుడు రోజుకు ఒకసారి దానంతట అదే నడుస్తుంది. ఈ పరికరం FLAC, ALAC, WAV, AIFF, MP3, AAC ఫైల్‌లను తానే తెరుస్తుంది; DTS, TrueHD, ఇతర ఫార్మాట్‌లను మార్చడానికి Macలో Vespertine అవసరం, కాబట్టి అవి ఇక్కడ జాబితాలో కనిపించవు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "การสแกนจะอ่านเฉพาะไฟล์ใหม่และไฟล์ที่เปลี่ยนแปลง และจะทำงานเองวันละครั้งเมื่อเปิดแชร์ อุปกรณ์เครื่องนี้เปิดไฟล์ FLAC, ALAC, WAV, AIFF, MP3 และ AAC ได้เอง ส่วน APE, WavPack และรูปแบบอื่นต้องใช้ Vespertine บน Mac เพื่อแปลง จึงไม่แสดงในรายการที่นี่"
+            "value": "การสแกนจะอ่านเฉพาะไฟล์ใหม่และไฟล์ที่เปลี่ยนแปลง และจะทำงานเองวันละครั้งเมื่อเปิดแชร์ อุปกรณ์เครื่องนี้เปิดไฟล์ FLAC, ALAC, WAV, AIFF, MP3 และ AAC ได้เอง ส่วน DTS, TrueHD และรูปแบบอื่นต้องใช้ Vespertine บน Mac เพื่อแปลง จึงไม่แสดงในรายการที่นี่"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tarama yalnızca yeni ve değişen dosyaları okur ve paylaşım açıldığında günde bir kez kendiliğinden çalışır. Bu aygıt FLAC, ALAC, WAV, AIFF, MP3 ve AAC dosyalarını kendisi açar; APE, WavPack ve diğer biçimlerin dönüştürülmesi için Mac’te Vespertine gerekir, bu yüzden bunlar burada listelenmez."
+            "value": "Tarama yalnızca yeni ve değişen dosyaları okur ve paylaşım açıldığında günde bir kez kendiliğinden çalışır. Bu aygıt FLAC, ALAC, WAV, AIFF, MP3 ve AAC dosyalarını kendisi açar; DTS, TrueHD ve diğer biçimlerin dönüştürülmesi için Mac’te Vespertine gerekir, bu yüzden bunlar burada listelenmez."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Під час сканування читаються лише нові та змінені файли; воно запускається само раз на день, коли відкривається ресурс. Цей пристрій сам відкриває файли FLAC, ALAC, WAV, AIFF, MP3 й AAC; для APE, WavPack та інших форматів потрібне перетворення у Vespertine на Mac, тому їх тут не показано."
+            "value": "Під час сканування читаються лише нові та змінені файли; воно запускається само раз на день, коли відкривається ресурс. Цей пристрій сам відкриває файли FLAC, ALAC, WAV, AIFF, MP3 й AAC; для DTS, TrueHD та інших форматів потрібне перетворення у Vespertine на Mac, тому їх тут не показано."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "اسکین صرف نئی اور تبدیل شدہ فائلیں پڑھتا ہے، اور شیئر کھولنے پر دن میں ایک بار خود بخود چلتا ہے۔ یہ ڈیوائس FLAC، ALAC، WAV، AIFF، MP3 اور AAC فائلیں خود کھولتی ہے؛ APE، WavPack اور دیگر فارمیٹس کو تبدیل کرنے کے لیے Mac پر Vespertine درکار ہے، اس لیے وہ یہاں درج نہیں ہوتے۔"
+            "value": "اسکین صرف نئی اور تبدیل شدہ فائلیں پڑھتا ہے، اور شیئر کھولنے پر دن میں ایک بار خود بخود چلتا ہے۔ یہ ڈیوائس FLAC، ALAC، WAV، AIFF، MP3 اور AAC فائلیں خود کھولتی ہے؛ DTS، TrueHD اور دیگر فارمیٹس کو تبدیل کرنے کے لیے Mac پر Vespertine درکار ہے، اس لیے وہ یہاں درج نہیں ہوتے۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mỗi lần quét chỉ đọc các tệp mới và tệp đã thay đổi, và tự chạy mỗi ngày một lần khi chia sẻ được mở. Thiết bị này tự mở được các tệp FLAC, ALAC, WAV, AIFF, MP3 và AAC; APE, WavPack và các định dạng khác cần Vespertine trên máy Mac để chuyển đổi nên không được liệt kê ở đây."
+            "value": "Mỗi lần quét chỉ đọc các tệp mới và tệp đã thay đổi, và tự chạy mỗi ngày một lần khi chia sẻ được mở. Thiết bị này tự mở được các tệp FLAC, ALAC, WAV, AIFF, MP3 và AAC; DTS, TrueHD và các định dạng khác cần Vespertine trên máy Mac để chuyển đổi nên không được liệt kê ở đây."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "掃描只會讀取新增和已更改的檔案，並在開啟共享時每日自動執行一次。此裝置可直接開啟 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；APE、WavPack 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會在此列出。"
+            "value": "掃描只會讀取新增和已更改的檔案，並在開啟共享時每日自動執行一次。此裝置可直接開啟 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；DTS、TrueHD 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會在此列出。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "扫描只会读取新增和已更改的文件，并在打开共享时每天自动运行一次。此设备可直接打开 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 文件；APE、WavPack 及其他格式需要由 Mac 上的 Vespertine 转换，因此不会在此列出。"
+            "value": "扫描只会读取新增和已更改的文件，并在打开共享时每天自动运行一次。此设备可直接打开 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 文件；DTS、TrueHD 及其他格式需要由 Mac 上的 Vespertine 转换，因此不会在此列出。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "掃描只會讀取新增和已更動的檔案，並在打開共享時每天自動執行一次。此裝置可直接打開 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；APE、WavPack 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會列在這裡。"
+            "value": "掃描只會讀取新增和已更動的檔案，並在打開共享時每天自動執行一次。此裝置可直接打開 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；DTS、TrueHD 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會列在這裡。"
           }
         }
       }
@@ -61857,6 +61857,544 @@
         }
       }
     },
+    "Licenses": {
+      "comment": "A row in Settings › About, and the title of the screen it opens: the licenses of the decoder libraries inside the app.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ፈቃዶች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "التراخيص"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "লাইসেন্স"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licence"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licenser"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lizenzen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Άδειες χρήσης"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licencias"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "مجوزها"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lisenssit"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga Lisensya"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licences"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "લાઇસન્સ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lasisi"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "רישיונות"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लाइसेंस"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licencek"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lisensi"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licenze"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライセンス"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪರವಾನಗಿಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "라이선스"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ലൈസൻസുകൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "परवाने"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lesen"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lisenser"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licenties"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਲਾਇਸੰਸ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licencje"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licenças"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licenças"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licențe"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licenser"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leseni"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "உரிமங்கள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "లైసెన్స్‌లు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สัญญาอนุญาต"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lisanslar"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ліцензії"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لائسنس"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giấy phép"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "授權條款"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "许可"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "授權條款"
+          }
+        }
+      }
+    },
+    "Vespertine opens APE, WavPack, Ogg Vorbis and Opus files with these libraries. Each is used under its own license.": {
+      "comment": "Footer of the Licenses screen. APE, WavPack, Ogg Vorbis and Opus are audio formats; keep their names as they are.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine የAPE፣ WavPack፣ Ogg Vorbis እና Opus ፋይሎችን በእነዚህ ቤተ-መጻሕፍት ይከፍታል። እያንዳንዱ በራሱ ፈቃድ መሠረት ጥቅም ላይ ይውላል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يفتح Vespertine ملفات APE و WavPack و Ogg Vorbis و Opus باستخدام هذه المكتبات. تُستخدم كل مكتبة بموجب ترخيصها الخاص."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine এই লাইব্রেরিগুলি দিয়ে APE, WavPack, Ogg Vorbis ও Opus ফাইল খোলে। প্রতিটি তার নিজস্ব লাইসেন্সের অধীনে ব্যবহৃত হয়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine otevírá soubory APE, WavPack, Ogg Vorbis a Opus pomocí těchto knihoven. Každá se používá podle své vlastní licence."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine åbner APE-, WavPack-, Ogg Vorbis- og Opus-filer med disse biblioteker. Hvert bibliotek bruges under sin egen licens."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine öffnet APE-, WavPack-, Ogg-Vorbis- und Opus-Dateien mit diesen Bibliotheken. Jede wird unter ihrer eigenen Lizenz verwendet."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Vespertine ανοίγει αρχεία APE, WavPack, Ogg Vorbis και Opus με αυτές τις βιβλιοθήκες. Καθεμία χρησιμοποιείται σύμφωνα με τη δική της άδεια."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine abre archivos APE, WavPack, Ogg Vorbis y Opus con estas bibliotecas. Cada una se usa bajo su propia licencia."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine فایل‌های APE،‏ WavPack،‏ Ogg Vorbis و Opus را با این کتابخانه‌ها باز می‌کند. هر کدام طبق مجوز خودش استفاده می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine avaa APE-, WavPack-, Ogg Vorbis- ja Opus-tiedostot näillä kirjastoilla. Kutakin käytetään sen oman lisenssin mukaisesti."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Binubuksan ng Vespertine ang mga APE, WavPack, Ogg Vorbis at Opus file gamit ang mga library na ito. Ginagamit ang bawat isa sa ilalim ng sarili nitong lisensya."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ouvre les fichiers APE, WavPack, Ogg Vorbis et Opus avec ces bibliothèques. Chacune est utilisée sous sa propre licence."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine આ લાઇબ્રેરીઓ વડે APE, WavPack, Ogg Vorbis અને Opus ફાઇલો ખોલે છે. દરેકનો ઉપયોગ તેના પોતાના લાઇસન્સ હેઠળ થાય છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine yana buɗe fayilolin APE, WavPack, Ogg Vorbis da Opus da waɗannan ɗakunan karatu na software. Ana amfani da kowannensu a ƙarƙashin lasisinsa."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine פותח קובצי APE, WavPack, Ogg Vorbis ו־Opus באמצעות הספריות האלה. כל אחת מהן נמצאת בשימוש לפי הרישיון שלה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine इन लाइब्रेरी की मदद से APE, WavPack, Ogg Vorbis और Opus फ़ाइलें खोलता है। हर एक का उपयोग उसके अपने लाइसेंस के तहत किया जाता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Vespertine ezekkel a könyvtárakkal nyitja meg az APE, WavPack, Ogg Vorbis és Opus fájlokat. Mindegyiket a saját licence szerint használja."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine membuka file APE, WavPack, Ogg Vorbis, dan Opus dengan pustaka ini. Masing-masing digunakan berdasarkan lisensinya sendiri."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine apre i file APE, WavPack, Ogg Vorbis e Opus con queste librerie. Ognuna è usata secondo la propria licenza."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VespertineはこれらのライブラリでAPE、WavPack、Ogg Vorbis、Opusのファイルを開きます。各ライブラリはそれぞれのライセンスに基づいて使用されています。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ಈ ಲೈಬ್ರರಿಗಳ ಮೂಲಕ APE, WavPack, Ogg Vorbis ಮತ್ತು Opus ಫೈಲ್‌ಗಳನ್ನು ತೆರೆಯುತ್ತದೆ. ಪ್ರತಿಯೊಂದನ್ನೂ ಅದರದೇ ಪರವಾನಗಿಯ ಅಡಿಯಲ್ಲಿ ಬಳಸಲಾಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine은 이 라이브러리들로 APE, WavPack, Ogg Vorbis 및 Opus 파일을 엽니다. 각 라이브러리는 자체 라이선스에 따라 사용됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ഈ ലൈബ്രറികൾ ഉപയോഗിച്ച് APE, WavPack, Ogg Vorbis, Opus ഫയലുകൾ തുറക്കുന്നു. ഓരോന്നും അതിന്റേതായ ലൈസൻസിന് കീഴിലാണ് ഉപയോഗിക്കുന്നത്."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine या लायब्ररींच्या मदतीने APE, WavPack, Ogg Vorbis आणि Opus फाइल्स उघडते. प्रत्येक लायब्ररी तिच्या स्वतःच्या परवान्याअंतर्गत वापरली जाते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine membuka fail APE, WavPack, Ogg Vorbis dan Opus dengan pustaka ini. Setiap satu digunakan di bawah lesennya sendiri."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine åpner APE-, WavPack-, Ogg Vorbis- og Opus-filer med disse bibliotekene. Hvert bibliotek brukes under sin egen lisens."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine opent APE-, WavPack-, Ogg Vorbis- en Opus-bestanden met deze bibliotheken. Elke bibliotheek wordt gebruikt onder haar eigen licentie."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ਇਨ੍ਹਾਂ ਲਾਇਬ੍ਰੇਰੀਆਂ ਨਾਲ APE, WavPack, Ogg Vorbis ਅਤੇ Opus ਫ਼ਾਈਲਾਂ ਖੋਲ੍ਹਦਾ ਹੈ। ਹਰੇਕ ਦੀ ਵਰਤੋਂ ਉਸ ਦੇ ਆਪਣੇ ਲਾਇਸੰਸ ਅਧੀਨ ਕੀਤੀ ਜਾਂਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine otwiera pliki APE, WavPack, Ogg Vorbis i Opus za pomocą tych bibliotek. Każda jest używana na podstawie własnej licencji."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine abre arquivos APE, WavPack, Ogg Vorbis e Opus com estas bibliotecas. Cada uma é usada sob sua própria licença."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Vespertine abre ficheiros APE, WavPack, Ogg Vorbis e Opus com estas bibliotecas. Cada uma é utilizada ao abrigo da sua própria licença."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine deschide fișierele APE, WavPack, Ogg Vorbis și Opus cu aceste biblioteci. Fiecare este folosită sub propria licență."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine öppnar APE-, WavPack-, Ogg Vorbis- och Opus-filer med de här biblioteken. Vart och ett används under sin egen licens."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine hufungua faili za APE, WavPack, Ogg Vorbis na Opus kwa kutumia maktaba hizi. Kila moja hutumika chini ya leseni yake."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine இந்த லைப்ரரிகளைக் கொண்டு APE, WavPack, Ogg Vorbis மற்றும் Opus கோப்புகளைத் திறக்கிறது. ஒவ்வொன்றும் அதன் சொந்த உரிமத்தின் கீழ் பயன்படுத்தப்படுகிறது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ఈ లైబ్రరీలతో APE, WavPack, Ogg Vorbis మరియు Opus ఫైల్‌లను తెరుస్తుంది. ప్రతి ఒక్కటి దాని స్వంత లైసెన్స్ కింద ఉపయోగించబడుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine เปิดไฟล์ APE, WavPack, Ogg Vorbis และ Opus ด้วยไลบรารีเหล่านี้ แต่ละไลบรารีใช้งานภายใต้สัญญาอนุญาตของตัวเอง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine; APE, WavPack, Ogg Vorbis ve Opus dosyalarını bu kitaplıklarla açar. Her biri kendi lisansı kapsamında kullanılır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine відкриває файли APE, WavPack, Ogg Vorbis та Opus за допомогою цих бібліотек. Кожна використовується на умовах власної ліцензії."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine ان لائبریریوں کے ذریعے APE، WavPack، Ogg Vorbis اور Opus فائلیں کھولتا ہے۔ ہر ایک اپنے لائسنس کے تحت استعمال ہوتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine mở các tệp APE, WavPack, Ogg Vorbis và Opus bằng các thư viện này. Mỗi thư viện được dùng theo giấy phép riêng của nó."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 使用這些程式庫開啟 APE、WavPack、Ogg Vorbis 和 Opus 檔案。每個程式庫均按其各自的授權條款使用。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 使用这些库打开 APE、WavPack、Ogg Vorbis 和 Opus 文件。每个库均按其各自的许可使用。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vespertine 使用這些程式庫開啟 APE、WavPack、Ogg Vorbis 和 Opus 檔案。每個程式庫均依其各自的授權條款使用。"
+          }
+        }
+      }
+    },
     "Sources": {
       "localizations": {
         "am": {
@@ -92257,271 +92795,271 @@
         }
       }
     },
-    "This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; APE, WavPack and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.": {
+    "This device opens FLAC, ALAC, WAV, AIFF, MP3 and AAC files itself; DTS, TrueHD and other formats need Vespertine on a Mac to convert them, so they aren’t listed here.": {
       "comment": "Shown on the iPhone or iPad. New: the app plays music stored on the device itself, from a folder the user picks in Apple's Files app (on the device, in iCloud Drive, or on a USB drive plugged in). This is the second sentence of the existing string that begins “A scan reads only new and changed files, and runs by itself once a day when the share is opened. This device opens FLAC…” (in /mnt/project-files/l10n/ios6/out/<lang>.json). Copy that second sentence of your translation exactly.",
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "ይህ መሣሪያ የFLAC፣ ALAC፣ WAV፣ AIFF፣ MP3 እና AAC ፋይሎችን ራሱ ይከፍታል፤ APE፣ WavPack እና ሌሎች ቅርጸቶች ለመቀየር በMac ላይ ያለ Vespertine ያስፈልጋቸዋል፣ ስለዚህ እዚህ አይዘረዘሩም።"
+            "value": "ይህ መሣሪያ የFLAC፣ ALAC፣ WAV፣ AIFF፣ MP3 እና AAC ፋይሎችን ራሱ ይከፍታል፤ DTS፣ TrueHD እና ሌሎች ቅርጸቶች ለመቀየር በMac ላይ ያለ Vespertine ያስፈልጋቸዋል፣ ስለዚህ እዚህ አይዘረዘሩም።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يفتح هذا الجهاز ملفات FLAC و ALAC و WAV و AIFF و MP3 و AAC بنفسه؛ أما APE و WavPack والتنسيقات الأخرى فتحتاج إلى Vespertine على Mac لتحويلها، ولذلك لا تظهر هنا."
+            "value": "يفتح هذا الجهاز ملفات FLAC و ALAC و WAV و AIFF و MP3 و AAC بنفسه؛ أما DTS و TrueHD والتنسيقات الأخرى فتحتاج إلى Vespertine على Mac لتحويلها، ولذلك لا تظهر هنا."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "এই ডিভাইস FLAC, ALAC, WAV, AIFF, MP3 ও AAC ফাইল নিজেই খোলে; APE, WavPack ও অন্যান্য ফরম্যাট রূপান্তর করতে Mac-এ Vespertine দরকার, তাই সেগুলো এখানে দেখানো হয় না।"
+            "value": "এই ডিভাইস FLAC, ALAC, WAV, AIFF, MP3 ও AAC ফাইল নিজেই খোলে; DTS, TrueHD ও অন্যান্য ফরম্যাট রূপান্তর করতে Mac-এ Vespertine দরকার, তাই সেগুলো এখানে দেখানো হয় না।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Toto zařízení samo otevírá soubory FLAC, ALAC, WAV, AIFF, MP3 a AAC; formáty APE, WavPack a další musí převést Vespertine na Macu, proto zde nejsou uvedeny."
+            "value": "Toto zařízení samo otevírá soubory FLAC, ALAC, WAV, AIFF, MP3 a AAC; formáty DTS, TrueHD a další musí převést Vespertine na Macu, proto zde nejsou uvedeny."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Denne enhed åbner selv FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer; APE, WavPack og andre formater skal konverteres af Vespertine på en Mac, så de vises ikke her."
+            "value": "Denne enhed åbner selv FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer; DTS, TrueHD og andre formater skal konverteres af Vespertine på en Mac, så de vises ikke her."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dieses Gerät öffnet FLAC-, ALAC-, WAV-, AIFF-, MP3- und AAC-Dateien selbst; APE, WavPack und andere Formate müssen von Vespertine auf einem Mac konvertiert werden und werden deshalb hier nicht aufgeführt."
+            "value": "Dieses Gerät öffnet FLAC-, ALAC-, WAV-, AIFF-, MP3- und AAC-Dateien selbst; DTS, TrueHD und andere Formate müssen von Vespertine auf einem Mac konvertiert werden und werden deshalb hier nicht aufgeführt."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Αυτή η συσκευή ανοίγει η ίδια αρχεία FLAC, ALAC, WAV, AIFF, MP3 και AAC· τα APE, WavPack και άλλες μορφές χρειάζονται το Vespertine σε Mac για τη μετατροπή τους, οπότε δεν εμφανίζονται εδώ."
+            "value": "Αυτή η συσκευή ανοίγει η ίδια αρχεία FLAC, ALAC, WAV, AIFF, MP3 και AAC· τα DTS, TrueHD και άλλες μορφές χρειάζονται το Vespertine σε Mac για τη μετατροπή τους, οπότε δεν εμφανίζονται εδώ."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Este dispositivo abre por sí mismo los archivos FLAC, ALAC, WAV, AIFF, MP3 y AAC; APE, WavPack y otros formatos necesitan que Vespertine los convierta en un Mac, así que no aparecen aquí."
+            "value": "Este dispositivo abre por sí mismo los archivos FLAC, ALAC, WAV, AIFF, MP3 y AAC; DTS, TrueHD y otros formatos necesitan que Vespertine los convierta en un Mac, así que no aparecen aquí."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "این دستگاه فایل‌های FLAC، ALAC، WAV، AIFF، MP3 و AAC را خودش باز می‌کند؛ APE، WavPack و قالب‌های دیگر برای تبدیل به Vespertine در Mac نیاز دارند و به همین دلیل اینجا فهرست نمی‌شوند."
+            "value": "این دستگاه فایل‌های FLAC، ALAC، WAV، AIFF، MP3 و AAC را خودش باز می‌کند؛ DTS، TrueHD و قالب‌های دیگر برای تبدیل به Vespertine در Mac نیاز دارند و به همین دلیل اینجا فهرست نمی‌شوند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tämä laite avaa FLAC-, ALAC-, WAV-, AIFF-, MP3- ja AAC-tiedostot itse; APE, WavPack ja muut muodot vaativat, että Vespertine muuntaa ne Macissa, joten niitä ei näytetä täällä."
+            "value": "Tämä laite avaa FLAC-, ALAC-, WAV-, AIFF-, MP3- ja AAC-tiedostot itse; DTS, TrueHD ja muut muodot vaativat, että Vespertine muuntaa ne Macissa, joten niitä ei näytetä täällä."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ang device na ito mismo ang nagbubukas ng mga FLAC, ALAC, WAV, AIFF, MP3 at AAC file; kailangan ng APE, WavPack at iba pang format ang Vespertine sa Mac para i-convert ang mga ito, kaya hindi nakalista ang mga iyon dito."
+            "value": "Ang device na ito mismo ang nagbubukas ng mga FLAC, ALAC, WAV, AIFF, MP3 at AAC file; kailangan ng DTS, TrueHD at iba pang format ang Vespertine sa Mac para i-convert ang mga ito, kaya hindi nakalista ang mga iyon dito."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cet appareil ouvre lui-même les fichiers FLAC, ALAC, WAV, AIFF, MP3 et AAC ; les formats APE, WavPack et autres doivent être convertis par Vespertine sur un Mac, et ne figurent donc pas ici."
+            "value": "Cet appareil ouvre lui-même les fichiers FLAC, ALAC, WAV, AIFF, MP3 et AAC ; les formats DTS, TrueHD et autres doivent être convertis par Vespertine sur un Mac, et ne figurent donc pas ici."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "આ ડિવાઇસ FLAC, ALAC, WAV, AIFF, MP3 અને AAC ફાઇલો જાતે ખોલે છે; APE, WavPack અને અન્ય ફૉર્મેટને રૂપાંતરિત કરવા માટે Mac પર Vespertine જોઈએ, તેથી તે અહીં બતાવાતાં નથી."
+            "value": "આ ડિવાઇસ FLAC, ALAC, WAV, AIFF, MP3 અને AAC ફાઇલો જાતે ખોલે છે; DTS, TrueHD અને અન્ય ફૉર્મેટને રૂપાંતરિત કરવા માટે Mac પર Vespertine જોઈએ, તેથી તે અહીં બતાવાતાં નથી."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Wannan na'ura tana buɗe fayilolin FLAC, ALAC, WAV, AIFF, MP3 da AAC da kanta; APE, WavPack da sauran tsare-tsare suna buƙatar Vespertine a kan Mac don ya juya su, don haka ba a nuna su a nan ba."
+            "value": "Wannan na'ura tana buɗe fayilolin FLAC, ALAC, WAV, AIFF, MP3 da AAC da kanta; DTS, TrueHD da sauran tsare-tsare suna buƙatar Vespertine a kan Mac don ya juya su, don haka ba a nuna su a nan ba."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "מכשיר זה פותח בעצמו קובצי FLAC, ALAC, WAV, AIFF, MP3 ו־AAC; APE, WavPack ופורמטים אחרים דורשים את Vespertine ב־Mac כדי להמיר אותם, ולכן הם אינם מופיעים כאן."
+            "value": "מכשיר זה פותח בעצמו קובצי FLAC, ALAC, WAV, AIFF, MP3 ו־AAC; DTS, TrueHD ופורמטים אחרים דורשים את Vespertine ב־Mac כדי להמיר אותם, ולכן הם אינם מופיעים כאן."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "यह डिवाइस FLAC, ALAC, WAV, AIFF, MP3 और AAC फ़ाइलें ख़ुद खोलता है; APE, WavPack और अन्य फ़ॉर्मैट को रूपांतरित करने के लिए Mac पर Vespertine चाहिए, इसलिए वे यहाँ नहीं दिखाए जाते।"
+            "value": "यह डिवाइस FLAC, ALAC, WAV, AIFF, MP3 और AAC फ़ाइलें ख़ुद खोलता है; DTS, TrueHD और अन्य फ़ॉर्मैट को रूपांतरित करने के लिए Mac पर Vespertine चाहिए, इसलिए वे यहाँ नहीं दिखाए जाते।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ez az eszköz a FLAC-, ALAC-, WAV-, AIFF-, MP3- és AAC-fájlokat maga nyitja meg; az APE, a WavPack és más formátumok átalakításához a Macen futó Vespertine szükséges, ezért ezek itt nem jelennek meg."
+            "value": "Ez az eszköz a FLAC-, ALAC-, WAV-, AIFF-, MP3- és AAC-fájlokat maga nyitja meg; a DTS, a TrueHD és más formátumok átalakításához a Macen futó Vespertine szükséges, ezért ezek itt nem jelennek meg."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Perangkat ini dapat membuka sendiri file FLAC, ALAC, WAV, AIFF, MP3, dan AAC; APE, WavPack, dan format lain memerlukan Vespertine di Mac untuk mengonversinya, sehingga tidak dicantumkan di sini."
+            "value": "Perangkat ini dapat membuka sendiri file FLAC, ALAC, WAV, AIFF, MP3, dan AAC; DTS, TrueHD, dan format lain memerlukan Vespertine di Mac untuk mengonversinya, sehingga tidak dicantumkan di sini."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Questo dispositivo apre direttamente i file FLAC, ALAC, WAV, AIFF, MP3 e AAC; APE, WavPack e altri formati devono essere convertiti da Vespertine su un Mac, quindi non sono elencati qui."
+            "value": "Questo dispositivo apre direttamente i file FLAC, ALAC, WAV, AIFF, MP3 e AAC; DTS, TrueHD e altri formati devono essere convertiti da Vespertine su un Mac, quindi non sono elencati qui."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "このデバイスはFLAC、ALAC、WAV、AIFF、MP3、AACのファイルを直接開けます。APE、WavPackなどのフォーマットは、Mac上のVespertineで変換する必要があるため、ここには表示されません。"
+            "value": "このデバイスはFLAC、ALAC、WAV、AIFF、MP3、AACのファイルを直接開けます。DTS、TrueHDなどのフォーマットは、Mac上のVespertineで変換する必要があるため、ここには表示されません。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಈ ಸಾಧನ FLAC, ALAC, WAV, AIFF, MP3 ಮತ್ತು AAC ಫೈಲ್‌ಗಳನ್ನು ತಾನೇ ತೆರೆಯುತ್ತದೆ; APE, WavPack ಮತ್ತು ಇತರ ಫಾರ್ಮ್ಯಾಟ್‌ಗಳನ್ನು ಪರಿವರ್ತಿಸಲು Mac ನಲ್ಲಿ Vespertine ಬೇಕು, ಆದ್ದರಿಂದ ಅವುಗಳನ್ನು ಇಲ್ಲಿ ಪಟ್ಟಿ ಮಾಡಲಾಗುವುದಿಲ್ಲ."
+            "value": "ಈ ಸಾಧನ FLAC, ALAC, WAV, AIFF, MP3 ಮತ್ತು AAC ಫೈಲ್‌ಗಳನ್ನು ತಾನೇ ತೆರೆಯುತ್ತದೆ; DTS, TrueHD ಮತ್ತು ಇತರ ಫಾರ್ಮ್ಯಾಟ್‌ಗಳನ್ನು ಪರಿವರ್ತಿಸಲು Mac ನಲ್ಲಿ Vespertine ಬೇಕು, ಆದ್ದರಿಂದ ಅವುಗಳನ್ನು ಇಲ್ಲಿ ಪಟ್ಟಿ ಮಾಡಲಾಗುವುದಿಲ್ಲ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "이 기기는 FLAC, ALAC, WAV, AIFF, MP3 및 AAC 파일을 직접 엽니다. APE, WavPack 및 기타 포맷은 Mac의 Vespertine에서 변환해야 하므로 여기에 표시되지 않습니다."
+            "value": "이 기기는 FLAC, ALAC, WAV, AIFF, MP3 및 AAC 파일을 직접 엽니다. DTS, TrueHD 및 기타 포맷은 Mac의 Vespertine에서 변환해야 하므로 여기에 표시되지 않습니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "ഈ ഉപകരണം FLAC, ALAC, WAV, AIFF, MP3, AAC ഫയലുകൾ സ്വയം തുറക്കുന്നു; APE, WavPack എന്നിവയും മറ്റ് ഫോർമാറ്റുകളും പരിവർത്തനം ചെയ്യാൻ Mac-ലെ Vespertine വേണം, അതിനാൽ അവ ഇവിടെ പട്ടികപ്പെടുത്തുന്നില്ല."
+            "value": "ഈ ഉപകരണം FLAC, ALAC, WAV, AIFF, MP3, AAC ഫയലുകൾ സ്വയം തുറക്കുന്നു; DTS, TrueHD എന്നിവയും മറ്റ് ഫോർമാറ്റുകളും പരിവർത്തനം ചെയ്യാൻ Mac-ലെ Vespertine വേണം, അതിനാൽ അവ ഇവിടെ പട്ടികപ്പെടുത്തുന്നില്ല."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "हे डिव्हाइस FLAC, ALAC, WAV, AIFF, MP3 आणि AAC फाइल स्वतः उघडते; APE, WavPack आणि इतर फॉरमॅट रूपांतरित करण्यासाठी Mac वरील Vespertine लागते, त्यामुळे ते येथे दाखवले जात नाहीत."
+            "value": "हे डिव्हाइस FLAC, ALAC, WAV, AIFF, MP3 आणि AAC फाइल स्वतः उघडते; DTS, TrueHD आणि इतर फॉरमॅट रूपांतरित करण्यासाठी Mac वरील Vespertine लागते, त्यामुळे ते येथे दाखवले जात नाहीत."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Peranti ini membuka sendiri fail FLAC, ALAC, WAV, AIFF, MP3 dan AAC; APE, WavPack dan format lain memerlukan Vespertine pada Mac untuk menukarnya, jadi ia tidak disenaraikan di sini."
+            "value": "Peranti ini membuka sendiri fail FLAC, ALAC, WAV, AIFF, MP3 dan AAC; DTS, TrueHD dan format lain memerlukan Vespertine pada Mac untuk menukarnya, jadi ia tidak disenaraikan di sini."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Denne enheten åpner FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer selv; APE, WavPack og andre formater må konverteres av Vespertine på en Mac, så de vises ikke her."
+            "value": "Denne enheten åpner FLAC-, ALAC-, WAV-, AIFF-, MP3- og AAC-filer selv; DTS, TrueHD og andre formater må konverteres av Vespertine på en Mac, så de vises ikke her."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Dit apparaat opent FLAC-, ALAC-, WAV-, AIFF-, MP3- en AAC-bestanden zelf; APE, WavPack en andere formaten moeten door Vespertine op een Mac worden omgezet en staan hier daarom niet in de lijst."
+            "value": "Dit apparaat opent FLAC-, ALAC-, WAV-, AIFF-, MP3- en AAC-bestanden zelf; DTS, TrueHD en andere formaten moeten door Vespertine op een Mac worden omgezet en staan hier daarom niet in de lijst."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਇਹ ਡਿਵਾਈਸ FLAC, ALAC, WAV, AIFF, MP3 ਅਤੇ AAC ਫ਼ਾਈਲਾਂ ਆਪ ਖੋਲ੍ਹਦਾ ਹੈ; APE, WavPack ਅਤੇ ਹੋਰ ਫ਼ਾਰਮੈਟਾਂ ਨੂੰ ਬਦਲਣ ਲਈ Mac ’ਤੇ Vespertine ਚਾਹੀਦਾ ਹੈ, ਇਸ ਲਈ ਉਹ ਇੱਥੇ ਨਹੀਂ ਦਿਖਾਏ ਜਾਂਦੇ।"
+            "value": "ਇਹ ਡਿਵਾਈਸ FLAC, ALAC, WAV, AIFF, MP3 ਅਤੇ AAC ਫ਼ਾਈਲਾਂ ਆਪ ਖੋਲ੍ਹਦਾ ਹੈ; DTS, TrueHD ਅਤੇ ਹੋਰ ਫ਼ਾਰਮੈਟਾਂ ਨੂੰ ਬਦਲਣ ਲਈ Mac ’ਤੇ Vespertine ਚਾਹੀਦਾ ਹੈ, ਇਸ ਲਈ ਉਹ ਇੱਥੇ ਨਹੀਂ ਦਿਖਾਏ ਜਾਂਦੇ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "To urządzenie samo otwiera pliki FLAC, ALAC, WAV, AIFF, MP3 i AAC; APE, WavPack i inne formaty wymagają konwersji przez Vespertine na Macu, więc nie są tutaj wyświetlane."
+            "value": "To urządzenie samo otwiera pliki FLAC, ALAC, WAV, AIFF, MP3 i AAC; DTS, TrueHD i inne formaty wymagają konwersji przez Vespertine na Macu, więc nie są tutaj wyświetlane."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Este dispositivo abre sozinho arquivos FLAC, ALAC, WAV, AIFF, MP3 e AAC; APE, WavPack e outros formatos precisam que o Vespertine em um Mac os converta, por isso não aparecem aqui."
+            "value": "Este dispositivo abre sozinho arquivos FLAC, ALAC, WAV, AIFF, MP3 e AAC; DTS, TrueHD e outros formatos precisam que o Vespertine em um Mac os converta, por isso não aparecem aqui."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Este dispositivo abre sozinho ficheiros FLAC, ALAC, WAV, AIFF, MP3 e AAC; APE, WavPack e outros formatos precisam que o Vespertine num Mac os converta, pelo que não aparecem aqui."
+            "value": "Este dispositivo abre sozinho ficheiros FLAC, ALAC, WAV, AIFF, MP3 e AAC; DTS, TrueHD e outros formatos precisam que o Vespertine num Mac os converta, pelo que não aparecem aqui."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Acest dispozitiv deschide singur fișierele FLAC, ALAC, WAV, AIFF, MP3 și AAC; APE, WavPack și alte formate au nevoie de Vespertine pe un Mac pentru a fi convertite, așa că nu apar aici."
+            "value": "Acest dispozitiv deschide singur fișierele FLAC, ALAC, WAV, AIFF, MP3 și AAC; DTS, TrueHD și alte formate au nevoie de Vespertine pe un Mac pentru a fi convertite, așa că nu apar aici."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Den här enheten öppnar FLAC-, ALAC-, WAV-, AIFF-, MP3- och AAC-filer själv; APE, WavPack och andra format måste konverteras av Vespertine på en Mac, så de visas inte här."
+            "value": "Den här enheten öppnar FLAC-, ALAC-, WAV-, AIFF-, MP3- och AAC-filer själv; DTS, TrueHD och andra format måste konverteras av Vespertine på en Mac, så de visas inte här."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kifaa hiki chenyewe hufungua faili za FLAC, ALAC, WAV, AIFF, MP3 na AAC; APE, WavPack na miundo mingine huhitaji Vespertine kwenye Mac ili kuzigeuza, kwa hivyo hazijaorodheshwa hapa."
+            "value": "Kifaa hiki chenyewe hufungua faili za FLAC, ALAC, WAV, AIFF, MP3 na AAC; DTS, TrueHD na miundo mingine huhitaji Vespertine kwenye Mac ili kuzigeuza, kwa hivyo hazijaorodheshwa hapa."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "இந்தச் சாதனம் FLAC, ALAC, WAV, AIFF, MP3, AAC கோப்புகளைத் தானே திறக்கும்; APE, WavPack மற்றும் பிற வடிவங்களை மாற்ற Mac-இல் Vespertine தேவை, எனவே அவை இங்கே பட்டியலிடப்படாது."
+            "value": "இந்தச் சாதனம் FLAC, ALAC, WAV, AIFF, MP3, AAC கோப்புகளைத் தானே திறக்கும்; DTS, TrueHD மற்றும் பிற வடிவங்களை மாற்ற Mac-இல் Vespertine தேவை, எனவே அவை இங்கே பட்டியலிடப்படாது."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "ఈ పరికరం FLAC, ALAC, WAV, AIFF, MP3, AAC ఫైల్‌లను తానే తెరుస్తుంది; APE, WavPack, ఇతర ఫార్మాట్‌లను మార్చడానికి Macలో Vespertine అవసరం, కాబట్టి అవి ఇక్కడ జాబితాలో కనిపించవు."
+            "value": "ఈ పరికరం FLAC, ALAC, WAV, AIFF, MP3, AAC ఫైల్‌లను తానే తెరుస్తుంది; DTS, TrueHD, ఇతర ఫార్మాట్‌లను మార్చడానికి Macలో Vespertine అవసరం, కాబట్టి అవి ఇక్కడ జాబితాలో కనిపించవు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "อุปกรณ์เครื่องนี้เปิดไฟล์ FLAC, ALAC, WAV, AIFF, MP3 และ AAC ได้เอง ส่วน APE, WavPack และรูปแบบอื่นต้องใช้ Vespertine บน Mac เพื่อแปลง จึงไม่แสดงในรายการที่นี่"
+            "value": "อุปกรณ์เครื่องนี้เปิดไฟล์ FLAC, ALAC, WAV, AIFF, MP3 และ AAC ได้เอง ส่วน DTS, TrueHD และรูปแบบอื่นต้องใช้ Vespertine บน Mac เพื่อแปลง จึงไม่แสดงในรายการที่นี่"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bu aygıt FLAC, ALAC, WAV, AIFF, MP3 ve AAC dosyalarını kendisi açar; APE, WavPack ve diğer biçimlerin dönüştürülmesi için Mac’te Vespertine gerekir, bu yüzden bunlar burada listelenmez."
+            "value": "Bu aygıt FLAC, ALAC, WAV, AIFF, MP3 ve AAC dosyalarını kendisi açar; DTS, TrueHD ve diğer biçimlerin dönüştürülmesi için Mac’te Vespertine gerekir, bu yüzden bunlar burada listelenmez."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Цей пристрій сам відкриває файли FLAC, ALAC, WAV, AIFF, MP3 й AAC; для APE, WavPack та інших форматів потрібне перетворення у Vespertine на Mac, тому їх тут не показано."
+            "value": "Цей пристрій сам відкриває файли FLAC, ALAC, WAV, AIFF, MP3 й AAC; для DTS, TrueHD та інших форматів потрібне перетворення у Vespertine на Mac, тому їх тут не показано."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "یہ ڈیوائس FLAC، ALAC، WAV، AIFF، MP3 اور AAC فائلیں خود کھولتی ہے؛ APE، WavPack اور دیگر فارمیٹس کو تبدیل کرنے کے لیے Mac پر Vespertine درکار ہے، اس لیے وہ یہاں درج نہیں ہوتے۔"
+            "value": "یہ ڈیوائس FLAC، ALAC، WAV، AIFF، MP3 اور AAC فائلیں خود کھولتی ہے؛ DTS، TrueHD اور دیگر فارمیٹس کو تبدیل کرنے کے لیے Mac پر Vespertine درکار ہے، اس لیے وہ یہاں درج نہیں ہوتے۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Thiết bị này tự mở được các tệp FLAC, ALAC, WAV, AIFF, MP3 và AAC; APE, WavPack và các định dạng khác cần Vespertine trên máy Mac để chuyển đổi nên không được liệt kê ở đây."
+            "value": "Thiết bị này tự mở được các tệp FLAC, ALAC, WAV, AIFF, MP3 và AAC; DTS, TrueHD và các định dạng khác cần Vespertine trên máy Mac để chuyển đổi nên không được liệt kê ở đây."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "此裝置可直接開啟 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；APE、WavPack 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會在此列出。"
+            "value": "此裝置可直接開啟 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；DTS、TrueHD 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會在此列出。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "此设备可直接打开 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 文件；APE、WavPack 及其他格式需要由 Mac 上的 Vespertine 转换，因此不会在此列出。"
+            "value": "此设备可直接打开 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 文件；DTS、TrueHD 及其他格式需要由 Mac 上的 Vespertine 转换，因此不会在此列出。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "此裝置可直接打開 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；APE、WavPack 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會列在這裡。"
+            "value": "此裝置可直接打開 FLAC、ALAC、WAV、AIFF、MP3 和 AAC 檔案；DTS、TrueHD 和其他格式需要由 Mac 上的 Vespertine 轉換，因此不會列在這裡。"
           }
         }
       }

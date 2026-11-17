@@ -49,6 +49,20 @@ SFBAudioEngine's prebuilt WavPack is compiled without DSD support, so [`scripts/
 
 SACD images often store their audio compressed with DST (Direct Stream Transfer, ISO/IEC 14496-3 subpart 10). FFmpeg's DST decoder only puts out PCM, which can't go to a DAC as DoP, so [`vespertine_dst.c`](Packages/VespertineKit/Sources/CVespertineDTS/vespertine_dst.c) is a copy of it (from FFmpeg's `libavcodec/dstdec.c`, by Peter Ross) that returns the decoded DSD instead. It stands alone, with its own bit reader in place of FFmpeg's internal one, and rejects frames that can't be valid instead of decoding them. The file says what was changed and when. It keeps FFmpeg's license, the LGPL 2.1 or later (its text ships as `FFmpeg-LGPL-2.1.txt`), and is compiled from source with the rest of Vespertine. The SACD image layout (Master TOC, area TOCs, audio sectors) follows the Scarlet Book as documented by the open-source [SACD Ripper](https://github.com/sacd-ripper/sacd-ripper) project; Vespertine's reader is its own code, and none of SACD Ripper's is included.
 
+## The iPhone and iPad app
+
+Vespertine for iPhone and iPad (`RemoteApp`) is under the GPL-3.0-or-later with the App Store exception ([`Packages/VespertineRemoteKit/APP-STORE-EXCEPTION.md`](Packages/VespertineRemoteKit/APP-STORE-EXCEPTION.md)). It carries none of the LGPL components above and no FFmpeg. To open APE, WavPack, Ogg Vorbis and Opus files from a share it includes these libraries, all BSD-3-Clause, in the same builds the Mac app uses (`Packages/VespertineDecoders`):
+
+| Component | License | Used for | Source |
+|---|---|---|---|
+| Monkey's Audio (CXXMonkeysAudio 12.13.0) | BSD-3-Clause | APE | https://monkeysaudio.com |
+| WavPack (wavpack-binary-xcframework 0.2.0) | BSD-3-Clause | WavPack | https://www.wavpack.com |
+| libogg (ogg-binary-xcframework 0.1.3) | BSD-3-Clause | The Ogg container | https://xiph.org |
+| libvorbis, libvorbisfile (vorbis-binary-xcframework 0.1.2) | BSD-3-Clause | Ogg Vorbis | https://xiph.org |
+| libopus, opusfile (opus-binary-xcframework 0.3.0) | BSD-3-Clause | Opus | https://xiph.org |
+
+Their license and copyright texts are shown in the app under Settings › About › Licenses (the files in [`App/Licenses`](App/Licenses)).
+
 ## AirPlay
 
 AirPlay Players (beta, off by default) sends to AirPlay 1 (RAOP) receivers with Vespertine's own code. The protocol has no public specification: the packet layouts and the order of requests follow what the open-source senders and receivers do, namely [OwnTone](https://github.com/owntone/owntone-server) (GPL-2.0-or-later), [libraop](https://github.com/philippe44/libraop) (MIT) and [shairport-sync](https://github.com/mikebrady/shairport-sync). None of their code is included. One value is taken from them: the AirPort Express RSA public key (a 2048-bit modulus), which every open sender carries and which receivers that ask for encryption expect the audio key to be wrapped with. It is a public key only; Vespertine holds no private key of Apple's and does not use FairPlay. For receivers that list MFi authentication, Vespertine sends the `/auth-setup` request such receivers expect before a session (described in the [unofficial AirPlay specification](https://openairplay.github.io/airplay-spec/)) and does not check the receiver's certificate; Vespertine is not part of Apple's MFi Program and holds no MFi key or certificate.

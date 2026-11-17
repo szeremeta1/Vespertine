@@ -27,10 +27,10 @@ home. Now Playing says **SMB share** as the source, and Output shows the share, 
 
 | | |
 |---|---|
-| Played from a share | FLAC, ALAC and AAC (`.m4a`, `.mp4`, `.m4b`), WAV (also RF64), AIFF, MP3, and stereo or mono DSD (`.dsf`, `.dff`) |
-| Counted as "Files that need the Mac", not listed | DSD in surround or packed with DST, APE, WavPack, TTA, Ogg, Opus, WMA, DTS, TrueHD/MLP, AC-3/E-AC-3, MKA, ISO, TAK |
-| Covers | `cover`, `folder`, `front`, `album` or `albumart` `.jpg`/`.jpeg`/`.png` in the album's folder, else the picture inside a file |
-| ReplayGain | Read from the file's own tags when Output › ReplayGain is on: Vorbis comments in FLAC, `TXXX` frames in ID3 (MP3, WAV, AIFF), named iTunes items or QuickTime keys in MPEG-4. Read again from the file each time a song is played, so an index made by an earlier version needs no rescan |
+| Played from a share | FLAC, ALAC and AAC (`.m4a`, `.mp4`, `.m4b`), WAV (also RF64), AIFF, MP3, stereo or mono DSD (`.dsf`, `.dff`), and in stereo or mono: APE, WavPack (`.wv`), Ogg Vorbis (`.ogg`, `.oga`) and Opus (`.opus`, `.ogg`) |
+| Counted as "Files that need the Mac", not listed | DSD in surround or packed with DST, WavPack holding DSD, APE, WavPack, Vorbis and Opus in surround, FLAC or Speex in Ogg, TTA, WMA, DTS, TrueHD/MLP, AC-3/E-AC-3, MKA, ISO, TAK |
+| Covers | `cover`, `folder`, `front`, `album` or `albumart` `.jpg`/`.jpeg`/`.png` in the album's folder, else the picture inside a file (not read from inside APE, WavPack, Ogg and Opus files) |
+| ReplayGain | Read from the file's own tags when Output › ReplayGain is on: Vorbis comments in FLAC, `TXXX` frames in ID3 (MP3, WAV, AIFF), named iTunes items or QuickTime keys in MPEG-4. Not read from APE, WavPack, Ogg or Opus files. Read again from the file each time a song is played, so an index made by an earlier version needs no rescan |
 | Not there | Playlists (they are the Mac's), CUE sheets |
 
 MP3 and AAC albums on a share join without a gap, like the lossless ones: the phone's decoder reads the encoder's delay and padding
@@ -55,6 +55,23 @@ Nothing is stored on the share or converted ahead of time: the phone reads the p
 PCM is this app's own conversion, so it is not sample-for-sample what the Mac's converter makes of the same file. Surround DSD and
 DST-packed DSDIFF (from an SACD) still need the Mac. A share scanned before this version lists its DSD files after its next scan
 (by itself after a day, or **Scan Again**).
+
+## APE, WavPack, Ogg Vorbis and Opus
+
+iOS opens none of these, so the app brings a decoder for each (`Packages/VespertineDecoders`): the Monkey's Audio SDK, libwavpack,
+libvorbisfile and opusfile. All four are BSD-3-Clause, and they are the same builds the Mac app decodes these files with, so a file
+decodes to the same samples on the phone as on the Mac. The app carries no FFmpeg and nothing under the LGPL: the App Store exception
+covers only Vespertine's own code, and a library that asks for relinking doesn't fit an App Store build. That is why TTA (LGPL), and
+TAK, WMA, DTS and TrueHD (FFmpeg on the Mac) stay with the Mac. Their licenses are in the app under Settings › About › Licenses.
+
+A file is decoded as it plays: the player is given PCM (whole numbers for APE and WavPack, 32-bit floats for Vorbis and Opus) and each
+range it asks for is decoded from the frames it covers, so seeking works and nothing is converted ahead of time. Now Playing says
+**ORIGINAL FILE**, as for a FLAC: the samples are the file's own. Reading in order, and any seek in APE, WavPack and Vorbis, gives
+exactly the samples the Mac decodes. Opus carries what it has decoded from packet to packet, so a seek starts decoding a second early and
+throws that second away: what plays is the same sound as reading in order, to within rounding.
+
+Only stereo and mono play here. A share scanned before this version lists these files after its next scan (by itself after a day, or
+**Scan Again**).
 
 ## The SMB client
 
@@ -112,6 +129,11 @@ favorites beside it; covers are fetched when first shown and kept at the sizes a
   clip's (`DoPProbeClip`) for the same DSD, whatever the file kind, bit order or the way the reads are cut up. As PCM, a tone must come
   out at its level (within 0.2%) at every rate, and DSD silence as digital silence. On a Mac, the player's own decoder must read
   the stream back to the same 24-bit words.
+- The decoders (`PhoneDecodersTests.swift` in VespertineKit, which has the Mac's decoder to compare with): APE at 16 and 24 bits,
+  WavPack, Ogg Vorbis and Opus fixtures must decode to exactly the samples SFBAudioEngine decodes on the Mac, read in pieces; a read
+  from any frame must be the same samples as reading in order (Opus: the same sound); DSD in WavPack and 5.1 Opus must be left to the
+  Mac; a share that stops answering must be said as that, not as a damaged file. `DecodedFormatsTests.swift` covers the scan and
+  `ShareMac` with a made-up decoder, and the player's own decoder reading 16, 24 and 32-bit and float samples back exactly.
 - The scan, the library and `ShareMac` on a made-up share in memory, including a share that stops answering mid-scan.
 - Against a real server when one is named: `VESPERTINE_SMB="host:port/share/user/password" swift test --package-path
   Packages/VespertineRemoteKit --filter SMBLiveTests` (`host:port/share` alone signs in as a guest). The share needs a `Music` folder
@@ -121,5 +143,6 @@ favorites beside it; covers are fetched when first shown and kept at the sizes a
   (`guest` likewise). The run prints the version, and whether the session is encrypted or a guest's. CI names none.
 
 What has not been measured: a real NAS (Synology, QNAP, TrueNAS, a Mac's or Windows' file sharing), a real phone over Tailscale, and
-keeping albums from a share on a phone. DSD from a share has not been heard on a phone or seen on a DAC's display (bench B8, step 13).
+keeping albums from a share on a phone. DSD from a share has not been heard on a phone or seen on a DAC's display (bench B8, step 13). APE, WavPack, Ogg Vorbis and
+Opus have been decoded on a Mac only: not yet built into an app on a phone, or heard there.
 Samba is what most NAS boxes run, but that is not the same as having tried them.
