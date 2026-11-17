@@ -81,6 +81,7 @@ final class FakeSSDPResponder: @unchecked Sendable {
     private let lock = NSLock()
     private var searches = 0
     private var closed = false
+    private let ended = DispatchSemaphore(value: 0)
 
     var searchesReceived: Int { lock.withLock { searches } }
 
@@ -108,14 +109,12 @@ final class FakeSSDPResponder: @unchecked Sendable {
                 var from = sockaddr_in()
                 var fromLen = socklen_t(MemoryLayout<sockaddr_in>.size)
                 var pfd = pollfd(fd: fd, events: Int16(POLLIN), revents: 0)
-                if poll(&pfd, 1, 100) <= 0 {
-                    if lock.withLock({ closed }) { return }
-                    continue
-                }
+                if lock.withLock({ closed }) { break }
+                if poll(&pfd, 1, 100) <= 0 { continue }
                 let n = withUnsafeMutablePointer(to: &from) { p in
                     p.withMemoryRebound(to: sockaddr.self, capacity: 1) { recvfrom(fd, &buffer, buffer.count, 0, $0, &fromLen) }
                 }
-                guard n > 0 else { return }
+                guard n > 0 else { break }
                 let text = String(decoding: buffer[0..<n], as: UTF8.self)
                 guard text.hasPrefix("M-SEARCH") else { continue }
                 lock.withLock { searches += 1 }
@@ -126,12 +125,15 @@ final class FakeSSDPResponder: @unchecked Sendable {
                     }
                 }
             }
+            // Closed by the thread that reads it, when it has stopped: closed from elsewhere after a guessed length of
+            // time, its number could be another test's socket while this thread still polled and read it.
+            Darwin.close(fd)
+            ended.signal()
         }
     }
 
     func close() {
-        lock.withLock { closed = true }
-        Thread.sleep(forTimeInterval: 0.15)
-        Darwin.close(fd)
+        guard lock.withLock({ () -> Bool in defer { closed = true }; return !closed }) else { return }
+        _ = ended.wait(timeout: .now() + 30)
     }
 }

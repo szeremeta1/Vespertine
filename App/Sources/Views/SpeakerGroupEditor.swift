@@ -31,6 +31,7 @@ struct SpeakerGroupEditor: View {
                 VStack(alignment: .leading, spacing: 18) {
                     Room3DView(group: $group)
                     SpeakerReadoutView(group: $group)
+                    GroupOutputsView(group: $group)
                     ChannelMapGrid(group: $group)
                     MemberVolumeView(group: group)
                     SpeakerPoliciesView(group: $group)
@@ -48,6 +49,57 @@ struct SpeakerGroupEditor: View {
         .padding(20)
         .frame(minWidth: 760, idealWidth: 820, minHeight: 520, idealHeight: 860)
         .onChange(of: group) { _, new in groups.upsert(new) }
+    }
+}
+
+/// The group's outputs: which one leads the clock, their order, taking one out and putting another in.
+struct GroupOutputsView: View {
+    @Environment(AppModel.self) private var model
+    @Binding var group: SpeakerGroup
+
+    var body: some View {
+        // The outputs the app already knows of: listing them again would ask the audio system while something may be playing.
+        let addable = GroupMemberEdits.addable(GroupCandidates.list(from: model.devices.devices), to: group)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Outputs").font(.headline)
+                Spacer()
+                Menu {
+                    ForEach(addable) { candidate in
+                        Button { group = GroupMemberEdits.add(candidate, to: group) } label: {
+                            Text("\(candidate.name) · \(candidate.channels) channels", comment: "Speaker Groups list: the group's outputs, a dot, then its channel count (plural by the count).")
+                        }
+                    }
+                } label: { Text("Add Output…") }
+                .fixedSize()
+                .disabled(addable.isEmpty)
+            }
+            Text("The outputs in the order of their channels. Removing one takes its speakers with it; a group keeps at least two.")
+                .font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            ForEach(group.members, id: \.deviceUID) { member in
+                HStack(spacing: 8) {
+                    RoundedRectangle(cornerRadius: 2).fill(Room3DView.color(ofMember: group.members.firstIndex { $0.deviceUID == member.deviceUID } ?? 0))
+                        .frame(width: 10, height: 10).accessibilityHidden(true)
+                    Text("\(member.name) · \(member.channelCount) channels", comment: "Speaker Groups list: the group's outputs, a dot, then its channel count (plural by the count).")
+                    Spacer()
+                    Button { group = GroupMemberEdits.move(member.deviceUID, by: -1, in: group) } label: { Image(systemName: "chevron.up") }
+                        .disabled(!GroupMemberEdits.canMove(member.deviceUID, by: -1, in: group))
+                        .accessibilityLabel(Text("Move \(member.name) earlier", comment: "Accessibility label: moves this output earlier in the group's order."))
+                    Button { group = GroupMemberEdits.move(member.deviceUID, by: 1, in: group) } label: { Image(systemName: "chevron.down") }
+                        .disabled(!GroupMemberEdits.canMove(member.deviceUID, by: 1, in: group))
+                        .accessibilityLabel(Text("Move \(member.name) later", comment: "Accessibility label: moves this output later in the group's order."))
+                    Button(role: .destructive) { group = GroupMemberEdits.remove(member.deviceUID, from: group) } label: { Text("Remove") }
+                        .disabled(!GroupMemberEdits.canRemove(member.deviceUID, from: group))
+                        .accessibilityLabel(Text("Remove \(member.name)", comment: "Accessibility label: takes this output out of the speaker group."))
+                }
+                .controlSize(.small)
+            }
+            Picker(selection: Binding(get: { group.clockLeaderUID }, set: { group = GroupMemberEdits.setLeader($0, in: group) })) {
+                ForEach(group.members, id: \.deviceUID) { Text(verbatim: $0.name).tag($0.deviceUID) }
+            } label: { Text("Clock leader") }
+            .fixedSize()
+            Text(verbatim: SpeakerGroupDraft.leaderExplanation).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+        }
     }
 }
 
@@ -170,7 +222,7 @@ struct MemberVolumeView: View {
             Text("Volume").font(.headline)
             Picker(selection: choice) {
                 Text("Hardware volume (each DAC's knob)").tag(GroupVolumeChoice.hardware)
-                Text("Software volume (set both DACs once, control here)").tag(GroupVolumeChoice.software)
+                Text("Software volume (set each DAC once, control here)").tag(GroupVolumeChoice.software)
             } label: { Text("Volume") }
             .pickerStyle(.radioGroup)
             .labelsHidden()

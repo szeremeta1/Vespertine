@@ -26,7 +26,7 @@ struct SystemOutputSettingsSection: View {
         let output = model.systemOutput
         Text("Shows a speaker group as an output of the Mac, under the name you gave it, so any app can play to it: a browser, the TV app, a video player. The volume keys set its volume. Vespertine's helper plays it, with Vespertine open or closed. Every group is off until you turn it on.")
             .font(.caption).foregroundStyle(.secondary)
-        if output.isolated {
+        if output.isolated && !output.preview {
             Text("Not available while Vespertine runs on a test library.").font(.caption).foregroundStyle(.secondary)
         } else {
             DriverRow(output: output)

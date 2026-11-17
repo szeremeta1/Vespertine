@@ -225,20 +225,24 @@ public enum SystemOutputRouting {
     }
 
     /// The router for `content`: the output's own channels for a surround source; the front pair (by the stereo choice) for stereo;
-    /// the upmixer's 5.1 for stereo under `upmix`.
+    /// the upmixer's 5.1 for stereo under `upmix`. On a group with Fill the room on, every speaker also plays the rest of its
+    /// side (`RoomRender.fillTaps`), so a film's dialogue is heard next to any speaker. Here the fill is a plain mix, in time
+    /// with the rest: this routing runs in the I/O cycle and must add no delay to a film.
     public static func router(input: [AudioChannelLabel], group: SpeakerGroup, content: SystemOutputContent, stereo: SystemOutputStereo) -> PositionRouter? {
+        let pair = [kAudioChannelLabel_Left, kAudioChannelLabel_Right]
+        let labels: [AudioChannelLabel]
+        var routed = group
         switch (content, stereo) {
-        case (.multichannel, _):
-            return PositionRouter(source: input, group: group)
-        case (.stereo, .upmix):
-            return PositionRouter(source: StereoUpmixer.outputLabels, group: group)
-        case (.stereo, .asGroup):
-            return PositionRouter(source: [kAudioChannelLabel_Left, kAudioChannelLabel_Right], group: group)
+        case (.multichannel, _): labels = input
+        case (.stereo, .upmix): labels = StereoUpmixer.outputLabels
+        case (.stereo, .asGroup): labels = pair
         case (.stereo, .extended):
-            var extended = group
-            extended.stereoPolicy = .allSpeakers
-            return PositionRouter(source: [kAudioChannelLabel_Left, kAudioChannelLabel_Right], group: extended)
+            labels = pair
+            routed.stereoPolicy = .allSpeakers
         }
+        guard let router = PositionRouter(source: labels, group: routed) else { return nil }
+        guard let fill = group.roomRender?.clamped.fillGain, fill > 0 else { return router }
+        return router.adding(fill: RoomRender.fillTaps(labels: labels, router: router, group: routed), gain: fill)
     }
 
     /// For each of the router's source channels, the matrix column it reads.

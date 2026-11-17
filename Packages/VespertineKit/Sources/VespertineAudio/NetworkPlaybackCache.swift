@@ -430,6 +430,10 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
     /// `makeReader` opens the file (a share's, or a remote reader's): the same wait applies to both.
     private func openReader(key: String, url: URL, foreground: Bool, cancelled: () -> Bool,
                             _ makeReader: @escaping @Sendable (URL) throws -> any PlaybackCacheReader) throws -> any PlaybackCacheReader {
+        // The wait is counted from before the open is begun, never from a moment after it: the open runs on another thread at
+        // once, and a clock read after it had started could miss what that start was (a test's stepped clock that the open
+        // itself moves past the limit then never showed any time passing, and the wait had no end).
+        let began = clock()
         let (job, starts) = openings.withLock { table -> (Opening, Bool) in
             if let running = table[key] { return (running, false) }
             let job = Opening(); table[key] = job
@@ -445,7 +449,6 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         // An open the share never answers is the same silence as a read it never answers: the song is given up after
         // `noProgressLimit` with that reason, instead of buffering for as long as the share stays quiet. Each caller counts from
         // when it began to wait; the open itself finishes, or fails, in the background (and is closed there).
-        let began = clock()
         let token = UUID()
         if foreground { openWaits.withLock { $0[token] = began } }
         defer { if foreground { openWaits.withLock { $0[token] = nil } } }
@@ -616,6 +619,9 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         var isWaiting: Bool { storage.condition.withLock { storage.starting || storage.waiters > 0 } }
         /// How many reads are parked waiting for bytes that are not on disk yet (each has stamped the start of its wait).
         var readsWaiting: Int { storage.condition.withLock { storage.waiters } }
+        /// How many of the copy's lanes are still running (the tests wait for a copy that was given up on to end, not for a
+        /// length of time).
+        var copyLanesRunning: Int { storage.condition.withLock { storage.activeLanes.count } }
         /// Seconds since a byte last arrived while the listener waits on this copy (its start, or a read of bytes not on disk yet);
         /// nil when nobody does: a prefetched next song, a copy that is finished, failed or cancelled, a lead being read from disk.
         var silence: TimeInterval? { storage.condition.withLock { storage.silence() } }

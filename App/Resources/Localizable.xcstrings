@@ -78919,542 +78919,6 @@
         }
       }
     },
-    "A pair 1.5 m ahead, and another pair 2.5 m behind facing it, as in a shared room.": {
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ጥንድ 1.5 ሜትር ፊት ለፊት፣ ሌላ ጥንድ ደግሞ 2.5 ሜትር ኋላ ወደ እሱ እያየ፣ እንደ የጋራ ክፍል።"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "زوج على بُعد 1.5 م أمامك، وزوج آخر على بُعد 2.5 م خلفك يواجهه، كما في غرفة مشتركة."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "১.৫ মিটার সামনে একটি জোড়া, আর ২.৫ মিটার পেছনে তার মুখোমুখি আরেকটি জোড়া, যেমন ভাগ করা ঘরে।"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jeden pár 1,5 m vpředu a druhý 2,5 m vzadu proti němu, jako ve sdílené místnosti."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Et par 1,5 m foran og et andet par 2,5 m bagved, vendt mod det, som i et fælles rum."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ein Paar 1,5 m vor dir und ein weiteres 2,5 m hinter dir, ihm gegenüber, wie in einem gemeinsam genutzten Raum."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ένα ζεύγος 1,5 m μπροστά και ένα άλλο 2,5 m πίσω, αντικριστά, όπως σε κοινόχρηστο δωμάτιο."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Un par a 1,5 m al frente y otro a 2,5 m detrás, enfrentado, como en una sala compartida."
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "یک جفت ۱٫۵ متر جلو و جفت دیگر ۲٫۵ متر عقب روبه‌روی آن، مانند اتاقی مشترک."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Yksi pari 1,5 m edessä ja toinen 2,5 m takana sitä vastapäätä, kuten yhteisessä tilassa."
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Isang pair na 1.5 m sa harap, at isa pang pair na 2.5 m sa likod na nakaharap dito, gaya sa shared na kuwarto."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Une paire à 1,5 m devant, et une autre à 2,5 m derrière lui faisant face, comme dans une pièce partagée."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1.5 મીટર આગળ એક જોડી, અને 2.5 મીટર પાછળ તેની સામે બીજી જોડી, વહેંચાયેલા રૂમની જેમ."
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ma'aurata ɗaya a nisan mita 1.5 a gaba, wasu kuma a nisan mita 2.5 a baya suna fuskantarsa, kamar a ɗakin haɗin gwiwa."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "זוג אחד 1.5 מ׳ מלפנים וזוג נוסף 2.5 מ׳ מאחור מולו, כמו בחדר משותף."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "एक जोड़ी 1.5 मीटर आगे, और दूसरी 2.5 मीटर पीछे उसके सामने, जैसे साझा कमरे में।"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Egy pár 1,5 m-re előtted, egy másik 2,5 m-re mögötted, szemben vele, mint egy közös szobában."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Satu pasang 1,5 m di depan, dan satu pasang lagi 2,5 m di belakang menghadapnya, seperti di ruangan bersama."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Una coppia a 1,5 m davanti e un’altra a 2,5 m dietro che la fronteggia, come in una stanza condivisa."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1.5 m前方に1ペア、2.5 m後方にそれと向かい合う1ペアを置きます。共用の部屋のような配置です。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1.5 ಮೀ ಮುಂದೆ ಒಂದು ಜೋಡಿ, ಮತ್ತು 2.5 ಮೀ ಹಿಂದೆ ಅದಕ್ಕೆ ಎದುರಾಗಿ ಇನ್ನೊಂದು ಜೋಡಿ, ಹಂಚಿಕೊಂಡ ಕೊಠಡಿಯಲ್ಲಿರುವಂತೆ."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1.5 m 앞에 한 쌍, 2.5 m 뒤에 그것을 마주 보는 한 쌍을 두는, 공용 공간 같은 배치입니다."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1.5 മീ മുന്നിൽ ഒരു ജോഡി, 2.5 മീ പിന്നിൽ അതിനെ അഭിമുഖീകരിച്ച് മറ്റൊരു ജോഡി, പങ്കിട്ട മുറിയിലേതുപോലെ."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1.5 मी पुढे एक जोडी, आणि 2.5 मी मागे तिच्यासमोर दुसरी जोडी, सामायिक खोलीत असते तशी."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sepasang 1.5 m di hadapan, dan sepasang lagi 2.5 m di belakang menghadapnya, seperti dalam bilik kongsi."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ett par 1,5 m foran og et annet par 2,5 m bak som vender mot det, som i et delt rom."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Een paar 1,5 m voor je en een ander paar 2,5 m achter je ertegenover, zoals in een gedeelde ruimte."
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1.5 ਮੀਟਰ ਅੱਗੇ ਇੱਕ ਜੋੜੀ, ਅਤੇ 2.5 ਮੀਟਰ ਪਿੱਛੇ ਉਸ ਦੇ ਸਾਹਮਣੇ ਦੂਜੀ ਜੋੜੀ, ਸਾਂਝੇ ਕਮਰੇ ਵਾਂਗ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jedna para 1,5 m z przodu i druga 2,5 m z tyłu, zwrócona w jej stronę, jak we wspólnym pokoju."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Um par a 1,5 m à frente e outro a 2,5 m atrás, de frente para ele, como em uma sala compartilhada."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Um par a 1,5 m à frente e outro a 2,5 m atrás, virado para ele, como numa sala partilhada."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O pereche la 1,5 m în față și alta la 2,5 m în spate, orientată spre ea, ca într-o cameră comună."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ett par 1,5 m framför och ett annat 2,5 m bakom, vänt mot det, som i ett delat rum."
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jozi moja mita 1.5 mbele, na jozi nyingine mita 2.5 nyuma inayoitazama, kama katika chumba cha pamoja."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1.5 மீ முன்னால் ஒரு இணை, 2.5 மீ பின்னால் அதற்கு எதிரே இன்னொரு இணை, பகிர்ந்த அறையில் இருப்பதுபோல."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1.5 మీ ముందు ఒక జత, 2.5 మీ వెనుక దానికి ఎదురుగా మరో జత, ఉమ్మడి గదిలో లాగా."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "คู่หนึ่งอยู่ข้างหน้า 1.5 ม. และอีกคู่อยู่ข้างหลัง 2.5 ม. หันเข้าหากัน เหมือนในห้องที่ใช้ร่วมกัน"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1,5 m önde bir çift, 2,5 m arkada ona bakan bir çift daha; paylaşılan bir odadaki gibi."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Одна пара за 1,5 м попереду й інша за 2,5 м позаду, повернена до неї, як у спільній кімнаті."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "1.5 میٹر آگے ایک جوڑا، اور 2.5 میٹر پیچھے اس کے سامنے دوسرا جوڑا، جیسے مشترکہ کمرے میں۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Một cặp cách 1,5 m phía trước và một cặp khác cách 2,5 m phía sau quay mặt vào nó, như trong phòng dùng chung."
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一對在前方 1.5 米，另一對在後方 2.5 米並與其相對，就像共用房間的佈局。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一对在前方 1.5 米，另一对在后方 2.5 米并与其相对，就像共用房间的布置。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一對在前方 1.5 公尺，另一對在後方 2.5 公尺並與其相對，就像共用房間的配置。"
-          }
-        }
-      }
-    },
-    "A preset needs at least four channels.": {
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ቅድመ ዝግጅት ቢያንስ አራት ቻናሎች ያስፈልገዋል።"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "يحتاج الإعداد المسبق إلى أربع قنوات على الأقل."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "প্রিসেটের জন্য অন্তত চারটি চ্যানেল লাগে।"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Předvolba potřebuje alespoň čtyři kanály."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En forudindstilling kræver mindst fire kanaler."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eine Voreinstellung braucht mindestens vier Kanäle."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Μια προεπιλογή χρειάζεται τουλάχιστον τέσσερα κανάλια."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Un preajuste necesita al menos cuatro canales."
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "پیش‌تنظیم دست‌کم به چهار کانال نیاز دارد."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Esiasetus tarvitsee vähintään neljä kanavaa."
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kailangan ng preset ng hindi bababa sa apat na channel."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Un préréglage nécessite au moins quatre canaux."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "પ્રીસેટને ઓછામાં ઓછી ચાર ચૅનલ જોઈએ."
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Saiti da aka riga aka tanada yana buƙatar aƙalla tashoshi huɗu."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "הגדרה מוכנה דורשת לפחות ארבעה ערוצים."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "प्रीसेट के लिए कम से कम चार चैनल चाहिए।"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Az előbeállításhoz legalább négy csatorna kell."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Preset memerlukan minimal empat saluran."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Un preset richiede almeno quattro canali."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "プリセットには4チャンネル以上が必要です。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ಪ್ರೀಸೆಟ್‌ಗೆ ಕನಿಷ್ಠ ನಾಲ್ಕು ಚಾನೆಲ್‌ಗಳು ಬೇಕು."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "프리셋에는 채널이 4개 이상 필요합니다."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "പ്രീസെറ്റിന് കുറഞ്ഞത് നാല് ചാനലുകൾ വേണം."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "प्रीसेटसाठी किमान चार चॅनेल लागतात."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pratetap memerlukan sekurang-kurangnya empat saluran."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En forhåndsinnstilling krever minst fire kanaler."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Een voorinstelling heeft minstens vier kanalen nodig."
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਪ੍ਰੀਸੈੱਟ ਲਈ ਘੱਟੋ-ਘੱਟ ਚਾਰ ਚੈਨਲ ਚਾਹੀਦੇ ਹਨ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ustawienie wstępne wymaga co najmniej czterech kanałów."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uma predefinição precisa de pelo menos quatro canais."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Uma predefinição precisa de pelo menos quatro canais."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O presetare necesită cel puțin patru canale."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En förinställning kräver minst fyra kanaler."
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mipangilio iliyowekwa tayari inahitaji angalau chaneli nne."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "முன்னமைவுக்குக் குறைந்தது நான்கு சேனல்கள் தேவை."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ప్రీసెట్‌కు కనీసం నాలుగు ఛానెల్‌లు అవసరం."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ค่าที่ตั้งไว้ล่วงหน้าต้องมีอย่างน้อยสี่ช่องสัญญาณ"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hazır ayar için en az dört kanal gerekir."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Для шаблону потрібно щонайменше чотири канали."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "پری سیٹ کے لیے کم از کم چار چینل درکار ہیں۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mẫu có sẵn cần ít nhất bốn kênh."
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "預設配置至少需要四個聲道。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "预设布局至少需要四个声道。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "預設配置至少需要四個聲道。"
-          }
-        }
-      }
-    },
     "A profile from the drawing is saved. It follows the drawing when you move a speaker.": {
       "localizations": {
         "am": {
@@ -88201,6 +87665,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "準備好後，隨時可以從「檔案」選單或空白的資料庫加入音樂。"
+          }
+        }
+      }
+    },
+    "Add Output…": {
+      "comment": "Speaker Group editor: menu that adds another output (DAC) to the group.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ውፅዓት አክል…"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إضافة مخرج…"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আউটপুট যোগ করুন…"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Přidat výstup…"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tilføj output…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgabe hinzufügen …"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Προσθήκη εξόδου…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir salida…"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "افزودن خروجی…"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lisää ulostulo…"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Magdagdag ng Output…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajouter une sortie…"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આઉટપુટ ઉમેરો…"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙara fitarwa…"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הוספת פלט…"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुट जोड़ें…"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kimenet hozzáadása…"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tambah Output…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi uscita…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出力を追加…"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಔಟ್‌ಪುಟ್ ಸೇರಿಸಿ…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출력 추가…"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഔട്ട്‌പുട്ട് ചേർക്കുക…"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुट जोडा…"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tambah Output…"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legg til utgang…"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voeg uitvoer toe…"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਉਟਪੁੱਟ ਜੋੜੋ…"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dodaj wyjście…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicionar Saída…"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adicionar saída…"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adaugă ieșire…"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lägg till utgång…"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ongeza kifaa cha kutoa sauti…"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வெளியீட்டைச் சேர்…"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అవుట్‌పుట్‌ను జోడించండి…"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพิ่มขาออก…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çıkış Ekle…"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Додати вихід…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آؤٹ پٹ شامل کریں…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm đầu ra…"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入輸出…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加输出…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入輸出…"
           }
         }
       }
@@ -205167,6 +204900,274 @@
         }
       }
     },
+    "Even everywhere": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በሁሉም ቦታ እኩል"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "متساوٍ في كل مكان"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সবখানে সমান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Všude stejně"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ens overalt"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Überall gleich"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ομοιόμορφα παντού"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniforme en toda la sala"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "یکنواخت در همه‌جا"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasaisesti kaikkialla"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pantay kahit saan"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniforme partout"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "બધે એકસરખું"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daidai a ko'ina"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אחיד בכל מקום"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हर जगह एक समान"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mindenhol egyenletes"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Merata di mana saja"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniforme ovunque"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "どこでも均一"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಎಲ್ಲೆಡೆ ಸಮಾನ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "어디서나 고르게"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "എല്ലായിടത്തും ഒരുപോലെ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सगळीकडे समान"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sekata di mana-mana"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jevnt overalt"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Overal gelijk"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹਰ ਥਾਂ ਇੱਕੋ ਜਿਹਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Równo wszędzie"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniforme em todo lugar"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniforme em todo o lado"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uniform peste tot"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jämnt överallt"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sawa kila mahali"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "எங்கும் சமமாக"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అంతటా సమానంగా"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "สม่ำเสมอทั่วทั้งห้อง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her yerde eşit"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Рівномірно всюди"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہر جگہ یکساں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đều ở mọi nơi"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "處處均勻"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "处处均匀"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "處處均勻"
+          }
+        }
+      }
+    },
     "Evens out loudness between songs or whole albums, using the ReplayGain tags in your files. Off keeps playback bit-perfect.": {
       "extractionState": "manual",
       "localizations": {
@@ -207046,6 +207047,274 @@
           "stringUnit": {
             "state": "translated",
             "value": "所有揚聲器"
+          }
+        }
+      }
+    },
+    "Every speaker plays at the same level and at the same time. The most even around the room; at the seat the sound is all around you, not in front.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "እያንዳንዱ ስፒከር በተመሳሳይ መጠንና በተመሳሳይ ጊዜ ያጫውታል። በክፍሉ ዙሪያ እጅግ እኩል የሆነው፤ በመቀመጫው ላይ ድምፁ ከፊት ሳይሆን በዙሪያዎ ነው።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "كل سماعة تعمل بالمستوى نفسه وفي الوقت نفسه. الأكثر تساويًا في أنحاء الغرفة؛ وعند المقعد يحيط بك الصوت بدل أن يأتي من الأمام."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "প্রতিটি স্পিকার একই মাত্রায় ও একই সময়ে বাজে। ঘরজুড়ে সবচেয়ে সমান; আসনে শব্দ সামনে নয়, আপনার চারপাশে থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Každý reproduktor hraje stejně hlasitě a ve stejný okamžik. Nejvyrovnanější po celé místnosti; na místě poslechu je zvuk všude kolem vás, ne vpředu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hver højttaler spiller på samme niveau og på samme tid. Det mest ensartede rundt i rummet; på lyttepladsen er lyden hele vejen omkring dig, ikke foran."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jeder Lautsprecher spielt gleich laut und zur gleichen Zeit. Am gleichmäßigsten im ganzen Raum; am Hörplatz ist der Klang rings um Sie, nicht vorn."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Κάθε ηχείο παίζει στην ίδια στάθμη και την ίδια στιγμή. Το πιο ομοιόμορφο σε όλο το δωμάτιο· στη θέση ακρόασης ο ήχος είναι γύρω σας, όχι μπροστά."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos los altavoces suenan al mismo nivel y al mismo tiempo. Lo más uniforme por toda la sala; en el asiento el sonido te rodea en lugar de venir de frente."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "هر بلندگو با همان سطح و در همان لحظه پخش می‌کند. یکنواخت‌ترین حالت در سراسر اتاق؛ در جای نشستن صدا دورتادور شماست، نه در جلو."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jokainen kaiutin soi samalla tasolla ja samaan aikaan. Tasaisin koko huoneessa; kuuntelupaikalla ääni on ympärilläsi, ei edessä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tumutugtog ang bawat speaker sa parehong lakas at sa parehong oras. Pinakapantay sa buong kuwarto; sa upuan, nasa paligid mo ang tunog, hindi sa harap."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaque enceinte joue au même niveau et au même moment. Le plus uniforme dans toute la pièce ; à la place d'écoute, le son vous entoure au lieu de venir de l'avant."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "દરેક સ્પીકર એક જ સ્તરે અને એક જ સમયે વાગે છે. આખા ઓરડામાં સૌથી એકસરખું; બેઠક પર અવાજ આગળ નહીં, તમારી ચારે બાજુ હોય છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kowace lasifika tana kunnawa da matakin sauti ɗaya kuma a lokaci ɗaya. Mafi daidaito a ko'ina cikin ɗakin; a wurin zama sautin yana kewaye da kai, ba a gaba ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כל רמקול מנגן באותה עוצמה ובאותו זמן. האחיד ביותר ברחבי החדר; במקום הישיבה הצליל מקיף אתכם ואינו מגיע מלפנים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "हर स्पीकर एक ही स्तर पर और एक ही समय पर बजता है। पूरे कमरे में सबसे समान; बैठने की जगह पर आवाज़ सामने नहीं, आपके चारों ओर होती है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minden hangszóró ugyanazon a szinten és ugyanabban a pillanatban szól. A szobában ez a legegyenletesebb; a hallgatási helyen a hang körülvesz, nem elölről jön."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setiap speaker berbunyi pada tingkat yang sama dan pada waktu yang sama. Paling merata di seluruh ruangan; di tempat duduk, suara mengelilingi Anda, bukan di depan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ogni diffusore suona allo stesso livello e nello stesso momento. Il più uniforme in tutta la stanza; al posto d'ascolto il suono ti circonda invece di arrivare da davanti."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "すべてのスピーカーが同じ音量で同時に再生します。部屋全体でもっとも均一になりますが、リスニング位置では音が前方ではなく周囲から聴こえます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪ್ರತಿಯೊಂದು ಸ್ಪೀಕರ್ ಒಂದೇ ಮಟ್ಟದಲ್ಲಿ ಮತ್ತು ಒಂದೇ ಸಮಯದಲ್ಲಿ ನುಡಿಸುತ್ತದೆ. ಕೋಣೆಯಾದ್ಯಂತ ಅತ್ಯಂತ ಸಮಾನ; ಆಸನದಲ್ಲಿ ಧ್ವನಿ ಮುಂದೆ ಅಲ್ಲ, ನಿಮ್ಮ ಸುತ್ತಲೂ ಇರುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모든 스피커가 같은 음량으로 동시에 재생합니다. 방 전체에서 가장 고르지만, 청취 위치에서는 소리가 앞쪽이 아니라 주위를 감쌉니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഓരോ സ്പീക്കറും ഒരേ ലെവലിലും ഒരേ സമയത്തും പ്ലേ ചെയ്യുന്നു. മുറിയിലുടനീളം ഏറ്റവും ഒരുപോലെ; ഇരിപ്പിടത്തിൽ ശബ്ദം മുന്നിലല്ല, നിങ്ങളുടെ ചുറ്റുമാണ്."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्रत्येक स्पीकर एकाच पातळीवर आणि एकाच वेळी वाजतो. संपूर्ण खोलीत सर्वांत समान; बसण्याच्या जागी आवाज समोर नाही, तुमच्या भोवती असतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Setiap pembesar suara berbunyi pada tahap yang sama dan pada masa yang sama. Paling sekata di seluruh bilik; di tempat duduk, bunyi mengelilingi anda, bukan di hadapan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hver høyttaler spiller på samme nivå og til samme tid. Jevnest rundt i rommet; på lytteplassen er lyden rundt deg, ikke foran."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elke luidspreker speelt even hard en op hetzelfde moment. Het gelijkmatigst door de hele kamer; op de luisterplek is het geluid om je heen, niet vooraan."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਹਰ ਸਪੀਕਰ ਇੱਕੋ ਪੱਧਰ 'ਤੇ ਅਤੇ ਇੱਕੋ ਸਮੇਂ ਵੱਜਦਾ ਹੈ। ਪੂਰੇ ਕਮਰੇ ਵਿੱਚ ਸਭ ਤੋਂ ਇੱਕੋ ਜਿਹਾ; ਬੈਠਣ ਵਾਲੀ ਥਾਂ 'ਤੇ ਆਵਾਜ਼ ਸਾਹਮਣੇ ਨਹੀਂ, ਤੁਹਾਡੇ ਚਾਰੇ ਪਾਸੇ ਹੁੰਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Każdy głośnik gra z tym samym poziomem i w tym samym momencie. Najrówniej w całym pokoju; w miejscu odsłuchu dźwięk otacza słuchacza, zamiast dochodzić z przodu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as caixas tocam no mesmo nível e ao mesmo tempo. O mais uniforme pelo ambiente; na posição de escuta, o som fica ao seu redor, não à frente."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todas as colunas tocam ao mesmo nível e ao mesmo tempo. O mais uniforme por toda a sala; no lugar de audição, o som fica à sua volta, não à frente."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fiecare boxă redă la același nivel și în același moment. Cel mai uniform în toată camera; în locul de ascultare sunetul vă înconjoară, nu vine din față."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varje högtalare spelar på samma nivå och samtidigt. Jämnast runt om i rummet; på lyssningsplatsen är ljudet runt omkring dig, inte framför."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kila spika hucheza kwa kiwango kilekile na kwa wakati uleule. Sawa zaidi chumbani kote; kitini sauti inakuzunguka, haiko mbele."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒவ்வொரு ஸ்பீக்கரும் ஒரே அளவிலும் ஒரே நேரத்திலும் இயங்குகிறது. அறை முழுவதும் மிகச் சமமானது; இருக்கையில் ஒலி முன்புறத்தில் அல்ல, உங்களைச் சுற்றிலும் இருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ప్రతి స్పీకర్ ఒకే స్థాయిలో, ఒకే సమయంలో ప్లే చేస్తుంది. గది అంతటా అత్యంత సమానంగా ఉంటుంది; కూర్చునే చోట ధ్వని ముందు కాకుండా మీ చుట్టూ ఉంటుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ลำโพงทุกตัวเล่นด้วยระดับเสียงเท่ากันและพร้อมกัน สม่ำเสมอที่สุดทั่วทั้งห้อง แต่ที่ตำแหน่งนั่งฟัง เสียงจะอยู่รอบตัวคุณ ไม่ใช่ด้านหน้า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Her hoparlör aynı seviyede ve aynı anda çalar. Odanın her yerinde en eşit olanı; dinleme yerinde ses önünüzde değil, çevrenizdedir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Кожна колонка грає з однаковим рівнем і одночасно. Найрівномірніше по всій кімнаті; на місці слухача звук довкола вас, а не попереду."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ہر اسپیکر ایک ہی سطح پر اور ایک ہی وقت میں چلتا ہے۔ پورے کمرے میں سب سے یکساں؛ نشست پر آواز سامنے نہیں، آپ کے چاروں طرف ہوتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mọi loa phát cùng mức và cùng lúc. Đều nhất trong khắp phòng; tại chỗ ngồi, âm thanh bao quanh bạn chứ không ở phía trước."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每個喇叭以相同音量同時播放。整個房間最為均勻；在聆聽位，聲音會環繞着你，而不是在前方。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每只音箱以相同音量同时播放。整个房间最为均匀；在聆听位，声音会环绕着你，而不是在前方。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每個喇叭以相同音量同時播放。整個房間最為均勻；在聆聽位，聲音會環繞著你，而不是在前方。"
           }
         }
       }
@@ -223036,270 +223305,270 @@
         }
       }
     },
-    "For listening anywhere in the room, not only at the seat: stereo songs add their ambience on the back pair, and the bass moves to the front pair. Songs are no longer bit-perfect.": {
+    "For listening anywhere in the room, not only at the seat: every speaker plays the whole song, or the whole film, so nothing is missing wherever you are. Songs are no longer bit-perfect.": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "በመቀመጫው ብቻ ሳይሆን በክፍሉ ውስጥ በየትኛውም ቦታ ለማዳመጥ፦ የስቴሪዮ ዘፈኖች ድባባቸውን በኋለኛው ጥንድ ላይ ይጨምራሉ፣ ባሱም ወደ ፊተኛው ጥንድ ይሄዳል። ዘፈኖች ከእንግዲህ ቢት-ፍጹም አይደሉም።"
+            "value": "በመቀመጫው ብቻ ሳይሆን በክፍሉ ውስጥ በየትኛውም ቦታ ለማዳመጥ፦ እያንዳንዱ ስፒከር ሙሉውን ዘፈን ወይም ሙሉውን ፊልም ያጫውታል፣ ስለዚህ የትም ብትሆኑ ምንም አይጎድልም። ዘፈኖች ከእንግዲህ ቢት-ፍጹም አይደሉም።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "للاستماع من أي مكان في الغرفة، لا من المقعد وحده: تضيف الأغاني الستيريو أجواءها على الزوج الخلفي، وينتقل الجهير إلى الزوج الأمامي. لم تعد الأغاني مطابقة بت ببت."
+            "value": "للاستماع من أي مكان في الغرفة، لا من المقعد وحده: كل سماعة تشغّل الأغنية كاملة أو الفيلم كاملًا، فلا ينقص شيء أينما كنت. لم تعد الأغاني مطابقة بت ببت."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "শুধু আসনে নয়, ঘরের যেকোনো জায়গা থেকে শোনার জন্য: স্টেরিও গান তার পরিবেশ-শব্দ পেছনের জোড়ায় যোগ করে, আর বেস সামনের জোড়ায় চলে যায়। গান আর বিট-পারফেক্ট থাকে না।"
+            "value": "শুধু আসনে নয়, ঘরের যেকোনো জায়গা থেকে শোনার জন্য: প্রতিটি স্পিকার পুরো গান বা পুরো চলচ্চিত্র বাজায়, তাই আপনি যেখানেই থাকুন কিছুই বাদ পড়ে না। গান আর বিট-পারফেক্ট থাকে না।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pro poslech kdekoli v místnosti, nejen na místě poslechu: stereo skladby přidají svůj prostor na zadní pár a basy se přesunou na přední pár. Skladby už nejsou bitově přesné."
+            "value": "Pro poslech kdekoli v místnosti, nejen na místě poslechu: každý reproduktor hraje celou skladbu nebo celý film, takže nikde nic nechybí. Skladby už nejsou bitově přesné."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Til at lytte hvor som helst i rummet, ikke kun fra lyttepladsen: stereonumre får deres rumklang på det bageste par, og bassen flytter til det forreste par. Numrene er ikke længere bit-perfekte."
+            "value": "Til at lytte hvor som helst i rummet, ikke kun fra lyttepladsen: hver højttaler spiller hele nummeret eller hele filmen, så intet mangler, uanset hvor du er. Numrene er ikke længere bit-perfekte."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zum Hören überall im Raum, nicht nur am Hörplatz: Stereotitel geben ihren Raumklang auf das hintere Paar, und der Bass wandert zum vorderen Paar. Titel sind dann nicht mehr bitgenau."
+            "value": "Zum Hören überall im Raum, nicht nur am Hörplatz: Jeder Lautsprecher spielt den ganzen Titel oder den ganzen Film, sodass nirgends etwas fehlt. Titel sind dann nicht mehr bitgenau."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Για ακρόαση οπουδήποτε στο δωμάτιο, όχι μόνο στη θέση ακρόασης: τα στερεοφωνικά τραγούδια προσθέτουν την ατμόσφαιρά τους στο πίσω ζεύγος και τα μπάσα μεταφέρονται στο μπροστινό ζεύγος. Τα τραγούδια δεν είναι πλέον bit-perfect."
+            "value": "Για ακρόαση οπουδήποτε στο δωμάτιο, όχι μόνο στη θέση ακρόασης: κάθε ηχείο παίζει ολόκληρο το τραγούδι ή ολόκληρη την ταινία, ώστε να μη λείπει τίποτα όπου κι αν βρίσκεστε. Τα τραγούδια δεν είναι πλέον bit-perfect."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para escuchar desde cualquier punto de la sala, no solo desde el asiento: las canciones estéreo añaden su ambiente en el par trasero y los graves pasan al par delantero. Las canciones dejan de ser bit-perfect."
+            "value": "Para escuchar desde cualquier punto de la sala, no solo desde el asiento: cada altavoz reproduce la canción entera o la película entera, así que no falta nada estés donde estés. Las canciones dejan de ser bit-perfect."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "برای شنیدن از هر جای اتاق، نه فقط از جای نشستن: آهنگ‌های استریو فضای صوتی خود را روی جفت عقبی اضافه می‌کنند و صدای بم به جفت جلویی می‌رود. آهنگ‌ها دیگر بیت‌به‌بیت دقیق نیستند."
+            "value": "برای شنیدن از هر جای اتاق، نه فقط از جای نشستن: هر بلندگو کل آهنگ یا کل فیلم را پخش می‌کند، پس هر جا باشید چیزی کم نیست. آهنگ‌ها دیگر بیت‌به‌بیت دقیق نیستند."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kuunteluun missä tahansa huoneessa, ei vain kuuntelupaikalla: stereokappaleiden tilaääni lisätään takapariin, ja basso siirtyy etupariin. Kappaleet eivät ole enää bittitarkkoja."
+            "value": "Kuunteluun missä tahansa huoneessa, ei vain kuuntelupaikalla: jokainen kaiutin toistaa koko kappaleen tai koko elokuvan, joten mitään ei puutu, missä ikinä oletkin. Kappaleet eivät ole enää bittitarkkoja."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para makinig kahit saan sa kuwarto, hindi lang sa upuan: idinadagdag ng mga stereo na kanta ang kanilang ambience sa likurang pares, at lumilipat ang bass sa harapang pares. Hindi na bit-perfect ang mga kanta."
+            "value": "Para makinig kahit saan sa kuwarto, hindi lang sa upuan: pinapatugtog ng bawat speaker ang buong kanta o ang buong pelikula, kaya walang kulang nasaan ka man. Hindi na bit-perfect ang mga kanta."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pour écouter n'importe où dans la pièce, pas seulement à la place d'écoute : les morceaux stéréo ajoutent leur ambiance sur la paire arrière, et les graves passent sur la paire avant. Les morceaux ne sont plus bit-perfect."
+            "value": "Pour écouter n'importe où dans la pièce, pas seulement à la place d'écoute : chaque enceinte joue le morceau entier, ou le film entier, si bien que rien ne manque où que vous soyez. Les morceaux ne sont plus bit-perfect."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "ફક્ત બેઠક પરથી નહીં, ઓરડામાં ક્યાંય પણ સાંભળવા માટે: સ્ટીરિયો ગીતો પોતાનું વાતાવરણ પાછળની જોડી પર ઉમેરે છે, અને બાસ આગળની જોડી પર જાય છે. ગીતો હવે બિટ-પરફેક્ટ રહેતાં નથી."
+            "value": "ફક્ત બેઠક પરથી નહીં, ઓરડામાં ક્યાંય પણ સાંભળવા માટે: દરેક સ્પીકર આખું ગીત અથવા આખી ફિલ્મ વગાડે છે, તેથી તમે જ્યાં પણ હો ત્યાં કશું ખૂટતું નથી. ગીતો હવે બિટ-પરફેક્ટ રહેતાં નથી."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Don sauraro a ko'ina cikin ɗakin, ba a wurin zama kaɗai ba: waƙoƙin sitiriyo suna ƙara yanayinsu a kan biyu na baya, kuma bas yana komawa biyu na gaba. Waƙoƙi ba su zama bit-perfect ba kuma."
+            "value": "Don sauraro a ko'ina cikin ɗakin, ba a wurin zama kaɗai ba: kowace lasifika tana kunna dukan waƙar ko dukan fim ɗin, don haka babu abin da ya ɓace a duk inda kake. Waƙoƙi ba su zama bit-perfect ba kuma."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "להאזנה מכל מקום בחדר, לא רק ממקום הישיבה: שירי סטריאו מוסיפים את האווירה שלהם בזוג האחורי, והבס עובר לזוג הקדמי. השירים כבר אינם מדויקים ברמת הביט."
+            "value": "להאזנה מכל מקום בחדר, לא רק ממקום הישיבה: כל רמקול מנגן את השיר כולו או את הסרט כולו, כך ששום דבר לא חסר בכל מקום שבו תהיו. השירים כבר אינם מדויקים ברמת הביט."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "सिर्फ़ बैठने की जगह पर नहीं, कमरे में कहीं से भी सुनने के लिए: स्टीरियो गाने अपना माहौल पीछे वाली जोड़ी पर जोड़ते हैं, और बेस आगे वाली जोड़ी पर चला जाता है। गाने अब बिट-परफ़ेक्ट नहीं रहते।"
+            "value": "सिर्फ़ बैठने की जगह पर नहीं, कमरे में कहीं से भी सुनने के लिए: हर स्पीकर पूरा गाना या पूरी फ़िल्म बजाता है, इसलिए आप जहाँ भी हों कुछ नहीं छूटता। गाने अब बिट-परफ़ेक्ट नहीं रहते।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Hogy a szobában bárhol jól szóljon, ne csak a hallgatási helyen: a sztereó dalok térhangzása a hátsó párra is kerül, a basszus pedig az első párra költözik. A dalok így már nem bitpontosak."
+            "value": "Hogy a szobában bárhol jól szóljon, ne csak a hallgatási helyen: minden hangszóró a teljes dalt vagy a teljes filmet játssza, így sehol sem hiányzik semmi. A dalok így már nem bitpontosak."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Untuk mendengarkan di mana saja di ruangan, bukan hanya di tempat duduk: lagu stereo menambahkan suasananya di pasangan belakang, dan bas pindah ke pasangan depan. Lagu tidak lagi bit-perfect."
+            "value": "Untuk mendengarkan di mana saja di ruangan, bukan hanya di tempat duduk: setiap speaker memutar seluruh lagu atau seluruh film, jadi tidak ada yang hilang di mana pun Anda berada. Lagu tidak lagi bit-perfect."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Per ascoltare da qualsiasi punto della stanza, non solo dal posto d'ascolto: i brani stereo aggiungono il loro ambiente sulla coppia posteriore e i bassi passano alla coppia anteriore. I brani non sono più bit-perfect."
+            "value": "Per ascoltare da qualsiasi punto della stanza, non solo dal posto d'ascolto: ogni diffusore riproduce l'intero brano o l'intero film, così non manca nulla ovunque ti trovi. I brani non sono più bit-perfect."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "リスニング位置だけでなく、部屋のどこで聴いてもよいように：ステレオの曲は残響成分をリアのペアに加え、低音はフロントのペアに移ります。曲はビットパーフェクトではなくなります。"
+            "value": "リスニング位置だけでなく、部屋のどこで聴いてもよいように：すべてのスピーカーが曲全体、または映画全体を再生するので、どこにいても欠ける音がありません。曲はビットパーフェクトではなくなります。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಆಸನದಲ್ಲಿ ಮಾತ್ರವಲ್ಲ, ಕೋಣೆಯ ಎಲ್ಲಿಂದಲಾದರೂ ಕೇಳಲು: ಸ್ಟೀರಿಯೋ ಹಾಡುಗಳು ತಮ್ಮ ವಾತಾವರಣವನ್ನು ಹಿಂದಿನ ಜೋಡಿಗೆ ಸೇರಿಸುತ್ತವೆ, ಮತ್ತು ಬಾಸ್ ಮುಂದಿನ ಜೋಡಿಗೆ ಹೋಗುತ್ತದೆ. ಹಾಡುಗಳು ಇನ್ನು ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಆಗಿರುವುದಿಲ್ಲ."
+            "value": "ಆಸನದಲ್ಲಿ ಮಾತ್ರವಲ್ಲ, ಕೋಣೆಯ ಎಲ್ಲಿಂದಲಾದರೂ ಕೇಳಲು: ಪ್ರತಿಯೊಂದು ಸ್ಪೀಕರ್ ಇಡೀ ಹಾಡನ್ನು ಅಥವಾ ಇಡೀ ಚಲನಚಿತ್ರವನ್ನು ನುಡಿಸುತ್ತದೆ, ಆದ್ದರಿಂದ ನೀವು ಎಲ್ಲೇ ಇದ್ದರೂ ಏನೂ ತಪ್ಪುವುದಿಲ್ಲ. ಹಾಡುಗಳು ಇನ್ನು ಬಿಟ್-ಪರ್ಫೆಕ್ಟ್ ಆಗಿರುವುದಿಲ್ಲ."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "청취 위치뿐 아니라 방 어디에서나 들을 수 있도록: 스테레오 곡은 공간감을 뒤쪽 쌍에 더하고, 저음은 앞쪽 쌍으로 옮겨집니다. 곡은 더 이상 비트 퍼펙트가 아닙니다."
+            "value": "청취 위치뿐 아니라 방 어디에서나 들을 수 있도록: 모든 스피커가 곡 전체 또는 영화 전체를 재생하므로 어디에 있든 빠지는 소리가 없습니다. 곡은 더 이상 비트 퍼펙트가 아닙니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "ഇരിപ്പിടത്തിൽ മാത്രമല്ല, മുറിയിൽ എവിടെനിന്നും കേൾക്കാൻ: സ്റ്റീരിയോ പാട്ടുകൾ അവയുടെ അന്തരീക്ഷം പിന്നിലെ ജോഡിയിൽ ചേർക്കുന്നു, ബാസ് മുന്നിലെ ജോഡിയിലേക്ക് മാറുന്നു. പാട്ടുകൾ ഇനി ബിറ്റ്-പെർഫെക്റ്റ് ആയിരിക്കില്ല."
+            "value": "ഇരിപ്പിടത്തിൽ മാത്രമല്ല, മുറിയിൽ എവിടെനിന്നും കേൾക്കാൻ: ഓരോ സ്പീക്കറും മുഴുവൻ പാട്ടും അല്ലെങ്കിൽ മുഴുവൻ സിനിമയും പ്ലേ ചെയ്യുന്നു, അതിനാൽ നിങ്ങൾ എവിടെയായാലും ഒന്നും നഷ്ടമാകില്ല. പാട്ടുകൾ ഇനി ബിറ്റ്-പെർഫെക്റ്റ് ആയിരിക്കില്ല."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "फक्त बसण्याच्या जागी नव्हे, खोलीत कुठूनही ऐकण्यासाठी: स्टिरिओ गाणी त्यांचे वातावरण मागच्या जोडीवर जोडतात आणि बास पुढच्या जोडीवर जातो. गाणी आता बिट-परफेक्ट राहत नाहीत."
+            "value": "फक्त बसण्याच्या जागी नव्हे, खोलीत कुठूनही ऐकण्यासाठी: प्रत्येक स्पीकर संपूर्ण गाणे किंवा संपूर्ण चित्रपट वाजवतो, त्यामुळे तुम्ही कुठेही असलात तरी काहीही सुटत नाही. गाणी आता बिट-परफेक्ट राहत नाहीत."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Untuk mendengar di mana-mana dalam bilik, bukan hanya di tempat duduk: lagu stereo menambah suasananya pada pasangan belakang, dan bes berpindah ke pasangan hadapan. Lagu tidak lagi bit-perfect."
+            "value": "Untuk mendengar di mana-mana dalam bilik, bukan hanya di tempat duduk: setiap pembesar suara memainkan keseluruhan lagu atau keseluruhan filem, jadi tiada apa yang tertinggal di mana-mana pun anda berada. Lagu tidak lagi bit-perfect."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "For å lytte hvor som helst i rommet, ikke bare fra lytteplassen: stereolåter får romklangen sin på det bakre paret, og bassen flytter til det fremre paret. Låtene er ikke lenger bitperfekte."
+            "value": "For å lytte hvor som helst i rommet, ikke bare fra lytteplassen: hver høyttaler spiller hele låten eller hele filmen, så ingenting mangler uansett hvor du er. Låtene er ikke lenger bitperfekte."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Om overal in de kamer te luisteren, niet alleen op de luisterplek: stereonummers krijgen hun ruimtelijkheid op het achterste paar en de bas gaat naar het voorste paar. Nummers zijn dan niet meer bit-perfect."
+            "value": "Om overal in de kamer te luisteren, niet alleen op de luisterplek: elke luidspreker speelt het hele nummer of de hele film, zodat er nergens iets ontbreekt. Nummers zijn dan niet meer bit-perfect."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਸਿਰਫ਼ ਬੈਠਣ ਵਾਲੀ ਥਾਂ ਤੋਂ ਨਹੀਂ, ਕਮਰੇ ਵਿੱਚ ਕਿਤੋਂ ਵੀ ਸੁਣਨ ਲਈ: ਸਟੀਰੀਓ ਗੀਤ ਆਪਣਾ ਮਾਹੌਲ ਪਿਛਲੀ ਜੋੜੀ 'ਤੇ ਜੋੜਦੇ ਹਨ, ਅਤੇ ਬੇਸ ਅਗਲੀ ਜੋੜੀ 'ਤੇ ਚਲਾ ਜਾਂਦਾ ਹੈ। ਗੀਤ ਹੁਣ ਬਿਟ-ਪਰਫੈਕਟ ਨਹੀਂ ਰਹਿੰਦੇ।"
+            "value": "ਸਿਰਫ਼ ਬੈਠਣ ਵਾਲੀ ਥਾਂ ਤੋਂ ਨਹੀਂ, ਕਮਰੇ ਵਿੱਚ ਕਿਤੋਂ ਵੀ ਸੁਣਨ ਲਈ: ਹਰ ਸਪੀਕਰ ਪੂਰਾ ਗੀਤ ਜਾਂ ਪੂਰੀ ਫ਼ਿਲਮ ਵਜਾਉਂਦਾ ਹੈ, ਇਸ ਲਈ ਤੁਸੀਂ ਜਿੱਥੇ ਵੀ ਹੋਵੋ ਕੁਝ ਨਹੀਂ ਛੁੱਟਦਾ। ਗੀਤ ਹੁਣ ਬਿਟ-ਪਰਫੈਕਟ ਨਹੀਂ ਰਹਿੰਦੇ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Do słuchania w dowolnym miejscu pokoju, nie tylko w miejscu odsłuchu: utwory stereo dodają swój pogłos na tylnej parze, a bas przechodzi na przednią parę. Utwory nie są już bit-perfect."
+            "value": "Do słuchania w dowolnym miejscu pokoju, nie tylko w miejscu odsłuchu: każdy głośnik gra cały utwór lub cały film, więc nigdzie niczego nie brakuje. Utwory nie są już bit-perfect."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para ouvir de qualquer lugar do ambiente, não só da posição de escuta: as músicas estéreo ganham sua ambiência no par traseiro, e os graves passam para o par dianteiro. As músicas deixam de ser bit-perfect."
+            "value": "Para ouvir de qualquer lugar do ambiente, não só da posição de escuta: cada caixa toca a música inteira ou o filme inteiro, então nada falta onde quer que você esteja. As músicas deixam de ser bit-perfect."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Para ouvir em qualquer ponto da sala, não só no lugar de audição: as músicas estéreo juntam a sua ambiência no par traseiro, e os graves passam para o par dianteiro. As músicas deixam de ser bit-perfect."
+            "value": "Para ouvir em qualquer ponto da sala, não só no lugar de audição: cada coluna reproduz a música inteira ou o filme inteiro, pelo que nada falta onde quer que esteja. As músicas deixam de ser bit-perfect."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pentru ascultare oriunde în cameră, nu doar din locul de ascultare: melodiile stereo își adaugă ambianța pe perechea din spate, iar basul trece pe perechea din față. Melodiile nu mai sunt bit-perfect."
+            "value": "Pentru ascultare oriunde în cameră, nu doar din locul de ascultare: fiecare boxă redă melodia întreagă sau filmul întreg, așa că nu lipsește nimic oriunde v-ați afla. Melodiile nu mai sunt bit-perfect."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "För att lyssna var som helst i rummet, inte bara från lyssningsplatsen: stereolåtar får sin rumsklang på det bakre paret och basen flyttas till det främre paret. Låtarna är inte längre bitperfekta."
+            "value": "För att lyssna var som helst i rummet, inte bara från lyssningsplatsen: varje högtalare spelar hela låten eller hela filmen, så inget saknas var du än är. Låtarna är inte längre bitperfekta."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kwa kusikiliza popote chumbani, si kitini pekee: nyimbo za stereo huongeza mandhari yao kwenye jozi ya nyuma, na besi huhamia jozi ya mbele. Nyimbo hazitakuwa tena bit-perfect."
+            "value": "Kwa kusikiliza popote chumbani, si kitini pekee: kila spika hucheza wimbo mzima au filamu nzima, kwa hiyo hakuna kinachokosekana popote ulipo. Nyimbo hazitakuwa tena bit-perfect."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "இருக்கையில் மட்டுமல்ல, அறையில் எங்கிருந்தும் கேட்க: ஸ்டீரியோ பாடல்கள் தங்கள் சூழலொலியைப் பின் ஜோடியில் சேர்க்கின்றன, பேஸ் முன் ஜோடிக்கு மாறுகிறது. பாடல்கள் இனி பிட்-பர்ஃபெக்ட் ஆக இருக்காது."
+            "value": "இருக்கையில் மட்டுமல்ல, அறையில் எங்கிருந்தும் கேட்க: ஒவ்வொரு ஸ்பீக்கரும் முழுப் பாடலையும் அல்லது முழுத் திரைப்படத்தையும் இயக்குகிறது, எனவே நீங்கள் எங்கிருந்தாலும் எதுவும் விடுபடாது. பாடல்கள் இனி பிட்-பர்ஃபெக்ட் ஆக இருக்காது."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "కూర్చునే చోటే కాకుండా గదిలో ఎక్కడి నుంచైనా వినడానికి: స్టీరియో పాటలు తమ వాతావరణాన్ని వెనుక జతకు జోడిస్తాయి, బేస్ ముందు జతకు వెళ్తుంది. పాటలు ఇకపై బిట్-పర్ఫెక్ట్ కావు."
+            "value": "కూర్చునే చోటే కాకుండా గదిలో ఎక్కడి నుంచైనా వినడానికి: ప్రతి స్పీకర్ మొత్తం పాటను లేదా మొత్తం సినిమాను ప్లే చేస్తుంది, కాబట్టి మీరు ఎక్కడ ఉన్నా ఏదీ తప్పిపోదు. పాటలు ఇకపై బిట్-పర్ఫెక్ట్ కావు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "สำหรับฟังได้ทุกที่ในห้อง ไม่ใช่แค่ที่ตำแหน่งนั่งฟัง: เพลงสเตอริโอจะเพิ่มเสียงบรรยากาศที่ลำโพงคู่หลัง และเสียงเบสจะย้ายไปที่ลำโพงคู่หน้า เพลงจะไม่เป็นบิตเพอร์เฟกต์อีกต่อไป"
+            "value": "สำหรับฟังได้ทุกที่ในห้อง ไม่ใช่แค่ที่ตำแหน่งนั่งฟัง: ลำโพงทุกตัวเล่นเพลงทั้งเพลงหรือภาพยนตร์ทั้งเรื่อง จึงไม่มีเสียงใดขาดหายไม่ว่าคุณจะอยู่ตรงไหน เพลงจะไม่เป็นบิตเพอร์เฟกต์อีกต่อไป"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yalnızca dinleme yerinden değil, odanın her yerinden dinlemek için: stereo şarkılar ortam seslerini arka çifte ekler, baslar ön çifte geçer. Şarkılar artık bit-perfect olmaz."
+            "value": "Yalnızca dinleme yerinden değil, odanın her yerinden dinlemek için: her hoparlör şarkının tamamını veya filmin tamamını çalar, böylece nerede olursanız olun hiçbir şey eksik kalmaz. Şarkılar artık bit-perfect olmaz."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Для прослуховування будь-де в кімнаті, а не лише на місці слухача: стереопісні додають свій простір на задню пару, а баси переходять на передню пару. Пісні більше не бітоточні."
+            "value": "Для прослуховування будь-де в кімнаті, а не лише на місці слухача: кожна колонка відтворює всю пісню або весь фільм, тож ніде нічого не бракує. Пісні більше не бітоточні."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "صرف نشست پر نہیں، کمرے میں کہیں سے بھی سننے کے لیے: اسٹیریو گانے اپنا ماحول پچھلے جوڑے پر شامل کرتے ہیں، اور باس اگلے جوڑے پر چلا جاتا ہے۔ گانے اب بٹ پرفیکٹ نہیں رہتے۔"
+            "value": "صرف نشست پر نہیں، کمرے میں کہیں سے بھی سننے کے لیے: ہر اسپیکر پورا گانا یا پوری فلم چلاتا ہے، اس لیے آپ جہاں بھی ہوں کچھ کم نہیں ہوتا۔ گانے اب بٹ پرفیکٹ نہیں رہتے۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Để nghe ở bất kỳ đâu trong phòng, không chỉ ở chỗ ngồi: các bài stereo thêm âm thanh không gian lên cặp loa sau, và âm trầm chuyển sang cặp loa trước. Bài hát không còn bit-perfect nữa."
+            "value": "Để nghe ở bất kỳ đâu trong phòng, không chỉ ở chỗ ngồi: mỗi loa phát toàn bộ bài hát hoặc toàn bộ bộ phim, nên dù bạn ở đâu cũng không thiếu gì. Bài hát không còn bit-perfect nữa."
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "讓房間內任何位置都能好好聆聽，而不只是聆聽位：立體聲歌曲會把氛圍聲加到後方一對喇叭上，低音則移到前方一對喇叭。歌曲將不再是位元完美。"
+            "value": "讓房間內任何位置都能好好聆聽，而不只是聆聽位：每個喇叭都會播放整首歌曲或整部電影，無論你在哪裏都不會缺少任何聲音。歌曲將不再是位元完美。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "让房间里任何位置都能好好聆听，而不只是聆听位：立体声歌曲会把氛围声加到后方一对音箱上，低音则移到前方一对音箱。歌曲将不再是比特完美。"
+            "value": "让房间里任何位置都能好好聆听，而不只是聆听位：每只音箱都会播放整首歌曲或整部电影，无论你在哪里都不会缺少任何声音。歌曲将不再是比特完美。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "讓房間裡任何位置都能好好聆聽，而不只是聆聽位：立體聲歌曲會把氛圍聲加到後方一對喇叭上，低音則移到前方一對喇叭。歌曲將不再是位元完美。"
+            "value": "讓房間裡任何位置都能好好聆聽，而不只是聆聽位：每個喇叭都會播放整首歌曲或整部電影，無論你在哪裡都不會缺少任何聲音。歌曲將不再是位元完美。"
           }
         }
       }
@@ -225187,274 +225456,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "格式"
-          }
-        }
-      }
-    },
-    "Four speakers around the seat, 2 m away, at 45° and 135°.": {
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ከመቀመጫው ዙሪያ አራት ድምጽ ማጉያዎች፣ 2 ሜትር ርቀት ላይ፣ በ45° እና 135°።"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أربع سماعات حول المقعد، على بُعد 2 م، بزاويتي 45° و135°."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "আসনের চারপাশে চারটি স্পিকার, ২ মিটার দূরে, ৪৫° ও ১৩৫° কোণে।"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Čtyři reproduktory kolem místa poslechu, 2 m daleko, pod úhly 45° a 135°."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fire højttalere rundt om pladsen, 2 m væk, i 45° og 135°."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vier Lautsprecher rund um den Platz, 2 m entfernt, bei 45° und 135°."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Τέσσερα ηχεία γύρω από τη θέση ακρόασης, σε απόσταση 2 m, στις 45° και 135°."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cuatro altavoces alrededor del asiento, a 2 m, a 45° y 135°."
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "چهار بلندگو دور جای نشستن، در فاصلهٔ ۲ متر، با زاویهٔ ۴۵ و ۱۳۵ درجه."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Neljä kaiutinta kuunteluaseman ympärillä, 2 m päässä, 45° ja 135° kulmissa."
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apat na speaker sa paligid ng upuan, 2 m ang layo, sa 45° at 135°."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quatre enceintes autour de la place, à 2 m, à 45° et 135°."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "બેઠકની આસપાસ ચાર સ્પીકર, 2 મીટર દૂર, 45° અને 135° પર."
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lasifikoki huɗu a kewayen kujera, nisan mita 2, a kusurwar 45° da 135°."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ארבעה רמקולים סביב המושב, במרחק 2 מ׳, בזוויות 45° ו־135°."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सीट के चारों ओर चार स्पीकर, 2 मीटर दूर, 45° और 135° पर।"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Négy hangszóró a hely körül, 2 m távolságra, 45° és 135° szögben."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Empat speaker di sekeliling tempat duduk, berjarak 2 m, pada 45° dan 135°."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quattro altoparlanti attorno al posto d’ascolto, a 2 m, a 45° e 135°."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "リスニング位置の周りに4台のスピーカーを、2 m離して45°と135°に配置します。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ಆಸನದ ಸುತ್ತ ನಾಲ್ಕು ಸ್ಪೀಕರ್‌ಗಳು, 2 ಮೀ ದೂರದಲ್ಲಿ, 45° ಮತ್ತು 135° ನಲ್ಲಿ."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "청취 위치 주변에 스피커 4개를 2 m 거리에서 45°와 135°로 배치합니다."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ഇരിപ്പിടത്തിനു ചുറ്റും നാല് സ്പീക്കറുകൾ, 2 മീ അകലെ, 45°, 135° കോണുകളിൽ."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "सीटभोवती चार स्पीकर, 2 मी दूर, 45° आणि 135° वर."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Empat pembesar suara di sekeliling tempat duduk, sejauh 2 m, pada 45° dan 135°."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fire høyttalere rundt plassen, 2 m unna, ved 45° og 135°."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vier luidsprekers rond de zitplaats, op 2 m afstand, onder 45° en 135°."
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਸੀਟ ਦੇ ਆਲੇ-ਦੁਆਲੇ ਚਾਰ ਸਪੀਕਰ, 2 ਮੀਟਰ ਦੂਰ, 45° ਅਤੇ 135° ਉੱਤੇ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cztery głośniki wokół miejsca odsłuchu, w odległości 2 m, pod kątami 45° i 135°."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quatro alto-falantes ao redor do lugar, a 2 m, em 45° e 135°."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quatro altifalantes à volta do lugar, a 2 m, a 45° e 135°."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Patru difuzoare în jurul locului de ascultare, la 2 m, la 45° și 135°."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fyra högtalare runt platsen, 2 m bort, i 45° och 135°."
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Spika nne kuzunguka kiti, umbali wa m 2, kwa 45° na 135°."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "இருக்கையைச் சுற்றி நான்கு ஸ்பீக்கர்கள், 2 மீ தொலைவில், 45° மற்றும் 135° கோணங்களில்."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "సీటు చుట్టూ నాలుగు స్పీకర్‌లు, 2 మీ దూరంలో, 45° మరియు 135° వద్ద."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ลำโพงสี่ตัวรอบที่นั่ง ห่าง 2 ม. ที่มุม 45° และ 135°"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Koltuğun çevresinde 2 m uzakta, 45° ve 135° açılarla dört hoparlör."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Чотири гучномовці навколо місця слухача, на відстані 2 м, під кутами 45° і 135°."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "نشست کے گرد چار اسپیکر، 2 میٹر دور، 45° اور 135° پر۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bốn loa quanh chỗ ngồi, cách 2 m, ở góc 45° và 135°."
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "圍繞座位放置四隻揚聲器，距離 2 米，角度為 45° 和 135°。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "围绕座位放置四只扬声器，距离 2 米，角度为 45° 和 135°。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "圍繞座位放置四隻揚聲器，距離 2 公尺，角度為 45° 和 135°。"
           }
         }
       }
@@ -307189,6 +307190,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "單一座位"
+          }
+        }
+      }
+    },
+    "Outputs": {
+      "comment": "Speaker Group editor: heading of the list of the group's outputs (DACs).",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ውፅዓቶች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المخارج"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আউটপুটগুলো"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Výstupy"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outputs"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ausgaben"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Έξοδοι"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salidas"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خروجی‌ها"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulostulot"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga output"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sorties"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આઉટપુટ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitarwa"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "פלטים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुट"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kimenetek"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uscite"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出力"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಔಟ್‌ಪುಟ್‌ಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출력"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഔട്ട്‌പുട്ടുകൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुट"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utganger"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uitvoer"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਉਟਪੁੱਟ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wyjścia"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saídas"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saídas"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ieșiri"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utgångar"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vifaa vya kutoa sauti"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வெளியீடுகள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అవుట్‌పుట్‌లు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ขาออก"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çıkışlar"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Виходи"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آؤٹ پٹس"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đầu ra"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸出"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输出"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸出"
           }
         }
       }
@@ -393504,6 +393774,275 @@
         }
       }
     },
+    "Remove %@": {
+      "comment": "Accessibility label: takes this output out of the speaker group. The output's name follows.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ን አስወግድ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "إزالة %@"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ সরান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odstranit %@"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjern %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ entfernen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αφαίρεση του %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar %@"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "حذف %@"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Poista %@"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alisin ang %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer %@"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ દૂર કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cire %@"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הסר את %@"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ हटाएँ"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ eltávolítása"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hapus %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rimuovi %@"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@を削除"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ತೆಗೆದುಹಾಕಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 제거"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ നീക്കം ചെയ്യുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ काढा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buang %@"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fjern %@"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verwijder %@"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ਹਟਾਓ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Usuń %@"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover %@"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remover %@"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elimină %@"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ta bort %@"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ondoa %@"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ஐ அகற்று"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ను తీసివేయి"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เอา %@ ออก"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ öğesini kaldır"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вилучити %@"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ ہٹائیں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xóa %@"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除 %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除 %@"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除 %@"
+          }
+        }
+      }
+    },
     "Remove %@ filter": {
       "localizations": {
         "am": {
@@ -447245,6 +447784,274 @@
         }
       }
     },
+    "Stage in front": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "መድረኩ ከፊት"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المسرح الصوتي في الأمام"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "মঞ্চ সামনে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scéna vpředu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scenen foran"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bühne vorn"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Σκηνή μπροστά"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escena al frente"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "صحنه در جلو"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Äänikuva edessä"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entablado sa harap"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scène à l'avant"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "મંચ આગળ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dandali a gaba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הבמה מלפנים"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मंच सामने"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Színpad elöl"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Panggung di depan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scena davanti"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前方にステージ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ವೇದಿಕೆ ಮುಂದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앞쪽에 무대"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "വേദി മുന്നിൽ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मंच समोर"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pentas di hadapan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scenen foran"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Podium vooraan"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਮੰਚ ਸਾਹਮਣੇ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scena z przodu"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Palco à frente"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Palco à frente"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scena în față"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scenen framför"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jukwaa mbele"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "மேடை முன்புறம்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "వేదిక ముందు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เวทีเสียงอยู่ด้านหน้า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sahne önde"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Сцена попереду"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اسٹیج سامنے"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sân khấu ở phía trước"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聲場在前方"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "声场在前方"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "聲場在前方"
+          }
+        }
+      }
+    },
     "Standard channel-layout mix (centre and surrounds folded in)": {
       "localizations": {
         "am": {
@@ -479741,6 +480548,274 @@
         }
       }
     },
+    "The other speakers play their share a little quieter and a moment later, so at the seat the sound still comes from the front.": {
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሌሎቹ ስፒከሮች ድርሻቸውን በትንሹ ዝቅ ባለ ድምፅና ከአፍታ በኋላ ያጫውታሉ፣ ስለዚህ በመቀመጫው ላይ ድምፁ አሁንም ከፊት ይመጣል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تشغّل السماعات الأخرى نصيبها بمستوى أخفض قليلًا وبعد لحظة، فيظل الصوت عند المقعد آتيًا من الأمام."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অন্য স্পিকারগুলো তাদের অংশ একটু আস্তে ও এক মুহূর্ত পরে বাজায়, তাই আসনে শব্দ আগের মতোই সামনে থেকে আসে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ostatní reproduktory hrají svůj díl o něco tišeji a o okamžik později, takže na místě poslechu zvuk dál přichází zepředu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De andre højttalere spiller deres del lidt svagere og et øjeblik senere, så lyden stadig kommer forfra på lyttepladsen."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die anderen Lautsprecher spielen ihren Anteil etwas leiser und einen Moment später, sodass der Klang am Hörplatz weiterhin von vorn kommt."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τα άλλα ηχεία παίζουν το μερίδιό τους λίγο πιο χαμηλά και μια στιγμή αργότερα, ώστε στη θέση ακρόασης ο ήχος να εξακολουθεί να έρχεται από μπροστά."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los demás altavoces reproducen su parte un poco más bajo y un instante después, así que en el asiento el sonido sigue llegando de frente."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بلندگوهای دیگر سهم خود را کمی آهسته‌تر و لحظه‌ای دیرتر پخش می‌کنند، پس در جای نشستن صدا همچنان از جلو می‌آید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Muut kaiuttimet toistavat osuutensa hieman hiljempaa ja hetkeä myöhemmin, joten kuuntelupaikalla ääni tulee edelleen edestä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pinapatugtog ng ibang speaker ang bahagi nila nang medyo mas mahina at saglit na mas huli, kaya sa upuan ay mula pa rin sa harap ang tunog."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les autres enceintes jouent leur part un peu moins fort et un instant plus tard, si bien qu'à la place d'écoute le son vient toujours de l'avant."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "બીજાં સ્પીકર પોતાનો ભાગ થોડો ધીમો અને ક્ષણભર મોડો વગાડે છે, તેથી બેઠક પર અવાજ હજી પણ આગળથી આવે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sauran lasifikoki suna kunna nasu kason da ɗan ƙaramin sauti kuma bayan ɗan lokaci kaɗan, don haka a wurin zama sautin yana ci gaba da fitowa daga gaba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הרמקולים האחרים מנגנים את חלקם מעט חלש יותר ורגע מאוחר יותר, כך שבמקום הישיבה הצליל עדיין מגיע מלפנים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "बाक़ी स्पीकर अपना हिस्सा थोड़ा धीमा और एक पल बाद बजाते हैं, इसलिए बैठने की जगह पर आवाज़ अब भी सामने से आती है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A többi hangszóró a maga részét kicsit halkabban és egy pillanattal később játssza, így a hallgatási helyen a hang továbbra is elölről érkezik."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speaker lain memutar bagiannya sedikit lebih pelan dan sesaat lebih lambat, jadi di tempat duduk suara tetap datang dari depan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gli altri diffusori riproducono la loro parte un po' più piano e un istante dopo, così al posto d'ascolto il suono continua ad arrivare da davanti."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ほかのスピーカーは担当分を少し小さく、わずかに遅らせて再生するので、リスニング位置では音がこれまでどおり前方から聴こえます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಉಳಿದ ಸ್ಪೀಕರ್‌ಗಳು ತಮ್ಮ ಪಾಲನ್ನು ಸ್ವಲ್ಪ ಕಡಿಮೆ ಧ್ವನಿಯಲ್ಲಿ ಮತ್ತು ಕ್ಷಣಕಾಲ ತಡವಾಗಿ ನುಡಿಸುತ್ತವೆ, ಆದ್ದರಿಂದ ಆಸನದಲ್ಲಿ ಧ್ವನಿ ಈಗಲೂ ಮುಂದಿನಿಂದಲೇ ಬರುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 스피커는 맡은 소리를 조금 작게, 아주 조금 늦게 재생하므로 청취 위치에서는 소리가 여전히 앞쪽에서 들립니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മറ്റ് സ്പീക്കറുകൾ അവയുടെ പങ്ക് അൽപ്പം താഴ്ന്ന ശബ്ദത്തിലും ഒരു നിമിഷം വൈകിയും പ്ലേ ചെയ്യുന്നു, അതിനാൽ ഇരിപ്പിടത്തിൽ ശബ്ദം ഇപ്പോഴും മുന്നിൽനിന്നുതന്നെ വരുന്നു."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "इतर स्पीकर त्यांचा वाटा थोडा हळू आणि क्षणभर उशिरा वाजवतात, त्यामुळे बसण्याच्या जागी आवाज अजूनही समोरूनच येतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pembesar suara lain memainkan bahagiannya sedikit lebih perlahan dan seketika kemudian, jadi di tempat duduk bunyi masih datang dari hadapan."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De andre høyttalerne spiller sin del litt svakere og et øyeblikk senere, så lyden fortsatt kommer forfra på lytteplassen."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De andere luidsprekers spelen hun deel iets zachter en een moment later, zodat het geluid op de luisterplek nog steeds van voren komt."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਬਾਕੀ ਸਪੀਕਰ ਆਪਣਾ ਹਿੱਸਾ ਥੋੜ੍ਹਾ ਹੌਲੀ ਅਤੇ ਪਲ ਭਰ ਬਾਅਦ ਵਜਾਉਂਦੇ ਹਨ, ਇਸ ਲਈ ਬੈਠਣ ਵਾਲੀ ਥਾਂ 'ਤੇ ਆਵਾਜ਼ ਹਾਲੇ ਵੀ ਸਾਹਮਣੇ ਤੋਂ ਆਉਂਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pozostałe głośniki grają swoją część nieco ciszej i chwilę później, więc w miejscu odsłuchu dźwięk nadal dochodzi z przodu."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As outras caixas tocam a parte delas um pouco mais baixo e um instante depois, então na posição de escuta o som continua vindo da frente."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As outras colunas reproduzem a sua parte um pouco mais baixo e um instante depois, pelo que no lugar de audição o som continua a vir da frente."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Celelalte boxe își redau partea puțin mai încet și o clipă mai târziu, așa că în locul de ascultare sunetul vine în continuare din față."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De andra högtalarna spelar sin del lite svagare och ett ögonblick senare, så på lyssningsplatsen kommer ljudet fortfarande framifrån."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spika nyingine hucheza sehemu yake kwa sauti ya chini kidogo na baadaye kidogo, kwa hiyo kitini sauti bado hutoka mbele."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "மற்ற ஸ்பீக்கர்கள் தங்கள் பங்கைச் சற்று மெதுவாகவும் ஒரு கணம் தாமதமாகவும் இயக்குகின்றன, எனவே இருக்கையில் ஒலி இப்போதும் முன்புறத்திலிருந்தே வருகிறது."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మిగతా స్పీకర్లు తమ వంతును కొంచెం తక్కువ స్థాయిలో, క్షణం ఆలస్యంగా ప్లే చేస్తాయి, కాబట్టి కూర్చునే చోట ధ్వని ఇప్పటికీ ముందు నుంచే వస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ลำโพงตัวอื่นจะเล่นส่วนของตนเบาลงเล็กน้อยและช้ากว่าเสี้ยววินาที ดังนั้นที่ตำแหน่งนั่งฟัง เสียงยังคงมาจากด้านหน้า"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diğer hoparlörler kendi paylarını biraz daha kısık ve bir an sonra çalar, böylece dinleme yerinde ses yine önden gelir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Інші колонки відтворюють свою частку трохи тихіше й на мить пізніше, тож на місці слухача звук і далі йде спереду."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "باقی اسپیکر اپنا حصہ ذرا آہستہ اور ایک لمحہ بعد چلاتے ہیں، اس لیے نشست پر آواز اب بھی سامنے سے آتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Các loa còn lại phát phần của mình nhỏ hơn một chút và trễ hơn một thoáng, nên tại chỗ ngồi âm thanh vẫn đến từ phía trước."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他喇叭會以稍低的音量、稍遲一點播放各自的部分，因此在聆聽位，聲音仍然來自前方。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他音箱会以稍低的音量、稍晚一点播放各自的部分，因此在聆听位，声音仍然来自前方。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他喇叭會以稍低的音量、稍晚一點播放各自的部分，因此在聆聽位，聲音仍然來自前方。"
+          }
+        }
+      }
+    },
     "The output %@ has no valid channel count.": {
       "localizations": {
         "am": {
@@ -480810,6 +481885,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "這些輸出共 %1$lld 個聲道；一個群組最多可有 %2$lld 個。"
+          }
+        }
+      }
+    },
+    "The outputs in the order of their channels. Removing one takes its speakers with it; a group keeps at least two.": {
+      "comment": "Speaker Group editor: caption under the Outputs heading.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ውፅዓቶቹ በቻናሎቻቸው ቅደም ተከተል። አንዱን ማስወገድ ስፒከሮቹንም ያስወግዳል፤ ቡድን ቢያንስ ሁለት ይይዛል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المخارج بترتيب قنواتها. إزالة أحدها تزيل سماعاته معه؛ وتحتفظ المجموعة بمخرجين على الأقل."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "চ্যানেলের ক্রম অনুযায়ী আউটপুটগুলো। একটি সরালে তার স্পিকারগুলোও সরে যায়; একটি গ্রুপে অন্তত দুটি থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Výstupy v pořadí svých kanálů. Odebráním výstupu zmizí i jeho reproduktory; skupina má vždy aspoň dva."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Outputs i deres kanalers rækkefølge. Fjerner du et, forsvinder dets højttalere også; en gruppe har altid mindst to."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Ausgaben in der Reihenfolge ihrer Kanäle. Mit einer Ausgabe verschwinden auch ihre Lautsprecher; eine Gruppe behält mindestens zwei."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Οι έξοδοι με τη σειρά των καναλιών τους. Αφαιρώντας μία, αφαιρούνται και τα ηχεία της· μια ομάδα κρατά τουλάχιστον δύο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las salidas en el orden de sus canales. Al eliminar una se van también sus altavoces; un grupo conserva al menos dos."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "خروجی‌ها به ترتیب کانال‌هایشان. با حذف هر خروجی، بلندگوهای آن هم حذف می‌شوند؛ گروه دست‌کم دو خروجی دارد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ulostulot kanaviensa järjestyksessä. Ulostulon poistaminen poistaa myös sen kaiuttimet; ryhmässä on aina vähintään kaksi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang mga output ayon sa pagkakasunod ng mga channel nila. Kapag inalis ang isa, kasama ang mga speaker nito; hindi bababa sa dalawa ang nasa isang grupo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les sorties dans l’ordre de leurs canaux. En supprimer une retire aussi ses enceintes ; un groupe en garde au moins deux."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "આઉટપુટ તેમની ચેનલોના ક્રમમાં. એક દૂર કરવાથી તેના સ્પીકર પણ દૂર થાય છે; જૂથમાં ઓછામાં ઓછા બે રહે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fitarwa bisa jerin tashoshinsu. Cire ɗaya yana cire lasifikokinsa tare da shi; rukuni yana riƙe aƙalla biyu."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "הפלטים לפי סדר הערוצים שלהם. הסרת פלט מסירה גם את הרמקולים שלו; בקבוצה נשארים לפחות שניים."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुट अपने चैनलों के क्रम में। किसी एक को हटाने पर उसके स्पीकर भी हट जाते हैं; समूह में कम से कम दो रहते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A kimenetek a csatornáik sorrendjében. Egy kimenet eltávolításával a hangszórói is eltűnnek; egy csoportban legalább kettő marad."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output sesuai urutan salurannya. Menghapus satu output ikut menghapus speakernya; grup selalu punya sedikitnya dua."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le uscite nell’ordine dei loro canali. Rimuovendone una spariscono anche i suoi diffusori; un gruppo ne conserva almeno due."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出力はチャンネルの順に並びます。出力を削除すると、そのスピーカーも削除されます。グループには少なくとも2つ必要です。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಔಟ್‌ಪುಟ್‌ಗಳು ಅವುಗಳ ಚಾನಲ್‌ಗಳ ಕ್ರಮದಲ್ಲಿ. ಒಂದನ್ನು ತೆಗೆದರೆ ಅದರ ಸ್ಪೀಕರ್‌ಗಳೂ ಹೋಗುತ್ತವೆ; ಗುಂಪಿನಲ್ಲಿ ಕನಿಷ್ಠ ಎರಡು ಇರುತ್ತವೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출력은 채널 순서대로 표시됩니다. 출력을 제거하면 그 스피커도 함께 제거되며, 그룹에는 최소 두 개가 남습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ഔട്ട്‌പുട്ടുകൾ അവയുടെ ചാനലുകളുടെ ക്രമത്തിൽ. ഒന്ന് നീക്കിയാൽ അതിലെ സ്പീക്കറുകളും പോകും; ഒരു ഗ്രൂപ്പിൽ കുറഞ്ഞത് രണ്ടെണ്ണം ഉണ്ടാകും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "आउटपुट त्यांच्या चॅनेलच्या क्रमाने. एक काढल्यास त्याचे स्पीकरही जातात; गटात किमान दोन राहतात."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Output mengikut susunan salurannya. Membuang satu output turut membuang pembesar suaranya; kumpulan mengekalkan sekurang-kurangnya dua."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utgangene i rekkefølgen til kanalene sine. Fjerner du én, forsvinner høyttalerne dens også; en gruppe har alltid minst to."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De uitvoeren in de volgorde van hun kanalen. Verwijder je er een, dan verdwijnen ook de luidsprekers ervan; een groep houdt er minstens twee."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਆਉਟਪੁੱਟ ਆਪਣੇ ਚੈਨਲਾਂ ਦੇ ਕ੍ਰਮ ਵਿੱਚ। ਇੱਕ ਹਟਾਉਣ ਨਾਲ ਉਸ ਦੇ ਸਪੀਕਰ ਵੀ ਹਟ ਜਾਂਦੇ ਹਨ; ਗਰੁੱਪ ਵਿੱਚ ਘੱਟੋ-ਘੱਟ ਦੋ ਰਹਿੰਦੇ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wyjścia w kolejności ich kanałów. Usunięcie wyjścia usuwa też jego głośniki; grupa ma zawsze co najmniej dwa."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As saídas na ordem dos seus canais. Remover uma leva junto os alto-falantes dela; um grupo mantém pelo menos duas."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As saídas pela ordem dos seus canais. Remover uma leva também as colunas dela; um grupo mantém pelo menos duas."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ieșirile în ordinea canalelor lor. Eliminarea uneia îi elimină și boxele; un grup păstrează cel puțin două."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utgångarna i sina kanalers ordning. Tar du bort en försvinner också dess högtalare; en grupp har alltid minst två."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vifaa vya kutoa sauti kwa mpangilio wa chaneli zake. Ukiondoa kimoja, spika zake huondoka pia; kikundi hubaki na angalau viwili."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வெளியீடுகள் அவற்றின் சேனல்களின் வரிசையில். ஒன்றை அகற்றினால் அதன் ஸ்பீக்கர்களும் நீங்கும்; ஒரு குழுவில் குறைந்தது இரண்டு இருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అవుట్‌పుట్‌లు వాటి ఛానెళ్ల క్రమంలో. ఒకదాన్ని తీసివేస్తే దాని స్పీకర్లూ పోతాయి; గ్రూప్‌లో కనీసం రెండు ఉంటాయి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ขาออกเรียงตามลำดับช่องสัญญาณ การเอาขาออกหนึ่งออกจะเอาลำโพงของมันออกด้วย กลุ่มต้องมีอย่างน้อยสองตัว"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çıkışlar kanallarının sırasıyla. Birini kaldırmak hoparlörlerini de kaldırır; bir grupta en az iki çıkış kalır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Виходи в порядку їхніх каналів. Якщо вилучити вихід, зникнуть і його динаміки; у групі лишається щонайменше два."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آؤٹ پٹس اپنے چینلز کی ترتیب میں۔ کسی ایک کو ہٹانے سے اس کے اسپیکر بھی ہٹ جاتے ہیں؛ گروپ میں کم از کم دو رہتے ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Các đầu ra theo thứ tự kênh của chúng. Xóa một đầu ra sẽ xóa luôn các loa của nó; một nhóm luôn có ít nhất hai."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸出按其聲道的次序排列。移除一個輸出會連同其喇叭一併移除；群組最少保留兩個。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输出按其声道的顺序排列。移除一个输出会连同其扬声器一并移除；一个组至少保留两个。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "輸出依其聲道的順序排列。移除一個輸出會連同其喇叭一併移除；群組至少保留兩個。"
           }
         }
       }
@@ -490246,274 +491590,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "離座位較近的揚聲器會等待最遠的一只，並依差值降低電平，因此不會提升任何電平。"
-          }
-        }
-      }
-    },
-    "The standard 5.1 room: 30° front pair, centre ahead, surrounds at 110°, the subwoofer in front.": {
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "መደበኛው 5.1 ክፍል፦ 30° የፊት ጥንድ፣ መሃል ፊት ለፊት፣ ዙሪያ ድምጽ ማጉያዎች በ110°፣ ሰብዉፈሩ ከፊት።"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "غرفة 5.1 القياسية: زوج أمامي عند 30°، والمركز في الأمام، والمحيطيتان عند 110°، ومكبر الصوت المنخفض في الأمام."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "স্ট্যান্ডার্ড ৫.১ ঘর: ৩০° সামনের জোড়া, সামনে মাঝখানে, সারাউন্ড ১১০°-তে, সামনে সাবউফার।"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Standardní místnost 5.1: přední pár pod 30°, střed vpředu, prostorové reproduktory pod 110°, subwoofer vpředu."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Standard 5.1-rum: forreste par ved 30°, center foran, surround ved 110°, subwooferen foran."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Der Standard-5.1-Raum: vorderes Paar bei 30°, Center vorn, Surrounds bei 110°, der Subwoofer vorn."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Το τυπικό δωμάτιο 5.1: μπροστινό ζεύγος στις 30°, κέντρο μπροστά, surround στις 110°, το υπογούφερ μπροστά."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La sala 5.1 estándar: par delantero a 30°, centro al frente, surrounds a 110°, el subwoofer delante."
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اتاق استاندارد 5.1: جفت جلو با ۳۰ درجه، مرکز در جلو، سراند با ۱۱۰ درجه، ساب‌ووفر در جلو."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vakio-5.1-huone: etupari 30°, keski edessä, surround-kaiuttimet 110°, subwoofer edessä."
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ang karaniwang 5.1 na kuwarto: front pair sa 30°, center sa harap, mga surround sa 110°, ang subwoofer sa harap."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La pièce 5.1 standard : paire avant à 30°, centre devant, surrounds à 110°, caisson de graves devant."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "પ્રમાણભૂત 5.1 રૂમ: 30° પર આગળની જોડી, આગળ મધ્યમાં, 110° પર સરાઉન્ડ, આગળ સબવૂફર."
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Daidaitaccen ɗakin 5.1: ma'auratan gaba a 30°, tsakiya a gaba, surround a 110°, subwoofer a gaba."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "חדר 5.1 הסטנדרטי: זוג קדמי ב־30°, מרכז מלפנים, סראונד ב־110°, הסאב־וופר מלפנים."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "मानक 5.1 कमरा: 30° पर आगे की जोड़ी, बीच में सामने, 110° पर सराउंड, सामने सबवूफ़र।"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A szabványos 5.1-es szoba: 30°-os első pár, elöl középső, 110°-os surroundok, elöl a mélyláda."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ruangan 5.1 standar: pasangan depan 30°, tengah di depan, surround 110°, subwoofer di depan."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La stanza 5.1 standard: coppia anteriore a 30°, centrale davanti, surround a 110°, subwoofer davanti."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "標準的な5.1の部屋: 前のペアは30°、センターは正面、サラウンドは110°、サブウーファーは前方。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ಪ್ರಮಾಣಿತ 5.1 ಕೊಠಡಿ: 30° ನಲ್ಲಿ ಮುಂಭಾಗದ ಜೋಡಿ, ಮುಂದೆ ಮಧ್ಯ, 110° ನಲ್ಲಿ ಸರೌಂಡ್, ಮುಂದೆ ಸಬ್‌ವೂಫರ್."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "표준 5.1 룸: 앞쪽 한 쌍은 30°, 센터는 정면, 서라운드는 110°, 서브우퍼는 앞쪽."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "സ്റ്റാൻഡേർഡ് 5.1 മുറി: 30°-ൽ മുൻ ജോഡി, മുന്നിൽ മധ്യം, 110°-ൽ സറൗണ്ടുകൾ, മുന്നിൽ സബ്‌വൂഫർ."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "मानक 5.1 खोली: 30° वर पुढची जोडी, समोर मध्यभागी, 110° वर सराउंड, समोर सबवूफर."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bilik 5.1 standard: pasangan hadapan 30°, tengah di depan, surround 110°, subwoofer di hadapan."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Standard 5.1-rom: fremre par ved 30°, senter foran, surround ved 110°, subwooferen foran."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "De standaard 5.1-kamer: voorste paar op 30°, midden vooraan, surrounds op 110°, subwoofer vooraan."
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਮਿਆਰੀ 5.1 ਕਮਰਾ: 30° ਉੱਤੇ ਅਗਲੀ ਜੋੜੀ, ਅੱਗੇ ਵਿਚਕਾਰ, 110° ਉੱਤੇ ਸਰਾਊਂਡ, ਅੱਗੇ ਸਬਵੂਫ਼ਰ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Standardowe pomieszczenie 5.1: przednia para pod 30°, środek z przodu, surroundy pod 110°, subwoofer z przodu."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A sala 5.1 padrão: par frontal a 30°, centro à frente, surrounds a 110°, subwoofer na frente."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A sala 5.1 padrão: par frontal a 30°, centro à frente, surrounds a 110°, subwoofer à frente."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Camera 5.1 standard: perechea din față la 30°, centru în față, surround la 110°, subwooferul în față."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Standardrummet 5.1: främre par på 30°, center framför, surroundhögtalare på 110°, subwoofern framför."
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chumba cha kawaida cha 5.1: jozi ya mbele kwa 30°, katikati mbele, surround kwa 110°, subwoofer mbele."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "நிலையான 5.1 அறை: 30° இல் முன் இணை, முன்னால் நடு, 110° இல் சரவுண்டுகள், முன்னால் சப்வூஃபர்."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ప్రామాణిక 5.1 గది: 30° వద్ద ముందు జత, ముందు మధ్య, 110° వద్ద సరౌండ్‌లు, ముందు సబ్‌వూఫర్."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ห้อง 5.1 มาตรฐาน: คู่ลำโพงหน้า 30° ลำโพงกลางด้านหน้า เซอร์ราวด์ 110° ซับวูฟเฟอร์ด้านหน้า"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Standart 5.1 odası: 30°’de ön çift, önde orta, 110°’de surround’lar, önde subwoofer."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Стандартна кімната 5.1: передня пара під 30°, центр попереду, об’ємні під 110°, сабвуфер попереду."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "معیاری 5.1 کمرہ: 30° پر اگلا جوڑا، سامنے درمیان، 110° پر سراؤنڈ، سامنے سب ووفر۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Phòng 5.1 chuẩn: cặp loa trước ở 30°, loa giữa phía trước, loa vòm ở 110°, loa siêu trầm phía trước."
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "標準 5.1 房間：前方一對 30°，中置在正前方，環繞 110°，重低音在前方。"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "标准 5.1 房间：前方一对 30°，中置在正前方，环绕 110°，低音炮在前方。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "標準 5.1 房間：前方一對 30°，中置在正前方，環繞 110°，重低音在前方。"
           }
         }
       }
@@ -607060,270 +608136,270 @@
         }
       }
     },
-    "Software volume (set both DACs once, control here)": {
+    "Software volume (set each DAC once, control here)": {
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "የሶፍትዌር የድምፅ መጠን (ሁለቱንም DAC አንድ ጊዜ ያዘጋጁ፣ እዚህ ይቆጣጠሩ)"
+            "value": "የሶፍትዌር የድምፅ መጠን (እያንዳንዱን DAC አንድ ጊዜ ያዘጋጁ፣ እዚህ ይቆጣጠሩ)"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "مستوى الصوت البرمجي (اضبط كلا الـ DAC مرة واحدة، وتحكّم هنا)"
+            "value": "مستوى الصوت البرمجي (اضبط كل DAC مرة واحدة، وتحكّم هنا)"
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "সফটওয়্যার ভলিউম (দুটি DAC একবারই সেট করুন, এখান থেকে নিয়ন্ত্রণ করুন)"
+            "value": "সফটওয়্যার ভলিউম (প্রতিটি DAC একবারই সেট করুন, এখান থেকে নিয়ন্ত্রণ করুন)"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Softwarová hlasitost (nastavte oba DAC jednou, ovládejte zde)"
+            "value": "Softwarová hlasitost (nastavte každý DAC jednou, ovládejte zde)"
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Softwarelydstyrke (indstil begge DAC'er én gang, styr her)"
+            "value": "Softwarelydstyrke (indstil hver DAC én gang, styr her)"
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Software-Lautstärke (beide DACs einmal einstellen, hier steuern)"
+            "value": "Software-Lautstärke (jeden DAC einmal einstellen, hier steuern)"
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ένταση λογισμικού (ρυθμίστε και τα δύο DAC μία φορά, ελέγξτε από εδώ)"
+            "value": "Ένταση λογισμικού (ρυθμίστε κάθε DAC μία φορά, ελέγξτε από εδώ)"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volumen por software (ajusta ambos DAC una vez y contrólalo aquí)"
+            "value": "Volumen por software (ajusta cada DAC una vez y contrólalo aquí)"
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "صدای نرم‌افزاری (هر دو DAC را یک بار تنظیم کنید، از اینجا کنترل کنید)"
+            "value": "صدای نرم‌افزاری (هر DAC را یک بار تنظیم کنید، از اینجا کنترل کنید)"
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ohjelmistollinen äänenvoimakkuus (aseta molemmat DAC:t kerran, säädä täältä)"
+            "value": "Ohjelmistollinen äänenvoimakkuus (aseta jokainen DAC kerran, säädä täältä)"
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Software volume (itakda nang isang beses ang dalawang DAC, kontrolin dito)"
+            "value": "Software volume (itakda nang isang beses ang bawat DAC, kontrolin dito)"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volume logiciel (réglez les deux DAC une fois, contrôlez ici)"
+            "value": "Volume logiciel (réglez chaque DAC une fois, contrôlez ici)"
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "સૉફ્ટવેર વૉલ્યૂમ (બંને DAC એક વાર સેટ કરો, અહીંથી નિયંત્રિત કરો)"
+            "value": "સૉફ્ટવેર વૉલ્યૂમ (દરેક DAC એક વાર સેટ કરો, અહીંથી નિયંત્રિત કરો)"
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ƙarar software (saita DAC biyun sau ɗaya, sarrafa a nan)"
+            "value": "Ƙarar software (saita kowane DAC sau ɗaya, sarrafa a nan)"
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "עוצמת קול בתוכנה (קובעים את שני ה-DAC פעם אחת, שולטים מכאן)"
+            "value": "עוצמת קול בתוכנה (קובעים כל DAC פעם אחת, שולטים מכאן)"
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "सॉफ़्टवेयर वॉल्यूम (दोनों DAC एक बार सेट करें, यहीं से नियंत्रित करें)"
+            "value": "सॉफ़्टवेयर वॉल्यूम (हर DAC एक बार सेट करें, यहीं से नियंत्रित करें)"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Szoftveres hangerő (mindkét DAC-ot egyszer állítsa be, itt szabályozza)"
+            "value": "Szoftveres hangerő (minden DAC-ot egyszer állítson be, itt szabályozza)"
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volume perangkat lunak (atur kedua DAC sekali saja, kendalikan di sini)"
+            "value": "Volume perangkat lunak (atur setiap DAC sekali saja, kendalikan di sini)"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volume software (imposta entrambi i DAC una volta, controlla da qui)"
+            "value": "Volume software (imposta ogni DAC una volta, controlla da qui)"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ソフトウェア音量（両方のDACを一度設定し、ここで操作）"
+            "value": "ソフトウェア音量（各DACを一度設定し、ここで操作）"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "ಸಾಫ್ಟ್‌ವೇರ್ ವಾಲ್ಯೂಮ್ (ಎರಡೂ DAC ಗಳನ್ನು ಒಮ್ಮೆ ಹೊಂದಿಸಿ, ಇಲ್ಲಿಂದ ನಿಯಂತ್ರಿಸಿ)"
+            "value": "ಸಾಫ್ಟ್‌ವೇರ್ ವಾಲ್ಯೂಮ್ (ಪ್ರತಿ DAC ಅನ್ನು ಒಮ್ಮೆ ಹೊಂದಿಸಿ, ಇಲ್ಲಿಂದ ನಿಯಂತ್ರಿಸಿ)"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "소프트웨어 음량 (두 DAC를 한 번만 설정하고 여기서 제어)"
+            "value": "소프트웨어 음량 (각 DAC를 한 번만 설정하고 여기서 제어)"
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "സോഫ്റ്റ്‌വെയർ വോളിയം (രണ്ട് DAC-കളും ഒരിക്കൽ സെറ്റ് ചെയ്യുക, ഇവിടെ നിയന്ത്രിക്കുക)"
+            "value": "സോഫ്റ്റ്‌വെയർ വോളിയം (ഓരോ DAC-ഉം ഒരിക്കൽ സെറ്റ് ചെയ്യുക, ഇവിടെ നിയന്ത്രിക്കുക)"
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "सॉफ्टवेअर व्हॉल्यूम (दोन्ही DAC एकदा सेट करा, इथून नियंत्रित करा)"
+            "value": "सॉफ्टवेअर व्हॉल्यूम (प्रत्येक DAC एकदा सेट करा, इथून नियंत्रित करा)"
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kelantangan perisian (tetapkan kedua-dua DAC sekali sahaja, kawal di sini)"
+            "value": "Kelantangan perisian (tetapkan setiap DAC sekali sahaja, kawal di sini)"
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Programvarevolum (still inn begge DAC-ene én gang, styr her)"
+            "value": "Programvarevolum (still inn hver DAC én gang, styr her)"
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Softwarevolume (stel beide DAC’s eenmalig in, regel hier)"
+            "value": "Softwarevolume (stel elke DAC eenmalig in, regel hier)"
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "ਸਾਫ਼ਟਵੇਅਰ ਵੌਲਿਊਮ (ਦੋਵੇਂ DAC ਇੱਕ ਵਾਰ ਸੈੱਟ ਕਰੋ, ਇੱਥੋਂ ਕੰਟਰੋਲ ਕਰੋ)"
+            "value": "ਸਾਫ਼ਟਵੇਅਰ ਵੌਲਿਊਮ (ਹਰ DAC ਇੱਕ ਵਾਰ ਸੈੱਟ ਕਰੋ, ਇੱਥੋਂ ਕੰਟਰੋਲ ਕਰੋ)"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Głośność programowa (ustaw oba DAC raz, steruj tutaj)"
+            "value": "Głośność programowa (ustaw każdy DAC raz, steruj tutaj)"
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volume por software (ajuste os dois DACs uma vez e controle aqui)"
+            "value": "Volume por software (ajuste cada DAC uma vez e controle aqui)"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volume de software (defina os dois DAC uma vez e controle aqui)"
+            "value": "Volume de software (defina cada DAC uma vez e controle aqui)"
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Volum software (setați ambele DAC-uri o dată, controlați de aici)"
+            "value": "Volum software (setați fiecare DAC o dată, controlați de aici)"
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mjukvaruvolym (ställ in båda DAC:arna en gång, styr här)"
+            "value": "Mjukvaruvolym (ställ in varje DAC en gång, styr här)"
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Kiwango cha sauti cha programu (weka DAC zote mbili mara moja, dhibiti hapa)"
+            "value": "Kiwango cha sauti cha programu (weka kila DAC mara moja, dhibiti hapa)"
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "மென்பொருள் ஒலியளவு (இரண்டு DAC-களையும் ஒருமுறை அமைக்கவும், இங்கே கட்டுப்படுத்தவும்)"
+            "value": "மென்பொருள் ஒலியளவு (ஒவ்வொரு DAC-ஐயும் ஒருமுறை அமைக்கவும், இங்கே கட்டுப்படுத்தவும்)"
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "సాఫ్ట్‌వేర్ వాల్యూమ్ (రెండు DACలను ఒక్కసారి సెట్ చేయండి, ఇక్కడ నియంత్రించండి)"
+            "value": "సాఫ్ట్‌వేర్ వాల్యూమ్ (ప్రతి DACను ఒక్కసారి సెట్ చేయండి, ఇక్కడ నియంత్రించండి)"
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "ระดับเสียงซอฟต์แวร์ (ตั้งค่า DAC ทั้งสองตัวครั้งเดียว แล้วควบคุมที่นี่)"
+            "value": "ระดับเสียงซอฟต์แวร์ (ตั้งค่า DAC แต่ละตัวครั้งเดียว แล้วควบคุมที่นี่)"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yazılım ses düzeyi (iki DAC'i bir kez ayarlayın, buradan denetleyin)"
+            "value": "Yazılım ses düzeyi (her DAC'i bir kez ayarlayın, buradan denetleyin)"
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Програмна гучність (налаштуйте обидва DAC один раз, керуйте тут)"
+            "value": "Програмна гучність (налаштуйте кожен DAC один раз, керуйте тут)"
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "سافٹ ویئر والیوم (دونوں DAC ایک بار سیٹ کریں، یہاں سے کنٹرول کریں)"
+            "value": "سافٹ ویئر والیوم (ہر DAC ایک بار سیٹ کریں، یہاں سے کنٹرول کریں)"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Âm lượng phần mềm (đặt cả hai DAC một lần, điều khiển tại đây)"
+            "value": "Âm lượng phần mềm (đặt mỗi DAC một lần, điều khiển tại đây)"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "軟件音量（兩個 DAC 只設定一次，在此控制）"
+            "value": "軟件音量（每個 DAC 只設定一次，在此控制）"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "软件音量（两个 DAC 只设置一次，在此控制）"
+            "value": "软件音量（每个 DAC 只设置一次，在此控制）"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "軟體音量（兩個 DAC 只設定一次，在此控制）"
+            "value": "軟體音量（每個 DAC 只設定一次，在此控制）"
           }
         }
       }

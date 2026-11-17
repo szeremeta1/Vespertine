@@ -6,6 +6,7 @@
 
 import Foundation
 import Network
+import os
 
 public final class HTTPServer: @unchecked Sendable {
     public typealias Handler = @Sendable (HTTPRequest) async -> HTTPResponse
@@ -16,6 +17,7 @@ public final class HTTPServer: @unchecked Sendable {
     private var listener: NWListener?
     private var connections: [ObjectIdentifier: NWConnection] = [:]
     static let chunk = 256 * 1024
+    private static let log = Logger(subsystem: "org.szeremeta.vespertine.player", category: "renderer")
     /// A client has this long to send its whole request, then it is cut off (a slow client can't hold a connection open).
     let headerTimeout: TimeInterval
     /// Connections open at once; more are closed as they arrive.
@@ -168,12 +170,20 @@ public final class HTTPServer: @unchecked Sendable {
         case .growing(let file):
             var offset: Int64 = 0
             // Chunked (RFC 9112, 7.1): the length isn't known until the writer is done.
-            while let data = await file.read(from: offset, max: chunk) {
-                var framed = Data("\(String(data.count, radix: 16))\r\n".utf8)
-                framed.append(data)
-                framed.append(Data("\r\n".utf8))
-                guard await write(framed, on: connection) else { return }
-                offset += Int64(data.count)
+            do {
+                while let data = try await file.read(from: offset, max: chunk) {
+                    var framed = Data("\(String(data.count, radix: 16))\r\n".utf8)
+                    framed.append(data)
+                    framed.append(Data("\r\n".utf8))
+                    guard await write(framed, on: connection) else { return }
+                    offset += Int64(data.count)
+                }
+            } catch {
+                // The file has more and it can't be read. The last chunk ("0") says "that was the whole song", so it is not
+                // sent: the connection is dropped instead, which every client takes as a transfer that failed.
+                log.error("A stream was cut off at byte \(offset, privacy: .public): its file could not be read: \(String(describing: error), privacy: .public)")
+                connection.forceCancel()
+                return
             }
             guard await write(Data("0\r\n\r\n".utf8), on: connection) else { return }
         }
