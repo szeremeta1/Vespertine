@@ -70,7 +70,7 @@ struct NowPlayingView: View {
                     VinylView(session: session)
                         .transition(reduceMotion ? .opacity : .scale(scale: 0.92).combined(with: .opacity))
                 } else {
-                    ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: 1000, cornerRadius: 10)
+                    ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: NowPlayingArt.flatSize, cornerRadius: 10)
                         .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous).strokeBorder(Palette.hairlineStrong, lineWidth: 0.5))
                         .shadow(color: .black.opacity(0.55), radius: 24, y: 14)
                         .transition(reduceMotion ? .opacity : .scale(scale: 0.92).combined(with: .opacity))

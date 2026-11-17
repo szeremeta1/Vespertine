@@ -76,7 +76,7 @@ struct VinylView: View {
                 .blendMode(.screen)
             // The label turns: the cover, with a paper ring and the spindle hole.
             ZStack {
-                ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: 600, cornerRadius: 0)
+                ArtworkView(key: player?.nowPlaying?.track.artworkKey, size: NowPlayingArt.recordSize, cornerRadius: 0)
                     .clipShape(Circle())
                 Circle().strokeBorder(Color.black.opacity(0.35), lineWidth: 1)
                 Circle().fill(Palette.base).frame(width: diameter * 0.035, height: diameter * 0.035)

@@ -97,6 +97,30 @@ struct RemoteTests {
         #expect(await RemoteBridge.artwork(key: "", size: 600, store: store) == nil)
     }
 
+    /// The phone's flat cover once asked for 1000 pixels. The store keeps 160 and 600, so that fell back to the original,
+    /// which a hi-res cover has at several MB: over what one message may carry, and the phone drew a note, not a cover.
+    @Test func aCoverTooBigToSendIsAnsweredWithItsLargestThumbnail() async throws {
+        let folder = try temporaryFolder()
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let store = ArtworkStore(directory: folder)
+        let thumbnail = Data([0xFF, 0xD8, 0xFF, 0xE0]) + Data(repeating: 7, count: 900)
+        try thumbnail.write(to: store.thumbnailURL("big-cover", size: 600))
+        try Data([0xFF, 0xD8, 0xFF, 0xE0]).appending(Data(repeating: 1, count: RemoteProtocol.maximumMessageSize)).write(to: store.originalURL("big-cover"))
+        for size in [600, 1000, 2048] {
+            let found = await RemoteBridge.artwork(key: "big-cover", size: size, store: store)
+            #expect(found?.data == thumbnail, "size \(size)")
+            #expect(found?.mimeType == "image/jpeg", "size \(size)")
+        }
+        // An original that fits is still what a larger size gets.
+        let small = Data([0xFF, 0xD8, 0xFF, 0xE0]) + Data(repeating: 9, count: 5_000)
+        try thumbnail.write(to: store.thumbnailURL("small-cover", size: 600))
+        try small.write(to: store.originalURL("small-cover"))
+        #expect(await RemoteBridge.artwork(key: "small-cover", size: 1000, store: store)?.data == small)
+        // Nothing small enough at all is still none.
+        try Data(repeating: 1, count: RemoteProtocol.maximumMessageSize).write(to: store.originalURL("only-huge"))
+        #expect(await RemoteBridge.artwork(key: "only-huge", size: 1000, store: store) == nil)
+    }
+
     @Test func webRequestsParseOnlyWhenComplete() throws {
         let head = "POST /command?x=1 HTTP/1.1\r\nHost: mac.local\r\nContent-Type: application/json\r\nCookie: a=1; vespertine-remote=abc\r\nContent-Length: 11\r\n\r\n"
         #expect(HTTPRequest(Data(head.utf8)) == nil)
