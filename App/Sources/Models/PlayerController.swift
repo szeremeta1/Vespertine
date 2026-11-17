@@ -183,6 +183,13 @@ final class PlayerController {
     /// e.g. the chosen output is reconnecting). Set by the app model.
     var wantsMultichannel: () -> Bool? = { nil }
 
+    /// Whether `tracks` are an album as it was opened: several songs, all of one album. Its versions on another edition
+    /// (the "(Dolby Atmos)" album beside it) then stay out, so an edition played from its own page is the edition that
+    /// plays. One song asked for by itself (Play Next on a favorite) is a song, not an album: it follows the output.
+    nonisolated static func keepsToOneAlbum(_ tracks: [Track]) -> Bool {
+        tracks.count > 1 && Set(tracks.map(\.albumKey)).count == 1
+    }
+
     /// Queue entries for `tracks`, each playing the version of its song that suits the output.
     /// A song whose versions all arrive together (a whole SACD album, a shuffle of the library that has a song in stereo
     /// and in Dolby Atmos) is queued once. With `allowing`, only versions it accepts are considered (a filtered page
@@ -192,9 +199,7 @@ final class PlayerController {
                          exactly: Set<String> = []) -> [QueueEntry] {
         // An album whose copies are bundled lets the output pick among them all; elsewhere a song's stereo and surround
         // versions follow the output while they are combined (Settings), and any other copy plays as itself.
-        // Songs of one album are that album as it was opened: its versions on another edition (the "(Dolby Atmos)"
-        // album beside it) stay out, so an edition played from its own page is the edition that plays.
-        let oneAlbum = Set(tracks.map(\.albumKey)).count == 1
+        let oneAlbum = Self.keepsToOneAlbum(tracks)
         let songs = library.playbackSongs(of: tracks, acrossEditions: !oneAlbum).enumerated().map { i, song -> LibraryStore.PlaybackSong in
             if exactly.contains(tracks[i].location) { return LibraryStore.PlaybackSong(versions: [tracks[i]]) }
             guard let allowing, song.versions.count > 1 else { return song }

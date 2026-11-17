@@ -225,6 +225,10 @@ struct RemoteLibraryTests {
         #expect(asked[2].versions.map(\.id) == [single.id] && asked[2].key == nil)
         #expect(TrackVersions.choose(asked[0].versions, multichannel: true)?.id == atmos.id)
         #expect(TrackVersions.choose(asked[0].versions, multichannel: false)?.id == stereo.id)
+        // Several songs of one album are that edition as it was opened; one song by itself, or songs of both, follow the output.
+        #expect(PlayerController.keepsToOneAlbum([stereo, single]))
+        #expect(!PlayerController.keepsToOneAlbum([stereo]))
+        #expect(!PlayerController.keepsToOneAlbum([stereo, atmos]))
 
         // Hearted in stereo on headphones: the Atmos version is the same favorite, and the song counts once.
         library.setFavorite(true, trackIDs: [stereoID])
