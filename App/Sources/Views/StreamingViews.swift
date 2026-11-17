@@ -40,6 +40,7 @@ struct StreamingSettingsSection: View {
         let streaming = model.streaming
         Section {
             Toggle(StreamingSwitch.title, isOn: Binding(get: { streaming.isOn(id) }, set: { streaming.setOn($0, id) }))
+                .accessibilityLabel(StreamingSwitch.title)
             Text(StreamingSwitch.explanation).font(.caption).foregroundStyle(.secondary)
             if streaming.isOn(id) {
                 ForEach(streaming.accounts(id), id: \.path) { source in
@@ -47,6 +48,7 @@ struct StreamingSettingsSection: View {
                 }
                 Button("Add Server…") { signingIn = SignInTarget() }
                 Toggle("Tell the server what I play", isOn: Binding(get: { streaming.reports(id) }, set: { streaming.setReports($0, id) }))
+                    .accessibilityLabel("Tell the server what I play")
                 Text("Off, the server is not told which songs you play. On, each song that counts as played is reported to it, as its own apps do.")
                     .font(.caption).foregroundStyle(.secondary)
                 Text("Your sign-in is kept in the macOS Keychain and nowhere else, and signing out deletes it. A format the server lists is marked ≈ until the song has played.")
