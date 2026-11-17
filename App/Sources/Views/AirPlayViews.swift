@@ -165,7 +165,7 @@ enum AirPlayText {
                 ? String(localized: "AIRPLAY 2 · ALAC 16/44.1 · CODE", comment: "Output list: an AirPlay 2 receiver (an Apple TV) that shows a code on its screen to be typed once before it plays (short, uppercase)")
                 : String(localized: "AIRPLAY 2 · ALAC 16/44.1", comment: "Output list: an AirPlay 2 receiver (a HomePod, an Apple TV) Vespertine sends ALAC 16-bit / 44.1 kHz to (short, uppercase)")
         }
-        switch device.support {
+        return switch device.support {
         case .supported(.none) where device.needsPassword:
             String(localized: "AIRPLAY · ALAC 16/44.1 · PASSWORD", comment: "Output list: an AirPlay receiver that asks for a password before it plays (short, uppercase)")
         case .supported(.none): String(localized: "AIRPLAY · ALAC 16/44.1", comment: "Output list: an AirPlay receiver Vespertine sends ALAC 16-bit / 44.1 kHz to (short, uppercase)")
