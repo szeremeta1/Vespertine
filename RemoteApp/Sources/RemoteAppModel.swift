@@ -142,6 +142,12 @@ final class RemoteAppModel {
         let mac = DemoMac(name: pairing.name, appVersion: Self.demoVersion(info: Bundle.main.infoDictionary)) { key, size in
             DemoArtwork.png(key: key, size: size)
         }
+        #if DEBUG
+        if LaunchOptions.testPlaylists {
+            mac.addTestPlaylist(name: "Long Mix", songs: 1_200)
+            mac.addTestPlaylist(name: "Nothing Yet", songs: 0)
+        }
+        #endif
         let session = RemoteSession(pairing: pairing, clientName: deviceName) { mac }
         self.session = session
         artwork.session = session

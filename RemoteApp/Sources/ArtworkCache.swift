@@ -64,6 +64,15 @@ struct ArtworkView: View {
     /// Draw the music-note placeholder while there's no cover (off for backdrops).
     var placeholder = true
     @State private var image: UIImage?
+    /// The cover `image` is (a row reused for another song mustn't keep the last one's).
+    @State private var shown: String?
+
+    /// What a cover is loaded again for: another song, or the Mac answering again. A cover that couldn't be had while the
+    /// connection was down (or being made) was otherwise never asked for again, and the row kept the placeholder for good.
+    private struct Load: Equatable {
+        let key: String?
+        let connected: Bool
+    }
 
     var body: some View {
         ZStack {
@@ -78,10 +87,15 @@ struct ArtworkView: View {
         }
         .aspectRatio(1, contentMode: .fit)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-        .task(id: key) {
-            guard let key else { image = nil; return }
-            image = model.artwork.cached(key, size: size)
-            if image == nil { image = await model.artwork.image(key, size: size) }
+        .task(id: Load(key: key, connected: model.artwork.session?.isConnected ?? false)) {
+            guard let key else { image = nil; shown = nil; return }
+            if let cached = model.artwork.cached(key, size: size) { image = cached; shown = key; return }
+            if shown == key, image != nil { return }
+            if shown != key { image = nil }
+            if let loaded = await model.artwork.image(key, size: size), !Task.isCancelled {
+                image = loaded
+                shown = key
+            }
         }
         .accessibilityHidden(true)
     }

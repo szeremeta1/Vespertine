@@ -7,6 +7,7 @@
 //   -VTSamplePairing YES         a made-up paired Mac with a Tailscale address (never saved)
 //   -VTPlay YES                  start the demo playing
 //   -VTScreenshot YES            an App Store capture: the demo notice bar is hidden (the demo library itself stays)
+//   -VTTestPlaylists YES         the demo also has a long playlist (1,200 songs) and an empty one
 //   -VTOpenFile <path>           a music file handed to the app as "Open in Vespertine" does (the Simulator won't open file links)
 //   -VTBench YES|<folder>        the phone bench (docs/IOS-AUDIO-BENCH.md, "Measured without a listener"): plays the test songs in
 //                                Library/VTBench/music (or <folder>, from the app's home folder), measures the joins and
@@ -25,6 +26,7 @@ enum LaunchOptions {
     static var samplePairing: Bool { defaults.bool(forKey: "VTSamplePairing") }
     static var screenshot: Bool { defaults.bool(forKey: "VTScreenshot") }
     static var play: Bool { defaults.bool(forKey: "VTPlay") }
+    static var testPlaylists: Bool { defaults.bool(forKey: "VTTestPlaylists") }
     static var openFile: String? { defaults.string(forKey: "VTOpenFile") }
     static var bench: String? { defaults.string(forKey: "VTBench") }
     static var vinyl: Bool? { defaults.object(forKey: "VTVinyl") == nil ? nil : defaults.bool(forKey: "VTVinyl") }
