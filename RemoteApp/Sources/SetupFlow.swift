@@ -222,7 +222,8 @@ struct SetupFlow: View {
                 .buttonStyle(.plain)
                 .font(.subheadline)
                 .foregroundStyle(Palette.text2)
-                .lineLimit(1)
+                .lineLimit(2)
+                .multilineTextAlignment(.trailing)
                 .minimumScaleFactor(0.7)
                 .frame(minHeight: 44)
                 .accessibilityIdentifier("setup-skip")
@@ -240,8 +241,8 @@ struct SetupFlow: View {
             }
         }
         .frame(maxWidth: pad ? 640 : 560)
-        .frame(maxWidth: .infinity, alignment: .trailing)
         .padding(.horizontal, 22).padding(.top, 8).padding(.bottom, 10)
+        .frame(maxWidth: .infinity)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .animation(.easeInOut(duration: 0.3), value: step)
         .animation(.easeInOut(duration: 0.2), value: canGoOn)
