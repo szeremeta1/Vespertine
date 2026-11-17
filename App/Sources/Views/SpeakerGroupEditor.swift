@@ -41,7 +41,8 @@ struct SpeakerGroupEditor: View {
                     Text(verbatim: problem).font(.caption).foregroundStyle(.orange)
                 }
                 Spacer()
-                Button { dismiss() } label: { Text("Done") }.keyboardShortcut(.defaultAction)
+                // Escape closes; Return is left to the number fields, which it would otherwise close the editor from under.
+                Button { dismiss() } label: { Text("Done") }.keyboardShortcut(.cancelAction).buttonStyle(.borderedProminent)
             }
         }
         .padding(20)

@@ -332,24 +332,31 @@ struct Room3DView: View {
 
     // MARK: The listening area
 
-    /// Two grips on the floor: the middle of the area moves it, its near right corner sizes it about its centre.
+    /// The lit floor moves the area when dragged anywhere on it, and its near right corner sizes it about its centre.
     private func areaHandles(_ layout: Room3DLayout) -> some View {
         let area = RoomCanvas.listeningArea(of: group)
-        let middle = layout.project(Point3D(area.center, z: 0))
         let corner = layout.project(Point3D(Room3DScene.sizingCorner(of: area), z: 0))
+        let w = area.width / 2, d = area.depth / 2
+        let outline = Path { path in
+            let points = [(-w, -d), (w, -d), (w, d), (-w, d)].map { layout.project(Point3D(Point2D(x: area.center.x + $0.0, y: area.center.y + $0.1), z: 0)) }
+            path.addLines(points.map { CGPoint(x: $0.x, y: $0.y) })
+            path.closeSubpath()
+        }
         return ZStack {
-            Circle().fill(Color.white.opacity(0.001)).frame(width: 30, height: 30).contentShape(Circle())
-                .position(x: middle.x, y: middle.y)
-                .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .named(Self.space))
+            outline.fill(Color.white.opacity(0.001)).contentShape(outline)
+                .gesture(DragGesture(minimumDistance: 2, coordinateSpace: .named(Self.space))
                     .onChanged { value in
-                        let held = grab ?? Grab(id: nil, offset: CGSize(width: middle.x - value.startLocation.x, height: middle.y - value.startLocation.y),
-                                                from: Point3D(area.center, z: 0), area: area)
+                        // Moved by as far across the floor as the pointer went, so the area stays under it wherever it was taken hold of.
+                        let held = grab ?? Grab(id: nil, offset: .zero, from: Point3D(area.center, z: 0), area: area)
                         grab = held
-                        if let to = layout.roomPoint(viewX: value.location.x + held.offset.width, viewY: value.location.y + held.offset.height) {
-                            group = RoomCanvas.moveListeningArea(to: to, in: group, snap: !NSEvent.modifierFlags.contains(.option))
-                        }
+                        guard let start = layout.roomPoint(viewX: value.startLocation.x, viewY: value.startLocation.y),
+                              let now = layout.roomPoint(viewX: value.location.x, viewY: value.location.y) else { return }
+                        group = RoomCanvas.moveListeningArea(to: Point2D(x: held.from.x + now.x - start.x, y: held.from.y + now.y - start.y), in: group,
+                                                             snap: !NSEvent.modifierFlags.contains(.option))
                     }
                     .onEnded { _ in grab = nil })
+                // The whole floor has nowhere to move to, and a drag on it turns the room as it does everywhere else.
+                .allowsHitTesting(group.listeningArea != nil)
                 .accessibilityLabel(Text("Listening area"))
                 .accessibilityAction(named: Text("Move left")) { group = RoomCanvas.moveListeningArea(to: Point2D(x: area.center.x - 0.1, y: area.center.y), in: group) }
                 .accessibilityAction(named: Text("Move right")) { group = RoomCanvas.moveListeningArea(to: Point2D(x: area.center.x + 0.1, y: area.center.y), in: group) }
