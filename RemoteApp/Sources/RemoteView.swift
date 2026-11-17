@@ -73,17 +73,19 @@ struct RemoteView: View {
                         }
                     }
                 }
-                Section(session.isFolder ? LocalizedStringKey("Folder") : session.isShare ? LocalizedStringKey("SMB Share") : LocalizedStringKey("Mac")) { sidebarLink(.output) }
+                Section(session.isFolder ? LocalizedStringKey("Folder") : session.isShare ? LocalizedStringKey("SMB Share") : LocalizedStringKey("Mac")) {
+                    sidebarLink(.output)
+                    // Back to the list of Macs, shares and folders. A row with its name: the picture alone, in the
+                    // bar under the sidebar, said little.
+                    Button { model.leave() } label: { CountedLabel(title: String(localized: "Libraries"), symbol: "music.note.house") }
+                        .accessibilityIdentifier("sidebar-libraries")
+                        .hoverEffect(.highlight)
+                }
             }
             .listStyle(.sidebar)
             .obsidianList()
             .navigationTitle(session.pairing.name)
             .navigationSplitViewColumnWidth(min: sidebar.min, ideal: sidebar.ideal, max: sidebar.max)
-            .toolbar {
-                ToolbarItem(placement: .bottomBar) {
-                    Button("Libraries", systemImage: "music.note.house") { model.leave() }.labelStyle(.titleAndIcon)
-                }
-            }
         } detail: {
             VStack(spacing: 0) {
                 ConnectionBanner(session: session)
