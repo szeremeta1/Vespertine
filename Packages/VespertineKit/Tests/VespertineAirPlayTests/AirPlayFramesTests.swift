@@ -44,8 +44,99 @@ func allFrames(_ frames: AirPlayFrames) -> [Int16] {
     }
 }
 
+func allSamples(_ frames: AirPlayFrames) -> [Int32] {
+    var out: [Int32] = []
+    while true {
+        let chunk = frames.nextSamples(maxFrames: 1000)
+        if chunk.isEmpty { return out }
+        out += chunk
+    }
+}
+
 @Suite("AirPlay frames", .serialized)
 struct AirPlayFramesTests {
+    static let deep48 = AirPlayFormat(sampleRate: 48_000, bitDepth: 24)
+    static let deep44 = AirPlayFormat(sampleRate: 44_100, bitDepth: 24)
+    static let plain48 = AirPlayFormat(sampleRate: 48_000, bitDepth: 16)
+
+    @Test("For a receiver that takes 24-bit at 48 kHz, a 24/48 file comes out as its own samples, nothing done to it")
+    func untouchedDeep() throws {
+        let (url, samples) = try writeWAV(seconds: 0.4, rate: 48_000, bits: 24)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let frames = try AirPlayFrames(item: PlayableItem(url: url), url: url, settings: RendererSettings(), format: Self.deep48)
+        #expect(frames.format == Self.deep48)
+        #expect(frames.steps.isEmpty)
+        let out = allSamples(frames)
+        #expect(out.count == samples.count)
+        #expect(out == samples)
+        #expect(frames.inexactSamples == 0)
+    }
+
+    @Test("24-bit at 44.1 kHz and 16-bit at 48 kHz come out as their own samples in the formats of those names")
+    func untouchedOthers() throws {
+        let (deepURL, deepSamples) = try writeWAV(seconds: 0.2, bits: 24)
+        defer { try? FileManager.default.removeItem(at: deepURL) }
+        let deep = try AirPlayFrames(item: PlayableItem(url: deepURL), url: deepURL, settings: RendererSettings(), format: Self.deep44)
+        #expect(deep.steps.isEmpty)
+        #expect(allSamples(deep) == deepSamples)
+        let (plainURL, plainSamples) = try writeWAV(seconds: 0.2, rate: 48_000)
+        defer { try? FileManager.default.removeItem(at: plainURL) }
+        let plain = try AirPlayFrames(item: PlayableItem(url: plainURL), url: plainURL, settings: RendererSettings(), format: Self.plain48)
+        #expect(plain.steps.isEmpty)
+        #expect(allSamples(plain) == plainSamples)
+        #expect(plain.inexactSamples == 0)
+    }
+
+    @Test("A 16-bit file in a 24-bit format is its own samples, eight bits up, with nothing added")
+    func sixteenInDeep() throws {
+        let (url, samples) = try writeWAV(seconds: 0.2)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let frames = try AirPlayFrames(item: PlayableItem(url: url), url: url, settings: RendererSettings(), format: Self.deep44)
+        #expect(frames.steps.isEmpty)
+        #expect(allSamples(frames) == samples.map { $0 * 256 })
+        #expect(frames.inexactSamples == 0)
+    }
+
+    @Test("In a 24-bit format, 96 kHz is resampled to 48 kHz, and volume changes the samples; both stay within 24 bits")
+    func convertedDeep() throws {
+        let (url, samples) = try writeWAV(seconds: 0.5, rate: 96_000, bits: 24)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let frames = try AirPlayFrames(item: PlayableItem(url: url), url: url, settings: RendererSettings(), format: Self.deep48)
+        #expect(frames.steps == [.resampled, .dithered])
+        let out = allSamples(frames)
+        #expect(abs(Double(out.count / 2) - Double(samples.count / 2) / 2) < 100)
+        #expect(out.allSatisfy { $0 >= -8_388_608 && $0 <= 8_388_607 })
+        // More than 16 bits are in use: the low eight aren't all zero.
+        #expect(out.contains { $0 & 0xff != 0 })
+        let (plainURL, _) = try writeWAV(seconds: 0.1, rate: 48_000, bits: 24)
+        defer { try? FileManager.default.removeItem(at: plainURL) }
+        let quiet = try AirPlayFrames(item: PlayableItem(url: plainURL), url: plainURL, settings: RendererSettings(digitalVolumeDB: -6), format: Self.deep48)
+        #expect(quiet.steps == [.volume, .dithered])
+        #expect(allSamples(quiet).allSatisfy { $0 >= -8_388_608 && $0 <= 8_388_607 })
+    }
+
+    @Test("A format AirPlay has no name for is never made: the frames are 16-bit at 44.1 kHz")
+    func unnamedFormat() throws {
+        let (url, samples) = try writeWAV(seconds: 0.1)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let frames = try AirPlayFrames(item: PlayableItem(url: url), url: url, settings: RendererSettings(),
+                                       format: AirPlayFormat(sampleRate: 96_000, bitDepth: 24))
+        #expect(frames.format == .cd)
+        #expect(frames.steps.isEmpty)
+        #expect(allSamples(frames) == samples)
+    }
+
+    @Test("The steps for a format: its own rate isn't resampling, and its own depth isn't dither")
+    func stepsForFormat() {
+        let none = RendererSettings()
+        let deep = SourceFormat(encoding: .pcm, codec: "FLAC", sampleRate: 48_000, bitDepth: 24, channels: 2)
+        #expect(AirPlayConversion.steps(source: deep, settings: none, replayGainDB: nil) == [.resampled, .dithered])
+        #expect(AirPlayConversion.steps(source: deep, settings: none, replayGainDB: nil, format: Self.deep48).isEmpty)
+        #expect(AirPlayConversion.steps(source: deep, settings: none, replayGainDB: nil, format: Self.plain48) == [.dithered])
+        #expect(AirPlayConversion.steps(source: deep, settings: none, replayGainDB: nil, format: Self.deep44) == [.resampled, .dithered])
+        #expect(AirPlayConversion.steps(source: deep, settings: none, replayGainDB: -2, format: Self.deep48) == [.replayGain, .dithered])
+    }
+
     @Test("A 16-bit / 44.1 kHz stereo file comes out as its own samples, nothing done to it")
     func untouchedStereo() throws {
         let (url, samples) = try writeWAV(seconds: 0.4)
