@@ -12,7 +12,7 @@ import VespertineAudio
 import VespertineUPnP
 @testable import VespertineAirPlay
 
-@Suite("AirPlay 2 playback", .serialized) @MainActor
+@Suite("AirPlay 2 playback", .serialized, .timeLimit(.minutes(2))) @MainActor
 struct AirPlay2PlaybackTests {
     /// What a HomePod mini advertises.
     static let features = "0x4A7FCA00,0xBC354BD0"
@@ -31,10 +31,7 @@ struct AirPlay2PlaybackTests {
         return (p, log)
     }
 
-    func wait(_ condition: () -> Bool, seconds: Double = 8) async {
-        let end = Date().addingTimeInterval(seconds)
-        while !condition(), Date() < end { try? await Task.sleep(for: .milliseconds(25)) }
-    }
+    func wait(_ condition: @MainActor () -> Bool) async { await untilTrue(condition) }
 
     /// Pairs with the fake receiver by its PIN, as the app does once.
     func keys(_ receiver: FakeRAOPReceiver, pin: String = "3939") async throws -> AirPlayPairingKeys {
