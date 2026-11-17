@@ -37,7 +37,7 @@ public enum RAOPTiming {
     /// What the receiver plays behind real time, in frames (2 s, as iTunes): sync packets say 77 175 and receivers add the
     /// 11 025 they always add.
     public static let latencyFrames: UInt32 = 88_200
-    static let syncLatencyFrames: UInt32 = 77_175
+    public static let syncLatencyFrames: UInt32 = 77_175
 }
 
 public enum RAOPPacket {
@@ -64,9 +64,10 @@ public enum RAOPPacket {
     }
 
     /// A sync packet: at NTP time `ntp`, frame `rtpNow − latency` is heard; `rtpNow` is the frame being sent now.
-    public static func sync(rtpNow: UInt32, ntp: UInt64, first: Bool) -> Data {
+    /// `latency`: in frames (1.75 s at 44.1 kHz unless the stream runs at another rate).
+    public static func sync(rtpNow: UInt32, ntp: UInt64, first: Bool, latency: UInt32 = RAOPTiming.syncLatencyFrames) -> Data {
         var d = Data([first ? 0x90 : 0x80, 0xD4, 0x00, 0x07])
-        d += be32(rtpNow &- RAOPTiming.syncLatencyFrames) + be64(ntp) + be32(rtpNow)
+        d += be32(rtpNow &- latency) + be64(ntp) + be32(rtpNow)
         return d
     }
 
