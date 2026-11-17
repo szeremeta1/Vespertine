@@ -104,6 +104,16 @@ public struct AirPlayRecord: Sendable, Hashable {
     /// It is set to ask for a password (`flags` 0x80).
     public var asksForPassword: Bool { (flags ?? 0) & 0x80 != 0 }
 
+    /// What it shows of a song, numbered as `_raop._tcp` numbers them: 0 text (`features` bit 17), 1 artwork (15),
+    /// 2 progress (16).
+    public var metadata: Set<Int> {
+        var kinds: Set<Int> = []
+        if has(17) { kinds.insert(0) }
+        if has(15) { kinds.insert(1) }
+        if has(16) { kinds.insert(2) }
+        return kinds
+    }
+
     private func has(_ bit: UInt64) -> Bool { (features ?? 0) >> bit & 1 == 1 }
 }
 
@@ -173,8 +183,21 @@ public struct AirPlayDevice: Sendable, Hashable, Identifiable {
     /// How an AirPlay 2 session with this receiver would begin; nil when it doesn't say it takes one (no `_airplay._tcp`
     /// record, no audio, or no pairing an open sender can do). A receiver set to ask for a password is not one yet.
     public var airPlay2Entry: AirPlay2Entry? {
-        guard let airplay, airplay.playsAudio, airplay.pairs, !airplay.asksForPassword else { return nil }
+        guard let airplay, airplay.playsAudio, airplay.pairs, !airplay.asksForPassword, raop?.needsPassword != true else { return nil }
         return airplay.asksForPIN ? .pin : .open
+    }
+
+    /// A session with this receiver would be an AirPlay 2 one: it takes one, and doesn't take AirPlay 1 as Vespertine
+    /// sends it. A receiver that takes both stays on AirPlay 1.
+    public var usesAirPlay2: Bool {
+        if case .supported = support { return false }
+        return airPlay2Entry != nil
+    }
+
+    /// What the receiver shows of a song: 0 text, 1 artwork, 2 progress.
+    public var metadata: Set<Int> {
+        if usesAirPlay2 { return airplay?.metadata ?? [] }
+        return raop?.metadata ?? []
     }
 
     public var support: Support {

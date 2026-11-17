@@ -50,6 +50,18 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         get { hooks.withLock { $0.refused } }
         set { hooks.withLock { $0.refused = newValue } }
     }
+    /// What was kept from pairing with a receiver that shows a PIN (nil: never paired). Called off the main thread, when a
+    /// session is opened; never for a receiver that asks for no PIN.
+    public var pairingProvider: (@Sendable () -> AirPlayPairingKeys?)? {
+        get { hooks.withLock { $0.pairing } }
+        set { hooks.withLock { $0.pairing = newValue } }
+    }
+    /// The receiver wants the PIN on its screen typed: this Mac was never paired with it, or it has forgotten this Mac
+    /// (the song has failed; the listener can be asked).
+    public var pairingRefused: (@Sendable () -> Void)? {
+        get { hooks.withLock { $0.unpaired } }
+        set { hooks.withLock { $0.unpaired = newValue } }
+    }
     /// The cover file (JPEG or PNG) for a song's `RendererTrackInfo.artworkKey`, for receivers that show one. Called off
     /// the main thread.
     public var artworkProvider: (@Sendable (String) -> Data?)? {
@@ -59,6 +71,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     private struct Hooks {
         var password: (@Sendable () -> String?)?
         var refused: (@Sendable () -> Void)?
+        var pairing: (@Sendable () -> AirPlayPairingKeys?)?
+        var unpaired: (@Sendable () -> Void)?
         var artwork: (@Sendable (String) -> Data?)?
         var next: (@Sendable (PlayableItem) -> PlayableItem?)?
         var resolver: (@Sendable (PlayableItem) -> URL)?
@@ -135,6 +149,10 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     /// it sends late still plays; past this it stops, lets the song before be heard to its end, and starts the next on a
     /// fresh stream when it opens (a gap, said so).
     static let holdLimit: TimeInterval = 1.5
+    /// Tests: SRP's private number when pairing without a PIN (random otherwise).
+    var pairingSecret: Data?
+    /// This Mac as an AirPlay 2 receiver is told of it.
+    var sender = AirPlay2Sender.thisMac
     /// How long a song may take to open before it fails (as long as the network cache waits for a share that sends nothing).
     var openTimeout: TimeInterval = 120
     /// Tests: the next song opened ahead, if any.
@@ -194,16 +212,33 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         }
     }
 
-    /// For a device found on Bonjour (its `_raop._tcp` service), or one with a known address.
+    /// For a device found on Bonjour (its `_raop._tcp` service, or its `_airplay._tcp` one when the session is an AirPlay 2
+    /// one), or one with a known address.
     public convenience init?(device: AirPlayDevice, lead: TimeInterval = 0.25) {
-        guard case .supported(let encryption) = device.support else { return nil }
-        let endpoint: NWEndpoint
-        if let service = device.service {
-            endpoint = .service(name: service.name, type: service.type, domain: service.domain, interface: nil)
-        } else if let host = device.host, let port = device.port.flatMap(NWEndpoint.Port.init(rawValue:)) {
-            endpoint = .hostPort(host: NWEndpoint.Host(host), port: port)
-        } else { return nil }
+        let encryption: RAOPEncryption
+        if device.usesAirPlay2 { encryption = .none } else if case .supported(let stated) = device.support { encryption = stated } else { return nil }
+        guard let endpoint = Self.endpoint(for: device, airPlay2: device.usesAirPlay2) else { return nil }
         self.init(device: device, endpoint: endpoint, encryption: encryption, lead: lead)
+    }
+
+    /// Where a session with `device` connects: the Bonjour service of its kind, or the known address.
+    static func endpoint(for device: AirPlayDevice, airPlay2: Bool) -> NWEndpoint? {
+        if let service = airPlay2 ? device.airplayService : device.service {
+            return .service(name: service.name, type: service.type, domain: service.domain, interface: nil)
+        }
+        if let host = device.host, let port = device.port.flatMap(NWEndpoint.Port.init(rawValue:)) {
+            return .hostPort(host: NWEndpoint.Host(host), port: port)
+        }
+        return nil
+    }
+
+    /// How the session gets past a receiver that must be paired with. One that shows a PIN and was never paired with is
+    /// refused here, before anything is sent, the way the receiver itself refuses a Mac it has forgotten.
+    private func sessionPairing() throws -> AirPlay2Pairing {
+        guard device.usesAirPlay2 else { return .none }
+        guard device.airPlay2Entry == .pin else { return .withoutPIN(secret: pairingSecret) }
+        guard let keys = pairingProvider?() else { throw PairingError.authentication }
+        return .paired(keys.identity, keys.receiver)
     }
 
     deinit { worker?.cancel() }
@@ -468,7 +503,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             }
             if !open {
                 let made = RAOPSession(name: device.name, endpoint: endpoint, encryption: encryption, rsaKey: rsaKey,
-                                       authSetup: device.needsAuthSetup, password: device.needsPassword ? passwordProvider?() : nil)
+                                       authSetup: device.needsAuthSetup, password: device.needsPassword ? passwordProvider?() : nil,
+                                       pairing: try sessionPairing(), sender: sender)
                 made.onLost = { [weak self] in self?.enqueue.yield(.lost) }
                 let volume = state.withLock { $0.receiverVolumeDB }
                 try await made.connect(volumeDB: volume)
@@ -481,6 +517,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
             if generation.withLock({ $0 }) == g {
                 fail(item, error)
                 if let refusal = error as? RAOPError, case .refused(_, 401) = refusal { passwordRefused?() }
+                if device.airPlay2Entry == .pin, (error as? PairingError) == .authentication { pairingRefused?() }
             }
             return
         }
@@ -748,18 +785,19 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     /// A song became audible: tell the app (unless it is a restart of the same song) and the receiver's display.
     private func announce(_ segment: Segment) async {
         if segment.announces { emit(.trackStarted(segment.item)) }
-        guard let session, let start = segment.start, let raop = device.raop else { return }
+        guard let session, let start = segment.start else { return }
+        let shown = device.metadata
         let info = metadataProvider?(segment.item)
-        if raop.metadata.contains(0) {
+        if shown.contains(0) {
             try? await session.setMetadata(title: info?.title ?? segment.item.url.deletingPathExtension().lastPathComponent,
                                            artist: info?.artist, album: info?.album, rtptime: start)
         }
         // The cover, or word that this song has none (so the last song's doesn't stay up).
-        if raop.metadata.contains(1) {
+        if shown.contains(1) {
             let image = info?.artworkKey.flatMap { key in artworkProvider?(key) }
             try? await session.setArtwork(image, rtptime: start)
         }
-        if raop.metadata.contains(2), segment.duration > 0 {
+        if shown.contains(2), segment.duration > 0 {
             let songStart = start &- UInt32(segment.offset * Double(RAOPTiming.sampleRate))
             let end = songStart &+ UInt32(segment.duration * Double(RAOPTiming.sampleRate))
             try? await session.setProgress(start: songStart, current: start, end: end)
