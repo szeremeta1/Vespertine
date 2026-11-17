@@ -114,6 +114,23 @@ final class FakeShare: ShareFiles, @unchecked Sendable {
         #expect(Set(library.songs.map(\.id)).count == 4)
     }
 
+    @Test func aScanSaysWhyEachFileNeedsTheMac() throws {
+        let share = FakeShare()
+        for name in ["a.dts", "b.DTS", "c.thd", "d.mlp", "e.ac3", "f.ec3", "g.tta", "h.tak", "i.wma", "j.mka", "k.iso", "l.ape"] {
+            share.put("Films/" + name, Data("x".utf8))
+        }
+        let library = try ShareScanner.scan(share, now: FakeShare.day)
+        #expect(library.songs.isEmpty && library.unreadable == 0 && library.needTheMac == 12)
+        // In the order the screen lists them, a kind with no files left out.
+        let expected: [MacNeed.Count] = [.init(need: .dts, files: 2), .init(need: .trueHD, files: 2), .init(need: .dolbyDigital, files: 2), .init(need: .tta, files: 1),
+                                         .init(need: .tak, files: 1), .init(need: .wma, files: 1), .init(need: .matroska, files: 1), .init(need: .discImage, files: 1),
+                                         .init(need: .other, files: 1)]
+        #expect(library.needsByKind == expected)
+        #expect(library.needsByKind.map(\.files).reduce(0, +) == library.needTheMac)
+        // A second scan counts them afresh: nothing doubles.
+        #expect(try ShareScanner.scan(share, previous: library, now: FakeShare.day).needs == library.needs)
+    }
+
     @Test func aSecondScanReadsOnlyWhatChanged() throws {
         let share = FakeShare.sample()
         let first = try ShareScanner.scan(share, now: FakeShare.day)

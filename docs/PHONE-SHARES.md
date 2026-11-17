@@ -36,6 +36,8 @@ home. Now Playing says **SMB share** as the source, and Output shows the share, 
 MP3 and AAC albums on a share join without a gap, like the lossless ones: the phone's decoder reads the encoder's delay and padding
 from each file and leaves them out (see `docs/REMOTE-STREAMING.md`).
 
+Tapping "Files that need the Mac" lists them by what they are, each with its number of files: DSD in surround, DSD (DST), DTS, Dolby TrueHD and MLP, Dolby Digital, TTA, TAK, WMA, Matroska (MKA), disc images (ISO), surround in other formats, and other formats. The screen says that Vespertine on a Mac opens them. A share scanned before this version shows the count alone until its next scan.
+
 Folders a NAS keeps for itself (`@eaDir`, `#recycle`, `$RECYCLE.BIN`, `System Volume Information`, `lost+found`, snapshots), hidden files
 and names starting with a dot are skipped. Songs without tags are filed by their folder and file name.
 

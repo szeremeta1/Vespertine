@@ -365,6 +365,7 @@ private func dsdShare() -> (share: FakeShare, files: [String: Data]) {
         let library = try ShareScanner.scan(dsdShare().share)
         #expect(library.songs.map(\.fileName) == ["01 Lantern Street.dsf", "02 Late Tram.dff"])
         #expect(library.needTheMac == 2, "surround DSD and DST")
+        #expect(library.needs == ["surroundDSD": 1, "dst": 1])
         #expect(library.unreadable == 1)
         let catalog = ShareCatalog(library)
         let album = try #require(catalog.albums.first)
@@ -380,6 +381,9 @@ private func dsdShare() -> (share: FakeShare, files: [String: Data]) {
         // An index written before DSD files were listed still reads.
         let old = Data(#"{"songs":[{"id":3,"path":"a.flac","size":10,"modified":0,"tags":{"codec":"FLAC","sampleRate":44100,"bitDepth":16,"channels":2,"duration":1}}],"covers":{},"needTheMac":1,"unreadable":0}"#.utf8)
         #expect(try JSONDecoder().decode(ShareLibrary.self, from: old).songs.first?.tags.dsd == nil)
+        // And one written before the reasons were kept: the count alone.
+        let before = try JSONDecoder().decode(ShareLibrary.self, from: old)
+        #expect(before.needTheMac == 1 && before.needs.isEmpty && before.needsByKind.isEmpty)
     }
 }
 

@@ -28,23 +28,99 @@ public struct ShareSong: Codable, Equatable, Sendable, Identifiable {
     public var fileName: String { path.split(separator: "/").last.map(String.init) ?? path }
 }
 
+/// Why a music file on a share can't be opened without the Mac.
+public enum MacNeed: String, Codable, CaseIterable, Sendable {
+    /// DSD with more than two channels.
+    case surroundDSD
+    /// DSD packed with DST (a DSDIFF from an SACD).
+    case dst
+    case dts
+    /// Dolby TrueHD, and the MLP it is built on.
+    case trueHD
+    /// Dolby Digital and Dolby Digital Plus (AC-3, E-AC-3).
+    case dolbyDigital
+    case tta
+    case tak
+    case wma
+    /// Audio in a Matroska file (.mka).
+    case matroska
+    /// A disc image (.iso), an SACD's mostly.
+    case discImage
+    /// More than two channels in a kind the phone otherwise opens (APE, WavPack, Ogg Vorbis, Opus).
+    case surround
+    /// Anything else: DSD inside WavPack, FLAC inside Ogg, a DSD rate that isn't a usual one.
+    case other
+
+    public struct Count: Equatable, Sendable {
+        public var need: MacNeed
+        public var files: Int
+
+        public init(need: MacNeed, files: Int) {
+            self.need = need
+            self.files = files
+        }
+    }
+
+    /// A library's `needs` as a list in this order, the reasons with no files left out.
+    public static func counts(_ needs: [String: Int]) -> [Count] {
+        allCases.compactMap { need in needs[need.rawValue].flatMap { $0 > 0 ? Count(need: need, files: $0) : nil } }
+    }
+
+    /// The need of every file whose name ends in `type`; nil for a kind that depends on what is inside.
+    static func named(_ type: String) -> MacNeed? {
+        switch type {
+        case "dts": .dts
+        case "thd", "mlp": .trueHD
+        case "ac3", "ec3": .dolbyDigital
+        case "tta": .tta
+        case "tak": .tak
+        case "wma": .wma
+        case "mka": .matroska
+        case "iso": .discImage
+        default: nil
+        }
+    }
+}
+
 public struct ShareLibrary: Codable, Equatable, Sendable {
     public var songs: [ShareSong]
     /// The picture file found in a folder (`cover.jpg` and the like), by folder.
     public var covers: [String: String]
     /// Music files of kinds the phone can't open without the Mac converting them (APE, WavPack, surround DSD…).
     public var needTheMac: Int
+    /// The same files by why they need the Mac (`MacNeed`'s raw values). Empty in a library saved before this was kept.
+    public var needs: [String: Int]
     /// Files with a playable name that couldn't be read as what the name says.
     public var unreadable: Int
     public var scanned: Date?
 
-    public init(songs: [ShareSong] = [], covers: [String: String] = [:], needTheMac: Int = 0, unreadable: Int = 0, scanned: Date? = nil) {
+    public init(songs: [ShareSong] = [], covers: [String: String] = [:], needTheMac: Int = 0, needs: [String: Int] = [:], unreadable: Int = 0, scanned: Date? = nil) {
         self.songs = songs
         self.covers = covers
         self.needTheMac = needTheMac
+        self.needs = needs
         self.unreadable = unreadable
         self.scanned = scanned
     }
+
+    public init(from decoder: any Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        songs = try values.decode([ShareSong].self, forKey: .songs)
+        covers = try values.decode([String: String].self, forKey: .covers)
+        needTheMac = try values.decode(Int.self, forKey: .needTheMac)
+        needs = try values.decodeIfPresent([String: Int].self, forKey: .needs) ?? [:]
+        unreadable = try values.decode(Int.self, forKey: .unreadable)
+        scanned = try values.decodeIfPresent(Date.self, forKey: .scanned)
+    }
+
+    /// One more file that needs the Mac, and why.
+    mutating func count(_ need: MacNeed) {
+        needTheMac += 1
+        needs[need.rawValue, default: 0] += 1
+    }
+
+    /// How many files need the Mac for each reason, in `MacNeed`'s order. Empty when the reasons weren't kept.
+    public var needsByKind: [MacNeed.Count] { MacNeed.counts(needs) }
 }
 
 public enum ShareScanner {
@@ -120,7 +196,7 @@ public enum ShareScanner {
                 }
                 // A kind the app has a decoder for is opened here, whatever the list of the Mac's kinds says.
                 let decoded = decoders?.extensions.contains(type) ?? false
-                if !decoded, SongTagReader.needsTheMac.contains(type) { library.needTheMac += 1; continue }
+                if !decoded, SongTagReader.needsTheMac.contains(type) { library.count(MacNeed.named(type) ?? .other); continue }
                 guard decoded || SongTagReader.playable.contains(type), entry.size > 0 else { continue }
                 if let old = known[path], old.size == entry.size, old.modified == entry.modified, !readsAgain(old, type: type) {
                     used.insert(old.id)
@@ -133,7 +209,8 @@ public enum ShareScanner {
                     if decoded, let decoders {
                         switch try decoders.open(type: type, size: entry.size, read: { offset, length in try files.read(path, offset: offset, length: length) }) {
                         case .opened(let decoder) where decoder.info.playsHere: tags = SongTagReader.tags(decoder.info, size: entry.size)
-                        case .opened, .needsTheMac: library.needTheMac += 1; continue
+                        case .opened(let decoder): library.count(decoder.info.channels > 2 ? .surround : .other); continue
+                        case .needsTheMac: library.count(.other); continue
                         case .unreadable: tags = nil
                         }
                     } else {
@@ -144,7 +221,7 @@ public enum ShareScanner {
                 }
                 guard let tags else { library.unreadable += 1; continue }
                 // DSD in surround, or packed with DST: a file the Mac has to convert.
-                if let dsd = tags.dsd, !dsd.playsHere { library.needTheMac += 1; continue }
+                if let dsd = tags.dsd, !dsd.playsHere { library.count(dsd.dst ? .dst : dsd.channels > 2 ? .surroundDSD : .other); continue }
                 var songID = known[path]?.id ?? id(for: path)
                 while used.contains(songID) { songID += 2 }
                 used.insert(songID)
