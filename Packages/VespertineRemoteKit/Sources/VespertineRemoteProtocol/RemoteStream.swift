@@ -17,6 +17,9 @@ public enum StreamKind: String, Codable, Sendable, Equatable {
     /// A FLAC the Mac made from the song (DSD, a format the phone can't decode, a CUE track, a multichannel file above the
     /// phone's rate), speakers and channel count kept.
     case flac
+    /// PCM the phone itself makes of a song as it reads it (a DSD file on a share: its bits as DoP frames, or converted).
+    /// Never sent by a Mac.
+    case pcm
 }
 
 /// An audio format, as the phone needs to open it.

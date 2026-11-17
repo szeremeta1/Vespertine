@@ -89,7 +89,7 @@ final class FakeShare: ShareFiles, @unchecked Sendable {
         share.put("Kestrel Park/Northern Signal/04 Aurora Line.m4a", SongFixtures.alac)
         share.put("Loose/Demos/03 Night Ferry.wav", WavMaker.file())
         share.put("Loose/Demos/10 Late Tram.flac", SongFixtures.surroundFlac)
-        share.put("Loose/Demos/sacd.dsf", Data("DSD ".utf8))
+        share.put("Loose/Demos/old rip.ape", Data("MAC ".utf8))
         share.put("Loose/Demos/broken.flac", Data("junk".utf8))
         share.put("Loose/Demos/.hidden.flac", SongFixtures.flac2496)
         share.put("@eaDir/thumb.flac", SongFixtures.flac2496)

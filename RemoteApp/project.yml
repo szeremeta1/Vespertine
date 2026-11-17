@@ -31,6 +31,8 @@ targets:
         product: VespertinePhonePlayer
       - package: VespertineRemoteKit
         product: VespertineShare
+      - package: VespertineRemoteKit
+        product: VespertinePhoneBench
     info:
       path: Info.plist
       properties:

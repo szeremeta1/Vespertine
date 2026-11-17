@@ -124,6 +124,13 @@ import VespertineRemoteProtocol
         #expect(!RemoteAppModel.showsDemoNotice(isDemo: false, screenshotRun: false))
     }
 
+    @Test func theDemoBarKeepsToOneLineAtAccessibilityTextSizesUntilOpened() {
+        #expect(RemoteLayout.demoNoticeLines(accessibilityText: true, open: false) == 1)
+        #expect(RemoteLayout.demoNoticeLines(accessibilityText: true, open: true) == nil)
+        #expect(RemoteLayout.demoNoticeLines(accessibilityText: false, open: false) == nil)
+        #expect(RemoteLayout.demoNoticeLines(accessibilityText: false, open: true) == nil)
+    }
+
     @Test func theDemoMacShowsThisAppsVersion() {
         #expect(RemoteAppModel.demoVersion(info: ["CFBundleShortVersionString": "1.2"]) == "1.2")
         #expect(RemoteAppModel.demoVersion(info: ["CFBundleShortVersionString": 3]).isEmpty)

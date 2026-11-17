@@ -32,7 +32,7 @@ public struct ShareLibrary: Codable, Equatable, Sendable {
     public var songs: [ShareSong]
     /// The picture file found in a folder (`cover.jpg` and the like), by folder.
     public var covers: [String: String]
-    /// Music files of kinds the phone can't open without the Mac converting them (DSD, APE, WavPack…).
+    /// Music files of kinds the phone can't open without the Mac converting them (APE, WavPack, surround DSD…).
     public var needTheMac: Int
     /// Files with a playable name that couldn't be read as what the name says.
     public var unreadable: Int
@@ -63,6 +63,14 @@ public enum ShareScanner {
         var hash: UInt64 = 0xcbf2_9ce4_8422_2325
         for byte in path.utf8 { hash = (hash ^ UInt64(byte)) &* 0x0000_0100_0000_01b3 }
         return Int64(hash & 0x1f_ffff_ffff_ffff) | 1
+    }
+
+    /// An MPEG-4 file an earlier scan found no title, artist or album in is read again though it has not changed: it may
+    /// be tagged the QuickTime way, which earlier versions could not read. A file with no tags at all costs one small
+    /// read more per scan.
+    static func readsAgain(_ old: ShareSong, type: String) -> Bool {
+        guard ["m4a", "mp4", "m4b"].contains(type) else { return false }
+        return old.tags.title == nil && old.tags.artist == nil && old.tags.album == nil
     }
 
     /// Walks `files` from the top and returns its library. `previous`: the last scan, whose tags are reused for files
@@ -109,7 +117,7 @@ public enum ShareScanner {
                 }
                 if SongTagReader.needsTheMac.contains(type) { library.needTheMac += 1; continue }
                 guard SongTagReader.playable.contains(type), entry.size > 0 else { continue }
-                if let old = known[path], old.size == entry.size, old.modified == entry.modified {
+                if let old = known[path], old.size == entry.size, old.modified == entry.modified, !readsAgain(old, type: type) {
                     used.insert(old.id)
                     library.songs.append(old)
                     continue
@@ -122,6 +130,8 @@ public enum ShareScanner {
                     tags = nil
                 }
                 guard let tags else { library.unreadable += 1; continue }
+                // DSD in surround, or packed with DST: a file the Mac has to convert.
+                if let dsd = tags.dsd, !dsd.playsHere { library.needTheMac += 1; continue }
                 var songID = known[path]?.id ?? id(for: path)
                 while used.contains(songID) { songID += 2 }
                 used.insert(songID)

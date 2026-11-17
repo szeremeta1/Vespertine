@@ -295,6 +295,8 @@ struct ConnectionBanner: View {
     @State private var editing = false
     /// Still within the first seconds of the Mac not answering.
     @State private var patient = true
+    /// At the accessibility text sizes: whether the demo's bar shows all of its words.
+    @State private var demoNoticeOpen = false
 
     var body: some View {
         if session.isShare { shareBanner } else { macBanner }
@@ -357,11 +359,7 @@ struct ConnectionBanner: View {
             case .connected where session.isDemo && !model.showsDemoNotice:
                 EmptyView()
             case .connected where session.isDemo:
-                notice {
-                    Text(session.phone == nil ? "Demo: a made-up library. To hear it, choose this device in Output." : "Demo: a made-up library, with sound the app makes itself.").font(.footnote)
-                } buttons: {
-                    Button("Leave Demo") { model.leave() }.font(.footnote.weight(.medium))
-                }
+                demoNotice
             case .connected, .closed:
                 EmptyView()
             case .connecting:
@@ -382,6 +380,45 @@ struct ConnectionBanner: View {
         }
         .sheet(isPresented: $editing) { MacConnectionView(serverID: session.pairing.serverID) }
         .onChange(of: session.isConnected) { _, connected in if connected { patient = true } }
+    }
+
+    /// The demo's bar. At the accessibility text sizes its words, squeezed beside the button, ran to ten lines and took
+    /// half the screen. There the words get the full width and one line, opened and closed by a tap, and the button
+    /// goes below them. VoiceOver reads all of the words either way.
+    @ViewBuilder private var demoNotice: some View {
+        let words = Text(session.phone == nil ? "Demo: a made-up library. To hear it, choose this device in Output." : "Demo: a made-up library, with sound the app makes itself.").font(.footnote)
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: 6) {
+                Button {
+                    demoNoticeOpen.toggle()
+                } label: {
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        words.lineLimit(RemoteLayout.demoNoticeLines(accessibilityText: true, open: demoNoticeOpen))
+                            .multilineTextAlignment(.leading)
+                            // Opened, every line shows: the screens below give up the room.
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 0)
+                        Image(systemName: demoNoticeOpen ? "chevron.up" : "chevron.down")
+                            .font(.footnote.weight(.medium)).foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                Button("Leave Demo") { model.leave() }.font(.footnote.weight(.medium))
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal).padding(.vertical, 8)
+            .background(Palette.surface)
+        } else {
+            HStack(spacing: 10) {
+                words
+                Spacer(minLength: 0)
+                Button("Leave Demo") { model.leave() }.font(.footnote.weight(.medium))
+            }
+            .padding(.horizontal).padding(.vertical, 8)
+            .background(Palette.surface)
+        }
     }
 
     @ViewBuilder private var unreachable: some View {

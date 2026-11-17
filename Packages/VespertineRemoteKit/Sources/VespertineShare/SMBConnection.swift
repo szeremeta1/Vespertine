@@ -255,7 +255,8 @@ public final class SMBConnection: @unchecked Sendable {
             done = try setup(SPNEGO.response(try NTLM.anonymous(challenge: challenge)))
         } else {
             let answer = try NTLM.authenticate(user: user, domain: domain, password: password,
-                                               negotiate: first, challenge: challenge, clientChallenge: options.random(8), time: options.now())
+                                               negotiate: first, challenge: challenge, clientChallenge: options.random(8), time: options.now(),
+                                               newKey: options.random(16))
             done = try setup(SPNEGO.response(answer.message, mechListMIC: answer.carriesDigest ? answer.listSignature(SPNEGO.mechanismList) : nil))
             sessionKey = Array(answer.sessionKey.prefix(16))
         }
