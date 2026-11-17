@@ -46,6 +46,7 @@ struct QueueView: View {
                 }
             }
             .obsidianList()
+            .accessibilityIdentifier("queue-list")
             .navigationTitle("Queue").screenTitleStyle()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { EditButton() }
@@ -68,6 +69,7 @@ struct QueueView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityIdentifier("queue-row")
     }
 
     private func remove(_ items: [QueueItem], _ offsets: IndexSet) {

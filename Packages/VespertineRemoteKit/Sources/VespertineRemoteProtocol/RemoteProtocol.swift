@@ -150,7 +150,10 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     case artists
     case artistAlbums(name: String)
     case playlists
-    case playlistTracks(id: Int64)
+    /// A playlist's songs. With `offset` and `limit` (a newer phone), a page of them, answered with `.songs` and the
+    /// playlist's total, so a playlist of any length fits in replies; without them (an older phone, the web remote), all of
+    /// them in `.tracks`. An older Mac ignores the two and answers `.tracks`. `PlaylistPages` reads either answer.
+    case playlistTracks(id: Int64, offset: Int? = nil, limit: Int? = nil)
     case favorites
     case search(text: String, limit: Int)
     /// Every song, by title, a page at a time (answered with `.songs`).

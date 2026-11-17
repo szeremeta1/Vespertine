@@ -205,6 +205,42 @@ struct DemoMacTests {
         #expect(try await ask(mac, .find(text: "   ", limit: 50)) == .found(SearchResults(tracks: [], albums: [], artists: [], playlists: [])))
     }
 
+    /// TestFlight feedback AOf1M7oLiLlxngkwwaWog5Y: a playlist's page lists it a page at a time, a tapped song plays the rest
+    /// in the playlist's order, and Shuffle plays every song, from a random one.
+    @Test func aPlaylistPagesPlaysInOrderAndShufflesWhole() async throws {
+        let (mac, pushes) = try await opened()
+        guard case .playlists(let lists) = try await ask(mac, .playlists) else { Issue.record("no playlists"); return }
+        let late = try #require(lists.first { !$0.smart })
+        guard case .tracks(let all) = try await ask(mac, .playlistTracks(id: late.id)) else { Issue.record("no tracks"); return }
+        guard case .songs(let page, let total) = try await ask(mac, .playlistTracks(id: late.id, offset: 10, limit: 10)) else { Issue.record("no page"); return }
+        #expect(total == all.count && page == Array(all[10...]))
+
+        #expect(try await ask(mac, .setShuffle(on: false)) == .ok)
+        #expect(try await ask(mac, .playPlaylist(id: late.id, startAt: 3, shuffled: nil)) == .ok)
+        let ordered = try #require(pushes.lastQueue)
+        #expect(ordered.current?.track.id == all[3].id)
+        #expect(ordered.continuing.map(\.track.id) == all[4...].map(\.id))
+
+        var firsts: Set<Int64?> = []
+        for _ in 0..<20 {
+            #expect(try await ask(mac, .playPlaylist(id: late.id, shuffled: true)) == .ok)
+            let shuffled = try #require(pushes.lastQueue)
+            let played = [shuffled.current].compactMap { $0 } + shuffled.continuing
+            let heard: [Int64] = played.compactMap(\.track.id).sorted()
+            let listed: [Int64] = all.compactMap(\.id).sorted()
+            #expect(heard == listed)
+            firsts.insert(shuffled.current?.track.id)
+        }
+        #expect(firsts.count > 1, "Shuffle starts from a random song, not always the first")
+
+        // A long playlist (the UI tests' -VTTestPlaylists) is listed a page at a time, and an empty one has no songs.
+        let long = mac.addTestPlaylist(name: "Long Mix", songs: 1_200), empty = mac.addTestPlaylist(name: "Nothing Yet", songs: 0)
+        guard case .songs(let last, let count) = try await ask(mac, .playlistTracks(id: long, offset: 1_000, limit: 500)) else { Issue.record("no page"); return }
+        #expect(count == 1_200 && last.count == 200)
+        #expect(try await ask(mac, .playlistTracks(id: empty, offset: 0, limit: 500)) == .songs(items: [], total: 0))
+        mac.close()
+    }
+
     @Test func playlistsSayWhatTheyHoldAndTakeMore() async throws {
         let (mac, pushes) = try await opened()
         guard case .playlists(let lists) = try await ask(mac, .playlists) else { Issue.record("no playlists"); return }
