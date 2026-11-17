@@ -8,6 +8,7 @@
 
 import Darwin
 import Foundation
+import CryptoKit
 import Security
 @testable import VespertineAirPlay
 
@@ -87,6 +88,39 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private var _requiresAuthSetup = false
     private var introduced = false
 
+    /// A receiver that must be paired with (HomePod, Apple TV): it answers pairing's POSTs, seals the connection once
+    /// pairing is done, and until then refuses everything else (470).
+    var pairing: FakePairing? {
+        get { lock.withLock { _pairing } }
+        set { lock.withLock { _pairing = newValue } }
+    }
+    private var _pairing: FakePairing?
+    /// AirPlay 2: what the two SETUP requests said (the session's, then the stream's), as property lists.
+    var setups: [[String: Any]] { lock.withLock { _setups } }
+    private var _setups: [[String: Any]] = []
+    /// AirPlay 2: how many times the event connection was opened.
+    var eventConnections: Int { lock.withLock { _eventConnections } }
+    private var _eventConnections = 0
+    private var eventListener: Int32 = -1
+    /// AirPlay 2: the key the audio packets are sealed with (the stream SETUP's), and how many packets didn't open.
+    private var audioKey: SymmetricKey?
+    var unopened: Int { lock.withLock { _unopened } }
+    private var _unopened = 0
+    /// AirPlay 2: answer the first SETUP without an event port.
+    var withholdEventPort = false
+
+    /// For each request in `requests`, whether it came sealed.
+    var sealed: [Bool] { lock.withLock { _sealed } }
+    private var _sealed: [Bool] = []
+    /// Keys the connection changes to once the answer under way has gone out.
+    private var nextKeys: PairingChannelKeys?
+    /// Spoil the next sealed answer (a frame that won't open).
+    var spoilNextAnswer: Bool {
+        get { lock.withLock { _spoil } }
+        set { lock.withLock { _spoil = newValue } }
+    }
+    private var _spoil = false
+
     /// The RTP times of the packets that came with the marker (the first of each stream after RECORD or FLUSH).
     var markerTimestamps: [UInt32] { lock.withLock { _markerTimestamps } }
     private var _markerTimestamps: [UInt32] = []
@@ -123,6 +157,8 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         }
         shutdown(listener, SHUT_RDWR)
         close(listener)
+        let events = lock.withLock { eventListener }
+        if events >= 0 { shutdown(events, SHUT_RDWR); close(events) }
         for c in clients { shutdown(c, SHUT_RDWR) }
         socks.forEach { $0.close() }
     }
@@ -175,21 +211,33 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private func serve(_ fd: Int32) {
         var parser = RTSPParser()
         var buffer = [UInt8](repeating: 0, count: 65_536)
+        var channel: PairingChannel?
         defer { close(fd) }
         while true {
             let n = read(fd, &buffer, buffer.count)
             guard n > 0 else { return }
-            parser.append(Data(buffer[0..<n]))
+            var data = Data(buffer[0..<n])
+            if channel != nil {
+                guard let plain = try? channel?.open(data) else { return }
+                data = plain
+            }
+            parser.append(data)
             while let request = try? parser.next() {
-                let response = handle(request)
-                let bytes = response.encoded()
+                let response = handle(request, sealed: channel != nil)
+                var bytes = response.encoded()
+                if channel != nil {
+                    guard var out = try? channel?.seal(bytes) else { return }
+                    if lock.withLock({ defer { _spoil = false }; return _spoil }) { out[out.count - 1] ^= 1 }
+                    bytes = out
+                }
                 _ = bytes.withUnsafeBytes { write(fd, $0.baseAddress, $0.count) }
+                if let keys = lock.withLock({ defer { nextKeys = nil }; return nextKeys }) { channel = PairingChannel(keys: keys) }
             }
         }
     }
 
-    private func handle(_ request: RTSPMessage) -> RTSPMessage {
-        lock.withLock { _requests.append(request) }
+    private func handle(_ request: RTSPMessage, sealed: Bool = false) -> RTSPMessage {
+        lock.withLock { _requests.append(request); _sealed.append(sealed) }
         var cseq = request["CSeq"] ?? "0"
         if wrongCSeq.contains(request.method ?? "") { cseq = String((Int(cseq) ?? 0) + 7) }
         var headers: [(String, String)] = [("CSeq", cseq), ("Server", "AirTunes/366.0")]
@@ -207,6 +255,20 @@ final class FakeRAOPReceiver: @unchecked Sendable {
                 return .response(401, "Unauthorized", headers: headers + [("WWW-Authenticate", "Digest realm=\"raop\", nonce=\"\(nonce)\"")])
             }
             lock.withLock { nonceUses += 1 }
+        }
+        if let pairing {
+            let binary = ("Content-Type", "application/octet-stream")
+            switch (request.method ?? "", request.url ?? "") {
+            case ("POST", "/pair-pin-start"):
+                pairing.showPIN()
+                return .response(200, "OK", headers: headers)
+            case ("POST", "/pair-setup"), ("POST", "/pair-verify"):
+                let (answer, keys) = pairing.answer(path: request.url ?? "", body: request.body)
+                lock.withLock { nextKeys = keys }
+                return .response(200, "OK", headers: headers + [binary], body: answer)
+            default:
+                if !sealed { return .response(470, "Connection Authorization Required", headers: headers) }
+            }
         }
         if request.method == "POST", request.url == "/auth-setup" {
             // 0x01 (unencrypted) and a 32-byte key; the answer is the receiver's key, then a certificate and signature
@@ -228,6 +290,36 @@ final class FakeRAOPReceiver: @unchecked Sendable {
                 aesKey = key
                 aesIV = iv
             }
+        case "SETUP" where request["Content-Type"] == AirPlay2Message.contentType:
+            guard let said = AirPlay2Message.decode(request.body) else { return .response(400, "Bad Request", headers: headers) }
+            lock.withLock { _setups.append(said) }
+            let plist = ("Content-Type", AirPlay2Message.contentType)
+            if let stream = (said["streams"] as? [[String: Any]])?.first {
+                // The stream: its key, and where this receiver takes audio and control packets.
+                guard let key = stream["shk"] as? Data, key.count == 32, let port = stream["controlPort"] as? Int,
+                      let audio = try? UDPSocket(bind: "127.0.0.1"), let control = try? UDPSocket(bind: "127.0.0.1") else {
+                    return .response(400, "Bad Request", headers: headers)
+                }
+                lock.withLock {
+                    audioKey = SymmetricKey(data: key)
+                    clientControl = UInt16(port)
+                    decoder = try? ALACDecoder(config: ALACConfig())
+                    sockets += [audio, control]
+                    controlSocket = control
+                }
+                audio.startReceiving(name: "fake audio") { [weak self] data, _, _ in self?.audio(data, resent: false) }
+                control.startReceiving(name: "fake control") { [weak self] data, _, _ in self?.control(data) }
+                let answer: [String: Any] = ["streams": [["type": 96, "dataPort": Int(audio.port), "controlPort": Int(control.port)]]]
+                return .response(200, "OK", headers: headers + [plist], body: AirPlay2Message.encode(answer))
+            }
+            // The session: where to ask the time, answered with the event port (a listener that counts who connects).
+            guard let port = said["timingPort"] as? Int, let timing = try? UDPSocket(bind: "127.0.0.1"), let events = eventPort() else {
+                return .response(400, "Bad Request", headers: headers)
+            }
+            timing.startReceiving(name: "fake timing") { [weak self] data, _, _ in self?.lock.withLock { self?._timingReplies.append(data) } }
+            lock.withLock { clientTiming = UInt16(port); sockets.append(timing); timingSocket = timing }
+            let answer: [String: Any] = withholdEventPort ? ["timingPort": Int(timing.port)] : ["eventPort": Int(events), "timingPort": Int(timing.port)]
+            return .response(200, "OK", headers: headers + [plist], body: AirPlay2Message.encode(answer))
         case "SETUP":
             guard let transport = request["Transport"], let audio = try? UDPSocket(bind: "127.0.0.1"), let control = try? UDPSocket(bind: "127.0.0.1"),
                   let timing = try? UDPSocket(bind: "127.0.0.1") else { return .response(500, "Error", headers: headers) }
@@ -254,6 +346,30 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         return .response(200, "OK", headers: headers)
     }
 
+    /// Opens the event listener (once) and gives its port.
+    private func eventPort() -> UInt16? {
+        let fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)
+        guard fd >= 0 else { return nil }
+        var addr = sockaddr_in()
+        addr.sin_family = sa_family_t(AF_INET)
+        addr.sin_len = UInt8(MemoryLayout<sockaddr_in>.size)
+        inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr)
+        let bound = withUnsafePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { bind(fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) } }
+        guard bound == 0, listen(fd, 4) == 0 else { close(fd); return nil }
+        var length = socklen_t(MemoryLayout<sockaddr_in>.size)
+        _ = withUnsafeMutablePointer(to: &addr) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { getsockname(fd, $0, &length) } }
+        lock.withLock { eventListener = fd }
+        let thread = Thread { [weak self] in
+            while true {
+                let client = accept(fd, nil, nil)
+                guard client >= 0, let self else { return }
+                self.lock.withLock { self._eventConnections += 1; self.clientSockets.append(client) }
+            }
+        }
+        thread.start()
+        return UInt16(bigEndian: addr.sin_port)
+    }
+
     private var controlSocket: UDPSocket?
     private var timingSocket: UDPSocket?
     private var received = 0
@@ -262,7 +378,16 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     // MARK: UDP
 
     private func audio(_ data: Data, resent: Bool) {
-        guard let packet = RAOPPacket.parseAudio(data) else { return }
+        // AirPlay 2: sealed with the stream's key; a packet that doesn't open is counted and dropped.
+        let sealedWith = lock.withLock { audioKey }
+        let packet: (seq: UInt16, timestamp: UInt32, payload: Data)
+        if let sealedWith {
+            guard let opened = AirPlay2Audio.open(data, key: sealedWith) else { lock.withLock { _unopened += 1 }; return }
+            packet = (opened.seq, opened.timestamp, opened.payload)
+        } else {
+            guard let plain = RAOPPacket.parseAudio(data) else { return }
+            packet = plain
+        }
         let lost = lock.withLock { () -> Bool in
             if !resent, data[data.startIndex + 1] == 0xE0 { _markers += 1; _markerTimestamps.append(packet.timestamp) }
             if !resent { received += 1 }
