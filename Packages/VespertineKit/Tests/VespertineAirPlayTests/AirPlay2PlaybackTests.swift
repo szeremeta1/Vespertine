@@ -74,6 +74,115 @@ struct AirPlay2PlaybackTests {
         #expect((told["name"] as? String)?.isEmpty == false)
     }
 
+    static let deep48 = AirPlayFormat(sampleRate: 48_000, bitDepth: 24)
+    /// A receiver that says it takes 24-bit at 48 kHz, and 16-bit at 44.1 kHz, on a realtime stream.
+    static let deepInfo: [String: Any] = ["audioFormats": [["type": 96, "audioInputFormats": 0x240000]]]
+
+    @Test("A 24-bit / 48 kHz song goes as it is to a receiver that says it takes that: every sample, and the path says so")
+    func deepSong() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.pairing = FakePairing()
+        receiver.info = Self.deepInfo
+        let (url, samples) = try writeWAV(seconds: 0.6, rate: 48_000, bits: 24, seed: 43)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let (p, log) = try playback(receiver, flags: "0x4")
+        defer { p.shutdown() }
+        p.metadataProvider = { _ in RendererTrackInfo(title: "Song", artist: "Artist", album: "Album", duration: 0.6) }
+        let item = PlayableItem(url: url)
+        p.play(item, at: 0)
+        await wait { log.started == [item.id] || !log.failures.isEmpty }
+        let stage = try #require(p.snapshot.signalPath?.renderer)
+        #expect(stage.sentSampleRate == 48_000)
+        #expect(stage.sentBitDepth == 24)
+        #expect(stage.processing.isEmpty)
+        await wait { log.ended }
+        #expect(log.started == [item.id])
+        #expect(log.failures.isEmpty)
+        #expect(Array(receiver.methods.prefix(6)) == ["GET", "POST", "POST", "SETUP", "SETUP", "RECORD"])
+        #expect(receiver.streamFormat == Self.deep48)
+        #expect(receiver.unopened == 0)
+        #expect(Array(receiver.deepSamples.prefix(samples.count)) == samples)
+        // Where the song is, in frames of the stream: 0.6 s is 28 800 of them at 48 kHz.
+        let progress = receiver.requests.map { String(decoding: $0.body, as: UTF8.self) }.first { $0.hasPrefix("progress: ") }
+        let said = try #require(progress)
+        let times = said.dropFirst("progress: ".count).split(separator: "/").compactMap { UInt32($0.trimmingCharacters(in: .whitespacesAndNewlines)) }
+        #expect(times.count == 3)
+        if times.count == 3 {
+            let length = times[2] &- times[0]
+            #expect(length >= 28_799 && length <= 28_800)
+        }
+    }
+
+    @Test("The same song to a receiver that doesn't say what it takes: asked, then 16-bit at 44.1 kHz as before")
+    func deepSongPlainReceiver() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.pairing = FakePairing()
+        let (url, samples) = try writeWAV(seconds: 0.6, rate: 48_000, bits: 24, seed: 44)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let (p, log) = try playback(receiver, flags: "0x4")
+        defer { p.shutdown() }
+        let item = PlayableItem(url: url)
+        p.play(item, at: 0)
+        await wait { log.started == [item.id] || !log.failures.isEmpty }
+        let stage = try #require(p.snapshot.signalPath?.renderer)
+        #expect(stage.sentSampleRate == 44_100)
+        #expect(stage.sentBitDepth == 16)
+        #expect(stage.processing == [.resampled, .dithered])
+        await wait { log.ended }
+        #expect(log.failures.isEmpty)
+        #expect(Array(receiver.methods.prefix(6)) == ["GET", "POST", "POST", "SETUP", "SETUP", "RECORD"])
+        #expect(receiver.streamFormat == .cd)
+        let expected = Double(samples.count / 2) * 44_100 / 48_000
+        #expect(abs(Double(receiver.samples.count / 2) - expected) < 800)
+    }
+
+    @Test("A 16-bit / 44.1 kHz song with nothing applied asks the same receiver nothing and goes as it always has")
+    func plainSongDeepReceiver() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.pairing = FakePairing()
+        receiver.info = Self.deepInfo
+        let (url, samples) = try writeWAV(seconds: 0.4, seed: 45)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let (p, log) = try playback(receiver, flags: "0x4")
+        defer { p.shutdown() }
+        let item = PlayableItem(url: url)
+        p.play(item, at: 0)
+        await wait { log.ended }
+        #expect(log.failures.isEmpty)
+        #expect(!receiver.methods.contains("GET"))
+        #expect(receiver.streamFormat == .cd)
+        #expect(Array(receiver.samples.map(Int32.init).prefix(samples.count)) == samples)
+    }
+
+    @Test("The stream keeps the format it was opened in: a 16/44.1 song after a 24/48 one joins it at 48 kHz, with no new session")
+    func queueKeepsFormat() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        receiver.pairing = FakePairing()
+        receiver.info = Self.deepInfo
+        let (firstURL, firstSamples) = try writeWAV(seconds: 0.5, rate: 48_000, bits: 24, seed: 46)
+        defer { try? FileManager.default.removeItem(at: firstURL) }
+        let (secondURL, secondSamples) = try writeWAV(seconds: 0.5, seed: 47)
+        defer { try? FileManager.default.removeItem(at: secondURL) }
+        let (p, log) = try playback(receiver, flags: "0x4")
+        defer { p.shutdown() }
+        let first = PlayableItem(url: firstURL), second = PlayableItem(url: secondURL)
+        p.nextItemProvider = { $0.id == first.id ? second : nil }
+        p.play(first, at: 0)
+        await wait { log.ended }
+        #expect(log.started == [first.id, second.id])
+        #expect(log.failures.isEmpty)
+        #expect(receiver.streamFormat == Self.deep48)
+        #expect(receiver.methods.filter { $0 == "SETUP" }.count == 2)
+        let heard = receiver.deepSamples
+        #expect(Array(heard.prefix(firstSamples.count)) == firstSamples)
+        let resampled = Double(secondSamples.count / 2) * 48_000 / 44_100
+        #expect(Double(heard.count / 2) >= Double(firstSamples.count / 2) + resampled - 800)
+    }
+
     @Test("A receiver that shows a PIN: paired with once, it plays with the kept keys and shows no PIN again")
     func paired() async throws {
         let receiver = try FakeRAOPReceiver()

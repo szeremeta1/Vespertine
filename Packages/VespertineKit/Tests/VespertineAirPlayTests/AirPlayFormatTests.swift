@@ -83,7 +83,9 @@ struct AirPlayFormatTests {
         #expect(AirPlayFormat.choose(sourceRate: 48_000, wantsDepth: false, accepted: [Self.deep48]) == Self.deep48)
         // 24 bits only at 44.1 kHz: a 96 kHz song keeps its depth there.
         #expect(AirPlayFormat.choose(sourceRate: 96_000, wantsDepth: true, accepted: [Self.deep44]) == Self.deep44)
-        #expect(AirPlayFormat.choose(sourceRate: 96_000, wantsDepth: false, accepted: [Self.deep44]) == .cd)
+        // A 16-bit 48 kHz song that must go at 44.1 kHz is resampled: 24 bits hold what that makes.
+        #expect(AirPlayFormat.choose(sourceRate: 48_000, wantsDepth: false, accepted: [Self.deep44]) == Self.deep44)
+        #expect(AirPlayFormat.choose(sourceRate: 96_000, wantsDepth: false, accepted: [Self.deep44]) == Self.deep44)
         // 48 kHz at 16 bits only: a 24-bit 48 kHz song keeps its rate.
         #expect(AirPlayFormat.choose(sourceRate: 48_000, wantsDepth: true, accepted: [Self.plain48]) == Self.plain48)
         // Nothing at 44.1 kHz but the format every receiver takes.
