@@ -124,7 +124,9 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     case playAlbum(key: String, startAt: Int, shuffled: Bool?)
     /// Plays these songs as a list, from the `startAt`th.
     case playTracks(ids: [Int64], startAt: Int, shuffled: Bool?)
-    case playPlaylist(id: Int64, shuffled: Bool?)
+    /// Plays a playlist from its `startAt`th song (nil, as an older phone sends it: the first), with the playlist's own
+    /// transitions on the Mac. An older Mac ignores `startAt` and plays from the first song.
+    case playPlaylist(id: Int64, startAt: Int? = nil, shuffled: Bool?)
     case playNext(ids: [Int64])
     case addToQueue(ids: [Int64])
     case setFavorite(ids: [Int64], on: Bool)

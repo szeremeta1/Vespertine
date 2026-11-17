@@ -116,6 +116,14 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         remote.playback.stop()
     }
 
+    @Test func aPlaylistPlaysFromTheSongTapped() async throws {
+        // TestFlight feedback tf-7adda59b4b: tapping any song in a playlist played its first song.
+        let (remote, _) = try made()
+        #expect(await remote.run(.playPlaylist(id: 5, startAt: 1, shuffled: nil)) == .ok)
+        #expect(remote.queueState.current?.track.id == 2 && remote.queueState.continuing.isEmpty)
+        remote.playback.stop()
+    }
+
     @Test func theMacsOwnWordsComeBackWhenItCannotListTheSongs() async throws {
         let (remote, _) = try made()
         #expect(await remote.run(.playAlbum(key: "gone", startAt: 0, shuffled: nil)) == .failed(reason: "That isn't in the library any more."))
