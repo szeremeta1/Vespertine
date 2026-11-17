@@ -25,10 +25,10 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private var _resent = 0
     private var stopped = false
     private var sockets: [UDPSocket] = []
-    /// The RTSP connections being served. A descriptor is on this list exactly as long as it is this receiver's: the thread
-    /// that serves it takes it off (under the lock) before it closes it. A closed descriptor's number is at once free to be
-    /// another socket's, of any test running in this process, and must never be touched again.
-    private var clientSockets: [Int32] = []
+    /// The RTSP connections being served. A descriptor is in this ledger exactly as long as it is this receiver's: the thread
+    /// that serves it closes it through the ledger, which forgets it under the same lock. A closed descriptor's number is at
+    /// once free to be another socket's, of any test running in this process, and must never be touched again.
+    private let clientSockets = FakeRAOPSockets()
     /// The event connections accepted (AirPlay 2): nobody reads them, so `stop` closes them.
     private var eventSockets: [Int32] = []
     /// Signalled by each accepting thread when it has closed its listener.
@@ -158,11 +158,11 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     }
 
     func stop() {
-        // Under the lock, so every descriptor touched here is still this receiver's (see `clientSockets`).
+        // Only descriptors still in the ledger are shut down, so each is still this receiver's (see `clientSockets`).
         let (first, socks, events) = lock.withLock { () -> (Bool, [UDPSocket], [UInt16]) in
             guard !stopped else { return (false, [], []) }
             stopped = true
-            for c in clientSockets { shutdown(c, SHUT_RDWR) }
+            clientSockets.stop()
             for c in eventSockets { close(c) }
             eventSockets = []
             return (true, sockets, eventPortsOpened)
@@ -246,7 +246,8 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         Self.accept(on: listener, for: self) { receiver, client in
             var on: Int32 = 1
             setsockopt(client, SOL_SOCKET, SO_NOSIGPIPE, &on, socklen_t(MemoryLayout<Int32>.size))
-            receiver.clientSockets.append(client)
+            // Never refused here: this runs under the lock with the receiver not yet stopped.
+            guard receiver.clientSockets.insert(client) else { return }
             let thread = Thread { receiver.serve(client) }
             thread.start()
         }
@@ -256,11 +257,8 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         var parser = RTSPParser()
         var buffer = [UInt8](repeating: 0, count: 65_536)
         var channel: PairingChannel?
-        // Off the list first, then closed: `stop` shuts down only what is on the list.
-        defer {
-            lock.withLock { clientSockets.removeAll { $0 == fd } }
-            close(fd)
-        }
+        // Forgotten and closed in one step: `stop` shuts down only what the ledger still holds.
+        defer { clientSockets.close(fd) }
         while true {
             let n = read(fd, &buffer, buffer.count)
             guard n > 0 else { return }
@@ -441,12 +439,16 @@ final class FakeRAOPReceiver: @unchecked Sendable {
             guard let plain = RAOPPacket.parseAudio(data) else { return }
             packet = plain
         }
+        // A packet's marker is counted in the same moment its audio is kept (below), never before: a test that waits for the
+        // marker and then reads the audio must find it. Only a packet lost on purpose, whose audio is not kept, counts here.
+        let marked = !resent && data[data.startIndex + 1] == 0xE0
         let lost = lock.withLock { () -> Bool in
-            if !resent, data[data.startIndex + 1] == 0xE0 { _markers += 1; _markerTimestamps.append(packet.timestamp) }
             if !resent { received += 1 }
-            if !resent, _drop.contains(packet.seq) { _drop.remove(packet.seq); return true }
-            if !resent, let l = loseAfter, received > l.count, received <= l.count + l.lose { return true }
-            return false
+            var lost = false
+            if !resent, _drop.contains(packet.seq) { _drop.remove(packet.seq); lost = true }
+            else if !resent, let l = loseAfter, received > l.count, received <= l.count + l.lose { lost = true }
+            if lost, marked { _markers += 1; _markerTimestamps.append(packet.timestamp) }
+            return lost
         }
         if lost {
             let (control, port) = lock.withLock { (controlSocket, clientControl) }
@@ -457,8 +459,10 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         let (key, iv, decoder) = lock.withLock { (aesKey, aesIV, self.decoder) }
         if let key, let iv { try? AESCBC.apply(&payload, key: key, iv: iv, encrypt: false) }
         // The audio and control threads both decode: one at a time.
-        guard let samples = decodeLock.withLock({ try? decoder?.decode(payload) }) else { return }
+        let samples = decodeLock.withLock { try? decoder?.decode(payload) }
         lock.withLock {
+            if marked { _markers += 1; _markerTimestamps.append(packet.timestamp) }
+            guard let samples else { return }
             if _firstTimestamp == nil { _firstTimestamp = packet.timestamp }
             if resent { _resent += 1 }
             _packets[packet.timestamp] = samples
