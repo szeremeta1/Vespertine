@@ -170,8 +170,8 @@ public struct PositionRouter: Hashable, Sendable {
     /// What output channel `output` is made of: the source channels and gains summed into it.
     public func matrixRow(_ output: Int) -> [Tap] { rows.indices.contains(output) ? rows[output] : [] }
 
-    /// The largest sum of gains any output channel adds up (when every channel peaks at once at full scale): the headroom the
-    /// shared preamp must leave. 1 when nothing is mixed.
+    /// The largest sum of gains any output channel adds up (when every channel peaks at once at full scale): how far past
+    /// full scale a fold can drive a speaker, which `GroupFoldLimiter` keeps it from. 1 when nothing is mixed.
     public var worstCaseGain: Float { rows.map { $0.reduce(Float(0)) { $0 + abs($1.gain) } }.max() ?? 0 }
 
     /// Interleaved source frames to interleaved output frames (`outputChannels` wide). An output with a single channel at 1.0 is

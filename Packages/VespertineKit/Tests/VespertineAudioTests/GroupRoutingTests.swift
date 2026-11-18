@@ -214,4 +214,32 @@ struct GroupRoutingTests {
         #expect(abs(Double(out[mid]) - 0.4 * 0.5.squareRoot()) < 1e-4 && abs(Double(out[mid + 1]) - 0.4 * 0.5.squareRoot()) < 1e-4)
         #expect(out[mid + 2] == 0 && out[mid + 3] == 0)
     }
+
+    // MARK: Headroom for a fold
+
+    @Test("A loud 5.1 file on the quad reaches the ring within full scale: the fronts (L + 0.707·C, 1.71 at worst) are limited only while they would clip, the back pair is the file's own, and no frame is added or lost")
+    func decodeLoudSurround() throws {
+        // L, R and C the same sine: a tenth of a second quiet, then at full scale. The surrounds a full-scale sine of their own.
+        func tone(_ hz: Double, _ f: Int) -> Double { sin(2 * .pi * hz * Double(f) / 48_000) }
+        let url = try write(channels: 6, mask: 0x3F, frames: 24_000) { c, f in
+            switch c {
+            case 0, 1, 2: (f < 4_800 ? 0.25 : 0.999) * tone(440, f)
+            case 3: 0
+            default: 0.999 * tone(1_000, f)
+            }
+        }
+        defer { try? FileManager.default.removeItem(at: url) }
+        let (out, plan, _) = try decode(url, group: quad())
+        #expect(plan.channels == 4 && out.count == 24_000 * 4)
+        let k = 0.5.squareRoot()
+        var frontPeak: Float = 0
+        for f in 0..<24_000 {
+            frontPeak = max(frontPeak, abs(out[f * 4]), abs(out[f * 4 + 1]))
+            let surround = Float((0.999 * tone(1_000, f) * 8_388_607).rounded() / 8_388_607)
+            #expect(abs(out[f * 4 + 2] - surround) < 1e-6 && abs(out[f * 4 + 3] - surround) < 1e-6)
+            // The quiet start is the plain fold, in time: nothing is held back or let through early.
+            if f < 4_600 { #expect(abs(Double(out[f * 4]) - (1 + k) * 0.25 * tone(440, f)) < 1e-5) }
+        }
+        #expect(frontPeak <= 1 && frontPeak > 0.95)
+    }
 }

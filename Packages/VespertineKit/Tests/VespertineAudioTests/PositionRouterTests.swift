@@ -118,7 +118,7 @@ struct PositionRouterTests {
         #expect(router.dropped == [3])
     }
 
-    @Test("The worst case a speaker can receive is its row's sum of gains: 1 + 0.707 + 0.707 = 2.414 for the 5.1 fold (+7.7 dB), the shared preamp's measure")
+    @Test("The worst case a speaker can receive is its row's sum of gains: 1 + 0.707 + 0.707 = 2.414 for the 5.1 fold (+7.7 dB), what the fold's limiter guards against")
     func worstCase() throws {
         let router = try makeRouter(surround51, group([(.frontLeft, -30), (.frontRight, 30)]))
         #expect(abs(router.worstCaseGain - (1 + 2 * r)) < 1e-6)

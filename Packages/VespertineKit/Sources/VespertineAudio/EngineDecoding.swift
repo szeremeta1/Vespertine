@@ -40,6 +40,9 @@ final class Decoding {
     /// Room render on a speaker group (`RoomRender`): the converter keeps the song's own channels and this makes the group's of
     /// them, in place of `groupRouter`. Its frames queue in `upmixQueue` (as wide as the group) and go out through `routed`.
     let renderer: RoomRenderer?
+    /// A song folded onto a speaker group so that a speaker gets a sum that can pass full scale: `groupRouter` with a limiter on
+    /// those speakers (`GroupFoldLimiter`), queued and handed out as the renderer's frames are. nil when no speaker can.
+    let foldLimiter: GroupFoldLimiter?
     private var upmixQueue: [Float] = []
     private var upmixFinished = false
     var inputExhausted = false
@@ -84,6 +87,8 @@ final class Decoding {
         self.groupRouter = groupRouter
         self.upmixer = upmixer
         self.renderer = renderer
+        let replayGain: Float = if let db = item.replayGainDB, db != 0, path.plan.mode == .pcm { Float(pow(10, db / 20)) } else { 1 }
+        foldLimiter = groupRouter.flatMap { GroupFoldLimiter(router: $0, sampleRate: path.plan.deviceSampleRate, gain: replayGain) }
         // Integer mode: straight to 32-bit integers (the device takes them as they are).
         let float = upmixer != nil || renderer != nil ? AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: channels, interleaved: true, layout: renderer == nil ? nil : own)
             : groupRouter.flatMap { AudioFormats.float32(sampleRate: path.plan.deviceSampleRate, channels: $0.sourceChannels, interleaved: true, layout: own) }
@@ -114,11 +119,7 @@ final class Decoding {
                                    layout: ChannelLayouts.layout(labels: StereoUpmixer.outputLabels))
                 .flatMap { AVAudioPCMBuffer(pcmFormat: $0, frameCapacity: chunk) }
         if upmixer != nil, upmixed == nil { throw SourceOpenerError.unsupported(item.url) }
-        if let db = item.replayGainDB, db != 0, path.plan.mode == .pcm {
-            gain = Float(pow(10, db / 20))
-        } else {
-            gain = 1
-        }
+        gain = replayGain
     }
 
     var durationSeconds: Double {
@@ -159,6 +160,7 @@ final class Decoding {
     func convertChunk() -> Chunk {
         if let upmixer { return convertUpmixedChunk(upmixer) }
         if let renderer { return convertRenderedChunk(renderer) }
+        if let foldLimiter { return convertRenderedChunk(foldLimiter) }
         let (status, conversionError, waiting) = runConverter()
 
         let frames = output.frameLength
@@ -225,9 +227,9 @@ final class Decoding {
                      error: ended ? (conversionError ?? error) : nil)
     }
 
-    /// Room render: converts until a chunk's worth of the group's frames is ready (or the song ends), then hands that out. As with
-    /// the upmix, the renderer's latency is its own: every source frame comes out, aligned, nothing more.
-    private func convertRenderedChunk(_ renderer: RoomRenderer) -> Chunk {
+    /// Room render, or a fold with its limiter: converts until a chunk's worth of the group's frames is ready (or the song ends),
+    /// then hands that out. As with the upmix, the renderer's latency is its own: every source frame comes out, aligned, nothing more.
+    private func convertRenderedChunk(_ renderer: any GroupRendering) -> Chunk {
         let n = renderer.outputChannels
         guard let routed, let buffer = routed.floatChannelData?[0] else {
             return Chunk(frames: 0, data: nil, ended: true, waiting: false, error: error)
