@@ -48,6 +48,12 @@ public final class RAOPSession: @unchecked Sendable {
     private let sender: AirPlay2Sender
     /// AirPlay 2: what would be sent if the receiver says it takes it (nil: 16-bit at 44.1 kHz, and nothing is asked).
     private let wish: AirPlayWish?
+    /// AirPlay 2: the clock a buffered stream is timed by. Given one, the session sets up a buffered stream of 24-bit
+    /// ALAC at 48 kHz when the song and the receiver both call for it (and a realtime one as ever when they don't); the
+    /// clock is then this session's, started by it and stopped when it closes.
+    private let clock: PTPClock?
+    /// Where the receiver takes the clock's messages (tests give their follower's ports).
+    var clockPeerPorts: (event: UInt16, general: UInt16) = (319, 320)
     /// An AirPlay 2 session: paired first, set up with property lists, its audio sealed, kept open with /feedback.
     private var usesPairing: Bool { if case .none = pairing { false } else { true } }
     private let log = Logger(subsystem: "org.szeremeta.vespertine.player", category: "airplay")
@@ -62,6 +68,8 @@ public final class RAOPSession: @unchecked Sendable {
         /// AirPlay 2: the connection the receiver asks for to tell of events. Nothing it says is used, but a receiver
         /// drops a session that hasn't opened it.
         var events: NWConnection?
+        /// AirPlay 2, a buffered stream: the connection its blocks are written to.
+        var blocks: NWConnection?
         /// AirPlay 2: the key each audio packet is sealed with.
         var audioKey: SymmetricKey?
         /// AirPlay 2, a stream in another format than 16-bit at 44.1 kHz: Apple's encoder for it.
@@ -81,6 +89,10 @@ public final class RAOPSession: @unchecked Sendable {
         var connected = false
         /// What the audio packets hold: 16-bit at 44.1 kHz unless an AirPlay 2 receiver said it takes more and took it.
         var format = AirPlayFormat.cd
+        /// AirPlay 2: the audio goes as the blocks of a buffered stream, played at moments named on the session's clock.
+        var buffered = false
+        /// The next block's number.
+        var block: UInt32 = 0
         var host = ""
         var ports = RAOPTransport(server: 0, control: 0, timing: nil)
         var session: String?
@@ -136,8 +148,9 @@ public final class RAOPSession: @unchecked Sendable {
     /// such a receiver if it says it takes it; without one, or for one that 16-bit at 44.1 kHz serves as well, the
     /// receiver is asked nothing and gets that.
     init(name: String, endpoint: NWEndpoint, encryption: RAOPEncryption, rsaKey: SecKey? = nil, authSetup: Bool = false,
-         password: String? = nil, pairing: AirPlay2Pairing, sender: AirPlay2Sender, wish: AirPlayWish? = nil) {
+         password: String? = nil, pairing: AirPlay2Pairing, sender: AirPlay2Sender, wish: AirPlayWish? = nil, clock: PTPClock? = nil) {
         self.name = name
+        self.clock = clock
         self.pairing = pairing
         self.sender = sender
         self.wish = wish
@@ -155,6 +168,8 @@ public final class RAOPSession: @unchecked Sendable {
         p.keepAlive?.cancel()
         [p.audio, p.control, p.timing].forEach { $0?.close() }
         p.events?.cancel()
+        p.blocks?.cancel()
+        clock?.stop()
         if let rtsp = p.rtsp { Task { await rtsp.close() } }
     }
 
@@ -163,6 +178,8 @@ public final class RAOPSession: @unchecked Sendable {
     /// What the audio packets hold. Settled by `connect`: 16-bit at 44.1 kHz before it, and after it unless the
     /// receiver said it takes the format wished for and then took it.
     public var format: AirPlayFormat { state.withLock { $0.format } }
+    /// The audio goes as a buffered stream. Settled by `connect`.
+    public var isBuffered: Bool { state.withLock { $0.buffered } }
     /// Packets sent again on the receiver's request.
     public var resentPackets: Int { state.withLock { $0.resent } }
 
@@ -272,10 +289,17 @@ public final class RAOPSession: @unchecked Sendable {
         // What the receiver takes is asked before pairing, in the clear, as it answers anyone; and only when there is
         // something to gain by it. No answer, or one that doesn't list the format, leaves 16-bit at 44.1 kHz.
         var format = AirPlayFormat.cd
+        var buffered: AirPlay2Buffered.Kind?
         if let wish, !wish.isPlain {
             let info = try? await request("GET", url: "/info")
             let accepted = info.flatMap { AirPlay2Message.acceptedFormats(info: $0.body) } ?? []
             format = wish.format(accepted: accepted)
+            // A buffered stream when there is a clock for one, the song is one its format serves, and the receiver's
+            // buffered streams take it.
+            let kind = AirPlay2Buffered.Kind.alac48000Deep
+            if clock != nil, wish.format(accepted: [kind.format]) == kind.format, let info, AirPlay2Message.takesBuffered(info: info.body) {
+                buffered = kind
+            }
         }
         let exchange = PairingExchange(connection: rtsp, cseq: state.withLock { $0.cseq })
         let secret: Data
@@ -287,6 +311,10 @@ public final class RAOPSession: @unchecked Sendable {
         let next = await exchange.cseq
         state.withLock { $0.cseq = next }
         guard let audioKey = AirPlay2Audio.key(secret: secret) else { throw RAOPError.badResponse("SETUP") }
+        if let buffered, let clock {
+            try await setUpBuffered(host: host, key: audioKey, kind: buffered, clock: clock)
+            return
+        }
         let timing = try UDPSocket(), control = try UDPSocket(), audio = try UDPSocket()
         parts.withLock { $0.timing = timing; $0.control = control; $0.audio = audio; $0.audioKey = SymmetricKey(data: audioKey) }
         state.withLock { $0.sealed = 0 }
@@ -316,6 +344,44 @@ public final class RAOPSession: @unchecked Sendable {
         if chosen != .cd { streamEncoder = try? ALACEncoder(config: chosen.alac) }
         parts.withLock { $0.streamEncoder = streamEncoder }
         state.withLock { $0.ports = RAOPTransport(server: ports.data, control: ports.control, timing: nil); $0.format = chosen }
+    }
+
+    /// A buffered stream in place of the realtime one: the receiver is told of this Mac's clock, the clock starts telling
+    /// it the time, and the blocks get a connection of their own. Anything refused on the way is thrown: there is no
+    /// going back to a realtime stream within the session (the caller opens another, without a clock).
+    private func setUpBuffered(host: String, key: Data, kind: AirPlay2Buffered.Kind, clock: PTPClock) async throws {
+        let local = parts.withLock { $0.localAddress }
+        parts.withLock { $0.audioKey = SymmetricKey(data: key) }
+        state.withLock { $0.sealed = 0; $0.block = 0 }
+        let plist = [("Content-Type", AirPlay2Message.contentType)]
+        let introduced = try await request("SETUP", headers: plist, body: AirPlay2Message.bufferedSessionSetup(sender: sender, sessionUUID: UUID(), groupUUID: UUID(),
+                                                                                                         addresses: [local]))
+        guard let eventPort = AirPlay2Message.eventPort(in: introduced.body) else { throw RAOPError.badResponse("SETUP") }
+        let events = try await Self.openEvents(host: host, port: eventPort)
+        parts.withLock { $0.events = events }
+        _ = try await request("SETPEERS", headers: plist, body: AirPlay2Message.peers([local, host]))
+        let ports = clockPeerPorts
+        clock.setPeers([PTPClock.Peer(host: host, eventPort: ports.event, generalPort: ports.general)])
+        clock.start()
+        let stream = try await request("SETUP", headers: plist, body: AirPlay2Message.bufferedStreamSetup(key: key, connectionID: sessionID, kind: kind))
+        guard let answer = AirPlay2Message.bufferedStream(in: stream.body) else { throw RAOPError.badResponse("SETUP") }
+        let blocks = try await Self.openEvents(host: host, port: answer.dataPort)
+        let streamEncoder = try? ALACEncoder(config: kind.format.alac)
+        parts.withLock { $0.blocks = blocks; $0.streamEncoder = streamEncoder }
+        state.withLock { $0.ports = RAOPTransport(server: answer.dataPort, control: 0, timing: nil); $0.format = kind.format; $0.buffered = true }
+    }
+
+    /// SETRATEANCHORTIME: the frame the stream is anchored at sounds its latency after the moment it was anchored, on the
+    /// session's clock (whose time is this Mac's uptime).
+    private func sendAnchor() async {
+        guard let clock, let (rtp, nanos, format) = state.withLock({ s in s.anchor.map { ($0.rtp, $0.nanos, s.format) } }) else { return }
+        let lead = UInt64(format.latencyFrames) * 1_000_000_000 / UInt64(format.sampleRate)
+        let body = AirPlay2Message.play(rtpTime: rtp, at: AirPlay2NetworkTime(nanoseconds: nanos &+ lead), clock: clock.identity)
+        do {
+            _ = try await request("SETRATEANCHORTIME", headers: [("Content-Type", AirPlay2Message.contentType)], body: body)
+        } catch {
+            log.error("AirPlay \(self.name, privacy: .public) was not told when to play: \(String(describing: error), privacy: .public)")
+        }
     }
 
     /// The event connection, open and being read (what arrives is sealed, and dropped unread).
@@ -380,6 +446,12 @@ public final class RAOPSession: @unchecked Sendable {
             s.anchor = nil
             return (s.seq, s.head)
         }
+        if let block = state.withLock({ s -> UInt32? in s.buffered ? s.block : nil }) {
+            // A buffered stream: everything before the next block is dropped, and the next block is anchored anew.
+            _ = try await request("FLUSHBUFFERED", headers: [("Content-Type", AirPlay2Message.contentType)],
+                                  body: AirPlay2Message.flushBuffered(untilSequence: block, untilTimestamp: head))
+            return
+        }
         _ = try await request("FLUSH", headers: [("RTP-Info", "seq=\(seq);rtptime=\(head)")])
     }
 
@@ -395,6 +467,8 @@ public final class RAOPSession: @unchecked Sendable {
         state.withLock { $0.connected = false }
         [p.audio, p.control, p.timing].forEach { $0?.close() }
         p.events?.cancel()
+        p.blocks?.cancel()
+        clock?.stop()
         await p.rtsp?.close()
     }
 
@@ -424,6 +498,8 @@ public final class RAOPSession: @unchecked Sendable {
                     let p = self.parts.withLock { p -> Parts in defer { p.keepAlive = nil }; return p }
                     [p.audio, p.control, p.timing].forEach { $0?.close() }
                     p.events?.cancel()
+                    p.blocks?.cancel()
+                    self.clock?.stop()
                     await p.rtsp?.close()
                     self.onLost?()
                     return
@@ -483,6 +559,25 @@ public final class RAOPSession: @unchecked Sendable {
             guard (try? AESCBC.apply(&payload, key: key, iv: iv, encrypt: true)) != nil else { return false }
         }
         let audioKey = parts.withLock { $0.audioKey }
+        if let kind = AirPlay2Buffered.Kind(format: format), isBuffered {
+            guard let audioKey, let blocks = parts.withLock({ $0.blocks }) else { return false }
+            let (block, first) = state.withLock { s -> (Data, Bool) in
+                let first = s.first
+                if first { s.anchor = (s.head, startNanos) }
+                let block = (try? AirPlay2Buffered.block(sequence: s.block, timestamp: s.head, kind: kind, payload: payload, key: audioKey, counter: s.sealed)) ?? Data()
+                s.sealed += 1
+                s.block = (s.block &+ 1) & AirPlay2Buffered.sequenceMask
+                s.head &+= UInt32(RAOPTiming.framesPerPacket)
+                s.first = false
+                s.lastAudio = NTPClock.nanosecondsNow()
+                return (block, first)
+            }
+            guard !block.isEmpty else { return false }
+            blocks.send(content: block, completion: .contentProcessed { _ in })
+            // The first block after RECORD or a flush says when it plays.
+            if first { Task { [weak self] in await self?.sendAnchor() } }
+            return true
+        }
         let (packet, first, host, port) = state.withLock { s -> (Data, Bool, String, UInt16) in
             let first = s.first
             if first { s.anchor = (s.head, startNanos) }
@@ -508,6 +603,8 @@ public final class RAOPSession: @unchecked Sendable {
 
     /// A sync packet (about once a second while playing).
     public func sendSync(first: Bool = false) {
+        // A buffered stream has no sync packets: its moments are named on the clock.
+        guard !isBuffered else { return }
         let nanos = NTPClock.nanosecondsNow()
         guard let rtp = clockTimestamp(nanoseconds: nanos) else { return }
         let (host, port, latency) = state.withLock { ($0.host, $0.ports.control, $0.format.syncLatencyFrames) }
