@@ -1,5 +1,6 @@
 //
-// Vespertine Remote: the Mac's outputs, as its output list shows them; choosing one plays there.
+// Vespertine Remote: the Output screen: who plays (the Mac or this device), and what belongs to whoever does: the Mac's
+// outputs as its output list shows them, or this device's own output and sound.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
@@ -20,41 +21,28 @@ struct OutputsView: View {
     var body: some View {
         NavigationStack {
             List {
-                if PlayMode.offersSwitch(share: session.isShare) {
-                    Section {
-                        PlayModeSwitch(session: session)
-                            .listRowInsets(EdgeInsets())
-                            .listRowBackground(Color.clear)
-                    } header: {
-                        Text("Music Plays On")
-                    } footer: {
-                        Text(PlayModeSwitch.explanation(PlayMode.current(playsHere: playsHere), mac: session.server?.name ?? session.pairing.name))
-                    }
-                }
+                // Only what belongs to whoever plays: this device's own output and sound while it plays, the Mac's
+                // outputs while the Mac does. The switch above the list is the one place that changes who plays.
+                if OutputLayout.showsThisDevice(playsHere: playsHere, share: session.isShare) {
                 Section {
                     HStack(spacing: 4) {
-                        Button { PlayTarget.shared.choose(thisDevice: true) } label: {
-                            HStack {
-                                Image(systemName: UIDevice.current.userInterfaceIdiom == .pad ? "ipad" : "iphone")
-                                    .rowIconColumn()
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text(PlayTarget.deviceName)
-                                    Text(hereDetail).font(.caption).foregroundStyle(Color.secondary)
-                                }
-                                Spacer()
-                                if playsHere { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
+                        HStack {
+                            Image(systemName: UIDevice.current.userInterfaceIdiom == .pad ? "ipad" : "iphone")
+                                .rowIconColumn()
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(hereName)
+                                if let rate = hereRate { Text(rate).font(.caption.monospaced()).foregroundStyle(Color.secondary) }
                             }
-                            .contentShape(Rectangle())
+                            Spacer()
                         }
-                        .buttonStyle(.plain)
-                        .disabled(!PlayTarget.shared.canPlayHere(session))
-                        .accessibilityAddTraits(playsHere ? .isSelected : [])
+                        .accessibilityElement(children: .combine)
                         // Where this device's sound goes (AirPlay, Bluetooth, a DAC): the system's own list, a tap away.
                         if RoutePickerPlacement.shows(playsHere: playsHere) {
                             RoutePickerButton().frame(width: 44, height: 44)
                                 .accessibilityIdentifier("airplay")
                         }
                     }
+                    .accessibilityIdentifier("output-this-device")
                     if playsHere {
                         // Off, or Spatial Audio: iOS renders it, Fixed or Head Tracked as chosen in Control Center.
                         Picker("Surround on Headphones", selection: Binding(get: {
@@ -64,6 +52,8 @@ struct OutputsView: View {
                             Text("Spatial Audio").tag(SpatialModeChoice.fixed)
                         }
                     }
+                } header: {
+                    Text(verbatim: PlayTarget.deviceName)
                 } footer: {
                     if session.isFolder {
                         Text("This device plays the songs from the folder itself, through its speaker, headphones or a DAC. Surround songs (5.1, 7.1, Dolby Atmos) go to iOS with all their channels, and iOS plays them as Spatial Audio on AirPods and Beats that have it on, as Apple Music does; choose Fixed or Head Tracked in Control Center (touch and hold the volume slider). Other headphones get Vespertine’s own fixed rendering. On speakers, or when this is Off, they’re folded to stereo.")
@@ -72,6 +62,7 @@ struct OutputsView: View {
                     } else {
                         Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched. Surround songs (5.1, 7.1, Dolby Atmos) go to iOS with all their channels, and iOS plays them as Spatial Audio on AirPods and Beats that have it on, as Apple Music does; choose Fixed or Head Tracked in Control Center (touch and hold the volume slider). Other headphones get Vespertine’s own fixed rendering. On speakers, or when this is Off, they’re folded to stereo.")
                     }
+                }
                 }
                 if playsHere {
                     Section {
@@ -103,10 +94,10 @@ struct OutputsView: View {
                 } else if session.isShare {
                     if let share = model.openShare { shareSection(share) }
                 } else {
+                    if OutputLayout.showsMacOutputs(playsHere: playsHere, share: session.isShare) {
                     Section {
                         ForEach(Array((session.outputs?.outputs ?? []).enumerated()), id: \.offset) { _, output in
                             Button {
-                                PlayTarget.shared.choose(thisDevice: false)
                                 feedback.run(session, .selectOutput(uid: output.uid))
                             } label: {
                                 HStack {
@@ -117,22 +108,25 @@ struct OutputsView: View {
                                         Text(output.detail).font(.caption.monospaced()).foregroundStyle(output.ready ? Color.secondary : Color.orange)
                                     }
                                     Spacer()
-                                    if output.selected, !playsHere { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
+                                    if output.selected { Image(systemName: "checkmark").foregroundStyle(Color.accentColor) }
                                 }
                                 .contentShape(Rectangle())
                             }
                             .buttonStyle(.plain)
-                            .accessibilityAddTraits(output.selected && !playsHere ? .isSelected : [])
+                            .accessibilityAddTraits(output.selected ? .isSelected : [])
                         }
+                    } header: {
+                        Text(verbatim: macName)
                     } footer: {
                         Text("Choose one of these and Vespertine on the Mac plays there.")
                     }
-                    // The sound of the output the Mac plays to, while the Mac is what plays.
-                    if !playsHere, let player = session.player, let sound = player.sound, !sound.isEmpty {
+                    // The sound of the output the Mac plays to.
+                    if let player = session.player, let sound = player.sound, !sound.isEmpty {
                         MacSoundSection(session: session, sound: sound, output: player.output, feedback: feedback)
                     }
+                    }
                     Section {
-                        LabeledContent("Mac", value: session.server?.name ?? session.pairing.name)
+                        LabeledContent("Mac", value: macName)
                         if let version = session.server?.appVersion, !version.isEmpty {
                             LabeledContent("Vespertine", value: version)
                         }
@@ -151,7 +145,13 @@ struct OutputsView: View {
                 }
                 }
             .obsidianList()
-            .navigationTitle("Output").screenTitleStyle()
+            // Above the list, not a row of it: a row is cut to the list's own rounded corners, which sliced the ends off
+            // the switch. Here it keeps its shape and stays in sight while the list scrolls.
+            .safeAreaInset(edge: .top, spacing: 0) {
+                if PlayMode.offersSwitch(share: session.isShare) { switchBar }
+            }
+            // A small title: under a large one the pinned switch sat below a tall, empty band.
+            .navigationTitle("Output").navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 // On an iPad's wide window the gear and "Libraries" are in the window's own bars.
                 if sizeClass != .regular {
@@ -176,6 +176,31 @@ struct OutputsView: View {
     }
 
     private var playsHere: Bool { session.phone != nil }
+    private var macName: String { session.server?.name ?? session.pairing.name }
+
+    /// "Music Plays On", the Mac / This iPhone switch, and a line on what the chosen one means.
+    private var switchBar: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Music Plays On")
+                .font(.footnote.weight(.semibold)).foregroundStyle(Palette.text2)
+                .accessibilityAddTraits(.isHeader)
+            PlayModeSwitch(session: session)
+            Text(switchNote)
+                .font(.footnote).foregroundStyle(Palette.text2)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .dynamicTypeSize(...RemoteLayout.bannerLargestText)
+        .frame(maxWidth: 560, alignment: .leading)
+        .padding(.horizontal, 20).padding(.top, 6).padding(.bottom, 10)
+        .frame(maxWidth: .infinity)
+        .background(Palette.base)
+    }
+
+    /// Under the switch: what the chosen side means, or why this device can't be chosen.
+    private var switchNote: String {
+        if session.isConnected, !PlayTarget.shared.canPlayHere(session) { return String(localized: "Update Vespertine on the Mac to play here.") }
+        return PlayModeSwitch.explanation(PlayMode.current(playsHere: playsHere), mac: macName)
+    }
 
     /// The share the songs come from: where it is, whether it answers, what the last scan found, and scanning again.
     @ViewBuilder private func shareSection(_ share: SavedShare) -> some View {
@@ -275,12 +300,13 @@ struct OutputsView: View {
         }
     }
 
-    /// Under "This iPhone": where its sound goes now, or why it can't play here.
-    private var hereDetail: String {
-        if session.isDemo, session.phone == nil { return String(localized: "Plays the demo’s made-up songs with sound") }
-        guard session.canStream || session.isDemo else { return String(localized: "Update Vespertine on the Mac to play here.") }
-        guard let route = session.phone?.route else { return String(localized: "Plays through this device") }
-        return route.sampleRate > 0 ? "\(route.name) · \(PhoneSignal.kilohertz(route.sampleRate)) kHz" : route.name
+    /// Where this device's sound goes now: the output's name as iOS gives it.
+    private var hereName: String { session.phone?.route?.name ?? String(localized: "Plays through this device") }
+
+    /// The rate that output runs at, when iOS says.
+    private var hereRate: String? {
+        guard let route = session.phone?.route, route.sampleRate > 0 else { return nil }
+        return String(localized: "\(PhoneSignal.kilohertz(route.sampleRate)) kHz", comment: "Signal chip: a sample rate.")
     }
 
     /// How the Mac is reached now.

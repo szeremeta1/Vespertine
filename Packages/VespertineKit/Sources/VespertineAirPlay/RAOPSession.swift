@@ -196,6 +196,10 @@ public final class RAOPSession: @unchecked Sendable {
 
     private var url: String { "rtsp://\(parts.withLock { $0.localAddress })/\(sessionID)" }
 
+    /// What every request says sent it. An Apple TV (tvOS 27) answers 403 to anything whose User-Agent doesn't begin
+    /// with "AirPlay/", /info included: with another product named first it refused every session.
+    static let userAgent = "AirPlay/550.10"
+
     private func request(_ method: String, url: String? = nil, headers extra: [(String, String)] = [], body: Data = Data()) async throws -> RTSPMessage {
         guard let rtsp else { throw RAOPError.closed }
         let target = url ?? self.url
@@ -208,7 +212,7 @@ public final class RAOPSession: @unchecked Sendable {
                 defer { s.cseq += 1 }
                 return (s.cseq, s.session, s.challenge, s.uppercaseDigest)
             }
-            var headers: [(String, String)] = [("CSeq", String(cseq)), ("User-Agent", "Vespertine/1 AirPlay/366.0"),
+            var headers: [(String, String)] = [("CSeq", String(cseq)), ("User-Agent", Self.userAgent),
                                                ("Client-Instance", clientInstance), ("DACP-ID", clientInstance), ("Active-Remote", activeRemote)]
             if let session { headers.append(("Session", session)) }
             if let challenge, let password {

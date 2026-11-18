@@ -51,6 +51,9 @@ public struct DoPKnownDAC: Codable, Sendable, Hashable, Identifiable {
     /// a few words on what it shows. JSON has no comments, so this is the comment field. No source, no entry.
     public var source: String
     public var note: String?
+    /// DoP carrier rates (Hz) this DAC was found not to play although it offers them as PCM rates: DSD that would need
+    /// one is converted to PCM for it instead of being sent natively into silence. Left out when none are known.
+    public var noDoPCarriers: [Double]? = nil
 
     var vendorProductIDs: (UInt16, UInt16)? { DoPDACList.hex(usbVendorID).flatMap { v in DoPDACList.hex(usbProductID).map { (v, $0) } } }
     var hasNamePair: Bool { !(uidVendor ?? "").isEmpty && !(uidProduct ?? "").isEmpty }

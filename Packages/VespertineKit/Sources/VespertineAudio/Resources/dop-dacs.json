@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "revision": 1,
+  "revision": 2,
   "comment": "DACs confirmed to decode DoP, and makers known for DSD DACs. Every entry needs an https source saying where the claim comes from. Matching never uses the unit serial. See docs/DOP-AUTO-SETUP.md.",
   "dacs": [
     {
@@ -10,7 +10,8 @@
       "uidProduct": "FiiO K11",
       "evidence": "hardware",
       "source": "https://github.com/szeremeta1/Vespertine/blob/main/docs/DEVICES.md (DSD to DSD128 played over DoP on a K11; the old allow list entry); FiiO's own spec page https://www.fiio.com/k11_parameters lists DSD256 over USB",
-      "note": "Was in DoPDefaults.knownDoPPrefixes before this list existed."
+      "note": "Was in DoPDefaults.knownDoPPrefixes before this list existed. noDoPCarriers: on 2026-11-18 a K11 played DoP at the 176.4 and 352.8 kHz carriers and stayed silent at 192 and 384 kHz (DSD at 3.072 and 6.144 MHz, the 48 kHz family), heard by a microphone at its speakers, one pass (docs/DEVICES.md).",
+      "noDoPCarriers": [192000, 384000]
     },
     {
       "id": "fosi-audio-zd3",

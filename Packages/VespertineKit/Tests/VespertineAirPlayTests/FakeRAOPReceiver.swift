@@ -332,6 +332,8 @@ final class FakeRAOPReceiver: @unchecked Sendable {
         var headers: [(String, String)] = [("CSeq", cseq), ("Server", "AirTunes/366.0")]
         if let wait = stall[request.method ?? ""] { Thread.sleep(forTimeInterval: wait) }
         if let status = refuse[request.method ?? ""] { return .response(status, "Refused", headers: headers) }
+        // As an Apple TV does: a sender that names something other than AirPlay first is refused whatever it asks.
+        if let sender = request["User-Agent"], !sender.hasPrefix("AirPlay/") { return .response(403, "Forbidden", headers: headers) }
         if let password {
             let (nonce, capitals) = lock.withLock { () -> (String, Bool) in
                 if nonceLife > 0, nonceUses >= nonceLife { nonceCount += 1; nonceUses = 0 }
