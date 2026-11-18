@@ -218,6 +218,8 @@ public final class PhoneRemote {
             if output.route != oldValue.route { applySurround() }
             // The volume and the output decide together whether a DAC is sent DoP: told once, with both as they are now.
             if output.route != oldValue.route || output.volume != oldValue.volume { playback.outputChanged() }
+            // A new output may want a song's other version: the songs still to come follow it.
+            if output.route != oldValue.route { followOutput() }
         }
     }
     /// Where the sound goes.
@@ -242,7 +244,35 @@ public final class PhoneRemote {
     public var dopCeiling: Double? { DoPGate.ceiling(route: route, volume: outputVolume, dacs: dopDACs) }
     /// How you want surround songs played: folded to stereo until you choose a rendering for headphones. The output
     /// decides what it gets (`PhoneRoute.surroundMode`).
-    public var surroundChoice: SpatialModeChoice = .off { didSet { applySurround() } }
+    public var surroundChoice: SpatialModeChoice = .off { didSet { applySurround(); if surroundChoice != oldValue { followOutput() } } }
+    /// A song the library has in stereo and in surround plays as the version for this phone's output (`PhoneVersions`).
+    /// Off, every song plays as the version asked for.
+    public var combinesVersions = true { didSet { if combinesVersions != oldValue { followOutput() } } }
+    /// Whether the output gets a song's surround version (`PhoneRoute.wantsSurround`): stereo while nothing is known of it.
+    public var wantsSurround: Bool {
+        route?.wantsSurround(wanted: surroundChoice, canTrackHead: playback.player.canTrackHead) ?? false
+    }
+    /// The songs of the queue that play as picked by hand (the copies sheet): the output leaves them alone.
+    @ObservationIgnored private var pinned = Set<Int64>()
+    /// The album the queue was started as (`PhoneVersions.album`), while everything added since is of it too.
+    @ObservationIgnored private var queueAlbum: String?
+
+    /// `tracks` as the versions that play on this output.
+    private func versions(_ tracks: [TrackSummary], startAt index: Int? = nil) -> (tracks: [TrackSummary], startAt: Int?) {
+        guard combinesVersions else { return (tracks, index) }
+        return PhoneVersions.resolve(tracks, surround: wantsSurround, startAt: index)
+    }
+
+    /// The output changed: the songs still to come become the versions for it. The song playing stays as it is.
+    private func followOutput() {
+        guard combinesVersions else { return }
+        let surround = wantsSurround, pinned = pinned
+        let oneAlbum = queueAlbum
+        playback.retrackUpcoming { entry in
+            guard let id = entry.track.id, !pinned.contains(id) else { return nil }
+            return PhoneVersions.changed(entry.track, surround: surround, oneAlbum: oneAlbum)
+        }
+    }
 
     /// What iOS says it renders the app's audio as.
     public var systemRendering: SystemRenderingMode? {
@@ -321,20 +351,24 @@ public final class PhoneRemote {
         case .clearUpcoming: playback.clearUpcoming()
 
         case .playAlbum(let key, let startAt, let shuffled):
-            return await play(.albumTracks(key: key)) { self.playback.play($0, startAt: startAt, shuffled: shuffled) }
+            return await play(.albumTracks(key: key)) { self.start($0, startAt: startAt, shuffled: shuffled) }
         case .playTracks(let ids, let startAt, let shuffled):
-            return await play(.tracks(ids: ids)) { self.playback.play($0, startAt: startAt, shuffled: shuffled) }
+            return await play(.tracks(ids: ids)) { self.start($0, startAt: startAt, shuffled: shuffled) }
         case .playCopy(let ids, let startAt):
-            // The songs by their own IDs are the very copies asked for.
-            return await play(.tracks(ids: ids)) { self.playback.play($0, startAt: startAt, shuffled: false) }
+            // The songs by their own IDs are the very copies asked for, whatever the output: they stay those copies.
+            return await play(.tracks(ids: ids)) {
+                self.pinned = Set($0.compactMap(\.id))
+                self.queueAlbum = nil
+                self.playback.play($0, startAt: startAt, shuffled: false)
+            }
         case .playPlaylist(let id, let startAt, let shuffled):
             // A page at a time: a long playlist in one reply would be more than a message holds.
             let songs = await PlaylistPages.load(id: id, ask: library)
-            return await play(songs) { self.playback.play($0, startAt: startAt ?? 0, shuffled: shuffled) }
+            return await play(songs) { self.start($0, startAt: startAt ?? 0, shuffled: shuffled) }
         case .playNext(let ids):
-            return await play(.tracks(ids: ids)) { self.playback.playNext($0) }
+            return await play(.tracks(ids: ids)) { self.playback.playNext(self.adding($0)) }
         case .addToQueue(let ids):
-            return await play(.tracks(ids: ids)) { self.playback.addToQueue($0) }
+            return await play(.tracks(ids: ids)) { self.playback.addToQueue(self.adding($0)) }
         case .playAlbums(let keys, let shuffled):
             var all: [TrackSummary] = []
             for key in keys {
@@ -345,7 +379,7 @@ public final class PhoneRemote {
                 }
             }
             guard !all.isEmpty else { return .failed(reason: "") }
-            playback.play(all, shuffled: shuffled)
+            start(all, shuffled: shuffled)
 
         case .volume, .setVolume, .setTransitions:
             // The phone's volume is the phone's own (its buttons); transitions are the Mac player's.
@@ -354,6 +388,24 @@ public final class PhoneRemote {
             return await library(command)
         }
         return .ok
+    }
+
+    /// Starts `tracks` in place of the queue, each song as the version for this output.
+    private func start(_ tracks: [TrackSummary], startAt index: Int = 0, shuffled: Bool? = nil) {
+        pinned = []
+        queueAlbum = PhoneVersions.album(of: tracks)
+        let playing = versions(tracks, startAt: index)
+        playback.play(playing.tracks, startAt: playing.startAt ?? 0, shuffled: shuffled)
+    }
+
+    /// Songs added to the queue, each as the version for this output.
+    private func adding(_ tracks: [TrackSummary]) -> [TrackSummary] {
+        if playback.queue.entries.isEmpty { queueAlbum = PhoneVersions.album(of: tracks) }
+        else if let album = queueAlbum, tracks.contains(where: { $0.albumKey != album }) { queueAlbum = nil }
+        let playing = versions(tracks).tracks
+        // A song that went to another edition takes the queue off the one album.
+        if let album = queueAlbum, playing.contains(where: { $0.albumKey != album }) { queueAlbum = nil }
+        return playing
     }
 
     private func play(_ ask: RemoteCommand, then start: ([TrackSummary]) -> Void) async -> RemoteReply {

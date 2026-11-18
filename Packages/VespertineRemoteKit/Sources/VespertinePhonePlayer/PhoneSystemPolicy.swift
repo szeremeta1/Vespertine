@@ -279,6 +279,13 @@ extension PhoneRoute {
         return wanted == .headTracked && !(spatial && canTrackHead) ? .fixed : wanted
     }
 
+    /// Whether a song the library has in stereo and in surround plays as its surround version here: on an interface or a
+    /// receiver with more than two outputs (running with them now or not), and on headphones that get surround rendered
+    /// for them. Everything else gets the stereo version, not a fold of the surround one.
+    public func wantsSurround(wanted: SpatialModeChoice, canTrackHead: Bool = true) -> Bool {
+        ((isUSB || portType == "HDMI") && maximumChannels > 2) || surroundMode(wanted: wanted, canTrackHead: canTrackHead) != .off
+    }
+
     /// The rate to ask iOS for so `streamRate` isn't resampled: only on outputs that can change rate (a USB DAC, the
     /// headphone adapter), and only when they aren't there already. iOS may still decline: the app reads back what it got.
     public func rateToAsk(for streamRate: Double) -> Double? {

@@ -17,6 +17,9 @@ final class AppSettings {
     /// Songs may be fetched from the Mac over cellular data when music plays on this device. Off unless turned on:
     /// streaming lossless music can use a lot of a data plan, so the person opts in. A choice already made is kept.
     var cellularPlayback: Bool { didSet { defaults.set(cellularPlayback, forKey: Keys.cellular) } }
+    /// A song the library has in stereo and in surround is one song: it plays on this device as the version for the
+    /// output, and a share or a folder lists it once. On unless turned off.
+    var combineVersions: Bool { didSet { defaults.set(combineVersions, forKey: Keys.versions) } }
     var albumsLayout: AlbumsLayout { didSet { defaults.set(albumsLayout.rawValue, forKey: Keys.albums) } }
 
     @ObservationIgnored private let defaults: UserDefaults
@@ -26,14 +29,16 @@ final class AppSettings {
         static let tilt = "coverFlowTilt"
         static let albums = "albumsLayout"
         static let cellular = "cellularPlayback"
+        static let versions = "combineVersions"
     }
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        defaults.register(defaults: [Keys.vinyl: false, Keys.tilt: true, Keys.albums: AlbumsLayout.grid.rawValue, Keys.cellular: false])
+        defaults.register(defaults: [Keys.vinyl: false, Keys.tilt: true, Keys.albums: AlbumsLayout.grid.rawValue, Keys.cellular: false, Keys.versions: true])
         vinyl = defaults.bool(forKey: Keys.vinyl)
         tiltParallax = defaults.bool(forKey: Keys.tilt)
         cellularPlayback = defaults.bool(forKey: Keys.cellular)
+        combineVersions = defaults.bool(forKey: Keys.versions)
         albumsLayout = AlbumsLayout(rawValue: defaults.string(forKey: Keys.albums) ?? "") ?? .grid
     }
 }

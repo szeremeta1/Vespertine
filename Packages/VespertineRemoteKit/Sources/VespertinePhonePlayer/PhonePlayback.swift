@@ -272,6 +272,12 @@ public final class PhonePlayback {
         if let entry = queue.jump(to: entry) { start(entry) }
     }
 
+    /// Gives songs still to come another track (`PhoneQueue.retrackUpcoming`): a song's other version, when the output
+    /// changed. The song playing carries on as it is; one lined up to follow it is lined up again.
+    public func retrackUpcoming(_ change: (PhoneQueue.Entry) -> TrackSummary?) {
+        if queue.retrackUpcoming(change) { queueChanged() }
+    }
+
     // MARK: Between launches
 
     /// Puts back a queue kept from an earlier launch: its song shows as paused at the place it was left, and nothing is

@@ -22,6 +22,13 @@ public struct ShareCatalog: Sendable {
     /// Where each album's cover is: a picture file in its folder, or the song whose file carries one.
     public private(set) var covers: [String: Cover] = [:]
 
+    /// For a song the share has in stereo and in surround: each version's other one (`ShareVersions`). Empty while
+    /// versions aren't combined.
+    public private(set) var otherLayout: [Int64: Int64] = [:]
+    /// The surround versions of those songs: lists of songs show the song once, as its stereo version, and the output
+    /// picks the one that plays.
+    public private(set) var unlisted: Set<Int64> = []
+
     public enum Cover: Sendable, Equatable {
         case file(path: String)
         case embedded(song: Int64)
@@ -29,7 +36,8 @@ public struct ShareCatalog: Sendable {
 
     public init() {}
 
-    public init(_ library: ShareLibrary, favorites: Set<Int64> = [], words: ShareWords = .english) {
+    /// `combinesVersions`: a song in stereo and in surround is one song (`ShareVersions`); false, every file is its own.
+    public init(_ library: ShareLibrary, favorites: Set<Int64> = [], words: ShareWords = .english, combinesVersions: Bool = true) {
         // A folder whose songs name one album and several artists, with no album artist, is a compilation.
         var artistsByAlbum: [String: Set<String>] = [:]
         for song in library.songs where song.tags.albumArtist == nil {
@@ -86,7 +94,8 @@ public struct ShareCatalog: Sendable {
                 songs[song.id] = song
                 tracks[song.id] = TrackSummary(id: song.id, title: member.title, artist: member.artist, album: member.album, albumKey: key,
                                                duration: song.tags.duration, trackNumber: member.track, discNumber: song.tags.disc,
-                                               format: Self.format(song.tags), artworkKey: artworkKey, favorite: favorites.contains(song.id))
+                                               format: Self.format(song.tags), artworkKey: artworkKey, favorite: favorites.contains(song.id),
+                                               surround: song.tags.channels > 2)
             }
             // The album is described by its best file: a 24/96 album with one 16/44.1 bonus track is a 24/96 album.
             let best = members.map(\.song.tags).max { Self.weight($0) < Self.weight($1) } ?? first.song.tags
@@ -105,6 +114,37 @@ public struct ShareCatalog: Sendable {
             if let x = a.summary.year, let y = b.summary.year, x != y { return x < y }
             return before(a.summary.title, b.summary.title) == .orderedAscending
         }
+        if combinesVersions { combineVersions() }
+    }
+
+    /// Pairs each song's stereo and surround versions (`ShareVersions.pairs`): each is told of the other, a heart on one
+    /// is a heart on both, and the surround one leaves the lists of songs.
+    private mutating func combineVersions() {
+        let candidates = albums.flatMap { album in
+            album.tracks.compactMap { id -> ShareVersions.Candidate? in
+                guard let track = tracks[id], let song = songs[id] else { return nil }
+                return .init(id: id, artist: album.summary.artist, album: album.summary.title, albumKey: album.summary.key, title: track.title,
+                             disc: track.discNumber, number: track.trackNumber, duration: track.duration, surround: song.tags.channels > 2)
+            }
+        }
+        for (stereo, surround) in ShareVersions.pairs(candidates) {
+            guard let a = tracks[stereo], let b = tracks[surround] else { continue }
+            otherLayout[stereo] = surround
+            otherLayout[surround] = stereo
+            unlisted.insert(surround)
+            let favorite = a.favorite || b.favorite
+            tracks[stereo]?.favorite = favorite
+            tracks[surround]?.favorite = favorite
+            tracks[stereo]?.otherLayout = TrackVersion(id: surround, album: b.album, albumKey: b.albumKey, duration: b.duration, format: b.format, artworkKey: b.artworkKey)
+            tracks[surround]?.otherLayout = TrackVersion(id: stereo, album: a.album, albumKey: a.albumKey, duration: a.duration, format: a.format, artworkKey: a.artworkKey)
+        }
+    }
+
+    /// `ids` and, for a song in two versions, its other version: a heart is the song's.
+    public func withVersions(_ ids: [Int64]) -> [Int64] {
+        var all = ids
+        for id in ids { if let other = otherLayout[id], !all.contains(other) { all.append(other) } }
+        return all
     }
 
     // MARK: Words and keys
@@ -165,6 +205,25 @@ public struct ShareCatalog: Sendable {
 
     public var allTracks: [TrackSummary] { albums.flatMap(\.tracks).compactMap { tracks[$0] } }
 
+    /// The songs as lists of songs show them (Songs, Favorites, search): a song in stereo and in surround once, as its
+    /// stereo version, with both versions beside it as its copies.
+    public var listedTracks: [TrackSummary] {
+        albums.flatMap(\.tracks).compactMap { id in
+            guard !unlisted.contains(id), var track = tracks[id] else { return nil }
+            if let other = otherLayout[id] { track.copies = [id, other].compactMap(copy) }
+            return track
+        }
+    }
+
+    /// A version of a song as the copies sheet lists it.
+    private func copy(_ id: Int64) -> TrackCopy? {
+        guard let track = tracks[id], let song = songs[id] else { return nil }
+        let tags = song.tags
+        let aboveCD = tags.lossless && ((tags.bitDepth ?? 16) > 16 || tags.sampleRate > 48_000)
+        return TrackCopy(id: id, format: track.format, hiRes: AlbumFilter.countsAsHiRes(aboveCD: aboveCD, dsd: tags.dsd != nil, maxSampleRate: tags.sampleRate),
+                         edition: nil, location: song.folder, duration: track.duration, favorite: track.favorite, preferred: false)
+    }
+
     public func album(_ key: String) -> Album? { albums.first { $0.summary.key == key } }
 
     public var artists: [ArtistSummary] {
@@ -205,7 +264,7 @@ public struct ShareCatalog: Sendable {
     public func search(_ text: String, limit: Int) -> [TrackSummary] {
         let words = Self.words(text)
         guard !words.isEmpty else { return [] }
-        return Array(allTracks.lazy.filter { Self.matches("\($0.title) \($0.artist) \($0.album)", words) }.prefix(min(max(1, limit), 500)))
+        return Array(listedTracks.lazy.filter { Self.matches("\($0.title) \($0.artist) \($0.album)", words) }.prefix(min(max(1, limit), 500)))
     }
 
     public func find(_ text: String, limit: Int) -> SearchResults {
@@ -219,7 +278,7 @@ public struct ShareCatalog: Sendable {
     }
 
     public func songs(offset: Int, limit: Int) -> (items: [TrackSummary], total: Int) {
-        let sorted = allTracks.sorted {
+        let sorted = listedTracks.sorted {
             let order = $0.title.compare($1.title, options: [.caseInsensitive, .diacriticInsensitive, .numeric])
             return order != .orderedSame ? order == .orderedAscending : ($0.id ?? 0) < ($1.id ?? 0)
         }
@@ -228,6 +287,6 @@ public struct ShareCatalog: Sendable {
     }
 
     public mutating func setFavorite(_ ids: [Int64], _ on: Bool) {
-        for id in ids { tracks[id]?.favorite = on }
+        for id in withVersions(ids) { tracks[id]?.favorite = on }
     }
 }

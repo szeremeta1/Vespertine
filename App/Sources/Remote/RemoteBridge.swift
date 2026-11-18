@@ -149,14 +149,33 @@ struct RemoteBridge {
     func trackSummary(_ track: Track) -> TrackSummary {
         TrackSummary(id: track.id, title: track.title, artist: track.displayArtist.libraryDisplayName, album: track.displayAlbum.libraryDisplayName,
                      albumKey: track.albumKey, duration: track.duration, trackNumber: track.trackNumber, discNumber: track.discNumber,
-                     format: track.formatSummary, artworkKey: model.artworkKey(track), favorite: library.isFavorite(track))
+                     format: track.formatSummary, artworkKey: model.artworkKey(track), favorite: library.isFavorite(track),
+                     surround: track.isMultichannel)
     }
 
-    /// A song listed once with its copies beside it (Favorites).
-    func trackSummary(_ song: Self.ListedSong) -> TrackSummary {
-        var summary = trackSummary(song.shown)
-        summary.copies = Self.copies(of: song, in: library)
-        return summary
+    /// Songs as a phone that plays them itself is given them: each with its version in the other layout beside it
+    /// (`TrackSummary.otherLayout`), so the phone's own output picks the one that plays. Only while versions are
+    /// combined and the output is what picks (Settings); `acrossEditions` false keeps to each song's own album.
+    func trackSummaries(_ tracks: [Track], acrossEditions: Bool = true) -> [TrackSummary] {
+        guard model.settings.versionPreference == .matchOutput else { return tracks.map(trackSummary) }
+        let others = Self.otherLayouts(of: tracks, in: library, acrossEditions: acrossEditions, isLocal: { [shares = model.shares] in !shares.isNetwork($0) })
+        return zip(tracks, others).map { track, other in
+            var summary = trackSummary(track)
+            if let other, let id = other.id {
+                summary.otherLayout = TrackVersion(id: id, album: other.displayAlbum.libraryDisplayName, albumKey: other.albumKey, duration: other.duration,
+                                                   format: other.formatSummary, artworkKey: model.artworkKey(other))
+            }
+            return summary
+        }
+    }
+
+    /// Songs listed once with their copies beside them (Favorites, Songs), and each one's version in the other layout.
+    func trackSummaries(_ songs: [Self.ListedSong]) -> [TrackSummary] {
+        zip(trackSummaries(songs.map(\.shown)), songs).map { summary, song in
+            var summary = summary
+            summary.copies = Self.copies(of: song, in: library)
+            return summary
+        }
     }
 
     func albumSummary(_ album: Album) -> AlbumSummary {
@@ -252,6 +271,19 @@ struct RemoteBridge {
             return TrackCopy(id: id, format: copy.formatSummary, hiRes: copy.isHiRes, edition: analyzed.copy(of: copy)?.edition,
                              location: library.displayPath((copy.filePath as NSString).deletingLastPathComponent), duration: copy.duration,
                              favorite: library.isFavorite(copy), preferred: library.isPreferredCopy(copy))
+        }
+    }
+
+    /// For each track, its song's version in the other layout (the Dolby Atmos mix of a stereo track, the stereo track of
+    /// an Atmos mix): the one that would play there, as `LibraryStore.playbackSongs` and `TrackVersions.choose` have it.
+    /// nil for a song in one layout, a track that plays as itself (its album's copy was chosen), and while versions
+    /// aren't combined.
+    static func otherLayouts(of tracks: [Track], in library: LibraryStore, acrossEditions: Bool = true,
+                             isLocal: (Track) -> Bool = { _ in true }) -> [Track?] {
+        guard library.combinesVersions else { return tracks.map { _ in nil } }
+        return zip(tracks, library.playbackSongs(of: tracks, acrossEditions: acrossEditions)).map { track, song in
+            let others = song.versions.filter { $0.isMultichannel != track.isMultichannel }
+            return TrackVersions.choose(others, multichannel: !track.isMultichannel, isLocal: isLocal, isPreferred: library.isPreferredCopy)
         }
     }
 
@@ -395,12 +427,13 @@ struct RemoteBridge {
             let end = min(start + min(max(1, limit), 500), albums.count)
             return .albums(items: albums[start..<end].map(albumSummary), total: albums.count)
         case .tracks(let ids):
-            return .tracks(items: ordered(ids).map(trackSummary))
+            return .tracks(items: trackSummaries(ordered(ids)))
         case .albumTracks(let key):
             // An album whose "copies" are different songs (a stereo album with a surround bonus track) is listed whole:
             // choosing one copy would leave songs off the phone's page, where they could be neither played nor kept.
             if library.albumCopies(albumKey: key).sharesNoSongs { return .tracks(items: library.tracks(albumKey: key).map(trackSummary)) }
-            return .tracks(items: model.playableTracks(albumKey: key).map(trackSummary))
+            // An album's page is that edition: only its own versions go with its songs.
+            return .tracks(items: trackSummaries(model.playableTracks(albumKey: key), acrossEditions: false))
         case .artists:
             return .artists(items: library.artists.map { ArtistSummary(name: $0.name.libraryDisplayName, albumCount: $0.albumCount, artworkKey: $0.artworkKey) })
         case .artistAlbums(let name):
@@ -410,9 +443,14 @@ struct RemoteBridge {
             return .playlists(items: library.playlists.compactMap { Self.playlistSummary($0, in: library, artworkKey: { model.artworkKey($0) }) })
         case .playlistTracks(let id, let offset, let limit):
             guard let playlist = library.playlists.first(where: { $0.id == id }) else { return notInLibrary }
-            return Self.playlistTracks(library.tracks(in: playlist), offset: offset, limit: limit, summary: trackSummary)
+            // Each song's other version goes with it (`trackSummaries`), a page's worth at a time.
+            let tracks = library.tracks(in: playlist)
+            guard let offset else { return .tracks(items: trackSummaries(tracks)) }
+            let start = min(max(0, offset), tracks.count)
+            let end = min(start + min(max(1, limit ?? PlaylistPages.pageSize), PlaylistPages.pageSize), tracks.count)
+            return .songs(items: trackSummaries(Array(tracks[start..<end])), total: tracks.count)
         case .favorites:
-            return .tracks(items: Self.favoriteSongs(in: library, choose: model.listedCopy).map(trackSummary))
+            return .tracks(items: trackSummaries(Self.favoriteSongs(in: library, choose: model.listedCopy)))
         case .library:
             return .library(Self.overview(of: library, connecting: { $0.isNetwork && model.shares.status(of: $0) == .connecting }))
         case .genres:
@@ -440,7 +478,7 @@ struct RemoteBridge {
             let page = Array(songs[start..<end])
             guard library.combinesVersions else { return .songs(items: page.map(trackSummary), total: songs.count) }
             let listed = zip(page, library.versions(of: page)).map { Self.ListedSong(shown: $0, copies: $1) }
-            return .songs(items: listed.map(trackSummary), total: songs.count)
+            return .songs(items: trackSummaries(listed), total: songs.count)
         case .find(let text, let limit):
             return .found(Self.find(text, limit: limit, in: library, track: trackSummary, album: albumSummary, artworkKey: { model.artworkKey($0) },
                                     oneCopyEach: model.oneCopyEach))

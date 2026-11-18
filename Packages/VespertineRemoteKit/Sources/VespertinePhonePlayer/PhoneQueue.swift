@@ -199,6 +199,26 @@ public struct PhoneQueue: Sendable, Equatable, Codable {
         revision += 1
     }
 
+    /// Gives upcoming songs another track (a song's other version, when the output changed): `change` is asked about
+    /// each entry after the song playing, and nil leaves an entry alone. A changed entry keeps its place and becomes a new
+    /// entry (whatever was opened for the old one is another song's). Says whether anything changed.
+    @discardableResult
+    public mutating func retrackUpcoming(_ change: (Entry) -> TrackSummary?) -> Bool {
+        guard let c = currentIndex else { return false }
+        var replaced: [String: Entry] = [:]
+        for i in entries.indices where i > c {
+            guard let track = change(entries[i]) else { continue }
+            let entry = Entry(track: track, queuedByUser: entries[i].queuedByUser)
+            replaced[entries[i].id] = entry
+            entries[i] = entry
+        }
+        guard !replaced.isEmpty else { return false }
+        for i in originalOrder.indices { if let entry = replaced[originalOrder[i].id] { originalOrder[i] = entry } }
+        if let after = shuffledAfter, let entry = replaced[after] { shuffledAfter = entry.id }
+        revision += 1
+        return true
+    }
+
     // MARK: Shuffle
 
     public mutating func setShuffle(_ on: Bool) {
