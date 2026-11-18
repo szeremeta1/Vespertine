@@ -297,8 +297,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # PyYAML comes with GitHub's Ubuntu image, so nothing is downloaded here. Only an image without it installs it,
+      # and says what it is doing: a quiet apt-get that stalls on a mirror shows nothing until the job's time is up.
       - name: Tools
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq python3-yaml
+        run: python3 -c 'import yaml' || { sudo apt-get update && sudo apt-get install -y python3-yaml; }
       - name: Fetch the pinned oracle sources (refuses any that differ from the registry)
         run: python3 verification/tools/fetch_oracles.py
       - name: Requirement registry, claims and hashes
@@ -427,8 +429,14 @@ jobs:
           restore-keys: verification-carriers-${{ github.run_id }}-
           enableCrossOsArchive: true
           fail-on-cache-miss: true
-      - name: FFmpeg 6.1.1 (the version the oracle record pins)
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      # Built from FFmpeg's own source at the tag the oracle record reviewed (the script refuses any other commit), in
+      # about half a minute. Not installed with apt-get: on some of GitHub's runners that install (a hundred packages
+      # from a mirror) never finished, the job ran out of time and main went red with nothing wrong in the commit.
+      - name: FFmpeg 6.1.1 (built from the source the oracle record pins)
+        timeout-minutes: 5
+        run: |
+          verification/oracles/iec61937/build_ffmpeg.sh "$RUNNER_TEMP/ffmpeg"
+          echo "$RUNNER_TEMP/ffmpeg" >> "$GITHUB_PATH"
       - name: Carriers against FFmpeg's S/PDIF demuxer and the carrier scanner
         run: python3 verification/oracles/iec61937/check_carriers.py verification-carriers
 
