@@ -170,7 +170,9 @@ struct GroupInfoTests {
 
     // MARK: Real Core Audio (reads only; any output device will do)
 
-    @Test func theLiveReaderFillsEveryFieldForARealDevice() throws {
+    // A Mac with no output device has nothing to read: CI on the project's own Macs runs where none can be reached.
+    @Test(.enabled(if: !OutputDevices.list().isEmpty, "needs an output device to read"))
+    func theLiveReaderFillsEveryFieldForARealDevice() throws {
         let device = try #require(OutputDevices.list().first, "no output device on this Mac")
         let info = MemberInfo.read(device)
         #expect(info.uid == device.uid)

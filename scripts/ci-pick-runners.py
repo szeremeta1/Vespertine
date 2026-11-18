@@ -20,7 +20,9 @@ single pull request lands on the project's Macs, and a burst of them spills over
 
 Always GitHub's runners:
   - a pull request from a fork. The project's Macs never run code from outside the repository;
-  - when the repository variable CI_OWN_MACS is "off", or a manual run asks for GitHub's runners;
+  - when the repository variable CI_OWN_MACS is "off", or a manual run asks for GitHub's runners (a manual run that
+    asks for the project's Macs gets them whenever one is taking jobs, even with the variable off: that is how a change
+    to the Macs is tried before they are switched back on for everyone);
   - when nothing can be read (no variables, no API): the answer is the one the workflow had before.
 """
 import calendar, json, os, sys, time, urllib.request
@@ -128,9 +130,10 @@ def main():
         event = {}
     now = time.time()
     why = None
+    forced = env.get("CI_MACS_INPUT") == "own"  # a manual run that asks for the project's Macs
     if from_fork(event):
         why = "a pull request from a fork runs on GitHub's runners only"
-    elif env.get("CI_OWN_MACS", "").strip().lower() == "off" or env.get("CI_MACS_INPUT") == "github":
+    elif env.get("CI_MACS_INPUT") == "github" or (env.get("CI_OWN_MACS", "").strip().lower() == "off" and not forced):
         why = "the project's Macs are switched off for CI"
     macs = set() if why else online({"fast": env.get("CI_MAC_FAST_SEEN"), "shared": env.get("CI_MAC_SHARED_SEEN")}, now)
     waiting, hosted_busy = 0.0, 0
@@ -139,7 +142,7 @@ def main():
             waiting, hosted_busy = load(unfinished_jobs(env["GITHUB_REPOSITORY"], env["GITHUB_TOKEN"], env.get("GITHUB_RUN_ID")), now)
         except Exception as error:  # the queue is only a refinement: without it the Macs count as free
             print(f"could not read the queue ({error}): counting every runner as free", file=sys.stderr)
-    chosen = plan(needed, macs, waiting, hosted_busy)
+    chosen = {job: "own" for job in needed} if forced and macs else plan(needed, macs, waiting, hosted_busy)
     summary = [f"Macs taking jobs: {', '.join(sorted(macs)) or 'none'}" + (f" ({why})" if why else ""),
                f"Already waiting: {waiting:.0f} min of work on the project's Macs, {hosted_busy} macOS jobs on GitHub's runners"]
     for job in JOBS:

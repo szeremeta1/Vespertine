@@ -38,9 +38,14 @@
 #   the job runs on GitHub's runner as before. Pull requests from forks never run on the project's Macs (the script
 #   refuses, and the repository asks for approval before any workflow from an outside contributor runs at all).
 #   Setting the repository variable CI_OWN_MACS to "off", or choosing "github" on a manual run, sends everything to
-#   GitHub's runners. The project's Macs keep their files between runs, so the steps below leave nothing behind that a
-#   later run reads: the checkout is cleaned, the app's tests get a bundle identifier and data directory of their own,
-#   and no test that opens a real audio device is on (they are all opt-in, by environment variables no runner sets).
+#   GitHub's runners ("own" on a manual run uses the Macs even then, to try a change to them before switching back on).
+#   The project's Macs keep their files between runs, so the steps below leave nothing behind that a later run reads:
+#   the checkout is cleaned, the app's tests get a bundle identifier and data directory of their own.
+#   Those Macs are in use (one may be playing music, another carrying a call), so their runners start every test
+#   process with no way to talk to macOS's audio system: the tests see no audio devices at all, whatever they try, and
+#   a test that needs one to exist says so and is skipped there (GitHub's runners have one). The runner tells the
+#   tests so (VESPERTINE_CI_NO_AUDIO=1), and one test in the kit and one in the app fail if they can see a device
+#   after all.
 name: CI
 
 on:
@@ -52,9 +57,9 @@ on:
   workflow_dispatch:
     inputs:
       macs:
-        description: Where the macOS jobs run (auto picks the project's Macs or GitHub's runners, whichever is quicker)
+        description: Where the macOS jobs run (auto picks the project's Macs or GitHub's runners, whichever is quicker; own is the project's Macs even while CI_OWN_MACS is off)
         type: choice
-        options: [auto, github]
+        options: [auto, github, own]
         default: auto
 
 # Actions are pinned by commit (a tag can be moved); Dependabot proposes updates. The Linux image is pinned by digest.

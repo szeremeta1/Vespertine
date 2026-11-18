@@ -120,6 +120,12 @@ class Script(unittest.TestCase):
         self.assertEqual(run({}, CI_OWN_MACS="off", **self.fresh), self.hosted)
         self.assertEqual(run({}, CI_MACS_INPUT="github", **self.fresh), self.hosted)
 
+    def test_a_manual_run_can_ask_for_the_macs_while_they_are_switched_off(self):
+        own = {f"{job}_runner": pick.OWN for job in ALL}
+        self.assertEqual(run({}, CI_OWN_MACS="off", CI_MACS_INPUT="own", **self.fresh), own)
+        self.assertEqual(run({}, CI_OWN_MACS="off", CI_MACS_INPUT="own"), self.hosted)  # no Mac is taking jobs
+        self.assertEqual(run(pull_request("someone/Vespertine"), CI_MACS_INPUT="own", **self.fresh), self.hosted)
+
     def test_a_job_that_is_not_needed_still_gets_a_valid_runner(self):
         out = run({}, NEED_VERIFICATION="false", **self.fresh)
         self.assertEqual(out["verification_runner"], pick.HOSTED)
