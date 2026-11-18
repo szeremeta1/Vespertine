@@ -258,6 +258,9 @@ jobs:
           mkdir -p build
           rm -rf /tmp/vespertine-test-host-library
           defaults delete org.szeremeta.Vespertine.ci 2>/dev/null || true
+          # Xcode inserts the library that loads the tests into the app. A runner that sets this replaces Xcode's list,
+          # and the app then starts with no tests in it ("The test runner hung before establishing connection").
+          unset TEST_RUNNER_DYLD_INSERT_LIBRARIES
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Debug -destination 'platform=macOS' \
             -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile ${CI_BUILD_JOBS:+-jobs $CI_BUILD_JOBS} \
             CODE_SIGNING_ALLOWED=NO PRODUCT_BUNDLE_IDENTIFIER=org.szeremeta.Vespertine.ci test 2>&1 | tee build/app-tests.log \
