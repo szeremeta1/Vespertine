@@ -23,7 +23,47 @@ public final class LibraryDatabase: Sendable {
             try db.execute(sql: "PRAGMA synchronous = NORMAL")
             Self.addSortFunction(to: db)
         }
-        try self.init(writer: DatabasePool(path: url.path, configuration: config))
+        let pool = try DatabasePool(path: url.path, configuration: config)
+        Self.opened(pool, at: url)
+        try self.init(writer: pool)
+    }
+
+    // MARK: Closing
+
+    /// A library opened from a file, held weakly: its connections live as long as anything holds its writer (the app's
+    /// observations do, for as long as they run), which can be after the `LibraryDatabase` itself is gone.
+    private final class OpenFile: @unchecked Sendable {
+        let path: String
+        weak var writer: (any DatabaseWriter)?
+        init(path: String, writer: any DatabaseWriter) { self.path = path; self.writer = writer }
+    }
+    private static let openFiles = Locked<[OpenFile]>([])
+
+    private static func opened(_ writer: any DatabaseWriter, at url: URL) {
+        let file = OpenFile(path: url.resolvingSymlinksInPath().path, writer: writer)
+        openFiles.withLock { files in
+            files.removeAll { $0.writer == nil }
+            files.append(file)
+        }
+    }
+
+    /// Closes this library's connections. Reading or writing it afterwards throws, and observations of it end.
+    public func close() {
+        try? writer.close()
+    }
+
+    /// Closes every library opened from a file in `folder` (at any depth) that is still open, so the folder can be deleted.
+    /// SQLite must not have a database's files deleted under it while they are open: it logs "BUG IN CLIENT OF
+    /// libsqlite3.dylib: database integrity compromised by API violation: vnode unlinked while in use" for each of them.
+    /// For tests and tools, which delete the folders they made; the app never deletes its library.
+    public static func closeAll(under folder: URL) {
+        let prefix = folder.resolvingSymlinksInPath().path + "/"
+        let writers = openFiles.withLock { (files: inout [OpenFile]) -> [any DatabaseWriter] in
+            let inside = files.filter { $0.path.hasPrefix(prefix) }
+            files.removeAll { file in file.writer == nil || inside.contains { $0 === file } }
+            return inside.compactMap(\.writer)
+        }
+        for writer in writers { try? writer.close() }
     }
 
     public static func inMemory() throws -> LibraryDatabase {
