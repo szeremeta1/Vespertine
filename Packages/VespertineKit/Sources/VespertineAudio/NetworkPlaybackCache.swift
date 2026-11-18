@@ -478,6 +478,9 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         return live.compactMap(\.silence).max()
     }
 
+    /// For tests: whether the cache itself holds a copy for the song chosen or lined up last (the press's warm-up, the prefetch).
+    var holdsNext: Bool { lock.withLock { next != nil } }
+
     /// Prefetches waiting for their file on the share to open (for tests).
     var waitingPrefetches: Int { prefetchWaits.withLock { $0 } }
     private let prefetchWaits = Locked(0)
@@ -616,6 +619,9 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         var url: URL { storage.url }
         var size: Int64 { storage.size }
         var isComplete: Bool { storage.condition.withLock { storage.ready.count == storage.blocks } }
+        /// The copy was given up (`cancel`) with bytes still missing: they never arrive, and a read of them fails. A copy that
+        /// had finished reads as before. The cache never hands such a copy out again (`entry(key:)` makes the song a new one).
+        var isGivenUp: Bool { storage.condition.withLock { storage.cancelled && storage.ready.count < storage.blocks } }
         var isWaiting: Bool { storage.condition.withLock { storage.starting || storage.waiters > 0 } }
         /// How many reads are parked waiting for bytes that are not on disk yet (each has stamped the start of its wait).
         var readsWaiting: Int { storage.condition.withLock { storage.waiters } }
