@@ -86,7 +86,7 @@ struct OutputsView: View {
                 }
                 if playsHere, let phone = session.phone, let signal = phone.signal {
                     Section {
-                        ForEach(PlayTarget.report(signal, route: phone.route, dop: phone.dopDACs), id: \.label) { row in
+                        ForEach(PlayTarget.report(signal, route: phone.route, dop: phone.dopDACs, dsdAsPCM: phone.playback.dsdAsPCM), id: \.label) { row in
                             LabeledContent(row.label, value: row.value)
                         }
                     } header: {
@@ -315,6 +315,11 @@ private struct DoPSection: View {
     var body: some View {
         Section {
             if let status { Text(status).foregroundStyle(Color.secondary) }
+            // The chord was heard with iOS's volume below the top: that volume changes nothing this DAC gets.
+            if !probe.isBusy, DoPGate.level(phone.output, dacs: phone.dopDACs) == .dac {
+                Text(verbatim: PlayTarget.volumeOnDAC).foregroundStyle(Color.secondary)
+                    .accessibilityIdentifier("dop-volume-on-dac")
+            }
             // Which rates this DAC played the chord at: there whether or not a song is playing.
             if !probe.isBusy {
                 ForEach(PlayTarget.dopRows(phone.dopDACs, route: phone.route), id: \.label) { row in
@@ -332,21 +337,24 @@ private struct DoPSection: View {
             }
             .disabled(probe.isBusy)
             .accessibilityIdentifier("dop-test")
-            .alert("Did you hear music or hiss?", isPresented: Binding(get: { probe.phase == .asking }, set: { if !$0, probe.phase == .asking { probe.cancel() } })) {
+            .alert("What did you hear?", isPresented: Binding(get: { probe.phase == .asking }, set: { if !$0, probe.phase == .asking { probe.cancel() } })) {
                 Button("Music") { probe.answer(.music) }
-                Button("Hiss") { probe.answer(.hiss) }
+                Button("Hiss or noise") { probe.answer(.noise) }
+                // Silence is its own answer: it is never kept as a failed test.
+                Button("Heard nothing") { probe.answer(.nothing) }
+                Button("Play again") { probe.answer(.again) }
                 Button("Cancel", role: .cancel) { probe.cancel() }
             } message: {
-                // The chord is played at each rate in turn: which one the question is about.
-                Text("\(PhoneSignal.kilohertz(probe.carrier)) kHz")
+                // The chord is played at each rate in turn: which one the question is about, as the DAC's display names it.
+                Text(verbatim: PlayTarget.dopRate(carrier: probe.carrier))
             }
         } header: {
             Text("Play DSD natively?")
         } footer: {
             if fromShare {
-                Text("DSD is converted to PCM on this device unless this DAC takes DSD over PCM (DoP). A short, quiet test can tell: it plays a soft chord as DSD and asks what you heard. Music stops for the test, and the volume has to be at 100%.")
+                Text("DSD is converted to PCM on this device unless this DAC takes DSD over PCM (DoP). A short, quiet test can tell: it plays a soft chord as DSD and asks what you heard. Music stops for the test. If you hear no chord while the volume is below 100%, set it to 100%, then test again.")
             } else {
-                Text("DSD is converted to PCM on the Mac unless this DAC takes DSD over PCM (DoP). A short, quiet test can tell: it plays a soft chord as DSD and asks what you heard. Music stops for the test, and the volume has to be at 100%.")
+                Text("DSD is converted to PCM on the Mac unless this DAC takes DSD over PCM (DoP). A short, quiet test can tell: it plays a soft chord as DSD and asks what you heard. Music stops for the test. If you hear no chord while the volume is below 100%, set it to 100%, then test again.")
             }
         }
         .onDisappear { if probe.isBusy { probe.cancel() } }
@@ -357,26 +365,17 @@ private struct DoPSection: View {
         switch probe.phase {
         case .preparing, .playing:
             return String(localized: "Playing a short, quiet test…", comment: "DoP test sheet while the test sound plays.")
-        case .failed(.volume):
-            return String(localized: "The test needs the volume at 100%.", comment: "DoP test on the iPhone: the test wasn't started because the device's volume isn't at its top.")
         case .failed(.changed):
             return String(localized: "The test stopped because an audio device changed. Nothing was saved.", comment: "DoP test ended early: an output was plugged in or out, or the default output changed.")
         case .failed:
             return String(localized: "The test couldn't play as DoP on this output, so nothing was saved.", comment: "DoP test ended early: the engine didn't send the test sound as DoP.")
-        case .idle, .asking, .answered:
+        case .answered(let ending):
+            // A run that ended with nothing to keep says so, and what to do.
+            if let words = PlayTarget.dopEnding(ending, carrier: probe.carrier) { return words }
+        case .idle, .asking:
             break
         }
-        switch phone.dopDACs.answer(for: phone.route?.uid) {
-        case .music?:
-            if let volume = phone.outputVolume, volume < DoPGate.fullVolume {
-                return String(localized: "DSD is sent as PCM while the volume is below 100%.", comment: "iPhone Output screen, for a DAC that passed the DoP test: with the device volume turned down, DSD songs are converted to PCM instead of being sent as DSD.")
-            }
-            return String(localized: "DoP is on for this DAC.", comment: "DoP test result after the listener answered Music.")
-        case .hiss?:
-            return String(localized: "DoP stays off for this DAC. DSD keeps playing as PCM.", comment: "DoP test result after the listener answered Hiss.")
-        case nil:
-            return nil
-        }
+        return PlayTarget.dopResult(phone.dopDACs, output: phone.output)
     }
 }
 

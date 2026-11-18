@@ -22,12 +22,16 @@ public struct OutputState: Equatable, Sendable {
     /// A rate the output was asked for that iOS hasn't been seen to give or to refuse yet. While it is set and the
     /// output runs at another rate, that other rate is on its way out: it is not shown as where the output settled.
     public var pendingRate: Double?
+    /// iOS's volume has been seen at two different levels while this was the output: the phone's volume buttons move it.
+    /// false says nothing either way (nobody may have pressed them); iOS has no API that says an output's volume is fixed.
+    public var volumeMoved = false
 
-    public init(route: PhoneRoute? = nil, volume: Double? = nil, rendering: SystemRenderingMode? = nil, pendingRate: Double? = nil) {
+    public init(route: PhoneRoute? = nil, volume: Double? = nil, rendering: SystemRenderingMode? = nil, pendingRate: Double? = nil, volumeMoved: Bool = false) {
         self.route = route
         self.volume = volume
         self.rendering = rendering
         self.pendingRate = pendingRate
+        self.volumeMoved = volumeMoved
     }
 
     /// The rate the output is being switched to, while it still runs at another.
@@ -132,7 +136,10 @@ public final class OutputWatch {
         // Another output (or none): what the old one was asked for is nothing to this one.
         if state.route?.name != reading.route?.name || state.route?.uid != reading.route?.uid {
             next.pendingRate = nil
+            next.volumeMoved = false
             lingerTicks = 0
+        } else if let was = state.volume, let now = reading.volume, abs(was - now) > 0.001 {
+            next.volumeMoved = true
         }
         if let pending = next.pendingRate, let route = next.route, abs(route.sampleRate - pending) < 0.5 {
             next.pendingRate = nil
@@ -247,6 +254,6 @@ public final class OutputWatch {
         let route = state.route.map { "\($0.name) [\($0.portType)] uid=\($0.uid ?? "?") rate=\($0.sampleRate) channels=\($0.channels)" } ?? "no output"
         let volume = state.volume.map { String(format: "%.3f", $0) } ?? "unknown"
         let pending = state.pendingRate.map { " asked=\($0)" } ?? ""
-        return "\(route) volume=\(volume)\(pending)"
+        return "\(route) volume=\(volume)\(state.volumeMoved ? " (seen to move)" : "")\(pending)"
     }
 }

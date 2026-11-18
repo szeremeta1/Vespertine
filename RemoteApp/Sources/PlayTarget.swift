@@ -193,16 +193,21 @@ final class PlayTarget {
     /// The DoP test's results for a DAC, as rows: the rates it played the chord at, and the rates it didn't.
     static func dopRows(_ dacs: DoPDACs, route: PhoneRoute?) -> [(label: String, value: String)] {
         let results = dacs.results(for: route?.uid)
-        func rates(_ passed: Bool) -> String? {
-            let list = results.filter { ($0.result == .passed) == passed }.map { PhoneSignal.kilohertz($0.carrier) }
+        func list(_ wanted: (DoPDACs.CarrierResult) -> Bool) -> String? {
+            let list = results.filter { wanted($0.result) }.map { PhoneSignal.kilohertz($0.carrier) }
             return list.isEmpty ? nil : String(localized: "\(list.joined(separator: ", ")) kHz", comment: "Signal chip: a sample rate.")
         }
+        // No sound is its own result: not a pass, and not the DAC failing to decode DoP.
+        func rates(_ passed: Bool) -> String? { list { $0 != .silent && ($0 == .passed) == passed } }
         var rows: [(String, String)] = []
         if let passed = rates(true) {
             rows.append((String(localized: "DoP passed at", comment: "Row label on the iPhone's Output screen: the sample rates at which this DAC passed the DoP listening test. The value is a list of rates, e.g. 176.4, 352.8 kHz. DoP stays as it is."), passed))
         }
         if let failed = rates(false) {
             rows.append((String(localized: "DoP not passed at", comment: "Row label on the iPhone's Output screen: the sample rates at which this DAC did not pass the DoP listening test. The value is a list of rates, e.g. 192, 384 kHz. DoP stays as it is."), failed))
+        }
+        if let silent = list({ $0 == .silent }) {
+            rows.append((String(localized: "No sound at", comment: "Row label on the iPhone's Output screen: the sample rates at which nothing at all was heard during the DoP listening test (not a failed test: no sound came out). The value is a list of rates, e.g. 192, 384 kHz."), silent))
         }
         return rows
     }
@@ -226,9 +231,86 @@ final class PlayTarget {
         return text
     }
 
-    /// The volume as the Output screen says it: a percentage, or that iOS gives none.
-    static func volumeWords(_ volume: Double?) -> String {
-        volume.map(percent) ?? String(localized: "Not reported by iOS", comment: "Value on the iPhone's Output screen, for the row Volume: iOS gave the app no volume level for this output. iOS stays as it is.")
+    /// The volume as the Output screen says it: a percentage, that iOS gives none, or that the DAC sets it.
+    static func volumeWords(_ volume: Double?, onDAC: Bool = false) -> String {
+        if onDAC {
+            return String(localized: "Set on the DAC", comment: "Value on the iPhone's Output screen, for the row Volume: this DAC's volume is set on the DAC itself (its knob or remote); the iPhone's volume doesn't change what it gets. DAC stays as it is.")
+        }
+        return volume.map(percent) ?? String(localized: "Not reported by iOS", comment: "Value on the iPhone's Output screen, for the row Volume: iOS gave the app no volume level for this output. iOS stays as it is.")
+    }
+
+    /// "Volume is set on the DAC": said wherever a volume would be, for a DAC shown to get its samples whatever iOS's
+    /// volume says (`DoPGate.Level.dac`).
+    static var volumeOnDAC: String {
+        String(localized: "Volume is set on the DAC", comment: "iPhone, Now Playing and Output: shown in place of a volume level for a DAC whose volume is set on the DAC itself; the iPhone's volume buttons don't change what it gets. DAC stays as it is.")
+    }
+
+    // MARK: DoP words
+
+    /// "DSD128 (384 kHz carrier)": the rate the DoP test is asking about, named the way the DAC's display names it.
+    static func dopRate(carrier: Double) -> String {
+        String(localized: "\(DoPGate.name(carrier: carrier)) (\(PhoneSignal.kilohertz(carrier)) kHz carrier)", comment: "DoP test on the iPhone: which rate the question is about. The first %@ is a DSD rate name such as DSD128 (shown on the DAC's display), the second the sample rate of the PCM stream that carries it, such as 384. DSD128 and kHz stay as they are.")
+    }
+
+    /// What the Output screen says when a run of the test ended without a result to keep; nil for a run that kept one.
+    static func dopEnding(_ ending: DoPTestRun.Ending, carrier: Double) -> String? {
+        switch ending {
+        case .on, .off:
+            return nil
+        case .silent:
+            return String(localized: "No sound at \(dopRate(carrier: carrier)). That is not a failed DoP test, and nothing was saved.", comment: "DoP test on the iPhone: the listener answered Heard nothing twice at the first rate. %@ is the rate, such as DSD64 (176.4 kHz carrier). DoP stays as it is.")
+        case .inconclusive:
+            return String(localized: "Hiss or noise proves nothing while the volume is below 100%, because the volume itself can cause it. Set the volume to 100%, then test again. Nothing was saved.", comment: "DoP test on the iPhone: the listener heard hiss or noise while the device's volume was below 100%. The test is not counted as failed; the listener is told what to do.")
+        }
+    }
+
+    /// What a DAC's kept answer means right now: DoP on, off, or on but not while the volume is where it is.
+    static func dopResult(_ dacs: DoPDACs, output: OutputState) -> String? {
+        switch dacs.answer(for: output.route?.uid) {
+        case .music?:
+            if !dacs.volumeIsOutOfTheWay(output.volume, for: output.route?.uid) {
+                return String(localized: "DSD is sent as PCM while the volume is below 100%.", comment: "iPhone Output screen, for a DAC that passed the DoP test: with the device volume turned down, DSD songs are converted to PCM instead of being sent as DSD.")
+            }
+            return String(localized: "DoP is on for this DAC.", comment: "DoP test result after the listener answered Music.")
+        case .hiss?:
+            return String(localized: "DoP stays off for this DAC. DSD keeps playing as PCM.", comment: "DoP test result after the listener answered Hiss.")
+        case nil:
+            return nil
+        }
+    }
+
+    /// Why a DSD song plays as PCM, as a short sentence without its full stop.
+    static func pcmReason(_ reason: DoPGate.PCMReason) -> String {
+        switch reason {
+        case .notADAC: String(localized: "This output can’t be tested for DoP", comment: "iPhone: why a DSD song is played as PCM: the output is not a USB DAC the DoP test can run on (Bluetooth, AirPlay, the speaker). No full stop. DoP stays as it is.")
+        case .notTested: String(localized: "This DAC hasn’t passed the DoP test yet", comment: "iPhone: why a DSD song is played as PCM: the DoP test was never run on this DAC. No full stop. DAC and DoP stay as they are.")
+        case .failedTest: String(localized: "This DAC didn’t pass the DoP test", comment: "iPhone: why a DSD song is played as PCM: the listener heard hiss or noise in the DoP test on this DAC. No full stop. DAC and DoP stay as they are.")
+        case .volume: String(localized: "The volume was below 100%", comment: "iPhone: why a DSD song is played as PCM: the device's volume was below 100% when the song started. No full stop.")
+        case .rate: String(localized: "This DAC hasn’t passed the DoP test at this song’s rate", comment: "iPhone: why a DSD song is played as PCM: the DAC passed the DoP test at lower rates only (for example DSD64 but not DSD128). No full stop. DAC and DoP stay as they are.")
+        case .declined: String(localized: "The DAC wouldn’t run at the rate DoP needs", comment: "iPhone: why a DSD song is played as PCM: the DAC did not switch to the sample rate that carries the song's DSD. No full stop. DAC and DoP stay as they are.")
+        case .ahead: String(localized: "The DAC was running at another rate when this song was lined up", comment: "iPhone: why a DSD song is played as PCM: it followed another song without a gap, and the DAC's sample rate can't change between them. No full stop. DAC stays as it is.")
+        }
+    }
+
+    static var dsdAsPCM: String {
+        String(localized: "DSD played as PCM", comment: "iPhone, Now Playing and Output: the playing song is a DSD file that is being played as PCM. Followed by the reason. DSD and PCM stay as they are.")
+    }
+
+    /// What Now Playing says while a song is being prepared, from what was asked for: DSD being packed as DoP is not a
+    /// conversion, and a DSD song converted to PCM says so. `share`: this device does the work itself, not a Mac.
+    static func preparing(_ kind: PhonePlayback.Preparing.Kind, progress: Double?, share: Bool = false) -> String {
+        let text: String
+        switch kind {
+        case .conversion:
+            return NowPlayingView.converting(progress: progress)
+        case .dop:
+            text = String(localized: "Preparing DSD for your DAC (DoP)…", comment: "Now Playing on the iPhone: a DSD song is being packed as DoP frames for a DAC that passed the DoP test; it is not being converted to PCM. DSD, DAC and DoP stay as they are.")
+        case .dsdAsPCM:
+            text = share ? String(localized: "Converting DSD to PCM on this device…", comment: "Now Playing on the iPhone: this device is converting a DSD song to PCM before it can play it. DSD and PCM stay as they are.")
+                         : String(localized: "Converting DSD to PCM on the Mac…", comment: "Now Playing on the iPhone: the Mac is converting a DSD song to PCM before it can send it. DSD and PCM stay as they are.")
+        }
+        guard let progress, progress > 0 else { return text }
+        return text + " " + min(max(progress, 0), 1).formatted(.percent.precision(.fractionLength(0)))
     }
 
     static func percent(_ level: Double) -> String {
@@ -236,7 +318,7 @@ final class PlayTarget {
     }
 
     /// The Output screen's read-back: what the song is and what iOS says the output is doing with it. Facts only.
-    static func report(_ signal: PhoneSignal, route: PhoneRoute?, dop: DoPDACs = DoPDACs()) -> [(label: String, value: String)] {
+    static func report(_ signal: PhoneSignal, route: PhoneRoute?, dop: DoPDACs = DoPDACs(), dsdAsPCM reason: DoPGate.PCMReason? = nil) -> [(label: String, value: String)] {
         var rows: [(String, String)] = [
             (String(localized: "Song", comment: "Row label on the iPhone's Output screen: the playing song's format, e.g. 24/192."), signal.streamFormat),
             (String(localized: "Song’s channels", comment: "Row label on the iPhone's Output screen: how many channels the playing song has."), String(signal.channels)),
@@ -245,6 +327,8 @@ final class PlayTarget {
             // The DSD bits travel in DoP frames at this rate; the output has to run at exactly it (the rows below say).
             rows.append(("DoP", String(localized: "\(PhoneSignal.kilohertz(signal.streamRate)) kHz", comment: "Signal chip: a sample rate.")))
         }
+        // A DSD song that isn't going out as DSD says why.
+        if let reason { rows.append((dsdAsPCM, pcmReason(reason))) }
         if let route {
             rows.append((String(localized: "Output"), route.name))
             if route.sampleRate > 0 {
@@ -291,8 +375,8 @@ final class PlayTarget {
             rows.append((String(localized: "ReplayGain"), String(localized: "None for this song", comment: "Value on the iPhone's Output screen, for the row ReplayGain: ReplayGain is turned on, but the playing song has no ReplayGain values (or is DSD sent as DoP), so it plays unchanged.")))
         }
         // Always said while there is an output: a volume iOS doesn't report is a fact too, and it rules out "no processing".
-        if route != nil { rows.append((String(localized: "Volume"), volumeWords(signal.volume))) }
-        if signal.onDAC, signal.volumeReduced || signal.volume == nil, signal.wouldBeUntouchedAtFullVolume {
+        if route != nil { rows.append((String(localized: "Volume"), volumeWords(signal.volume, onDAC: signal.volumeOnDAC))) }
+        if signal.onDAC, !signal.volumeOnDAC, signal.volumeReduced || signal.volume == nil, signal.wouldBeUntouchedAtFullVolume {
             rows.append((String(localized: "Original file", comment: "Row label on the iPhone's Output screen: the song's own lossless file is playing. The value is No processing or Verified on this DAC."),
                          signal.volume == nil
                             ? String(localized: "Can’t say: iOS reports no volume", comment: "Value on the iPhone's Output screen, for the row Original file: iOS gives no volume level for this DAC, so the app can't say whether the song's samples reach it unchanged. iOS stays as it is.")
