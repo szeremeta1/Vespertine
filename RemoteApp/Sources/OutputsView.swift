@@ -150,7 +150,8 @@ struct OutputsView: View {
             .safeAreaInset(edge: .top, spacing: 0) {
                 if PlayMode.offersSwitch(share: session.isShare) { switchBar }
             }
-            .navigationTitle("Output").screenTitleStyle()
+            // A small title: under a large one the pinned switch sat below a tall, empty band.
+            .navigationTitle("Output").navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 // On an iPad's wide window the gear and "Libraries" are in the window's own bars.
                 if sizeClass != .regular {
