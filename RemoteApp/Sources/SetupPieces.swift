@@ -285,6 +285,8 @@ struct SetupOption<Control: View>: View {
                     SetupSymbol(name: symbol, selected: on)
                     VStack(alignment: .leading, spacing: 3) {
                         title.font(.body.weight(.semibold)).foregroundStyle(Palette.text)
+                            // A long name wraps: beside a switch it was cut short with an ellipsis.
+                            .fixedSize(horizontal: false, vertical: true)
                         detail.font(.footnote).foregroundStyle(Palette.text2)
                             .fixedSize(horizontal: false, vertical: true)
                     }
