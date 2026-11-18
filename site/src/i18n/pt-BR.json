@@ -165,7 +165,7 @@
         "links": [
           "Grupos de alto-falantes em detalhe"
         ],
-        "alt": "O editor de grupos de alto-falantes do Vespertine para um quadrifônico: um desenho da sala visto de cima com quatro alto-falantes ao redor do assento de audição, e a distância, o ângulo, o atraso e o nível de cada um.",
+        "alt": "O editor de grupos de alto-falantes do Vespertine para um quadrifônico: uma sala desenhada em três dimensões com quatro alto-falantes em pedestais ao redor do assento de audição, e a largura, a profundidade e a altura do teto da sala.",
         "floatAlt": "O mapa de canais: cada canal de cada saída atribuído a um alto-falante, com um botão “Identify” e uma caixa “Inverted” em cada canal.",
         "floatCaption": "Mapa de canais"
       },
@@ -274,7 +274,8 @@
           "Compartilhamentos de rede via SMB, NFS ou WebDAV, com cache, Manter Offline e reprodução feita para servidores lentos: as faixas são carregadas em buffer no seu Mac antes de tocar, com um anel de carregamento no botão de reproduzir enquanto isso acontece.",
           "Encontrar Músicas procura a sua música de verdade em todas as unidades e deixa a bagunça de lado. Uma configuração rápida na primeira abertura escolhe a sua saída e explica o que fazem o acesso exclusivo e o ReplayGain.",
           "EQ paramétrico por saída, que importa presets do AutoEQ e do Equalizer APO. Desativado por padrão; quando está ativo, o caminho do sinal mostra <span class=\"mono nowrap\">EQUALIZADOR</span> em vez de <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Minirreprodutor, item na barra de menus, teclas de mídia, ReplayGain e atualizações automáticas e assinadas."
+          "Minirreprodutor, item na barra de menus, teclas de mídia, ReplayGain e atualizações automáticas e assinadas.",
+          "Opcionais, e desativados até você ativar: reprodutores de rede (UPnP) e receptores AirPlay como saídas, seu próprio servidor OpenSubsonic na barra lateral, um controle remoto para o telefone ou qualquer navegador da sua rede, um visualizador e transições entre músicas."
         ],
         "links": [
           "Todos os recursos, em detalhes"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Ele faz streaming do Qobuz, do TIDAL ou do Apple Music?",
-          "a": "Não. O Vespertine reproduz a música que é sua, no seu Mac, em discos externos ou em um compartilhamento de rede. Downloads da assinatura do Apple Music protegidos por DRM não podem ser reproduzidos."
+          "a": "Não de um serviço comercial: o Vespertine não tem cliente para Qobuz, TIDAL ou Apple Music, e downloads do Apple Music protegidos por DRM não podem ser reproduzidos. Ele reproduz a música que é sua, no seu Mac, em discos externos ou em um compartilhamento de rede. Dois recursos beta opcionais acrescentam seu próprio servidor OpenSubsonic (Navidrome e outros) e a música enviada por apps de controle UPnP."
         },
         {
           "q": "Como sei que é bit-perfect de verdade?",

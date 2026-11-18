@@ -165,7 +165,7 @@
         "links": [
           "Kumpulan pembesar suara secara terperinci"
         ],
-        "alt": "Penyunting kumpulan pembesar suara Vespertine untuk quad: lukisan bilik dari atas dengan empat pembesar suara mengelilingi tempat mendengar, serta jarak, sudut, kelewatan dan aras setiap pembesar suara.",
+        "alt": "Penyunting kumpulan pembesar suara Vespertine untuk quad: bilik yang dilukis dalam tiga dimensi dengan empat pembesar suara di atas kaki mengelilingi tempat mendengar, serta lebar, kedalaman dan ketinggian siling bilik.",
         "floatAlt": "Peta saluran: setiap saluran bagi setiap output ditetapkan kepada pembesar suara, dengan butang “Identify” dan kotak “Inverted” pada setiap saluran.",
         "floatCaption": "Peta saluran"
       },
@@ -274,7 +274,8 @@
           "Perkongsian rangkaian melalui SMB, NFS atau WebDAV, dengan cache, Simpan Luar Talian dan main balik yang dibina untuk pelayan perlahan: lagu ditimbal pada Mac anda sebelum dimainkan, dengan gelang pemuatan pada butang main sepanjang proses itu.",
           "Cari Muzik mencari muzik sebenar anda di setiap pemacu dan meninggalkan fail-fail yang bersepah. Persediaan ringkas pada pelancaran pertama memilih output anda dan menerangkan fungsi akses eksklusif dan ReplayGain.",
           "EQ parametrik bagi setiap output yang mengimport pratetap AutoEQ dan Equalizer APO. Mati secara lalai; apabila dihidupkan, laluan isyarat menunjukkan <span class=\"mono nowrap\">PENYAMA</span> dan bukannya <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Pemain Mini, ikon bar menu, kekunci media, ReplayGain dan kemas kini automatik yang ditandatangani."
+          "Pemain Mini, ikon bar menu, kekunci media, ReplayGain dan kemas kini automatik yang ditandatangani.",
+          "Pilihan, dan dimatikan sehingga anda menghidupkannya: pemain rangkaian (UPnP) dan penerima AirPlay sebagai output, pelayan OpenSubsonic anda sendiri dalam bar sisi, kawalan jauh untuk telefon anda atau mana-mana pelayar dalam rangkaian anda, pemvisual, dan peralihan antara lagu."
         ],
         "links": [
           "Setiap ciri, secara terperinci"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Adakah ia menstrim daripada Qobuz, TIDAL atau Apple Music?",
-          "a": "Tidak. Vespertine memainkan muzik milik anda, pada Mac anda, pada pemacu luaran atau pada perkongsian rangkaian. Muat turun langganan Apple Music yang dilindungi DRM tidak boleh dimainkan."
+          "a": "Bukan daripada perkhidmatan komersial: Vespertine tiada klien untuk Qobuz, TIDAL atau Apple Music, dan muat turun Apple Music yang dilindungi DRM tidak boleh dimainkan. Ia memainkan muzik milik anda, pada Mac anda, pada pemacu luaran atau pada perkongsian rangkaian. Dua ciri beta pilihan menambah pelayan OpenSubsonic anda sendiri (Navidrome dan lain-lain) serta muzik yang dihantar oleh app kawalan UPnP."
         },
         {
           "q": "Bagaimana saya tahu ia benar-benar bit-perfect?",

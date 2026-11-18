@@ -165,7 +165,7 @@
         "links": [
           "Nhóm loa chi tiết"
         ],
-        "alt": "Trình chỉnh sửa nhóm loa của Vespertine cho một quad: bản vẽ căn phòng nhìn từ trên xuống với bốn loa quanh chỗ nghe, cùng khoảng cách, góc, độ trễ và mức âm của từng loa.",
+        "alt": "Trình chỉnh sửa nhóm loa của Vespertine cho một quad: căn phòng được vẽ ba chiều với bốn loa đặt trên chân đế quanh chỗ nghe, cùng chiều rộng, chiều sâu và chiều cao trần của phòng.",
         "floatAlt": "Sơ đồ kênh: mỗi kênh của mỗi đầu ra được gán cho một loa, có nút “Identify” và ô “Inverted” ở mỗi kênh.",
         "floatCaption": "Sơ đồ kênh"
       },
@@ -274,7 +274,8 @@
           "Thư mục chia sẻ qua mạng SMB, NFS hoặc WebDAV, có bộ nhớ đệm, Giữ ngoại tuyến và cơ chế phát lại được thiết kế cho máy chủ chậm: các bài được nạp sẵn vào bộ đệm trên máy Mac trước khi phát, và trong lúc đó nút phát hiển thị một vòng tải.",
           "Tính năng Tìm nhạc quét mọi ổ đĩa để lọc ra nhạc thật của bạn và bỏ lại những thứ lộn xộn. Một bước thiết lập ngắn ở lần khởi chạy đầu tiên sẽ chọn đầu ra và giải thích truy cập độc quyền và ReplayGain có tác dụng gì.",
           "EQ tham số theo từng đầu ra, nhập được preset AutoEQ và Equalizer APO. Mặc định tắt; khi bật, đường tín hiệu hiển thị <span class=\"mono nowrap\">BỘ CHỈNH ÂM</span> thay vì <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Trình phát mini, tiện ích trên thanh menu, phím media, ReplayGain và cập nhật tự động có chữ ký."
+          "Trình phát mini, tiện ích trên thanh menu, phím media, ReplayGain và cập nhật tự động có chữ ký.",
+          "Tùy chọn, và tắt cho đến khi bạn bật: đầu phát mạng (UPnP) và đầu thu AirPlay làm đầu ra, máy chủ OpenSubsonic của riêng bạn trong thanh bên, điều khiển từ xa cho điện thoại hoặc bất kỳ trình duyệt nào trong mạng của bạn, trình hiển thị, và chuyển tiếp giữa các bài hát."
         ],
         "links": [
           "Chi tiết mọi tính năng"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Có phát trực tuyến từ Qobuz, TIDAL hay Apple Music không?",
-          "a": "Không. Vespertine phát nhạc bạn sở hữu, trên máy Mac của bạn, trên ổ đĩa ngoài hoặc trên chia sẻ mạng. Không thể phát các bản tải xuống từ gói thuê bao Apple Music có bảo vệ DRM."
+          "a": "Không phải từ dịch vụ thương mại: Vespertine không có ứng dụng khách cho Qobuz, TIDAL hay Apple Music, và không thể phát các bản tải xuống từ Apple Music có bảo vệ DRM. Ứng dụng phát nhạc bạn sở hữu, trên máy Mac của bạn, trên ổ đĩa ngoài hoặc trên chia sẻ mạng. Hai tính năng beta tùy chọn bổ sung máy chủ OpenSubsonic của riêng bạn (Navidrome và các máy chủ khác) và nhạc do các ứng dụng điều khiển UPnP gửi đến."
         },
         {
           "q": "Làm sao biết nó thực sự bit-perfect?",
