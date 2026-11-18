@@ -64,11 +64,16 @@ struct SettingsView: View {
                             }
                         }
                     }
-                    Toggle("Keep Smaller Copies", isOn: $shelf.smaller)
+                    // Smaller copies are made by the Mac: without one there is nothing to make them.
+                    if Self.showsMacFetching(pairedMacs: model.pairings.count) { Toggle("Keep Smaller Copies", isOn: $shelf.smaller) }
                 } header: {
                     Text("Kept on This Device")
                 } footer: {
+                    if !Self.showsMacFetching(pairedMacs: model.pairings.count) {
+                        Text("Albums you keep are copied whole to this device, and play when the share or folder they came from can’t be reached.")
+                    } else {
                     Text("Albums and playlists you keep are fetched whole from your Mac and play without it. With smaller copies, lossless songs above 48 kHz are converted on the Mac to 44.1 or 48 kHz before they’re kept; everything else is kept as it is. This applies to what you keep from now on.")
+                    }
                 }
                 Section {
                     Button("Setup Assistant…") {

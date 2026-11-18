@@ -17528,6 +17528,275 @@
         }
       }
     },
+    "Current": {
+      "comment": "VoiceOver on the iPhone's first-run setup: said after the name of the step you are on, in the row of step names at the top.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የአሁኑ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الحالية"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "বর্তমান"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Současné"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuværende"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktuell"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τρέχουσα"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actual"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فعلی"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nykyinen"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kasalukuyan"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actuel"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વર્તમાન"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Na yanzu"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "נוכחי"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "मौजूदा"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jelenlegi"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saat ini"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attuale"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "現在"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪ್ರಸ್ತುತ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിലവിലുള്ളത്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सध्याचे"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semasa"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nåværende"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Huidig"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਮੌਜੂਦਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Obecne"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atual"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Atual"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actual"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nuvarande"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sasa"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "தற்போதையது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ప్రస్తుతం"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ปัจจุบัน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geçerli"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поточне"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "موجودہ"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiện tại"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "目前"
+          }
+        }
+      }
+    },
     "Cover Flow reads the motion sensors only while it’s on screen, to shift its perspective as you tilt the device. Nothing is recorded.": {
       "localizations": {
         "am": {
@@ -29094,6 +29363,275 @@
           "stringUnit": {
             "state": "translated",
             "value": "已保留在此裝置上"
+          }
+        }
+      }
+    },
+    "Albums you keep are copied whole to this device, and play when the share or folder they came from can’t be reached.": {
+      "comment": "Settings on the iPhone, under Kept on This Device, for someone with no Mac paired: their music is on an SMB share or in a folder.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "የምታስቀምጣቸው አልበሞች ሙሉ በሙሉ ወደዚህ መሣሪያ ይቀዳሉ፤ የመጡበት ማጋሪያ ወይም አቃፊ ሊደረስበት በማይችልበት ጊዜም ይጫወታሉ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الألبومات التي تحتفظ بها تُنسخ كاملةً إلى هذا الجهاز، وتُشغَّل عندما يتعذّر الوصول إلى المشاركة أو المجلد الذي جاءت منه."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনি যে অ্যালবামগুলো রাখেন সেগুলো পুরোটা এই ডিভাইসে কপি হয়, এবং যে শেয়ার বা ফোল্ডার থেকে এসেছে সেটিতে পৌঁছানো না গেলেও বাজে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alba, která si uchováte, se celá zkopírují do tohoto zařízení a hrají, i když sdílení nebo složka, odkud pocházejí, nejsou dostupné."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album, du beholder, kopieres i deres helhed til denne enhed og afspilles, når den deling eller mappe, de kom fra, ikke kan nås."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alben, die du behältst, werden vollständig auf dieses Gerät kopiert und spielen auch, wenn die Freigabe oder der Ordner, aus dem sie stammen, nicht erreichbar ist."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Τα άλμπουμ που διατηρείτε αντιγράφονται ολόκληρα σε αυτήν τη συσκευή και παίζουν όταν ο κοινόχρηστος φάκελος ή ο φάκελος από τον οποίο προήλθαν δεν είναι προσβάσιμος."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los álbumes que conservas se copian enteros en este dispositivo y se reproducen cuando no se puede acceder al recurso compartido o a la carpeta de donde vinieron."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آلبوم‌هایی که نگه می‌دارید به‌طور کامل در این دستگاه کپی می‌شوند و وقتی اشتراک یا پوشه‌ای که از آن آمده‌اند در دسترس نیست هم پخش می‌شوند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Säilyttämäsi albumit kopioidaan kokonaan tälle laitteelle, ja ne toistuvat, vaikka jakoon tai kansioon, josta ne tulivat, ei saada yhteyttä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang mga album na itinatabi mo ay kinokopya nang buo sa device na ito, at tumutugtog kapag hindi maabot ang share o folder na pinanggalingan ng mga ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les albums que vous conservez sont copiés en entier sur cet appareil et sont lus lorsque le partage ou le dossier d’où ils viennent est inaccessible."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમે જે આલ્બમ રાખો છો તે આખાં આ ડિવાઇસ પર કૉપિ થાય છે, અને જે શેર કે ફોલ્ડરમાંથી તે આવ્યાં હોય તે સુધી પહોંચી ન શકાય ત્યારે પણ વાગે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kundin waƙoƙin da ka ajiye ana kwafin su gaba ɗaya zuwa wannan na'ura, kuma suna kunnawa idan ba a iya isa ga foldar cibiyar sadarwa ko foldar da suka fito ba."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אלבומים שבחרת לשמור מועתקים במלואם למכשיר זה, ומתנגנים גם כשאי אפשר להגיע לשיתוף או לתיקייה שמהם הגיעו."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जो ऐल्बम आप रखते हैं वे पूरे इस डिवाइस पर कॉपी होते हैं, और जिस शेयर या फ़ोल्डर से वे आए हैं उस तक न पहुँच पाने पर भी चलते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A megtartott albumok teljes egészében erre az eszközre másolódnak, és akkor is szólnak, ha a megosztás vagy mappa, ahonnan származnak, nem érhető el."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album yang Anda simpan disalin seluruhnya ke perangkat ini, dan diputar saat share atau folder asalnya tidak dapat dijangkau."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gli album che mantieni vengono copiati per intero su questo dispositivo e vengono riprodotti quando la condivisione o la cartella da cui provengono non è raggiungibile."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "保存したアルバムはまるごとこのデバイスにコピーされ、元の共有やフォルダに接続できないときでも再生できます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನೀವು ಇರಿಸಿಕೊಳ್ಳುವ ಆಲ್ಬಮ್‌ಗಳು ಪೂರ್ತಿಯಾಗಿ ಈ ಸಾಧನಕ್ಕೆ ನಕಲಾಗುತ್ತವೆ, ಮತ್ತು ಅವು ಬಂದ ಶೇರ್ ಅಥವಾ ಫೋಲ್ಡರ್ ತಲುಪಲು ಆಗದಿದ್ದಾಗಲೂ ಪ್ಲೇ ಆಗುತ್ತವೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보관한 앨범은 전체가 이 기기로 복사되며, 원래의 공유나 폴더에 연결할 수 없을 때에도 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങൾ സൂക്ഷിക്കുന്ന ആൽബങ്ങൾ മുഴുവനായി ഈ ഉപകരണത്തിലേക്ക് പകർത്തുന്നു, അവ വന്ന ഷെയറിലോ ഫോൾഡറിലോ എത്താൻ കഴിയാത്തപ്പോഴും പ്ലേ ചെയ്യും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुम्ही ठेवलेले अल्बम पूर्णपणे या डिव्हाइसवर कॉपी होतात, आणि ते ज्या शेअर किंवा फोल्डरमधून आले तिथे पोहोचता येत नसतानाही वाजतात."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album yang anda simpan disalin sepenuhnya ke peranti ini, dan dimainkan apabila perkongsian atau folder asalnya tidak dapat dicapai."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album du beholder, kopieres i sin helhet til denne enheten og spilles når delingen eller mappen de kom fra, ikke kan nås."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Albums die je bewaart, worden in hun geheel naar dit apparaat gekopieerd en spelen af wanneer de share of map waar ze vandaan komen niet bereikbaar is."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜਿਹੜੀਆਂ ਐਲਬਮਾਂ ਤੁਸੀਂ ਰੱਖਦੇ ਹੋ ਉਹ ਪੂਰੀਆਂ ਇਸ ਡਿਵਾਈਸ ’ਤੇ ਕਾਪੀ ਹੁੰਦੀਆਂ ਹਨ, ਅਤੇ ਜਿਸ ਸ਼ੇਅਰ ਜਾਂ ਫ਼ੋਲਡਰ ਤੋਂ ਉਹ ਆਈਆਂ ਹਨ ਉਸ ਤੱਕ ਪਹੁੰਚ ਨਾ ਹੋਣ ’ਤੇ ਵੀ ਚੱਲਦੀਆਂ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Albumy, które zachowujesz, są kopiowane w całości na to urządzenie i grają, gdy zasób lub folder, z którego pochodzą, jest niedostępny."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os álbuns que você mantém são copiados por inteiro para este dispositivo e tocam quando o compartilhamento ou a pasta de onde vieram não pode ser acessado."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Os álbuns que mantém são copiados por inteiro para este dispositivo e são reproduzidos quando a partilha ou a pasta de onde vieram não está acessível."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Albumele pe care le păstrezi sunt copiate în întregime pe acest dispozitiv și sunt redate când partajarea sau dosarul din care provin nu poate fi accesat."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Album som du behåller kopieras i sin helhet till den här enheten och spelas när resursen eller mappen de kom från inte kan nås."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Albamu unazohifadhi hunakiliwa zote kwenye kifaa hiki, na huchezwa wakati folda ya mtandao au folda zilikotoka haifikiki."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "நீங்கள் வைத்திருக்கும் ஆல்பங்கள் முழுமையாக இந்தச் சாதனத்திற்கு நகலெடுக்கப்படும்; அவை வந்த பகிர்வையோ கோப்புறையையோ அணுக முடியாதபோதும் இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీరు ఉంచుకునే ఆల్బమ్‌లు పూర్తిగా ఈ పరికరానికి కాపీ అవుతాయి, అవి వచ్చిన షేర్ లేదా ఫోల్డర్‌ను చేరుకోలేనప్పుడు కూడా ప్లే అవుతాయి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "อัลบั้มที่คุณเก็บไว้จะถูกคัดลอกทั้งหมดมายังอุปกรณ์เครื่องนี้ และเล่นได้แม้เข้าถึงแชร์หรือโฟลเดอร์ต้นทางไม่ได้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tuttuğunuz albümler bütünüyle bu aygıta kopyalanır ve geldikleri paylaşıma veya klasöre ulaşılamadığında da çalınır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Альбоми, які ви зберігаєте, повністю копіюються на цей пристрій і відтворюються, коли ресурс або папка, звідки вони походять, недоступні."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جو البمز آپ رکھتے ہیں وہ پورے کے پورے اس ڈیوائس پر کاپی ہوتے ہیں، اور جس شیئر یا فولڈر سے وہ آئے ہیں اس تک رسائی نہ ہونے پر بھی چلتے ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Các album bạn giữ lại được sao chép toàn bộ vào thiết bị này và vẫn phát khi không thể truy cập chia sẻ hoặc thư mục gốc của chúng."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你保留的专辑会完整拷贝到此设备上，在无法访问其来源的共享或文件夹时也能播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你保留的專輯會完整拷貝到此裝置上，在無法連接其來源的共享或檔案夾時也能播放。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你保留嘅專輯會完整複製到此裝置上，喺連接唔到佢哋來源嘅共享或資料夾時都可以播放。"
           }
         }
       }

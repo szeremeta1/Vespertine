@@ -304,8 +304,10 @@ struct RemoteBridge {
         }
     }
 
-    static func overview(of library: LibraryStore, connecting: (LibrarySource) -> Bool = { _ in false }) -> LibraryOverview {
-        LibraryOverview(albums: library.stats.albums, artists: library.stats.artists, songs: library.stats.tracks, genres: library.genres.count,
+    /// `songs`: how many rows the Songs list has, when that isn't every file: while a song's versions are combined, a
+    /// stereo and a surround copy are one row, and the count beside "Songs" says what the list holds.
+    static func overview(of library: LibraryStore, songs: Int? = nil, connecting: (LibrarySource) -> Bool = { _ in false }) -> LibraryOverview {
+        LibraryOverview(albums: library.stats.albums, artists: library.stats.artists, songs: songs ?? library.stats.tracks, genres: library.genres.count,
                         favorites: library.favoriteCount, playlists: library.playlists.count, sources: sources(of: library, connecting: connecting))
     }
 
@@ -452,7 +454,10 @@ struct RemoteBridge {
         case .favorites:
             return .tracks(items: trackSummaries(Self.favoriteSongs(in: library, choose: model.listedCopy)))
         case .library:
-            return .library(Self.overview(of: library, connecting: { $0.isNetwork && model.shares.status(of: $0) == .connecting }))
+            // The same list the Songs page is given (kept until the library or the output changes), so the two agree.
+            let listed = library.combinesVersions
+                ? Self.songs(of: library, surround: model.outputWantsMultichannel(), oneCopyEach: model.oneCopyEach).count : nil
+            return .library(Self.overview(of: library, songs: listed, connecting: { $0.isNetwork && model.shares.status(of: $0) == .connecting }))
         case .genres:
             return .genres(items: Self.genres(of: library))
         case .genreAlbums(let key):

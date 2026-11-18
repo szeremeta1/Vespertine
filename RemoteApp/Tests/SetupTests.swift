@@ -184,3 +184,10 @@ import Testing
         #expect(SettingsView.showsMacFetching(pairedMacs: 3))
     }
 }
+
+@Suite struct SetupSpoken {
+    @Test func aChoiceIsSpokenWithWhatItMeans() {
+        #expect(SetupChoice.spoken(title: "Just looking", detail: "A made-up library.") == "Just looking. A made-up library.")
+        #expect(SetupChoice.spoken(title: "Just looking", detail: "") == "Just looking")
+    }
+}

@@ -193,6 +193,8 @@ struct SetupFlow: View {
                 // Read as text, in order, with the step you are on marked as the selected one.
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text(title(item)))
+                // Said in words: the selected trait alone isn't spoken on plain text.
+                .accessibilityValue(item == current ? Text("Current") : Text(verbatim: ""))
                 .accessibilityAddTraits(item == current ? [.isStaticText, .isSelected] : .isStaticText)
             }
         }

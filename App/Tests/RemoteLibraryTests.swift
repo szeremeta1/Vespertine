@@ -59,6 +59,17 @@ struct RemoteLibraryTests {
         #expect(RemoteBridge.songs(of: library).map(\.title) == ["Apple 2", "apple 10", "Éclair", "Mango", "Zebra Crossing"])
     }
 
+    @Test("The count beside Songs is the length of the list a phone is given, not the number of files")
+    func songCountMatchesTheList() async throws {
+        let (library, root) = try await library(songs: ["Tide", "Tide (5.1)", "Harbor"])
+        defer { try? FileManager.default.removeItem(at: root) }
+        #expect(RemoteBridge.overview(of: library).songs == 3)
+        // Two of the files are one song's versions: the list has it once, and the count follows the list.
+        let listed = RemoteBridge.songs(of: library, surround: true, oneCopyEach: { $0.filter { $0.title != "Tide (5.1)" } })
+        #expect(listed.map(\.title) == ["Harbor", "Tide"])
+        #expect(RemoteBridge.overview(of: library, songs: listed.count).songs == 2)
+    }
+
     @Test("A search answers in groups, and only with what matches every word")
     func findsInGroups() async throws {
         let (library, root) = try await library(songs: ["Night Train", "Night Owl", "Morning"])
