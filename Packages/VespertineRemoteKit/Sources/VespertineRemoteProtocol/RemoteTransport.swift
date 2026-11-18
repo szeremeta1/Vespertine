@@ -2,9 +2,13 @@
 // Vespertine: the connection settings both ends of the remote use (Network.framework, Apple platforms only).
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
-// TLS 1.2 with pre-shared keys (TLS_PSK_WITH_AES_128_GCM_SHA256), as in Apple's peer-to-peer networking sample: no
-// certificates to make, trust or renew. The Mac lists every paired phone's key, plus the pairing keys while a pairing
-// window is open; a phone offers just its own. Inside the TLS, each JSON message goes as a 4-byte big-endian length
+// TLS 1.2 with pre-shared keys, as in Apple's peer-to-peer networking sample: no certificates to make, trust or renew.
+// The Mac lists every paired phone's key, plus the pairing keys while a pairing window is open; a phone offers just its own.
+// Both ends offer TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256 first and TLS_PSK_WITH_AES_128_GCM_SHA256 after it, and two
+// ends of this version agree on the first: the session keys then also come from an elliptic-curve Diffie-Hellman exchange,
+// so a recording of the connection can't be opened by trying keys. That matters for pairing by the typed 6-digit code:
+// its pre-shared key comes from one of 900,000 codes, and with plain PSK anyone who recorded the pairing could try them
+// all offline, open the session and read the phone's new long-term key. A phone or Mac from before still agrees on plain PSK. Inside the TLS, each JSON message goes as a 4-byte big-endian length
 // and then its bytes (`RemoteFrame`). (Network's WebSocket refused to connect on loopback in CI, with or without TLS,
 // and a WebSocket gains nothing here: nothing but this app speaks to the port.)
 //
@@ -25,6 +29,14 @@ public enum RemoteTransport {
         }
     }
 
+    /// The cipher suites offered, in order of preference: ECDHE-PSK (forward secret: a recorded session can't be opened by
+    /// guessing the pre-shared key, which a typed pairing code would make possible), then plain PSK for the other end's sake
+    /// when it is from before (that is what every version up to this one offered, and the only suite it takes).
+    public static let cipherSuites: [tls_ciphersuite_t] = [
+        tls_ciphersuite_t(rawValue: 0xCCAC)!,   // TLS_ECDHE_PSK_WITH_CHACHA20_POLY1305_SHA256 (RFC 7905)
+        tls_ciphersuite_t(rawValue: UInt16(TLS_PSK_WITH_AES_128_GCM_SHA256))!,
+    ]
+
     /// TCP + TLS (with `keys`) + message framing, for the Mac's listener (every key it accepts) or a phone's connection (its one).
     public static func parameters(keys: [PresharedKey]) -> NWParameters {
         let tls = NWProtocolTLS.Options()
@@ -34,7 +46,7 @@ public enum RemoteTransport {
             let identity = Data(psk.identity.utf8).withUnsafeBytes { DispatchData(bytes: $0) }
             sec_protocol_options_add_pre_shared_key(security, key as __DispatchData, identity as __DispatchData)
         }
-        sec_protocol_options_append_tls_ciphersuite(security, tls_ciphersuite_t(rawValue: UInt16(TLS_PSK_WITH_AES_128_GCM_SHA256))!)
+        for suite in cipherSuites { sec_protocol_options_append_tls_ciphersuite(security, suite) }
         sec_protocol_options_set_min_tls_protocol_version(security, .TLSv12)
         sec_protocol_options_set_max_tls_protocol_version(security, .TLSv12)
 
