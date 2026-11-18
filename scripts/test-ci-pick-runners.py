@@ -4,11 +4,12 @@
     python3 scripts/test-ci-pick-runners.py
 
 The rules they pin: a pull request from a fork never reaches the project's Macs; a Mac that has gone quiet gets nothing;
-with nothing readable the answer is GitHub's runners, as before; and a burst of work spreads instead of piling up.
+with nothing readable the answer is GitHub's runners, as before; and a burst of work spills over to GitHub's runners instead of piling up.
 CI runs this on every change (Linux).
 """
 import importlib.util, json, os, subprocess, sys, tempfile, time, unittest
 
+sys.dont_write_bytecode = True  # importing the script must not leave a __pycache__ beside it
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCRIPT = os.path.join(HERE, "ci-pick-runners.py")
 spec = importlib.util.spec_from_file_location("ci_pick", SCRIPT)
@@ -47,32 +48,36 @@ class Plan(unittest.TestCase):
         self.assertEqual(pick.plan(ALL, set()), {job: "hosted" for job in ALL})
 
     def test_one_pull_request_lands_on_the_projects_macs(self):
-        chosen = pick.plan(ALL, {"fast", "shared"})
-        self.assertEqual(chosen["app"], "fast")
-        self.assertNotIn("hosted", chosen.values())
+        # A short job placed last may be quicker on an idle GitHub runner; not once GitHub has a queue.
+        for macs in ({"fast"}, {"fast", "shared"}):
+            self.assertEqual(pick.plan(ALL, macs)["app"], "own")
+        self.assertEqual(pick.plan(ALL, {"fast"}, hosted_busy=10), {job: "own" for job in ALL})
+        self.assertEqual(pick.plan(ALL, {"fast", "shared"}, hosted_busy=10), {job: "own" for job in ALL})
 
     def test_only_needed_jobs_are_placed(self):
-        self.assertEqual(pick.plan(["verification"], {"fast"}), {"verification": "fast"})
+        self.assertEqual(pick.plan(["verification"], {"fast"}), {"verification": "own"})
 
-    def test_a_busy_mac_overflows_to_the_others(self):
-        chosen = pick.plan(ALL, {"fast", "shared"}, {"fast": 60, "shared": 0})
-        self.assertNotIn("fast", chosen.values())
-        self.assertIn("hosted", chosen.values())
+    def test_a_long_queue_overflows_to_github(self):
+        self.assertEqual(set(pick.plan(ALL, {"fast", "shared"}, waiting=120).values()), {"hosted"})
 
     def test_a_full_hosted_queue_keeps_work_on_the_macs(self):
-        chosen = pick.plan(ALL, {"fast"}, {"fast": 30}, hosted_busy=40)
-        self.assertEqual(set(chosen.values()), {"fast"})
+        self.assertEqual(set(pick.plan(ALL, {"fast"}, waiting=60, hosted_busy=40).values()), {"own"})
 
-    def test_a_burst_uses_all_three(self):
-        waiting, hosted_busy, used = {}, 0, set()
-        for _ in range(6):
-            for job, pool in pick.plan(ALL, {"fast", "shared"}, waiting, hosted_busy).items():
-                used.add(pool)
-                if pool == "hosted":
+    def test_the_slow_mac_alone_takes_only_what_it_finishes_sooner(self):
+        chosen = pick.plan(ALL, {"shared"})
+        self.assertEqual(chosen["app"], "own")
+        self.assertEqual(pick.plan(ALL, {"shared"}, waiting=30)["verification"], "hosted")
+
+    def test_a_burst_uses_both_places(self):
+        waiting, hosted_busy, used = 0.0, 0, set()
+        for _ in range(8):
+            for job, place in pick.plan(ALL, {"fast", "shared"}, waiting, hosted_busy).items():
+                used.add(place)
+                if place == "hosted":
                     hosted_busy += 1
                 else:
-                    waiting[pool] = waiting.get(pool, 0) + pick.MINUTES[pool][job]
-        self.assertEqual(used, {"fast", "shared", "hosted"})
+                    waiting += pick.OWN_MINUTES[job]
+        self.assertEqual(used, {"own", "hosted"})
 
 
 class Load(unittest.TestCase):
@@ -80,7 +85,7 @@ class Load(unittest.TestCase):
         now = time.time()
         started = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(now - 240))
         jobs = [
-            {"name": pick.JOB_NAMES["app"], "status": "queued", "labels": ["self-hosted", "macOS", "vespertine-fast"]},
+            {"name": pick.JOB_NAMES["app"], "status": "queued", "labels": ["self-hosted", "macOS", "vespertine"]},
             {"name": pick.JOB_NAMES["packages"], "status": "in_progress", "started_at": started,
              "labels": ["self-hosted", "macOS", "vespertine-fast"]},
             {"name": pick.JOB_NAMES["verification"], "status": "queued", "labels": ["self-hosted", "macOS", "vespertine-shared"]},
@@ -89,8 +94,8 @@ class Load(unittest.TestCase):
             {"name": "Analysis core (Linux)", "status": "in_progress", "labels": ["ubuntu-latest"]},
         ]
         waiting, hosted_busy = pick.load(jobs, now)
-        self.assertAlmostEqual(waiting["fast"], pick.MINUTES["fast"]["app"] + pick.MINUTES["fast"]["packages"] - 4, delta=0.2)
-        self.assertEqual(waiting["shared"], pick.MINUTES["shared"]["verification"])
+        own = pick.OWN_MINUTES
+        self.assertAlmostEqual(waiting, own["app"] + own["packages"] - 4 + own["verification"], delta=0.2)
         self.assertEqual(hosted_busy, 1)
 
 
@@ -105,7 +110,7 @@ class Script(unittest.TestCase):
 
     def test_a_pull_request_from_the_repository_uses_them(self):
         out = run(pull_request("szeremeta1/Vespertine"), **self.fresh)
-        self.assertEqual(out["app_runner"], ["self-hosted", "macOS", "vespertine-fast"])
+        self.assertEqual(out["app_runner"], ["self-hosted", "macOS", "vespertine"])
 
     def test_nothing_readable_is_hosted(self):
         self.assertEqual(run({}), self.hosted)
