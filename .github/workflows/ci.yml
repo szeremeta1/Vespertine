@@ -30,7 +30,16 @@
 #   long run was going left three of them untested and the README badge red);
 # - pull requests restore the SwiftPM caches but only main saves them, so per-PR copies (0.7 to 1.3 GB each) don't
 #   push main's out of the repository's 10 GB cache;
-# - every job has a timeout of about twice its longest run so far, so a hung test can't hold a runner for an hour.
+# - every job has a timeout of about twice its longest run so far, so a hung test can't hold a runner for an hour;
+# - a macOS job runs on GitHub's runner (macos-26) or on one of the project's own two Macs, whichever would finish it
+#   first: scripts/ci-pick-runners.py decides for each job, from which Macs are taking jobs right now and what is
+#   already waiting where, and says why in the run's summary. A Mac that is off, asleep or unplugged gets nothing, and
+#   the job runs on GitHub's runner as before. Pull requests from forks never run on the project's Macs (the script
+#   refuses, and the repository asks for approval before any workflow from an outside contributor runs at all).
+#   Setting the repository variable CI_OWN_MACS to "off", or choosing "github" on a manual run, sends everything to
+#   GitHub's runners. The project's Macs keep their files between runs, so the steps below leave nothing behind that a
+#   later run reads: the checkout is cleaned, the app's tests get a bundle identifier and data directory of their own,
+#   and no test that opens a real audio device is on (they are all opt-in, by environment variables no runner sets).
 name: CI
 
 on:
@@ -40,6 +49,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      macs:
+        description: Where the macOS jobs run (auto picks the project's Macs or GitHub's runners, whichever is quicker)
+        type: choice
+        options: [auto, github]
+        default: auto
 
 # Actions are pinned by commit (a tag can be moved); Dependabot proposes updates. The Linux image is pinned by digest.
 permissions:
@@ -54,16 +69,35 @@ jobs:
     name: Which macOS jobs this change needs (Linux)
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read # the picker reads the repository's queued and running jobs
     outputs:
       packages: ${{ steps.changes.outputs.packages }}
       app: ${{ steps.changes.outputs.app }}
       verification: ${{ steps.changes.outputs.verification }}
+      packages_runner: ${{ steps.runners.outputs.packages_runner }}
+      app_runner: ${{ steps.runners.outputs.app_runner }}
+      verification_runner: ${{ steps.runners.outputs.verification_runner }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 2
       - id: changes
         run: python3 scripts/ci-changes.py | tee -a "$GITHUB_OUTPUT"
+      # Where each macOS job runs. If this step fails or prints nothing, the jobs fall back to macos-26 below.
+      - id: runners
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NEED_PACKAGES: ${{ steps.changes.outputs.packages }}
+          NEED_APP: ${{ steps.changes.outputs.app }}
+          NEED_VERIFICATION: ${{ steps.changes.outputs.verification }}
+          CI_OWN_MACS: ${{ vars.CI_OWN_MACS }}
+          CI_MACS_INPUT: ${{ inputs.macs }}
+          CI_MAC_FAST_SEEN: ${{ vars.CI_MAC_FAST_SEEN }}
+          CI_MAC_SHARED_SEEN: ${{ vars.CI_MAC_SHARED_SEEN }}
+        run: python3 scripts/ci-pick-runners.py | tee -a "$GITHUB_OUTPUT"
 
   analysis-linux:
     name: Analysis core (Linux)
@@ -110,14 +144,17 @@ jobs:
     if: >-
       ${{ !cancelled() && needs.changes.outputs.packages != 'false' &&
       (github.event_name != 'pull_request' || !github.event.pull_request.draft) }}
-    runs-on: macos-26
+    runs-on: ${{ fromJSON(needs.changes.outputs.packages_runner || '"macos-26"') }}
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Toolchain
         run: xcodebuild -version && swift --version
+      # GitHub's runners only: the cached build folder holds the paths of the runner that made it, so one of the
+      # project's Macs can't use it (and must not save one for GitHub's runners to restore).
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         id: kit-cache
+        if: runner.environment == 'github-hosted'
         with:
           path: Packages/VespertineKit/.build
           key: spm-kit-${{ runner.os }}-${{ hashFiles('Packages/VespertineKit/Package.resolved') }}
@@ -127,8 +164,9 @@ jobs:
       # The build runs outside the watchdog (a cold release build can take 15 minutes on a slow runner and must not eat the
       # test budget); a test hang prints the test process's stacks after 15 minutes instead of waiting out the job.
       # -enable-testing is what swift test adds by itself for the tests' @testable imports; swift build does not.
+      # CI_BUILD_JOBS is set only by a runner that must leave room for other work: it caps the compile jobs.
       - name: Build VespertineKit and its tests (release)
-        run: swift build --package-path Packages/VespertineKit --build-tests -c release -Xswiftc -enable-testing
+        run: swift build --package-path Packages/VespertineKit --build-tests -c release -Xswiftc -enable-testing ${CI_BUILD_JOBS:+-j $CI_BUILD_JOBS}
       - name: VespertineKit tests (release)
         run: scripts/run-with-watchdog.sh 900 swift test --package-path Packages/VespertineKit -c release --skip-build --skip VespertineUPnPTests --skip VespertineAirPlayTests
       # The network player and AirPlay tests play to a fake renderer and a fake receiver over the loopback, against the
@@ -143,7 +181,7 @@ jobs:
       - name: Remote protocol tests (macOS)
         run: scripts/run-with-watchdog.sh 300 swift test --package-path Packages/VespertineRemoteKit
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: github.ref == 'refs/heads/main' && steps.kit-cache.outputs.cache-hit != 'true'
+        if: runner.environment == 'github-hosted' && github.ref == 'refs/heads/main' && steps.kit-cache.outputs.cache-hit != 'true'
         with:
           path: Packages/VespertineKit/.build
           key: ${{ steps.kit-cache.outputs.cache-primary-key }}
@@ -186,34 +224,42 @@ jobs:
     if: >-
       ${{ !cancelled() && needs.changes.outputs.app != 'false' &&
       (github.event_name != 'pull_request' || !github.event.pull_request.draft) }}
-    runs-on: macos-26
+    runs-on: ${{ fromJSON(needs.changes.outputs.app_runner || '"macos-26"') }}
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Toolchain
         run: xcodebuild -version
       - name: Generate the project
-        run: brew install xcodegen && scripts/generate-project.sh
+        run: (command -v xcodegen >/dev/null || brew install xcodegen) && scripts/generate-project.sh
       - name: App and kit lockfiles agree
         run: python3 scripts/check-lockfiles.py
       - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         id: app-cache
+        if: runner.environment == 'github-hosted'
         with:
           path: build/CI/SourcePackages
           key: spm-app-${{ runner.os }}-${{ hashFiles('project.yml', 'App/Package.resolved') }}
           restore-keys: spm-app-${{ runner.os }}-
+      # The tests run inside the app. On a Mac that someone also uses, the app must not read that person's settings
+      # (their saved output device above all) or a library a previous run left: so it gets a bundle identifier of its
+      # own, whose settings are deleted first, and the scheme's test library (-VespertineDataDirectory) starts empty.
       - name: App tests
         run: |
           # The build log runs past what the log viewer keeps, so a failure repeats the compiler's errors at the end.
           set -o pipefail
           mkdir -p build
+          rm -rf /tmp/vespertine-test-host-library
+          defaults delete org.szeremeta.Vespertine.ci 2>/dev/null || true
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Debug -destination 'platform=macOS' \
-            -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile CODE_SIGNING_ALLOWED=NO test 2>&1 | tee build/app-tests.log \
+            -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile ${CI_BUILD_JOBS:+-jobs $CI_BUILD_JOBS} \
+            CODE_SIGNING_ALLOWED=NO PRODUCT_BUNDLE_IDENTIFIER=org.szeremeta.Vespertine.ci test 2>&1 | tee build/app-tests.log \
             || { echo "::group::Errors"; grep -E ': error: |While evaluating request|While emitting' build/app-tests.log | sort -u; echo "::endgroup::"; exit 1; }
       - name: Universal Release build
         run: |
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -destination 'generic/platform=macOS' \
-            -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO build
+            -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile ${CI_BUILD_JOBS:+-jobs $CI_BUILD_JOBS} \
+            ONLY_ACTIVE_ARCH=NO CODE_SIGNING_ALLOWED=NO build
           app=build/CI/Build/Products/Release/Vespertine.app
           # Current lipo verifies one architecture per call (two make it read the second as an input file).
           for arch in arm64 x86_64; do lipo "$app/Contents/MacOS/Vespertine" -verify_arch $arch; done
@@ -224,10 +270,11 @@ jobs:
           set -o pipefail
           xcodegen generate --spec RemoteApp/project.yml
           xcodebuild -project RemoteApp/VespertineRemote.xcodeproj -scheme VespertineRemote -configuration Debug \
-            -destination 'generic/platform=iOS Simulator' -derivedDataPath build/CI-iOS CODE_SIGNING_ALLOWED=NO build 2>&1 | tee build/remote-ios.log \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build/CI-iOS ${CI_BUILD_JOBS:+-jobs $CI_BUILD_JOBS} \
+            CODE_SIGNING_ALLOWED=NO build 2>&1 | tee build/remote-ios.log \
             || { echo "::group::Errors"; grep -E ': error: |While evaluating request|While emitting' build/remote-ios.log | sort -u; echo "::endgroup::"; exit 1; }
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: github.ref == 'refs/heads/main' && steps.app-cache.outputs.cache-hit != 'true'
+        if: runner.environment == 'github-hosted' && github.ref == 'refs/heads/main' && steps.app-cache.outputs.cache-hit != 'true'
         with:
           path: build/CI/SourcePackages
           key: ${{ steps.app-cache.outputs.cache-primary-key }}
@@ -256,6 +303,10 @@ jobs:
       - name: macOS job gate tests
         if: ${{ !cancelled() }}
         run: python3 scripts/test-ci-changes.py
+      # Nor this: where the macOS jobs run (a fork never reaches the project's Macs; a quiet Mac gets nothing).
+      - name: macOS runner choice tests
+        if: ${{ !cancelled() }}
+        run: python3 scripts/test-ci-pick-runners.py
       # Not verification, but a Linux job every change runs (no path filter), so a catalog or Swift string change
       # can't skip it: every string translated, placeholders matching, every localized literal in the catalog.
       - name: String Catalogs complete
@@ -283,7 +334,7 @@ jobs:
     if: >-
       ${{ !cancelled() && needs.changes.outputs.verification != 'false' &&
       (github.event_name != 'pull_request' || !github.event.pull_request.draft) }}
-    runs-on: macos-26
+    runs-on: ${{ fromJSON(needs.changes.outputs.verification_runner || '"macos-26"') }}
     timeout-minutes: 60
     env:
       VERIFICATION_IEC_OUT: ${{ github.workspace }}/verification-carriers
@@ -298,7 +349,7 @@ jobs:
       # adapter. One step per group, so a slow or stuck group is named in the log; the first one builds.
       - name: Build, then DoP packing
         timeout-minutes: 20
-        run: swift test -c release --package-path verification/harness --filter DoPPackAcceptance
+        run: swift test -c release --package-path verification/harness --filter DoPPackAcceptance ${CI_BUILD_JOBS:+-j $CI_BUILD_JOBS}
       - name: DoP output stream
         if: ${{ !cancelled() }}
         timeout-minutes: 10

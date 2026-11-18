@@ -204,13 +204,15 @@ private func song(_ id: Int64, seconds: Double = 1) -> TrackSummary {
         #expect(abs(kept.position - 0.3) < 0.001)
 
         // The app is ended and opened again: another player, the same shelf.
-        let (again, _) = try make(mac)
-        let asksBefore = mac.asks.count
+        // It has a Mac of its own to count on: the first player is still there, and what it asks its Mac (the song it
+        // sought in, the song after) is answered off the main actor, so a count shared with it moves at any moment.
+        let unasked = TapeMac()
+        let (again, _) = try make(unasked)
         let second = QueueKeeper(playback: again, shelf: shelf, owner: "mac")
         second.start()
         #expect(again.queue == playback.queue)
         #expect(again.nowPlaying?.track.id == 2 && abs(again.position - 0.3) < 0.001)
-        #expect(!again.isPlaying && mac.asks.count == asksBefore)
+        #expect(!again.isPlaying && unasked.asks.isEmpty)
         playback.stop()
     }
 
