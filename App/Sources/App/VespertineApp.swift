@@ -10,6 +10,10 @@ import SwiftUI
 
 @main
 struct VespertineApp: App {
+    #if DEBUG
+    // First, before anything below can look for an audio device: see CIQuiet (CI on a Mac that is in use).
+    private let ciQuiet = CIQuiet.applied
+    #endif
     @State private var startup = LibraryStartup()
     @State private var updater = AppUpdater()
     @State private var roomMeasure = RoomMeasureModel()

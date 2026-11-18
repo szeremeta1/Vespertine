@@ -41,11 +41,12 @@
 #   GitHub's runners ("own" on a manual run uses the Macs even then, to try a change to them before switching back on).
 #   The project's Macs keep their files between runs, so the steps below leave nothing behind that a later run reads:
 #   the checkout is cleaned, the app's tests get a bundle identifier and data directory of their own.
-#   Those Macs are in use (one may be playing music, another carrying a call), so their runners start every test
-#   process with no way to talk to macOS's audio system: the tests see no audio devices at all, whatever they try, and
-#   a test that needs one to exist says so and is skipped there (GitHub's runners have one). The runner tells the
-#   tests so (VESPERTINE_CI_NO_AUDIO=1), and one test in the kit and one in the app fail if they can see a device
-#   after all.
+#   Those Macs are in use (one may be playing music, another carrying a call), so no test there can talk to macOS's
+#   audio system: the runner starts `swift test` in a sandbox that can't, and tells the tests so
+#   (VESPERTINE_CI_NO_AUDIO=1); told the same, the debug app that hosts the app's tests shuts itself off first thing
+#   (CIQuiet). The tests then see no audio devices at all, whatever they try: one that needs a device to exist says so
+#   and is skipped there (GitHub's runners have one), and one test in the kit and one in the app fail if they can see
+#   a device after all.
 name: CI
 
 on:
