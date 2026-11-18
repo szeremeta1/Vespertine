@@ -9,11 +9,23 @@ import VespertineVisualizer
 /// The cover the visualizer window shows, from the library and the artwork cache the app really uses.
 @Suite("Visualizer cover in the app", .serialized) @MainActor
 struct VisualizerArtworkAppTests {
+    /// A patterned cover, built from raw bytes. Not pixel by pixel with `NSBitmapImageRep.setColor`: an sRGB colour set on
+    /// a device RGB bitmap logs two lines ("Unrecognized colorspace number -1") for every pixel, which had these tests write
+    /// millions of lines to the Mac's log and to CI's, and take minutes.
     private func png(_ side: Int, red: CGFloat = 0.8) -> Data {
-        let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: side, pixelsHigh: side, bitsPerSample: 8, samplesPerPixel: 4,
-                                   hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0)!
-        for x in 0..<side { for y in 0..<side { rep.setColor(NSColor(srgbRed: red, green: CGFloat(x % 9) / 12, blue: CGFloat(y % 7) / 9, alpha: 1), atX: x, y: y) } }
-        return rep.representation(using: .png, properties: [:])!
+        var bytes = [UInt8](repeating: 255, count: side * side * 4)
+        for y in 0..<side {
+            for x in 0..<side {
+                let i = (y * side + x) * 4
+                bytes[i] = UInt8((red * 255).rounded())
+                bytes[i + 1] = UInt8((CGFloat(x % 9) / 12 * 255).rounded())
+                bytes[i + 2] = UInt8((CGFloat(y % 7) / 9 * 255).rounded())
+            }
+        }
+        let image = CGImage(width: side, height: side, bitsPerComponent: 8, bitsPerPixel: 32, bytesPerRow: side * 4,
+                            space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.noneSkipLast.rawValue),
+                            provider: CGDataProvider(data: Data(bytes) as CFData)!, decode: nil, shouldInterpolate: false, intent: .defaultIntent)!
+        return NSBitmapImageRep(cgImage: image).representation(using: .png, properties: [:])!
     }
 
     private func scratch() throws -> URL {
