@@ -38,7 +38,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/VERIFICATION.md:21`: "Vespertine switches the device's nominal rate and reads it back from Core Audio. It doesn't trust its own request."
 - **Text:** `docs/VERIFICATION.md:42`: "The device values are read from Core Audio after playback starts:"
-- **Text:** `site/src/i18n/en.json:532`: "The signal path reads back what Core Audio actually did: the device’s nominal rate, its physical format and who holds it."
+- **Text:** `site/src/i18n/en.json:533`: "The signal path reads back what Core Audio actually did: the device’s nominal rate, its physical format and who holds it."
 - **Property:** the rate, physical format and hog owner that the verdict uses are the values Core Audio returned (`kAudioDevicePropertyNominalSampleRate`, `kAudioStreamPropertyPhysicalFormat`, `kAudioDevicePropertyHogMode`). If a readback fails, the verdict must not fall back to what Vespertine asked for.
 - **Governed by:** vespertine-rule; the meaning of each property comes from Apple's Core Audio headers (spec for the property semantics only).
 - **Route:** spec-traced (verdict group: a failed or stale readback must not yield BIT-PERFECT); source review recorded in `FINDINGS.md` (F-01). The readback itself happens in `OutputSession`, which needs a real device; see `hardware/LOOPBACK.md` step P1.
@@ -148,7 +148,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 
 - **Text:** `docs/FEATURES.md:93`: "An active preset that changes samples replaces BIT-PERFECT with EQUALIZER."
 - **Text:** `site/src/i18n/en.json:276`: "Off by default; when it’s on, the signal path says"
-- **Text:** `README.md:125`: "when it is on the signal path says EQUALIZER."
+- **Text:** `README.md:147`: "when it is on the signal path says EQUALIZER."
 - **Property:** with an equalizer preset applied, the verdict is false; and when no earlier reason applies (resampling, DSD → PCM, lossy source, mixing, device class, spatial, channels), the status line is EQUALIZER.
 - **Governed by:** vespertine-rule.
 - **Route:** spec-traced (verdict group).
@@ -412,7 +412,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-RATE-01 <a id="rate-native"></a>The DAC runs at the track's own rate
 
 - **Text:** `docs/FEATURES.md:35`: "Vespertine switches the DAC to each track's native rate."
-- **Text:** `README.md:124`: "Switches your DAC to each file's sample rate"
+- **Text:** `README.md:146`: "Switches your DAC to each file's sample rate"
 - **Text:** `site/src/i18n/en.json:129`: "Vespertine switches the device to each file’s rate and resamples"
 - **Property:** when the device lists the source rate and the policy is "match source", the planned device rate equals the source rate and nothing is resampled.
 - **Governed by:** vespertine-rule.
@@ -475,7 +475,7 @@ Requirement records point back to these anchors (`claim: CLAIMS.md#<anchor>`).
 ### CL-DEC-01 <a id="dec-lossless"></a>Lossless decoders are exact
 
 - **Text:** `docs/ARCHITECTURE.md:58`: "A test checks TrueHD decodes identically to the 24-bit source it was encoded from."
-- **Text:** `site/src/i18n/en.json:325`: "Lossless, can be bit-perfect"
+- **Text:** `site/src/i18n/en.json:326`: "Lossless, can be bit-perfect"
 - **Property:** decoding returns the encoder's input exactly.
 - **Governed by:** oracle (the decoders are FFmpeg's and SFBAudioEngine's).
 - **Route:** inventory.

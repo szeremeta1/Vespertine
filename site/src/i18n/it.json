@@ -165,7 +165,7 @@
         "links": [
           "I gruppi di altoparlanti nel dettaglio"
         ],
-        "alt": "L’editor dei gruppi di altoparlanti di Vespertine per un quad: un disegno della stanza visto dall’alto con quattro altoparlanti attorno alla posizione d’ascolto, e distanza, angolo, ritardo e livello di ciascuno.",
+        "alt": "L’editor dei gruppi di altoparlanti di Vespertine per un quad: una stanza disegnata in tre dimensioni con quattro altoparlanti su stativi attorno alla posizione d’ascolto, e larghezza, profondità e altezza del soffitto della stanza.",
         "floatAlt": "La mappa dei canali: ogni canale di ogni uscita assegnato a un altoparlante, con un pulsante «Identify» e una casella «Inverted» su ogni canale.",
         "floatCaption": "Mappa dei canali"
       },
@@ -274,7 +274,8 @@
           "Condivisioni di rete via SMB, NFS o WebDAV, con cache, Mantieni offline e una riproduzione pensata per i server lenti: i brani vengono caricati in un buffer sul tuo Mac prima di essere riprodotti e, nel frattempo, sul pulsante di riproduzione compare un anello di caricamento.",
           "Trova musica cerca la tua vera musica su ogni disco e lascia da parte il superfluo. Una breve configurazione al primo avvio sceglie la tua uscita e spiega cosa fanno l’accesso esclusivo e il ReplayGain.",
           "EQ parametrico per ogni uscita, che importa preset AutoEQ ed Equalizer APO. Disattivato per impostazione predefinita; quando è attivo, il percorso del segnale indica <span class=\"mono nowrap\">EQUALIZZATORE</span> invece di <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Mini player, icona nella barra dei menu, tasti multimediali, ReplayGain e aggiornamenti automatici firmati."
+          "Mini player, icona nella barra dei menu, tasti multimediali, ReplayGain e aggiornamenti automatici firmati.",
+          "Facoltativi, e disattivati finché non li attivi: lettori di rete (UPnP) e ricevitori AirPlay come uscite, il tuo server OpenSubsonic nella barra laterale, un telecomando per il telefono o per qualsiasi browser della tua rete, un visualizzatore e transizioni tra i brani."
         ],
         "links": [
           "Tutte le funzioni, nel dettaglio"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Fa streaming da Qobuz, TIDAL o Apple Music?",
-          "a": "No. Vespertine riproduce la musica che possiedi: sul Mac, su unità esterne o su una condivisione di rete. I download dell’abbonamento Apple Music protetti da DRM non possono essere riprodotti."
+          "a": "Non da un servizio commerciale: Vespertine non ha un client per Qobuz, TIDAL o Apple Music, e i download di Apple Music protetti da DRM non possono essere riprodotti. Riproduce la musica che possiedi: sul Mac, su unità esterne o su una condivisione di rete. Due funzioni beta facoltative aggiungono il tuo server OpenSubsonic (Navidrome e altri) e la musica inviata dalle app di controllo UPnP."
         },
         {
           "q": "Come faccio a sapere che è davvero bit-perfect?",

@@ -108,6 +108,30 @@ struct AirPlayFormatTests {
         #expect(AirPlay2Message.acceptedFormats(info: Data()) == nil)
     }
 
+    @Test("An Apple TV 4K's own answer: 16-bit at 44.1 kHz on a realtime stream, whatever its buffered streams take; a Roku's says nothing")
+    func realReceivers() {
+        // As an Apple TV 4K (AppleTV14,1, AirPlay 1005.13.2) answered on 2026-11-17. Its buffered streams take 24-bit and
+        // 48 kHz ALAC (bits 19 and 21); its realtime stream takes PCM, ALAC, AAC-LC and AAC-ELD at 44.1 kHz only.
+        let appleTV: [String: Any] = [
+            "supportedAudioFormatsExtended": ["bufferStream": [71, 72, 73, 74, 75, 19, 21, 22, 23, 25]],
+            "supportedFormats": ["audioStream": 21_235_712, "bufferStream": -577_021_992_844_656_640,
+                                 "lowLatencyAudioStream": 0, "screenStream": 21_235_712],
+        ]
+        #expect(AirPlay2Message.acceptedFormats(info: AirPlay2Message.encode(appleTV)) == [.cd])
+        #expect(AirPlayWish(sourceRate: 48_000, wantsDepth: true).format(accepted: [.cd]) == .cd)
+        // The same shape from a receiver whose realtime stream does take more.
+        let more: [String: Any] = ["supportedFormats": ["audioStream": 0x240800, "bufferStream": 0]]
+        #expect(AirPlay2Message.acceptedFormats(info: AirPlay2Message.encode(more)) == [Self.deep48, .cd])
+        // A list for other streams only doesn't hide the mask beside it; an entry for realtime streams is the one read.
+        let both: [String: Any] = ["audioFormats": [["type": 96, "audioInputFormats": 0x40000]], "supportedFormats": ["audioStream": 0x240000]]
+        #expect(AirPlay2Message.acceptedFormats(info: AirPlay2Message.encode(both)) == [.cd])
+        let beside: [String: Any] = ["audioFormats": [["type": 100, "audioInputFormats": 0x3FFFFFC]], "supportedFormats": ["audioStream": 0x240000]]
+        #expect(AirPlay2Message.acceptedFormats(info: AirPlay2Message.encode(beside)) == [Self.deep48, .cd])
+        // As a Roku Streaming Stick 4K (3820X, AirPlay 377.40.00) answered: latencies, and no word on formats.
+        let roku: [String: Any] = ["audioLatencies": [["outputLatencyMicros": 150_000]], "model": "3820X"]
+        #expect(AirPlay2Message.acceptedFormats(info: AirPlay2Message.encode(roku)) == nil)
+    }
+
     @Test("The stream SETUP names the format and its rate; without one it is 16-bit at 44.1 kHz as before")
     func streamSetup() throws {
         let key = Data(repeating: 7, count: 32)

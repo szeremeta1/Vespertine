@@ -15,7 +15,7 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B1 | Stereo to the speaker and to AirPods | not run | | | |
 | B2 | Lock screen, Control Center, calls and Siri | not run | | | |
 | B3 | Gapless album | not run | | | |
-| B4 | 5.1 and 7.1 on AirPods Max: Fixed, Head Tracked, Off | not run | | | |
+| B4 | 5.1, 7.1 and Dolby Atmos on AirPods Max: Spatial Audio (Fixed and Head Tracked in Control Center), Off | not run | | | |
 | B5 | Spatial double-processing check | not run | | | |
 | B6 | DSD 5.1 from the Mac | not run | | | |
 | B7 | USB DAC: rates and the label | not run | | | |
@@ -27,7 +27,9 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 | B13 | The queue comes back after the app is closed | not run | | | |
 | B14 | Music on the phone: a folder from Files, iCloud Drive, a USB drive | not run | | | |
 | B15 | ReplayGain: off by default, on, and never on DoP | not run | | | |
+| B16 | USB DAC: the volume the app shows, and a DAC whose volume is set on the DAC | not run | | | |
 | M1 | Measured by the app: MP3, AAC and FLAC joins, and what ReplayGain does to the level | passed | 2026-11-16 | iPhone 15 Pro Max (iPhone16,2), iOS 26.3.1 (23D8133), Debug build of 8a1797a (#381 branch) | 14 joins and 9 tagged songs on the phone's speaker path at 48,000 Hz, phone volume 0. Every `tone-*` join GAPLESS (gap 0.00 ms, slip within 0.01 samples, level step within 0.01 dB); `gap-30-80` GAP 30.02 and 80.02 ms; every GAIN line MATCHES within 0.01 dB. Not covered: anything after the app's mixer, and the DoP step of B15. Lines below. |
+| M2 | Surround reaches iOS whole (`-VTSpatialProbe`): silent 5.1 through the sample buffer renderer | passed (speaker only) | 2026-11-17 | iPhone 15 Pro Max (iPhone16,2), iOS 26.3.1 (23D8133), Debug build of the fix/ios-spatial-headphones branch | Digital silence, nothing audible. Path `system(channels: 6)`, renderer status 1 (rendering) with no error, clock 3.086 s in 3 s; `supportsMultichannelContent` false before, true after; route Speaker `spatialAudioEnabled=true`, `outputNumberOfChannels=2`, `maximumOutputNumberOfChannels=2`; `renderingMode` stayed 0 (not applicable) throughout. Not covered: AirPods (none on this phone): what Control Center shows and what is heard is B4. |
 
 ## Before any script
 
@@ -73,27 +75,35 @@ the code does what it says; they can't show what an iPhone, AirPods Max or a USB
 
 ## B4. Surround on AirPods Max (5 min)
 
-0. On a fresh install (or after deleting the app), Output › Surround on Headphones reads **Off**, and a 5.1 song shows the badge
-   **SURROUND FOLDED TO STEREO**: the spatial rendering is asked for, never the starting point. A choice made in an earlier build
-   is kept. On iOS 17 the picker offers Off and Fixed only (the mixer can't follow the head before iOS 18).
-1. AirPods Max on, Output › Surround on Headphones: **Head Tracked**. Play the channel-identification file (5.1, then 7.1).
-2. Each voice should come from its speaker's direction: left surround behind-left, and so on. LFE is heard, not placed.
-3. Turn your head: the scene should stay put. Badge: **SPATIAL AUDIO · HEAD TRACKED**.
-4. Choose **Fixed**: the scene turns with your head. Badge: **SPATIAL AUDIO · FIXED**.
-5. Choose **Off**: every voice is still heard, in plain stereo. Badge: **SURROUND FOLDED TO STEREO**.
-6. On the phone's own speaker and over AirPlay: every voice heard, folded to stereo.
-7. With Head Tracked chosen, open Control Center, long-press the volume slider and turn the AirPods' Spatial Audio off, then on.
-   Output › What Reaches the Output › **Surround on Headphones** and the badge should follow: Fixed while it is off, Head Tracked
-   again when it is on, without changing songs.
-8. A stereo album and (on a DAC that passed the DoP test) a DSD album, with Head Tracked still chosen: badges **ORIGINAL FILE** and
-   **NATIVE DSD · DoP**, never a SPATIAL AUDIO badge. Two-channel songs don't go through the spatial mixer whatever is chosen.
+Since build 8 (TestFlight feedback tf-1c99555e54, tf-4e0452d141, tf-a5b2a6dbdc): a surround song goes to iOS with all its
+channels and their layout (an `AVSampleBufferAudioRenderer`), and iOS's own Spatial Audio renders it, as for Apple Music. Build 7
+rendered it to two channels inside the app, so iOS only ever saw stereo. Fixed or Head Tracked is chosen in Control Center: the
+API that lets an app choose it is visionOS-only in the iOS 27 SDK.
+
+0. On a fresh install, Output › Surround on Headphones reads **Off**, and a 5.1 song shows **SURROUND FOLDED TO STEREO**. A choice
+   made in an earlier build is kept (Fixed or Head Tracked both read **Spatial Audio** now).
+1. AirPods Max on, Output › Surround on Headphones: **Spatial Audio**. Play the channel-identification file (5.1, then 7.1), or any
+   5.1 / Dolby Atmos song.
+2. Open Control Center, touch and hold the volume slider. Expect the AirPods' panel to say **Spatial Audio** (not "Stereo"), with
+   **Fixed** and **Head Tracked** offered. Choose Head Tracked: turn your head, the scene stays put. Choose Fixed: it turns with you.
+3. Each voice should come from its speaker's direction: left surround behind-left, and so on. LFE is heard, not placed.
+4. Badge: **SPATIAL AUDIO** (or **SPATIAL AUDIO · DOLBY ATMOS**) only if iOS's rendering mode says so; otherwise
+   **SURROUND TO iOS · SPATIAL AUDIO ON** (iOS says Spatial Audio is on for the AirPods and was handed six channels). Never
+   "head tracked" or "fixed": iOS doesn't tell apps which. Output › What Reaches the Output: **Channels sent to iOS 6**,
+   **Spatial Audio on this output On**, **Surround on Headphones Spatial Audio by iOS**, and **Output's channels 2** (the two your
+   ears get: iOS makes them from the six).
+5. Choose **Off** in the app: every voice is still heard, in plain stereo; Control Center says **Stereo**. Badge **SURROUND FOLDED
+   TO STEREO**; Channels sent to iOS disappears.
+6. In Control Center turn the AirPods' Spatial Audio off with the app on Spatial Audio: the song moves back into the app (Vespertine's
+   own fixed rendering), badge **BINAURAL · FIXED**; on again, back to iOS. No song change needed.
+7. A stereo album and (on a DAC that passed the DoP test) a DSD album: badges **ORIGINAL FILE** and **NATIVE DSD · DoP**, never a
+   surround badge. Two-channel songs never go to the renderer whatever is chosen.
 
 ## B5. Double processing (3 min)
 
-With B4 step 1 playing, open Control Center, long-press the volume slider. Note what the Spatial Audio button offers (Off / Fixed /
-Head Tracked, or "Spatialize Stereo") and whether the app's sound changes when it is switched. If the system spatializes what the app
-already rendered, the sound becomes diffuse and echoey: record which combination does it. This decides whether the app's own
-renderer or the system's stays the default (open question Q3).
+No longer a risk in the default path: the app no longer renders binaurally anything it hands to iOS. With the AirPods' Spatial
+Audio off (B4 step 6), the app renders; with it on, iOS does. Check once that "Spatialize Stereo" in Control Center doesn't change a
+surround song (it applies to stereo).
 
 ## B6. DSD 5.1 (3 min)
 
@@ -113,6 +123,19 @@ MAC**, all six channels placed as in B4. Play it again: it should start at once 
 7. Multichannel interface or HDMI receiver, if there is one: play a 5.1 song. Expect **SURROUND ON 6 OUTPUTS** and each channel on
    its own output (L, R, C, LFE, then the back pair). On a stereo DAC the same song is folded to stereo.
 8. Unplug the DAC mid-song: expect a pause, and silence from the phone's speaker. Plug it back in: still paused until Play.
+9. The rate, song after song (TestFlight feedback `AF7O6K_qZH9VNVho4bluxWo`: the app said 48 kHz while a FiiO K11's display said
+   44.1). Volume at 100%. Make a playlist that alternates 44.1, 48, 88.2, 96 and 192 kHz songs, and include Nick Drake, "One of These
+   Things First" (FLAC 24/96), which is the control: it showed 96 on both in build 7. For every song write down three things within a
+   second or so of its start: the chip on Now Playing, Output › "Output runs at", and the DAC's own display. All three must agree.
+   While the DAC switches, the chip may say "switching to 44.1 kHz…" and Output "Waiting for iOS to switch"; it must never show the
+   previous song's rate as settled. If the DAC stays at another rate, the app must say that rate and "resampled by iOS".
+10. The same playlist with the volume at 30%: the chip says "→ 96 kHz · volume 30%", Output › Original file says "Changed by the
+    volume (below 100%)", and no NO PROCESSING badge shows. (On a DAC that B16 found sets its own volume, see B16 instead.)
+
+| DAC | Song rate | Chip | Output runs at | DAC display | Agree within 1 s | Date, device, iOS, build |
+|---|---|---|---|---|---|---|
+| FiiO K11 | | | | | | |
+| Fosi ZD3 | | | | | | |
 
 ## B8. DSD as DoP, and bit-exactness (10 min)
 
@@ -120,10 +143,13 @@ Needs a DAC that shows what it is receiving (a DSD light or a display). Volume a
 knob down first.
 
 1. With the DAC never tested: play a DSD64 song. Expect **CONVERTED ON THE MAC** and PCM on the DAC's display. Nowhere "DoP".
-2. Output › Play DSD natively? › Test DoP. Expect the music to stop, about five seconds of a soft chord, then "Did you hear music or
-   hiss?" with "176.4 kHz" under it. Note what the DAC's display showed during the sound (DSD64, or PCM 176.4), and what you heard.
+2. Output › Play DSD natively? › Test DoP. Expect the music to stop, a second of silence, about five seconds of a soft chord, then
+   "What did you hear?" with "DSD64 (176.4 kHz carrier)" under it and the answers Music, Hiss or noise, Heard nothing, Play again and
+   Cancel. Note what the DAC's display showed during the sound (DSD64, or PCM 176.4), and what you heard.
 3. Answer what you heard. After Music the same chord follows at 192, 352.8 and 384 kHz, with the same question and the rate under it
-   each time. For each rate note what the DAC's display showed (DSD64 for 176.4 and 192, DSD128 for 352.8 and 384) and answer what you
+   each time (DSD64 for 176.4 and 192, DSD128 for 352.8 and 384). Heard nothing plays the rate once more; nothing twice at 176.4 ends
+   the test with "No sound at … That is not a failed DoP test, and nothing was saved.", and at a later rate lists it under "No sound
+   at". Play again plays the rate again. For each rate note what the DAC's display showed (DSD64 for 176.4 and 192, DSD128 for 352.8 and 384) and answer what you
    heard. A rate the DAC won't run at is skipped without a question. When it ends, the section lists "DoP passed at" and, if any,
    "DoP not passed at", and they must match what the display showed. Write the four results in the table under these steps.
    Then: play the DSD64 song again. Expect **NATIVE DSD · DoP**, the DAC showing DSD64, Output showing
@@ -134,8 +160,10 @@ knob down first.
    (**CONVERTED ON THE MAC**, the chip showing the volume). Never noise. Back at 100%, the next DSD song is DoP again.
 7. Play a DSD128 song on a DAC that stops at 192 kHz: expect PCM (the carrier would be 352.8), with no noise before it starts.
 8. Unplug the DAC mid-DSD-song: a pause, silence from the speaker. Plug another DAC in: it is not sent DoP until it passes its own test.
-9. On a DAC that does not take DoP: run the test, expect a quiet hiss or silence, answer Hiss. DSD stays PCM; "DoP stays off for this DAC."
-10. Test with the volume below 100%: expect "The test needs the volume at 100%." and no sound.
+9. On a DAC that does not take DoP: run the test with the volume at 100%, expect a quiet hiss, answer Hiss or noise. DSD stays PCM;
+   "DoP stays off for this DAC." If it is silent instead, answer Heard nothing: nothing is saved.
+10. Test with the volume below 100%: the test starts (it is never refused for the volume). If the chord is heard, see B16. If hiss or
+    noise is heard, answer so: expect "Hiss or noise proves nothing while the volume is below 100%…" and nothing saved.
 11. On a DAC that passed at 176.4 or 192 kHz, volume at 100%: play a lossless stereo album at that rate (24/176.4 or 24/192). Expect the
     badge **ORIGINAL FILE · VERIFIED ON THIS DAC**, and in Output the rows "Original file: Verified on this DAC" and "DoP passed at".
     Play a 16/44.1 or 24/96 album: expect **ORIGINAL FILE · NO PROCESSING** (no DoP test reaches those rates).
@@ -149,6 +177,28 @@ knob down first.
 | DAC | 176.4 kHz | 192 kHz | 352.8 kHz | 384 kHz | Date, device, iOS, build |
 |---|---|---|---|---|---|
 | | | | | | |
+
+Five whole runs on each of these DACs, volume at 100% (TestFlight feedback `ACYG3aqcmGHtjCSJhP8P45c`: some runs on a FiiO K11 were
+silent in build 7, which had no lead-in before the chord). In each cell: what was heard (music, hiss, nothing) and what the DAC's
+display showed.
+
+| DAC | Run | 176.4 kHz | 192 kHz | 352.8 kHz | 384 kHz | Date, device, iOS, build |
+|---|---|---|---|---|---|---|
+| FiiO K11 | 1 | | | | | |
+| FiiO K11 | 2 | | | | | |
+| FiiO K11 | 3 | | | | | |
+| FiiO K11 | 4 | | | | | |
+| FiiO K11 | 5 | | | | | |
+| Fosi ZD3 | 1 | | | | | |
+| Fosi ZD3 | 2 | | | | | |
+| Fosi ZD3 | 3 | | | | | |
+| Fosi ZD3 | 4 | | | | | |
+| Fosi ZD3 | 5 | | | | | |
+
+Then on each: a DSD64 and a DSD128 song with the volume at 100%. While it is made ready Now Playing must say "Preparing DSD for your
+DAC (DoP)…", never "Converting", and the DAC must show DSD64 or DSD128 (TestFlight feedback `AB79Gu1HWKT1C1C9lmqSb_A`). On a DAC
+whose volume the phone sets, the same song at 80%: "Converting DSD to PCM on the Mac…", then "DSD played as PCM · The volume was
+below 100%".
 
 Bit-exactness of PCM is a separate measurement (a DAC with a bit-perfect light, or a digital loopback into a recorder, and the files in
 `docs/fixtures`). A DAC playing the DoP test as music has received those frames exactly, at that rate and 100% volume; that says
@@ -231,6 +281,29 @@ and album gain from the tagger first.
 7. Keep a tagged album on this device (B11's setup), turn the Mac off, and play it with Track chosen: the row shows the same gain as in step 2.
 8. On a share (if one is set up): a tagged FLAC, MP3 and M4A each show their gain in the row.
    Without a listener: M1 measures steps 2 and 3's levels on the phone (not the DoP step, which needs the DAC).
+
+## B16. The volume on a USB DAC (5 min each DAC)
+
+TestFlight feedback `AO0TzJgleq0jnLQ7g7ei9VA`, `AA0UDi09-2p4lRKsNesXlK8` (the app said 30% on a FiiO K11 while the phone was at
+100%, then snapped to 100%) and `AIPS3rYlDtQxr7x-IBSUOr0` (a Fosi ZD3's volume is set on the DAC, and the DoP test demanded 100%).
+iOS tells an app one volume number and nothing about whether an output's volume is fixed, so this row is where that is found out.
+
+1. Phone volume at 100%, DAC unplugged. Plug the DAC in, start a song. The volume on Now Playing must match the iOS volume HUD (press
+   a volume button once to see it, then put it back). Write both down.
+2. Unplug, set the phone to about 30% on its speaker, plug in, start a song: write down the app's number and the HUD's.
+3. Plug and unplug twice, lock and unlock, switch to AirPods and back. After each, the app's number must match the HUD.
+4. Press volume up and down ten times quickly, then hold the button, while a PCM song plays: no dropout, no restart, no flicker.
+5. Does the loudness change when the phone's buttons are pressed? Write Yes or No. Does the HUD's number move? Yes or No.
+6. With the number below 100%, run Output › Test DoP (turn the DAC or amplifier down first). Write what was heard at 176.4 kHz and
+   what the display showed.
+   - Chord heard below 100%: the app must then show **Volume is set on the DAC** on Now Playing and in Output while the number stays
+     there, DSD must play as DoP at that number, and the chip must not say "volume 30%".
+   - Hiss or noise below 100%: nothing is saved and the app asks for 100%. That DAC's volume is the phone's.
+
+| DAC | iOS number after plug-in (100%, 30%) | App matches the HUD | Buttons change loudness | Buttons move the number | Test below 100%: heard, display | Date, device, iOS, build |
+|---|---|---|---|---|---|---|
+| FiiO K11 | | | | | | |
+| Fosi ZD3 | | | | | | |
 
 ## M1. Measured without a listener (5 min, nobody touches the phone)
 

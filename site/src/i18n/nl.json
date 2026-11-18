@@ -165,7 +165,7 @@
         "links": [
           "Luidsprekergroepen in detail"
         ],
-        "alt": "De luidsprekergroep-editor van Vespertine voor een quad: een tekening van de kamer van bovenaf met vier luidsprekers rond de luisterplek, en de afstand, hoek, vertraging en het niveau van elke luidspreker.",
+        "alt": "De luidsprekergroep-editor van Vespertine voor een quad: een kamer in drie dimensies getekend met vier luidsprekers op standaards rond de luisterplek, en de breedte, diepte en plafondhoogte van de kamer.",
         "floatAlt": "De kanaalindeling: elk kanaal van elke uitgang is aan een luidspreker toegewezen, met een knop “Identify” en een vakje “Inverted” bij elk kanaal.",
         "floatCaption": "Kanaalindeling"
       },
@@ -274,7 +274,8 @@
           "Netwerkshares via SMB, NFS of WebDAV, met caching, ‘Bewaar offline’ en afspelen dat is gebouwd voor trage servers: nummers worden op je Mac gebufferd voordat ze spelen, met een laadring op de afspeelknop zolang dat duurt.",
           "‘Zoek muziek op deze Mac’ doorzoekt elke schijf naar je echte muziek en laat de rommel links liggen. Een korte configuratie bij de eerste start kiest je uitvoer en legt uit wat exclusieve toegang en ReplayGain doen.",
           "Parametrische EQ per uitvoer die presets van AutoEQ en Equalizer APO importeert. Standaard uit; staat hij aan, dan toont het signaalpad <span class=\"mono nowrap\">EQUALIZER</span> in plaats van <span class=\"mono nowrap\">BITPERFECT</span>.",
-          "Minispeler, menubalkextra, mediatoetsen, ReplayGain en automatische, ondertekende updates."
+          "Minispeler, menubalkextra, mediatoetsen, ReplayGain en automatische, ondertekende updates.",
+          "Optioneel, en uit totdat je ze aanzet: netwerkspelers (UPnP) en AirPlay-ontvangers als uitgangen, je eigen OpenSubsonic-server in de zijbalk, een afstandsbediening voor je telefoon of elke browser in je netwerk, een visualizer en overgangen tussen nummers."
         ],
         "links": [
           "Alle functies, in detail"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Streamt het van Qobuz, TIDAL of Apple Music?",
-          "a": "Nee. Vespertine speelt muziek af die van jou is, op je Mac, op externe schijven of op een netwerkshare. Met DRM beveiligde downloads uit een Apple Music-abonnement kunnen niet worden afgespeeld."
+          "a": "Niet van een commerciële dienst: Vespertine heeft geen client voor Qobuz, TIDAL of Apple Music, en met DRM beveiligde downloads van Apple Music kunnen niet worden afgespeeld. Het speelt muziek af die van jou is, op je Mac, op externe schijven of op een netwerkshare. Twee optionele bèta’s voegen je eigen OpenSubsonic-server (Navidrome en andere) toe, en muziek die UPnP-bedieningsapps sturen."
         },
         {
           "q": "Hoe weet ik dat het echt bitperfect is?",

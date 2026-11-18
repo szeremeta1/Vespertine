@@ -13,7 +13,7 @@ struct NowPlayingView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let session: RemoteSession
     @State private var feedback = CommandFeedback()
-    @State private var scrubbing: Double?
+    @State private var scrub = Scrubber()
 
     private var player: PlayerState? { session.shownPlayer }
 
@@ -53,6 +53,7 @@ struct NowPlayingView: View {
         .background(backdrop)
         .accessibilityIdentifier("now-playing")
         .feedback(feedback)
+        .onAppear { _ = session.phone?.readOutput?(.shown) }
         .sensoryFeedback(.impact(weight: .light), trigger: player?.playback)
         .sensoryFeedback(.selection, trigger: player?.nowPlaying?.entry)
     }
@@ -188,20 +189,17 @@ struct NowPlayingView: View {
     private var scrubber: some View {
         TimelineView(.periodic(from: .now, by: 0.5)) { context in
             let duration = max(player?.duration ?? 0, 0)
-            let position = max(0, scrubbing ?? player?.expectedPosition(at: context.date) ?? 0)
+            let position = max(0, scrub.shown(position: player?.expectedPosition(at: context.date) ?? 0))
             VStack(spacing: 2) {
-                Slider(value: Binding(get: { min(position, duration) }, set: { scrubbing = $0 }),
+                Slider(value: Binding(get: { min(position, duration) }, set: { scrub.drag(to: min($0, duration)) }),
                        in: 0...max(duration, 1), onEditingChanged: { editing in
-                    if !editing, let target = scrubbing {
-                        feedback.run(session, .seek(seconds: target))
-                        // Keep showing the target until the Mac's next update.
-                        Task { try? await Task.sleep(for: .seconds(1)); scrubbing = nil }
-                    }
+                    if !editing { scrub.end() }
                 })
                 .tint(Palette.brass)
                 .disabled(duration <= 0 || !session.canControl)
                 .accessibilityLabel(Text("Position"))
                 .accessibilityValue(Text("\(formatTime(position)) of \(formatTime(duration))"))
+                .accessibilityIdentifier("position")
                 HStack {
                     Text(formatTime(position))
                     Spacer()
@@ -212,6 +210,13 @@ struct NowPlayingView: View {
             }
         }
         .playbackDirection()
+        .onAppear { scrub.commit = { [session, feedback] target in feedback.run(session, .seek(seconds: target)) } }
+        // The player's word on where the song is lets go of the knob once it is where the finger put it.
+        .onChange(of: player?.position) { _, _ in
+            if let player { scrub.reported(position: player.expectedPosition(at: Date())) }
+        }
+        // Another song: a place in the last one means nothing in this one.
+        .onChange(of: player?.nowPlaying?.entry) { _, _ in scrub.expire() }
     }
 
     private var transport: some View {

@@ -18,8 +18,8 @@ final class PlayTarget {
 
     /// "This iPhone" is chosen in Output. Kept between launches.
     private(set) var onThisDevice = UserDefaults.standard.bool(forKey: PlayTarget.key)
-    /// How surround songs are played on headphones here: folded to stereo (Off) until you choose Fixed or Head Tracked.
-    /// Kept between launches.
+    /// How surround songs are played on headphones here: folded to stereo (Off) until you choose Spatial Audio (kept as
+    /// `.fixed`; a `.headTracked` kept from build 7 means the same). Kept between launches.
     var surround = PlayTarget.surround(stored: UserDefaults.standard.string(forKey: PlayTarget.surroundKey)) {
         didSet {
             UserDefaults.standard.set(surround.rawValue, forKey: Self.surroundKey)
@@ -31,8 +31,11 @@ final class PlayTarget {
     /// The choice kept from an earlier launch, or Off for someone who never made one: the spatial rendering is asked for,
     /// never the starting point.
     static func surround(stored: String?) -> SpatialModeChoice { stored.flatMap(SpatialModeChoice.init(rawValue:)) ?? .off }
-    /// The choices the picker offers: Head Tracked only where the system can turn the scene with your head (iOS 18).
-    static var surroundChoices: [SpatialModeChoice] { PhonePlayer.systemTracksHead ? [.off, .fixed, .headTracked] : [.off, .fixed] }
+    /// The choices the picker offers: Off and Spatial Audio. Fixed or Head Tracked is chosen in Control Center: iOS renders
+    /// Spatial Audio for the app, and no iOS app can choose that for it (the API for it is visionOS-only in the iOS 27 SDK).
+    static let surroundChoices: [SpatialModeChoice] = [.off, .fixed]
+    /// The picker's value for a kept choice.
+    static func pickerValue(_ choice: SpatialModeChoice) -> SpatialModeChoice { choice == .off ? .off : .fixed }
     /// Whether songs played here are levelled with the ReplayGain values in their files, and by which of them. Off until
     /// chosen: with it off no sample is changed. Kept between launches.
     var replayGain = PlayTarget.replayGain(stored: UserDefaults.standard.string(forKey: PlayTarget.replayGainKey)) {
@@ -143,9 +146,23 @@ final class PlayTarget {
         if let outputs = signal.discreteOutputs {
             return String(localized: "SURROUND ON \(String(outputs)) OUTPUTS", comment: "Signal badge on the iPhone: a surround song played on an audio interface, each channel on an output of its own. %@ is the number of outputs, e.g. 6.")
         }
+        // Handed to iOS whole: only what iOS says it does with it.
+        switch signal.systemSurround {
+        case .spatial?:
+            return signal.systemRendering == .dolbyAtmos
+                ? String(localized: "SPATIAL AUDIO · DOLBY ATMOS", comment: "Signal badge on the iPhone: iOS says it plays this surround song as Spatial Audio in Dolby Atmos. Dolby Atmos stays as it is.")
+                : String(localized: "SPATIAL AUDIO", comment: "Signal badge on the iPhone: iOS says it plays this surround song as Spatial Audio (on AirPods or Beats).")
+        case .surround?:
+            let channels = signal.systemChannels ?? signal.channels
+            return String(localized: "SURROUND · \(String(channels)) CHANNELS TO iOS", comment: "Signal badge on the iPhone: a surround song is handed to iOS with all its channels, but iOS doesn't say it spatializes it. %@ is the number of channels, e.g. 6. iOS stays as it is.")
+        case .stereo?:
+            return String(localized: "SURROUND · iOS PLAYS STEREO", comment: "Signal badge on the iPhone: a surround song is handed to iOS with all its channels, and iOS says it plays it as stereo. iOS stays as it is.")
+        case .pending?:
+            return String(localized: "SURROUND TO iOS · SPATIAL AUDIO ON", comment: "Signal badge on the iPhone: a surround song was handed to iOS with all its channels, and iOS says Spatial Audio is on for this output; iOS hasn't said how it renders the song. iOS stays as it is.")
+        case nil: break
+        }
         switch signal.surround {
-        case .headTracked?: return String(localized: "SPATIAL AUDIO · HEAD TRACKED", comment: "Signal badge on the iPhone: a surround song rendered for headphones, following the head.")
-        case .fixed?: return String(localized: "SPATIAL AUDIO · FIXED", comment: "Signal badge on the iPhone: a surround song rendered for headphones, not following the head.")
+        case .headTracked?, .fixed?: return String(localized: "BINAURAL · FIXED", comment: "Signal badge on the iPhone: a surround song rendered for headphones by the app itself (not by iOS), not following the head.")
         case .off?: return String(localized: "SURROUND FOLDED TO STEREO", comment: "Signal badge on the iPhone: a surround song mixed down to two channels.")
         case nil: break
         }
@@ -187,17 +204,28 @@ final class PlayTarget {
         return rows
     }
 
-    /// What the output runs at, and that iOS changed the rate to get there when it did.
+    /// What the output runs at, and that iOS changed the rate to get there when it did. While a rate that was asked for
+    /// hasn't arrived, the chip says the output is switching to it: the rate on its way out is never shown as settled.
     static func output(_ signal: PhoneSignal) -> String {
         guard let rate = signal.outputRate, rate > 0 else { return "" }
-        let kilohertz = PhoneSignal.kilohertz(rate)
-        var text = signal.resampled ? String(localized: "\(kilohertz) kHz, resampled by iOS", comment: "Signal chip on the iPhone: the output's sample rate, which differs from the song's.")
+        var text: String
+        if let asked = signal.switchingTo {
+            text = String(localized: "switching to \(PhoneSignal.kilohertz(asked)) kHz…", comment: "Signal chip on the iPhone, lowercase: the DAC was asked for this sample rate and iOS hasn't switched to it yet. %@ is a rate such as 96.")
+        } else {
+            let kilohertz = PhoneSignal.kilohertz(rate)
+            text = signal.resampled ? String(localized: "\(kilohertz) kHz, resampled by iOS", comment: "Signal chip on the iPhone: the output's sample rate, which differs from the song's.")
                                     : String(localized: "\(kilohertz) kHz", comment: "Signal chip: a sample rate.")
+        }
         // On a DAC, a volume below the top means it isn't getting the song's own samples: said, not hidden.
         if signal.onDAC, signal.volumeReduced, let volume = signal.volume {
             text += " · " + String(localized: "volume \(percent(volume))", comment: "Signal chip on the iPhone, after the sample rate: the device's volume when it is not at 100%, lowercase. %@ is a percentage such as 80%.")
         }
         return text
+    }
+
+    /// The volume as the Output screen says it: a percentage, or that iOS gives none.
+    static func volumeWords(_ volume: Double?) -> String {
+        volume.map(percent) ?? String(localized: "Not reported by iOS", comment: "Value on the iPhone's Output screen, for the row Volume: iOS gave the app no volume level for this output. iOS stays as it is.")
     }
 
     static func percent(_ level: Double) -> String {
@@ -223,20 +251,35 @@ final class PlayTarget {
             if route.channels > 0 {
                 rows.append((String(localized: "Output’s channels", comment: "Row label on the iPhone's Output screen: how many channels the output device runs with now."), String(route.channels)))
             }
-            rows.append((String(localized: "Resampled by iOS", comment: "Row label on the iPhone's Output screen: whether iOS changes the song's sample rate on the way to the output. The value is Yes or No."),
-                         signal.resampled ? String(localized: "Yes") : String(localized: "No")))
+            if let asked = signal.switchingTo {
+                // Asked and not yet given: whether iOS resamples isn't known until it answers.
+                rows.append((String(localized: "Asked iOS for", comment: "Row label on the iPhone's Output screen: the sample rate the app asked iOS to run the DAC at, which iOS hasn't switched to yet. The value is a rate such as 96 kHz. iOS stays as it is."),
+                             String(localized: "\(PhoneSignal.kilohertz(asked)) kHz", comment: "Signal chip: a sample rate.")))
+                rows.append((String(localized: "Resampled by iOS", comment: "Row label on the iPhone's Output screen: whether iOS changes the song's sample rate on the way to the output. The value is Yes or No."),
+                             String(localized: "Waiting for iOS to switch", comment: "Value on the iPhone's Output screen, for the row Resampled by iOS: the DAC was asked for the song's sample rate and iOS hasn't switched yet, so it isn't known. iOS stays as it is.")))
+            } else {
+                rows.append((String(localized: "Resampled by iOS", comment: "Row label on the iPhone's Output screen: whether iOS changes the song's sample rate on the way to the output. The value is Yes or No."),
+                             signal.resampled ? String(localized: "Yes") : String(localized: "No")))
+            }
         }
         if signal.discreteOutputs != nil {
             rows.append((String(localized: "Surround"), String(localized: "A channel to each output", comment: "Value on the iPhone's Output screen, for the row Surround: each channel of a surround song goes to its own output of an audio interface, unmixed.")))
+        } else if let sent = signal.systemChannels {
+            // Handed to iOS whole. What iOS does with it is iOS's word, read back; Fixed or Head Tracked isn't told to apps.
+            rows.append((String(localized: "Channels sent to iOS", comment: "Row label on the iPhone's Output screen: how many channels of a surround song the app hands to iOS, for iOS's Spatial Audio to render. iOS stays as it is."), String(sent)))
+            rows.append((String(localized: "Spatial Audio on this output", comment: "Row label on the iPhone's Output screen: whether iOS says the output can play Spatial Audio and it is turned on. The value is On or Off."),
+                         signal.routeSpatial ? String(localized: "On") : String(localized: "Off")))
+            rows.append((String(localized: "Surround on Headphones"), String(localized: "Spatial Audio by iOS", comment: "Value on the iPhone's Output screen, for the row Surround on Headphones: the surround song is handed to iOS, whose Spatial Audio renders it (Fixed or Head Tracked as chosen in Control Center). iOS stays as it is.")))
         } else if let surround = signal.surround, route?.isHeadphones == true {
-            // What is being done to the song right now, which isn't always what was chosen (Head Tracked on headphones
-            // that don't follow your head plays Fixed).
+            // What is being done to the song right now.
             let value = switch surround {
             case .off: String(localized: "Off")
-            case .fixed: String(localized: "Fixed")
-            case .headTracked: String(localized: "Head Tracked")
+            case .fixed, .headTracked: String(localized: "Rendered by Vespertine, fixed", comment: "Value on the iPhone's Output screen, for the row Surround on Headphones: the app renders the surround song for headphones itself (iOS doesn't spatialize on these headphones), without following the head.")
             }
             rows.append((String(localized: "Surround on Headphones"), value))
+        }
+        if signal.channels > 2, let mode = signal.systemRendering, let name = renderingName(mode) {
+            rows.append((String(localized: "iOS renders it as", comment: "Row label on the iPhone's Output screen: how iOS says it renders the app's audio (AVAudioSession rendering mode). The value is Stereo, Surround, Spatial Audio, Dolby Audio or Dolby Atmos. iOS stays as it is."), name))
         }
         // Only while ReplayGain is on: what is being done to this song's samples, or that nothing is.
         if let gain = signal.replayGain {
@@ -244,7 +287,14 @@ final class PlayTarget {
         } else if signal.replayGainHasNothing {
             rows.append((String(localized: "ReplayGain"), String(localized: "None for this song", comment: "Value on the iPhone's Output screen, for the row ReplayGain: ReplayGain is turned on, but the playing song has no ReplayGain values (or is DSD sent as DoP), so it plays unchanged.")))
         }
-        if let volume = signal.volume { rows.append((String(localized: "Volume"), percent(volume))) }
+        // Always said while there is an output: a volume iOS doesn't report is a fact too, and it rules out "no processing".
+        if route != nil { rows.append((String(localized: "Volume"), volumeWords(signal.volume))) }
+        if signal.onDAC, signal.volumeReduced || signal.volume == nil, signal.wouldBeUntouchedAtFullVolume {
+            rows.append((String(localized: "Original file", comment: "Row label on the iPhone's Output screen: the song's own lossless file is playing. The value is No processing or Verified on this DAC."),
+                         signal.volume == nil
+                            ? String(localized: "Can’t say: iOS reports no volume", comment: "Value on the iPhone's Output screen, for the row Original file: iOS gives no volume level for this DAC, so the app can't say whether the song's samples reach it unchanged. iOS stays as it is.")
+                            : String(localized: "Changed by the volume (below 100%)", comment: "Value on the iPhone's Output screen, for the row Original file: the device's volume is below 100%, so iOS scales the song's samples before the DAC gets them.")))
+        }
         if signal.untouched {
             rows.append((String(localized: "Original file", comment: "Row label on the iPhone's Output screen: the song's own lossless file is playing. The value is No processing or Verified on this DAC."),
                          signal.verifiedOnDAC ? String(localized: "Verified on this DAC", comment: "Value on the iPhone's Output screen, for the row Original file: this DAC passed the DoP listening test at this song's sample rate. DAC stays as it is.")
@@ -252,6 +302,19 @@ final class PlayTarget {
         }
         rows.append(contentsOf: dopRows(dop, route: route).map { ($0.label, $0.value) })
         return rows
+    }
+
+    /// iOS's rendering mode in words; nil while iOS hasn't said.
+    static func renderingName(_ mode: SystemRenderingMode) -> String? {
+        switch mode {
+        case .notApplicable: nil
+        case .monoStereo: String(localized: "Stereo", comment: "Value on the iPhone's Output screen, for the row iOS renders it as: iOS plays the audio as plain two-channel stereo.")
+        case .surround: String(localized: "Surround")
+        case .spatialAudio: String(localized: "Spatial Audio")
+        // Brand names, the same in every language.
+        case .dolbyAudio: "Dolby Audio"
+        case .dolbyAtmos: "Dolby Atmos"
+        }
     }
 
     /// "−6.2", "+1.5": a gain with its sign, to one decimal place.

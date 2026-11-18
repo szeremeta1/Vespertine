@@ -15,13 +15,16 @@ struct RootView: View {
 
     var body: some View {
         Group {
-            if let session = model.session {
-                RemoteView(session: session)
+            if SetupAssistant.shared.isShowing {
+                SetupFlow().transition(.opacity)
+            } else if let session = model.session {
+                RemoteView(session: session).transition(.opacity)
             } else {
-                MacsView()
+                MacsView().transition(.opacity)
             }
         }
         .animation(.default, value: model.session == nil)
+        .animation(.easeInOut(duration: 0.45), value: SetupAssistant.shared.isShowing)
         .overlay {
             if model.pendingLink != nil || model.isPairing {
                 ProgressView("Pairing…")
@@ -186,7 +189,7 @@ struct MacsView: View {
             .obsidianList()
             .readablePane(maxWidth: 760)
             .onChange(of: model.unpairedMacs.count, initial: true) { model.searchChanged() }
-            .navigationTitle("Macs")
+            .navigationTitle("Libraries")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -226,8 +229,12 @@ struct MacsView: View {
             Text(verbatim: "vespertine")
                 .font(.system(size: 30, weight: .light, design: .serif))
                 .foregroundStyle(Palette.text)
-            Text("The companion to Vespertine on your Mac")
+            Text("A remote for Vespertine on your Mac, and a player in its own right.")
                 .font(.footnote).foregroundStyle(Palette.text2)
+                .multilineTextAlignment(.center)
+                // Two lines on a phone: without this the row held it to one and cut both ends off.
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 24)
         }
         .frame(maxWidth: .infinity)
         .padding(.top, 12).padding(.bottom, 8)

@@ -165,7 +165,7 @@
         "links": [
           "Skupiny reproduktorů podrobně"
         ],
-        "alt": "Editor skupin reproduktorů ve Vespertine pro quad: nákres místnosti shora se čtyřmi reproduktory kolem místa poslechu a vzdálenost, úhel, zpoždění a hlasitost každého z nich.",
+        "alt": "Editor skupin reproduktorů ve Vespertine pro quad: místnost nakreslená ve třech rozměrech se čtyřmi reproduktory na stojanech kolem místa poslechu a šířka, hloubka a výška stropu místnosti.",
         "floatAlt": "Mapa kanálů: každý kanál každého výstupu přiřazený k reproduktoru, s tlačítkem „Identify“ a políčkem „Inverted“ u každého kanálu.",
         "floatCaption": "Mapa kanálů"
       },
@@ -274,7 +274,8 @@
           "Síťová sdílení přes SMB, NFS nebo WebDAV, s mezipamětí, volbou Ponechat offline a přehráváním uzpůsobeným pomalým serverům: skladby se před přehráním uloží do vyrovnávací paměti ve vašem Macu a tlačítko přehrávání mezitím ukazuje kroužek načítání.",
           "Funkce Najít hudbu prohledá všechny disky, najde vaši skutečnou hudbu a nepořádek nechá stranou. Krátké nastavení při prvním spuštění vybere váš výstup a vysvětlí, co dělají výhradní přístup a ReplayGain.",
           "Parametrický EQ pro každý výstup, který importuje předvolby AutoEQ a Equalizer APO. Ve výchozím stavu vypnutý; když je zapnutý, signálová cesta ukazuje <span class=\"mono nowrap\">EKVALIZÉR</span> místo <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Minipřehrávač, položka na řádku nabídek, mediální klávesy, ReplayGain a automatické podepsané aktualizace."
+          "Minipřehrávač, položka na řádku nabídek, mediální klávesy, ReplayGain a automatické podepsané aktualizace.",
+          "Volitelné a vypnuté, dokud je nezapnete: síťové přehrávače (UPnP) a přijímače AirPlay jako výstupy, váš vlastní server OpenSubsonic v bočním panelu, dálkové ovládání pro telefon nebo jakýkoli prohlížeč ve vaší síti, vizualizér a přechody mezi skladbami."
         ],
         "links": [
           "Všechny funkce podrobně"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Streamuje z Qobuzu, TIDALu nebo Apple Music?",
-          "a": "Ne. Vespertine přehrává hudbu, kterou vlastníte, na vašem Macu, na externích discích nebo na síťovém sdílení. Stažené skladby z předplatného Apple Music chráněné DRM přehrát nelze."
+          "a": "Z komerční služby ne: Vespertine nemá klienta pro Qobuz, TIDAL ani Apple Music a stažené skladby z Apple Music chráněné DRM přehrát nelze. Přehrává hudbu, kterou vlastníte, na vašem Macu, na externích discích nebo na síťovém sdílení. Dvě volitelné beta funkce přidávají váš vlastní server OpenSubsonic (Navidrome a další) a hudbu posílanou z ovládacích aplikací UPnP."
         },
         {
           "q": "Jak poznám, že je přehrávání opravdu bit-perfect?",

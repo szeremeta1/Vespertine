@@ -2,7 +2,7 @@
 // Vespertine: the phone player's manners on iOS: the lock screen and Control Center (what is playing, its cover, the
 // buttons and the scrubber), a call or an alarm pausing the music and giving it back, unplugged headphones pausing it, the
 // output changing under the engine, and a DAC being asked for the song's own rate. iOS only; the decisions are in
-// PhoneSystemPolicy.swift, where they are tested.
+// PhoneSystemPolicy.swift and the reading of the output in PhoneOutputState.swift, where they are tested.
 // SPDX-License-Identifier: GPL-3.0-or-later WITH LicenseRef-Vespertine-App-Store-Exception
 //
 
@@ -33,12 +33,17 @@ public final class PhoneSystem {
     private var cover: (key: String, art: MPMediaItemArtwork)?
     private var coverTask: Task<Void, Never>?
     private var coverTried: String?
-    /// What a DAC has been asked for, and what to ask next when it declines.
-    private var ladder = RateLadder()
-    private var settling: Task<Void, Never>?
-    /// The channel count last asked of an output, so it isn't asked again for every song.
-    private var askedChannels: (route: String, channels: Int)?
+    /// Reads the output from iOS (its route, rate, channels, volume and rendering together) and asks a DAC for a song's rate.
+    private let watch = OutputWatch(session: SystemOutputSession())
+    /// Looks at the output again while a rate that was asked for is on its way, and every two seconds while music plays.
+    private var driver: Task<Void, Never>?
+    private var driverIsFast = false
+    /// The song and whether it was sounding when the output was last read for a song starting.
+    private var songSeen: (entry: String?, playing: Bool) = (nil, false)
     private var volumeWatch: NSKeyValueObservation?
+    #if DEBUG
+    private static let outputLog = Logger(subsystem: "org.szeremeta.VespertineRemote", category: "output")
+    #endif
 
     /// `artwork`: a cover's image data for its key (the app's cover cache).
     public init(remote: PhoneRemote, artwork: @escaping @MainActor (String) async -> Data?) {
@@ -49,7 +54,14 @@ public final class PhoneSystem {
     public func start() {
         guard !running else { return }
         running = true
-        refreshRoute()
+        watch.onChange = { [weak self] state in self?.remote.output = state }
+        #if DEBUG
+        // Every read of the output and every rate asked of it, with the log's own timestamps: a rate shown wrong can be
+        // traced to the read that was missing or late.
+        watch.log = { line in Self.outputLog.debug("\(line, privacy: .public)") }
+        #endif
+        remote.readOutput = { [weak self] occasion in self?.look(occasion) ?? OutputState() }
+        look(.start)
         remote.onTransport = { [weak self] command in self?.transport(command) }
         remote.playback.dop.bring = { [weak self] carrier in await self?.bring(carrier) ?? false }
         let session = AVAudioSession.sharedInstance()
@@ -68,17 +80,28 @@ public final class PhoneSystem {
         })
         // Spatial Audio switched on or off for the headphones in Control Center: whether they follow your head changed.
         observers.append(Self.observe(AVAudioSession.spatialPlaybackCapabilitiesChangedNotification, session) { [weak self] _, _, _ in
-            Task { @MainActor in self?.refreshRoute() }
+            Task { @MainActor in self?.look(.rendering) }
         })
+        // What iOS renders the app's audio as (stereo, surround, Spatial Audio, Dolby Atmos): the badge says only what this says.
+        if #available(iOS 17.2, *) {
+            observers.append(Self.observe(AVAudioSession.renderingModeChangeNotification, session) { [weak self] _, _, _ in
+                Task { @MainActor in self?.look(.rendering) }
+            })
+        }
         observers.append(Self.observe(AVAudioSession.mediaServicesWereResetNotification, session) { [weak self] _, _, _ in
             Task { @MainActor in self?.outputChanged() }
         })
         observers.append(Self.observe(.AVAudioEngineConfigurationChange, nil) { [weak self] _, _, _ in
             Task { @MainActor in self?.outputChanged() }
         })
-        remote.outputVolume = Double(session.outputVolume)
-        volumeWatch = Self.watchVolume(session) { [weak self] level in
-            Task { @MainActor in self?.remote.outputVolume = level }
+        // Back at the front: iOS may have changed the output or the volume while nobody was told.
+        observers.append(Self.observe(UIApplication.didBecomeActiveNotification, nil) { [weak self] _, _, _ in
+            Task { @MainActor in self?.look(.foreground) }
+        })
+        // iOS says the volume changed. It doesn't always (a DAC plugged in can bring a volume of its own and no word of
+        // it), which is why every other occasion reads the volume too.
+        volumeWatch = Self.watchVolume(session) { [weak self] _ in
+            Task { @MainActor in self?.look(.volume) }
         }
         registerCommands()
         track()
@@ -92,8 +115,12 @@ public final class PhoneSystem {
         for (command, target) in commands { command.removeTarget(target) }
         commands = []
         coverTask?.cancel()
-        settling?.cancel()
+        driver?.cancel()
+        driver = nil
+        renderingCheck?.cancel()
         volumeWatch = nil
+        watch.onChange = nil
+        remote.readOutput = nil
         controls.withLock { $0 = .none }
         remote.onTransport = nil
         remote.playback.dop.bring = { _ in false }
@@ -114,61 +141,79 @@ public final class PhoneSystem {
 
     private func routeChanged(_ reason: RouteChangePolicy.Reason) {
         let old = remote.route
-        refreshRoute()
+        look(.routeChange)
         if RouteChangePolicy.pauses(reason: reason) || RouteChangePolicy.pauses(from: old, to: remote.route), remote.playback.isPlaying {
             remote.playback.pause()
         }
-        askOutput()
     }
 
     /// The engine stopped because its output changed (another device, another rate, or iOS restarted its audio services).
     /// iOS may say this before it says a DAC was unplugged: the music is paused first, so it is never started on the speaker.
     private func outputChanged() {
         let old = remote.route
-        refreshRoute()
+        look(.outputChange)
         if RouteChangePolicy.pauses(from: old, to: remote.route), remote.playback.isPlaying { remote.playback.pause() }
         remote.playback.player.recoverFromConfigurationChange()
     }
 
-    private func refreshRoute() {
-        let route = PhoneAudioSession.currentRoute().map {
-            PhoneRoute(name: $0.outputName, portType: $0.portType, sampleRate: $0.sampleRate, channels: $0.outputChannels, spatial: $0.isSpatialAudioEnabled,
-                       maximumChannels: $0.maximumChannels, channelLabels: $0.channelLabels, uid: $0.uid)
-        }
-        if remote.route != route { remote.route = route }
+    /// Reads everything iOS says about the output, now: the route, its rate and channels, the volume and the rendering
+    /// mode, together (`OutputWatch.refresh`). Every occasion on which any of it may have changed ends here; nothing else
+    /// reads the session for the screens.
+    @discardableResult private func look(_ occasion: OutputWatch.Occasion) -> OutputState {
+        let state = watch.refresh(occasion)
+        drive()
+        return state
     }
 
-    /// A DAC (or the headphone adapter) is asked to run at the song's rate, and an interface with more than two outputs
-    /// to run with enough of them for a surround song; Bluetooth and the speaker are never asked for anything. iOS
-    /// answers by changing the route, which comes back as an output change. What it gave is read back and shown.
-    private func askOutput() {
-        guard let route = remote.route, let format = remote.playback.stream?.format else { return }
-        let session = AVAudioSession.sharedInstance()
-        if let channels = route.channelsToAsk(for: format.channels),
-           askedChannels?.route != route.name || askedChannels?.channels != channels {
-            askedChannels = (route.name, channels)
-            try? session.setPreferredOutputNumberOfChannels(channels)
-        }
-        if let rate = ladder.begin(route: route, songRate: format.sampleRate) { ask(rate) }
-    }
-
-    /// Asks for `rate`, then looks at what the output runs at once the song is playing: declined, the next rate down the
-    /// ladder is asked for (`RateLadder`).
-    private func ask(_ rate: Double) {
-        try? AVAudioSession.sharedInstance().setPreferredSampleRate(rate)
-        settling?.cancel()
-        settling = Task { [weak self] in
-            // A preferred rate takes effect while the session is active: wait for the song to be playing.
-            for _ in 0..<20 {
-                try? await Task.sleep(for: .milliseconds(700))
-                guard let self, !Task.isCancelled else { return }
-                guard self.remote.playback.player.state == .playing else { continue }
-                self.refreshRoute()
-                if let route = self.remote.route, let next = self.ladder.declined(route: route) { self.ask(next) }
-                return
+    /// Keeps looking while there is something to wait for: every `OutputWatch.tick` while a rate that was asked for is
+    /// on its way, and every two seconds while music plays (iOS doesn't announce every change: a DAC's rate can move
+    /// with no notification at all when the engine isn't running yet).
+    private func drive() {
+        let fast = watch.needsTicks
+        if driver != nil, driverIsFast || !fast { return }
+        driver?.cancel()
+        driverIsFast = fast
+        driver = Task { [weak self] in
+            while !Task.isCancelled {
+                guard let pause = self?.driveStep() else { return }
+                try? await Task.sleep(for: pause)
             }
-            // Never played: the next song asks afresh.
-            self?.ladder.forget()
+        }
+    }
+
+    /// One look, and how long until the next; nil when there is nothing to wait for.
+    private func driveStep() -> Duration? {
+        guard running else { return nil }
+        let playing = remote.playback.player.state == .playing && !remote.playback.player.isBuffering
+        if watch.needsTicks {
+            driverIsFast = true
+            watch.tick(playing: playing)
+            return OutputWatch.tick
+        }
+        driverIsFast = false
+        guard playing else {
+            driver = nil
+            return nil
+        }
+        watch.refresh(.heartbeat)
+        return watch.needsTicks ? OutputWatch.tick : .seconds(2)
+    }
+
+    private var renderingCheck: Task<Void, Never>?
+    private var renderingSeen: (PhonePlayer.Rendering, Bool)?
+
+    /// A song started, stopped or changed path: iOS resolves its rendering once audio flows, so it is read again shortly.
+    private func settleRendering(_ rendering: PhonePlayer.Rendering, playing: Bool) {
+        guard renderingSeen.map({ $0.0 != rendering || $0.1 != playing }) ?? true else { return }
+        renderingSeen = (rendering, playing)
+        look(.rendering)
+        renderingCheck?.cancel()
+        renderingCheck = Task { [weak self] in
+            for delay in [300, 1_000, 3_000] {
+                try? await Task.sleep(for: .milliseconds(delay))
+                guard !Task.isCancelled else { return }
+                self?.look(.rendering)
+            }
         }
     }
 
@@ -176,18 +221,19 @@ public final class PhoneSystem {
     /// the session is read to see that it does. Only then are the frames DSD; otherwise the song is asked for as PCM.
     private func bring(_ carrier: Double) async -> Bool {
         func there() -> Bool {
-            refreshRoute()
-            return remote.route.map { abs($0.sampleRate - carrier) < 0.5 } ?? false
+            look(.settle).route.map { abs($0.sampleRate - carrier) < 0.5 } ?? false
         }
         if there() { return true }
         // A preferred rate is honoured only for an active session.
         try? PhoneAudioSession.activate()
-        try? AVAudioSession.sharedInstance().setPreferredSampleRate(carrier)
+        look(.activation)
+        watch.bring(to: carrier)
         for _ in 0..<20 {
             try? await Task.sleep(for: .milliseconds(100))
-            if Task.isCancelled { return false }
+            if Task.isCancelled { watch.giveUp(); return false }
             if there() { return true }
         }
+        watch.giveUp()
         return false
     }
 
@@ -286,7 +332,17 @@ public final class PhoneSystem {
         _ = playback.stream
         // Read so a seek or a stall brings this back; the lock screen is told where the song is this instant.
         _ = playback.anchor
-        askOutput()
+        // A DAC is asked for the song's own rate, and an interface for a surround song's channels (`OutputWatch.want`).
+        if let format = playback.stream?.format { watch.want(rate: format.sampleRate, channels: format.channels) }
+        // A song started, or started sounding (which is when the session is made active and a rate asked for takes
+        // effect): the output is read again, volume and all.
+        let song = (entry: playback.nowPlaying?.id, playing: playback.player.state == .playing)
+        if song != songSeen {
+            songSeen = song
+            look(.song)
+        }
+        drive()
+        settleRendering(playback.player.rendering, playing: playback.player.state == .playing)
         // Shuffle, repeat and edits change what Next can do and where the song is in the queue.
         let queue = playback.queue
         let card = NowPlayingCard(queue: queue, nowPlaying: playback.nowPlaying, duration: playback.duration, position: playback.livePosition,

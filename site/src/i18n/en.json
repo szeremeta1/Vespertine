@@ -165,7 +165,7 @@
         "links": [
           "Speaker Groups in detail"
         ],
-        "alt": "Vespertine’s speaker group editor for a quad: a top-down drawing of the room with four speakers around the listening seat, and each speaker’s distance, angle, delay and level.",
+        "alt": "Vespertine’s speaker group editor for a quad: a room drawn in three dimensions with four speakers on stands around the listening seat, and the room’s width, depth and ceiling height.",
         "floatAlt": "The channel map: every channel of each output assigned to a speaker, with an Identify button and an Inverted box on each channel.",
         "floatCaption": "Channel map"
       },
@@ -274,7 +274,8 @@
           "Network shares over SMB, NFS or WebDAV, with caching, Keep Offline and playback built for slow servers: tracks are buffered on your Mac before they play, with a loading ring on the play button while they do.",
           "Find Music searches every drive for your real music and leaves the clutter behind. A short setup on first launch picks your output and explains what exclusive access and ReplayGain do.",
           "Parametric EQ per output that imports AutoEQ and Equalizer APO presets. Off by default; when it’s on, the signal path says <span class=\"mono nowrap\">EQUALIZER</span> instead of <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Mini player, menu-bar extra, media keys, ReplayGain and automatic, signed updates."
+          "Mini player, menu-bar extra, media keys, ReplayGain and automatic, signed updates.",
+          "Optional, and off until you turn them on: network players (UPnP) and AirPlay receivers as outputs, your own OpenSubsonic server in the sidebar, a remote for your phone or any browser on your network, a visualizer, and transitions between songs."
         ],
         "links": [
           "Every feature, in detail"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Does it stream from Qobuz, TIDAL or Apple Music?",
-          "a": "No. Vespertine plays music you own, on your Mac, on external drives or on a network share. DRM-protected Apple Music subscription downloads cannot be played."
+          "a": "Not from a commercial service: Vespertine has no client for Qobuz, TIDAL or Apple Music, and DRM-protected Apple Music downloads cannot be played. It plays music you own, on your Mac, on external drives or on a network share. Two optional betas add your own OpenSubsonic server (Navidrome and others) and music sent by UPnP control apps."
         },
         {
           "q": "How do I know it’s actually bit-perfect?",

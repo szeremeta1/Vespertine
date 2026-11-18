@@ -32,7 +32,29 @@ public enum PhoneAudioSession {
     public static func activate() throws {
         let session = AVAudioSession.sharedInstance()
         try session.setCategory(.playback, mode: .default)
+        // Tells iOS this app supplies multichannel audio (surround songs, handed over whole through a sample buffer
+        // renderer): what iOS asks of a "Now Playing" app before it offers Spatial Audio for it.
+        if !session.supportsMultichannelContent { try? session.setSupportsMultichannelContent(true) }
         try session.setActive(true)
+    }
+
+    /// What iOS says it renders the app's audio as right now (iOS 17.2 and later); nil before.
+    public static func renderingMode() -> SystemRenderingMode? {
+        guard #available(iOS 17.2, *) else { return nil }
+        return SystemRenderingMode(rawValue: AVAudioSession.sharedInstance().renderingMode.rawValue)
+    }
+
+    /// Everything iOS says about spatial and multichannel output, as words for a log line (the bench and the probe).
+    public static func readback() -> String {
+        let session = AVAudioSession.sharedInstance()
+        let outputs = session.currentRoute.outputs.map {
+            "\($0.portName) [\($0.portType.rawValue)] channels=\($0.channels?.count ?? 0) spatialAudioEnabled=\($0.isSpatialAudioEnabled)"
+        }
+        var mode = "n/a"
+        if #available(iOS 17.2, *) { mode = "\(session.renderingMode.rawValue) (\(renderingMode().map { "\($0)" } ?? "?"))" }
+        return "route=\(outputs) sampleRate=\(session.sampleRate) outputNumberOfChannels=\(session.outputNumberOfChannels) "
+            + "maximumOutputNumberOfChannels=\(session.maximumOutputNumberOfChannels) supportsMultichannelContent=\(session.supportsMultichannelContent) "
+            + "renderingMode=\(mode)"
     }
 
     public static func currentRoute() -> Route? {
@@ -42,5 +64,23 @@ public enum PhoneAudioSession {
                      outputChannels: output.channels?.count ?? 0, isSpatialAudioEnabled: output.isSpatialAudioEnabled,
                      maximumChannels: session.maximumOutputNumberOfChannels, channelLabels: output.channels?.map(\.channelLabel) ?? [], uid: output.uid)
     }
+}
+/// iOS's audio session as the output's state is read from it (`OutputWatch`): one call reads the output, its rate and
+/// channels, the volume and the rendering mode.
+@MainActor
+final class SystemOutputSession: OutputSession {
+    func read() -> OutputReading {
+        let session = AVAudioSession.sharedInstance()
+        let route = PhoneAudioSession.currentRoute().map {
+            PhoneRoute(name: $0.outputName, portType: $0.portType, sampleRate: $0.sampleRate, channels: $0.outputChannels, spatial: $0.isSpatialAudioEnabled,
+                       maximumChannels: $0.maximumChannels, channelLabels: $0.channelLabels, uid: $0.uid)
+        }
+        // iOS's volume for the output it names; with no output there is nothing the number would be about.
+        return OutputReading(route: route, volume: route == nil ? nil : Double(session.outputVolume), rendering: PhoneAudioSession.renderingMode())
+    }
+
+    func ask(rate: Double) { try? AVAudioSession.sharedInstance().setPreferredSampleRate(rate) }
+
+    func ask(channels: Int) { try? AVAudioSession.sharedInstance().setPreferredOutputNumberOfChannels(channels) }
 }
 #endif

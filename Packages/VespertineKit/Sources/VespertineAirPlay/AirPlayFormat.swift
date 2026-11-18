@@ -107,13 +107,20 @@ public struct AirPlayWish: Sendable, Equatable {
 }
 
 extension AirPlay2Message {
-    /// What a receiver's /info answer says it takes on a realtime stream: the formats of `AirPlayFormat.all` its
-    /// `audioInputFormats` for that stream type has the bits of. nil when the answer doesn't say (no list, or no
-    /// entry for realtime streams), which is not the same as taking none.
+    /// What a receiver's /info answer says it takes on a realtime stream: the formats of `AirPlayFormat.all` it has the
+    /// bits of. Receivers say it in one of two ways: an `audioFormats` list with an entry per stream type
+    /// (`audioInputFormats`), or `supportedFormats` with one mask per kind of stream (`audioStream` is the realtime
+    /// one; an Apple TV 4K answers this way, and what its `bufferStream` takes is not offered here). nil when the answer
+    /// says neither (a Roku's doesn't), which is not the same as taking none.
     static func acceptedFormats(info: Data) -> [AirPlayFormat]? {
-        guard let entries = decode(info)?["audioFormats"] as? [[String: Any]] else { return nil }
-        for entry in entries where entry["type"] as? Int == realtime {
-            guard let mask = entry["audioInputFormats"] as? Int else { return nil }
+        guard let said = decode(info) else { return nil }
+        if let entries = said["audioFormats"] as? [[String: Any]] {
+            for entry in entries where entry["type"] as? Int == realtime {
+                guard let mask = entry["audioInputFormats"] as? Int else { return nil }
+                return AirPlayFormat.accepted(mask: mask)
+            }
+        }
+        if let mask = (said["supportedFormats"] as? [String: Any])?["audioStream"] as? Int {
             return AirPlayFormat.accepted(mask: mask)
         }
         return nil

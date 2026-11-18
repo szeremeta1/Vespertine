@@ -131,6 +131,7 @@ private func song(_ id: Int64, seconds: Double = 1) -> TrackSummary {
         playback.restore(left())
         playback.resume()
         try await until { playback.player.state == .playing && playback.player.decodedAhead > 0.59 }
+        playback.player.settle()
         #expect(playback.resumeAt == nil)
         let from = Int(0.4 * rate)
         let expected = Array(mac.samples(2)[from...])
@@ -149,6 +150,7 @@ private func song(_ id: Int64, seconds: Double = 1) -> TrackSummary {
         playback.seek(to: 0.5)
         playback.resume()
         try await until { playback.player.state == .playing && playback.player.decodedAhead > 0.49 }
+        playback.player.settle()
         let expected = Array(mac.samples(2)[Int(0.5 * rate)...])
         #expect(try render(engine, frames: expected.count) == expected)
         playback.stop()
@@ -223,6 +225,7 @@ private func song(_ id: Int64, seconds: Double = 1) -> TrackSummary {
         keeper.start()
         playback.play([song(1), song(2)])
         try await until { playback.player.state == .playing && playback.player.decodedAhead > 0.99 }
+        playback.player.settle()
         try await until { shelf.load("mac") != nil }
         await keeper.settled()
         _ = try render(engine, frames: Int(0.5 * rate))
@@ -243,6 +246,7 @@ private func song(_ id: Int64, seconds: Double = 1) -> TrackSummary {
         keeper.start()
         playback.play([song(1), song(2)])
         try await until { playback.player.state == .playing && playback.player.decodedAhead > 0.99 }
+        playback.player.settle()
         _ = try render(engine, frames: Int(0.25 * rate))
         // As the app does when another Mac is chosen: the keeper first, then the player.
         keeper.stop()
@@ -292,6 +296,7 @@ private func song(_ id: Int64, seconds: Double = 1) -> TrackSummary {
         let once = mac.samples(1)
         // Two and a half times round are decoded ahead before anything is rendered.
         try await until { playback.player.state == .playing && playback.player.decodedAhead > 1.24 }
+        playback.player.settle()
         let heard = try render(engine, frames: once.count * 2 + once.count / 2)
         #expect(heard == once + once + Array(once.prefix(once.count / 2)), "the song's first sample follows its last, each time round")
         playback.tick()
@@ -307,6 +312,7 @@ private func song(_ id: Int64, seconds: Double = 1) -> TrackSummary {
         mac.hold(2)
         playback.play([song(1, seconds: 0.5), song(2, seconds: 0.5), song(3, seconds: 0.5)])
         try await until { playback.player.state == .playing && playback.player.decodedAhead > 0.49 && mac.asks.contains(2) }
+        playback.player.settle()
         let first = mac.samples(1)
         // The first song is heard to its end with the second still not here.
         #expect(try render(engine, frames: first.count) == first)
@@ -316,6 +322,7 @@ private func song(_ id: Int64, seconds: Double = 1) -> TrackSummary {
         #expect(playback.notice == nil)
         mac.letGo(2)
         try await until { playback.player.state == .playing && playback.player.decodedAhead > 0.99 }
+        playback.player.settle()
         // Song 2 from its first sample, then song 3 joined to it.
         let second = mac.samples(2), third = mac.samples(3)
         #expect(try render(engine, frames: second.count + third.count) == second + third)
@@ -329,10 +336,12 @@ private func song(_ id: Int64, seconds: Double = 1) -> TrackSummary {
         playback.play([song(1, seconds: 0.5), song(2, seconds: 0.5)])
         // All of the first song is decoded and waiting; the second is still being asked for.
         try await until { playback.player.state == .playing && playback.player.decodedAhead > 0.49 && mac.asks.contains(2) }
+        playback.player.settle()
         let first = mac.samples(1), second = mac.samples(2)
         let early = try render(engine, frames: first.count / 2)
         mac.letGo(2)
         try await until { playback.player.decodedAhead > 0.74 }
+        playback.player.settle()
         let rest = try render(engine, frames: first.count / 2 + second.count)
         #expect(early + rest == first + second, "it arrived while the first song still had audio to play: no gap")
         playback.stop()
