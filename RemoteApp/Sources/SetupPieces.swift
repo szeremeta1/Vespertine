@@ -227,6 +227,9 @@ struct SetupSymbol: View {
 /// One of several choices on a step (where the music is, where it plays): a card with a tick when it's the chosen one.
 /// To VoiceOver it is one button that says whether it is selected.
 struct SetupChoice: View {
+    /// A choice as VoiceOver says it: its name, then what it means.
+    nonisolated static func spoken(title: String, detail: String) -> String { detail.isEmpty ? title : "\(title). \(detail)" }
+
     let symbol: String
     let title: String
     let detail: String
@@ -259,8 +262,8 @@ struct SetupChoice: View {
         .disabled(!enabled)
         .opacity(enabled ? 1 : 0.5)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(verbatim: title))
-        .accessibilityHint(Text(verbatim: detail))
+        // What the choice means is part of what it is called: a hint is spoken late, and not at all when hints are off.
+        .accessibilityLabel(Text(verbatim: SetupChoice.spoken(title: title, detail: detail)))
         .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
         .sensoryFeedback(.selection, trigger: selected)
     }
@@ -285,6 +288,8 @@ struct SetupOption<Control: View>: View {
                     SetupSymbol(name: symbol, selected: on)
                     VStack(alignment: .leading, spacing: 3) {
                         title.font(.body.weight(.semibold)).foregroundStyle(Palette.text)
+                            // A long name wraps: beside a switch it was cut short with an ellipsis.
+                            .fixedSize(horizontal: false, vertical: true)
                         detail.font(.footnote).foregroundStyle(Palette.text2)
                             .fixedSize(horizontal: false, vertical: true)
                     }

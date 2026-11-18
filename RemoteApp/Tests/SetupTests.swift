@@ -176,3 +176,18 @@ import Testing
         #expect(SetupFlowPicture.dotPosition(index: 0, of: 0, time: 1) >= 0)
     }
 }
+
+@Suite struct SettingsSections {
+    @Test func theCellularSwitchShowsOnlyToSomeoneWithAMac() {
+        #expect(!SettingsView.showsMacFetching(pairedMacs: 0))
+        #expect(SettingsView.showsMacFetching(pairedMacs: 1))
+        #expect(SettingsView.showsMacFetching(pairedMacs: 3))
+    }
+}
+
+@Suite struct SetupSpoken {
+    @Test func aChoiceIsSpokenWithWhatItMeans() {
+        #expect(SetupChoice.spoken(title: "Just looking", detail: "A made-up library.") == "Just looking. A made-up library.")
+        #expect(SetupChoice.spoken(title: "Just looking", detail: "") == "Just looking")
+    }
+}
