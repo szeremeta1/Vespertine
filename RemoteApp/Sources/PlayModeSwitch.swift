@@ -30,6 +30,15 @@ nonisolated enum PlayMode: String, CaseIterable, Sendable {
     }
 }
 
+/// What the Output screen lists. Each side's outputs show only while that side plays: the Mac's DACs beside "This
+/// iPhone" playing, or a "This iPhone" row among the Mac's outputs, said two things at once.
+nonisolated enum OutputLayout {
+    /// This device's output and its sound settings: while it plays, and always for a share or a folder.
+    static func showsThisDevice(playsHere: Bool, share: Bool) -> Bool { playsHere || share }
+    /// The Mac's outputs and their sound: while the Mac plays.
+    static func showsMacOutputs(playsHere: Bool, share: Bool) -> Bool { !playsHere && !share }
+}
+
 struct PlayModeSwitch: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var typeSize
