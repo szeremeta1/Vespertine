@@ -34,7 +34,9 @@ IEC 61937 burst; `CLAIMS.md#iec-dtscd`), decodes other DTS files to PCM, and not
 - **FFmpeg's demuxer** (`libavformat/spdifdec.c`, `spdif.c`, `spdif.h` at tag `n6.1.1`, pinned by the IEC-O-001
   hash; `tools/fetch_oracles.py` fetches exactly those files). It was written from the IEC text by people outside
   this project and is what most software uses to read IEC 61937. The job refuses any FFmpeg that isn't 6.1.1, the
-  version whose source the record pins (Ubuntu 24.04's package).
+  version whose source the record pins. It builds that FFmpeg itself, from the same tag
+  (`oracles/iec61937/build_ffmpeg.sh`, which refuses the tag unless it is the commit it names): only the S/PDIF
+  demuxer and what it needs, in about half a minute.
 - **The blind scanner** shares nothing with FFmpeg or with Vespertine: it knows only the codecs' frame syntax from
   the public ATSC standard, and it would find a frame that is truncated, split, byte-swapped wrongly or followed by
   junk that parses as a frame.
@@ -47,8 +49,10 @@ stream, is a finding.
 ```sh
 cd verification/harness
 VERIFICATION_IEC_OUT=/tmp/carriers swift test --filter writeIECCarriers
-# FFmpeg 6.1.1 is needed for the pinned oracle; Homebrew's is newer. On Linux (or a Linux VM):
-python3 verification/oracles/iec61937/check_carriers.py /tmp/carriers
+# FFmpeg 6.1.1 is needed for the pinned oracle; Homebrew's is newer. On Linux (or a Linux VM), build it as CI does
+# (needs git, a C compiler and make):
+verification/oracles/iec61937/build_ffmpeg.sh /tmp/ffmpeg-6.1.1
+PATH=/tmp/ffmpeg-6.1.1:$PATH python3 verification/oracles/iec61937/check_carriers.py /tmp/carriers
 ```
 
 With a newer FFmpeg the script stops at the version check. To look anyway, run the two checks it runs:

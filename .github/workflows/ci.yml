@@ -184,9 +184,25 @@ jobs:
         run: scripts/run-with-watchdog.sh 600 swift test --package-path Packages/VespertineKit -c release --skip-build --filter 'VespertineUPnPTests|VespertineAirPlayTests'
       - name: Analysis core tests (macOS, with the app-parity tests)
         run: swift test --package-path Packages/VespertineAnalysis
-      # The phone remote's protocol, with its TLS pre-shared-key WebSocket tested end to end on the loopback.
+      # The phone remote's protocol, with its TLS pre-shared-key WebSocket tested end to end on the loopback, and the
+      # phone's player, shares and stream server.
+      # Built outside the watchdog, as the kit is: build and tests together had come within 20 s of its 300 s.
+      - name: Build the remote protocol tests
+        run: swift build --package-path Packages/VespertineRemoteKit --build-tests ${CI_BUILD_JOBS:+-j $CI_BUILD_JOBS}
+      # One test target at a time, each in a process of its own. Run together on a three-core runner, the DSD tests of
+      # the share target (minutes of arithmetic each in a debug build) held every thread the tests share for 30 to 55
+      # seconds, and the tests that talk over the loopback in the other targets ran out of their own five-second waits
+      # with nothing wrong (#421 and #429 on main). The targets are read from the folder, so a new one is run too.
       - name: Remote protocol tests (macOS)
-        run: scripts/run-with-watchdog.sh 300 swift test --package-path Packages/VespertineRemoteKit
+        run: |
+          status=0
+          for dir in Packages/VespertineRemoteKit/Tests/*/; do
+            target=$(basename "$dir")
+            echo "::group::$target"
+            scripts/run-with-watchdog.sh 300 swift test --package-path Packages/VespertineRemoteKit --skip-build --filter "$target" || status=1
+            echo "::endgroup::"
+          done
+          exit $status
       - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: runner.environment == 'github-hosted' && github.ref == 'refs/heads/main' && steps.kit-cache.outputs.cache-hit != 'true'
         with:
@@ -297,8 +313,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # PyYAML comes with GitHub's Ubuntu image, so nothing is downloaded here. Only an image without it installs it,
+      # and says what it is doing: a quiet apt-get that stalls on a mirror shows nothing until the job's time is up.
       - name: Tools
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq python3-yaml
+        run: python3 -c 'import yaml' || { sudo apt-get update && sudo apt-get install -y python3-yaml; }
       - name: Fetch the pinned oracle sources (refuses any that differ from the registry)
         run: python3 verification/tools/fetch_oracles.py
       - name: Requirement registry, claims and hashes
@@ -427,8 +445,14 @@ jobs:
           restore-keys: verification-carriers-${{ github.run_id }}-
           enableCrossOsArchive: true
           fail-on-cache-miss: true
-      - name: FFmpeg 6.1.1 (the version the oracle record pins)
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      # Built from FFmpeg's own source at the tag the oracle record reviewed (the script refuses any other commit), in
+      # about half a minute. Not installed with apt-get: on some of GitHub's runners that install (a hundred packages
+      # from a mirror) never finished, the job ran out of time and main went red with nothing wrong in the commit.
+      - name: FFmpeg 6.1.1 (built from the source the oracle record pins)
+        timeout-minutes: 5
+        run: |
+          verification/oracles/iec61937/build_ffmpeg.sh "$RUNNER_TEMP/ffmpeg"
+          echo "$RUNNER_TEMP/ffmpeg" >> "$GITHUB_PATH"
       - name: Carriers against FFmpeg's S/PDIF demuxer and the carrier scanner
         run: python3 verification/oracles/iec61937/check_carriers.py verification-carriers
 
