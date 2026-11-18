@@ -487,7 +487,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     private func sessionClock(for wish: AirPlayWish) -> PTPClock? {
         guard buffersStreams, !bufferedRefused, device.usesAirPlay2, !wish.isPlain else { return nil }
         let address = sender.deviceID.split(separator: ":").compactMap { UInt8($0, radix: 16) }
-        let ports = clockPorts?.own ?? (319, 320)
+        let ports: (event: UInt16, general: UInt16) = clockPorts?.own ?? (319, 320)
         do {
             return try PTPClock(identity: PTPMessage.identity(address: address), eventPort: ports.event, generalPort: ports.general)
         } catch {
