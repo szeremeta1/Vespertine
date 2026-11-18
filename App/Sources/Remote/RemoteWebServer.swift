@@ -29,6 +29,16 @@ final class RemoteWebServer {
     static let preferredPort: UInt16 = 47_820
     private static let cookieName = "vespertine-remote"
     private static let maximumRequest = 64 * 1024
+    /// Connections open at once, event streams included; more are closed as they arrive. Anything on the network can
+    /// connect before it has paired, and an app has only a few hundred file descriptors for its songs and everything else.
+    static let maximumConnections = 48
+    /// A browser has this long to send its whole request, then it is cut off (a silent connection can't hold a place).
+    static let requestTimeout: Duration = .seconds(10)
+    /// Connections whose request hasn't been answered yet, and of those the ones whose request hasn't fully arrived.
+    private var pending: [ObjectIdentifier: NWConnection] = [:]
+    private var awaited: Set<ObjectIdentifier> = []
+    /// Connections open now (the tests look).
+    var connectionCount: Int { pending.count + streams.count }
 
     var hasListeners: Bool { !streams.isEmpty }
     var isRunning: Bool { listener != nil }
@@ -72,6 +82,9 @@ final class RemoteWebServer {
         port = nil
         for stream in streams.values { stream.close() }
         streams.removeAll()
+        for connection in pending.values { connection.cancel() }
+        pending.removeAll()
+        awaited.removeAll()
     }
 
     /// Closes the event streams of a browser that was removed in Settings.
@@ -91,9 +104,27 @@ final class RemoteWebServer {
     // MARK: Requests
 
     private func accept(_ connection: NWConnection) {
+        guard Self.admits(open: connectionCount) else { connection.cancel(); return }
+        let id = ObjectIdentifier(connection)
+        pending[id] = connection
+        awaited.insert(id)
+        connection.stateUpdateHandler = { [weak self] state in
+            switch state {
+            case .failed, .cancelled: MainActor.assumeIsolated { self?.pending[id] = nil; self?.awaited.remove(id) }
+            default: break
+            }
+        }
         connection.start(queue: .main)
+        Task { [weak self] in
+            try? await Task.sleep(for: Self.requestTimeout)
+            guard let self, self.awaited.contains(id) else { return }
+            connection.cancel()
+        }
         read(connection, buffer: Data())
     }
+
+    /// Whether one more connection is taken with `open` of them open already.
+    static func admits(open: Int) -> Bool { open < maximumConnections }
 
     private func read(_ connection: NWConnection, buffer: Data) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 16 * 1024) { [weak self] content, _, complete, error in
@@ -103,6 +134,7 @@ final class RemoteWebServer {
                 if let content { buffer.append(content) }
                 if buffer.count > Self.maximumRequest || error != nil { connection.cancel(); return }
                 if let request = HTTPRequest(buffer) {
+                    self.awaited.remove(ObjectIdentifier(connection))
                     self.handle(request, on: connection)
                 } else if complete {
                     connection.cancel()
@@ -149,6 +181,8 @@ final class RemoteWebServer {
             }
         case ("GET", "/events"):
             guard let device else { return respond(connection, status: 401) }
+            // The stream watches the connection itself from here on.
+            pending[ObjectIdentifier(connection)] = nil
             let stream = RemoteWebStream(connection: connection, device: device)
             let id = ObjectIdentifier(stream)
             stream.onClose = { [weak self] in self?.streams[id] = nil; self?.server?.webDevicesChanged() }
