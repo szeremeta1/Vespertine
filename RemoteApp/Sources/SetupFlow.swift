@@ -268,7 +268,7 @@ struct SetupFlow: View {
     @ViewBuilder private var footer: some View {
         // One row at every text size: the buttons stop growing at the largest ordinary size, so the step keeps the screen.
         HStack(spacing: 12) {
-            if step != .welcome, step != .done, let previous {
+            if step != .welcome, step != .done, previous != nil {
                 Button { goBack() } label: {
                     Image(systemName: "chevron.backward").accessibilityLabel(Text("Back"))
                 }
