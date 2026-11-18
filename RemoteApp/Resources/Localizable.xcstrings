@@ -14034,6 +14034,275 @@
         }
       }
     },
+    "A song you have in stereo and in surround plays as the version that fits the output. Off, every file plays as itself.": {
+      "comment": "First-run setup on the iPhone and iPad, under the switch Combine Stereo and Surround Versions. A short form of the longer explanation in Settings.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በስቴሪዮም በሰራውንድም ያለህ ዘፈን ለውፅዓቱ በሚስማማው ስሪት ይጫወታል። ሲጠፋ እያንዳንዱ ፋይል እንደ ራሱ ይጫወታል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "الأغنية التي لديك بالستيريو وبالصوت المحيطي تُشغَّل بالإصدار الذي يناسب المخرج. عند الإيقاف، يُشغَّل كل ملف كما هو."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "যে গান আপনার কাছে স্টেরিও ও সারাউন্ড দুটোতেই আছে, সেটি আউটপুটের সঙ্গে মানানসই সংস্করণে বাজে। বন্ধ থাকলে প্রতিটি ফাইল নিজের মতোই বাজে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skladba, kterou máte ve stereu i v surroundu, se přehraje ve verzi, která odpovídá výstupu. Je-li vypnuto, každý soubor se přehraje tak, jak je."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En sang, du har i stereo og i surround, afspilles i den version, der passer til udgangen. Når det er slået fra, afspilles hver fil som sig selv."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Titel, den du in Stereo und in Surround hast, wird in der Version wiedergegeben, die zum Ausgang passt. Ausgeschaltet wird jede Datei als sie selbst wiedergegeben."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ένα τραγούδι που έχετε σε στέρεο και σε surround παίζει στην εκδοχή που ταιριάζει στην έξοδο. Όταν είναι ανενεργό, κάθε αρχείο παίζει ως έχει."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una canción que tienes en estéreo y en sonido envolvente se reproduce en la versión que corresponde a la salida. Si está desactivado, cada archivo se reproduce tal cual."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "آهنگی که هم به‌صورت استریو و هم با صدای فراگیر دارید، با نسخه‌ای پخش می‌شود که با خروجی جور است. در حالت خاموش، هر فایل همان‌طور که هست پخش می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kappale, joka sinulla on sekä stereona että surround-versiona, toistetaan lähtöön sopivana versiona. Kun asetus on pois päältä, jokainen tiedosto toistetaan sellaisenaan."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ang kantang mayroon ka sa stereo at sa surround ay tumutugtog sa bersyong akma sa output. Kapag naka-off, tumutugtog ang bawat file bilang ito mismo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un morceau que vous avez en stéréo et en surround est lu dans la version qui convient à la sortie. Désactivé, chaque fichier est lu tel quel."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "જે ગીત તમારી પાસે સ્ટીરિયોમાં અને સરાઉન્ડમાં છે, તે આઉટપુટને અનુરૂપ આવૃત્તિમાં વાગે છે. બંધ હોય ત્યારે દરેક ફાઇલ જેમ છે તેમ વાગે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waƙar da kake da ita a stereo da kuma a sautin kewaye tana kunnawa da nau'in da ya dace da mafitar sauti. Idan an kashe, kowane fayil yana kunnawa yadda yake."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שיר שיש לך גם בסטריאו וגם בסראונד מתנגן בגרסה שמתאימה ליציאה. כשהאפשרות כבויה, כל קובץ מתנגן כמות שהוא."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जो गीत आपके पास स्टीरियो में और सराउंड में है, वह आउटपुट के अनुकूल संस्करण में चलता है। बंद होने पर हर फ़ाइल जैसी है वैसी ही चलती है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az a dal, amely sztereóban és surround változatban is megvan, a kimenethez illő változatban szól. Kikapcsolva minden fájl önmagaként szól."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagu yang Anda miliki dalam stereo dan dalam surround diputar sebagai versi yang sesuai dengan output. Jika dimatikan, setiap file diputar apa adanya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un brano che hai in stereo e in surround viene riprodotto nella versione adatta all’uscita. Se disattivato, ogni file viene riprodotto così com’è."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ステレオ版とサラウンド版の両方がある曲は、出力に合ったバージョンで再生されます。オフにすると、どのファイルもそのまま再生されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮ್ಮ ಬಳಿ ಸ್ಟೀರಿಯೋದಲ್ಲಿ ಮತ್ತು ಸರೌಂಡ್‌ನಲ್ಲಿ ಇರುವ ಹಾಡು ಔಟ್‌ಪುಟ್‌ಗೆ ಹೊಂದುವ ಆವೃತ್ತಿಯಲ್ಲಿ ಪ್ಲೇ ಆಗುತ್ತದೆ. ಆಫ್ ಇದ್ದಾಗ ಪ್ರತಿಯೊಂದು ಫೈಲ್ ಇದ್ದ ಹಾಗೆಯೇ ಪ್ಲೇ ಆಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스테레오와 서라운드로 모두 가지고 있는 노래는 출력에 맞는 버전으로 재생됩니다. 끄면 모든 파일이 있는 그대로 재생됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "സ്റ്റീരിയോയിലും സറൗണ്ടിലും നിങ്ങളുടെ പക്കലുള്ള ഒരു പാട്ട് ഔട്ട്‌പുട്ടിന് ചേരുന്ന പതിപ്പായി പ്ലേ ചെയ്യും. ഓഫായിരിക്കുമ്പോൾ ഓരോ ഫയലും അതേപടി പ്ലേ ചെയ്യും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जे गाणे तुमच्याकडे स्टिरिओमध्ये आणि सराउंडमध्ये आहे, ते आउटपुटला साजेशा आवृत्तीत वाजते. बंद असताना प्रत्येक फाइल जशी आहे तशीच वाजते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lagu yang anda ada dalam stereo dan dalam bunyi keliling dimainkan sebagai versi yang sesuai dengan output. Apabila dimatikan, setiap fail dimainkan seadanya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En sang du har i stereo og i surround, spilles i den versjonen som passer til utgangen. Når det er av, spilles hver fil som seg selv."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een nummer dat je in stereo en in surround hebt, wordt afgespeeld in de versie die bij de uitvoer past. Uitgeschakeld wordt elk bestand als zichzelf afgespeeld."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜਿਹੜਾ ਗੀਤ ਤੁਹਾਡੇ ਕੋਲ ਸਟੀਰੀਓ ਵਿੱਚ ਅਤੇ ਸਰਾਊਂਡ ਵਿੱਚ ਹੈ, ਉਹ ਆਉਟਪੁੱਟ ਦੇ ਅਨੁਕੂਲ ਸੰਸਕਰਣ ਵਿੱਚ ਚੱਲਦਾ ਹੈ। ਬੰਦ ਹੋਣ ’ਤੇ ਹਰ ਫ਼ਾਈਲ ਜਿਵੇਂ ਹੈ ਉਵੇਂ ਹੀ ਚੱਲਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utwór, który masz w stereo oraz w surround, jest odtwarzany w wersji pasującej do wyjścia. Po wyłączeniu każdy plik jest odtwarzany taki, jaki jest."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma música que você tem em estéreo e em surround é reproduzida na versão adequada à saída. Desativado, cada arquivo é reproduzido como ele mesmo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uma música que tem em estéreo e em surround é reproduzida na versão adequada à saída. Desativado, cada ficheiro é reproduzido tal como é."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O melodie pe care o ai în stereo și în surround este redată în versiunea potrivită ieșirii. Dezactivat, fiecare fișier este redat ca atare."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En låt som du har i stereo och i surround spelas i den version som passar utgången. Avstängt spelas varje fil som den är."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wimbo ulio nao katika stereo na katika sauti ya kuzunguka huchezwa kwa toleo linalofaa towe la sauti. Ikizimwa, kila faili huchezwa kama ilivyo."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஸ்டீரியோவிலும் சரவுண்டிலும் உங்களிடம் உள்ள பாடல், வெளியீட்டுக்குப் பொருந்தும் பதிப்பாக இயங்கும். முடக்கப்பட்டிருக்கும்போது ஒவ்வொரு கோப்பும் அப்படியே இயங்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "స్టీరియోలోనూ సరౌండ్‌లోనూ మీ దగ్గర ఉన్న పాట అవుట్‌పుట్‌కు సరిపోయే వెర్షన్‌గా ప్లే అవుతుంది. ఆఫ్‌లో ఉన్నప్పుడు ప్రతి ఫైల్ ఉన్నది ఉన్నట్టే ప్లే అవుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพลงที่คุณมีทั้งแบบสเตอริโอและแบบเสียงรอบทิศทางจะเล่นด้วยเวอร์ชันที่เหมาะกับเอาต์พุต เมื่อปิดอยู่ ทุกไฟล์จะเล่นตามที่เป็น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hem stereo hem de surround olarak sahip olduğunuz bir şarkı, çıkışa uygun sürümüyle çalınır. Kapalıyken her dosya olduğu gibi çalınır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Пісня, яку ви маєте у стерео та в об’ємному звуку, відтворюється у версії, що відповідає виходу. Коли вимкнено, кожен файл відтворюється сам по собі."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جو گانا آپ کے پاس اسٹیریو میں اور سراؤنڈ میں ہے، وہ اُس ورژن میں چلتا ہے جو آؤٹ پٹ کے مطابق ہو۔ بند ہونے پر ہر فائل جیسی ہے ویسی ہی چلتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bài hát mà bạn có cả ở dạng stereo lẫn âm thanh vòm sẽ phát bằng phiên bản phù hợp với đầu ra. Khi tắt, mỗi tệp được phát đúng như chính nó."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同时拥有立体声和环绕声版本的歌曲，会以适合输出的版本播放。关闭后，每个文件都按原样播放。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同時擁有立體聲與環繞聲版本的歌曲，會以適合輸出的版本播放。關閉後，每個檔案都會照原樣播放。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你同時有立體聲同環繞聲版本嘅歌曲，會以配合輸出嘅版本播放。關閉後，每個檔案都會照原樣播放。"
+          }
+        }
+      }
+    },
     "Connecting to “%@”…": {
       "localizations": {
         "am": {

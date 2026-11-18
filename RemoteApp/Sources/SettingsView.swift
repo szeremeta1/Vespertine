@@ -40,6 +40,8 @@ struct SettingsView: View {
                         Text("Cover Flow reads the motion sensors only while it’s on screen, to shift its perspective as you tilt the device. Nothing is recorded.")
                     }
                 }
+                // Songs are fetched over the network only from a Mac: with none paired there is nothing to switch.
+                if Self.showsMacFetching(pairedMacs: model.pairings.count) {
                 Section {
                     Toggle("Play over Cellular Data", isOn: Binding(get: { settings.cellularPlayback }, set: { settings.cellularPlayback = $0; model.cellularSettingChanged() }))
                     LabeledContent("Fetched from the Mac", value: ByteCountFormatter.string(fromByteCount: PlayTarget.shared.bytesReceived, countStyle: .file))
@@ -47,6 +49,7 @@ struct SettingsView: View {
                     Text("Playing on This Device")
                 } footer: {
                     Text("When music plays on this device, its songs come from your Mac. Lossless and hi-res songs are large: an album can be several hundred megabytes. The count is since the app was opened.")
+                }
                 }
                 Section {
                     Toggle("Combine Stereo and Surround Versions", isOn: Binding(get: { settings.combineVersions }, set: { settings.combineVersions = $0; model.versionsSettingChanged() }))
@@ -92,6 +95,10 @@ struct SettingsView: View {
             }
         }
     }
+
+    /// Whether Settings shows the cellular switch and the count of what was fetched from the Mac. Both are about songs
+    /// a Mac sends; someone whose music is on a share or in a folder has no use for them.
+    nonisolated static func showsMacFetching(pairedMacs: Int) -> Bool { pairedMacs > 0 }
 
     static var version: String {
         let info = Bundle.main.infoDictionary
