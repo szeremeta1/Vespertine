@@ -19,6 +19,7 @@ private final class FlakyMac: @unchecked Sendable {
     private var _connected = true
     private var _opens = 0
     private var _closed: [Int] = []
+    private var looksUntilBack: Int?
     var tag = "same-bytes"
     let data = Data((0..<4000).map { UInt8(truncatingIfNeeded: $0) })
 
@@ -31,6 +32,19 @@ private final class FlakyMac: @unchecked Sendable {
 
     /// The connection is lost: every stream is forgotten, and nothing answers until `connected` is true again.
     func drop(reconnecting: Bool = false) { lock.withLock { live = []; _connected = reconnecting } }
+
+    /// The connection comes back by itself the `look`th time the line looks at it. Counted in the line's own looks,
+    /// not in milliseconds, so it comes back at the same point of the wait on any machine.
+    func comeBack(atLook look: Int) { lock.withLock { looksUntilBack = look } }
+
+    private func look() -> Bool {
+        lock.withLock {
+            if !_connected, let left = looksUntilBack {
+                if left <= 1 { _connected = true; looksUntilBack = nil } else { looksUntilBack = left - 1 }
+            }
+            return _connected
+        }
+    }
 
     func descriptor(_ number: Int) -> StreamDescriptor {
         StreamDescriptor(stream: number, kind: .original, byteSize: Int64(data.count),
@@ -54,7 +68,20 @@ private final class FlakyMac: @unchecked Sendable {
             return StreamFrame(request: 1, stream: stream, offset: offset, endOfStream: end >= data.count, payload: Data(data[Int(offset)..<end]))
         }, close: { [self] stream in
             lock.withLock { _closed.append(stream); live.remove(stream) }
-        }, isConnected: { [self] in connected })
+        }, isConnected: { [self] in look() })
+    }
+}
+
+/// The line's clock in these tests: its time passes only when the line pauses between looks, by exactly that pause. A
+/// test's patience is then a number of looks, the same on a machine that holds every test still for a minute (GitHub's
+/// three-core Mac did, and a five-second patience on the real clock was spent before the first look).
+private final class Paces: @unchecked Sendable {
+    private let lock = NSLock()
+    private var at = ContinuousClock.now
+    var now: ContinuousClock.Instant { lock.withLock { at } }
+    func rest(_ pause: Duration) async {
+        lock.withLock { at = at + pause }
+        await Task.yield()
     }
 }
 
@@ -64,12 +91,18 @@ private final class FlakyMac: @unchecked Sendable {
         return descriptor
     }
 
+    private func lineTo(_ mac: FlakyMac, patience: Duration = .seconds(5)) async throws -> StreamLine {
+        let paces = Paces()
+        return StreamLine(client: mac.client, song: 1, descriptor: try await opened(mac), maxSampleRate: nil, patience: patience, pause: .milliseconds(5),
+                          now: { paces.now }, rest: { await paces.rest($0) })
+    }
+
     @Test func aReadAfterTheConnectionCameBackOpensTheSongAgainAndCarriesOn() async throws {
         let mac = FlakyMac()
-        let line = StreamLine(client: mac.client, song: 1, descriptor: try await opened(mac), maxSampleRate: nil, patience: .seconds(5), pause: .milliseconds(5))
+        let line = try await lineTo(mac)
         #expect(try await line.read(offset: 0, length: 1000).payload == mac.data.prefix(1000))
         mac.drop()
-        Task { try? await Task.sleep(for: .milliseconds(60)); mac.connected = true }
+        mac.comeBack(atLook: 12)
         let frame = try await line.read(offset: 1000, length: 1000)
         #expect(frame.payload == mac.data[1000..<2000])
         #expect(mac.opens == 2)
@@ -78,7 +111,7 @@ private final class FlakyMac: @unchecked Sendable {
 
     @Test func fourReadsThatFailTogetherOpenTheSongOnce() async throws {
         let mac = FlakyMac()
-        let line = StreamLine(client: mac.client, song: 1, descriptor: try await opened(mac), maxSampleRate: nil, patience: .seconds(5), pause: .milliseconds(5))
+        let line = try await lineTo(mac)
         mac.drop(reconnecting: true)
         try await withThrowingTaskGroup(of: Int.self) { group in
             for i in 0..<4 { group.addTask { try await line.read(offset: Int64(i) * 1000, length: 1000).payload.count } }
@@ -89,7 +122,7 @@ private final class FlakyMac: @unchecked Sendable {
 
     @Test func aSongThatChangedOnTheMacIsNotStitchedTogether() async throws {
         let mac = FlakyMac()
-        let line = StreamLine(client: mac.client, song: 1, descriptor: try await opened(mac), maxSampleRate: nil, patience: .seconds(5), pause: .milliseconds(5))
+        let line = try await lineTo(mac)
         mac.drop(reconnecting: true)
         mac.tag = "other-bytes"
         await #expect(throws: StreamSource.Failure.self) { try await line.read(offset: 0, length: 1000) }
@@ -97,9 +130,9 @@ private final class FlakyMac: @unchecked Sendable {
 
     @Test func aMacThatNeverComesBackEndsTheWaitWithWords() async throws {
         let mac = FlakyMac()
-        let line = StreamLine(client: mac.client, song: 1, descriptor: try await opened(mac), maxSampleRate: nil, patience: .milliseconds(80), pause: .milliseconds(5))
+        let line = try await lineTo(mac, patience: .milliseconds(80))
         mac.drop()
-        // The read ends by itself once the patience is spent, and what it throws carries the last error's words.
+        // The read ends by itself once the patience is spent (16 pauses of 5 ms), and what it throws carries the last error's words.
         do {
             _ = try await line.read(offset: 0, length: 1000)
             Issue.record("the read came back from a Mac that is gone")
@@ -111,10 +144,10 @@ private final class FlakyMac: @unchecked Sendable {
     @Test func whileItWaitsItSaysSoAndClosingGivesBackTheStreamItHasNow() async throws {
         let mac = FlakyMac()
         let waits = Waits()
-        let line = StreamLine(client: mac.client, song: 1, descriptor: try await opened(mac), maxSampleRate: nil, patience: .seconds(5), pause: .milliseconds(5))
+        let line = try await lineTo(mac)
         await line.onWaiting { waits.note($0) }
         mac.drop()
-        Task { try? await Task.sleep(for: .milliseconds(40)); mac.connected = true }
+        mac.comeBack(atLook: 8)
         _ = try await line.read(offset: 0, length: 10)
         #expect(waits.seen == [true, false])
         await line.close()
