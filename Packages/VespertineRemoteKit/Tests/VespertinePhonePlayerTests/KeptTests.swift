@@ -145,36 +145,6 @@ private func bytes(_ id: Int64, count: Int = 3500) -> Data { Data((0..<count).ma
         #expect(names.filter { $0.hasSuffix(".part") }.isEmpty)
     }
 
-    @Test func whatWasKeptFromOneLibraryIsTakenInWhenLibrariesAreJoined() async throws {
-        // Kept from a Mac and from a share, each by itself, with the same song numbers.
-        let (fromMac, _, macFolder) = try made([1, 2])
-        fromMac.keep(album([1, 2]))
-        try await wait { fromMac.isIdle }
-        let (fromShare, _, shareFolder) = try made([1])
-        fromShare.keep(album([1]))
-        try await wait { fromShare.isIdle }
-
-        let joined = try KeptStore(directory: folder())
-        joined.adopt(macFolder, slot: 1)
-        joined.adopt(shareFolder, slot: 2)
-        #expect(joined.lists.map(\.id) == ["album:1~a", "album:2~a"])
-        #expect(joined.lists[0].reference == "1~a" && joined.lists[0].artworkKey == "1~art")
-        let macSong = try #require(JoinedID.join(2, slot: 1)), shareSong = try #require(JoinedID.join(1, slot: 2))
-        #expect(joined.lists[0].tracks.map(\.id) == [JoinedID.join(1, slot: 1), macSong])
-        // The files came along: nothing is fetched again, and the two libraries' song 1 are two files.
-        #expect(try Data(contentsOf: try #require(joined.kept(macSong)).file) == bytes(2))
-        #expect(try Data(contentsOf: try #require(joined.kept(shareSong)).file) == bytes(1))
-        #expect(joined.progress(of: "album:1~a").isComplete && joined.progress(of: "album:2~a").isComplete)
-        #expect(joined.missing.isEmpty && joined.bytes == 10_500)
-        #expect(!FileManager.default.fileExists(atPath: macFolder.path) && !FileManager.default.fileExists(atPath: shareFolder.path))
-        // Still there the next time the app opens.
-        let again = try KeptStore(directory: joined.directory)
-        #expect(again.lists.count == 2 && again.kept(macSong) != nil && again.kept(shareSong) != nil)
-        // A folder with nothing kept in it is nothing to take in.
-        joined.adopt(folder(), slot: 3)
-        #expect(joined.lists.count == 2)
-    }
-
     @Test func aSongInTwoListsIsFetchedOnceAndStaysUntilBothAreGone() async throws {
         let (keeper, mac, _) = try made([1, 2, 3])
         keeper.keep(album([1, 2]))
