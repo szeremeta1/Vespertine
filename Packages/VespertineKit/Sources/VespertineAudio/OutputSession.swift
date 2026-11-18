@@ -323,6 +323,9 @@ final class OutputSession: @unchecked Sendable {
                                 speakerNames: [], streamCount: 1, integerMode: false)
         decodedLayout = nil
         latencyFrames = 0
+        // As the real session sets them: a DoP plan's silence is idle frames behind the markers, never zeros.
+        nrt_context_set_passthrough(ctx, plan.isPassthrough)
+        nrt_context_set_dop(ctx, plan.mode == .dop)
         simulated = SimulatedOutput(context: ctx, channels: plan.channels, rate: rate, bufferFrames: bufferFrames)
     }
 
