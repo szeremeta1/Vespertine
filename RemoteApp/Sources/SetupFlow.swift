@@ -17,7 +17,10 @@ struct SetupFlow: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var typeSize
     @State private var step = SetupAssistant.shared.openingStep
-    @State private var source = SetupAssistant.shared.openingSource
+    /// The Music step's chosen cards: any mix of a Mac, a share and a folder, or the demo by itself.
+    @State private var sources: Set<SetupSource> = SetupAssistant.shared.openingSource.map { [$0] } ?? []
+    /// Which of them the connect step is pairing or adding now.
+    @State private var connecting: SetupSource?
     @State private var forward = true
     /// The step whose pieces have come into place.
     @State private var revealed: SetupStep?
@@ -29,16 +32,40 @@ struct SetupFlow: View {
 
     private var pad: Bool { UIDevice.current.userInterfaceIdiom == .pad }
     /// This device is where the music plays: always for a share or a folder, by choice with a Mac.
-    private var playsHere: Bool { source == .share || source == .folder || PlayTarget.shared.onThisDevice }
-    private var named: [SetupStep] { SetupPlan.named(source: source, playsHere: playsHere) }
-    private var next: SetupStep? { SetupPlan.next(after: step, source: source, playsHere: playsHere) }
-    private var previous: SetupStep? { SetupPlan.previous(before: step, source: source, playsHere: playsHere) }
+    /// With a Mac it also counts when this device was left turned on in the Output step, so its sound is asked about.
+    private var playsHere: Bool {
+        let canPlayHere = model.session.map { PlayTarget.shared.canPlayHere($0) } ?? true
+        return SetupPlan.playsHere(sources: sources, onThisDevice: PlayTarget.shared.onThisDevice || (PlayTarget.shared.sides.hasDevice && canPlayHere))
+    }
+    private var named: [SetupStep] { SetupPlan.named(sources: sources, playsHere: playsHere) }
+    private var next: SetupStep? { SetupPlan.next(after: step, sources: sources, playsHere: playsHere) }
+    private var previous: SetupStep? { SetupPlan.previous(before: step, sources: sources, playsHere: playsHere) }
     private func shown(_ page: SetupStep) -> Bool { revealed == page }
+    /// What the connect step asks for, in order, and the one it is on.
+    private var queue: [SetupSource] { SetupPlan.connecting(sources) }
+    private var current: SetupSource? { connecting ?? queue.first }
 
-    /// What is open is the kind of thing the Music step's chosen card is: the pairing, share or folder is in place.
-    private var connected: Bool {
-        guard let session = model.session, let source else { return false }
-        return SetupSource.of(demo: session.isDemo, share: session.isShare, folder: session.isFolder) == source
+    /// The name of the Mac, share or folder of this kind that is part of the library, once there is one.
+    private func ready(_ kind: SetupSource?) -> String? {
+        guard let session = model.session, !session.isDemo else { return nil }
+        switch kind {
+        case .mac: return model.macInUse?.name
+        case .share: return model.shareInUse?.name
+        case .folder: return model.folderInUse?.name
+        default: return nil
+        }
+    }
+
+    /// What the connect step is asking for is in place.
+    private var connected: Bool { ready(current) != nil }
+
+    /// The kinds of thing the library is made of now.
+    private var kindsInUse: Set<SetupSource> {
+        var kinds: Set<SetupSource> = []
+        if model.macInUse != nil { kinds.insert(.mac) }
+        if model.shareInUse != nil { kinds.insert(.share) }
+        if model.folderInUse != nil { kinds.insert(.folder) }
+        return kinds
     }
 
     /// The text size setup is drawn at. It follows the system's size up to the second accessibility size, since past it
@@ -59,7 +86,8 @@ struct SetupFlow: View {
                             .frame(maxWidth: .infinity, minHeight: geometry.size.height)
                     }
                     .scrollBounceBehavior(.basedOnSize)
-                    .id(step)
+                    // The connect step is a page for each thing it pairs or adds.
+                    .id(step == .connect ? "connect-\(current?.rawValue ?? "")" : "\(step)")
                     .transition(transition)
                 }
             }
@@ -86,13 +114,13 @@ struct SetupFlow: View {
             revealed = step
         }
         .onAppear {
-            // Setup opened again from Settings with something already open: its card is the chosen one.
-            if source == nil, let session = model.session {
-                source = SetupSource.of(demo: session.isDemo, share: session.isShare, folder: session.isFolder)
+            // Setup opened again from Settings with a library open: the cards of what it is made of are the chosen ones.
+            if sources.isEmpty, let session = model.session {
+                sources = session.isDemo ? [.demo] : kindsInUse
             }
-            if step == .connect, source == .mac { model.lookForMacs() }
+            if step == .connect, current == .mac { model.lookForMacs() }
         }
-        .onChange(of: model.session?.pairing.serverID) { _, opened in sessionChanged(opened) }
+        .onChange(of: model.inUse) { old, new in libraryChanged(from: old, to: new) }
     }
 
     // MARK: Moving
@@ -108,7 +136,11 @@ struct SetupFlow: View {
 
     private func go(to target: SetupStep) {
         forward = target > step
-        if target == .connect, source == .mac { model.lookForMacs() }
+        // Into the connect step from the front it starts with the first thing to add; from behind, with the last.
+        if target == .connect {
+            connecting = forward ? queue.first : queue.last
+            if connecting == .mac { model.lookForMacs() }
+        }
         // The leaving page takes its direction from this update; the move comes in the next one.
         Task { @MainActor in
             withAnimation(reduceMotion ? .easeInOut(duration: 0.25) : .spring(response: 0.6, dampingFraction: 0.86)) { step = target }
@@ -116,9 +148,39 @@ struct SetupFlow: View {
     }
 
     private func goOn() {
-        // The demo needs nothing found or added: choosing it opens it.
-        if step == .music, source == .demo, model.session?.isDemo != true { model.tryDemo() }
+        if step == .music {
+            if sources.contains(.demo) {
+                // The demo needs nothing found or added: choosing it opens it.
+                if model.session?.isDemo != true { model.tryDemo() }
+            } else {
+                // The library is what the cards say: a kind that was turned off is taken out of it (never forgotten).
+                if model.session?.isDemo == true { model.leave() }
+                model.keepInUse(mac: sources.contains(.mac), share: sources.contains(.share), folder: sources.contains(.folder))
+            }
+        }
+        // More than one thing to pair or add: the connect step moves to the next before setup moves on.
+        if step == .connect, let current, let index = queue.firstIndex(of: current), index + 1 < queue.count {
+            turn(to: queue[index + 1], forward: true)
+            return
+        }
         if let next { go(to: next) }
+    }
+
+    private func goBack() {
+        if step == .connect, let current, let index = queue.firstIndex(of: current), index > 0 {
+            turn(to: queue[index - 1], forward: false)
+        } else if let previous {
+            go(to: previous)
+        }
+    }
+
+    /// The connect step turns to another of the things it pairs or adds.
+    private func turn(to kind: SetupSource, forward: Bool) {
+        self.forward = forward
+        if kind == .mac { model.lookForMacs() }
+        Task { @MainActor in
+            withAnimation(reduceMotion ? .easeInOut(duration: 0.25) : .spring(response: 0.6, dampingFraction: 0.86)) { connecting = kind }
+        }
     }
 
     private func finish() {
@@ -126,29 +188,27 @@ struct SetupFlow: View {
         SetupAssistant.shared.finish()
     }
 
-    /// Something opened while setup is up: a Mac was paired, a share or a folder added, or a file was opened in
+    /// The library changed while setup is up: a Mac was paired, a share or a folder added, or a file was opened in
     /// Vespertine from another app.
-    private func sessionChanged(_ opened: String?) {
-        guard opened != nil, let session = model.session else { return }
-        let kind = SetupSource.of(demo: session.isDemo, share: session.isShare, folder: session.isFolder)
+    private func libraryChanged(from old: [String], to new: [String]) {
+        let added = new.filter { !old.contains($0) }
+        guard !added.isEmpty else { return }
         switch step {
         case .welcome, .music:
             // Not by way of a step: a pairing code scanned with the Camera app, or a song opened from Files. The song
             // is what was asked for, so setup gets out of its way; a pairing carries on from the step after it.
-            if session.pairing.serverID == SavedFolder.ownID {
+            if added.contains(SavedFolder.ownID) {
                 finish()
-            } else if kind != .demo || source == .demo {
-                source = kind
-                if let after = SetupPlan.next(after: .connect, source: kind, playsHere: kind != .mac || PlayTarget.shared.onThisDevice) {
-                    go(to: after)
-                }
+            } else {
+                sources = sources.subtracting([.demo]).union(kindsInUse)
+                if let after = SetupPlan.next(after: .connect, sources: sources, playsHere: playsHere) { go(to: after) }
             }
         case .connect:
             // What the step asked for is there: a moment to see it, then on.
-            source = kind
+            let asked = current
             Task {
                 try? await Task.sleep(for: .milliseconds(1100))
-                if step == .connect, connected { goOn() }
+                if step == .connect, current == asked, connected { goOn() }
             }
         default:
             break
@@ -209,7 +269,7 @@ struct SetupFlow: View {
         // One row at every text size: the buttons stop growing at the largest ordinary size, so the step keeps the screen.
         HStack(spacing: 12) {
             if step != .welcome, step != .done, let previous {
-                Button { go(to: previous) } label: {
+                Button { goBack() } label: {
                     Image(systemName: "chevron.backward").accessibilityLabel(Text("Back"))
                 }
                 .buttonStyle(SetupQuietButtonStyle())
@@ -253,7 +313,7 @@ struct SetupFlow: View {
     /// Music goes on once a card is chosen; pairing or adding, once what it asks for is there.
     private var canGoOn: Bool {
         switch step {
-        case .music: source != nil
+        case .music: !sources.isEmpty
         case .connect: connected
         default: true
         }
@@ -276,7 +336,7 @@ struct SetupFlow: View {
     private var music: some View {
         VStack(spacing: 22) {
             SetupHeading(title: Text("Where is your music?"),
-                         detail: Text("Vespertine plays from any of these. Choose one to start with; the others can be added later."),
+                         detail: Text("Vespertine plays from any of these, and from several at once as one library. Choose every one you have; more can be added later."),
                          shown: shown(.music))
             VStack(spacing: 10) {
                 choice(.mac, symbol: "desktopcomputer", title: String(localized: "A Mac running Vespertine"),
@@ -292,15 +352,15 @@ struct SetupFlow: View {
     }
 
     private func choice(_ kind: SetupSource, symbol: String, title: String, detail: String, delay: Double) -> some View {
-        SetupChoice(symbol: symbol, title: title, detail: detail, selected: source == kind) {
-            withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.8)) { source = kind }
+        SetupChoice(symbol: symbol, title: title, detail: detail, selected: sources.contains(kind)) {
+            withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.8)) { sources = SetupPlan.tapping(kind, in: sources) }
         }
         .accessibilityIdentifier("setup-source-" + kind.rawValue)
         .setupReveal(shown(.music), delay: delay)
     }
 
     @ViewBuilder private var connect: some View {
-        switch source {
+        switch current {
         case .share:
             connectPage(leading: "externaldrive.connected.to.line.below", title: Text("Add an SMB Share"),
                         detail: Text("Music in a shared folder on a NAS or another computer plays on this device by itself, with no Mac running. Away from home, the share is reached over Tailscale or another VPN.")) {
@@ -333,11 +393,11 @@ struct SetupFlow: View {
             }
             SetupHeading(title: title, detail: detail, shown: shown(.connect))
             VStack(spacing: 12) {
-                if connected, let session = model.session {
+                if let name = ready(current) {
                     SetupCard(selected: true) {
                         HStack(spacing: 14) {
                             SetupCheck(size: 40)
-                            Text(String(localized: "“\(session.pairing.name)” is ready.", comment: "First-run setup on the iPhone, after pairing with a Mac or adding a share or a folder. %@ is its name."))
+                            Text(String(localized: "“\(name)” is ready.", comment: "First-run setup on the iPhone, after pairing with a Mac or adding a share or a folder. %@ is its name."))
                                 .font(.body.weight(.semibold)).foregroundStyle(Palette.text)
                                 .fixedSize(horizontal: false, vertical: true)
                             Spacer(minLength: 0)
@@ -417,28 +477,29 @@ struct SetupFlow: View {
         let here = PlayTarget.shared.onThisDevice
         // A Mac whose Vespertine is too old to send songs can only play itself.
         let canPlayHere = model.session.map { PlayTarget.shared.canPlayHere($0) } ?? true
-        let mac = model.session.flatMap { $0.isShare ? nil : $0.server?.name ?? $0.pairing.name } ?? String(localized: "Mac")
+        let mac = macName
+        let sides = PlayTarget.shared.sides
         return VStack(spacing: 22) {
             if !typeSize.isAccessibilitySize {
-                SetupFlowPicture(leading: "desktopcomputer", trailing: pad ? "ipad" : "iphone", towardTrailing: here, sounds: here ? .trailing : .leading)
+                SetupFlowPicture(leading: "desktopcomputer", trailing: pad ? "ipad" : "iphone", towardTrailing: here, sounds: here ? .trailing : .leading, soundsBoth: sides == .both && canPlayHere)
                     .setupReveal(shown(.output))
             }
             SetupHeading(title: Text("Choose where it plays"),
-                         detail: Text("On the Mac’s DAC and speakers, or on this device’s headphones. The switch on Now Playing changes it at any time."),
+                         detail: Text("On the Mac’s DAC and speakers, on this device’s headphones, or both. With both turned on, the switch on Now Playing moves the music between them."),
                          shown: shown(.output))
             VStack(spacing: 10) {
                 SetupChoice(symbol: "desktopcomputer", title: mac,
                             detail: String(localized: "This device is the remote. You choose the music here and hear it on the Mac’s outputs."),
-                            selected: !here) {
-                    withAnimation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.8)) { PlayTarget.shared.choose(thisDevice: false) }
+                            selected: sides.hasMac || !canPlayHere) {
+                    withAnimation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.8)) { PlayTarget.shared.allow(sides.toggling(mac: true)) }
                 }
                 .accessibilityIdentifier("setup-plays-mac")
                 .setupReveal(shown(.output), delay: 0.12)
                 SetupChoice(symbol: pad ? "ipad" : "iphone", title: PlayTarget.deviceName,
                             detail: canPlayHere ? String(localized: "The Mac sends the songs and you listen here: on headphones, the speaker or a DAC, at home or away.")
                                                 : String(localized: "Update Vespertine on the Mac to play here."),
-                            selected: here, enabled: canPlayHere) {
-                    withAnimation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.8)) { PlayTarget.shared.choose(thisDevice: true) }
+                            selected: sides.hasDevice && canPlayHere, enabled: canPlayHere) {
+                    withAnimation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.8)) { PlayTarget.shared.allow(sides.toggling(mac: false)) }
                 }
                 .accessibilityIdentifier("setup-plays-device")
                 .setupReveal(shown(.output), delay: 0.18)
@@ -475,7 +536,7 @@ struct SetupFlow: View {
                 }
                 .setupReveal(shown(.sound), delay: 0.18)
                 // Songs come over the network only from a Mac: a share is read as files, a folder is on the device.
-                if source == .mac {
+                if sources.contains(.mac) {
                     SetupOption(symbol: "antenna.radiowaves.left.and.right", title: Text("Play over Cellular Data"),
                                 detail: Text("Away from Wi-Fi, songs come from your Mac over cellular data. Lossless albums are large, so this starts off."),
                                 on: settings.cellularPlayback) {
@@ -492,7 +553,7 @@ struct SetupFlow: View {
                         .labelsHidden().tint(Palette.brass)
                         .accessibilityIdentifier("setup-versions")
                 }
-                .setupReveal(shown(.sound), delay: source == .mac ? 0.3 : 0.24)
+                .setupReveal(shown(.sound), delay: sources.contains(.mac) ? 0.3 : 0.24)
             }
             Label {
                 Text("A DAC plugged into this device is asked for each song’s own sample rate. The Output screen shows what reaches it, and has the test for playing DSD natively.")
@@ -553,10 +614,10 @@ struct SetupFlow: View {
                 .padding(.top, 8)
                 .setupReveal(shown(.done), delay: 0.48)
             VStack(spacing: 0) {
-                summary("music.note.list", Text("Music"), session?.pairing.name ?? String(localized: "Not connected"))
+                summary("music.note.list", Text("Music"), musicSummary)
                 if let here {
                     Rectangle().fill(Palette.hairlineStrong).frame(height: 0.5)
-                    summary("hifispeaker", Text("Music Plays On"), here ? PlayTarget.deviceName : String(localized: "Mac"))
+                    summary("hifispeaker", Text("Music Plays On"), playsOnSummary(here: here))
                     if here {
                         Rectangle().fill(Palette.hairlineStrong).frame(height: 0.5)
                         summary("dial.medium", Text("ReplayGain"), replayGainName(PlayTarget.shared.replayGain))
@@ -579,6 +640,28 @@ struct SetupFlow: View {
             .setupReveal(shown(.done), delay: 0.8)
             .accessibilityIdentifier("setup-finish")
         }
+    }
+
+    /// The Mac's name for the Output step: the one in the library, the demo's, or just "Mac".
+    private var macName: String {
+        if let session = model.session, session.isDemo { return session.server?.name ?? session.pairing.name }
+        return model.macInUse?.name ?? String(localized: "Mac")
+    }
+
+    /// What the library is made of, by name: "Studio Mac, NAS and Music".
+    private var musicSummary: String {
+        guard let session = model.session else { return String(localized: "Not connected") }
+        let names = session.isDemo ? [session.pairing.name] : model.namesInUse
+        return names.isEmpty ? session.pairing.name : ListFormatter.localizedString(byJoining: names)
+    }
+
+    /// Who plays: this device or the Mac, or both when both were turned on and there is a Mac.
+    private func playsOnSummary(here: Bool) -> String {
+        let mac = String(localized: "Mac")
+        if model.session?.isShare == false, PlayTarget.shared.sides == .both {
+            return ListFormatter.localizedString(byJoining: [mac, PlayTarget.deviceName])
+        }
+        return here ? PlayTarget.deviceName : mac
     }
 
     private func summary(_ symbol: String, _ title: Text, _ value: String) -> some View {

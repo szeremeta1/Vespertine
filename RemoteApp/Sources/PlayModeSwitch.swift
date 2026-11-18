@@ -14,7 +14,8 @@ nonisolated enum PlayMode: String, CaseIterable, Sendable {
     case device
 
     /// A share or a folder has no Mac that could play: there is nothing to switch between.
-    static func offersSwitch(share: Bool) -> Bool { !share }
+    /// Now Playing also leaves it out when setup turned on one side only (`both` false); Output always has it.
+    static func offersSwitch(share: Bool, both: Bool = true) -> Bool { !share && both }
 
     /// The mode in force: this device's when its own player is the one the screens talk to.
     static func current(playsHere: Bool) -> PlayMode { playsHere ? .device : .mac }
@@ -44,11 +45,13 @@ struct PlayModeSwitch: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     @Namespace private var pill
     let session: RemoteSession
+    /// The switch on Now Playing: there only while both sides can play.
+    var quick = false
 
     private var mode: PlayMode { PlayMode.current(playsHere: session.phone != nil) }
 
     var body: some View {
-        if PlayMode.offersSwitch(share: session.isShare) {
+        if PlayMode.offersSwitch(share: session.isShare, both: !quick || PlayTarget.shared.sides == .both) {
             HStack(spacing: 0) {
                 ForEach(PlayMode.allCases, id: \.self) { segment($0) }
             }

@@ -11,6 +11,28 @@ import VespertinePhonePlayer
 import VespertineRemoteClient
 import VespertineRemoteProtocol
 
+/// Who can play the music when a Mac is part of the library: the Mac, this device, or both.
+nonisolated enum PlaySides: String, Sendable, CaseIterable {
+    case both, mac, device
+
+    var hasMac: Bool { self != .device }
+    var hasDevice: Bool { self != .mac }
+
+    /// What is allowed once one side has been chosen to play: the same, or both when it was the side left out.
+    static func including(_ sides: PlaySides, thisDevice: Bool) -> PlaySides {
+        (thisDevice ? sides.hasDevice : sides.hasMac) ? sides : .both
+    }
+
+    /// One side turned on or off, as setup's two cards do. The last one on stays on: something has to play.
+    func toggling(mac: Bool) -> PlaySides {
+        switch self {
+        case .both: mac ? .device : .mac
+        case .mac: mac ? .mac : .both
+        case .device: mac ? .both : .device
+        }
+    }
+}
+
 @Observable
 final class PlayTarget {
     static let shared = PlayTarget()
@@ -50,6 +72,8 @@ final class PlayTarget {
 
     /// The choice kept from an earlier launch, or Off for someone who never made one.
     static func replayGain(stored: String?) -> ReplayGainChoice { stored.flatMap(ReplayGainChoice.init(rawValue:)) ?? .off }
+    /// Told when who plays was changed (the lists of several libraries as one follow it).
+    @ObservationIgnored var onChoice: (() -> Void)?
     /// Why songs aren't fetched right now (cellular data with playing over it turned off), or nil.
     @ObservationIgnored var holdReason: String?
     /// How much has been fetched from the Mac for playing here since the app opened.
@@ -77,11 +101,30 @@ final class PlayTarget {
     /// Whether `session`'s Mac can send songs to this device (a Mac whose Vespertine speaks the stream channel).
     func canPlayHere(_ session: RemoteSession) -> Bool { session.canStream || session.isDemo }
 
+    /// Which of the two can play, as setup's Output step left it: both (the switch on Now Playing moves the music between
+    /// them), or one alone (Now Playing then shows no switch; Output still has it). Kept between launches.
+    private(set) var sides = PlaySides(rawValue: UserDefaults.standard.string(forKey: PlayTarget.sidesKey) ?? "") ?? .both
+    private static let sidesKey = "playSides"
+
+    /// Setup's choice of who can play. One side alone is also made the one that plays.
+    func allow(_ new: PlaySides) {
+        if new == .mac { choose(thisDevice: false) }
+        if new == .device { choose(thisDevice: true) }
+        sides = new
+        UserDefaults.standard.set(new.rawValue, forKey: Self.sidesKey)
+    }
+
     func choose(thisDevice: Bool) {
+        // Choosing the side that was left out (in Output, or by playing kept songs here) brings it back in.
+        if sides != PlaySides.including(sides, thisDevice: thisDevice) {
+            sides = .both
+            UserDefaults.standard.set(sides.rawValue, forKey: Self.sidesKey)
+        }
         guard thisDevice != onThisDevice else { return }
         if !thisDevice { made?.remote.playback.stop() }
         onThisDevice = thisDevice
         UserDefaults.standard.set(thisDevice, forKey: Self.key)
+        onChoice?()
     }
 
     /// The session is over (another Mac was chosen, or none): the phone stops and lets go of its streams.

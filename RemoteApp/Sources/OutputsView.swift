@@ -89,11 +89,7 @@ struct OutputsView: View {
                 if playsHere, !session.isDemo, let phone = session.phone, DoPGate.canTest(phone.route) {
                     DoPSection(phone: phone, fromShare: session.isShare)
                 }
-                if session.isFolder {
-                    if let folder = model.openFolder { folderSection(folder) }
-                } else if session.isShare {
-                    if let share = model.openShare { shareSection(share) }
-                } else {
+                if !session.isShare {
                     if OutputLayout.showsMacOutputs(playsHere: playsHere, share: session.isShare) {
                     Section {
                         ForEach(Array((session.outputs?.outputs ?? []).enumerated()), id: \.offset) { _, output in
@@ -127,14 +123,14 @@ struct OutputsView: View {
                     }
                     Section {
                         LabeledContent("Mac", value: macName)
-                        if let version = session.server?.appVersion, !version.isEmpty {
+                        if let version = mac.server?.appVersion, !version.isEmpty {
                             LabeledContent("Vespertine", value: version)
                         }
                         if !session.isDemo {
                             Button { editingConnection = true } label: {
                                 LabeledContent("Connection") {
                                     HStack(spacing: 6) {
-                                        Circle().fill(session.isConnected ? Palette.brass : Palette.text3).frame(width: 7, height: 7)
+                                        Circle().fill(mac.isConnected ? Palette.brass : Palette.text3).frame(width: 7, height: 7)
                                         Text(reach)
                                     }
                                 }
@@ -143,6 +139,9 @@ struct OutputsView: View {
                         }
                     }
                 }
+                // Each folder and share the songs come from; with several libraries open as one, all of them.
+                ForEach(model.openFolders) { folder in folderSection(folder) }
+                ForEach(model.openShares) { share in shareSection(share) }
                 }
             .obsidianList()
             // Above the list, not a row of it: a row is cut to the list's own rounded corners, which sliced the ends off
@@ -170,13 +169,15 @@ struct OutputsView: View {
             .feedback(feedback)
             // The screen that speaks about the output reads it as it comes up, not from whatever was last heard.
             .onAppear { _ = session.phone?.readOutput?(.shown) }
-            .sheet(isPresented: $editingConnection) { MacConnectionView(serverID: session.pairing.serverID).withoutMiniPlayer() }
+            .sheet(isPresented: $editingConnection) { MacConnectionView(serverID: mac.pairing.serverID).withoutMiniPlayer() }
             .sheet(isPresented: $showingSettings) { SettingsView().withoutMiniPlayer() }
         }
     }
 
     private var playsHere: Bool { session.phone != nil }
-    private var macName: String { session.server?.name ?? session.pairing.name }
+    /// The Mac's own connection: the session itself, or the Mac among several libraries open as one.
+    private var mac: RemoteSession { model.macSession ?? session }
+    private var macName: String { mac.server?.name ?? mac.pairing.name }
 
     /// "Music Plays On", the Mac / This iPhone switch, and a line on what the chosen one means.
     private var switchBar: some View {
@@ -198,13 +199,13 @@ struct OutputsView: View {
 
     /// Under the switch: what the chosen side means, or why this device can't be chosen.
     private var switchNote: String {
-        if session.isConnected, !PlayTarget.shared.canPlayHere(session) { return String(localized: "Update Vespertine on the Mac to play here.") }
+        if mac.isConnected, !PlayTarget.shared.canPlayHere(session) { return String(localized: "Update Vespertine on the Mac to play here.") }
         return PlayModeSwitch.explanation(PlayMode.current(playsHere: playsHere), mac: macName)
     }
 
     /// The share the songs come from: where it is, whether it answers, what the last scan found, and scanning again.
     @ViewBuilder private func shareSection(_ share: SavedShare) -> some View {
-        let status = model.shareStatus ?? ShareStatus()
+        let status = model.statuses[share.id] ?? ShareStatus()
         Section {
             LabeledContent("SMB Share", value: share.address.display)
             LabeledContent("Connection") {
@@ -233,7 +234,7 @@ struct OutputsView: View {
                 LabeledContent("Last scanned", value: scanned.formatted(date: .abbreviated, time: .shortened))
             }
             Button {
-                model.rescanShare()
+                model.rescan(share.id)
             } label: {
                 HStack {
                     Text("Scan Again")
@@ -253,7 +254,7 @@ struct OutputsView: View {
 
     /// The folder the songs come from: what the last look found, looking again, and choosing the folder again.
     @ViewBuilder private func folderSection(_ folder: SavedFolder) -> some View {
-        let status = model.shareStatus ?? ShareStatus()
+        let status = model.statuses[folder.id] ?? ShareStatus()
         Section {
             LabeledContent("Folder", value: folder.name)
             LabeledContent("Songs", value: status.songs.formatted())
@@ -276,7 +277,7 @@ struct OutputsView: View {
                 LabeledContent("Last scanned", value: scanned.formatted(date: .abbreviated, time: .shortened))
             }
             Button {
-                model.rescanShare()
+                model.rescan(folder.id)
             } label: {
                 HStack {
                     Text("Scan Again")
@@ -311,8 +312,8 @@ struct OutputsView: View {
 
     /// How the Mac is reached now.
     private var reach: String {
-        guard session.isConnected else { return String(localized: "Not connected") }
-        return session.reach.map(NowPlayingView.reachName) ?? String(localized: "On this network")
+        guard mac.isConnected else { return String(localized: "Not connected") }
+        return mac.reach.map(NowPlayingView.reachName) ?? String(localized: "On this network")
     }
 
     private func icon(_ kind: OutputKind) -> String {

@@ -37,12 +37,37 @@ nonisolated enum SetupPlan {
     /// own step (the demo needs none). Where the music plays is asked only when a Mac could play it; how it sounds only
     /// when this device plays.
     static func steps(source: SetupSource?, playsHere: Bool) -> [SetupStep] {
+        steps(sources: source.map { [$0] } ?? [], playsHere: playsHere)
+    }
+
+    /// The steps for someone whose music is in every one of `sources` (the Music step's cards, any mix of them). The
+    /// connect step is walked once for each of them (see `connecting`).
+    static func steps(sources: Set<SetupSource>, playsHere: Bool) -> [SetupStep] {
         var steps: [SetupStep] = [.welcome, .music]
-        let hasMac = source == nil || source == .mac || source == .demo
-        if let source, source != .demo { steps.append(.connect) }
+        let hasMac = sources.isEmpty || sources.contains(.mac) || sources.contains(.demo)
+        if !connecting(sources).isEmpty { steps.append(.connect) }
         if hasMac { steps.append(.output) }
         if !hasMac || playsHere { steps.append(.sound) }
         return steps + [.extras, .done]
+    }
+
+    /// What the connect step pairs or adds, in the order it asks: the Mac, then a share, then a folder.
+    static func connecting(_ sources: Set<SetupSource>) -> [SetupSource] {
+        [SetupSource.mac, .share, .folder].filter(sources.contains)
+    }
+
+    /// The Music step's cards after one is tapped. A Mac, a share and a folder can be chosen together, each tap turning
+    /// one on or off; the demo is a made-up library by itself, so it and the others turn each other off.
+    static func tapping(_ kind: SetupSource, in sources: Set<SetupSource>) -> Set<SetupSource> {
+        if kind == .demo { return sources == [.demo] ? [] : [.demo] }
+        var result = sources.subtracting([.demo])
+        if result.contains(kind) { result.remove(kind) } else { result.insert(kind) }
+        return result
+    }
+
+    /// This device is where music plays: always when no Mac was chosen, by choice with one.
+    static func playsHere(sources: Set<SetupSource>, onThisDevice: Bool) -> Bool {
+        (!sources.isEmpty && !sources.contains(.mac) && !sources.contains(.demo)) || onThisDevice
     }
 
     static func next(after step: SetupStep, source: SetupSource?, playsHere: Bool) -> SetupStep? {
@@ -53,9 +78,21 @@ nonisolated enum SetupPlan {
         steps(source: source, playsHere: playsHere).last { $0 < step }
     }
 
+    static func next(after step: SetupStep, sources: Set<SetupSource>, playsHere: Bool) -> SetupStep? {
+        steps(sources: sources, playsHere: playsHere).first { $0 > step }
+    }
+
+    static func previous(before step: SetupStep, sources: Set<SetupSource>, playsHere: Bool) -> SetupStep? {
+        steps(sources: sources, playsHere: playsHere).last { $0 < step }
+    }
+
     /// The steps the progress bar names. Connecting is part of Music; the welcome and the end stand outside it.
     static func named(source: SetupSource?, playsHere: Bool) -> [SetupStep] {
-        steps(source: source, playsHere: playsHere).filter { $0 != .welcome && $0 != .connect && $0 != .done }
+        named(sources: source.map { [$0] } ?? [], playsHere: playsHere)
+    }
+
+    static func named(sources: Set<SetupSource>, playsHere: Bool) -> [SetupStep] {
+        steps(sources: sources, playsHere: playsHere).filter { $0 != .welcome && $0 != .connect && $0 != .done }
     }
 
     /// The named step a step belongs to.

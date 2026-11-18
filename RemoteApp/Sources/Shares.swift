@@ -153,3 +153,13 @@ extension SavedShare {
         }
     }
 }
+
+/// What several libraries open as one say when something can't be done.
+enum LibraryWording {
+    static var sayings: JoinedSayings {
+        JoinedSayings(gone: String(localized: "That isn’t in your library any more.", comment: "Shown on the iPhone when a song is asked for whose Mac, network share or folder has been taken out of the library since."),
+                      notOnTheMac: String(localized: "The Mac can’t play that: it isn’t in the Mac’s library. To play it, set Music Plays On to this device.", comment: "Shown on the iPhone when the Mac is what plays and a song is chosen that is only on a network share or in a folder on the phone. “Music Plays On” must match the label of the switch between the Mac and this device."),
+                      playlistsAreTheMacs: String(localized: "Playlists are kept on the Mac and hold only songs from the Mac’s library.", comment: "Shown on the iPhone when a song from a network share or a folder on the phone is added to a playlist; playlists live on the Mac."),
+                      noPlaylists: ShareWording.sayings.noPlaylists)
+    }
+}

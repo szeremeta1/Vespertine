@@ -42272,271 +42272,540 @@
         }
       }
     },
-    "Vespertine plays from any of these. Choose one to start with; the others can be added later.": {
-      "comment": "First-run setup on the iPhone and iPad. Under the Music step's heading, above four cards: a Mac, a NAS or shared folder, a folder in Files, the demo.",
+    "Vespertine plays from any of these, and from several at once as one library. Choose every one you have; more can be added later.": {
+      "comment": "First-run setup on the iPhone and iPad. Under the Music step's heading, above four cards: a Mac, a NAS or shared folder, a folder in Files, the demo. More than one of the first three can be chosen.",
       "localizations": {
         "am": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ከእነዚህ ሁሉ ያጫውታል። ለመጀመር አንዱን ይምረጡ፤ ሌሎቹን በኋላ ማከል ይቻላል።"
+            "value": "Vespertine ከእነዚህ ሁሉ ያጫውታል፣ ከብዙዎቹም በአንድ ጊዜ እንደ አንድ ቤተ-መጻሕፍት። ያለዎትን ሁሉ ይምረጡ፤ ተጨማሪ በኋላ ማከል ይቻላል።"
           }
         },
         "ar": {
           "stringUnit": {
             "state": "translated",
-            "value": "يشغّل Vespertine الموسيقى من أيٍّ من هذه. اختر واحدًا للبدء، ويمكن إضافة البقية لاحقًا."
+            "value": "يشغّل Vespertine الموسيقى من أيٍّ من هذه، ومن عدة منها معًا كمكتبة واحدة. اختر كل ما لديك، ويمكن إضافة المزيد لاحقًا."
           }
         },
         "bn": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine এর যেকোনোটি থেকে চালায়। শুরু করতে একটি বেছে নিন; বাকিগুলো পরে যোগ করা যাবে।"
+            "value": "Vespertine এর যেকোনোটি থেকে চালায়, আর একসাথে কয়েকটি থেকে একটি লাইব্রেরি হিসেবেও। আপনার যা যা আছে সব বেছে নিন; আরও পরে যোগ করা যাবে।"
           }
         },
         "cs": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine přehrává z kteréhokoli z těchto míst. Jedno si vyberte pro začátek, ostatní lze přidat později."
+            "value": "Vespertine přehrává z kteréhokoli z těchto míst, i z několika najednou jako z jedné knihovny. Vyberte všechna, která máte; další lze přidat později."
           }
         },
         "da": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine afspiller fra alle disse. Vælg én at starte med. De andre kan tilføjes senere."
+            "value": "Vespertine afspiller fra alle disse, også fra flere på én gang som ét bibliotek. Vælg alle dem, du har. Flere kan tilføjes senere."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine spielt von all diesen Orten. Wähle einen für den Anfang, die anderen lassen sich später hinzufügen."
+            "value": "Vespertine spielt von all diesen Orten, auch von mehreren zugleich als eine Mediathek. Wähle alle, die du hast; weitere lassen sich später hinzufügen."
           }
         },
         "el": {
           "stringUnit": {
             "state": "translated",
-            "value": "Το Vespertine παίζει από οποιοδήποτε από αυτά. Επιλέξτε ένα για αρχή. Τα υπόλοιπα προστίθενται αργότερα."
+            "value": "Το Vespertine παίζει από οποιοδήποτε από αυτά, και από πολλά μαζί ως μία βιβλιοθήκη. Επιλέξτε όλα όσα έχετε. Περισσότερα προστίθενται αργότερα."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine reproduce desde cualquiera de estos. Elige uno para empezar; los demás se pueden añadir después."
+            "value": "Vespertine reproduce desde cualquiera de estos, y desde varios a la vez como una sola biblioteca. Elige todos los que tengas; se pueden añadir más después."
           }
         },
         "fa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine از هر یک از این‌ها پخش می‌کند. برای شروع یکی را انتخاب کنید؛ بقیه را بعداً می‌توان افزود."
+            "value": "Vespertine از هر یک از این‌ها پخش می‌کند، و از چندتای آن‌ها با هم به‌صورت یک کتابخانه. هرکدام را که دارید انتخاب کنید؛ بعداً می‌توان موارد بیشتری افزود."
           }
         },
         "fi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine toistaa mistä tahansa näistä. Valitse yksi aluksi. Muut voi lisätä myöhemmin."
+            "value": "Vespertine toistaa mistä tahansa näistä, myös useasta yhtä aikaa yhtenä kirjastona. Valitse kaikki, jotka sinulla on. Lisää voi lisätä myöhemmin."
           }
         },
         "fil": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nagpe-play ang Vespertine mula sa alinman sa mga ito. Pumili ng isa para magsimula; maidaragdag ang iba sa ibang pagkakataon."
+            "value": "Nagpe-play ang Vespertine mula sa alinman sa mga ito, at mula sa ilan nang sabay-sabay bilang iisang library. Piliin ang lahat ng mayroon ka; makapagdaragdag pa sa ibang pagkakataon."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine lit depuis chacune de ces sources. Choisissez-en une pour commencer ; les autres pourront être ajoutées plus tard."
+            "value": "Vespertine lit depuis chacune de ces sources, et depuis plusieurs à la fois comme une seule bibliothèque. Choisissez toutes celles que vous avez ; d’autres pourront être ajoutées plus tard."
           }
         },
         "gu": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine આમાંથી કોઈપણમાંથી વગાડે છે. શરૂ કરવા માટે એક પસંદ કરો; બાકીના પછીથી ઉમેરી શકાય છે."
+            "value": "Vespertine આમાંથી કોઈપણમાંથી વગાડે છે, અને એકસાથે અનેકમાંથી એક લાઇબ્રેરી તરીકે પણ. તમારી પાસે જે પણ હોય તે બધું પસંદ કરો; વધુ પછીથી ઉમેરી શકાય છે."
           }
         },
         "ha": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine yana kunna kiɗa daga kowanne daga cikin waɗannan. Zaɓi ɗaya don farawa; sauran za a iya ƙara su daga baya."
+            "value": "Vespertine yana kunna kiɗa daga kowanne daga cikin waɗannan, da kuma daga da yawa a lokaci guda a matsayin laburare ɗaya. Zaɓi duk waɗanda kake da su; za a iya ƙara wasu daga baya."
           }
         },
         "he": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine מנגן מכל אחד מאלה. כדאי לבחור אחד להתחלה; את האחרים אפשר להוסיף אחר כך."
+            "value": "Vespertine מנגן מכל אחד מאלה, וגם מכמה מהם יחד כספריה אחת. כדאי לבחור את כל מה שיש לך; אפשר להוסיף עוד אחר כך."
           }
         },
         "hi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine इनमें से किसी से भी चलाता है। शुरू करने के लिए एक चुनें; बाक़ी बाद में जोड़े जा सकते हैं।"
+            "value": "Vespertine इनमें से किसी से भी चलाता है, और एक साथ कई से एक लाइब्रेरी के रूप में भी। आपके पास जो भी हैं, सब चुनें; और बाद में जोड़े जा सकते हैं।"
           }
         },
         "hu": {
           "stringUnit": {
             "state": "translated",
-            "value": "A Vespertine ezek bármelyikéről játszik. Válassz egyet a kezdéshez, a többit később is hozzáadhatod."
+            "value": "A Vespertine ezek bármelyikéről játszik, akár többről egyszerre is, egyetlen könyvtárként. Válaszd ki mindet, amid van; később továbbiakat is hozzáadhatsz."
           }
         },
         "id": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine memutar dari mana pun di antara ini. Pilih satu untuk memulai; yang lain bisa ditambahkan nanti."
+            "value": "Vespertine memutar dari mana pun di antara ini, juga dari beberapa sekaligus sebagai satu perpustakaan. Pilih semua yang Anda miliki; yang lain bisa ditambahkan nanti."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine riproduce da ognuna di queste sorgenti. Scegline una per iniziare; le altre si possono aggiungere dopo."
+            "value": "Vespertine riproduce da ognuna di queste sorgenti, anche da più di una insieme come un’unica libreria. Scegli tutte quelle che hai; altre si possono aggiungere dopo."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertineはこのどれからでも再生できます。まず1つ選んでください。ほかはあとで追加できます。"
+            "value": "Vespertineはこのどれからでも再生でき、複数をまとめて1つのライブラリとして使うこともできます。お持ちのものをすべて選んでください。あとから追加もできます。"
           }
         },
         "kn": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ಇವುಗಳಲ್ಲಿ ಯಾವುದರಿಂದಲಾದರೂ ಪ್ಲೇ ಮಾಡುತ್ತದೆ. ಆರಂಭಿಸಲು ಒಂದನ್ನು ಆರಿಸಿ; ಉಳಿದವುಗಳನ್ನು ನಂತರ ಸೇರಿಸಬಹುದು."
+            "value": "Vespertine ಇವುಗಳಲ್ಲಿ ಯಾವುದರಿಂದಲಾದರೂ ಪ್ಲೇ ಮಾಡುತ್ತದೆ, ಹಲವುಗಳಿಂದ ಒಟ್ಟಿಗೆ ಒಂದೇ ಲೈಬ್ರರಿಯಾಗಿಯೂ ಸಹ. ನಿಮ್ಮಲ್ಲಿರುವ ಎಲ್ಲವನ್ನೂ ಆರಿಸಿ; ಇನ್ನಷ್ಟನ್ನು ನಂತರ ಸೇರಿಸಬಹುದು."
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine은 이 중 어디에서든 재생합니다. 시작할 하나를 고르세요. 나머지는 나중에 추가할 수 있습니다."
+            "value": "Vespertine은 이 중 어디에서든 재생하며, 여러 곳을 한꺼번에 하나의 보관함으로 재생할 수도 있습니다. 가지고 있는 것을 모두 고르세요. 나중에 더 추가할 수 있습니다."
           }
         },
         "ml": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ഇവയിൽ ഏതിൽനിന്നും പ്ലേ ചെയ്യും. തുടങ്ങാൻ ഒന്ന് തിരഞ്ഞെടുക്കൂ; ബാക്കി പിന്നീട് ചേർക്കാം."
+            "value": "Vespertine ഇവയിൽ ഏതിൽനിന്നും പ്ലേ ചെയ്യും, പലതിൽനിന്ന് ഒരുമിച്ച് ഒറ്റ ലൈബ്രറിയായും. നിങ്ങൾക്കുള്ളതെല്ലാം തിരഞ്ഞെടുക്കൂ; കൂടുതൽ പിന്നീട് ചേർക്കാം."
           }
         },
         "mr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine यांपैकी कशावरूनही वाजवते. सुरुवातीसाठी एक निवडा; बाकीचे नंतर जोडता येतील."
+            "value": "Vespertine यांपैकी कशावरूनही वाजवते, आणि एकाच वेळी अनेकांवरून एक लायब्ररी म्हणूनही. तुमच्याकडे जे जे आहे ते सर्व निवडा; आणखी नंतर जोडता येतील."
           }
         },
         "ms": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine memainkan muzik daripada mana-mana antara ini. Pilih satu untuk bermula; yang lain boleh ditambah kemudian."
+            "value": "Vespertine memainkan muzik daripada mana-mana antara ini, dan daripada beberapa sekali gus sebagai satu pustaka. Pilih semua yang anda ada; yang lain boleh ditambah kemudian."
           }
         },
         "nb": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine spiller fra alle disse. Velg én å starte med. De andre kan legges til senere."
+            "value": "Vespertine spiller fra alle disse, også fra flere samtidig som ett bibliotek. Velg alle du har. Flere kan legges til senere."
           }
         },
         "nl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine speelt af vanaf elk van deze plekken. Kies er één om mee te beginnen; de andere kun je later toevoegen."
+            "value": "Vespertine speelt af vanaf elk van deze plekken, ook vanaf meerdere tegelijk als één bibliotheek. Kies ze allemaal als je ze hebt; je kunt er later meer toevoegen."
           }
         },
         "pa": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ਇਨ੍ਹਾਂ ਵਿੱਚੋਂ ਕਿਸੇ ਤੋਂ ਵੀ ਚਲਾਉਂਦਾ ਹੈ। ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਇੱਕ ਚੁਣੋ; ਬਾਕੀ ਬਾਅਦ ਵਿੱਚ ਜੋੜੇ ਜਾ ਸਕਦੇ ਹਨ।"
+            "value": "Vespertine ਇਨ੍ਹਾਂ ਵਿੱਚੋਂ ਕਿਸੇ ਤੋਂ ਵੀ ਚਲਾਉਂਦਾ ਹੈ, ਅਤੇ ਇੱਕੋ ਵੇਲੇ ਕਈਆਂ ਤੋਂ ਇੱਕ ਲਾਇਬ੍ਰੇਰੀ ਵਜੋਂ ਵੀ। ਤੁਹਾਡੇ ਕੋਲ ਜੋ ਵੀ ਹਨ, ਸਾਰੇ ਚੁਣੋ; ਹੋਰ ਬਾਅਦ ਵਿੱਚ ਜੋੜੇ ਜਾ ਸਕਦੇ ਹਨ।"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine odtwarza z każdego z tych miejsc. Wybierz jedno na początek, pozostałe można dodać później."
+            "value": "Vespertine odtwarza z każdego z tych miejsc, także z kilku naraz jako z jednej biblioteki. Wybierz wszystkie, które masz; kolejne można dodać później."
           }
         },
         "pt-BR": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine toca a partir de qualquer um destes. Escolha um para começar; os outros podem ser adicionados depois."
+            "value": "O Vespertine toca a partir de qualquer um destes, e de vários ao mesmo tempo como uma só biblioteca. Escolha todos os que você tem; outros podem ser adicionados depois."
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "O Vespertine reproduz a partir de qualquer um destes. Escolha um para começar; os outros podem ser adicionados mais tarde."
+            "value": "O Vespertine reproduz a partir de qualquer um destes, e de vários em simultâneo como uma só biblioteca. Escolha todos os que tem; outros podem ser adicionados mais tarde."
           }
         },
         "ro": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine redă din oricare dintre acestea. Alege una pentru început; celelalte pot fi adăugate mai târziu."
+            "value": "Vespertine redă din oricare dintre acestea, și din mai multe deodată ca o singură bibliotecă. Alege-le pe toate cele pe care le ai; altele pot fi adăugate mai târziu."
           }
         },
         "sv": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine spelar från vilken som helst av dessa. Välj en att börja med. De andra kan läggas till senare."
+            "value": "Vespertine spelar från vilken som helst av dessa, även från flera samtidigt som ett bibliotek. Välj alla du har. Fler kan läggas till senare."
           }
         },
         "sw": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine hucheza kutoka chochote kati ya hivi. Chagua kimoja cha kuanzia; vingine vinaweza kuongezwa baadaye."
+            "value": "Vespertine hucheza kutoka chochote kati ya hivi, na kutoka kadhaa kwa pamoja kama maktaba moja. Chagua vyote ulivyo navyo; vingine vinaweza kuongezwa baadaye."
           }
         },
         "ta": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine இவற்றில் எதிலிருந்தும் இயக்கும். தொடங்க ஒன்றைத் தேர்ந்தெடுங்கள்; மற்றவற்றைப் பின்னர் சேர்க்கலாம்."
+            "value": "Vespertine இவற்றில் எதிலிருந்தும் இயக்கும், பலவற்றிலிருந்து ஒரே நேரத்தில் ஒரே நூலகமாகவும் இயக்கும். உங்களிடம் உள்ள அனைத்தையும் தேர்ந்தெடுங்கள்; மேலும் பின்னர் சேர்க்கலாம்."
           }
         },
         "te": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine వీటిలో దేని నుండైనా ప్లే చేస్తుంది. ప్రారంభించడానికి ఒకదాన్ని ఎంచుకోండి; మిగతావి తర్వాత జోడించవచ్చు."
+            "value": "Vespertine వీటిలో దేని నుండైనా ప్లే చేస్తుంది, అనేకవాటి నుండి ఒకేసారి ఒకే లైబ్రరీగా కూడా. మీ వద్ద ఉన్నవన్నీ ఎంచుకోండి; మరిన్ని తర్వాత జోడించవచ్చు."
           }
         },
         "th": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine เล่นจากที่ใดก็ได้ในนี้ เลือกหนึ่งอย่างเพื่อเริ่มต้น ที่เหลือเพิ่มทีหลังได้"
+            "value": "Vespertine เล่นจากที่ใดก็ได้ในนี้ และเล่นจากหลายที่พร้อมกันเป็นคลังเดียวได้ เลือกทุกอย่างที่คุณมี แล้วเพิ่มอีกทีหลังได้"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine bunların herhangi birinden çalar. Başlamak için birini seçin; diğerleri sonra eklenebilir."
+            "value": "Vespertine bunların herhangi birinden, birkaçından aynı anda tek bir arşiv olarak da çalar. Sizde olanların hepsini seçin; sonra başkaları da eklenebilir."
           }
         },
         "uk": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine відтворює з будь-якого з цих джерел. Виберіть одне для початку; інші можна додати пізніше."
+            "value": "Vespertine відтворює з будь-якого з цих джерел, а також із кількох одразу як з однієї медіатеки. Виберіть усі, які у вас є; інші можна додати пізніше."
           }
         },
         "ur": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine ان میں سے کسی سے بھی چلاتا ہے۔ شروع کرنے کے لیے ایک منتخب کریں؛ باقی بعد میں شامل کیے جا سکتے ہیں۔"
+            "value": "Vespertine ان میں سے کسی سے بھی چلاتا ہے، اور ایک ساتھ کئی سے ایک لائبریری کے طور پر بھی۔ آپ کے پاس جو بھی ہیں سب منتخب کریں؛ مزید بعد میں شامل کیے جا سکتے ہیں۔"
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine phát từ bất kỳ nguồn nào trong số này. Hãy chọn một nguồn để bắt đầu; các nguồn khác có thể thêm sau."
+            "value": "Vespertine phát từ bất kỳ nguồn nào trong số này, và từ nhiều nguồn cùng lúc như một thư viện. Hãy chọn mọi nguồn bạn có; có thể thêm nguồn khác sau."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 可以从以下任一来源播放。先选一个开始，其他的可以稍后添加。"
+            "value": "Vespertine 可以从以下任一来源播放，也可以同时使用多个来源，合并为一个资料库。请选择你拥有的所有来源，其他的可以稍后添加。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 可以從以下任一來源播放。先選一個開始，其他的可以稍後加入。"
+            "value": "Vespertine 可以從以下任一來源播放，也可以同時使用多個來源，合併為一個資料庫。請選擇你擁有的所有來源，其他的可以稍後加入。"
           }
         },
         "zh-HK": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vespertine 可以從以下任何一個來源播放。先選一個開始，其他的可以稍後加入。"
+            "value": "Vespertine 可以從以下任何一個來源播放，也可以同時使用多個來源，合成一個資料庫。請選取你擁有的所有來源，其他的可以稍後加入。"
+          }
+        }
+      }
+    },
+    "On the Mac’s DAC and speakers, on this device’s headphones, or both. With both turned on, the switch on Now Playing moves the music between them.": {
+      "comment": "First-run setup on the iPhone and iPad. Under the heading “Choose where it plays”, above two cards (the Mac, this device) that can each be turned on. Now Playing is the app's screen of that name.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በMac ዳክ እና ስፒከሮች፣ በዚህ መሣሪያ የጆሮ ማዳመጫዎች፣ ወይም በሁለቱም። ሁለቱም ሲበሩ በ«አሁን በመጫወት ላይ» ያለው ማብሪያ ሙዚቃውን በመካከላቸው ያዘዋውራል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "على DAC والسماعات الموصولة بالـ Mac، أو على سماعات الرأس لهذا الجهاز، أو كليهما. عند تفعيل الاثنين، ينقل المفتاح في «قيد التشغيل» الموسيقى بينهما."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-এর DAC ও স্পিকারে, এই ডিভাইসের হেডফোনে, অথবা দুটোতেই। দুটোই চালু থাকলে “এখন চলছে”-এর সুইচটি সংগীতকে এক থেকে অন্যটিতে সরায়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Na DAC a reproduktorech Macu, ve sluchátkách tohoto zařízení, nebo obojí. Když je zapnuté obojí, přepínač na obrazovce Právě hraje přesouvá hudbu mezi nimi."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "På Mac’ens DAC og højttalere, i denne enheds hovedtelefoner eller begge dele. Når begge er slået til, flytter kontakten på Spiller nu musikken mellem dem."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Über DAC und Lautsprecher des Mac, über die Kopfhörer dieses Geräts oder beides. Ist beides eingeschaltet, wechselt der Schalter in „Jetzt läuft“ die Musik zwischen ihnen."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Στο DAC και τα ηχεία του Mac, στα ακουστικά αυτής της συσκευής ή και στα δύο. Με ενεργά και τα δύο, ο διακόπτης στο «Παίζει τώρα» μεταφέρει τη μουσική από το ένα στο άλλο."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En el DAC y los altavoces del Mac, en los auriculares de este dispositivo, o en ambos. Con los dos activados, el selector de Ahora suena pasa la música de uno a otro."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "روی DAC و بلندگوهای Mac، روی هدفون این دستگاه، یا هر دو. وقتی هر دو روشن باشند، کلید در «در حال پخش» موسیقی را بین آن‌ها جابه‌جا می‌کند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macin DAC:ssa ja kaiuttimissa, tämän laitteen kuulokkeissa tai molemmissa. Kun molemmat ovat päällä, Toistetaan nyt -näkymän kytkin siirtää musiikin niiden välillä."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sa DAC at mga speaker ng Mac, sa headphones ng device na ito, o pareho. Kapag parehong naka-on, inililipat ng switch sa Nagpe-play Ngayon ang musika sa pagitan ng dalawa."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sur le DAC et les enceintes du Mac, sur le casque de cet appareil, ou les deux. Avec les deux activés, le sélecteur de l’écran À l’écoute fait passer la musique de l’un à l’autre."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ના DAC અને સ્પીકર પર, આ ડિવાઇસના હેડફોન પર, અથવા બંને પર. બંને ચાલુ હોય ત્યારે “હમણાં વાગી રહ્યું છે” પરની સ્વિચ સંગીતને બંને વચ્ચે ખસેડે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A kan DAC da lasifikokin Mac, a kan belun kunne na wannan na'ura, ko duka biyun. Idan an kunna duka biyun, maɓallin da ke kan Ana Kunnawa Yanzu yana matsar da kiɗan tsakaninsu."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ב‑DAC וברמקולים של ה‑Mac, באוזניות של המכשיר הזה, או בשניהם. כששניהם מופעלים, המתג ב״מתנגן כעת״ מעביר את המוזיקה ביניהם."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac के DAC और स्पीकर पर, इस डिवाइस के हेडफ़ोन पर, या दोनों पर। दोनों चालू होने पर “अभी चल रहा है” का स्विच संगीत को एक से दूसरे पर ले जाता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Mac DAC-ján és hangszóróin, ennek az eszköznek a fejhallgatóján, vagy mindkettőn. Ha mindkettő be van kapcsolva, a Most játszott képernyő kapcsolója viszi át a zenét egyikről a másikra."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di DAC dan speaker Mac, di headphone perangkat ini, atau keduanya. Jika keduanya aktif, sakelar di Sedang Diputar memindahkan musik di antara keduanya."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sul DAC e sugli altoparlanti del Mac, sulle cuffie di questo dispositivo, oppure entrambi. Con entrambi attivi, il selettore in In riproduzione sposta la musica dall’uno all’altro."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "MacのDACとスピーカーで、このデバイスのヘッドフォンで、またはその両方で。両方をオンにすると、「再生中」のスイッチで音楽を切り替えられます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ನ DAC ಮತ್ತು ಸ್ಪೀಕರ್‌ಗಳಲ್ಲಿ, ಈ ಸಾಧನದ ಹೆಡ್‌ಫೋನ್‌ಗಳಲ್ಲಿ, ಅಥವಾ ಎರಡರಲ್ಲೂ. ಎರಡೂ ಆನ್ ಆಗಿದ್ದಾಗ “ಈಗ ಪ್ಲೇ ಆಗುತ್ತಿದೆ” ಯಲ್ಲಿರುವ ಸ್ವಿಚ್ ಸಂಗೀತವನ್ನು ಅವುಗಳ ನಡುವೆ ಬದಲಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac의 DAC와 스피커에서, 이 기기의 헤드폰에서, 또는 둘 다에서. 둘 다 켜면 지금 재생 중 화면의 스위치로 음악을 서로 옮길 수 있습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ന്റെ DAC-ലും സ്പീക്കറുകളിലും, ഈ ഉപകരണത്തിന്റെ ഹെഡ്‌ഫോണിൽ, അല്ലെങ്കിൽ രണ്ടിലും. രണ്ടും ഓണായിരിക്കുമ്പോൾ “ഇപ്പോൾ പ്ലേ ചെയ്യുന്നത്” എന്നതിലെ സ്വിച്ച് സംഗീതം അവയ്ക്കിടയിൽ മാറ്റും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac च्या DAC आणि स्पीकरवर, या डिव्हाइसच्या हेडफोनवर, किंवा दोन्हीवर. दोन्ही चालू असताना “आता वाजत आहे” मधील स्विच संगीत एकावरून दुसऱ्यावर नेतो."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pada DAC dan pembesar suara Mac, pada fon kepala peranti ini, atau kedua-duanya. Apabila kedua-duanya dihidupkan, suis pada Sedang Dimainkan memindahkan muzik antara kedua-duanya."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "På Mac-ens DAC og høyttalere, i hodetelefonene til denne enheten, eller begge deler. Når begge er slått på, flytter bryteren på Spilles nå musikken mellom dem."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Op de DAC en speakers van de Mac, op de koptelefoon van dit apparaat, of allebei. Als beide aanstaan, zet de schakelaar in Speelt nu de muziek van de een naar de ander."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ਦੇ DAC ਅਤੇ ਸਪੀਕਰਾਂ ’ਤੇ, ਇਸ ਡਿਵਾਈਸ ਦੇ ਹੈੱਡਫ਼ੋਨਾਂ ’ਤੇ, ਜਾਂ ਦੋਵਾਂ ’ਤੇ। ਦੋਵੇਂ ਚਾਲੂ ਹੋਣ ’ਤੇ “ਹੁਣ ਚੱਲ ਰਿਹਾ ਹੈ” ਵਿਚਲਾ ਸਵਿੱਚ ਸੰਗੀਤ ਨੂੰ ਇੱਕ ਤੋਂ ਦੂਜੇ ’ਤੇ ਲੈ ਜਾਂਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Na DAC-u i głośnikach Maca, na słuchawkach tego urządzenia albo na obu. Gdy włączone są oba, przełącznik na ekranie Teraz odtwarzane przenosi muzykę między nimi."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No DAC e nos alto-falantes do Mac, nos fones deste dispositivo, ou em ambos. Com os dois ativados, o seletor em Tocando Agora passa a música de um para o outro."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No DAC e nas colunas do Mac, nos auscultadores deste dispositivo, ou em ambos. Com os dois ativados, o seletor em A reproduzir passa a música de um para o outro."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pe DAC-ul și difuzoarele Mac-ului, în căștile acestui dispozitiv sau pe amândouă. Cu amândouă activate, comutatorul din În redare mută muzica de la unul la celălalt."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "På Macens DAC och högtalare, i den här enhetens hörlurar, eller båda. När båda är påslagna flyttar reglaget i Spelas nu musiken mellan dem."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kwenye DAC na spika za Mac, kwenye vipokea sauti vya kifaa hiki, au vyote viwili. Vyote viwili vikiwashwa, swichi iliyo kwenye Inacheza Sasa huhamisha muziki kati yake."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-இன் DAC மற்றும் ஸ்பீக்கர்களில், இந்தச் சாதனத்தின் ஹெட்ஃபோன்களில், அல்லது இரண்டிலும். இரண்டும் இயக்கத்தில் இருக்கும்போது, “இப்போது இயங்குவது” திரையில் உள்ள சுவிட்ச் இசையை அவற்றுக்கிடையே மாற்றும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac యొక్క DAC మరియు స్పీకర్లలో, ఈ పరికరం హెడ్‌ఫోన్‌లలో, లేదా రెండింటిలోనూ. రెండూ ఆన్‌లో ఉన్నప్పుడు “ఇప్పుడు ప్లే అవుతోంది” లోని స్విచ్ సంగీతాన్ని వాటి మధ్య మారుస్తుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บน DAC และลำโพงของ Mac บนหูฟังของอุปกรณ์นี้ หรือทั้งสองอย่าง เมื่อเปิดทั้งสองอย่าง สวิตช์ในหน้ากำลังเล่นจะย้ายเพลงไปมาระหว่างกัน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’in DAC’inde ve hoparlörlerinde, bu aygıtın kulaklığında ya da her ikisinde. İkisi de açıkken Şu An Çalan ekranındaki anahtar müziği aralarında taşır."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "На ЦАП і динаміках Mac, у навушниках цього пристрою або і там, і там. Коли ввімкнено обидва варіанти, перемикач на екрані «Зараз грає» переносить музику між ними."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac کے DAC اور اسپیکرز پر، اس ڈیوائس کے ہیڈفونز پر، یا دونوں پر۔ دونوں آن ہوں تو ”ابھی چل رہا ہے“ میں موجود سوئچ موسیقی کو ایک سے دوسرے پر لے جاتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trên DAC và loa của máy Mac, trên tai nghe của thiết bị này, hoặc cả hai. Khi bật cả hai, công tắc trong Đang phát sẽ chuyển nhạc qua lại giữa hai nơi."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Mac 的 DAC 和扬声器上、在这台设备的耳机上，或两者皆可。两者都开启时，“正在播放”中的开关可让音乐在两者之间切换。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Mac 的 DAC 和揚聲器上、在這部裝置的耳機上，或兩者皆可。兩者都開啟時，「正在播放」中的開關可讓音樂在兩者之間切換。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Mac 的 DAC 和揚聲器上、在這部裝置的耳筒上，或兩者皆可。兩者都開啟時，「正在播放」中的開關可讓音樂在兩者之間切換。"
           }
         }
       }
@@ -44958,275 +45227,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "「%@」已就緒。"
-          }
-        }
-      }
-    },
-    "On the Mac’s DAC and speakers, or on this device’s headphones. The switch on Now Playing changes it at any time.": {
-      "comment": "First-run setup on the iPhone and iPad. Under the heading “Choose where it plays”. Now Playing is the app's screen of that name.",
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "በMac ዳክ እና ስፒከሮች፣ ወይም በዚህ መሣሪያ የጆሮ ማዳመጫዎች። በ«አሁን በመጫወት ላይ» ያለው ማብሪያ በማንኛውም ጊዜ ይቀይረዋል።"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "على DAC والسماعات الموصولة بالـ Mac، أو على سماعات الرأس لهذا الجهاز. المفتاح في «قيد التشغيل» يغيّره في أي وقت."
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-এর DAC ও স্পিকারে, অথবা এই ডিভাইসের হেডফোনে। “এখন চলছে”-এর সুইচটি যেকোনো সময় এটি বদলায়।"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Na DAC a reproduktorech Macu, nebo ve sluchátkách tohoto zařízení. Přepínač na obrazovce Právě hraje to kdykoli změní."
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "På Mac’ens DAC og højttalere, eller i denne enheds hovedtelefoner. Kontakten på Spiller nu ændrer det når som helst."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Über DAC und Lautsprecher des Mac oder über die Kopfhörer dieses Geräts. Der Schalter in „Jetzt läuft“ ändert das jederzeit."
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Στο DAC και τα ηχεία του Mac ή στα ακουστικά αυτής της συσκευής. Ο διακόπτης στο «Παίζει τώρα» το αλλάζει οποτεδήποτε."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En el DAC y los altavoces del Mac, o en los auriculares de este dispositivo. El selector de Ahora suena lo cambia en cualquier momento."
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "روی DAC و بلندگوهای Mac، یا روی هدفون این دستگاه. کلید در «در حال پخش» هر زمان آن را عوض می‌کند."
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macin DAC:ssa ja kaiuttimissa tai tämän laitteen kuulokkeissa. Toistetaan nyt -näkymän kytkin vaihtaa sen milloin tahansa."
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sa DAC at mga speaker ng Mac, o sa headphones ng device na ito. Mababago ito anumang oras gamit ang switch sa Nagpe-play Ngayon."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sur le DAC et les enceintes du Mac, ou sur le casque de cet appareil. Le sélecteur de l’écran À l’écoute le change à tout moment."
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac ના DAC અને સ્પીકર પર, અથવા આ ડિવાઇસના હેડફોન પર. “હમણાં વાગી રહ્યું છે” પરની સ્વિચ તેને ગમે ત્યારે બદલે છે."
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A kan DAC da lasifikokin Mac, ko a kan belun kunne na wannan na'ura. Maɓallin da ke kan Ana Kunnawa Yanzu yana canza shi a kowane lokaci."
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ב‑DAC וברמקולים של ה‑Mac, או באוזניות של המכשיר הזה. המתג ב״מתנגן כעת״ משנה את זה בכל רגע."
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac के DAC और स्पीकर पर, या इस डिवाइस के हेडफ़ोन पर। “अभी चल रहा है” का स्विच इसे कभी भी बदल देता है।"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A Mac DAC-ján és hangszóróin, vagy ennek az eszköznek a fejhallgatóján. A Most játszott képernyő kapcsolója bármikor átváltja."
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Di DAC dan speaker Mac, atau di headphone perangkat ini. Sakelar di Sedang Diputar dapat mengubahnya kapan saja."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sul DAC e sugli altoparlanti del Mac, oppure sulle cuffie di questo dispositivo. Il selettore in In riproduzione lo cambia in qualsiasi momento."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "MacのDACとスピーカーで、またはこのデバイスのヘッドフォンで。「再生中」のスイッチでいつでも切り替えられます。"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac ನ DAC ಮತ್ತು ಸ್ಪೀಕರ್‌ಗಳಲ್ಲಿ, ಅಥವಾ ಈ ಸಾಧನದ ಹೆಡ್‌ಫೋನ್‌ಗಳಲ್ಲಿ. “ಈಗ ಪ್ಲೇ ಆಗುತ್ತಿದೆ” ಯಲ್ಲಿರುವ ಸ್ವಿಚ್ ಇದನ್ನು ಯಾವಾಗ ಬೇಕಾದರೂ ಬದಲಿಸುತ್ತದೆ."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac의 DAC와 스피커에서, 또는 이 기기의 헤드폰에서. 지금 재생 중 화면의 스위치로 언제든 바꿀 수 있습니다."
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-ന്റെ DAC-ലും സ്പീക്കറുകളിലും, അല്ലെങ്കിൽ ഈ ഉപകരണത്തിന്റെ ഹെഡ്‌ഫോണിൽ. “ഇപ്പോൾ പ്ലേ ചെയ്യുന്നത്” എന്നതിലെ സ്വിച്ച് ഇത് എപ്പോൾ വേണമെങ്കിലും മാറ്റും."
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac च्या DAC आणि स्पीकरवर, किंवा या डिव्हाइसच्या हेडफोनवर. “आता वाजत आहे” मधील स्विच ते कधीही बदलतो."
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pada DAC dan pembesar suara Mac, atau pada fon kepala peranti ini. Suis pada Sedang Dimainkan menukarnya pada bila-bila masa."
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "På Mac-ens DAC og høyttalere, eller i hodetelefonene til denne enheten. Bryteren på Spilles nå endrer det når som helst."
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Op de DAC en speakers van de Mac, of op de koptelefoon van dit apparaat. De schakelaar in Speelt nu verandert dat op elk moment."
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac ਦੇ DAC ਅਤੇ ਸਪੀਕਰਾਂ ’ਤੇ, ਜਾਂ ਇਸ ਡਿਵਾਈਸ ਦੇ ਹੈੱਡਫ਼ੋਨਾਂ ’ਤੇ। “ਹੁਣ ਚੱਲ ਰਿਹਾ ਹੈ” ਵਿਚਲਾ ਸਵਿੱਚ ਇਸਨੂੰ ਕਿਸੇ ਵੀ ਵੇਲੇ ਬਦਲ ਦਿੰਦਾ ਹੈ।"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Na DAC-u i głośnikach Maca albo na słuchawkach tego urządzenia. Przełącznik na ekranie Teraz odtwarzane zmienia to w każdej chwili."
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No DAC e nos alto-falantes do Mac, ou nos fones deste dispositivo. O seletor em Tocando Agora muda isso a qualquer momento."
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No DAC e nas colunas do Mac, ou nos auscultadores deste dispositivo. O seletor em A reproduzir muda isto a qualquer momento."
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pe DAC-ul și difuzoarele Mac-ului sau în căștile acestui dispozitiv. Comutatorul din În redare schimbă asta oricând."
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "På Macens DAC och högtalare, eller i den här enhetens hörlurar. Reglaget i Spelas nu ändrar det när som helst."
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kwenye DAC na spika za Mac, au kwenye vipokea sauti vya kifaa hiki. Swichi iliyo kwenye Inacheza Sasa huibadilisha wakati wowote."
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-இன் DAC மற்றும் ஸ்பீக்கர்களில், அல்லது இந்தச் சாதனத்தின் ஹெட்ஃபோன்களில். “இப்போது இயங்குவது” திரையில் உள்ள சுவிட்ச் இதை எப்போது வேண்டுமானாலும் மாற்றும்."
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac యొక్క DAC మరియు స్పీకర్లలో, లేదా ఈ పరికరం హెడ్‌ఫోన్‌లలో. “ఇప్పుడు ప్లే అవుతోంది” లోని స్విచ్ దీన్ని ఎప్పుడైనా మారుస్తుంది."
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "บน DAC และลำโพงของ Mac หรือบนหูฟังของอุปกรณ์นี้ สวิตช์ในหน้ากำลังเล่นเปลี่ยนได้ทุกเมื่อ"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac’in DAC’inde ve hoparlörlerinde ya da bu aygıtın kulaklığında. Şu An Çalan ekranındaki anahtar bunu istediğiniz zaman değiştirir."
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "На ЦАП і динаміках Mac або в навушниках цього пристрою. Перемикач на екрані «Зараз грає» змінює це будь-коли."
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac کے DAC اور اسپیکرز پر، یا اس ڈیوائس کے ہیڈفونز پر۔ ”ابھی چل رہا ہے“ میں موجود سوئچ اسے کسی بھی وقت بدل دیتا ہے۔"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trên DAC và loa của máy Mac, hoặc trên tai nghe của thiết bị này. Công tắc trong Đang phát có thể đổi bất cứ lúc nào."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 Mac 的 DAC 和扬声器上，或在这台设备的耳机上。“正在播放”中的开关可随时更改。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 Mac 的 DAC 和揚聲器上，或在這部裝置的耳機上。「正在播放」中的開關可隨時更改。"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在 Mac 的 DAC 和揚聲器上，或在這部裝置的耳筒上。「正在播放」中的開關可隨時更改。"
           }
         }
       }
@@ -114039,6 +114039,1351 @@
           "stringUnit": {
             "state": "translated",
             "value": "播放列表儲存在 Mac 上，檔案夾中沒有播放列表。"
+          }
+        }
+      }
+    },
+    "While the Mac plays, this is the Mac’s music. To see all of your libraries together, set Music Plays On to this device.": {
+      "comment": "Footer on the iPhone's Library screen when a Mac, network shares and folders are open together as one library and the Mac is what plays: the lists then show only the Mac's music. “Music Plays On” must match the label of the switch between the Mac and this device.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac በሚጫወትበት ጊዜ ይህ የMac ሙዚቃ ነው። ሁሉንም ቤተ-መጻሕፍቶችዎን በአንድ ላይ ለማየት «ሙዚቃ የሚጫወትበት»ን ወደዚህ መሣሪያ ያዘጋጁ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "أثناء تشغيل الـ Mac، هذه موسيقى الـ Mac. لرؤية كل مكتباتك معًا، اضبط «تُشغَّل الموسيقى على» على هذا الجهاز."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac যখন বাজায়, তখন এটি Mac-এর সংগীত। আপনার সব লাইব্রেরি একসাথে দেখতে «সংগীত যেখানে চলে» এই ডিভাইসে সেট করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Když hraje Mac, je tu hudba z Macu. Chcete-li vidět všechny své knihovny pohromadě, nastavte „Hudba hraje na“ na toto zařízení."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Når Mac’en afspiller, er dette Mac’ens musik. Hvis du vil se alle dine biblioteker samlet, skal du indstille “Musikken afspilles på” til denne enhed."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solange der Mac spielt, ist dies die Musik des Mac. Um alle deine Mediatheken zusammen zu sehen, stelle „Musik spielt auf“ auf dieses Gerät."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Όσο παίζει το Mac, εδώ εμφανίζεται η μουσική του Mac. Για να δείτε όλες τις βιβλιοθήκες σας μαζί, ορίστε το «Η μουσική παίζει σε» σε αυτήν τη συσκευή."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mientras suena el Mac, esta es la música del Mac. Para ver todas tus bibliotecas juntas, pon «La música suena en» en este dispositivo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وقتی Mac پخش می‌کند، این موسیقیِ Mac است. برای دیدن همهٔ کتابخانه‌هایتان در کنار هم، «محل پخش موسیقی» را روی این دستگاه بگذارید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kun Mac soittaa, tässä näkyy Macin musiikki. Jos haluat nähdä kaikki kirjastosi yhdessä, valitse kohdassa ”Musiikki soi laitteessa” tämä laite."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Habang ang Mac ang tumutugtog, musika ng Mac ang narito. Para makita nang magkakasama ang lahat ng library mo, itakda ang “Tumutugtog ang Musika sa” sa device na ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tant que le Mac joue, vous voyez ici la musique du Mac. Pour voir toutes vos bibliothèques ensemble, réglez « La musique est lue sur » sur cet appareil."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac વગાડે ત્યારે આ Macનું સંગીત છે. તમારી બધી લાઇબ્રેરી સાથે જોવા માટે «સંગીત અહીં વાગે છે»ને આ ડિવાઇસ પર સેટ કરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yayin da Mac ke kunnawa, wannan kiɗan Mac ne. Don ganin duk laburorinka tare, saita “Inda Kiɗa Ke Kunnawa” zuwa wannan na’ura."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "כשה־Mac מנגן, זו המוזיקה של ה־Mac. כדי לראות את כל הספריות שלך יחד, יש להגדיר את ״המוזיקה מתנגנת ב־״ למכשיר הזה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "जब Mac चलाता है, तब यह Mac का संगीत है। अपनी सभी लाइब्रेरी एक साथ देखने के लिए «संगीत यहाँ चलता है» को इस डिवाइस पर सेट करें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Amíg a Mac játszik, itt a Mac zenéje látható. Ha az összes könyvtáradat együtt szeretnéd látni, állítsd „A zene itt szól” beállítást erre az eszközre."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saat Mac yang memutar, ini adalah musik Mac. Untuk melihat semua perpustakaan Anda sekaligus, atur “Musik Diputar di” ke perangkat ini."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mentre suona il Mac, questa è la musica del Mac. Per vedere tutte le tue librerie insieme, imposta “La musica suona su” su questo dispositivo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macが再生している間は、Macの音楽が表示されます。すべてのライブラリをまとめて表示するには、「音楽を再生する場所」をこのデバイスに設定してください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ಪ್ಲೇ ಮಾಡುವಾಗ, ಇದು Mac ನ ಸಂಗೀತ. ನಿಮ್ಮ ಎಲ್ಲಾ ಲೈಬ್ರರಿಗಳನ್ನು ಒಟ್ಟಿಗೆ ನೋಡಲು «ಸಂಗೀತ ಪ್ಲೇ ಆಗುವ ಸ್ಥಳ» ಅನ್ನು ಈ ಸಾಧನಕ್ಕೆ ಹೊಂದಿಸಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac이 재생하는 동안에는 Mac의 음악이 표시됩니다. 모든 보관함을 함께 보려면 ‘음악 재생 위치’를 이 기기로 설정하십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac പ്ലേ ചെയ്യുമ്പോൾ ഇത് Mac-ന്റെ സംഗീതമാണ്. നിങ്ങളുടെ എല്ലാ ലൈബ്രറികളും ഒരുമിച്ച് കാണാൻ «സംഗീതം പ്ലേ ചെയ്യുന്ന ഇടം» ഈ ഉപകരണത്തിലേക്ക് സജ്ജമാക്കുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac वाजवत असताना हे Mac चे संगीत असते. तुमच्या सर्व लायब्ररी एकत्र पाहण्यासाठी «संगीत येथे वाजते» या डिव्हाइसवर सेट करा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Semasa Mac memainkan, ini ialah muzik Mac. Untuk melihat semua pustaka anda bersama-sama, tetapkan “Muzik Dimainkan pada” kepada peranti ini."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mens Macen spiller, er dette Macens musikk. Hvis du vil se alle bibliotekene dine samlet, setter du «Musikken spilles på» til denne enheten."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terwijl de Mac afspeelt, zie je hier de muziek van de Mac. Stel ‘Muziek speelt af op’ in op dit apparaat om al je bibliotheken samen te zien."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਜਦੋਂ Mac ਚਲਾਉਂਦਾ ਹੈ, ਇਹ Mac ਦਾ ਸੰਗੀਤ ਹੈ। ਆਪਣੀਆਂ ਸਾਰੀਆਂ ਲਾਇਬ੍ਰੇਰੀਆਂ ਇਕੱਠੀਆਂ ਦੇਖਣ ਲਈ «ਸੰਗੀਤ ਇੱਥੇ ਚੱਲਦਾ ਹੈ» ਨੂੰ ਇਸ ਡਿਵਾਈਸ ’ਤੇ ਸੈੱਟ ਕਰੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gdy gra Mac, widać tu muzykę z Maca. Aby zobaczyć wszystkie swoje biblioteki razem, ustaw „Muzyka gra na” na to urządzenie."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto o Mac toca, esta é a música do Mac. Para ver todas as suas bibliotecas juntas, defina “A música toca em” como este dispositivo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enquanto o Mac toca, esta é a música do Mac. Para ver todas as suas bibliotecas em conjunto, defina “A música toca em” para este dispositivo."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cât timp redă Mac-ul, aceasta este muzica de pe Mac. Pentru a vedea toate bibliotecile împreună, configurați „Muzica se redă pe” la acest dispozitiv."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "När Macen spelar är det här Macens musik. Om du vill se alla dina bibliotek tillsammans ställer du in ”Musiken spelas på” på den här enheten."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac inapocheza, huu ni muziki wa Mac. Ili kuona maktaba zako zote pamoja, weka “Muziki Huchezwa kwenye” kuwa kifaa hiki."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac இயக்கும்போது, இது Mac-இன் இசை. உங்கள் எல்லா நூலகங்களையும் ஒன்றாகப் பார்க்க, «இசை இயங்கும் இடம்» என்பதை இந்தச் சாதனத்திற்கு அமைக்கவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ప్లే చేస్తున్నప్పుడు, ఇది Mac సంగీతం. మీ లైబ్రరీలన్నింటినీ కలిపి చూడటానికి «సంగీతం ప్లే అయ్యే చోటు»ను ఈ పరికరానికి సెట్ చేయండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ขณะที่ Mac เล่นอยู่ ที่นี่จะเป็นเพลงของ Mac หากต้องการดูคลังทั้งหมดของคุณรวมกัน ให้ตั้งค่า “เล่นเพลงที่” เป็นอุปกรณ์เครื่องนี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac çalarken burada Mac’in müziği görünür. Tüm arşivlerinizi birlikte görmek için “Müziğin Çaldığı Yer”i bu aygıt olarak ayarlayın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Поки відтворює Mac, тут показано музику з Mac. Щоб побачити всі свої медіатеки разом, виберіть цей пристрій у «Музика відтворюється на»."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جب Mac چلاتا ہے تو یہ Mac کی موسیقی ہے۔ اپنی تمام لائبریریاں ایک ساتھ دیکھنے کے لیے «موسیقی یہاں چلتی ہے» کو اس ڈیوائس پر سیٹ کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Khi máy Mac đang phát, đây là nhạc của máy Mac. Để xem tất cả thư viện của bạn cùng nhau, hãy đặt “Nhạc phát trên” thành thiết bị này."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 播放时，这里显示的是 Mac 的音乐。要同时查看所有资料库，请将“音乐播放位置”设为此设备。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 播放時，這裡顯示的是 Mac 的音樂。若要同時檢視所有資料庫，請將「音樂播放位置」設為此裝置。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 播放時，這裡顯示的是 Mac 的音樂。如要同時檢視所有資料庫，請將「音樂播放位置」設為此裝置。"
+          }
+        }
+      }
+    },
+    "Choose what your library is made of. Everything with a checkmark is shown together as one library.": {
+      "comment": "At the top of the iPhone's list of libraries (paired Macs, network shares, folders) while the user chooses which of them make up the library; each row has a checkmark.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ቤተ-መጻሕፍትዎ ከምን እንደሚሠራ ይምረጡ። ምልክት የተደረገበት ሁሉ እንደ አንድ ቤተ-መጻሕፍት በአንድ ላይ ይታያል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اختر ممَّ تتكوّن مكتبتك. كل ما عليه علامة اختيار يُعرض معًا كمكتبة واحدة."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "আপনার লাইব্রেরি কী কী নিয়ে গঠিত তা বেছে নিন। টিকচিহ্ন দেওয়া সবকিছু একসাথে একটি লাইব্রেরি হিসেবে দেখানো হয়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyberte, z čeho se skládá vaše knihovna. Vše zaškrtnuté se zobrazuje společně jako jedna knihovna."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vælg, hvad dit bibliotek består af. Alt med et flueben vises samlet som ét bibliotek."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wähle, woraus deine Mediathek besteht. Alles mit einem Häkchen wird zusammen als eine Mediathek angezeigt."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Επιλέξτε από τι αποτελείται η βιβλιοθήκη σας. Ό,τι έχει σημάδι επιλογής εμφανίζεται μαζί ως μία βιβλιοθήκη."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige de qué se compone tu biblioteca. Todo lo que tiene una marca de verificación se muestra junto como una sola biblioteca."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتخاب کنید کتابخانهٔ شما از چه چیزهایی تشکیل شود. هرچه علامت تیک دارد با هم به‌صورت یک کتابخانه نشان داده می‌شود."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valitse, mistä kirjastosi koostuu. Kaikki valintamerkillä merkityt näytetään yhdessä yhtenä kirjastona."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Piliin kung saan binubuo ang library mo. Ang lahat ng may checkmark ay ipinapakita nang magkakasama bilang iisang library."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez de quoi se compose votre bibliothèque. Tout ce qui est coché s’affiche ensemble, comme une seule bibliothèque."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તમારી લાઇબ્રેરી શેની બનેલી છે તે પસંદ કરો. ચેકમાર્ક ધરાવતું બધું એક લાઇબ્રેરી તરીકે સાથે બતાવાય છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zaɓi abin da laburarenka ya ƙunsa. Duk abin da ke da alamar zaɓi ana nuna shi tare a matsayin laburare ɗaya."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "יש לבחור ממה מורכבת הספריה שלך. כל מה שמסומן בסימן וי מוצג יחד כספריה אחת."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "चुनें कि आपकी लाइब्रेरी किन चीज़ों से बनी है। चेकमार्क वाली हर चीज़ एक लाइब्रेरी के रूप में एक साथ दिखाई जाती है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Válaszd ki, miből álljon a könyvtárad. Minden, ami mellett pipa van, együtt, egyetlen könyvtárként jelenik meg."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih isi perpustakaan Anda. Semua yang bertanda centang ditampilkan bersama sebagai satu perpustakaan."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli da cosa è composta la tua libreria. Tutto ciò che ha un segno di spunta viene mostrato insieme, come un’unica libreria."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライブラリを構成するものを選択してください。チェックマークの付いたものすべてが、1つのライブラリとしてまとめて表示されます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ನಿಮ್ಮ ಲೈಬ್ರರಿ ಯಾವುದರಿಂದ ಕೂಡಿದೆ ಎಂಬುದನ್ನು ಆರಿಸಿ. ಚೆಕ್‌ಮಾರ್ಕ್ ಇರುವ ಎಲ್ಲವನ್ನೂ ಒಂದೇ ಲೈಬ್ರರಿಯಾಗಿ ಒಟ್ಟಿಗೆ ತೋರಿಸಲಾಗುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보관함을 구성할 항목을 선택하십시오. 체크 표시가 있는 모든 항목이 하나의 보관함으로 함께 표시됩니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "നിങ്ങളുടെ ലൈബ്രറിയിൽ എന്തെല്ലാം ഉൾപ്പെടണമെന്ന് തിരഞ്ഞെടുക്കുക. ചെക്ക്മാർക്കുള്ളതെല്ലാം ഒറ്റ ലൈബ്രറിയായി ഒരുമിച്ച് കാണിക്കും."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "तुमची लायब्ररी कशापासून बनलेली आहे ते निवडा. चेकमार्क असलेले सर्व काही एक लायब्ररी म्हणून एकत्र दाखवले जाते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih kandungan pustaka anda. Semua yang bertanda semak ditunjukkan bersama-sama sebagai satu pustaka."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velg hva biblioteket ditt består av. Alt med en hake vises samlet som ett bibliotek."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies waaruit je bibliotheek bestaat. Alles met een vinkje wordt samen als één bibliotheek getoond."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਚੁਣੋ ਕਿ ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਕਿਸ ਚੀਜ਼ ਤੋਂ ਬਣੀ ਹੈ। ਚੈੱਕਮਾਰਕ ਵਾਲੀ ਹਰ ਚੀਜ਼ ਇੱਕ ਲਾਇਬ੍ਰੇਰੀ ਵਜੋਂ ਇਕੱਠੀ ਦਿਖਾਈ ਜਾਂਦੀ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz, z czego składa się Twoja biblioteka. Wszystko, co jest zaznaczone, jest pokazywane razem jako jedna biblioteka."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha do que sua biblioteca é composta. Tudo o que tem uma marca de seleção é mostrado junto, como uma só biblioteca."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolha de que é composta a sua biblioteca. Tudo o que tem um visto é mostrado em conjunto, como uma só biblioteca."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alegeți din ce este alcătuită biblioteca. Tot ce este bifat se afișează împreună, ca o singură bibliotecă."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Välj vad ditt bibliotek består av. Allt med en bock visas tillsammans som ett bibliotek."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chagua maktaba yako inaundwa na nini. Kila kitu chenye alama ya tiki huonyeshwa pamoja kama maktaba moja."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "உங்கள் நூலகம் எவற்றால் ஆனது என்பதைத் தேர்வுசெய்யவும். சரிக்குறி உள்ள அனைத்தும் ஒரே நூலகமாக ஒன்றாகக் காட்டப்படும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మీ లైబ్రరీ వేటితో రూపొందిందో ఎంచుకోండి. చెక్‌మార్క్ ఉన్నవన్నీ ఒకే లైబ్రరీగా కలిపి చూపబడతాయి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เลือกว่าคลังของคุณประกอบด้วยอะไรบ้าง ทุกรายการที่มีเครื่องหมายถูกจะแสดงรวมกันเป็นคลังเดียว"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arşivinizin nelerden oluşacağını seçin. Onay işareti olan her şey tek bir arşiv olarak birlikte gösterilir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Виберіть, із чого складається ваша медіатека. Усе, що позначено галочкою, показується разом як одна медіатека."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "منتخب کریں کہ آپ کی لائبریری کن چیزوں سے بنی ہے۔ چیک مارک والی ہر چیز ایک لائبریری کے طور پر ایک ساتھ دکھائی جاتی ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn những gì tạo nên thư viện của bạn. Mọi mục có dấu kiểm được hiển thị cùng nhau như một thư viện."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择资料库的组成部分。所有带勾号的项目会合并显示为一个资料库。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇資料庫的組成部分。所有帶有勾號的項目會合併顯示為一個資料庫。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇資料庫的組成部分。所有帶有剔號的項目會合併顯示為一個資料庫。"
+          }
+        }
+      }
+    },
+    "That isn’t in your library any more.": {
+      "comment": "Shown on the iPhone when a song is asked for whose Mac, network share or folder has been taken out of the library since.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ያ ከእንግዲህ በቤተ-መጻሕፍትዎ ውስጥ የለም።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يعد هذا موجودًا في مكتبتك."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "সেটি আর আপনার লাইব্রেরিতে নেই।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tohle už ve vaší knihovně není."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det findes ikke længere i dit bibliotek."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das ist nicht mehr in deiner Mediathek."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αυτό δεν υπάρχει πια στη βιβλιοθήκη σας."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eso ya no está en tu biblioteca."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "این دیگر در کتابخانهٔ شما نیست."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sitä ei enää ole kirjastossasi."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wala na iyon sa library mo."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet élément ne se trouve plus dans votre bibliothèque."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "તે હવે તમારી લાઇબ્રેરીમાં નથી."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wannan ba ya cikin laburarenka kuma."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "זה כבר לא נמצא בספריה שלך."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वह अब आपकी लाइब्रेरी में नहीं है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ez már nincs a könyvtáradban."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Itu sudah tidak ada di perpustakaan Anda."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è più nella tua libreria."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "その項目はもうライブラリにありません。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಅದು ಇನ್ನು ನಿಮ್ಮ ಲೈಬ್ರರಿಯಲ್ಲಿ ಇಲ್ಲ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "해당 항목은 더 이상 보관함에 없습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "അത് ഇനി നിങ്ങളുടെ ലൈബ്രറിയിലില്ല."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ते आता तुमच्या लायब्ररीमध्ये नाही."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Itu tiada lagi dalam pustaka anda."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det finnes ikke lenger i biblioteket ditt."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dat staat niet meer in je bibliotheek."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਉਹ ਹੁਣ ਤੁਹਾਡੀ ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਨਹੀਂ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tego nie ma już w Twojej bibliotece."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isso não está mais na sua biblioteca."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Isso já não está na sua biblioteca."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aceasta nu mai este în biblioteca dvs."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Det finns inte längre i ditt bibliotek."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiyo haipo tena kwenye maktaba yako."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "அது இனி உங்கள் நூலகத்தில் இல்லை."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "అది ఇకపై మీ లైబ్రరీలో లేదు."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "รายการนั้นไม่อยู่ในคลังของคุณแล้ว"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu artık arşivinizde değil."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Цього вже немає у вашій медіатеці."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "وہ اب آپ کی لائبریری میں نہیں ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mục đó không còn trong thư viện của bạn nữa."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该项目已不在你的资料库中。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該項目已不在你的資料庫中。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該項目已不在你的資料庫中。"
+          }
+        }
+      }
+    },
+    "The Mac can’t play that: it isn’t in the Mac’s library. To play it, set Music Plays On to this device.": {
+      "comment": "Shown on the iPhone when the Mac is what plays and a song is chosen that is only on a network share or in a folder on the phone. “Music Plays On” must match the label of the switch between the Mac and this device.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ያንን መጫወት አይችልም፦ በMac ቤተ-መጻሕፍት ውስጥ የለም። እሱን ለመጫወት «ሙዚቃ የሚጫወትበት»ን ወደዚህ መሣሪያ ያዘጋጁ።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يستطيع الـ Mac تشغيل ذلك: فهو غير موجود في مكتبة الـ Mac. لتشغيله، اضبط «تُشغَّل الموسيقى على» على هذا الجهاز."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac সেটি বাজাতে পারে না: সেটি Mac-এর লাইব্রেরিতে নেই। সেটি বাজাতে «সংগীত যেখানে চলে» এই ডিভাইসে সেট করুন।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tohle Mac přehrát nemůže: není to v knihovně Macu. Chcete-li to přehrát, nastavte „Hudba hraje na“ na toto zařízení."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac’en kan ikke afspille det: Det findes ikke i Mac’ens bibliotek. Hvis du vil afspille det, skal du indstille “Musikken afspilles på” til denne enhed."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das kann der Mac nicht spielen: Es ist nicht in der Mediathek des Mac. Um es zu spielen, stelle „Musik spielt auf“ auf dieses Gerät."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Το Mac δεν μπορεί να το παίξει: δεν υπάρχει στη βιβλιοθήκη του Mac. Για να το παίξετε, ορίστε το «Η μουσική παίζει σε» σε αυτήν τη συσκευή."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El Mac no puede reproducir eso: no está en la biblioteca del Mac. Para reproducirlo, pon «La música suena en» en este dispositivo."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac نمی‌تواند آن را پخش کند: در کتابخانهٔ Mac نیست. برای پخش آن، «محل پخش موسیقی» را روی این دستگاه بگذارید."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ei voi toistaa sitä: sitä ei ole Macin kirjastossa. Jos haluat toistaa sen, valitse kohdassa ”Musiikki soi laitteessa” tämä laite."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi iyon mapapatugtog ng Mac: wala iyon sa library ng Mac. Para patugtugin ito, itakda ang “Tumutugtog ang Musika sa” sa device na ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Mac ne peut pas lire cet élément : il n’est pas dans la bibliothèque du Mac. Pour le lire, réglez « La musique est lue sur » sur cet appareil."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac તે વગાડી શકતું નથી: તે Macની લાઇબ્રેરીમાં નથી. તેને વગાડવા માટે «સંગીત અહીં વાગે છે»ને આ ડિવાઇસ પર સેટ કરો."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ba zai iya kunna wannan ba: ba ya cikin laburaren Mac. Don kunna shi, saita “Inda Kiɗa Ke Kunnawa” zuwa wannan na’ura."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ה־Mac לא יכול לנגן את זה: זה לא נמצא בספריה של ה־Mac. כדי לנגן את זה, יש להגדיר את ״המוזיקה מתנגנת ב־״ למכשיר הזה."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac उसे नहीं चला सकता: वह Mac की लाइब्रेरी में नहीं है। उसे चलाने के लिए «संगीत यहाँ चलता है» को इस डिवाइस पर सेट करें।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Mac ezt nem tudja lejátszani: nincs a Mac könyvtárában. A lejátszásához állítsd „A zene itt szól” beállítást erre az eszközre."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac tidak dapat memutarnya: itu tidak ada di perpustakaan Mac. Untuk memutarnya, atur “Musik Diputar di” ke perangkat ini."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il Mac non può riprodurlo: non è nella libreria del Mac. Per riprodurlo, imposta “La musica suona su” su questo dispositivo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macでは再生できません。その項目はMacのライブラリにありません。再生するには、「音楽を再生する場所」をこのデバイスに設定してください。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ಅದನ್ನು ಪ್ಲೇ ಮಾಡಲಾಗದು: ಅದು Mac ನ ಲೈಬ್ರರಿಯಲ್ಲಿ ಇಲ್ಲ. ಅದನ್ನು ಪ್ಲೇ ಮಾಡಲು «ಸಂಗೀತ ಪ್ಲೇ ಆಗುವ ಸ್ಥಳ» ಅನ್ನು ಈ ಸಾಧನಕ್ಕೆ ಹೊಂದಿಸಿ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac에서 재생할 수 없습니다. 해당 항목이 Mac의 보관함에 없습니다. 재생하려면 ‘음악 재생 위치’를 이 기기로 설정하십시오."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ന് അത് പ്ലേ ചെയ്യാനാവില്ല: അത് Mac-ന്റെ ലൈബ്രറിയിലില്ല. അത് പ്ലേ ചെയ്യാൻ «സംഗീതം പ്ലേ ചെയ്യുന്ന ഇടം» ഈ ഉപകരണത്തിലേക്ക് സജ്ജമാക്കുക."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ते वाजवू शकत नाही: ते Mac च्या लायब्ररीमध्ये नाही. ते वाजवण्यासाठी «संगीत येथे वाजते» या डिव्हाइसवर सेट करा."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac tidak dapat memainkannya: ia tiada dalam pustaka Mac. Untuk memainkannya, tetapkan “Muzik Dimainkan pada” kepada peranti ini."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macen kan ikke spille det: Det finnes ikke i Macens bibliotek. Hvis du vil spille det, setter du «Musikken spilles på» til denne enheten."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De Mac kan dat niet afspelen: het staat niet in de bibliotheek van de Mac. Stel ‘Muziek speelt af op’ in op dit apparaat om het af te spelen."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac ਉਸ ਨੂੰ ਨਹੀਂ ਚਲਾ ਸਕਦਾ: ਉਹ Mac ਦੀ ਲਾਇਬ੍ਰੇਰੀ ਵਿੱਚ ਨਹੀਂ ਹੈ। ਉਸ ਨੂੰ ਚਲਾਉਣ ਲਈ «ਸੰਗੀਤ ਇੱਥੇ ਚੱਲਦਾ ਹੈ» ਨੂੰ ਇਸ ਡਿਵਾਈਸ ’ਤੇ ਸੈੱਟ ਕਰੋ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac nie może tego odtworzyć: nie ma tego w bibliotece Maca. Aby to odtworzyć, ustaw „Muzyka gra na” na to urządzenie."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Mac não pode tocar isso: não está na biblioteca do Mac. Para tocar, defina “A música toca em” como este dispositivo."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "O Mac não consegue reproduzir isso: não está na biblioteca do Mac. Para o reproduzir, defina “A música toca em” para este dispositivo."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac-ul nu poate reda aceasta: nu este în biblioteca Mac-ului. Pentru a o reda, configurați „Muzica se redă pe” la acest dispozitiv."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Macen kan inte spela det: det finns inte i Macens bibliotek. Om du vill spela det ställer du in ”Musiken spelas på” på den här enheten."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac haiwezi kucheza hiyo: haipo kwenye maktaba ya Mac. Ili kuicheza, weka “Muziki Huchezwa kwenye” kuwa kifaa hiki."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac அதை இயக்க முடியாது: அது Mac-இன் நூலகத்தில் இல்லை. அதை இயக்க, «இசை இயங்கும் இடம்» என்பதை இந்தச் சாதனத்திற்கு அமைக்கவும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac దాన్ని ప్లే చేయలేదు: అది Mac లైబ్రరీలో లేదు. దాన్ని ప్లే చేయడానికి «సంగీతం ప్లే అయ్యే చోటు»ను ఈ పరికరానికి సెట్ చేయండి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac เล่นรายการนั้นไม่ได้ เพราะไม่ได้อยู่ในคลังของ Mac หากต้องการเล่น ให้ตั้งค่า “เล่นเพลงที่” เป็นอุปกรณ์เครื่องนี้"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac bunu çalamaz: Mac’in arşivinde yok. Çalmak için “Müziğin Çaldığı Yer”i bu aygıt olarak ayarlayın."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac не може це відтворити: цього немає в медіатеці Mac. Щоб відтворити, виберіть цей пристрій у «Музика відтворюється на»."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac اسے نہیں چلا سکتا: وہ Mac کی لائبریری میں نہیں ہے۔ اسے چلانے کے لیے «موسیقی یہاں چلتی ہے» کو اس ڈیوائس پر سیٹ کریں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy Mac không thể phát mục đó: mục đó không có trong thư viện của máy Mac. Để phát, hãy đặt “Nhạc phát trên” thành thiết bị này."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 无法播放该项目：它不在 Mac 的资料库中。要播放它，请将“音乐播放位置”设为此设备。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 無法播放該項目：它不在 Mac 的資料庫中。若要播放，請將「音樂播放位置」設為此裝置。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 無法播放該項目：它不在 Mac 的資料庫中。如要播放，請將「音樂播放位置」設為此裝置。"
+          }
+        }
+      }
+    },
+    "Playlists are kept on the Mac and hold only songs from the Mac’s library.": {
+      "comment": "Shown on the iPhone when a song from a network share or a folder on the phone is added to a playlist; playlists live on the Mac.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "አጫዋች ዝርዝሮች የሚቀመጡት በMac ላይ ነው፣ የሚይዙትም ከMac ቤተ-መጻሕፍት የሆኑ ዘፈኖችን ብቻ ነው።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "قوائم التشغيل محفوظة على الـ Mac ولا تضم إلا أغانيَ من مكتبة الـ Mac."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "প্লেলিস্ট Mac-এ রাখা থাকে এবং তাতে শুধু Mac-এর লাইব্রেরির গান থাকে।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playlisty jsou uložené na Macu a obsahují jen skladby z knihovny Macu."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spillelister opbevares på Mac’en og indeholder kun sange fra Mac’ens bibliotek."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playlists werden auf dem Mac aufbewahrt und enthalten nur Titel aus der Mediathek des Mac."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Οι λίστες αναπαραγωγής διατηρούνται στο Mac και περιέχουν μόνο τραγούδια από τη βιβλιοθήκη του Mac."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las listas de reproducción se guardan en el Mac y solo contienen canciones de la biblioteca del Mac."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "فهرست‌های پخش در Mac نگه‌داری می‌شوند و فقط آهنگ‌های کتابخانهٔ Mac را در خود دارند."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soittolistat säilytetään Macissa, ja niissä on vain Macin kirjaston kappaleita."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nakatabi sa Mac ang mga playlist at mga kanta lang mula sa library ng Mac ang laman ng mga ito."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les playlists sont conservées sur le Mac et ne contiennent que des morceaux de la bibliothèque du Mac."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "પ્લેલિસ્ટ Mac પર રખાય છે અને તેમાં ફક્ત Macની લાઇબ્રેરીનાં ગીતો હોય છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana ajiye jerin waƙoƙi a kan Mac ne, kuma waƙoƙin laburaren Mac kawai suke ɗauka."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "רשימות ההשמעה נשמרות ב־Mac ומכילות רק שירים מהספריה של ה־Mac."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्लेलिस्ट Mac पर रखी जाती हैं और उनमें केवल Mac की लाइब्रेरी के गाने होते हैं।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A lejátszási listák a Macen vannak tárolva, és csak a Mac könyvtárában lévő dalokat tartalmazhatnak."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daftar putar disimpan di Mac dan hanya berisi lagu dari perpustakaan Mac."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le playlist sono conservate sul Mac e contengono solo brani della libreria del Mac."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "プレイリストはMacに保存されており、Macのライブラリの曲だけを入れられます。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಪ್ಲೇಲಿಸ್ಟ್‌ಗಳು Mac ನಲ್ಲಿ ಇರುತ್ತವೆ ಮತ್ತು Mac ನ ಲೈಬ್ರರಿಯ ಹಾಡುಗಳನ್ನು ಮಾತ್ರ ಹೊಂದಿರುತ್ತವೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "플레이리스트는 Mac에 보관되며 Mac 보관함의 노래만 담을 수 있습니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പ്ലേലിസ്റ്റുകൾ Mac-ലാണ് സൂക്ഷിക്കുന്നത്, അവയിൽ Mac-ന്റെ ലൈബ്രറിയിലെ ഗാനങ്ങൾ മാത്രമേ ഉണ്ടാകൂ."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "प्लेलिस्ट Mac वर ठेवल्या जातात आणि त्यांत फक्त Mac च्या लायब्ररीमधील गाणी असतात."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senarai main disimpan pada Mac dan hanya mengandungi lagu daripada pustaka Mac."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spillelister oppbevares på Macen og inneholder bare sanger fra Macens bibliotek."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playlists worden op de Mac bewaard en bevatten alleen nummers uit de bibliotheek van de Mac."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਪਲੇਲਿਸਟਾਂ Mac ’ਤੇ ਰੱਖੀਆਂ ਜਾਂਦੀਆਂ ਹਨ ਅਤੇ ਉਨ੍ਹਾਂ ਵਿੱਚ ਸਿਰਫ਼ Mac ਦੀ ਲਾਇਬ੍ਰੇਰੀ ਦੇ ਗੀਤ ਹੁੰਦੇ ਹਨ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playlisty są przechowywane na Macu i zawierają tylko utwory z biblioteki Maca."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As playlists ficam no Mac e só contêm músicas da biblioteca do Mac."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "As playlists ficam guardadas no Mac e só contêm músicas da biblioteca do Mac."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playlisturile sunt păstrate pe Mac și conțin doar melodii din biblioteca Mac-ului."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spellistor finns på Macen och innehåller bara låtar från Macens bibliotek."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orodha za nyimbo huhifadhiwa kwenye Mac na huwa na nyimbo za maktaba ya Mac pekee."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "பிளேலிஸ்ட்கள் Mac-இல் வைக்கப்படுகின்றன; அவற்றில் Mac-இன் நூலகத்திலுள்ள பாடல்கள் மட்டுமே இருக்கும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ప్లేలిస్ట్‌లు Macలో ఉంటాయి, వాటిలో Mac లైబ్రరీలోని పాటలు మాత్రమే ఉంటాయి."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เพลย์ลิสต์เก็บอยู่บน Mac และมีได้เฉพาะเพลงจากคลังของ Mac"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çalma listeleri Mac’te tutulur ve yalnızca Mac’in arşivindeki parçaları içerir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Плейлисти зберігаються на Mac і містять лише пісні з медіатеки Mac."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "پلے لسٹس Mac پر رکھی جاتی ہیں اور ان میں صرف Mac کی لائبریری کے گانے ہوتے ہیں۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Danh sách phát được lưu trên máy Mac và chỉ chứa các bài hát trong thư viện của máy Mac."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放列表存储在 Mac 上，只能包含 Mac 资料库中的歌曲。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放列表儲存在 Mac 上，只能包含 Mac 資料庫中的歌曲。"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "播放列表儲存在 Mac 上，只能包含 Mac 資料庫中的歌曲。"
           }
         }
       }
