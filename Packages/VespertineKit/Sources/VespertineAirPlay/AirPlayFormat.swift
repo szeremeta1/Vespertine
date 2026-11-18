@@ -125,4 +125,11 @@ extension AirPlay2Message {
         }
         return nil
     }
+
+    /// Whether a receiver's /info answer says its buffered streams take 24-bit ALAC at 48 kHz (`supportedFormats`,
+    /// `bufferStream`): the one buffered stream Vespertine makes. An Apple TV 4K's does.
+    static func takesBuffered(info: Data) -> Bool {
+        guard let mask = (decode(info)?["supportedFormats"] as? [String: Any])?["bufferStream"] as? Int else { return false }
+        return mask & bufferedFormat != 0
+    }
 }

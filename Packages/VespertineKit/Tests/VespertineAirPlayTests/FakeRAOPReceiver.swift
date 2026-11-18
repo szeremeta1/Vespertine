@@ -130,6 +130,23 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private var _streamFormat: AirPlayFormat?
     /// AirPlay 2: answer the first SETUP without an event port.
     var withholdEventPort = false
+    /// AirPlay 2, a buffered stream: the clocks the sender named (SETPEERS), what each SETRATEANCHORTIME and
+    /// FLUSHBUFFERED said, how many times the block connection was opened, and the blocks that came (their numbers).
+    var peers: [String] { lock.withLock { _peers } }
+    private var _peers: [String] = []
+    var anchors: [[String: Any]] { lock.withLock { _anchors } }
+    private var _anchors: [[String: Any]] = []
+    var bufferedFlushes: [[String: Any]] { lock.withLock { _bufferedFlushes } }
+    private var _bufferedFlushes: [[String: Any]] = []
+    var blockConnections: Int { lock.withLock { _blockConnections } }
+    private var _blockConnections = 0
+    var blockSequences: [UInt32] { lock.withLock { _blockSequences } }
+    private var _blockSequences: [UInt32] = []
+    /// Bytes on the block connection that were not blocks, or blocks of a kind this receiver doesn't know.
+    var badBlocks: Int { lock.withLock { _badBlocks } }
+    private var _badBlocks = 0
+    /// How many bytes of blocks the buffered stream's answer says this receiver holds.
+    static let bufferSize = 8 * 1024 * 1024
 
     /// For each request in `requests`, whether it came sealed.
     var sealed: [Bool] { lock.withLock { _sealed } }
@@ -362,6 +379,24 @@ final class FakeRAOPReceiver: @unchecked Sendable {
             guard let said = AirPlay2Message.decode(request.body) else { return .response(400, "Bad Request", headers: headers) }
             lock.withLock { _setups.append(said) }
             let plist = ("Content-Type", AirPlay2Message.contentType)
+            if let stream = (said["streams"] as? [[String: Any]])?.first, stream["type"] as? Int == AirPlay2Buffered.streamType {
+                // A buffered stream: its key, and a TCP port its blocks are written to.
+                let named = stream["audioFormat"] as? Int ?? 0
+                guard !refusedFormats.contains(named), named == AirPlay2Message.bufferedFormat else {
+                    return .response(415, "Unsupported Media Type", headers: headers)
+                }
+                guard let key = stream["shk"] as? Data, key.count == 32, let blocks = blockPort() else {
+                    return .response(400, "Bad Request", headers: headers)
+                }
+                let format = AirPlay2Buffered.Kind.alac48000Deep.format
+                lock.withLock {
+                    audioKey = SymmetricKey(data: key)
+                    _streamFormat = format
+                    decoder = try? ALACDecoder(config: format.alac)
+                }
+                let answer: [String: Any] = ["streams": [["type": AirPlay2Buffered.streamType, "dataPort": Int(blocks), "audioBufferSize": Self.bufferSize]]]
+                return .response(200, "OK", headers: headers + [plist], body: AirPlay2Message.encode(answer))
+            }
             if let stream = (said["streams"] as? [[String: Any]])?.first {
                 // The format it names decides how the packets decode; one this receiver is set to refuse is refused.
                 let named = stream["audioFormat"] as? Int ?? AirPlay2Message.alacFormat
@@ -384,6 +419,14 @@ final class FakeRAOPReceiver: @unchecked Sendable {
                 audio.startReceiving(name: "fake audio") { [weak self] data, _, _ in self?.audio(data, resent: false) }
                 control.startReceiving(name: "fake control") { [weak self] data, _, _ in self?.control(data) }
                 let answer: [String: Any] = ["streams": [["type": 96, "dataPort": Int(audio.port), "controlPort": Int(control.port)]]]
+                return .response(200, "OK", headers: headers + [plist], body: AirPlay2Message.encode(answer))
+            }
+            // A session timed by the sender's PTP clock has no port to ask the time of: answered with the event port and
+            // this receiver's own name as a clock.
+            if said["timingProtocol"] as? String == "PTP" {
+                guard said["timingPeerInfo"] is [String: Any], let events = eventPort() else { return .response(400, "Bad Request", headers: headers) }
+                let peer: [String: Any] = ["Addresses": ["127.0.0.1"], "ID": "127.0.0.1"]
+                let answer: [String: Any] = ["eventPort": Int(events), "timingPort": 0, "timingPeerInfo": peer]
                 return .response(200, "OK", headers: headers + [plist], body: AirPlay2Message.encode(answer))
             }
             // The session: where to ask the time, answered with the event port (a listener that counts who connects).
@@ -413,6 +456,16 @@ final class FakeRAOPReceiver: @unchecked Sendable {
             // Asks the sender for the time, as a receiver does before it uses sync packets.
             let (timing, port) = lock.withLock { (timingSocket, clientTiming) }
             timing?.send(RAOPPacket.timingRequest(transmit: NTPClock.now()), to: "127.0.0.1", port: port)
+        case "SETPEERS":
+            let list = (try? PropertyListSerialization.propertyList(from: request.body, format: nil)) as? [String]
+            guard let list else { return .response(400, "Bad Request", headers: headers) }
+            lock.withLock { _peers = list }
+        case "SETRATEANCHORTIME":
+            guard let said = AirPlay2Message.decode(request.body) else { return .response(400, "Bad Request", headers: headers) }
+            lock.withLock { _anchors.append(said) }
+        case "FLUSHBUFFERED":
+            guard let said = AirPlay2Message.decode(request.body) else { return .response(400, "Bad Request", headers: headers) }
+            lock.withLock { _bufferedFlushes.append(said) }
         case "OPTIONS":
             headers.append(("Public", "ANNOUNCE, SETUP, RECORD, PAUSE, FLUSH, TEARDOWN, OPTIONS, GET_PARAMETER, SET_PARAMETER"))
         default: break
@@ -422,6 +475,26 @@ final class FakeRAOPReceiver: @unchecked Sendable {
 
     /// Opens the event listener (once) and gives its port.
     private func eventPort() -> UInt16? {
+        listenerPort { receiver, client in
+            receiver._eventConnections += 1
+            receiver.eventSockets.append(client)
+        }
+    }
+
+    /// Opens the listener a buffered stream's blocks are written to and gives its port. Each connection is served by a
+    /// thread of its own, and is in the ledger of connections exactly as an RTSP one is.
+    private func blockPort() -> UInt16? {
+        listenerPort { receiver, client in
+            guard receiver.clientSockets.insert(client) else { return }
+            receiver._blockConnections += 1
+            let thread = Thread { receiver.serveBlocks(client) }
+            thread.start()
+        }
+    }
+
+    /// A TCP listener on a free port, accepted on by a thread of its own until the receiver stops. `take` is given each
+    /// connection, under the lock.
+    private func listenerPort(take: @escaping (FakeRAOPReceiver, Int32) -> Void) -> UInt16? {
         let fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)
         guard fd >= 0 else { return nil }
         var addr = sockaddr_in()
@@ -440,13 +513,43 @@ final class FakeRAOPReceiver: @unchecked Sendable {
             return true
         }) else { close(fd); return nil }
         let thread = Thread { [self] in
-            Self.accept(on: fd, for: self) { receiver, client in
-                receiver._eventConnections += 1
-                receiver.eventSockets.append(client)
-            }
+            Self.accept(on: fd, for: self, take: take)
         }
         thread.start()
         return port
+    }
+
+    /// Reads a buffered stream's connection: whole blocks are opened with the stream's key and decoded; the rest waits
+    /// for more bytes.
+    private func serveBlocks(_ fd: Int32) {
+        var buffer = [UInt8](repeating: 0, count: 65_536)
+        var arrived = Data()
+        // Forgotten and closed in one step, as an RTSP connection is.
+        defer { clientSockets.close(fd) }
+        while true {
+            let n = read(fd, &buffer, buffer.count)
+            guard n > 0 else { return }
+            arrived.append(contentsOf: buffer[0..<n])
+            guard let cut = AirPlay2Buffered.split(arrived) else {
+                lock.withLock { _badBlocks += 1 }
+                return
+            }
+            arrived = Data(arrived.dropFirst(cut.used))
+            for block in cut.blocks { takeBlock(block) }
+        }
+    }
+
+    private func takeBlock(_ data: Data) {
+        let (key, decoder) = lock.withLock { (audioKey, self.decoder) }
+        guard let key, let opened = AirPlay2Buffered.open(data, key: key) else { lock.withLock { _unopened += 1 }; return }
+        guard opened.kind == AirPlay2Buffered.Kind.alac48000Deep.rawValue else { lock.withLock { _badBlocks += 1 }; return }
+        let samples = decodeLock.withLock { try? decoder?.decode(samples: opened.payload) }
+        lock.withLock {
+            _blockSequences.append(opened.sequence)
+            guard let samples else { return }
+            if _firstTimestamp == nil { _firstTimestamp = opened.timestamp }
+            _packets[opened.timestamp] = samples
+        }
     }
 
     private var controlSocket: UDPSocket?
