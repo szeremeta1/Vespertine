@@ -85,7 +85,7 @@ struct GoneFileTests {
     func unreadableFolder() async throws {
         let root = try scratch()
         let album = root.appendingPathComponent("Music/Album")
-        defer { chmod(album.path, 0o755); try? FileManager.default.removeItem(at: root) }
+        defer { chmod(album.path, 0o755); removeScratch(root) }
         let (player, library) = try await player(in: root)
         let track = try #require(try library.database.allTracks().first { $0.filePath.hasSuffix("song.wav") })
         #expect(chmod(album.path, 0) == 0)
@@ -94,7 +94,7 @@ struct GoneFileTests {
 
     @Test("A song on a source whose folder is gone (a dropped mount) is not marked missing")
     func droppedSource() async throws {
-        let root = try scratch(); defer { try? FileManager.default.removeItem(at: root) }
+        let root = try scratch(); defer { removeScratch(root) }
         let (player, library) = try await player(in: root)
         let track = try #require(try library.database.allTracks().first { $0.filePath.hasSuffix("song.wav") })
         try FileManager.default.moveItem(at: root.appendingPathComponent("Music"), to: root.appendingPathComponent("Unmounted"))
@@ -103,7 +103,7 @@ struct GoneFileTests {
 
     @Test("A song whose file was deleted while its folder still lists is marked missing")
     func reallyGone() async throws {
-        let root = try scratch(); defer { try? FileManager.default.removeItem(at: root) }
+        let root = try scratch(); defer { removeScratch(root) }
         let (player, library) = try await player(in: root)
         let track = try #require(try library.database.allTracks().first { $0.filePath.hasSuffix("song.wav") })
         try FileManager.default.removeItem(atPath: track.filePath)

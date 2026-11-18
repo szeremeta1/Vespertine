@@ -43,7 +43,7 @@ struct MissingSongsAppTests {
 
     @Test("Turning automatic scanning on looks for the music added while it was off, at once; turning it off scans nothing")
     func turningOnCatchesUp() async throws {
-        let root = try scratch(); defer { try? FileManager.default.removeItem(at: root) }
+        let root = try scratch(); defer { removeScratch(root) }
         let library = try library(in: root, songs: ["song"], automatic: false)
         try await settle()
         #expect(try songsInLibrary(library) == 0 && library.scanProgress == nil)
@@ -60,7 +60,7 @@ struct MissingSongsAppTests {
 
     @Test("With scanning off, a song whose file is gone is hidden and no source is rescanned; a new song stays unread")
     func goneFileWithScanOffOnlyHides() async throws {
-        let root = try scratch(); defer { try? FileManager.default.removeItem(at: root) }
+        let root = try scratch(); defer { removeScratch(root) }
         let library = try library(in: root, songs: ["song"], automatic: false)
         await library.rescanAll()
         let track = try #require(try library.database.allTracks().first)
@@ -78,7 +78,7 @@ struct MissingSongsAppTests {
 
     @Test("With scanning on, a song whose file is gone still starts a rescan of its source, which finds the new song")
     func goneFileWithScanOnRescans() async throws {
-        let root = try scratch(); defer { try? FileManager.default.removeItem(at: root) }
+        let root = try scratch(); defer { removeScratch(root) }
         let library = try library(in: root, songs: ["song"], automatic: true)
         await library.rescanAll()
         let track = try #require(try library.database.allTracks().first)
@@ -95,7 +95,7 @@ struct MissingSongsAppTests {
 
     @Test("Remove Missing Songs takes the hidden rows out, reports what it removed, and leaves every file on disk")
     func removeMissingSongs() async throws {
-        let root = try scratch(); defer { try? FileManager.default.removeItem(at: root) }
+        let root = try scratch(); defer { removeScratch(root) }
         let library = try library(in: root, songs: ["keep", "gone"], automatic: false)
         await library.rescanAll()
         let gone = try #require(try library.database.allTracks().first { $0.filePath.hasSuffix("gone.wav") })

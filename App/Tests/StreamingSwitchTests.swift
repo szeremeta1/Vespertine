@@ -165,7 +165,7 @@ struct StreamingSwitchTests {
 
     private func clean(_ scratch: Scratch) {
         scratch.defaults.removePersistentDomain(forName: scratch.suite)
-        try? FileManager.default.removeItem(at: scratch.root)
+        removeScratch(scratch.root)
     }
 
     private func model(_ scratch: Scratch, library: LibraryStore? = nil) -> StreamingModel {

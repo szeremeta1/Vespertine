@@ -17,7 +17,7 @@ struct PreviousSongTests {
     private func fixture(_ body: (PlayerController, [Track]) throws -> Void) throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-previous-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let url = root.appendingPathComponent("sample.wav")
         do {
             let file = try AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatLinearPCM,

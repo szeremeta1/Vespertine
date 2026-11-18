@@ -12,7 +12,7 @@ struct OfflineCopyYieldTests {
     func yieldsWhileTheGateIsHeld() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-yield-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let defaults = try #require(UserDefaults(suiteName: root.appendingPathComponent("defaults.plist").path))
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
         let library = try LibraryStore(dataDirectory: root.appendingPathComponent("library"))

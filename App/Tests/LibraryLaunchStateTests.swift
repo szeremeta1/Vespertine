@@ -12,7 +12,7 @@ struct LibraryLaunchStateTests {
     func sidebarStateIsReadBeforeTheFirstFrame() async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-launch-state-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         do {
             let database = try LibraryDatabase(url: root.appendingPathComponent("Library.sqlite"))
             let source = try database.addSource(LibrarySource(path: "/Volumes/QA/Music", mode: .reference))

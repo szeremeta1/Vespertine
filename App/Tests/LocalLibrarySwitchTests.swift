@@ -43,7 +43,7 @@ struct LocalLibrarySwitchTests {
     private func clean(_ scratch: Scratch) {
         scratch.player.stop()
         scratch.defaults.removePersistentDomain(forName: scratch.suite)
-        try? FileManager.default.removeItem(at: scratch.root)
+        removeScratch(scratch.root)
     }
 
     private func apply(_ on: Bool, _ scratch: Scratch) {

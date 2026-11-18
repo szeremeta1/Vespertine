@@ -18,7 +18,7 @@ struct AutomaticWorkTests {
     @Test("A fresh install scans and analyzes only when asked")
     func defaultsAreOff() throws {
         let (root, defaults, suite) = try scratch()
-        defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
+        defer { defaults.removePersistentDomain(forName: suite); removeScratch(root) }
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
         #expect(!settings.watchFolders && !settings.autoAnalyze)
         #expect(!settings.analyzeNetworkShares)
@@ -27,7 +27,7 @@ struct AutomaticWorkTests {
     @Test("An install that had both on, or on by default, is put to off once; its later choice stands")
     func existingInstallsMigrateToOff() throws {
         let (root, defaults, suite) = try scratch()
-        defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
+        defer { defaults.removePersistentDomain(forName: suite); removeScratch(root) }
         // What rc4 left behind: Watch Folders stored on, and analysis switched on in setup.
         defaults.set(true, forKey: "watchFolders")
         defaults.set(true, forKey: "autoAnalyze")
@@ -47,7 +47,7 @@ struct AutomaticWorkTests {
     @Test("An install with nothing stored for them (watching was on by default) ends up off")
     func implicitOnMigratesToOff() throws {
         let (root, defaults, suite) = try scratch()
-        defer { defaults.removePersistentDomain(forName: suite); try? FileManager.default.removeItem(at: root) }
+        defer { defaults.removePersistentDomain(forName: suite); removeScratch(root) }
         defaults.set(true, forKey: "exclusiveMode")   // an existing install: other settings stored, these two not
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
         #expect(!settings.watchFolders && !settings.autoAnalyze && settings.exclusiveMode)
@@ -74,7 +74,7 @@ struct AutomaticWorkTests {
     @Test("With automatic scanning on, the scan at launch finds the new song")
     func launchScanRunsWhenOn() async throws {
         let (root, _, _) = try scratch()
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let library = try libraryWithUnscannedSong(in: root, automatic: true)
         for _ in 0..<600 where library.stats.tracks == 0 { try await Task.sleep(for: .milliseconds(50)) }
         #expect(library.stats.tracks == 1)
@@ -83,7 +83,7 @@ struct AutomaticWorkTests {
     @Test("With it off, nothing scans at launch, and Rescan still finds the song")
     func launchScanDoesNotRunWhenOff() async throws {
         let (root, _, _) = try scratch()
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let library = try libraryWithUnscannedSong(in: root, automatic: false)
         // Many times the launch delay (50 ms), and long enough for the observations to have delivered.
         try await Task.sleep(for: .seconds(2))

@@ -47,7 +47,7 @@ struct RemoteLibraryTests {
     @Test("Songs are listed by title the way a person sorts them, and the list follows the library")
     func songsByTitle() async throws {
         let (library, root) = try await library(songs: ["Zebra Crossing", "apple 10", "Apple 2", "Éclair"])
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let songs = RemoteBridge.songs(of: library)
         #expect(songs.map(\.title) == ["Apple 2", "apple 10", "Éclair", "Zebra Crossing"])
         #expect(RemoteBridge.songs(of: library).map(\.id) == songs.map(\.id))
@@ -62,7 +62,7 @@ struct RemoteLibraryTests {
     @Test("The count beside Songs is the length of the list a phone is given, not the number of files")
     func songCountMatchesTheList() async throws {
         let (library, root) = try await library(songs: ["Tide", "Tide (5.1)", "Harbor"])
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         #expect(RemoteBridge.overview(of: library).songs == 3)
         // Two of the files are one song's versions: the list has it once, and the count follows the list.
         let listed = RemoteBridge.songs(of: library, surround: true, oneCopyEach: { $0.filter { $0.title != "Tide (5.1)" } })
@@ -73,7 +73,7 @@ struct RemoteLibraryTests {
     @Test("A search answers in groups, and only with what matches every word")
     func findsInGroups() async throws {
         let (library, root) = try await library(songs: ["Night Train", "Night Owl", "Morning"])
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         _ = library.createPlaylist(name: "Late Night", trackIDs: [])
         _ = library.createPlaylist(name: "Sunday")
         func find(_ text: String, limit: Int = 50) -> SearchResults {
@@ -111,7 +111,7 @@ struct RemoteLibraryTests {
     @Test("Songs are added to a playlist in the order sent, a new playlist is listed at once, and bad requests are refused")
     func playlists() async throws {
         let (library, root) = try await library(songs: ["One", "Two", "Three"])
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let songs = RemoteBridge.songs(of: library)
         let ids = try #require(songs.map(\.id) as? [Int64])
         let cover: (Track) -> String? = { _ in nil }
@@ -165,7 +165,7 @@ struct RemoteLibraryTests {
         // One album in two folders, as a hi-res download and its Atmos mix sit in a library, and a song in one copy.
         let (library, root) = try await library(songs: ["Evening (2021) [ALAC 24-96]/Harbor", "Evening (2021) [Dolby Atmos]/Harbor",
                                                         "Evening (2021) [ALAC 24-96]/Lanterns"])
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         // Each copy keeps its own heart here; hearts shared by a song's versions have their own test below.
         library.combinesVersions = false
         try await set("album = 'Evening', albumArtist = 'The Vesper Quartet', codec = 'ALAC', isLossless = 1, bitDepth = 24, sampleRate = 96000",
@@ -221,7 +221,7 @@ struct RemoteLibraryTests {
     func versionsAcrossEditionsAreOneSong() async throws {
         // The stereo album and its Atmos mix tagged as an album of its own, as stores sell them, and a song only one has.
         let (library, root) = try await library(songs: ["Evening/Harbor", "Evening Atmos/Harbor", "Evening/Lanterns"])
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         try await set("album = 'Evening', albumArtist = 'The Vesper Quartet', codec = 'ALAC', isLossless = 1, bitDepth = 24, sampleRate = 96000",
                       whereIn: "/Evening/", of: library)
         try await set("album = 'Evening (Dolby Atmos)', albumArtist = 'The Vesper Quartet', codec = 'Dolby Atmos', isLossless = 0, bitDepth = NULL, bitrate = 768, channels = 6, sampleRate = 48000",
@@ -284,7 +284,7 @@ struct RemoteLibraryTests {
     @Test("Genres, Recently Added and Sources list what the Mac's own pages list")
     func sections() async throws {
         let (library, root) = try await library(songs: ["Low Tide/One", "Low Tide/Two", "Glass Orchard/Three", "Fieldwork/Four"])
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         try await set("album = 'Low Tide', albumArtist = 'Marisol Vance', genre = 'Folk; Jazz', addedAt = '2026-01-01 10:00:00.000'", whereIn: "/Low Tide/", of: library)
         try await set("album = 'Glass Orchard', albumArtist = 'The Quiet Engines', genre = 'jazz', addedAt = '2026-03-01 10:00:00.000'", whereIn: "/Glass Orchard/", of: library)
         try await set("album = 'Fieldwork', albumArtist = 'Theo Lindqvist', addedAt = '2026-02-01 10:00:00.000'", whereIn: "/Fieldwork/", of: library)

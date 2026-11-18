@@ -30,7 +30,7 @@ struct RendererMissingTests {
     private func fixture(_ body: (PlayerController, [Track], AppSettings) async throws -> Void) async throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-renderer-missing-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let url = root.appendingPathComponent("sample.wav")
         do {
             let file = try AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatLinearPCM,
