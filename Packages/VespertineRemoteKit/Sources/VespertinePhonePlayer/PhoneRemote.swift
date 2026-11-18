@@ -63,8 +63,18 @@ public struct PhoneSignal: Equatable, Sendable {
     public var channels: Int
     /// The rate the output runs at, when known.
     public var outputRate: Double?
-    /// iOS changes the rate between the two.
-    public var resampled: Bool { outputRate.map { $0 > 0 && abs($0 - streamRate) > 0.5 } ?? false }
+    /// A rate the output was asked for that iOS hasn't been seen to give or refuse yet (`OutputState.pendingRate`).
+    public var pendingRate: Double?
+    /// The rate the output is being switched to while it still runs at another: `outputRate` is then on its way out, and
+    /// is not said to be where the output settled.
+    public var switchingTo: Double? {
+        guard let pendingRate, let outputRate, abs(outputRate - pendingRate) > 0.5 else { return nil }
+        return pendingRate
+    }
+    /// The output runs at another rate than the song's, settled or not.
+    private var rateDiffers: Bool { outputRate.map { $0 > 0 && abs($0 - streamRate) > 0.5 } ?? false }
+    /// iOS changes the rate between the two. Not said while the output is still switching: iOS hasn't answered yet.
+    public var resampled: Bool { switchingTo == nil && rateDiffers }
     /// For a surround song: how it is being played (`.off` is the fold to stereo). nil for stereo and mono.
     public var surround: SpatialModeChoice?
     /// For a surround song on an interface with more than two outputs: how many outputs it plays on, a channel each.
@@ -114,7 +124,7 @@ public struct PhoneSignal: Equatable, Sendable {
     /// ever set for a DAC that passed the DoP test here. nil: PCM.
     public var dsdRate: Double?
     /// Sent as DoP, but the output isn't at the carrier rate or the volume isn't at its top: the DAC isn't getting DSD.
-    public var dopBroken: Bool { dsdRate != nil && (resampled || volumeReduced) }
+    public var dopBroken: Bool { dsdRate != nil && (rateDiffers || volumeReduced) }
     /// The phone holds the file itself, as it is on the Mac or the share: nothing was converted or cut out for it.
     public var original: Bool
     /// Vespertine is changing the samples on purpose (a gain, an equalizer, anything of the kind). Whatever does so sets
@@ -134,9 +144,15 @@ public struct PhoneSignal: Equatable, Sendable {
     /// at the DAC. Anything unknown (the rate, the volume) counts against it, and so does Bluetooth, AirPlay or the
     /// speaker, where iOS always converts.
     public var untouched: Bool {
+        guard wouldBeUntouchedAtFullVolume, let volume, volume >= 0.995 else { return false }
+        return true
+    }
+
+    /// Everything `untouched` asks for except the volume: with the volume at its top the DAC would get the song's own
+    /// samples. What the Output screen uses to say that the volume is the one thing in the way.
+    public var wouldBeUntouchedAtFullVolume: Bool {
         guard original, lossless, dsdRate == nil, !processed, surround == nil, discreteOutputs == nil, systemChannels == nil, onDAC else { return false }
-        guard let outputRate, outputRate > 0, !resampled, outputChannels == channels else { return false }
-        guard let volume, volume >= 0.995 else { return false }
+        guard let outputRate, outputRate > 0, !rateDiffers, outputChannels == channels else { return false }
         return true
     }
 
@@ -162,6 +178,15 @@ public struct PhoneSignal: Equatable, Sendable {
         onDAC = route.map { !$0.hasFixedRate } ?? false
     }
 
+    /// The song as it meets one reading of the output: the route, the volume and the rate asked for all come from the
+    /// same look at iOS.
+    public init(stream: StreamDescriptor, output: OutputState) {
+        self.init(stream: stream, route: output.route)
+        volume = output.volume
+        pendingRate = output.pendingRate
+        systemRendering = output.rendering
+    }
+
     /// "24/96", "16/44.1", or "48 kHz" for lossy audio.
     public var streamFormat: String {
         // DoP frames are 24-bit samples at the carrier rate only as packaging: the song is DSD.
@@ -184,12 +209,34 @@ import VespertineChannels
 @Observable
 public final class PhoneRemote {
     public let playback: PhonePlayback
-    /// Where the sound goes (the app keeps it current from the audio session).
-    public var route: PhoneRoute? { didSet { applySurround(); if route != oldValue { playback.outputChanged() } } }
+    /// What the output is doing, as iOS reports it: where the sound goes, the rate and channels it runs at, the volume,
+    /// how iOS renders, and a rate that is still on its way. One reading (`OutputWatch` keeps it current from the audio
+    /// session), so what is said about the volume is never older than what is said about the output.
+    public var output = OutputState() {
+        didSet {
+            guard output != oldValue else { return }
+            if output.route != oldValue.route { applySurround() }
+            // The volume and the output decide together whether a DAC is sent DoP: told once, with both as they are now.
+            if output.route != oldValue.route || output.volume != oldValue.volume { playback.outputChanged() }
+            // A new output may want a song's other version: the songs still to come follow it.
+            if output.route != oldValue.route { followOutput() }
+        }
+    }
+    /// Where the sound goes.
+    public var route: PhoneRoute? {
+        get { output.route }
+        set { output.route = newValue }
+    }
     /// The Mac's name, for "Waiting for … to connect" while a song waits for it.
     public var macName: String?
     /// The device's own volume, 0…1, when known (the app keeps it current): shown, never changed from here.
-    public var outputVolume: Double? { didSet { if outputVolume != oldValue { playback.outputChanged() } } }
+    public var outputVolume: Double? {
+        get { output.volume }
+        set { output.volume = newValue }
+    }
+    /// Reads the output from iOS again, now, and returns it (the system glue answers; nil before it is running). The DoP
+    /// test looks at the output through this, as everything else does.
+    @ObservationIgnored public var readOutput: ((OutputWatch.Occasion) -> OutputState)?
     /// The DACs whose DoP test you answered (the app keeps them between launches).
     public var dopDACs = DoPDACs() { didSet { if dopDACs != oldValue { onDoPDACsChanged?(dopDACs); playback.outputChanged() } } }
     @ObservationIgnored public var onDoPDACsChanged: ((DoPDACs) -> Void)?
@@ -197,10 +244,41 @@ public final class PhoneRemote {
     public var dopCeiling: Double? { DoPGate.ceiling(route: route, volume: outputVolume, dacs: dopDACs) }
     /// How you want surround songs played: folded to stereo until you choose a rendering for headphones. The output
     /// decides what it gets (`PhoneRoute.surroundMode`).
-    public var surroundChoice: SpatialModeChoice = .off { didSet { applySurround() } }
+    public var surroundChoice: SpatialModeChoice = .off { didSet { applySurround(); if surroundChoice != oldValue { followOutput() } } }
+    /// A song the library has in stereo and in surround plays as the version for this phone's output (`PhoneVersions`).
+    /// Off, every song plays as the version asked for.
+    public var combinesVersions = true { didSet { if combinesVersions != oldValue { followOutput() } } }
+    /// Whether the output gets a song's surround version (`PhoneRoute.wantsSurround`): stereo while nothing is known of it.
+    public var wantsSurround: Bool {
+        route?.wantsSurround(wanted: surroundChoice, canTrackHead: playback.player.canTrackHead) ?? false
+    }
+    /// The songs of the queue that play as picked by hand (the copies sheet): the output leaves them alone.
+    @ObservationIgnored private var pinned = Set<Int64>()
+    /// The album the queue was started as (`PhoneVersions.album`), while everything added since is of it too.
+    @ObservationIgnored private var queueAlbum: String?
 
-    /// What iOS says it renders the app's audio as (the app keeps it current from the audio session).
-    public var systemRendering: SystemRenderingMode?
+    /// `tracks` as the versions that play on this output.
+    private func versions(_ tracks: [TrackSummary], startAt index: Int? = nil) -> (tracks: [TrackSummary], startAt: Int?) {
+        guard combinesVersions else { return (tracks, index) }
+        return PhoneVersions.resolve(tracks, surround: wantsSurround, startAt: index)
+    }
+
+    /// The output changed: the songs still to come become the versions for it. The song playing stays as it is.
+    private func followOutput() {
+        guard combinesVersions else { return }
+        let surround = wantsSurround, pinned = pinned
+        let oneAlbum = queueAlbum
+        playback.retrackUpcoming { entry in
+            guard let id = entry.track.id, !pinned.contains(id) else { return nil }
+            return PhoneVersions.changed(entry.track, surround: surround, oneAlbum: oneAlbum)
+        }
+    }
+
+    /// What iOS says it renders the app's audio as.
+    public var systemRendering: SystemRenderingMode? {
+        get { output.rendering }
+        set { output.rendering = newValue }
+    }
 
     private func applySurround() {
         let path = route.map { $0.surroundPath(wanted: surroundChoice, canTrackHead: playback.player.canTrackHead) }
@@ -273,20 +351,24 @@ public final class PhoneRemote {
         case .clearUpcoming: playback.clearUpcoming()
 
         case .playAlbum(let key, let startAt, let shuffled):
-            return await play(.albumTracks(key: key)) { self.playback.play($0, startAt: startAt, shuffled: shuffled) }
+            return await play(.albumTracks(key: key)) { self.start($0, startAt: startAt, shuffled: shuffled) }
         case .playTracks(let ids, let startAt, let shuffled):
-            return await play(.tracks(ids: ids)) { self.playback.play($0, startAt: startAt, shuffled: shuffled) }
+            return await play(.tracks(ids: ids)) { self.start($0, startAt: startAt, shuffled: shuffled) }
         case .playCopy(let ids, let startAt):
-            // The songs by their own IDs are the very copies asked for.
-            return await play(.tracks(ids: ids)) { self.playback.play($0, startAt: startAt, shuffled: false) }
+            // The songs by their own IDs are the very copies asked for, whatever the output: they stay those copies.
+            return await play(.tracks(ids: ids)) {
+                self.pinned = Set($0.compactMap(\.id))
+                self.queueAlbum = nil
+                self.playback.play($0, startAt: startAt, shuffled: false)
+            }
         case .playPlaylist(let id, let startAt, let shuffled):
             // A page at a time: a long playlist in one reply would be more than a message holds.
             let songs = await PlaylistPages.load(id: id, ask: library)
-            return await play(songs) { self.playback.play($0, startAt: startAt ?? 0, shuffled: shuffled) }
+            return await play(songs) { self.start($0, startAt: startAt ?? 0, shuffled: shuffled) }
         case .playNext(let ids):
-            return await play(.tracks(ids: ids)) { self.playback.playNext($0) }
+            return await play(.tracks(ids: ids)) { self.playback.playNext(self.adding($0)) }
         case .addToQueue(let ids):
-            return await play(.tracks(ids: ids)) { self.playback.addToQueue($0) }
+            return await play(.tracks(ids: ids)) { self.playback.addToQueue(self.adding($0)) }
         case .playAlbums(let keys, let shuffled):
             var all: [TrackSummary] = []
             for key in keys {
@@ -297,7 +379,7 @@ public final class PhoneRemote {
                 }
             }
             guard !all.isEmpty else { return .failed(reason: "") }
-            playback.play(all, shuffled: shuffled)
+            start(all, shuffled: shuffled)
 
         case .volume, .setVolume, .setTransitions:
             // The phone's volume is the phone's own (its buttons); transitions are the Mac player's.
@@ -306,6 +388,24 @@ public final class PhoneRemote {
             return await library(command)
         }
         return .ok
+    }
+
+    /// Starts `tracks` in place of the queue, each song as the version for this output.
+    private func start(_ tracks: [TrackSummary], startAt index: Int = 0, shuffled: Bool? = nil) {
+        pinned = []
+        queueAlbum = PhoneVersions.album(of: tracks)
+        let playing = versions(tracks, startAt: index)
+        playback.play(playing.tracks, startAt: playing.startAt ?? 0, shuffled: shuffled)
+    }
+
+    /// Songs added to the queue, each as the version for this output.
+    private func adding(_ tracks: [TrackSummary]) -> [TrackSummary] {
+        if playback.queue.entries.isEmpty { queueAlbum = PhoneVersions.album(of: tracks) }
+        else if let album = queueAlbum, tracks.contains(where: { $0.albumKey != album }) { queueAlbum = nil }
+        let playing = versions(tracks).tracks
+        // A song that went to another edition takes the queue off the one album.
+        if let album = queueAlbum, playing.contains(where: { $0.albumKey != album }) { queueAlbum = nil }
+        return playing
     }
 
     private func play(_ ask: RemoteCommand, then start: ([TrackSummary]) -> Void) async -> RemoteReply {
@@ -330,7 +430,7 @@ public final class PhoneRemote {
 
     public var signal: PhoneSignal? {
         playback.stream.map { stream in
-            var signal = PhoneSignal(stream: stream, route: route)
+            var signal = PhoneSignal(stream: stream, output: output)
             switch playback.player.rendering {
             case .untouched: signal.surround = nil
             case .downmix: signal.surround = .off
@@ -342,9 +442,6 @@ public final class PhoneRemote {
                 signal.surround = nil
                 signal.discreteOutputs = outputs
             }
-            // What iOS says it renders the app's audio as, for every song: the fold's "Stereo" is as much a fact as Spatial Audio.
-            signal.systemRendering = systemRendering
-            signal.volume = outputVolume
             signal.dacPassedAtRate = dopDACs.passed(at: stream.format.sampleRate, for: route?.uid)
             // ReplayGain multiplies every sample: the song is no longer the file's own samples while it does.
             signal.replayGain = playback.appliedGain?.decibels

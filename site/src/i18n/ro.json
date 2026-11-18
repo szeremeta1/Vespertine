@@ -165,7 +165,7 @@
         "links": [
           "Grupurile de boxe în detaliu"
         ],
-        "alt": "Editorul de grupuri de boxe din Vespertine pentru un quad: un desen al camerei văzut de sus, cu patru boxe în jurul locului de ascultare, și distanța, unghiul, întârzierea și nivelul fiecăreia.",
+        "alt": "Editorul de grupuri de boxe din Vespertine pentru un quad: o cameră desenată în trei dimensiuni, cu patru boxe pe stative în jurul locului de ascultare, și lățimea, adâncimea și înălțimea tavanului camerei.",
         "floatAlt": "Harta canalelor: fiecare canal al fiecărei ieșiri atribuit unei boxe, cu un buton „Identify” și o casetă „Inverted” la fiecare canal.",
         "floatCaption": "Harta canalelor"
       },
@@ -274,7 +274,8 @@
           "Partajări de rețea prin SMB, NFS sau WebDAV, cu cache, Păstrează offline și redare concepută pentru servere lente: piesele sunt preîncărcate pe Mac înainte de a fi redate, iar între timp butonul de redare afișează un inel de încărcare.",
           "Găsește muzică caută pe toate unitățile muzica reală și lasă deoparte fișierele inutile. O scurtă configurare la prima lansare alege ieșirea și explică ce fac accesul exclusiv și ReplayGain.",
           "EQ parametric pentru fiecare ieșire, care importă presetări AutoEQ și Equalizer APO. Dezactivat implicit; când este activat, calea semnalului afișează <span class=\"mono nowrap\">EGALIZATOR</span> în loc de <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Mini player, pictogramă în bara de meniu, taste media, ReplayGain și actualizări automate, semnate."
+          "Mini player, pictogramă în bara de meniu, taste media, ReplayGain și actualizări automate, semnate.",
+          "Opționale și dezactivate până le activați: playere de rețea (UPnP) și receptoare AirPlay ca ieșiri, propriul server OpenSubsonic în bara laterală, o telecomandă pentru telefon sau pentru orice browser din rețeaua dvs., un vizualizator și tranziții între melodii."
         ],
         "links": [
           "Toate funcțiile, în detaliu"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Poate reda în streaming de pe Qobuz, TIDAL sau Apple Music?",
-          "a": "Nu. Vespertine redă muzica pe care o dețineți, de pe Mac, de pe unități externe sau de pe o partajare de rețea. Descărcările din abonamentul Apple Music protejate prin DRM nu pot fi redate."
+          "a": "Nu dintr-un serviciu comercial: Vespertine nu are client pentru Qobuz, TIDAL sau Apple Music, iar descărcările Apple Music protejate prin DRM nu pot fi redate. Redă muzica pe care o dețineți, de pe Mac, de pe unități externe sau de pe o partajare de rețea. Două funcții beta opționale adaugă propriul server OpenSubsonic (Navidrome și altele) și muzica trimisă de aplicațiile de control UPnP."
         },
         {
           "q": "De unde știu că este cu adevărat bit-perfect?",

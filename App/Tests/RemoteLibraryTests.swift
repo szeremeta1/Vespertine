@@ -240,6 +240,9 @@ struct RemoteLibraryTests {
         #expect(asked[2].versions.map(\.id) == [single.id] && asked[2].key == nil)
         #expect(TrackVersions.choose(asked[0].versions, multichannel: true)?.id == atmos.id)
         #expect(TrackVersions.choose(asked[0].versions, multichannel: false)?.id == stereo.id)
+        // A phone that plays on itself is told each song's other version, and picks by its own output.
+        #expect(RemoteBridge.otherLayouts(of: [stereo, atmos, single], in: library).map { $0?.id } == [atmos.id, stereo.id, nil])
+        #expect(RemoteBridge.otherLayouts(of: [stereo], in: library, acrossEditions: false).map { $0?.id } == [nil], "an album's page is that edition")
         // Several songs of one album are that edition as it was opened; one song by itself, or songs of both, follow the output.
         #expect(PlayerController.keepsToOneAlbum([stereo, single]))
         #expect(!PlayerController.keepsToOneAlbum([stereo]))
@@ -264,6 +267,7 @@ struct RemoteLibraryTests {
         #expect(library.favoriteIDs == [stereoID])
         #expect(library.songs(listing: all).count == 3)
         #expect(library.playbackSongs(of: [stereo]).map { $0.versions.map(\.id) } == [[stereo.id]])
+        #expect(RemoteBridge.otherLayouts(of: [stereo, atmos], in: library).map { $0?.id } == [nil, nil])
     }
 
     @Test("Genres, Recently Added and Sources list what the Mac's own pages list")

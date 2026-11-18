@@ -46,6 +46,27 @@ Every number and word of the test is in `DoPTestConstants.swift`. The words are 
 
 An unknown DAC that offers 176.4 kHz or more and whose maker is on `makers` gets the card's text changed from a plain offer to "<maker> makes DACs that play DSD, so this one may take DoP", with the same test button. DSD still converts to PCM until the user taps it; nothing is switched on silently.
 
+## 4. The test on the iPhone and iPad
+
+The phone has no list and no hint. A DAC gets DSD as DoP only after it passed the listening test on that phone (Output › Play DSD natively? › Test DoP; `PhoneDoP.swift`, `PhoneDoPProbe.swift`), and the answer is kept by iOS's identifier for that output. The test differs from the Mac's in what iOS lets an app know and do:
+
+- **It asks nothing of the volume.** iOS gives an app no way to set an output's volume, and no way to learn that an output's volume is fixed. On a DAC whose level is set on the DAC itself, iOS's number can sit below 100% and can't be moved. So the test runs at whatever the volume is, notes it, and counts only if the output, its rate and that volume stayed as they were from the first frame to the last.
+- **One second of DSD silence comes first**, sent as valid DoP frames, so a DAC that takes a moment to lock onto DoP has locked before the chord begins.
+- **The question is "What did you hear?"**, with the rate named the way a DAC's display names it: "DSD64 (176.4 kHz carrier)". The answers:
+  - **Music**: the rate passed. A DAC can only play the chord if every frame reached it as sent. Heard with the volume below 100%, it also shows that this volume level changes nothing the DAC gets, and that level is kept with the result.
+  - **Hiss or noise**: with the volume at 100%, the rate did not pass. With the volume below 100% it proves nothing (iOS scaling the samples sounds the same), so nothing is saved and the listener is asked to set the volume to 100% and test again.
+  - **Heard nothing**: the rate plays once more. Nothing twice at the first rate ends the test with nothing saved; at a later rate it is kept as "No sound at" for that rate, which is not a pass and not a failed test.
+  - **Play again**: plays the rate again and saves nothing.
+- After Music at 176.4 kHz the same chord follows at 192, 352.8 and 384 kHz with the same question. A rate the DAC won't run at is kept as declined without a question.
+
+When DSD is then sent as DoP (`DoPGate.ceiling`): only to a DAC that passed, only up to the highest rate below the first that didn't pass, and only while the volume is out of the way: at 100%, or at exactly the level at which this DAC played the chord. At any other level, or with a volume iOS doesn't report, DSD is PCM. Nothing here is taken from a DAC's name, and no DAC is sent DoP untested.
+
+A DSD song that plays as PCM says why, on Now Playing and in Output ("DSD played as PCM", then the reason): the output can't be tested, the DAC hasn't passed yet, it didn't pass, the volume was below 100%, it hasn't passed at this song's rate, it wouldn't run at the rate DoP needs, or it was running at another rate when the song was lined up behind another. While a DoP song is being made ready the screen says "Preparing DSD for your DAC (DoP)…", and "Converting DSD to PCM on the Mac…" (or "on this device") only when that is what is happening.
+
+For a DAC that played the chord below 100%, the app shows "Volume is set on the DAC" in place of a volume slider and a percentage while iOS's volume is at that level, and the original-file badges no longer treat that level as a reduced volume.
+
 ## What was not verified
 
 Written without a USB DAC attached: the I/O Registry lookup of USB IDs (`USBIdentity`), the engine playing the clip to a real DAC, the hardware-volume cap on real DACs, and the sheet's behaviour in the running app were not exercised. Name matching, the list, signatures, the cache, the hint rules, the answer's persistence, the cap, the fade-in and the misread-level bound are unit-tested.
+
+The iPhone's test (part 4) was written without a DAC attached to a phone: what a FiiO K11 and a Fosi ZD3 do with the lead-in, at each rate, and what iOS reports as their volume, are bench rows B8 and B16 in [the iPhone bench](IOS-AUDIO-BENCH.md). Its rules (what is saved for each answer, the volume that counts, the reasons) are unit-tested.

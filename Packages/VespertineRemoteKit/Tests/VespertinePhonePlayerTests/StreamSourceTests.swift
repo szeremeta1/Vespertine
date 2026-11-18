@@ -128,8 +128,10 @@ struct StreamSourceTests {
         try await untilAReadWaits(source)
         mac.allowAll()
         #expect(try await reading.value == data[50_250..<50_750])
-        // It did not wait for the fifty chunks before it: its chunk is the next one asked for.
-        #expect(mac.offsets.prefix(3).contains(50_000))
+        // It did not wait for the fifty chunks before it: its chunk is one of the next two asked for. Two reads run at a
+        // time, and the two that follow the ones in flight are asked together: the read's own chunk and the one after it,
+        // in either order.
+        #expect(mac.offsets.prefix(4).contains(50_000))
         // And the gap is still filled in afterwards.
         try await source.waitUntilComplete(timeout: 30)
         source.close()

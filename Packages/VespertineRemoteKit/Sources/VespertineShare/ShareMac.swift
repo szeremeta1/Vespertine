@@ -150,6 +150,16 @@ public final class ShareMac: RemoteChannel {
     private let now: @Sendable () -> Date
 
     private var favorites: Set<Int64>
+    /// A song the share has in stereo and in surround is one song (`ShareVersions`): listed once, one heart, and the
+    /// phone's output picks the version that plays. Off, every file is its own song.
+    public var combinesVersions = true {
+        didSet {
+            guard combinesVersions != oldValue else { return }
+            catalog = ShareCatalog(library, favorites: favorites, words: sayings.words, combinesVersions: combinesVersions)
+            revision += 1
+            onChange?()
+        }
+    }
     private var isOpen = false
     private var scanning: Task<Void, Never>?
     private var stop: StopFlag?
@@ -191,7 +201,7 @@ public final class ShareMac: RemoteChannel {
         self.now = now
         favorites = store.favorites()
         library = store.library() ?? ShareLibrary()
-        catalog = ShareCatalog(library, favorites: favorites, words: sayings.words)
+        catalog = ShareCatalog(library, favorites: favorites, words: sayings.words, combinesVersions: combinesVersions)
     }
 
     // MARK: RemoteChannel
@@ -343,7 +353,7 @@ public final class ShareMac: RemoteChannel {
         store.save(scanned)
         guard changed else { return }
         store.clearCovers()
-        catalog = ShareCatalog(scanned, favorites: favorites, words: sayings.words)
+        catalog = ShareCatalog(scanned, favorites: favorites, words: sayings.words, combinesVersions: combinesVersions)
         revision += 1
     }
 
@@ -358,7 +368,7 @@ public final class ShareMac: RemoteChannel {
     private func show(_ partial: ShareLibrary) {
         guard library.scanned == nil, partial.scanned == nil, partial.songs.count > library.songs.count else { return }
         library = partial
-        catalog = ShareCatalog(partial, favorites: favorites, words: sayings.words)
+        catalog = ShareCatalog(partial, favorites: favorites, words: sayings.words, combinesVersions: combinesVersions)
     }
 
     private func noteReachable(_ value: Bool) {
@@ -474,7 +484,7 @@ public final class ShareMac: RemoteChannel {
         guard library.songs.contains(where: { $0.id == song.id }) else { return }
         library.songs.removeAll { $0.id == song.id }
         store.save(library)
-        catalog = ShareCatalog(library, favorites: favorites, words: sayings.words)
+        catalog = ShareCatalog(library, favorites: favorites, words: sayings.words, combinesVersions: combinesVersions)
         revision += 1
         onChange?()
     }
@@ -575,7 +585,8 @@ public final class ShareMac: RemoteChannel {
         case .setFavorite(let ids, let on):
             let known = ids.filter { catalog.songs[$0] != nil }
             guard !known.isEmpty else { return .failed(reason: sayings.notInLibrary) }
-            if on { favorites.formUnion(known) } else { favorites.subtract(known) }
+            // A heart is the song's: taking it off one version takes it off the other.
+            if on { favorites.formUnion(known) } else { favorites.subtract(catalog.withVersions(known)) }
             store.save(favorites: favorites)
             catalog.setFavorite(known, on)
             return .ok
@@ -599,12 +610,12 @@ public final class ShareMac: RemoteChannel {
             let theirs = catalog.albums.map(\.summary).filter { $0.artist == name }
             return .albums(items: theirs, total: theirs.count)
         case .favorites:
-            return .tracks(items: catalog.allTracks.filter(\.favorite))
+            return .tracks(items: catalog.listedTracks.filter(\.favorite))
         case .library:
             let source = SourceSummary(id: 1, name: sourceName, kind: .network, online: reachable ?? true, scanning: isScanning,
                                        albumCount: catalog.albums.count, detail: "")
-            return .library(LibraryOverview(albums: catalog.albums.count, artists: catalog.artists.count, songs: catalog.tracks.count,
-                                            genres: catalog.genres.count, favorites: catalog.tracks.values.filter(\.favorite).count, playlists: 0,
+            return .library(LibraryOverview(albums: catalog.albums.count, artists: catalog.artists.count, songs: catalog.tracks.count - catalog.unlisted.count,
+                                            genres: catalog.genres.count, favorites: catalog.listedTracks.filter(\.favorite).count, playlists: 0,
                                             sources: [source]))
         case .genres:
             return .genres(items: catalog.genres)

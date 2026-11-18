@@ -6,8 +6,8 @@
 import { links } from './app';
 import { compare } from './content';
 
-/** When docs/COMPARISON.md was last updated (its room-correction row); the other cells were checked 9 to 14 October 2026. */
-export const CHECKED = { iso: '2026-10-29', text: '29 October 2026', cells: '9 to 14 October 2026' };
+/** When the table last changed (its room-correction row); the cells were checked 9 to 14 October 2026 and all again on 17 November 2026. */
+export const CHECKED = { iso: '2026-10-29', text: '29 October 2026', cells: '9 to 14 October 2026, and all again on 17 November 2026' };
 
 export type Rival = {
   slug: string;

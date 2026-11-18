@@ -20,7 +20,8 @@ SHIPPED_MARKDOWN = {"THIRD-PARTY-NOTICES.md"}
 # App code: a change to any of these runs the App and the Engine macOS jobs, always. Directories and files by name...
 APP_CODE_DIRS = ("App/", "Packages/", "Driver/", "Helper/", "RemoteApp/")
 APP_CODE_FILES = {"project.yml", "Package.swift", "Package.resolved", "LICENSE", ".github/workflows/ci.yml",
-                  "scripts/ci-changes.py", "scripts/test-ci-changes.py", "scripts/generate-project.sh", "scripts/check-lockfiles.py"}
+                  "scripts/ci-changes.py", "scripts/test-ci-changes.py", "scripts/generate-project.sh", "scripts/check-lockfiles.py",
+                  "scripts/ci-pick-runners.py"}
 # ...and, as a net for a directory that doesn't exist yet, by extension anywhere outside the DOCS above and these, which
 # have rules of their own: verification/ (its harness has a macOS job), tests/ (C audits, the Engine job only) and
 # scripts/ (tools and release scripts, listed by name above when the app job reads them).

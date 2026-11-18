@@ -168,6 +168,8 @@ struct OutputsView: View {
                 }
             }
             .feedback(feedback)
+            // The screen that speaks about the output reads it as it comes up, not from whatever was last heard.
+            .onAppear { _ = session.phone?.readOutput?(.shown) }
             .sheet(isPresented: $editingConnection) { MacConnectionView(serverID: session.pairing.serverID).withoutMiniPlayer() }
             .sheet(isPresented: $showingSettings) { SettingsView().withoutMiniPlayer() }
         }

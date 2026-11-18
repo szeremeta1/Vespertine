@@ -207,9 +207,17 @@ public struct TrackSummary: Codable, Sendable, Equatable, Identifiable {
     /// Every copy of the song in the library, this one among them, on lists that show a song once however many copies
     /// it has (Favorites); nil for a song in one copy, on lists of files, and from an older Mac.
     public var copies: [TrackCopy]?
+    /// Whether this is a surround version (5.1, Dolby Atmos) rather than a stereo one; nil when the library didn't say
+    /// (an older Mac).
+    public var surround: Bool?
+    /// The song's version in the other layout (the Dolby Atmos mix of a stereo track, the stereo track of an Atmos
+    /// mix), when the library has one and treats the two as one song: a phone that plays the song itself picks between
+    /// them by its own output. nil for a song in one layout, and where versions aren't combined.
+    public var otherLayout: TrackVersion?
 
     public init(id: Int64?, title: String, artist: String, album: String, albumKey: String, duration: Double,
-                trackNumber: Int?, discNumber: Int?, format: String, artworkKey: String?, favorite: Bool, copies: [TrackCopy]? = nil) {
+                trackNumber: Int?, discNumber: Int?, format: String, artworkKey: String?, favorite: Bool, copies: [TrackCopy]? = nil,
+                surround: Bool? = nil, otherLayout: TrackVersion? = nil) {
         self.id = id
         self.title = title
         self.artist = artist
@@ -222,6 +230,39 @@ public struct TrackSummary: Codable, Sendable, Equatable, Identifiable {
         self.artworkKey = artworkKey
         self.favorite = favorite
         self.copies = copies
+        self.surround = surround
+        self.otherLayout = otherLayout
+    }
+
+    /// The song as its version in the other layout, with this one as that version's other layout, so the choice can be
+    /// made again when the output changes. nil without one.
+    public var asOtherLayout: TrackSummary? {
+        guard let other = otherLayout, let id, let surround else { return nil }
+        return TrackSummary(id: other.id, title: title, artist: artist, album: other.album, albumKey: other.albumKey, duration: other.duration,
+                            trackNumber: trackNumber, discNumber: discNumber, format: other.format, artworkKey: other.artworkKey,
+                            favorite: favorite, copies: copies, surround: !surround,
+                            otherLayout: TrackVersion(id: id, album: album, albumKey: albumKey, duration: duration, format: format, artworkKey: artworkKey))
+    }
+}
+
+/// A song's version in the other speaker layout, as much of it as differs from the song listed: see
+/// `TrackSummary.otherLayout`.
+public struct TrackVersion: Codable, Sendable, Equatable {
+    public var id: Int64
+    public var album: String
+    public var albumKey: String
+    public var duration: Double
+    /// "Dolby Atmos · 768k · 5.1"
+    public var format: String
+    public var artworkKey: String?
+
+    public init(id: Int64, album: String, albumKey: String, duration: Double, format: String, artworkKey: String?) {
+        self.id = id
+        self.album = album
+        self.albumKey = albumKey
+        self.duration = duration
+        self.format = format
+        self.artworkKey = artworkKey
     }
 }
 
