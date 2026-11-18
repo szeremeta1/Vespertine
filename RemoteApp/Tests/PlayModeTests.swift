@@ -48,6 +48,14 @@ import Testing
         #expect(volume.shown(reported: 0.4) == 0.7)
     }
 
+    @Test func aLevelIOSNeverReportedIsNotShownAsZero() {
+        let volume = DeviceVolume()
+        #expect(volume.label(reported: nil) == "—")
+        #expect(volume.label(reported: 0.3) == DeviceVolume.percent(0.3))
+        volume.drag(to: 0.7)
+        #expect(volume.label(reported: nil) == DeviceVolume.percent(0.7))
+    }
+
     @Test func aDragSetsTheSystemVolumeAtEveryStep() {
         let volume = DeviceVolume()
         var set: [Double] = []
