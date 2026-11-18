@@ -106,12 +106,31 @@ struct SystemVolumeHandle: UIViewRepresentable {
 struct DeviceVolumeRow: View {
     /// The volume iOS reports (`AVAudioSession.outputVolume`), nil before it has said.
     let reported: Double?
+    /// This DAC's volume is set on the DAC (`DoPGate.Level.dac`): iOS's level changes nothing it gets, so no slider and
+    /// no percentage are shown for it.
+    var onDAC = false
     var volume = DeviceVolume.shared
 
     var body: some View {
+        if onDAC {
+            HStack(spacing: 12) {
+                Label(PlayTarget.volumeOnDAC, systemImage: "dial.medium")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityIdentifier("volume-on-dac")
+                RoutePickerButton().frame(width: 44, height: 44)
+                    .accessibilityIdentifier("airplay")
+            }
+            .font(.footnote)
+            .foregroundStyle(Palette.text2)
+        } else {
+            slider
+        }
+    }
+
+    private var slider: some View {
         let level = volume.shown(reported: reported)
         let known = volume.held != nil || reported != nil
-        HStack(spacing: 12) {
+        return HStack(spacing: 12) {
             Image(systemName: level <= 0 ? "speaker.slash.fill" : "speaker.fill")
                 .frame(width: 36, height: 44)
                 .accessibilityHidden(true)

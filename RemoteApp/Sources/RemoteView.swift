@@ -187,7 +187,7 @@ struct MiniPlayer: View {
                         VStack(alignment: .leading, spacing: 1) {
                             Text(track.title).font(.serif(.subheadline, weight: .medium)).foregroundStyle(Palette.text).lineLimit(1)
                             if let converting = session.phone?.playback.preparing {
-                                Text(NowPlayingView.converting(progress: converting.progress)).font(.caption).foregroundStyle(Palette.brass).lineLimit(1)
+                                Text(PlayTarget.preparing(converting.kind, progress: converting.progress, share: session.isShare)).font(.caption).foregroundStyle(Palette.brass).lineLimit(1)
                             } else {
                                 Text(track.artist).font(.caption).foregroundStyle(Palette.text2).lineLimit(1)
                             }

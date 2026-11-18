@@ -70,6 +70,9 @@ public struct DoPOutput {
     public var bring: @MainActor (_ carrier: Double) async -> Bool = { _ in false }
     /// The output wouldn't run at `carrier`: told so it isn't asked again.
     public var declined: @MainActor (_ carrier: Double) -> Void = { _ in }
+    /// Why a DSD song whose DoP needs `carrier` (nil: not known) is asked for as PCM right now; nil when it is asked
+    /// for as DoP, or nothing here can say (`DoPGate.reason`).
+    public var reason: @MainActor (_ carrier: Double?) -> DoPGate.PCMReason? = { _ in nil }
 
     public init() {}
 
@@ -98,8 +101,28 @@ public final class PhonePlayback {
     public private(set) var nowPlaying: PhoneQueue.Entry?
     /// What the Mac is sending for it: the original file or a FLAC it made, and the format.
     public private(set) var stream: StreamDescriptor?
-    /// The Mac is converting the song before it can send it; `progress` 0…1 when the Mac knows.
-    public private(set) var preparing: (entry: String, progress: Double?)?
+    /// What the wait for a song is, as far as the phone knows from what it asked for.
+    public struct Preparing: Equatable, Sendable {
+        public enum Kind: Equatable, Sendable {
+            /// A file the phone can't open is being converted to one it can.
+            case conversion
+            /// A DSD song asked for as DoP: its own DSD bits are being packed into frames for the DAC.
+            case dop
+            /// A DSD song asked for as PCM, and why when that is known.
+            case dsdAsPCM(DoPGate.PCMReason?)
+        }
+        public var entry: String
+        /// 0…1 when the Mac knows.
+        public var progress: Double?
+        public var kind: Kind
+    }
+
+    /// The Mac is preparing the song before it can send it.
+    public private(set) var preparing: Preparing?
+    /// Why each open DSD song that arrived as PCM did, by queue entry.
+    private var pcmReasons: [String: DoPGate.PCMReason] = [:]
+    /// The song being heard is DSD played as PCM: why. nil for a song that isn't, and when nothing here can say.
+    public var dsdAsPCM: DoPGate.PCMReason? { nowPlaying.flatMap { pcmReasons[$0.id] } }
     /// The last thing that went wrong, in words.
     public private(set) var notice: String?
     /// Where the song was when that last changed otherwise than by playing on (`positionAt`): see `PositionAnchor`.
@@ -319,9 +342,12 @@ public final class PhonePlayback {
                     let ready = dop.ceiling() != nil ? await dop.bring(carrier) : false
                     guard !Task.isCancelled, nowPlaying?.id == entry.id else { return }
                     if !ready {
+                        // Asked for and not given: the DAC declined the rate. Otherwise the output stopped taking
+                        // DoP while the song was being opened (the volume moved, another output), and says why.
+                        let why = dop.ceiling() != nil ? DoPGate.PCMReason.declined : dop.reason(carrier)
                         if dop.ceiling() != nil { dop.declined(carrier) }
                         drop(entry.id)
-                        opened = try await self.opened(entry, plain: true)
+                        opened = try await self.opened(entry, plain: true, why: why)
                         guard !Task.isCancelled, nowPlaying?.id == entry.id else { return }
                     }
                 }
@@ -349,7 +375,8 @@ public final class PhonePlayback {
 
     /// The stream for `entry`: the one already open, or a new one (asking again while the Mac converts).
     /// `ahead`: the song is opened while another plays. `plain`: never as DoP.
-    private func opened(_ entry: PhoneQueue.Entry, ahead: Bool = false, plain: Bool = false) async throws -> Open {
+    /// `why`: for a DSD song opened `plain`, why it isn't DoP.
+    private func opened(_ entry: PhoneQueue.Entry, ahead: Bool = false, plain: Bool = false, why: DoPGate.PCMReason? = nil) async throws -> Open {
         if let have = open[entry.id] { return have }
         // One being opened that was let go of meanwhile is no use: it is closed when it gets here.
         if let running = opening[entry.id], !running.isCancelled { return try await running.value }
@@ -362,7 +389,27 @@ public final class PhonePlayback {
         let task = Task { [weak self] () throws -> Open in
             guard let self else { throw CancellationError() }
             let ceiling = plain ? nil : (ahead ? DoPGate.aheadCeiling(ceiling: dop.ceiling(), outputRate: dop.rate()) : dop.ceiling())
-            let descriptor = try await openStream(song: song, entry: entry.id, dop: ceiling)
+            // What is being waited for, from what is asked: a DSD song as DoP, a DSD song as PCM (and why), or a
+            // conversion of some other file.
+            let carrier = DoPGate.carrier(format: entry.track.format)
+            var reason: DoPGate.PCMReason?
+            var kind = Preparing.Kind.conversion
+            if let carrier {
+                if let ceiling, carrier <= ceiling + 0.5 {
+                    kind = .dop
+                } else {
+                    // Lined up behind a song at another rate: the output can't change under the song being heard.
+                    reason = why ?? dop.reason(carrier) ?? (ahead && !plain ? .ahead : nil)
+                    kind = .dsdAsPCM(reason)
+                }
+            }
+            let descriptor = try await openStream(song: song, entry: entry.id, dop: ceiling, kind: kind)
+            if carrier != nil, descriptor.dsdRate == nil {
+                // PCM came although DoP was asked for (a Mac that sends none, a rate above what was offered).
+                pcmReasons[entry.id] = reason ?? dop.reason(carrier) ?? .rate
+            } else {
+                pcmReasons[entry.id] = nil
+            }
             let client = self.client
             let number = descriptor.stream
             // Nobody wants it any more (another song was chosen while the Mac was opening this one): give it back.
@@ -395,7 +442,7 @@ public final class PhonePlayback {
         return result
     }
 
-    private func openStream(song: Int64, entry: String, dop: Double? = nil) async throws -> StreamDescriptor {
+    private func openStream(song: Int64, entry: String, dop: Double? = nil, kind: Preparing.Kind = .conversion) async throws -> StreamDescriptor {
         let deadline = ContinuousClock.now + preparingTimeout
         defer { if preparing?.entry == entry { preparing = nil } }
         while true {
@@ -405,7 +452,7 @@ public final class PhonePlayback {
             switch await client.open(song: song, maxSampleRate: maxSampleRate(), dop: dop) {
             case .streamOpened(let descriptor): return descriptor
             case .streamPreparing(let progress):
-                if nowPlaying?.id == entry { preparing = (entry, progress) }
+                if nowPlaying?.id == entry { preparing = Preparing(entry: entry, progress: progress, kind: kind) }
                 guard ContinuousClock.now < deadline else { throw Failure.stillPreparing }
                 try await Task.sleep(for: pollInterval)
             case .failed(let reason): throw Failure.refused(reason)
@@ -441,7 +488,8 @@ public final class PhonePlayback {
             // DoP frames at another rate than the output runs at would be played as noise while the rate changed: PCM then.
             if opened.descriptor.dsdRate != nil, !dop.runs(at: opened.descriptor.format.sampleRate) || dop.ceiling() == nil {
                 drop(next.id)
-                guard let plain = try? await self.opened(next, ahead: true, plain: true), !Task.isCancelled else { return }
+                let why = dop.ceiling() == nil ? dop.reason(opened.descriptor.format.sampleRate) : DoPGate.PCMReason.ahead
+                guard let plain = try? await self.opened(next, ahead: true, plain: true, why: why), !Task.isCancelled else { return }
                 opened = plain
             }
             let applied = await gain(for: next, opened)
@@ -464,6 +512,7 @@ public final class PhonePlayback {
 
     /// Closes the streams of every entry but `keeping`. A song that arrived whole stays on the phone as a file.
     private func release(keeping: Set<String>) {
+        for entry in pcmReasons.keys where !keeping.contains(entry) { pcmReasons[entry] = nil }
         for (entry, task) in opening where !keeping.contains(entry) { task.cancel() }
         for (entry, stream) in open where !keeping.contains(entry) {
             open[entry] = nil

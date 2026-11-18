@@ -116,7 +116,11 @@ public struct PhoneSignal: Equatable, Sendable {
     /// The device's own volume, 0…1, when known.
     public var volume: Double?
     /// The volume isn't at its top: what reaches a DAC is not the song's own samples.
-    public var volumeReduced: Bool { volume.map { $0 < 0.995 } ?? false }
+    public var volumeReduced: Bool { !volumeOnDAC && (volume.map { $0 < 0.995 } ?? false) }
+    /// This DAC played the DoP test's chord with iOS's volume at the level it is at now, below the top
+    /// (`DoPDACs.heardBelowTop`): that level changes nothing the DAC gets, so its volume is set on the DAC and iOS's
+    /// number is not a volume to speak of. Evidence from this DAC on this phone, never from its name.
+    public var volumeOnDAC = false
     /// The output is one that can run at a song's own rate (a DAC, the headphone adapter), where the volume and the rate
     /// decide whether it gets the song's samples as they are.
     public var onDAC = false
@@ -144,8 +148,8 @@ public struct PhoneSignal: Equatable, Sendable {
     /// at the DAC. Anything unknown (the rate, the volume) counts against it, and so does Bluetooth, AirPlay or the
     /// speaker, where iOS always converts.
     public var untouched: Bool {
-        guard wouldBeUntouchedAtFullVolume, let volume, volume >= 0.995 else { return false }
-        return true
+        guard wouldBeUntouchedAtFullVolume else { return false }
+        return volumeOnDAC || (volume.map { $0 >= 0.995 } ?? false)
     }
 
     /// Everything `untouched` asks for except the volume: with the volume at its top the DAC would get the song's own
@@ -310,6 +314,10 @@ public final class PhoneRemote {
         playback.maxSampleRate = { [weak self] in self?.route?.conversionCap }
         playback.dop.ceiling = { [weak self] in self?.dopCeiling }
         playback.dop.rate = { [weak self] in self?.route?.sampleRate }
+        playback.dop.reason = { [weak self] carrier in
+            guard let self else { return nil }
+            return DoPGate.reason(route: route, volume: outputVolume, dacs: dopDACs, carrier: carrier)
+        }
         playback.dop.declined = { [weak self] carrier in
             guard let self, let uid = route?.uid else { return }
             dopDACs.declined(carrier, uid: uid)
@@ -443,6 +451,7 @@ public final class PhoneRemote {
                 signal.discreteOutputs = outputs
             }
             signal.dacPassedAtRate = dopDACs.passed(at: stream.format.sampleRate, for: route?.uid)
+            signal.volumeOnDAC = signal.onDAC && dopDACs.heardBelowTop(at: output.volume, for: route?.uid)
             // ReplayGain multiplies every sample: the song is no longer the file's own samples while it does.
             signal.replayGain = playback.appliedGain?.decibels
             signal.replayGainHasNothing = playback.replayGainHasNothing
