@@ -234,6 +234,99 @@ import VespertineRemoteProtocol
         }
     }
 
+    // TestFlight ACYG3aqcmGHtjCSJhP8P45c: the alert said "384 kHz" where the DAC's display says DSD128.
+    @Test func theTestNamesTheRateTheWayTheDacDoes() {
+        #expect(PlayTarget.dopRate(carrier: 384_000) == "DSD128 (384 kHz carrier)")
+        #expect(PlayTarget.dopRate(carrier: 176_400) == "DSD64 (176.4 kHz carrier)")
+        #expect(PlayTarget.dopRate(carrier: 192_000) == "DSD64 (192 kHz carrier)")
+        #expect(PlayTarget.dopRate(carrier: 352_800) == "DSD128 (352.8 kHz carrier)")
+    }
+
+    @Test func aRunThatKeptNothingSaysSoAndNeverCallsSilenceAFailedTest() {
+        #expect(PlayTarget.dopEnding(.on, carrier: 176_400) == nil && PlayTarget.dopEnding(.off, carrier: 176_400) == nil)
+        let silent = PlayTarget.dopEnding(.silent, carrier: 176_400)
+        #expect(silent == "No sound at DSD64 (176.4 kHz carrier). That is not a failed DoP test, and nothing was saved.")
+        let unsure = PlayTarget.dopEnding(.inconclusive, carrier: 176_400)
+        #expect(unsure?.contains("Set the volume to 100%, then test again") == true && unsure?.contains("Nothing was saved") == true)
+    }
+
+    @Test func noSoundAtARateHasItsOwnRow() {
+        var dacs = DoPDACs()
+        var run = DoPTestRun(uid: "usb:k11", name: "K11")
+        for heard in [DoPTestRun.Heard.music, .nothing, .nothing, .music, .noise] { _ = run.heard(heard, into: &dacs) }
+        let rows = PlayTarget.dopRows(dacs, route: tested)
+        #expect(rows.first { $0.label == "DoP passed at" }?.value == "176.4, 352.8 kHz")
+        #expect(rows.first { $0.label == "No sound at" }?.value == "192 kHz")
+        #expect(rows.first { $0.label == "DoP not passed at" }?.value == "384 kHz")
+    }
+
+    // TestFlight AIPS3rYlDtQxr7x-IBSUOr0: a DAC whose volume is set on the DAC. Decided from the chord it played with
+    // iOS's volume below the top, never from its name.
+    private let zd3 = PhoneRoute(name: "ZD3", portType: "USBAudio", sampleRate: 192_000, channels: 2, spatial: false, uid: "usb:zd3")
+    private var heardAt30: DoPDACs {
+        var dacs = DoPDACs()
+        var run = DoPTestRun(uid: "usb:zd3", name: "ZD3", volume: 0.3)
+        _ = run.heard(.music, into: &dacs)
+        return dacs
+    }
+
+    @Test func aDacThatSetsItsOwnVolumeIsSaidToEverywhereAVolumeWouldBe() {
+        var said = original(on: zd3, volume: 0.3)
+        said.volumeOnDAC = heardAt30.heardBelowTop(at: 0.3, for: zd3.uid)
+        #expect(said.volumeOnDAC)
+        // No "volume 30%" on the chip, no "changed by the volume" row, and the volume row says where it is set.
+        #expect(PlayTarget.output(said) == "192 kHz")
+        let rows = PlayTarget.report(said, route: zd3, dop: heardAt30)
+        #expect(rows.first { $0.label == "Volume" }?.value == "Set on the DAC")
+        #expect(rows.first { $0.label == "Original file" }?.value == "No processing")
+        #expect(PlayTarget.badge(said) == "ORIGINAL FILE · NO PROCESSING")
+        #expect(PlayTarget.volumeOnDAC == "Volume is set on the DAC")
+        // The same DAC at a level the chord wasn't heard at: iOS's volume is a volume again.
+        var moved = original(on: zd3, volume: 0.5)
+        moved.volumeOnDAC = heardAt30.heardBelowTop(at: 0.5, for: zd3.uid)
+        #expect(PlayTarget.output(moved) == "192 kHz · volume 50%" && PlayTarget.badge(moved) == "ORIGINAL FILE")
+        // And another DAC at 30% is not helped by this one's test.
+        var other = original(on: tested, volume: 0.3)
+        other.volumeOnDAC = heardAt30.heardBelowTop(at: 0.3, for: tested.uid)
+        #expect(!other.volumeOnDAC && PlayTarget.badge(other) == "ORIGINAL FILE")
+    }
+
+    @Test func theDoPResultLineFollowsWhatTheVolumeIsKnownToDo() {
+        let on = "DoP is on for this DAC."
+        #expect(PlayTarget.dopResult(heardAt30, output: OutputState(route: zd3, volume: 0.3)) == on)
+        #expect(DoPGate.level(OutputState(route: zd3, volume: 0.3), dacs: heardAt30) == .dac)
+        #expect(PlayTarget.dopResult(heardAt30, output: OutputState(route: zd3, volume: 1)) == on)
+        #expect(PlayTarget.dopResult(heardAt30, output: OutputState(route: zd3, volume: 0.5)) == "DSD is sent as PCM while the volume is below 100%.")
+        #expect(PlayTarget.dopResult(results, output: OutputState(route: tested, volume: 1)) == on)
+        #expect(PlayTarget.dopResult(results, output: OutputState(route: tested, volume: 0.3)) == "DSD is sent as PCM while the volume is below 100%.")
+        #expect(PlayTarget.dopResult(DoPDACs(), output: OutputState(route: tested, volume: 1)) == nil)
+        var hiss = DoPDACs()
+        hiss.record(.hiss, uid: "usb:k11", name: "K11")
+        #expect(PlayTarget.dopResult(hiss, output: OutputState(route: tested, volume: 1)) == "DoP stays off for this DAC. DSD keeps playing as PCM.")
+    }
+
+    // TestFlight AB79Gu1HWKT1C1C9lmqSb_A: "Converting on the Mac… 1%" for a DSD64 song on a DAC that passed the test.
+    @Test func theWaitForADsdSongSaysWhatIsBeingDone() {
+        #expect(PlayTarget.preparing(.dop, progress: nil) == "Preparing DSD for your DAC (DoP)…")
+        #expect(PlayTarget.preparing(.dop, progress: 0.01) == "Preparing DSD for your DAC (DoP)… 1%")
+        #expect(PlayTarget.preparing(.dsdAsPCM(.volume), progress: 0.42) == "Converting DSD to PCM on the Mac… 42%")
+        #expect(PlayTarget.preparing(.dsdAsPCM(nil), progress: nil, share: true) == "Converting DSD to PCM on this device…")
+        // Anything else (DTS, WavPack…) is the conversion it always was.
+        #expect(PlayTarget.preparing(.conversion, progress: 0.42) == "Converting on the Mac… 42%")
+        #expect(!PlayTarget.preparing(.dop, progress: 0.5).contains("Converting"))
+    }
+
+    @Test func everyReasonDsdIsPlayedAsPCMHasItsOwnWords() {
+        let all: [DoPGate.PCMReason] = [.notADAC, .notTested, .failedTest, .volume, .rate, .declined, .ahead]
+        let words = all.map(PlayTarget.pcmReason)
+        #expect(Set(words).count == all.count && words.allSatisfy { !$0.isEmpty && !$0.hasSuffix(".") })
+        #expect(PlayTarget.pcmReason(.volume) == "The volume was below 100%")
+        #expect(PlayTarget.pcmReason(.notTested) == "This DAC hasn’t passed the DoP test yet")
+        let rows = PlayTarget.report(original(on: tested), route: tested, dsdAsPCM: .declined)
+        #expect(rows.first { $0.label == "DSD played as PCM" }?.value == "The DAC wouldn’t run at the rate DoP needs")
+        #expect(!PlayTarget.report(original(on: tested), route: tested).contains { $0.label == "DSD played as PCM" })
+    }
+
     @Test func theOutputScreenListsTheRatesTheDacPassedTheDoPTestAt() {
         let rows = PlayTarget.report(original(on: tested), route: tested, dop: results)
         #expect(rows.first { $0.label == "DoP passed at" }?.value == "176.4, 192 kHz")
