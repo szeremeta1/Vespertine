@@ -12,6 +12,9 @@ import Testing
     private let keyA = Data(repeating: 0xA1, count: 32)
     private let keyB = Data(repeating: 0xB2, count: 32)
 
+    // HelloProof is HMAC-SHA256 from CryptoKit, which the Linux build of this package doesn't have (the Mac and the
+    // phone both do). The message-shape test below needs no CryptoKit and runs everywhere.
+    #if canImport(CryptoKit)
     @Test func aPhoneWithItsOwnKeyIsLetInAndCountsAsProved() {
         let proof = HelloProof.make(key: keyA, serverID: mac, device: "phone-a")
         #expect(proof.count == 32)
@@ -48,6 +51,8 @@ import Testing
         #expect(HelloProof.verdict(proof: Data(), key: keyA, serverID: mac, device: "phone-a", provedBefore: false) == .refused)
         #expect(HelloProof.verdict(proof: proof + [0], key: keyA, serverID: mac, device: "phone-a", provedBefore: false) == .refused)
     }
+
+    #endif
 
     /// A Mac from before the proof decodes a hello that carries one (it ignores the field), and a hello without one is
     /// byte for byte what it always was.
