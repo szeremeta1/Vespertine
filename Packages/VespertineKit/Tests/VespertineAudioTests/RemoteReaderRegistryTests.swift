@@ -174,11 +174,15 @@ private final class WaitingReader: RemoteCacheReader, @unchecked Sendable {
     /// Asked each time the cache looks (nil: this source can't say).
     var quiet: (@Sendable () -> TimeInterval?)?
     var quietFor: TimeInterval? { condition.withLock { quiet }?() }
-    /// Called once, when a read first waits: the moment a test may move the cache's clock past the limit.
-    var whenWaiting: (@Sendable () -> Void)?
+    /// Called once, when a read first waits: the moment a test may move the cache's clock past the limit. Given when the reader
+    /// is made, never after: a cache starts copying the moment it is handed the reader, so a hook set after that could be set
+    /// after the first read had already begun to wait, and the clock would then never move.
+    private var whenWaiting: (@Sendable () -> Void)?
     var fileExtension: String { "flac" }
     var size: Int64 { Int64(bytes.count) }
-    init(_ bytes: Data, message: String? = nil) { self.bytes = bytes; notAnsweringMessage = message }
+    init(_ bytes: Data, message: String? = nil, whenWaiting: (@Sendable () -> Void)? = nil) {
+        self.bytes = bytes; notAnsweringMessage = message; self.whenWaiting = whenWaiting
+    }
     func read(at offset: Int64, count: Int) throws -> Data {
         if offset >= 4096 {
             let first = condition.withLock { () -> (@Sendable () -> Void)? in defer { whenWaiting = nil }; return whenWaiting }
@@ -211,9 +215,8 @@ struct RemoteReaderCancelTests {
         // A copy whose reads never come back fails with "not answering" after the no-progress limit, and lets its reader go.
         let clock = RunawayClock()
         let quiet = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096, noProgressLimit: 5, clock: { clock.now })
-        let silent = WaitingReader(Data(repeating: 2, count: 64 << 10))
+        let silent = WaitingReader(Data(repeating: 2, count: 64 << 10), whenWaiting: { clock.run() })
         let stuck = try quiet.entry(key: "b", url: URL(string: "x-remote://b")!, reader: silent)
-        silent.whenWaiting = { clock.run() }
         #expect(throws: (any Error).self) { try stuck.prepare(full: true, lead: 0, cancelled: { false }) }
         #expect(silent.wasCancelled)
     }
@@ -226,8 +229,7 @@ struct RemoteReaderCancelTests {
         for message in ["Service X isn't answering", nil] as [String?] {
             let clock = RunawayClock()
             let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096, noProgressLimit: 5, clock: { clock.now })
-            let reader = WaitingReader(Data(repeating: 3, count: 64 << 10), message: message)
-            reader.whenWaiting = { clock.run() }
+            let reader = WaitingReader(Data(repeating: 3, count: 64 << 10), message: message, whenWaiting: { clock.run() })
             let entry = try cache.entry(key: "m", url: URL(string: "x-remote://m")!, reader: reader)
             do {
                 try entry.prepare(full: true, lead: 0, cancelled: { false })
@@ -270,14 +272,14 @@ struct RemoteReaderCancelTests {
             let clock = Locked((now: 0.0, running: false))
             let now: @Sendable () -> TimeInterval = { clock.withLock { if $0.running { $0.now += 1 }; return $0.now } }
             let cache = NetworkPlaybackCache(directory: dir, budget: 64 << 20, chunk: 4096, noProgressLimit: test.cache, clock: now)
-            let reader = WaitingReader(Data(repeating: 4, count: 64 << 10), message: "Service Z isn't answering")
+            let reader = WaitingReader(Data(repeating: 4, count: 64 << 10), message: "Service Z isn't answering",
+                                       whenWaiting: { clock.withLock { $0.running = true } })
             reader.silenceLimit = test.own
             switch test.quiet {
             case .unknown: reader.quiet = nil
             case .fixed(let seconds): reader.quiet = { seconds }
             case .sinceAsked: reader.quiet = { clock.withLock { $0.now } }   // the clock starts when the read waits
             }
-            reader.whenWaiting = { clock.withLock { $0.running = true } }
             let entry = try cache.entry(key: "limit-\(index)", url: URL(string: "x-remote://limit-\(index)")!, reader: reader)
             do {
                 try entry.prepare(full: true, lead: 0, cancelled: { false })

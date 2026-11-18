@@ -185,14 +185,19 @@ final class PlayPauseRig: @unchecked Sendable {
     var audibleFrames: Int { outputs.withLock { $0.reduce(0) { $0 + $1.audible } } }
     var elapsed: String { String(format: "%5.2f", Date().timeIntervalSince(t0)) }
 
+    /// Seconds the machine has been awake: what a window of watching is measured in. The wall clock (`Date`) also counts the time
+    /// a Mac sleeps and is stepped when its clock is set, while a sleeping thread, the output and the song all stand still then,
+    /// so a window measured by it can come out seconds longer than anything had time to play in.
+    static var awake: TimeInterval { ProcessInfo.processInfo.systemUptime }
+
     /// Watches for `seconds`: the engine's snapshot at the end, and how far the playhead and the sound went.
     /// The waits here are `Task.sleep`, never `Thread.sleep`: this suite runs for minutes, and a test that sleeps on a thread holds one
     /// of the few Swift concurrency threads (one per core) all that time, which on a small CI machine starves every other test.
     func observe(_ seconds: Double) async -> Observation {
-        let p0 = engine.snapshot.position, a0 = audibleFrames, began = Date()
+        let p0 = engine.snapshot.position, a0 = audibleFrames, began = Self.awake
         try? await Task.sleep(for: .seconds(seconds))
         let s = engine.snapshot
-        let seconds = Date().timeIntervalSince(began)
+        let seconds = Self.awake - began
         return Observation(state: s.state, buffering: s.isBuffering, fraction: s.bufferingFraction, positionMoved: s.position - p0,
                            audibleSeconds: Double(audibleFrames - a0) / Self.rate, window: seconds)
     }
@@ -230,10 +235,10 @@ final class PlayPauseRig: @unchecked Sendable {
 
     /// `observe` for a script thread.
     func observeBlocking(_ seconds: Double) -> Observation {
-        let p0 = engine.snapshot.position, a0 = audibleFrames, began = Date()
+        let p0 = engine.snapshot.position, a0 = audibleFrames, began = Self.awake
         Thread.sleep(forTimeInterval: seconds)
         let s = engine.snapshot
-        let window = Date().timeIntervalSince(began)
+        let window = Self.awake - began
         return Observation(state: s.state, buffering: s.isBuffering, fraction: s.bufferingFraction, positionMoved: s.position - p0,
                            audibleSeconds: Double(audibleFrames - a0) / Self.rate, window: window)
     }
@@ -252,11 +257,11 @@ final class PlayPauseRig: @unchecked Sendable {
     /// settled, not one that was true for a moment on the way (a pause that a queued resume is about to undo). For a script thread.
     func settledBlocking(timeout: Double, hold: Double, _ condition: (EngineSnapshot) -> Bool) -> Bool {
         let end = Date().addingTimeInterval(timeout)
-        var since: Date?
+        var since: TimeInterval?
         while Date() < end {
             if condition(engine.snapshot) {
-                since = since ?? Date()
-                if Date().timeIntervalSince(since!) >= hold { return true }
+                since = since ?? Self.awake
+                if Self.awake - since! >= hold { return true }
             } else { since = nil }
             Thread.sleep(forTimeInterval: 0.005)
         }
