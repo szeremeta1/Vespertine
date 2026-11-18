@@ -296,43 +296,28 @@ struct TrackTableSortTests {
         #expect(Array(table.selectedRowIndexes) == [7])
     }
 
-    // DIAGNOSTIC (temporary, removed before merge): the CI sequence of main 43af78c, two tables, several times.
-    @Test("DIAG two tables")
-    func diagTwoTables() async throws {
+    /// A table outlives its window for a while (a page closed, a window shut), and goes on following the app's
+    /// selection. On CI (main 43af78c) the closed window of the test before still held a song it had selected out of
+    /// sight, and handed it back as part of the next table's selection. Only a table on screen sets the app's selection.
+    @Test("A table whose window has closed follows the app's selection and never sets it")
+    func closedTableNeverSetsTheSelection() async throws {
+        let tracks = try SortFixture.library(3000)
+        let rig = try await makeRig(tracks)
+        let table = rig.table
         let model = try #require(LibraryStartup.current?.model)
         let before = model.selectedTrackIDs
         defer { model.selectedTrackIDs = before }
-        var report: [String] = []
-        for round in 0..<5 {
-            let big = try SortFixture.library(20_000)
-            let a = try await makeRig(big)
-            await settle(1)
-            let natural = topRows(a.table)
-            let time = try #require(a.table.tableColumns.last?.sortDescriptorPrototype)
-            a.table.sortDescriptors = [time]
-            await until { topRows(a.table) != natural }
-            await settle(0.3)
-            a.table.sortDescriptors = [try #require(a.table.tableColumns.first?.sortDescriptorPrototype)]
-            var line = "r\(round):"
-            for row in [2, 7, 11] {
-                a.table.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
-                line += " sel\(row)->\(model.selectedTrackIDs.sorted())"
-                await settle(0.5)
-                line += "/\(model.selectedTrackIDs.sorted()) A\(Array(a.table.selectedRowIndexes))"
-            }
-            line += " landed=\(topRows(a.table) == natural)"
-            a.window.close()
-            let tracks = try SortFixture.library(3000)
-            let b = try await makeRig(tracks)
-            line += " Bopen model\(model.selectedTrackIDs.sorted()) B\(Array(b.table.selectedRowIndexes)) A\(Array(a.table.selectedRowIndexes))"
-            b.table.selectRowIndexes(IndexSet([2, 40]), byExtendingSelection: false)
-            for _ in 0..<60 where model.selectedTrackIDs != [3, 41] { await settle(0.05) }
-            await settle(1)
-            line += " after model\(model.selectedTrackIDs.sorted()) B\(Array(b.table.selectedRowIndexes)) A\(Array(a.table.selectedRowIndexes))"
-            b.window.close()
-            report.append(line)
-            await settle(0.5)
-        }
-        Issue.record("x: error: DIAG \(report.joined(separator: " || "))")
+
+        table.selectRowIndexes(IndexSet(integer: 4), byExtendingSelection: false)
+        let chosen: Set<Int64> = [try #require(tracks[4].id)]
+        await until { model.selectedTrackIDs == chosen }
+        try #require(model.selectedTrackIDs == chosen, "on screen, the table sets the app's selection")
+
+        rig.window.close()
+        table.selectRowIndexes(IndexSet(integer: 9), byExtendingSelection: false)
+        await settle(0.5)
+        #expect(model.selectedTrackIDs == chosen, "selected songs \(model.selectedTrackIDs.sorted())")
+        await until { Array(table.selectedRowIndexes) == [4] }
+        #expect(Array(table.selectedRowIndexes) == [4], "it goes back to following the app's selection")
     }
 }
