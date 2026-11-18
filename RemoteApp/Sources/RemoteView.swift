@@ -301,8 +301,16 @@ struct ConnectionBanner: View {
     @State private var demoNoticeOpen = false
 
     var body: some View {
-        if session.isShare { shareBanner } else { macBanner }
+        // Several libraries open as one: the Mac's news, then each share's and folder's.
+        VStack(spacing: 0) {
+            if !session.isShare { macBanner }
+            ForEach(model.openFolders) { folder in sourceBanner(id: folder.id, name: folder.name, folder: folder) }
+            ForEach(model.openShares) { share in sourceBanner(id: share.id, name: share.name, folder: nil) }
+        }
     }
+
+    /// The Mac's own connection: the session itself, or the Mac among several libraries open as one.
+    private var mac: RemoteSession { model.macSession ?? session }
 
     /// A banner's words beside its buttons; at the accessibility text sizes the buttons go under the words, which then
     /// have the whole width and are never cut short.
@@ -323,15 +331,15 @@ struct ConnectionBanner: View {
     }
 
     /// A share has no Mac to wait for: what is said is the first scan going on, or why the share can't be used.
-    @ViewBuilder private var shareBanner: some View {
-        let status = model.shareStatus
-        if let trouble = status?.trouble, session.isFolder {
+    @ViewBuilder private func sourceBanner(id: String, name: String, folder: SavedFolder?) -> some View {
+        let status = model.statuses[id]
+        if let trouble = status?.trouble, let folder {
             // A folder's trouble ends in what to do, and the way to do it is here.
             VStack(alignment: .leading, spacing: 8) {
                 Text(trouble).font(.footnote)
                 HStack(spacing: 16) {
-                    Button("Try Again") { model.rescanShare() }.disabled(status?.scan.isRunning ?? false)
-                    if let folder = model.openFolder, !folder.isOwn { ChooseFolderAgainButton(folder: folder) }
+                    Button("Try Again") { model.rescan(id) }.disabled(status?.scan.isRunning ?? false)
+                    if !folder.isOwn { ChooseFolderAgainButton(folder: folder) }
                     Spacer(minLength: 0)
                     Button("Libraries") { model.leave() }
                 }
@@ -344,20 +352,20 @@ struct ConnectionBanner: View {
             notice {
                 Text(trouble).font(.footnote)
             } buttons: {
-                Button("Try Again") { model.rescanShare() }.font(.footnote.weight(.medium))
+                Button("Try Again") { model.rescan(id) }.font(.footnote.weight(.medium))
                     .disabled(status?.scan.isRunning ?? false)
                 Button("Libraries") { model.leave() }.font(.footnote.weight(.medium))
             }
             .accessibilityIdentifier("share-trouble")
         } else if let status, status.scanned == nil, case .scanning(let songs) = status.scan {
-            banner(Text("Reading “\(session.pairing.name)” for the first time. Songs found so far: \(songs.formatted())", comment: "Banner on the iPhone while an SMB share is scanned for the first time. The first %@ is the share's name, the second a count of songs that goes up."), busy: true)
+            banner(Text("Reading “\(name)” for the first time. Songs found so far: \(songs.formatted())", comment: "Banner on the iPhone while an SMB share is scanned for the first time. The first %@ is the share's name, the second a count of songs that goes up."), busy: true)
                 .accessibilityIdentifier("share-scanning")
         }
     }
 
     private var macBanner: some View {
         Group {
-            switch session.phase {
+            switch mac.phase {
             case .connected where session.isDemo && !model.showsDemoNotice:
                 EmptyView()
             case .connected where session.isDemo:
@@ -365,13 +373,13 @@ struct ConnectionBanner: View {
             case .connected, .closed:
                 EmptyView()
             case .connecting:
-                banner(Text("Connecting to “\(session.pairing.name)”…"), busy: true)
+                banner(Text("Connecting to “\(mac.pairing.name)”…"), busy: true)
             case .unreachable:
                 unreachable
             case .unpaired:
                 VStack(spacing: 8) {
-                    Text("“\(session.pairing.name)” no longer knows this device. Pair it again from the Mac’s Settings › Remote.")
-                    Button("Pair Again") { model.forget(session.pairing) }
+                    Text("“\(mac.pairing.name)” no longer knows this device. Pair it again from the Mac’s Settings › Remote.")
+                    Button("Pair Again") { model.forget(mac.pairing) }
                         .buttonStyle(.borderedProminent)
                 }
                 .font(.callout).padding().frame(maxWidth: .infinity).background(Palette.surface)
@@ -380,8 +388,8 @@ struct ConnectionBanner: View {
                 banner(Text("This version of Vespertine on this device doesn’t match Vespertine on the Mac. Update both to the latest version."), busy: false)
             }
         }
-        .sheet(isPresented: $editing) { MacConnectionView(serverID: session.pairing.serverID) }
-        .onChange(of: session.isConnected) { _, connected in if connected { patient = true } }
+        .sheet(isPresented: $editing) { MacConnectionView(serverID: mac.pairing.serverID) }
+        .onChange(of: mac.isConnected) { _, connected in if connected { patient = true } }
     }
 
     /// The demo's bar. At the accessibility text sizes its words, squeezed beside the button, ran to ten lines and took
@@ -424,8 +432,8 @@ struct ConnectionBanner: View {
     }
 
     @ViewBuilder private var unreachable: some View {
-        let name = session.pairing.name
-        let trouble = model.trouble(reaching: session.pairing.serverID)
+        let name = mac.pairing.name
+        let trouble = model.trouble(reaching: mac.pairing.serverID)
         if Self.waitsQuietly(trouble, patient: patient) {
             banner(Text("Waiting for “\(name)”…", comment: "Connection banner on the iPhone for the first seconds after the Mac stops answering (it may just be restarting). %@ is the Mac's name."), busy: true)
                 .task {

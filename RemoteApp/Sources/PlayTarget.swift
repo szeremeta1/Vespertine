@@ -50,6 +50,8 @@ final class PlayTarget {
 
     /// The choice kept from an earlier launch, or Off for someone who never made one.
     static func replayGain(stored: String?) -> ReplayGainChoice { stored.flatMap(ReplayGainChoice.init(rawValue:)) ?? .off }
+    /// Told when who plays was changed (the lists of several libraries as one follow it).
+    @ObservationIgnored var onChoice: (() -> Void)?
     /// Why songs aren't fetched right now (cellular data with playing over it turned off), or nil.
     @ObservationIgnored var holdReason: String?
     /// How much has been fetched from the Mac for playing here since the app opened.
@@ -82,6 +84,7 @@ final class PlayTarget {
         if !thisDevice { made?.remote.playback.stop() }
         onThisDevice = thisDevice
         UserDefaults.standard.set(thisDevice, forKey: Self.key)
+        onChoice?()
     }
 
     /// The session is over (another Mac was chosen, or none): the phone stops and lets go of its streams.

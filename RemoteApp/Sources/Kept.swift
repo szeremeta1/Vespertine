@@ -89,6 +89,16 @@ final class KeptShelf {
         }
     }
 
+    /// A library that was open by itself is now one of several open as one (`session`): what was kept from it is
+    /// taken in under its joined names, with nothing fetched again.
+    func adopt(serverID: String, slot: Int, into session: RemoteSession) {
+        let old = Self.folder(serverID)
+        guard serverID != session.pairing.serverID, FileManager.default.fileExists(atPath: old.path), let keeper = keeper(for: session) else { return }
+        keepers[serverID] = nil
+        keeper.store.adopt(old, slot: slot)
+        keeper.resume()
+    }
+
     /// The Mac was forgotten: what was kept from it goes too.
     func forget(serverID: String) {
         keepers[serverID] = nil

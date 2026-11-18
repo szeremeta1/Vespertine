@@ -19,6 +19,13 @@ final class RemoteAppModel {
     let search = DiscoveryPatience()
     private(set) var pairings: [SavedPairing]
     private(set) var session: RemoteSession?
+    /// The Mac among the libraries that are open together, when there is one: its own connection. `session` is then
+    /// all of them as one library.
+    private(set) var macSession: RemoteSession?
+    /// The Macs, shares and folders the library is made of, by their IDs. Kept between launches.
+    private(set) var inUse: [String] = []
+    /// The list of libraries is showing over the open library, to choose what it is made of.
+    var choosingLibraries = false
     /// The SMB shares this device plays from by itself, without a Mac.
     private(set) var shares: [SavedShare]
     /// The folders of music on this device that were added from Files.
@@ -27,8 +34,8 @@ final class RemoteAppModel {
     private(set) var ownFolderInUse: Bool
     /// Why a file opened in Vespertine from another app couldn't be played, for an alert.
     var openedFileTrouble: String?
-    /// What the open share or folder is doing (scanning, not answering), for the screens; nil when a Mac or nothing is open.
-    private(set) var shareStatus: ShareStatus?
+    /// What each open share or folder is doing (scanning, not answering), by its ID, for the screens.
+    private(set) var statuses: [String: ShareStatus] = [:]
     /// Goes up when the open share's library changed under the screens (a scan found new or changed songs).
     private(set) var libraryRevision = 0
     /// A pairing link opened from the Camera app or scanned, waiting for its Mac to show up on Bonjour.
@@ -51,18 +58,28 @@ final class RemoteAppModel {
     @ObservationIgnored private let keychain = PairingKeychain()
     @ObservationIgnored private let shareKeychain = ShareKeychain()
     @ObservationIgnored private let folderShelf = SavedFolder.shelf
-    /// The permission to read the open folder, held while it is open.
-    @ObservationIgnored private var folderAccess: FolderAccess?
+    /// The permission to read each open folder, held while it is open.
+    @ObservationIgnored private var folderAccesses: [String: FolderAccess] = [:]
     /// Waiting for a file just opened in Vespertine to be indexed, to play it.
     @ObservationIgnored private var playWhenRead: Task<Void, Never>?
-    /// The open share, answering the screens as a Mac would.
-    @ObservationIgnored private var shareMac: ShareMac?
+    /// The open shares and folders, each answering as a Mac would, by their IDs.
+    @ObservationIgnored private var shareMacs: [String: ShareMac] = [:]
+    /// The open libraries as one, once more than one has been in use (see `use`).
+    @ObservationIgnored private var joined: JoinedLibrary?
+    /// Which slot each library has in the joined one (see `JoinedID`): the same for as long as the library is kept.
+    @ObservationIgnored private var slots: [String: Int]
+    /// More than one library has been in use at once: from then on the library is a joined one, even with one in it,
+    /// so that what was queued and kept under its joined names stays.
+    @ObservationIgnored private var joinedForGood: Bool
+    private static let inUseKey = "librarySources"
+    private static let slotsKey = "librarySlots"
+    private static let joinedKey = "librariesJoined"
     /// Pairings that are never saved (a made-up one for screenshots).
     @ObservationIgnored private var transientPairings: Set<String> = []
     @ObservationIgnored private var linkWatch: Task<Void, Never>?
     /// The paired Macs Bonjour listed last time, to notice one that just showed up.
     @ObservationIgnored private var listedPaired: Set<String> = []
-    @ObservationIgnored private var shareRevisionSeen = 0
+    @ObservationIgnored private var shareRevisions: [String: Int] = [:]
     @ObservationIgnored private let pathMonitor = NWPathMonitor()
     private static let lastMacKey = "lastMac"
     /// First-run setup is showing and hasn't reached pairing yet: the search for Macs, which makes iOS ask about the
@@ -70,6 +87,8 @@ final class RemoteAppModel {
     @ObservationIgnored private var discoveryHeld = false
 
     init() {
+        slots = (UserDefaults.standard.dictionary(forKey: Self.slotsKey) as? [String: Int]) ?? [:]
+        joinedForGood = UserDefaults.standard.bool(forKey: Self.joinedKey)
         pairings = keychain.load().sorted { $0.pairedAt < $1.pairedAt }
         shares = shareKeychain.load().sorted { $0.addedAt < $1.addedAt }
         folders = folderShelf.load()
@@ -85,6 +104,7 @@ final class RemoteAppModel {
             MainActor.assumeIsolated { self?.networkChanged(online: online, cellular: cellular) }
         }
         pathMonitor.start(queue: .main)
+        PlayTarget.shared.onChoice = { [weak self] in self?.whoPlaysChanged() }
         #if DEBUG
         if applyLaunchOptions() { return }
         if let path = LaunchOptions.openFile {
@@ -92,51 +112,239 @@ final class RemoteAppModel {
             return
         }
         #endif
-        if let last = UserDefaults.standard.string(forKey: Self.lastMacKey), let pairing = pairings.first(where: { $0.serverID == last }) {
-            choose(pairing)
-        } else if let last = UserDefaults.standard.string(forKey: Self.lastMacKey), let share = shares.first(where: { $0.id == last }) {
-            choose(share)
-        } else if let last = UserDefaults.standard.string(forKey: Self.lastMacKey), let folder = shownFolders.first(where: { $0.id == last }) {
-            choose(folder)
-        } else if pairings.count == 1, shares.isEmpty, shownFolders.isEmpty {
-            choose(pairings[0])
-        } else if shares.count == 1, pairings.isEmpty, shownFolders.isEmpty {
-            choose(shares[0])
-        } else if shownFolders.count == 1, pairings.isEmpty, shares.isEmpty {
-            choose(shownFolders[0])
-        }
+        // What was in use last time; before libraries could be used together, the one that was open.
+        let known = pairings.map(\.serverID) + shares.map(\.id) + shownFolders.map(\.id)
+        var start = UserDefaults.standard.stringArray(forKey: Self.inUseKey) ?? [UserDefaults.standard.string(forKey: Self.lastMacKey)].compactMap { $0 }
+        start = start.filter(known.contains)
+        if start.isEmpty, known.count == 1 { start = known }
+        if !start.isEmpty { use(start) }
     }
 
     /// The name this phone shows in the Mac's list of paired phones.
     var deviceName: String { UIDevice.current.name }
 
-    // MARK: Choosing a Mac
+    // MARK: What the library is made of
 
-    func choose(_ pairing: SavedPairing) {
+    func isInUse(_ id: String) -> Bool { inUse.contains(id) }
+
+    /// Several libraries are open as one and the Mac among them is what plays: the lists hold the Mac's music only.
+    var showsTheMacsMusicOnly: Bool { macSession != nil && inUse.count > 1 && !PlayTarget.shared.onThisDevice }
+
+    /// A library in the list was tapped. While choosing what the library is made of, it is put in or taken out; from
+    /// the list with nothing open, it is opened by itself.
+    func tap(_ id: String) {
+        if choosingLibraries, let session, !session.isDemo {
+            use(isInUse(id) ? inUse.filter { $0 != id } : inUse + [id])
+        } else {
+            use([id], afresh: [id])
+        }
+    }
+
+    /// Opens a Mac by itself.
+    func choose(_ pairing: SavedPairing) { use([pairing.serverID], afresh: [pairing.serverID]) }
+
+    /// A library was added or changed: it joins what is open, or opens by itself when nothing is.
+    private func include(_ id: String) {
+        if let session, !session.isDemo {
+            use(inUse.filter { $0 != id } + [id], afresh: [id])
+        } else {
+            use([id], afresh: [id])
+        }
+    }
+
+    private func isMac(_ id: String) -> Bool { pairings.contains { $0.serverID == id } }
+
+    private func folder(_ id: String) -> SavedFolder? {
+        id == SavedFolder.ownID ? SavedFolder.own : folders.first { $0.id == id }
+    }
+
+    /// Makes the library of these Macs, shares and folders. One by itself is opened as it always was; more than one
+    /// are joined as one library. `afresh` are made anew even if they were open (their address or place changed).
+    private func use(_ ids: [String], afresh: Set<String> = []) {
+        // One Mac at most (there is one "the Mac plays"): the one named last.
+        let mac = ids.last(where: isMac)
+        var wanted: [String] = []
+        for id in ids where !wanted.contains(id) {
+            if isMac(id) ? id == mac : shares.contains(where: { $0.id == id }) || folder(id) != nil { wanted.append(id) }
+        }
+        inUse = wanted
+        UserDefaults.standard.set(wanted, forKey: Self.inUseKey)
+        if wanted.count > 1, !joinedForGood {
+            joinedForGood = true
+            UserDefaults.standard.set(true, forKey: Self.joinedKey)
+        }
+        if session?.isDemo == true { teardown() }
+        guard let first = wanted.first else {
+            teardown()
+            choosingLibraries = false
+            return
+        }
+        if joinedForGood {
+            join(wanted, afresh: afresh)
+        } else {
+            teardown()
+            if let pairing = pairing(serverID: first) {
+                open(pairing)
+            } else if let share = shares.first(where: { $0.id == first }) {
+                open(shareMac(for: share), id: share.id, name: share.name, device: "share")
+            } else if let folder = folder(first) {
+                open(folderMac(for: folder), id: folder.id, name: folder.name, device: "folder")
+            }
+        }
+    }
+
+    /// Everything that is open is closed: the player, the sessions, the shares and folders.
+    private func teardown() {
         PlayTarget.shared.leave()
         session?.close()
-        closeShare()
+        macSession?.close()
+        macSession = nil
+        joined = nil
+        playWhenRead?.cancel()
+        playWhenRead = nil
+        for mac in shareMacs.values { mac.onChange = nil }
+        shareMacs = [:]
+        shareRevisions = [:]
+        if !statuses.isEmpty { statuses = [:] }
+        for access in folderAccesses.values { access.letGo() }
+        folderAccesses = [:]
+        session = nil
+        artwork.session = nil
+    }
+
+    /// A session with a paired Mac, not yet connecting.
+    private func newMacSession(for pairing: SavedPairing) -> RemoteSession {
         let serverID = pairing.serverID
         let session = RemoteSession(pairing: pairing, clientName: deviceName, routes: { [weak self] in
             self?.routes(to: serverID) ?? []
         })
         // The Mac words what it refuses in the language this app is showing.
         session.language = Bundle.main.preferredLocalizations.first
+        return session
+    }
+
+    /// Opens a Mac by itself as the session.
+    private func open(_ pairing: SavedPairing) {
+        let serverID = pairing.serverID
+        let session = newMacSession(for: pairing)
         session.onConnected = { [weak self, weak session] _, address in
             self?.remember(address, told: session?.server, for: serverID)
             if let session { KeptShelf.shared.connected(session) }
         }
         self.session = session
         artwork.session = session
-        UserDefaults.standard.set(pairing.serverID, forKey: Self.lastMacKey)
         session.connect()
+    }
+
+    // MARK: Several libraries as one
+
+    /// Opens these libraries as one, or changes what the open one is made of without stopping the music.
+    private func join(_ ids: [String], afresh: Set<String>) {
+        let library: JoinedLibrary
+        let top: RemoteSession
+        if let joined, let session {
+            library = joined
+            top = session
+        } else {
+            teardown()
+            let name = String(localized: "Library")
+            library = JoinedLibrary(name: name, sayings: LibraryWording.sayings)
+            library.onChange = { [weak self] in self?.libraryRevision += 1 }
+            // The same one each time the session connects: the app coming back to the front opens it again.
+            let pairing = SavedPairing(serverID: JoinedLibrary.serverID, name: name, device: "library", key: Data())
+            top = RemoteSession(pairing: pairing, clientName: deviceName) { library }
+            top.onConnected = { [weak top] _, _ in
+                if let top { KeptShelf.shared.connected(top) }
+            }
+            joined = library
+            session = top
+            artwork.session = top
+        }
+        // Every library that is kept has its slot, in use or not: put back in later, its songs are called what they were.
+        slots = JoinedID.assign(pairings.map(\.serverID) + shares.map(\.id) + [SavedFolder.ownID] + folders.map(\.id), kept: slots)
+        UserDefaults.standard.set(slots, forKey: Self.slotsKey)
+        let wanted = ids.filter { slots[$0] != nil }
+        let wantedSlots = Set(wanted.filter { !afresh.contains($0) }.compactMap { slots[$0] })
+        var members = library.members
+        // What was taken out, or is to be made anew, is let go.
+        for member in members where !wantedSlots.contains(member.slot) {
+            if let id = slots.first(where: { $0.value == member.slot })?.key { letGo(id) }
+            (member.library as? ChannelMember)?.close()
+            if member.kind == .mac {
+                macSession?.close()
+                macSession = nil
+            }
+        }
+        members.removeAll { !wantedSlots.contains($0.slot) }
+        for id in wanted {
+            guard let slot = slots[id], !members.contains(where: { $0.slot == slot }) else { continue }
+            if let pairing = pairing(serverID: id) {
+                members.append(macMember(pairing, slot: slot, in: library))
+            } else if let share = shares.first(where: { $0.id == id }) {
+                members.append(.init(slot: slot, name: share.name, kind: .share, library: ChannelMember(shareMac(for: share))))
+            } else if let folder = folder(id) {
+                members.append(.init(slot: slot, name: folder.name, kind: .folder, library: ChannelMember(folderMac(for: folder))))
+            }
+            // What was kept from it while it was open by itself comes along.
+            KeptShelf.shared.adopt(serverID: id, slot: slot, into: top)
+        }
+        // In the order they were chosen: where two libraries tie in a list, the earlier one's comes first.
+        members.sort { a, b in
+            (wanted.firstIndex { slots[$0] == a.slot } ?? .max) < (wanted.firstIndex { slots[$0] == b.slot } ?? .max)
+        }
+        top.mix = RemoteSession.Mix(hasMac: members.contains { $0.kind == .mac }, onlyFolders: members.allSatisfy { $0.kind == .folder })
+        library.members = members
+        whoPlaysChanged()
+        top.connect()
+    }
+
+    /// The Mac's place in the joined library: its own session, whose news is passed on to the joined one.
+    private func macMember(_ pairing: SavedPairing, slot: Int, in library: JoinedLibrary) -> JoinedLibrary.Member {
+        let serverID = pairing.serverID
+        let mac = newMacSession(for: pairing)
+        mac.onPush = { [weak library] message in library?.macSaid(message) }
+        mac.onConnected = { [weak self, weak mac, weak library] _, address in
+            guard let self else { return }
+            self.remember(address, told: mac?.server, for: serverID)
+            // The lists now hold the Mac's music too.
+            library?.changed()
+            if let top = self.session, top.isJoined { KeptShelf.shared.connected(top) }
+        }
+        macSession = mac
+        mac.connect()
+        return .init(slot: slot, name: pairing.name, kind: .mac, library: mac,
+                     canStream: { [weak mac] in mac?.canStream ?? false }, server: { [weak mac] in mac?.server })
+    }
+
+    /// A share or a folder is no longer open.
+    private func letGo(_ id: String) {
+        shareMacs[id]?.onChange = nil
+        shareMacs[id] = nil
+        shareRevisions[id] = nil
+        if statuses[id] != nil { statuses[id] = nil }
+        folderAccesses[id]?.letGo()
+        folderAccesses[id] = nil
+    }
+
+    /// Output's choice of who plays changed, or the Mac came or went: while the Mac plays, the lists hold what it can
+    /// play, its own library.
+    private func whoPlaysChanged() {
+        guard let joined else { return }
+        let macPlays = macSession != nil && !PlayTarget.shared.onThisDevice
+        if joined.macPlays != macPlays { joined.macPlays = macPlays }
+    }
+
+    /// The Mac's own session, whether it is open by itself or as one of several libraries.
+    private func linkToMac(_ serverID: String) -> RemoteSession? {
+        if let macSession, macSession.pairing.serverID == serverID { return macSession }
+        if let session, session.pairing.serverID == serverID { return session }
+        return nil
     }
 
     /// Tries the remote on a pretend Mac inside the app (no network, no sound). Not saved as a pairing.
     func tryDemo() {
-        PlayTarget.shared.leave()
-        session?.close()
-        closeShare()
+        teardown()
+        choosingLibraries = false
         let pairing = SavedPairing(serverID: DemoMac.serverID, name: String(localized: "Demo Mac"), device: "demo", key: Data())
         // One pretend Mac for the whole demo, so the queue survives the app going to the background and back.
         let mac = DemoMac(name: pairing.name, appVersion: Self.demoVersion(info: Bundle.main.infoDictionary)) { key, size in
@@ -160,86 +368,98 @@ final class RemoteAppModel {
         (info?["CFBundleShortVersionString"] as? String)?.trimmingCharacters(in: .whitespaces) ?? ""
     }
 
-    /// Back to the list of Macs.
+    /// To the list of libraries. A real library stays open behind it (the music carries on) while what it is made of is
+    /// chosen; the demo is left, for the library that was open before it.
     func leave() {
-        PlayTarget.shared.leave()
-        session?.close()
-        closeShare()
-        session = nil
-        artwork.session = nil
-        UserDefaults.standard.removeObject(forKey: Self.lastMacKey)
+        if session?.isDemo == true {
+            teardown()
+            use(inUse)
+        } else {
+            choosingLibraries = true
+        }
+    }
+
+    /// A library was forgotten: it is taken out of what is open.
+    private func drop(_ id: String) {
+        slots[id] = nil
+        UserDefaults.standard.set(slots, forKey: Self.slotsKey)
+        guard inUse.contains(id) else { return }
+        if session?.isDemo == true {
+            inUse.removeAll { $0 == id }
+            UserDefaults.standard.set(inUse, forKey: Self.inUseKey)
+        } else {
+            use(inUse.filter { $0 != id })
+        }
     }
 
     func forget(_ pairing: SavedPairing) {
-        if session?.pairing.serverID == pairing.serverID { leave() }
         if !transientPairings.contains(pairing.serverID) { keychain.remove(serverID: pairing.serverID) }
         KeptShelf.shared.forget(serverID: pairing.serverID)
         PlayTarget.queues.forget(pairing.serverID)
         pairings.removeAll { $0.serverID == pairing.serverID }
+        drop(pairing.serverID)
     }
 
     // MARK: Shares
 
-    /// Opens a share in place of a Mac: this device reads its songs itself and is where they play.
-    func choose(_ share: SavedShare) {
-        PlayTarget.shared.leave()
-        session?.close()
-        closeShare()
+    /// Opens a share by itself: this device reads its songs itself and is where they play.
+    func choose(_ share: SavedShare) { use([share.id], afresh: [share.id]) }
+
+    /// A share's library, answering as a Mac would; watched while it is open.
+    private func shareMac(for share: SavedShare) -> ShareMac {
         // Two connections: a song being played never waits behind a scan or a cover.
         let mac = ShareMac(id: share.id, name: share.name, files: share.files(), playback: share.files(), store: share.store,
                            sayings: ShareWording.sayings, decoders: PhoneDecoders(), shrink: { data, size in ShareCovers.shrink(data, to: size) })
-        open(mac, id: share.id, name: share.name, device: "share")
+        watch(mac, id: share.id, folder: false)
+        return mac
     }
 
-    /// Opens a share's or a folder's library as the session, in place of a Mac.
-    private func open(_ mac: ShareMac, id: String, name: String, device: String) {
+    /// Keeps an eye on a share's or a folder's library while it is open.
+    private func watch(_ mac: ShareMac, id: String, folder: Bool) {
         mac.onChange = { [weak self, weak mac] in
-            guard let self, let mac, self.shareMac === mac else { return }
-            self.noteShare(mac)
+            guard let self, let mac, self.shareMacs[id] === mac else { return }
+            self.noteShare(mac, id: id, folder: folder)
         }
+        mac.combinesVersions = settings.combineVersions
+        shareMacs[id] = mac
+        shareRevisions[id] = 0
+        statuses[id] = ShareStatus(mac, folder: folder)
+    }
+
+    /// Opens a share's or a folder's library by itself as the session, in place of a Mac.
+    private func open(_ mac: ShareMac, id: String, name: String, device: String) {
         // The same one each time the session connects: the app coming back to the front opens it again.
         let pairing = SavedPairing(serverID: id, name: name, device: device, key: Data())
         let session = RemoteSession(pairing: pairing, clientName: deviceName) { mac }
         session.onConnected = { [weak session] _, _ in
             if let session { KeptShelf.shared.connected(session) }
         }
-        mac.combinesVersions = settings.combineVersions
-        shareMac = mac
-        shareStatus = ShareStatus(mac, folder: session.isFolder)
         self.session = session
         artwork.session = session
-        UserDefaults.standard.set(id, forKey: Self.lastMacKey)
         session.connect()
     }
 
-    private func closeShare() {
-        playWhenRead?.cancel()
-        playWhenRead = nil
-        shareMac?.onChange = nil
-        shareMac = nil
-        shareRevisionSeen = 0
-        shareStatus = nil
-        folderAccess?.letGo()
-        folderAccess = nil
-    }
-
-    private func noteShare(_ mac: ShareMac) {
-        let status = ShareStatus(mac, folder: session?.isFolder ?? false)
-        if status != shareStatus { shareStatus = status }
-        if mac.revision != shareRevisionSeen {
-            shareRevisionSeen = mac.revision
-            libraryRevision += 1
+    private func noteShare(_ mac: ShareMac, id: String, folder: Bool) {
+        let status = ShareStatus(mac, folder: folder)
+        if status != statuses[id] { statuses[id] = status }
+        if mac.revision != shareRevisions[id] {
+            shareRevisions[id] = mac.revision
+            // The lists changed under the screens: joined, every list is put together again.
+            if let joined { joined.changed() } else { libraryRevision += 1 }
         }
     }
 
-    /// The share that is open, if one is.
-    var openShare: SavedShare? {
-        guard let id = session?.pairing.serverID else { return nil }
-        return shares.first { $0.id == id }
-    }
+    /// The shares that are open.
+    var openShares: [SavedShare] { shares.filter { statuses[$0.id] != nil } }
+    /// The share that is open, when one is.
+    var openShare: SavedShare? { openShares.first }
+    /// What the open share or folder is doing; with several open, the first one's.
+    var shareStatus: ShareStatus? { (openFolders.first?.id ?? openShares.first?.id).flatMap { statuses[$0] } }
 
     /// Looks at the open share again for new, changed and removed songs.
-    func rescanShare() { shareMac?.rescan() }
+    func rescanShare() { for mac in shareMacs.values { mac.rescan() } }
+    /// Looks at one open share or folder again.
+    func rescan(_ id: String) { shareMacs[id]?.rescan() }
 
     /// Keeps a share that was added or changed (its password in the Keychain, on this device only) and opens it.
     func save(_ share: SavedShare) {
@@ -247,16 +467,16 @@ final class RemoteAppModel {
         shares.removeAll { $0.id == share.id }
         shares.append(share)
         shares.sort { $0.addedAt < $1.addedAt }
-        choose(share)
+        include(share.id)
     }
 
     func forget(_ share: SavedShare) {
-        if session?.pairing.serverID == share.id { leave() }
+        shares.removeAll { $0.id == share.id }
+        drop(share.id)
         shareKeychain.remove(id: share.id)
         share.store.remove()
         KeptShelf.shared.forget(serverID: share.id)
         PlayTarget.queues.forget(share.id)
-        shares.removeAll { $0.id == share.id }
     }
 
     // MARK: Folders on this device
@@ -264,17 +484,16 @@ final class RemoteAppModel {
     /// The folders to list: the app's own (once it holds music) and the ones added from Files.
     var shownFolders: [SavedFolder] { (ownFolderInUse ? [SavedFolder.own] : []) + folders }
 
-    /// The folder that is open, if one is.
-    var openFolder: SavedFolder? {
-        guard let id = session?.pairing.serverID else { return nil }
-        return shownFolders.first { $0.id == id }
-    }
+    /// The folders that are open.
+    var openFolders: [SavedFolder] { shownFolders.filter { statuses[$0.id] != nil } }
+    /// The folder that is open, when one is.
+    var openFolder: SavedFolder? { openFolders.first }
 
-    /// Opens a folder in place of a Mac: this device reads the songs where they are and is where they play.
-    func choose(_ folder: SavedFolder) {
-        PlayTarget.shared.leave()
-        session?.close()
-        closeShare()
+    /// Opens a folder by itself: this device reads the songs where they are and is where they play.
+    func choose(_ folder: SavedFolder) { use([folder.id], afresh: [folder.id]) }
+
+    /// A folder's library, answering as a Mac would; watched while it is open.
+    private func folderMac(for folder: SavedFolder) -> ShareMac {
         // A reader for the lists and one for the song playing, so a song never waits behind a scan.
         let files: FolderFiles, playback: FolderFiles
         if let bookmark = folder.bookmark {
@@ -282,7 +501,7 @@ final class RemoteAppModel {
             let access = FolderAccess(bookmark: bookmark) { [weak self] fresh in
                 Task { @MainActor in self?.keep(bookmark: fresh, for: id) }
             }
-            folderAccess = access
+            folderAccesses[id] = access
             files = FolderFiles(locate: { try access.url() }, lost: { access.letGo() })
             playback = FolderFiles(locate: { try access.url() }, lost: { access.letGo() })
         } else {
@@ -296,7 +515,8 @@ final class RemoteAppModel {
         // Looking at a folder on the device costs little: every time it is opened, and when a file turns out changed.
         mac.rescanAfter = 0
         mac.mendsItself = true
-        open(mac, id: folder.id, name: folder.name, device: "folder")
+        watch(mac, id: folder.id, folder: true)
+        return mac
     }
 
     /// A folder was chosen in the Files picker: keeps the way back to it (a bookmark, on this device only) and opens it.
@@ -309,7 +529,7 @@ final class RemoteAppModel {
         let folder = SavedFolder(name: url.lastPathComponent, bookmark: bookmark)
         folderShelf.upsert(folder)
         folders.append(folder)
-        choose(folder)
+        include(folder.id)
     }
 
     /// An added folder was pointed at its place again (the way back to it was lost, or it moved): it keeps its index,
@@ -319,17 +539,17 @@ final class RemoteAppModel {
         var updated = folder
         updated.bookmark = bookmark
         keep(updated)
-        choose(updated)
+        include(updated.id)
     }
 
     func forget(_ folder: SavedFolder) {
         guard !folder.isOwn else { return }
-        if session?.pairing.serverID == folder.id { leave() }
+        folders.removeAll { $0.id == folder.id }
+        drop(folder.id)
         folderShelf.remove(id: folder.id)
         folder.store.remove()
         KeptShelf.shared.forget(serverID: folder.id)
         PlayTarget.queues.forget(folder.id)
-        folders.removeAll { $0.id == folder.id }
     }
 
     private func keep(_ folder: SavedFolder) {
@@ -359,8 +579,11 @@ final class RemoteAppModel {
             switch outcome {
             case .added(let path):
                 self.ownFolderInUse = true
-                if self.session?.pairing.serverID == SavedFolder.ownID, let mac = self.shareMac {
+                if let mac = self.shareMacs[SavedFolder.ownID] {
                     mac.rescan()
+                } else if self.joined != nil {
+                    // Several libraries are open as one: the opened files join them.
+                    self.use(self.inUse + [SavedFolder.ownID])
                 } else {
                     self.choose(SavedFolder.own)
                 }
@@ -380,10 +603,14 @@ final class RemoteAppModel {
             // The scan of a folder on the device takes a moment; the wait is bounded so a file that never shows is let be.
             var lookedAgain = false
             for _ in 0..<400 {
-                guard let self, !Task.isCancelled, let mac = self.shareMac, let session = self.session, session.isFolder else { return }
+                guard let self, !Task.isCancelled, let mac = self.shareMacs[SavedFolder.ownID], let session = self.session else { return }
                 if session.isConnected, !mac.isScanning, mac.library.scanned != nil {
                     if let song = mac.library.songs.first(where: { $0.path == path }) {
-                        _ = await session.run(.playTracks(ids: [song.id], startAt: 0, shuffled: false))
+                        // Among several libraries the song goes by its joined name, and plays here: no Mac has it.
+                        let id = self.joined == nil ? song.id : self.slots[SavedFolder.ownID].flatMap { JoinedID.join(song.id, slot: $0) }
+                        guard let id else { return }
+                        if self.joined != nil { PlayTarget.shared.choose(thisDevice: true) }
+                        _ = await session.run(.playTracks(ids: [id], startAt: 0, shuffled: false))
                         return
                     }
                     // A scan already under way when the file arrived may have passed its place: one more look.
@@ -458,7 +685,7 @@ final class RemoteAppModel {
         guard let index = pairings.firstIndex(where: { $0.serverID == serverID }), pairings[index].address != address else { return }
         pairings[index].address = address
         save(pairings[index])
-        if session?.pairing.serverID == serverID { session?.networkChanged() }
+        linkToMac(serverID)?.networkChanged()
     }
 
     /// Bonjour's list changed. A paired Mac that announces a port (it moved when its usual one was busy) has that port
@@ -473,13 +700,13 @@ final class RemoteAppModel {
             if updated != pairings[index] {
                 pairings[index] = updated
                 save(updated)
-                if session?.pairing.serverID == mac.serverID { moved = true }
+                if linkToMac(mac.serverID) != nil { moved = true }
             }
         }
         let listed = Set(macs.map(\.serverID)).intersection(pairings.map(\.serverID))
         let appeared = !listed.subtracting(listedPaired).isEmpty
         listedPaired = listed
-        if let session, !session.isConnected, moved || (appeared && listed.contains(session.pairing.serverID)) {
+        if let session = macSession ?? session, !session.isConnected, moved || (appeared && listed.contains(session.pairing.serverID)) {
             session.networkChanged()
         }
     }
@@ -510,7 +737,7 @@ final class RemoteAppModel {
     /// The versions switch in Settings was changed: the player picks by the output or not, and a share's lists follow.
     func versionsSettingChanged() {
         PlayTarget.shared.combinesVersions = settings.combineVersions
-        shareMac?.combinesVersions = settings.combineVersions
+        for mac in shareMacs.values { mac.combinesVersions = settings.combineVersions }
     }
 
     /// The cellular switch in Settings was changed: applies it to the network in use now.
@@ -525,7 +752,8 @@ final class RemoteAppModel {
             ? String(localized: "Playing over cellular data is off. Connect to Wi-Fi, or turn it on in Settings.") : nil
         if online {
             session?.networkChanged()
-            shareMac?.lineChanged()
+            macSession?.networkChanged()
+            for mac in shareMacs.values { mac.lineChanged() }
         }
         // Fetching to keep waits out cellular data too, and carries on when Wi-Fi is back.
         if PlayTarget.shared.holdReason == nil, let session { KeptShelf.shared.keeper(for: session)?.resume() }
@@ -575,7 +803,7 @@ final class RemoteAppModel {
             keychain.upsert(pairing)
             pairings.removeAll { $0.serverID == pairing.serverID }
             pairings.append(pairing)
-            choose(pairing)
+            include(pairing.serverID)
         } catch {
             switch error {
             case .refused:
@@ -600,15 +828,20 @@ final class RemoteAppModel {
             // A connection kept while the app was away may have died without a word: ask, and connect if there is none.
             session?.checkLink()
             session?.connect()
+            macSession?.checkLink()
+            macSession?.connect()
             networkChanged(online: isOnline, cellular: onCellular)
             // Music may have been put into, or taken out of, the app's own folder in Files meanwhile.
-            let inUse = OpenedFiles.holdsAnything(SavedFolder.ownURL) || session?.pairing.serverID == SavedFolder.ownID
-            if inUse != ownFolderInUse { ownFolderInUse = inUse }
+            let holds = OpenedFiles.holdsAnything(SavedFolder.ownURL) || shareMacs[SavedFolder.ownID] != nil
+            if holds != ownFolderInUse { ownFolderInUse = holds }
         case .background:
             // iOS may end the app from here without telling it: the queue and the place in the song are written now.
             PlayTarget.shared.saveQueue()
             // Music playing on this device needs its songs from the Mac: the connection stays while it plays.
-            if !PlayTarget.shared.isBusy { session?.suspend() }
+            if !PlayTarget.shared.isBusy {
+                session?.suspend()
+                macSession?.suspend()
+            }
             discovery.stop()
             searchChanged()
         default:

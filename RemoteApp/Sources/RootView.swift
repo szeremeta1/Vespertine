@@ -17,13 +17,13 @@ struct RootView: View {
         Group {
             if SetupAssistant.shared.isShowing {
                 SetupFlow().transition(.opacity)
-            } else if let session = model.session {
+            } else if let session = model.session, !model.choosingLibraries {
                 RemoteView(session: session).transition(.opacity)
             } else {
                 MacsView().transition(.opacity)
             }
         }
-        .animation(.default, value: model.session == nil)
+        .animation(.default, value: model.session == nil || model.choosingLibraries)
         .animation(.easeInOut(duration: 0.45), value: SetupAssistant.shared.isShowing)
         .overlay {
             if model.pendingLink != nil || model.isPairing {
@@ -59,12 +59,18 @@ struct MacsView: View {
                         .listRowBackground(Color.clear)
                         .listRowInsets(EdgeInsets())
                 }
+                if choosing {
+                    Section {} footer: {
+                        Text("Choose what your library is made of. Everything with a checkmark is shown together as one library.")
+                    }
+                }
                 if !model.pairings.isEmpty {
                     Section("Your Macs") {
                         ForEach(model.pairings) { saved in
                             HStack(spacing: 4) {
-                                Button { model.choose(saved) } label: {
+                                Button { model.tap(saved.serverID) } label: {
                                     HStack(spacing: 12) {
+                                        if choosing { InUseMark(on: model.isInUse(saved.serverID)) }
                                         Image(systemName: SavedPairing.symbol(portable: saved.portable)).foregroundStyle(Palette.brass).rowIconColumn()
                                         VStack(alignment: .leading, spacing: 2) {
                                             Text(saved.name).font(.serif(.body, weight: .medium)).foregroundStyle(Palette.text)
@@ -75,6 +81,7 @@ struct MacsView: View {
                                     .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
+                                .accessibilityAddTraits(choosing && model.isInUse(saved.serverID) ? .isSelected : [])
                                 Button { connection = saved } label: {
                                     Image(systemName: "info.circle").font(.title3)
                                 }
@@ -91,8 +98,14 @@ struct MacsView: View {
                     Section("Your Shares") {
                         ForEach(model.shares) { share in
                             HStack(spacing: 4) {
-                                Button { model.choose(share) } label: { ShareRow(share: share) }
-                                    .buttonStyle(.plain)
+                                Button { model.tap(share.id) } label: {
+                                    HStack(spacing: 12) {
+                                        if choosing { InUseMark(on: model.isInUse(share.id)) }
+                                        ShareRow(share: share)
+                                    }
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityAddTraits(choosing && model.isInUse(share.id) ? .isSelected : [])
                                 Button { editingShare = share } label: {
                                     Image(systemName: "info.circle").font(.title3)
                                 }
@@ -108,8 +121,14 @@ struct MacsView: View {
                 if !model.shownFolders.isEmpty {
                     Section("Your Folders") {
                         ForEach(model.shownFolders) { folder in
-                            Button { model.choose(folder) } label: { FolderRow(folder: folder) }
+                            Button { model.tap(folder.id) } label: {
+                                HStack(spacing: 12) {
+                                    if choosing { InUseMark(on: model.isInUse(folder.id)) }
+                                    FolderRow(folder: folder)
+                                }
+                            }
                                 .buttonStyle(.plain)
+                                .accessibilityAddTraits(choosing && model.isInUse(folder.id) ? .isSelected : [])
                                 .accessibilityIdentifier("folder-row")
                                 .swipeActions {
                                     // The app's own folder is emptied in Files, where its music can be seen.
@@ -192,7 +211,14 @@ struct MacsView: View {
             .navigationTitle("Libraries")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
+                if choosing {
+                    // Back to the library, made of what has a checkmark now.
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") { model.choosingLibraries = false }
+                            .accessibilityIdentifier("libraries-done")
+                    }
+                }
+                ToolbarItem(placement: choosing ? .topBarLeading : .topBarTrailing) {
                     Button { showingSettings = true } label: { Image(systemName: "gearshape") }
                         .accessibilityLabel(Text("Settings"))
                 }
@@ -218,6 +244,9 @@ struct MacsView: View {
             }
         }
     }
+
+    /// The list is showing over an open library, to choose what it is made of: rows carry checkmarks, and Done goes back.
+    private var choosing: Bool { model.choosingLibraries && model.session != nil && model.session?.isDemo != true }
 
     private var header: some View {
         VStack(spacing: 10) {
@@ -248,6 +277,18 @@ struct MacsView: View {
             return address.kind == .tailscale ? String(localized: "By Tailscale: \(address.host)") : String(localized: "By address: \(address.host)")
         }
         return String(localized: "Not on this network")
+    }
+}
+
+/// Whether a Mac, a share or a folder is part of the library, on its row while that is being chosen.
+struct InUseMark: View {
+    let on: Bool
+
+    var body: some View {
+        Image(systemName: on ? "checkmark.circle.fill" : "circle")
+            .font(.title3)
+            .foregroundStyle(on ? Palette.brass : Palette.text3)
+            .accessibilityHidden(true)
     }
 }
 

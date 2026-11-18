@@ -75,6 +75,12 @@ struct LibraryView: View {
                 rootLink("recentlyAdded", .recentlyAdded)
                 rootLink("favorites", .favorites, count: overview?.favorites)
                 if !session.isShare { rootLink("playlists", .playlists, count: overview?.playlists) }
+            } footer: {
+                // Several libraries open as one: the Mac can only play its own, so that is what is listed while it plays.
+                if model.showsTheMacsMusicOnly {
+                    Text("While the Mac plays, this is the Mac’s music. To see all of your libraries together, set Music Plays On to this device.")
+                        .accessibilityIdentifier("library-mac-only")
+                }
             }
             if !session.isDemo {
                 Section { rootLink("kept", .kept, count: KeptShelf.shared.keeper(for: session)?.store.lists.count) }
