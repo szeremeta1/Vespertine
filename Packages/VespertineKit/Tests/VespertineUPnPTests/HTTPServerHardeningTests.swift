@@ -14,6 +14,10 @@ func rawExchange(port: UInt16, send bytes: Data, timeout: Double = 5) -> (respon
     let fd = socket(AF_INET, SOCK_STREAM, 0)
     guard fd >= 0 else { return nil }
     defer { close(fd) }
+    // The servers these tests talk to close on the client on purpose (over the cap, cut off, stopped). A send that
+    // lands after such a close must fail with EPIPE, not end the whole test process with SIGPIPE.
+    var on: Int32 = 1
+    setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &on, socklen_t(MemoryLayout<Int32>.size))
     var addr = sockaddr_in()
     addr.sin_family = sa_family_t(AF_INET)
     addr.sin_port = port.bigEndian
