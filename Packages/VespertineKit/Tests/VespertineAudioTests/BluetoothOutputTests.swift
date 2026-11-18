@@ -12,10 +12,12 @@ import Testing
 
 /// AirPods Max as macOS lists them: nominal rates 24, 44.1 and 48 kHz, one rate current.
 private func headset(rate: Double, channels: Int = 2, transport: Transport = .bluetooth, id: UInt32 = 7001) -> OutputDevice {
-    OutputDevice(id: id, uid: "sim-airpods", name: "Alex’s AirPods Max", manufacturer: "Apple Inc.", modelUID: nil, transport: transport,
+    var device = OutputDevice(id: id, uid: "sim-airpods", name: "Alex’s AirPods Max", manufacturer: "Apple Inc.", modelUID: nil, transport: transport,
                  nominalSampleRate: rate,
                  capabilities: DeviceCapabilities(sampleRates: [24_000, 44_100, 48_000], physicalFormats: [], outputChannels: channels, supportsDoP: false),
                  hasHardwareVolume: true, isDefault: false)
+    device.airPodsMaxCableAttached = false   // said, or the profile asks the Mac running the test whether a pair is on its cable
+    return device
 }
 
 private func source(rate: Double) -> SourceFormat {
