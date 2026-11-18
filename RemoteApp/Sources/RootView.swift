@@ -271,6 +271,8 @@ struct CodeEntryView: View {
                         .font(.system(size: 32, weight: .semibold, design: .monospaced))
                         .multilineTextAlignment(.center)
                         .focused($focused)
+                        // The field's own words are an example of a code; this says what to type and where to find it.
+                        .accessibilityLabel(Text("Type the code under the QR code on “\(mac.name)”."))
                 } footer: {
                     Text("Type the code under the QR code on “\(mac.name)”.")
                 }

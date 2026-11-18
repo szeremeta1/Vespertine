@@ -156,6 +156,16 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     var pairingSecret: Data?
     /// This Mac as an AirPlay 2 receiver is told of it.
     var sender = AirPlay2Sender.thisMac
+    /// Send a song that 24-bit at 48 kHz serves as a buffered stream, to an AirPlay 2 receiver that says its buffered
+    /// streams take it (an Apple TV 4K's do, though its realtime ones stop at 16-bit and 44.1 kHz). Off unless set: no
+    /// receiver has been heard playing one from Vespertine yet. A receiver that refuses it gets the realtime stream, and
+    /// isn't asked again while this playback lasts.
+    public var buffersStreams = false
+    /// Tests: the ports the session's clock is made on (0: any free ones) and the ones the receiver takes its messages
+    /// on. nil: 319 and 320 for both, as PTP has them.
+    var clockPorts: (own: (event: UInt16, general: UInt16), peer: (event: UInt16, general: UInt16))?
+    /// A buffered stream was tried and the receiver didn't take it. Only the worker touches it.
+    private var bufferedRefused = false
     /// How long a song may take to open before it fails (as long as the network cache waits for a share that sends nothing).
     var openTimeout: TimeInterval = 120
     /// Tests: the next song opened ahead, if any.
@@ -463,6 +473,29 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
         }
     }
 
+    private func makeSession(wish: AirPlayWish, clock: PTPClock?) throws -> RAOPSession {
+        let made = RAOPSession(name: device.name, endpoint: endpoint, encryption: encryption, rsaKey: rsaKey,
+                               authSetup: device.needsAuthSetup, password: device.needsPassword ? passwordProvider?() : nil,
+                               pairing: try sessionPairing(), sender: sender, wish: wish, clock: clock)
+        if let peer = clockPorts?.peer { made.clockPeerPorts = peer }
+        return made
+    }
+
+    /// The clock for a session that may carry a buffered stream: only when they are switched on, the receiver is an
+    /// AirPlay 2 one that hasn't refused one, and the song has something to gain. nil too when the clock's ports can't
+    /// be had; the session is then a realtime one.
+    private func sessionClock(for wish: AirPlayWish) -> PTPClock? {
+        guard buffersStreams, !bufferedRefused, device.usesAirPlay2, !wish.isPlain else { return nil }
+        let address = sender.deviceID.split(separator: ":").compactMap { UInt8($0, radix: 16) }
+        let ports: (event: UInt16, general: UInt16) = clockPorts?.own ?? (319, 320)
+        do {
+            return try PTPClock(identity: PTPMessage.identity(address: address), eventPort: ports.event, generalPort: ports.general)
+        } catch {
+            log.info("AirPlay \(self.device.name, privacy: .public): no clock for a buffered stream (\(String(describing: error), privacy: .public)); sending a realtime one")
+            return nil
+        }
+    }
+
     private func closeWhenIdle() {
         let g = generation.withLock { $0 }
         let limit = idleLimit
@@ -508,14 +541,19 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                 }
             }
             if !open {
-                let made = RAOPSession(name: device.name, endpoint: endpoint, encryption: encryption, rsaKey: rsaKey,
-                                       authSetup: device.needsAuthSetup, password: device.needsPassword ? passwordProvider?() : nil,
-                                       pairing: try sessionPairing(), sender: sender,
-                                       wish: AirPlayConversion.wish(source: segment.frames.source, settings: state.withLock { $0.settings },
-                                                                    replayGainDB: item.replayGainDB))
-                made.onLost = { [weak self] in self?.enqueue.yield(.lost) }
+                let wish = AirPlayConversion.wish(source: segment.frames.source, settings: state.withLock { $0.settings }, replayGainDB: item.replayGainDB)
                 let volume = state.withLock { $0.receiverVolumeDB }
-                try await made.connect(volumeDB: volume)
+                var made = try makeSession(wish: wish, clock: sessionClock(for: wish))
+                do { try await made.connect(volumeDB: volume) } catch {
+                    // A buffered stream the receiver didn't take: the realtime stream it does, from a session of its
+                    // own. Anything else that went wrong stands.
+                    guard made.triedBuffered else { throw error }
+                    log.info("AirPlay \(self.device.name, privacy: .public) didn't take a buffered stream (\(String(describing: error), privacy: .public)); sending a realtime one")
+                    bufferedRefused = true
+                    made = try makeSession(wish: wish, clock: nil)
+                    try await made.connect(volumeDB: volume)
+                }
+                made.onLost = { [weak self] in self?.enqueue.yield(.lost) }
                 state.withLock { $0.sentVolumeDB = volume }
                 session = made
             }

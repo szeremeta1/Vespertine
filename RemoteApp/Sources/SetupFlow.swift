@@ -193,6 +193,8 @@ struct SetupFlow: View {
                 // Read as text, in order, with the step you are on marked as the selected one.
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text(title(item)))
+                // Said in words: the selected trait alone isn't spoken on plain text.
+                .accessibilityValue(item == current ? Text("Current") : Text(verbatim: ""))
                 .accessibilityAddTraits(item == current ? [.isStaticText, .isSelected] : .isStaticText)
             }
         }
@@ -483,6 +485,14 @@ struct SetupFlow: View {
                     }
                     .setupReveal(shown(.sound), delay: 0.24)
                 }
+                SetupOption(symbol: "square.on.square", title: Text("Combine Stereo and Surround Versions"),
+                            detail: Text("A song you have in stereo and in surround plays as the version that fits the output. Off, every file plays as itself."),
+                            on: settings.combineVersions) {
+                    Toggle("Combine Stereo and Surround Versions", isOn: Binding(get: { settings.combineVersions }, set: { settings.combineVersions = $0; model.versionsSettingChanged() }))
+                        .labelsHidden().tint(Palette.brass)
+                        .accessibilityIdentifier("setup-versions")
+                }
+                .setupReveal(shown(.sound), delay: source == .mac ? 0.3 : 0.24)
             }
             Label {
                 Text("A DAC plugged into this device is asked for each song’s own sample rate. The Output screen shows what reaches it, and has the test for playing DSD natively.")
@@ -492,7 +502,7 @@ struct SetupFlow: View {
             .font(.footnote).foregroundStyle(Palette.text2)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 4)
-            .setupReveal(shown(.sound), delay: 0.3)
+            .setupReveal(shown(.sound), delay: 0.36)
         }
     }
 

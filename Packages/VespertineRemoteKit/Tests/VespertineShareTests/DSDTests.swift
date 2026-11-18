@@ -201,7 +201,7 @@ enum DSDMaker {
         #expect(Int64(bytes.count) == rendering.byteSize)
         let words = DSDMaker.words(bytes, channels: 2)
         // The left channel is the DoP test's own DSD: its frames must be the test's frames, word for word.
-        #expect(words[0] == DoPProbeClip.frames())
+        #expect(words[0] == DoPProbeClip.chord())
         // The right channel carries its own bits behind the same markers.
         let tone = Self.tone
         #expect(words[1] == (0..<tone.count / 2).map { DoPProbeClip.word(frame: $0, tone[2 * $0], tone[2 * $0 + 1]) })
@@ -506,7 +506,7 @@ private final class MemorySource: ByteSource, @unchecked Sendable {
         let file = DSDMaker.dsf([chord, Array(tone.prefix(200_000))])
         let rendering = try #require(DSDRendering.plan(try DSDMaker.layout(file, named: "a.dsf"), maxSampleRate: nil, dop: 176_400))
         let words = try decoded(rendering, of: file)
-        #expect(words[0] == Array(DoPProbeClip.frames().prefix(100_000)))
+        #expect(words[0] == Array(DoPProbeClip.chord().prefix(100_000)))
         #expect(words == DSDMaker.words(try DSDMaker.bytes(rendering, of: file), channels: 2))
     }
 

@@ -4,6 +4,7 @@
 //
 
 import SwiftUI
+import VespertinePhonePlayer
 import VespertineRemoteClient
 import VespertineRemoteProtocol
 
@@ -111,10 +112,21 @@ struct NowPlayingView: View {
             transport
             modes
             volume
-            if let converting = session.phone?.playback.preparing {
-                Label(Self.converting(progress: converting.progress), systemImage: "arrow.triangle.2.circlepath")
+            if let preparing = session.phone?.playback.preparing {
+                Label(PlayTarget.preparing(preparing.kind, progress: preparing.progress, share: session.isShare), systemImage: "arrow.triangle.2.circlepath")
                     .font(.caption).foregroundStyle(Palette.brass)
                     .accessibilityIdentifier("converting")
+                // A DSD song that is being made PCM says why, while it is.
+                if case .dsdAsPCM(let reason?) = preparing.kind {
+                    Text(verbatim: PlayTarget.pcmReason(reason)).font(.caption).foregroundStyle(Palette.text2)
+                        .multilineTextAlignment(.center)
+                        .accessibilityIdentifier("dsd-as-pcm-reason")
+                }
+            } else if let reason = session.phone?.playback.dsdAsPCM {
+                // And while it plays: nothing falls back to PCM without a word.
+                Text(verbatim: PlayTarget.dsdAsPCM + " · " + PlayTarget.pcmReason(reason)).font(.caption).foregroundStyle(Palette.text2)
+                    .multilineTextAlignment(.center)
+                    .accessibilityIdentifier("dsd-as-pcm")
             }
             if let waiting = player?.waitingFor {
                 Text("Waiting for “\(waiting)” to connect").font(.caption).foregroundStyle(Palette.copper)
@@ -329,7 +341,8 @@ struct NowPlayingView: View {
         if let volume = player?.volume {
             switch volume.route {
             case .fixed where session.phone != nil:
-                DeviceVolumeRow(reported: volume.level)
+                DeviceVolumeRow(reported: volume.level,
+                                onDAC: session.phone.map { DoPGate.level($0.output, dacs: $0.dopDACs) == .dac } ?? false)
             case .fixed:
                 Label("Fixed volume: set the level on your amplifier or DAC", systemImage: "speaker.slash")
                     .font(.caption).foregroundStyle(Palette.text2)

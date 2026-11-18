@@ -256,8 +256,10 @@ struct RoomRenderTests {
         #expect(abs(SpeakerGeometry.azimuth(from: behind.listener, to: moved.group.speakers[0].position) + 30) < 1e-9)
 
         // 7.1 (sides at index 4 and 5, backs at 6 and 7) on the misdrawn group: BL is 0, BR 1, FL 2, FR 3.
+        // The right side surround has no side speaker and goes to the back right one by name, however that is drawn; the right
+        // back surround has that speaker for its own.
         let before = try #require(PositionRouter(source: Self.surround71, group: Self.misdrawn(nil)))
-        #expect(!before.routes[5].contains { $0.output == 1 })
+        #expect(before.routes[5].map(\.output) == [1] && before.routes[7].map(\.output) == [1])
         let after = try #require(GroupContentPlan(source: Self.surround71, group: Self.misdrawn()))
         #expect(after.router.routes[5].contains { $0.output == 1 })
         #expect(after.router.routes[7].filter { $0.kind != .fill }.map(\.output) == [1])

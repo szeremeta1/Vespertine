@@ -36,6 +36,7 @@ struct ShareEditView: View {
     @State private var name = ""
     @State private var checking = false
     @State private var error: String?
+    @FocusState private var typing: Bool
 
     init(editing: SavedShare? = nil) {
         self.editing = editing
@@ -49,9 +50,20 @@ struct ShareEditView: View {
 
     var body: some View {
         NavigationStack {
+            ScrollViewReader { page in
             Form {
+                // What went wrong is the first thing on the page: at the end it sat under the keyboard, and Add looked
+                // as if it had done nothing.
+                if let error {
+                    Section {
+                        Label(error, systemImage: "exclamationmark.triangle").foregroundStyle(.red)
+                            .id("share-error")
+                            .accessibilityIdentifier("share-error")
+                    }
+                }
                 Section {
                     TextField(String("smb://server/share/folder"), text: $address)
+                        .focused($typing)
                         .keyboardType(.URL).textInputAutocapitalization(.never).autocorrectionDisabled()
                         .accessibilityLabel(Text("SMB Share"))
                         .accessibilityIdentifier("share-address")
@@ -63,9 +75,13 @@ struct ShareEditView: View {
                 Section {
                     TextField("Account", text: $user)
                         .textContentType(.username).textInputAutocapitalization(.never).autocorrectionDisabled()
+                        .focused($typing)
+                        .accessibilityLabel(Text("Account"))
                         .accessibilityIdentifier("share-account")
                     SecureField("Password", text: $password)
                         .textContentType(.password)
+                        .focused($typing)
+                        .accessibilityLabel(Text("Password"))
                         .accessibilityIdentifier("share-password")
                 } footer: {
                     VStack(alignment: .leading, spacing: 6) {
@@ -75,12 +91,11 @@ struct ShareEditView: View {
                 }
                 Section {
                     TextField("Name", text: $name, prompt: Text(verbatim: typed.map(SavedShare.suggestedName) ?? String(localized: "Name")))
+                        .focused($typing)
+                        .accessibilityLabel(Text("Name"))
                         .accessibilityIdentifier("share-name")
                 } footer: {
                     Text("Vespertine reads the songs’ tags from the share and keeps a list of them on this device. The first time takes a while for a large library; after that only new and changed files are read.")
-                }
-                if let error {
-                    Section { Text(error).foregroundStyle(.red) }
                 }
                 if let editing {
                     Section {
@@ -107,6 +122,14 @@ struct ShareEditView: View {
                 }
             }
             .interactiveDismissDisabled(checking)
+            .onChange(of: error) { _, trouble in
+                guard let trouble else { return }
+                // The keyboard goes away and the page goes to the top, where the trouble is said; VoiceOver reads it.
+                typing = false
+                withAnimation { page.scrollTo("share-error", anchor: .top) }
+                AccessibilityNotification.Announcement(trouble).post()
+            }
+            }
         }
     }
 
@@ -114,6 +137,7 @@ struct ShareEditView: View {
     private func confirm() async {
         guard let typed else {
             error = String(localized: "Type the server and the share, like smb://server/share.", comment: "Shown on the iPhone under the Add a Share form when the address typed has no server or no share name in it. Keep “smb://server/share” as an example in Latin letters.")
+            typing = false
             return
         }
         let shown = name.trimmingCharacters(in: .whitespaces)

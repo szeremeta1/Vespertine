@@ -5,6 +5,9 @@
 // The rule generalizes what BedRouter does for a speaker setup and keeps the ITU-R BS.775 folds as special cases:
 //   1. A channel whose speaker the group has plays on it alone, at 1.0.
 //   2. Else, on the nearest single speaker no other channel claimed (Ls on a back pair), alone, at 1.0.
+//      A song with two surround pairs (7.1's sides and backs) on a group with one: the pair left without a speaker joins the
+//      other on the group's surround speaker of its side, at −3 dB, as `BedRouter` folds it for a single device's speaker setup.
+//      A surround channel never plays on a front speaker while the group has a surround speaker on its side.
 //   3. Else it is panned between the two speakers on either side of its angle, with equal power (the tangent law of 2-D
 //      vector-base panning). Halfway between two is 0.707 on each, which is the ITU's −3 dB (a 5.1 centre on L and R).
 //   4. A channel outside every pair's arc goes to the nearest speaker alone, at −3 dB.
@@ -97,6 +100,11 @@ public struct PositionRouter: Hashable, Sendable {
                 claimed.insert(output)
                 continue
             }
+            // A side surround with no side speakers, or a back surround with no back speakers: the surround speaker of its side.
+            if let output = Self.otherSurround(of: role, outputOf: outputOf) {
+                found[s] = [Route(output: output, gain: Self.foldGain, kind: .folded)]
+                continue
+            }
             // 3 and 4. By angle.
             found[s] = Self.byAngle(Self.azimuth(of: role, among: present), height: role.isHeight, targets: targets)
         }
@@ -162,8 +170,8 @@ public struct PositionRouter: Hashable, Sendable {
     /// What output channel `output` is made of: the source channels and gains summed into it.
     public func matrixRow(_ output: Int) -> [Tap] { rows.indices.contains(output) ? rows[output] : [] }
 
-    /// The largest sum of gains any output channel adds up (when every channel peaks at once at full scale): the headroom the
-    /// shared preamp must leave. 1 when nothing is mixed.
+    /// The largest sum of gains any output channel adds up (when every channel peaks at once at full scale): how far past
+    /// full scale a fold can drive a speaker, which `GroupFoldLimiter` keeps it from. 1 when nothing is mixed.
     public var worstCaseGain: Float { rows.map { $0.reduce(Float(0)) { $0 + abs($1.gain) } }.max() ?? 0 }
 
     /// Interleaved source frames to interleaved output frames (`outputChannels` wide). An output with a single channel at 1.0 is
@@ -197,6 +205,21 @@ public struct PositionRouter: Hashable, Sendable {
         case .sideLeft where !both, .backLeft where !both: return -110
         case .sideRight where !both, .backRight where !both: return 110
         default: return role.defaultAzimuth ?? 0
+        }
+    }
+
+    /// Where a surround channel goes when the group has no speakers of its pair (and step 2 found its speaker taken): a side
+    /// surround to the back speaker of its side when the group has no side speakers, a back surround to the side speaker of its
+    /// side when it has no back speakers. nil for any other channel, and when there is no such speaker.
+    private static func otherSurround(of role: SpeakerRole, outputOf: [SpeakerRole: Int]) -> Int? {
+        let hasSides = outputOf[.sideLeft] != nil || outputOf[.sideRight] != nil
+        let hasBacks = outputOf[.backLeft] != nil || outputOf[.backRight] != nil
+        switch role {
+        case .sideLeft where !hasSides: return outputOf[.backLeft]
+        case .sideRight where !hasSides: return outputOf[.backRight]
+        case .backLeft where !hasBacks: return outputOf[.sideLeft]
+        case .backRight where !hasBacks: return outputOf[.sideRight]
+        default: return nil
         }
     }
 

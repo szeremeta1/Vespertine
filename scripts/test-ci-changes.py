@@ -8,6 +8,7 @@ job is skipped only when every changed file is provably one it doesn't read. CI 
 """
 import importlib.util, os, subprocess, sys, unittest
 
+sys.dont_write_bytecode = True  # importing the script must not leave a __pycache__ beside it
 HERE = os.path.dirname(os.path.abspath(__file__))
 spec = importlib.util.spec_from_file_location("ci_changes", os.path.join(HERE, "ci-changes.py"))
 ci = importlib.util.module_from_spec(spec)

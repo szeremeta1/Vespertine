@@ -98,13 +98,14 @@ struct PositionRouterTests {
         #expect(router.untouchedOutputs == [2, 3])
     }
 
-    @Test("7.1 on a quad: the sides at ±90° fall halfway between the pairs, 0.707 on each; the backs stay on the back pair")
+    @Test("7.1 on a quad: the sides have no speakers, so each joins the back surround on the back speaker of its side at 0.707; the fronts get none of it")
     func sevenOneOnQuad() throws {
         let router = try makeRouter(surround71, quadGroup())
-        expect(gains(router, output: 0), [0: 1, 2: r, 4: r])
-        expect(gains(router, output: 1), [1: 1, 2: r, 5: r])
+        expect(gains(router, output: 0), [0: 1, 2: r])
+        expect(gains(router, output: 1), [1: 1, 2: r])
         expect(gains(router, output: 2), [6: 1, 4: r])
         expect(gains(router, output: 3), [7: 1, 5: r])
+        #expect(abs(router.worstCaseGain - (1 + r)) < 1e-6)
     }
 
     @Test("5.1 to two speakers at ±30°, the ITU fold: L + 0.707·C + 0.707·Ls, R + 0.707·C + 0.707·Rs; LFE out")
@@ -117,7 +118,7 @@ struct PositionRouterTests {
         #expect(router.dropped == [3])
     }
 
-    @Test("The worst case a speaker can receive is its row's sum of gains: 1 + 0.707 + 0.707 = 2.414 for the 5.1 fold (+7.7 dB), the shared preamp's measure")
+    @Test("The worst case a speaker can receive is its row's sum of gains: 1 + 0.707 + 0.707 = 2.414 for the 5.1 fold (+7.7 dB), what the fold's limiter guards against")
     func worstCase() throws {
         let router = try makeRouter(surround51, group([(.frontLeft, -30), (.frontRight, 30)]))
         #expect(abs(router.worstCaseGain - (1 + 2 * r)) < 1e-6)

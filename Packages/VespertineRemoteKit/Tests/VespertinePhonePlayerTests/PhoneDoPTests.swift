@@ -77,6 +77,26 @@ private func dac(rate: Double = 44_100, channels: Int = 2, uid: String? = "usb:f
         }
     }
 
+    @MainActor @Test func theVolumeIsSeenToMoveOnlyWhenIosReportsTwoLevelsOnTheSameOutput() {
+        final class Session: OutputSession {
+            var next = OutputReading()
+            func read() -> OutputReading { next }
+            func ask(rate: Double) {}
+            func ask(channels: Int) {}
+        }
+        let session = Session()
+        let watch = OutputWatch(session: session)
+        session.next = OutputReading(route: dac(uid: "usb:zd3"), volume: 0.3)
+        #expect(!watch.refresh(.start).volumeMoved)
+        #expect(!watch.refresh(.heartbeat).volumeMoved, "the same level again says nothing")
+        session.next.volume = 0.35
+        #expect(watch.refresh(.volume).volumeMoved)
+        #expect(watch.refresh(.heartbeat).volumeMoved, "and it stays said")
+        // Another output starts unseen.
+        session.next = OutputReading(route: dac(), volume: 0.35)
+        #expect(!watch.refresh(.routeChange).volumeMoved)
+    }
+
     @Test func doPNeedsATestedDacAndTheVolumeAtItsTop() {
         var dacs = DoPDACs()
         dacs.record(.music, uid: "usb:fiio-k11", name: "K11")
@@ -89,6 +109,80 @@ private func dac(rate: Double = 44_100, channels: Int = 2, uid: String? = "usb:f
         #expect(DoPGate.ceiling(route: dac(), volume: 1, dacs: DoPDACs()) == nil, "never tested")
         let speaker = PhoneRoute(name: "Speaker", portType: "Speaker", sampleRate: 48_000, channels: 2, spatial: false, uid: "usb:fiio-k11")
         #expect(DoPGate.ceiling(route: speaker, volume: 1, dacs: dacs) == nil)
+    }
+
+    // TestFlight AIPS3rYlDtQxr7x-IBSUOr0: "the test DoP button says volume must be at 100%, even when the DAC (my Fosi
+    // ZD3) LITERALLY DOESN'T OFFER SOFTWARE VOLUME CONTROL".
+    @Test func aDacThatPlayedTheChordBelowTheTopGetsDoPAtThatLevelWhateverIosCallsIt() {
+        for level in [0.3, 0.0, nil] as [Double?] {
+            var dacs = DoPDACs()
+            var run = DoPTestRun(uid: "usb:zd3", name: "ZD3", volume: level)
+            #expect(run.heard(.music, into: &dacs) == .next)
+            let zd3 = dac(uid: "usb:zd3")
+            // The chord is only heard if every frame arrived bit for bit: at this level iOS changes nothing.
+            #expect(dacs.heardBelowTop(at: level, for: "usb:zd3"))
+            #expect(DoPGate.ceiling(route: zd3, volume: level, dacs: dacs) == DoPDACs.highestCarrier, "\(String(describing: level))")
+            #expect(DoPGate.reason(route: zd3, volume: level, dacs: dacs) == nil)
+            #expect(DoPGate.ceiling(route: zd3, volume: 1, dacs: dacs) == DoPDACs.highestCarrier, "and at the top, as for any DAC")
+            // Only that level is vouched for: another one may be scaled, so it is PCM there, and says why.
+            let other: Double? = level == 0.3 ? 0.5 : 0.3
+            #expect(DoPGate.ceiling(route: zd3, volume: other, dacs: dacs) == nil)
+            #expect(DoPGate.reason(route: zd3, volume: other, dacs: dacs) == .volume)
+            // And only this DAC.
+            #expect(!dacs.heardBelowTop(at: level, for: "usb:fiio-k11"))
+            #expect(DoPGate.ceiling(route: dac(), volume: level, dacs: dacs) == nil)
+        }
+    }
+
+    @Test func aChordHeardAtTheTopSaysNothingAboutLowerLevels() {
+        var dacs = DoPDACs()
+        var run = DoPTestRun(uid: "usb:fiio-k11", name: "K11", volume: 1)
+        _ = run.heard(.music, into: &dacs)
+        #expect(dacs.entries["usb:fiio-k11"]?.level == nil)
+        #expect(!dacs.heardBelowTop(at: 0.3, for: "usb:fiio-k11") && !dacs.heardBelowTop(at: nil, for: "usb:fiio-k11") && !dacs.heardBelowTop(at: 1, for: "usb:fiio-k11"))
+        #expect(DoPGate.ceiling(route: dac(), volume: 0.3, dacs: dacs) == nil && DoPGate.ceiling(route: dac(), volume: nil, dacs: dacs) == nil)
+        #expect(DoPGate.reason(route: dac(), volume: 0.3, dacs: dacs) == .volume)
+    }
+
+    @Test func whyDsdIsPlayedAsPCMIsSaidForEveryCase() {
+        var dacs = DoPDACs()
+        #expect(DoPGate.reason(route: nil, volume: 1, dacs: dacs) == .notADAC)
+        #expect(DoPGate.reason(route: PhoneRoute(name: "AirPods", portType: "BluetoothA2DPOutput", sampleRate: 48_000, channels: 2, spatial: true, uid: "bt"), volume: 1, dacs: dacs) == .notADAC)
+        #expect(DoPGate.reason(route: dac(), volume: 1, dacs: dacs) == .notTested)
+        dacs.record(.hiss, uid: "usb:fiio-k11", name: "K11")
+        #expect(DoPGate.reason(route: dac(), volume: 1, dacs: dacs) == .failedTest)
+        var run = DoPTestRun(uid: "usb:fiio-k11", name: "K11")
+        for result in [DoPDACs.CarrierResult.passed, .passed, .hiss, .hiss] { _ = run.finish(result, into: &dacs) }
+        #expect(DoPGate.reason(route: dac(), volume: 1, dacs: dacs) == nil)
+        #expect(DoPGate.reason(route: dac(), volume: 0.8, dacs: dacs) == .volume && DoPGate.reason(route: dac(), volume: nil, dacs: dacs) == .volume)
+        // DSD64 goes as DoP; DSD128 needs a rate this DAC didn't pass at.
+        #expect(DoPGate.reason(route: dac(), volume: 1, dacs: dacs, carrier: 176_400) == nil)
+        #expect(DoPGate.reason(route: dac(), volume: 1, dacs: dacs, carrier: 352_800) == .rate)
+        // It never disagrees with the ceiling.
+        for volume in [1, 0.8, nil] as [Double?] {
+            #expect((DoPGate.reason(route: dac(), volume: volume, dacs: dacs) == nil) == (DoPGate.ceiling(route: dac(), volume: volume, dacs: dacs) != nil))
+        }
+    }
+
+    @Test func aSongsCarrierRateIsReadFromItsFormat() {
+        #expect(DoPGate.carrier(format: "DSD64") == 176_400 && DoPGate.carrier(format: "DSD128") == 352_800 && DoPGate.carrier(format: "DSD256 · 5.1") == 705_600)
+        #expect(DoPGate.carrier(format: "FLAC · 24/96") == nil && DoPGate.carrier(format: "") == nil)
+        #expect(DoPGate.name(carrier: 384_000) == "DSD128" && DoPGate.name(carrier: 176_400) == "DSD64" && DoPGate.name(carrier: 192_000) == "DSD64")
+    }
+
+    @Test func whereTheVolumeIsSetIsSaidOnlyFromWhatWasSeen() {
+        var dacs = DoPDACs()
+        let zd3 = dac(uid: "usb:zd3")
+        // Nothing seen: unknown. iOS has no API that says an output's volume is fixed, so it is never assumed.
+        #expect(DoPGate.level(OutputState(route: zd3, volume: 0.3), dacs: dacs) == .unknown)
+        #expect(DoPGate.level(OutputState(route: zd3, volume: nil), dacs: dacs) == .unknown)
+        // The number moved while this was the output: the phone's buttons set it.
+        #expect(DoPGate.level(OutputState(route: zd3, volume: 0.4, volumeMoved: true), dacs: dacs) == .phone)
+        // The chord was heard at this level below the top: the DAC sets it.
+        var run = DoPTestRun(uid: "usb:zd3", name: "ZD3", volume: 0.3)
+        _ = run.heard(.music, into: &dacs)
+        #expect(DoPGate.level(OutputState(route: zd3, volume: 0.3), dacs: dacs) == .dac)
+        #expect(DoPGate.level(OutputState(route: zd3, volume: 0.6, volumeMoved: true), dacs: dacs) == .phone)
     }
 
     @Test func aSongOpenedAheadGetsDoPOnlyAtTheRateTheOutputAlreadyRunsAt() {
@@ -113,6 +207,121 @@ private func dac(rate: Double = 44_100, channels: Int = 2, uid: String? = "usb:f
         #expect(DoPDACs.testCarriers.first == DoPDACs.testCarrier)
         // Sixteen DSD bits a frame: the DSD rate each carrier holds.
         #expect(DoPDACs.testCarriers.map { DoPGate.name(dsdRate: $0 * 16) } == ["DSD64", "DSD64", "DSD128", "DSD128"])
+    }
+
+    // TestFlight ACYG3aqcmGHtjCSJhP8P45c: "the options say music or hiss, but i actually didn't hear anything at all on
+    // some of these runs". Silence had to be answered as hiss, which turned DoP off for the DAC.
+    @Test func hearingNothingIsNeverKeptAsHiss() {
+        var dacs = DoPDACs()
+        var run = DoPTestRun(uid: "a", name: "A")
+        // Once: the same rate is played again.
+        #expect(run.heard(.nothing, into: &dacs) == .replay)
+        #expect(run.carrier == 176_400 && dacs == DoPDACs())
+        // Twice at the first rate: the run ends, and the DAC is as untested as it was.
+        #expect(run.heard(.nothing, into: &dacs) == .ended(.silent))
+        #expect(dacs == DoPDACs() && dacs.answer(for: "a") == nil && run.carrier == nil)
+        // A DAC that had passed keeps what it had.
+        dacs.record(.music, uid: "a", name: "A")
+        let before = dacs
+        var again = DoPTestRun(uid: "a", name: "A")
+        _ = again.heard(.nothing, into: &dacs)
+        #expect(again.heard(.nothing, into: &dacs) == .ended(.silent))
+        #expect(dacs == before && dacs.ceiling(for: "a") == DoPDACs.highestCarrier)
+    }
+
+    @Test func playAgainPlaysTheSameRateAndKeepsNothingHoweverOftenItIsAsked() {
+        var dacs = DoPDACs()
+        var run = DoPTestRun(uid: "a", name: "A")
+        for _ in 0..<5 { #expect(run.heard(.again, into: &dacs) == .replay) }
+        #expect(run.carrier == 176_400 && dacs == DoPDACs())
+        #expect(run.heard(.music, into: &dacs) == .next)
+        #expect(dacs.answer(for: "a") == .music)
+    }
+
+    @Test func nothingThenMusicIsMusic() {
+        var dacs = DoPDACs()
+        var run = DoPTestRun(uid: "a", name: "A")
+        #expect(run.heard(.nothing, into: &dacs) == .replay)
+        #expect(run.heard(.music, into: &dacs) == .next)
+        #expect(dacs.passed(for: "a") == [176_400])
+        // The count starts again at each rate: one "nothing" at the next rate plays it again.
+        #expect(run.heard(.nothing, into: &dacs) == .replay && run.carrier == 192_000)
+    }
+
+    @Test func noSoundAtALaterRateIsKeptAsNoSoundAndTheRunGoesOn() {
+        var dacs = DoPDACs()
+        var run = DoPTestRun(uid: "a", name: "A")
+        #expect(run.heard(.music, into: &dacs) == .next)
+        #expect(run.heard(.nothing, into: &dacs) == .replay)
+        #expect(run.heard(.nothing, into: &dacs) == .next)
+        #expect(run.carrier == 352_800)
+        #expect(run.heard(.music, into: &dacs) == .next)
+        #expect(run.heard(.noise, into: &dacs) == .ended(.on))
+        #expect(dacs.results(for: "a").map(\.result) == [.passed, .silent, .passed, .hiss])
+        #expect(dacs.silent(for: "a") == [192_000] && dacs.answer(for: "a") == .music)
+        // Not heard at 192: nothing is sent as DoP at or above it until it is, as for any rate that didn't pass.
+        #expect(dacs.ceiling(for: "a") == 176_400)
+    }
+
+    @Test func musicAndNoiseAnswerAsMusicAndHissAlwaysDid() {
+        var dacs = DoPDACs()
+        var run = DoPTestRun(uid: "a", name: "A")
+        #expect(run.heard(.noise, into: &dacs) == .ended(.off))
+        #expect(dacs.answer(for: "a") == .hiss && dacs.ceiling(for: "a") == nil)
+        var again = DoPTestRun(uid: "a", name: "A")
+        for _ in 0..<3 { #expect(again.heard(.music, into: &dacs) == .next) }
+        #expect(again.heard(.music, into: &dacs) == .ended(.on))
+        #expect(dacs.passed(for: "a") == DoPDACs.testCarriers)
+    }
+
+    @Test func noiseWithTheVolumeBelowTheTopProvesNothingAndIsNotKept() {
+        // iOS scaling the samples makes noise of DoP on a DAC that decodes it perfectly well.
+        for level in [0.3, nil] as [Double?] {
+            var dacs = DoPDACs()
+            var run = DoPTestRun(uid: "a", name: "A", volume: level)
+            #expect(run.heard(.noise, into: &dacs) == .ended(.inconclusive))
+            #expect(dacs == DoPDACs() && run.carrier == nil)
+        }
+        // Once the chord was heard at that level, noise at a later rate is that rate's result.
+        var dacs = DoPDACs()
+        var run = DoPTestRun(uid: "a", name: "A", volume: 0.3)
+        #expect(run.heard(.music, into: &dacs) == .next)
+        #expect(run.heard(.noise, into: &dacs) == .next)
+        #expect(dacs.results(for: "a").map(\.result) == [.passed, .hiss])
+    }
+
+    @Test func aRunCountsOnlyWhileTheOutputAndTheVolumeStayAsTheyWere() {
+        let zd3 = dac(rate: 176_400, uid: "usb:zd3")
+        let low = DoPTestRun(uid: "usb:zd3", name: "ZD3", volume: 0.3)
+        #expect(low.holds(on: OutputState(route: zd3, volume: 0.3)))
+        #expect(!low.holds(on: OutputState(route: zd3, volume: 0.35)), "the volume moved")
+        #expect(!low.holds(on: OutputState(route: zd3, volume: nil)))
+        #expect(!low.holds(on: OutputState(route: dac(rate: 176_400), volume: 0.3)), "another DAC")
+        #expect(!low.holds(on: OutputState(route: dac(rate: 176_400, channels: 6, uid: "usb:zd3"), volume: 0.3)))
+        #expect(!low.holds(on: OutputState(route: nil, volume: 0.3)))
+        let unknown = DoPTestRun(uid: "usb:zd3", name: "ZD3", volume: nil)
+        #expect(unknown.holds(on: OutputState(route: zd3, volume: nil)) && !unknown.holds(on: OutputState(route: zd3, volume: 1)))
+        let top = DoPTestRun(uid: "usb:zd3", name: "ZD3", volume: 1)
+        #expect(top.holds(on: OutputState(route: zd3, volume: 0.999)) && !top.holds(on: OutputState(route: zd3, volume: 0.9)))
+    }
+
+    @Test func theLevelAChordWasHeardAtIsKeptBetweenLaunches() throws {
+        let suite = "dop-\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        var dacs = DoPDACs()
+        var run = DoPTestRun(uid: "a", name: "ZD3", volume: 0.3)
+        _ = run.heard(.music, into: &dacs)
+        _ = run.heard(.nothing, into: &dacs)
+        _ = run.heard(.nothing, into: &dacs)
+        dacs.save(to: defaults)
+        let back = DoPDACs.load(from: defaults)
+        #expect(back == dacs && back.heardBelowTop(at: 0.3, for: "a") && back.silent(for: "a") == [192_000])
+        // What a build before this one wrote still reads, with no level.
+        let old = #"{"entries":{"a":{"answer":"music","name":"K11","carriers":{"176400":"passed"}}}}"#
+        defaults.set(Data(old.utf8), forKey: DoPDACs.defaultsKey)
+        let read = DoPDACs.load(from: defaults)
+        #expect(read.answer(for: "a") == .music && read.entries["a"]?.level == nil)
     }
 
     @Test func aRunPlaysEveryRateAndKeepsHowEachWent() {
@@ -335,7 +544,8 @@ private func dac(rate: Double = 44_100, channels: Int = 2, uid: String? = "usb:f
 }
 
 @Suite struct TheDoPTestSound {
-    private static let frames = DoPProbeClip.frames()
+    /// The chord, without the second of DSD silence that leads into it.
+    private static let frames = DoPProbeClip.chord()
 
     @Test func itIsFiveSecondsOfDoPFramesWithTheMarkerAlternatingThroughout() {
         let frames = Self.frames
@@ -395,7 +605,7 @@ private func dac(rate: Double = 44_100, channels: Int = 2, uid: String? = "usb:f
 
     @Test func theSameChordIsMadeForEveryCarrierRate() {
         for carrier in DoPDACs.testCarriers.dropFirst() {
-            let frames = DoPProbeClip.frames(carrier: carrier)
+            let frames = DoPProbeClip.chord(carrier: carrier)
             #expect(frames.count == Int(carrier * DoPProbeClip.seconds) && frames.count % 2 == 0, "\(carrier)")
             var wrong = 0
             for (index, word) in frames.enumerated() where word >> 16 != (index % 2 == 0 ? 0x05 : 0xFA) || word > 0xFF_FFFF { wrong += 1 }
@@ -418,7 +628,42 @@ private func dac(rate: Double = 44_100, channels: Int = 2, uid: String? = "usb:f
             #expect((audio.prefix(Int(0.05 * rate)).map(abs).max() ?? 1) < 0.02 && (audio.suffix(Int(0.05 * rate)).map(abs).max() ?? 1) < 0.02, "\(carrier)")
         }
         // The first rate's clip is what it always was.
-        #expect(DoPProbeClip.frames(carrier: 176_400).prefix(4_000) == Self.frames.prefix(4_000))
+        #expect(DoPProbeClip.chord(carrier: 176_400).prefix(4_000) == Self.frames.prefix(4_000))
+    }
+
+    // TestFlight ACYG3aqcmGHtjCSJhP8P45c: "i actually didn't hear anything at all on some of these runs", on a DAC whose
+    // display showed DSD64 and DSD128. The chord used to start with the first frame the DAC got.
+    @Test func theChordIsLedInByASecondOfDsdSilenceThatIsValidDoP() {
+        for carrier in DoPDACs.testCarriers {
+            let frames = DoPProbeClip.frames(carrier: carrier)
+            let lead = DoPProbeClip.leadFrames(carrier: carrier)
+            #expect(lead == Int(carrier * DoPProbeClip.leadIn) && lead % 2 == 0, "\(carrier)")
+            #expect(DoPProbeClip.leadIn >= 1)
+            #expect(frames.count == lead + Int(carrier * DoPProbeClip.seconds), "\(carrier)")
+            // The marker alternates from the first frame of the lead-in to the last of the chord, with no break
+            // where one ends and the other begins.
+            var wrong = 0
+            for (index, word) in frames.enumerated() where word >> 16 != (index % 2 == 0 ? 0x05 : 0xFA) || word > 0xFF_FFFF { wrong += 1 }
+            #expect(wrong == 0, "\(carrier)")
+            // The lead-in is DSD silence: 0x69 in both bytes, as many ones as zeros, which a DAC decodes to nothing.
+            #expect(frames.prefix(lead).allSatisfy { $0 & 0xFFFF == 0x6969 }, "\(carrier)")
+            #expect(DoPProbeClip.idle.nonzeroBitCount == 4)
+            // And the chord after it is the chord as it always was.
+            #expect(Array(frames.dropFirst(lead).prefix(4_000)) == Array(DoPProbeClip.chord(carrier: carrier).prefix(4_000)), "\(carrier)")
+        }
+    }
+
+    @Test func playedAsPCMTheLeadInIsQuietToo() {
+        let lead = DoPProbeClip.leadFrames()
+        let samples = DoPProbeClip.frames().prefix(lead).map { Double(Int32(bitPattern: $0 << 8) >> 8) / 8_388_608 }
+        var sum = 0.0
+        for index in stride(from: 0, to: samples.count - 1, by: 2) {
+            let audible = (samples[index] + samples[index + 1]) / 2
+            sum += audible * audible
+        }
+        let decibels = 20 * log10((sum / Double(samples.count / 2)).squareRoot())
+        // A constant, far below full scale: nothing a speaker moves to.
+        #expect(decibels < -42, "got \(decibels) dBFS")
     }
 
     @Test func aFrameSurvivesTheFloatSampleItIsSentAs() {
@@ -454,10 +699,18 @@ private final class DoPMac: @unchecked Sendable {
 
     init(seconds: Double = 3) { self.seconds = seconds }
 
+    private var _holding = false
+    /// While set, every ask is answered "still preparing, 1%".
+    var holding: Bool {
+        get { lock.withLock { _holding } }
+        set { lock.withLock { _holding = newValue } }
+    }
+
     var asks: [Ask] { lock.withLock { _asks } }
     var closed: [Int] { lock.withLock { _closed } }
 
     func answer(_ song: Int64, dop: Double?) -> RemoteReply {
+        if holding { return .streamPreparing(progress: 0.01) }
         let data = DemoSound.wave(song: song, seconds: seconds)
         let asDoP = !pcmSongs.contains(song) && (dop.map { $0 >= carrier - 0.5 } ?? false)
         return lock.withLock {
@@ -500,6 +753,8 @@ private final class DoPMac: @unchecked Sendable {
     var grants = true
     var brought: [Double] = []
     var declined: [Double] = []
+    /// Why DSD is PCM on this output (`DoPGate.reason`), as the tests set it beside `ceiling`.
+    var reason: DoPGate.PCMReason?
     /// Called inside `bring`, before it answers.
     var whileBringing: (() -> Void)?
 
@@ -516,6 +771,7 @@ private final class DoPMac: @unchecked Sendable {
             return grants
         }
         playback.dop.declined = { [weak self] carrier in self?.declined.append(carrier) }
+        playback.dop.reason = { [weak self] _ in self?.reason }
     }
 }
 
@@ -610,6 +866,106 @@ private final class DoPMac: @unchecked Sendable {
         playback.next()
         try await until { playback.nowPlaying?.track.id == 2 && playback.player.state == .playing }
         #expect(playback.stream?.dsdRate == nil && output.brought.isEmpty)
+        playback.stop()
+    }
+
+    // TestFlight AB79Gu1HWKT1C1C9lmqSb_A: "this says converting on the mac, but this player very clearly supports DSD",
+    // for a DSD64 song on a DAC that had just passed the DoP test. One "Converting on the Mac…" stood for every wait.
+    @Test func aDsdSongAskedForAsDoPIsSaidToBePreparedAsDoPNotConverted() async throws {
+        let mac = DoPMac()
+        let (playback, output) = try make(mac)
+        playback.pollInterval = .milliseconds(5)
+        output.ceiling = 768_000
+        mac.holding = true
+        playback.play([track(1)])
+        try await until { playback.preparing != nil }
+        #expect(playback.preparing?.kind == .dop && playback.preparing?.progress == 0.01)
+        mac.holding = false
+        try await until { playback.player.state == .playing }
+        #expect(playback.preparing == nil && playback.stream?.dsdRate != nil)
+        #expect(playback.dsdAsPCM == nil, "it is DSD: there is nothing to give a reason for")
+        playback.stop()
+    }
+
+    @Test func aDsdSongAskedForAsPCMSaysSoAndWhy() async throws {
+        for reason in [DoPGate.PCMReason.notTested, .volume, .notADAC, .failedTest] {
+            let mac = DoPMac()
+            let (playback, output) = try make(mac)
+            playback.pollInterval = .milliseconds(5)
+            output.ceiling = nil
+            output.reason = reason
+            mac.holding = true
+            playback.play([track(1)])
+            try await until { playback.preparing != nil }
+            #expect(playback.preparing?.kind == .dsdAsPCM(reason))
+            mac.holding = false
+            try await until { playback.player.state == .playing }
+            #expect(mac.asks == [.init(song: 1, dop: nil)], "and nothing was asked for as DoP")
+            // The reason stays with the song while it plays as PCM.
+            #expect(playback.stream?.dsdRate == nil && playback.dsdAsPCM == reason)
+            playback.stop()
+            #expect(playback.dsdAsPCM == nil)
+        }
+    }
+
+    @Test func aDacThatWillNotRunAtTheCarrierRateIsTheReasonTheSongIsPCM() async throws {
+        let mac = DoPMac()
+        let (playback, output) = try make(mac)
+        playback.pollInterval = .milliseconds(5)
+        output.ceiling = 768_000
+        output.grants = false
+        var kinds: [PhonePlayback.Preparing.Kind] = []
+        // The second ask (the PCM one) is held, so what the wait is called can be read.
+        output.whileBringing = { mac.holding = true }
+        playback.play([track(1)])
+        try await until { playback.preparing != nil }
+        if let kind = playback.preparing?.kind { kinds.append(kind) }
+        mac.holding = false
+        try await until { playback.player.state == .playing }
+        #expect(kinds == [.dsdAsPCM(.declined)])
+        #expect(playback.stream?.dsdRate == nil && playback.dsdAsPCM == .declined)
+        playback.stop()
+    }
+
+    @Test func aSongThatIsNotDsdIsAConversionWithNoDsdReason() async throws {
+        let mac = DoPMac()
+        mac.pcmSongs = [7]
+        let (playback, output) = try make(mac)
+        playback.pollInterval = .milliseconds(5)
+        output.ceiling = 768_000
+        mac.holding = true
+        playback.play([TrackSummary(id: 7, title: "Song", artist: "Artist", album: "Album", albumKey: "a", duration: 3, trackNumber: 1, discNumber: 1,
+                                    format: "DTS · 5.1", artworkKey: nil, favorite: false)])
+        try await until { playback.preparing != nil }
+        #expect(playback.preparing?.kind == .conversion)
+        mac.holding = false
+        try await until { playback.player.state == .playing }
+        #expect(playback.dsdAsPCM == nil)
+        playback.stop()
+    }
+
+    // TestFlight AA0UDi09-2p4lRKsNesXlK8, the DoP half: a fall back to PCM is said, and a volume that comes back does not
+    // flip the song to DoP again behind the listener's back.
+    @Test func aSongBroughtBackAsPCMSaysWhyAndStaysPCMWhenTheVolumeComesBack() async throws {
+        let mac = DoPMac(seconds: 6)
+        let (playback, output) = try make(mac)
+        output.ceiling = 768_000
+        playback.play([track(1)])
+        try await until { playback.player.state == .playing && playback.stream?.dsdRate != nil }
+        #expect(playback.dsdAsPCM == nil)
+        output.ceiling = nil
+        output.reason = .volume
+        playback.outputChanged()
+        try await until { playback.stream != nil && playback.stream?.dsdRate == nil && playback.player.state == .playing }
+        #expect(playback.dsdAsPCM == .volume)
+        let asked = mac.asks.count
+        // Back at the top: this song carries on as PCM, and still says why it is.
+        output.ceiling = 768_000
+        output.reason = nil
+        playback.outputChanged()
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(mac.asks.count == asked && playback.stream?.dsdRate == nil && playback.player.state == .playing)
+        #expect(playback.dsdAsPCM == .volume)
         playback.stop()
     }
 
