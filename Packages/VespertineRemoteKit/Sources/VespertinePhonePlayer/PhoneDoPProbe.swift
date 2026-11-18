@@ -55,8 +55,10 @@ public final class DoPProbe {
     /// Stops the music (the test needs the output to itself) and plays the test sound.
     public func run() {
         guard !isBusy else { return }
-        guard DoPGate.canTest(remote.route), let route = remote.route, let uid = route.uid else { phase = .failed(.notADAC); return }
-        guard (remote.outputVolume ?? 0) >= DoPGate.fullVolume else { phase = .failed(.volume); return }
+        // Read now, not remembered: the volume shown may be from before the DAC was plugged in.
+        let now = outputNow()
+        guard DoPGate.canTest(now.route), let route = now.route, let uid = route.uid else { phase = .failed(.notADAC); return }
+        guard (now.volume ?? 0) >= DoPGate.fullVolume else { phase = .failed(.volume); return }
         remote.playback.stop()
         remote.playback.player.rest()
         plan = DoPTestRun(uid: uid, name: route.name)
@@ -111,17 +113,23 @@ public final class DoPProbe {
         engine = nil
     }
 
+    /// The output as iOS reports it this instant: read the one way everything else reads it (`OutputWatch`), so the
+    /// screens show what the test saw.
+    private func outputNow() -> OutputState { remote.readOutput?(.dopTest) ?? remote.output }
+
     /// The output is still the DAC under test, with two channels and the volume at its top.
-    private func sameOutput() -> Bool {
-        guard let plan, let now = PhoneAudioSession.currentRoute() else { return false }
-        return now.uid == plan.uid && now.outputChannels == 2
-            && Double(AVAudioSession.sharedInstance().outputVolume) >= DoPGate.fullVolume
+    private func sameOutput(_ now: OutputState) -> Bool {
+        guard let plan, let route = now.route else { return false }
+        return route.uid == plan.uid && route.channels == 2 && (now.volume ?? 0) >= DoPGate.fullVolume
     }
+
+    private func sameOutput() -> Bool { sameOutput(outputNow()) }
 
     /// The output is still the DAC under test, at the carrier rate, with the volume at its top.
     private func intact() -> Bool {
-        guard sameOutput(), let now = PhoneAudioSession.currentRoute() else { return false }
-        return abs(now.sampleRate - carrier) < 0.5
+        let now = outputNow()
+        guard sameOutput(now), let route = now.route else { return false }
+        return abs(route.sampleRate - carrier) < 0.5
     }
 
     /// The chord couldn't be sent at this rate. At the first rate that ends the test with nothing saved. At a later one
@@ -180,6 +188,8 @@ public final class DoPProbe {
         let held = intact()
         silence()
         phase = held ? .asking : .failed(.changed)
+        // The engine has stopped: what the output does now is read once more.
+        _ = outputNow()
     }
 }
 #endif

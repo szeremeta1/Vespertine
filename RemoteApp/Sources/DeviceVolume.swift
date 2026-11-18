@@ -61,6 +61,12 @@ final class DeviceVolume {
 
     nonisolated static func clamped(_ level: Double) -> Double { level.isFinite ? min(1, max(0, level)) : 0 }
 
+    /// The number beside the slider: the level, or a dash while iOS reports none and no finger has set one (a slider at
+    /// zero with "0%" beside it would be a level nobody read).
+    func label(reported: Double?) -> String {
+        held == nil && reported == nil ? "—" : Self.percent(shown(reported: reported))
+    }
+
     /// "62%".
     nonisolated static func percent(_ level: Double) -> String {
         clamped(level).formatted(.percent.precision(.fractionLength(0)))
@@ -104,6 +110,7 @@ struct DeviceVolumeRow: View {
 
     var body: some View {
         let level = volume.shown(reported: reported)
+        let known = volume.held != nil || reported != nil
         HStack(spacing: 12) {
             Image(systemName: level <= 0 ? "speaker.slash.fill" : "speaker.fill")
                 .frame(width: 36, height: 44)
@@ -112,10 +119,10 @@ struct DeviceVolumeRow: View {
                    onEditingChanged: { editing in if !editing { volume.end() } })
                 .tint(Palette.text2)
                 .accessibilityLabel(Text("Volume"))
-                .accessibilityValue(Text(verbatim: DeviceVolume.percent(level)))
+                .accessibilityValue(known ? Text(verbatim: DeviceVolume.percent(level)) : Text("Not reported by iOS"))
                 .accessibilityIdentifier("device-volume")
                 .background(SystemVolumeHandle(volume: volume).frame(width: 1, height: 1).accessibilityHidden(true))
-            Text(verbatim: DeviceVolume.percent(level))
+            Text(verbatim: volume.label(reported: reported))
                 .font(.signal(.caption)).monospacedDigit()
                 .frame(minWidth: 40, alignment: .trailing)
                 .accessibilityHidden(true)

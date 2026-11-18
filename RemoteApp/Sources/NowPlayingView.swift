@@ -53,6 +53,7 @@ struct NowPlayingView: View {
         .background(backdrop)
         .accessibilityIdentifier("now-playing")
         .feedback(feedback)
+        .onAppear { _ = session.phone?.readOutput?(.shown) }
         .sensoryFeedback(.impact(weight: .light), trigger: player?.playback)
         .sensoryFeedback(.selection, trigger: player?.nowPlaying?.entry)
     }
