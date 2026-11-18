@@ -130,6 +130,25 @@ final class RemoteAppModel {
     /// Several libraries are open as one and the Mac among them is what plays: the lists hold the Mac's music only.
     var showsTheMacsMusicOnly: Bool { macSession != nil && inUse.count > 1 && !PlayTarget.shared.onThisDevice }
 
+    /// The Mac, the share and the folder that are part of the library (the first of each), for setup's cards.
+    var macInUse: SavedPairing? { pairings.first { isInUse($0.serverID) } }
+    var shareInUse: SavedShare? { shares.first { isInUse($0.id) } }
+    var folderInUse: SavedFolder? { shownFolders.first { isInUse($0.id) } }
+    /// The names of everything the library is made of.
+    var namesInUse: [String] {
+        inUse.compactMap { id in pairing(serverID: id)?.name ?? shares.first { $0.id == id }?.name ?? folder(id)?.name }
+    }
+
+    /// Setup's Music step was left with these kinds chosen: what is in use of the others is taken out of the library.
+    /// Nothing is forgotten; it stays in the list of libraries.
+    func keepInUse(mac: Bool, share: Bool, folder: Bool) {
+        let kept = inUse.filter { id in
+            if isMac(id) { return mac }
+            return shares.contains { $0.id == id } ? share : folder
+        }
+        if kept != inUse { use(kept) }
+    }
+
     /// A library in the list was tapped. While choosing what the library is made of, it is put in or taken out; from
     /// the list with nothing open, it is opened by itself.
     func tap(_ id: String) {

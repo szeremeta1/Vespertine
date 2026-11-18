@@ -9,6 +9,36 @@ import Testing
 @testable import VespertineRemote
 
 @Suite struct SetupSteps {
+    @Test func severalSourcesAreConnectedInTurnAndAMacAmongThemBringsTheOutputStep() {
+        #expect(SetupPlan.steps(sources: [.mac, .share, .folder], playsHere: false) == [.welcome, .music, .connect, .output, .extras, .done])
+        #expect(SetupPlan.steps(sources: [.mac, .folder], playsHere: true) == [.welcome, .music, .connect, .output, .sound, .extras, .done])
+        #expect(SetupPlan.steps(sources: [.share, .folder], playsHere: true) == [.welcome, .music, .connect, .sound, .extras, .done])
+        #expect(SetupPlan.connecting([.folder, .mac, .share]) == [.mac, .share, .folder])
+        #expect(SetupPlan.connecting([.demo]).isEmpty)
+        #expect(SetupPlan.named(sources: [.mac, .share], playsHere: true) == [.music, .output, .sound, .extras])
+    }
+
+    @Test func theMusicCardsAddUpAndTheDemoStandsAlone() {
+        var chosen: Set<SetupSource> = []
+        chosen = SetupPlan.tapping(.mac, in: chosen)
+        chosen = SetupPlan.tapping(.share, in: chosen)
+        chosen = SetupPlan.tapping(.folder, in: chosen)
+        #expect(chosen == [.mac, .share, .folder])
+        #expect(SetupPlan.tapping(.share, in: chosen) == [.mac, .folder])
+        #expect(SetupPlan.tapping(.demo, in: chosen) == [.demo])
+        #expect(SetupPlan.tapping(.folder, in: [.demo]) == [.folder])
+        #expect(SetupPlan.tapping(.demo, in: [.demo]).isEmpty)
+    }
+
+    @Test func thisDevicePlaysWheneverNoMacWasChosen() {
+        #expect(SetupPlan.playsHere(sources: [.share], onThisDevice: false))
+        #expect(SetupPlan.playsHere(sources: [.share, .folder], onThisDevice: false))
+        #expect(!SetupPlan.playsHere(sources: [.mac, .share], onThisDevice: false))
+        #expect(SetupPlan.playsHere(sources: [.mac, .share], onThisDevice: true))
+        #expect(!SetupPlan.playsHere(sources: [], onThisDevice: false))
+        #expect(!SetupPlan.playsHere(sources: [.demo], onThisDevice: false))
+    }
+
     @Test func beforeAnythingIsChosenTheStepsAreTheOnesForAMac() {
         #expect(SetupPlan.steps(source: nil, playsHere: false) == [.welcome, .music, .output, .extras, .done])
     }
