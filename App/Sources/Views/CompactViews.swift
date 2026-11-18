@@ -336,6 +336,7 @@ struct LibrarySettings: View {
         Form {
             Section("Sources") {
                 Toggle(LocalLibrarySwitch.title, isOn: Binding(get: { s.localLibrary }, set: { model.setLocalLibrary($0) }))
+                    .accessibilityLabel(LocalLibrarySwitch.title)
                 Text(LocalLibrarySwitch.explanation).font(.caption).foregroundStyle(.secondary)
                 if rows.contains(.sources) {
                 ForEach(model.library.sources) { source in
@@ -377,9 +378,11 @@ struct LibrarySettings: View {
                     model.library.automaticScanningChanged()
                     if $0 { Task { await model.shares.rescanStale() } }   // shares connected and due a look catch up too
                 }))
+                .accessibilityLabel("Scan for new music automatically")
                 Text("Watches your folders, looks again at launch and rechecks network shares now and then. When it’s off, use Rescan Library.")
                     .font(.caption).foregroundStyle(.secondary)
                 Toggle("Skip voice recordings and short clips", isOn: $s.skipNonMusic)
+                    .accessibilityLabel("Skip voice recordings and short clips")
                     .onChange(of: s.skipNonMusic) { model.library.setSkipsNonMusic(s.skipNonMusic) }
                 Button("Find Music on This Mac…") { openWindow(id: "main"); model.showFindMusic = true }
             }
@@ -387,8 +390,10 @@ struct LibrarySettings: View {
             if rows.contains(.analysis) {
             Section {
                 Toggle("Analyze new music automatically", isOn: $s.autoAnalyze)
+                    .accessibilityLabel("Analyze new music automatically")
                     .onChange(of: s.autoAnalyze) { if s.autoAnalyze { model.analysis.analyzeLibrary() } }
                 Toggle("Include network shares", isOn: $s.analyzeNetworkShares)
+                    .accessibilityLabel("Include network shares")
                     .disabled(!s.autoAnalyze)
                 HStack {
                     Button(model.analysis.isRunning ? String(localized: "Stop", comment: "Stops the library analysis") : String(localized: "Analyze Library Now")) {

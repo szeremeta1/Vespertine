@@ -21,7 +21,7 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
 @MainActor private final class FakeLibrary {
     var asked: [RemoteCommand] = []
     let albums: [String: [TrackSummary]] = ["a": (1...4).map { song($0) }, "b": (10...11).map { song($0, album: "b") }]
-    let playlist: [TrackSummary] = [song(11, album: "b"), song(2)]
+    var playlist: [TrackSummary] = [song(11, album: "b"), song(2)]
 
     func answer(_ command: RemoteCommand) async -> RemoteReply {
         asked.append(command)
@@ -125,6 +125,25 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         let (remote, _) = try made()
         #expect(await remote.run(.playPlaylist(id: 5, startAt: 1, shuffled: nil)) == .ok)
         #expect(remote.queueState.current?.track.id == 2 && remote.queueState.continuing.isEmpty)
+        remote.playback.stop()
+    }
+
+    @Test func aPlaylistsLastSongAndASongItHoldsTwicePlayFromThePlaceTapped() async throws {
+        // TestFlight feedback ACUpAP5U-pTc3fiJ6CwJ0Z0 and AOf1M7oLiLlxngkwwaWog5Y.
+        let (remote, library) = try made()
+        library.playlist = [song(1), song(2), song(1), song(3)]
+        // The second place of the song held twice: what follows is what follows that place.
+        #expect(await remote.run(.playPlaylist(id: 5, startAt: 2, shuffled: nil)) == .ok)
+        #expect(remote.queueState.current?.track.id == 1 && remote.queueState.continuing.map(\.track.id) == [3])
+        // Its first place: the whole playlist follows.
+        #expect(await remote.run(.playPlaylist(id: 5, startAt: 0, shuffled: nil)) == .ok)
+        #expect(remote.queueState.current?.track.id == 1 && remote.queueState.continuing.map(\.track.id) == [2, 1, 3])
+        // The last song: it plays, and nothing comes after it.
+        #expect(await remote.run(.playPlaylist(id: 5, startAt: 3, shuffled: nil)) == .ok)
+        #expect(remote.queueState.current?.track.id == 3 && remote.queueState.continuing.isEmpty)
+        // Shuffle plays every place once, the song held twice twice.
+        #expect(await remote.run(.playPlaylist(id: 5, shuffled: true)) == .ok)
+        #expect(([remote.queueState.current].compactMap { $0 } + remote.queueState.continuing).compactMap(\.track.id).sorted() == [1, 1, 2, 3])
         remote.playback.stop()
     }
 

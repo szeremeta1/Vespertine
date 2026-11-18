@@ -12961,274 +12961,6 @@
         }
       }
     },
-    "Choose Another Mac": {
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ሌላ Mac ምረጥ"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اختيار Mac آخر"
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "অন্য Mac বেছে নিন"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vybrat jiný Mac"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vælg en anden Mac"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Anderen Mac wählen"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Επιλογή άλλου Mac"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegir otro Mac"
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "انتخاب Mac دیگر"
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Valitse toinen Mac"
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pumili ng Ibang Mac"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choisir un autre Mac"
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "બીજું Mac પસંદ કરો"
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zaɓi Wata Mac"
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "בחר Mac אחר"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कोई और Mac चुनें"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Másik Mac kiválasztása"
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pilih Mac Lain"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scegli un altro Mac"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "別のMacを選択"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ಬೇರೆ Mac ಆರಿಸಿ"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "다른 Mac 선택"
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "മറ്റൊരു Mac തിരഞ്ഞെടുക്കുക"
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "दुसरा Mac निवडा"
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pilih Mac Lain"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Velg en annen Mac"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kies een andere Mac"
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਕੋਈ ਹੋਰ Mac ਚੁਣੋ"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wybierz innego Maca"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Escolher Outro Mac"
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Escolher outro Mac"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alege alt Mac"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Välj en annan Mac"
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chagua Mac Nyingine"
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "வேறொரு Mac-ஐத் தேர்வுசெய்"
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "మరొక Macను ఎంచుకో"
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "เลือก Mac เครื่องอื่น"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Başka Bir Mac Seç"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Вибрати інший Mac"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "کوئی اور Mac منتخب کریں"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chọn máy Mac khác"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "選擇另一部 Mac"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选取其他 Mac"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "選擇其他 Mac"
-          }
-        }
-      }
-    },
     "Choose one of these and Vespertine on the Mac plays there.": {
       "localizations": {
         "am": {
@@ -29902,6 +29634,544 @@
         }
       }
     },
+    "Libraries": {
+      "comment": "Button and title on the iPhone and iPad: the screen that lists the Macs, shares and folders this device plays music from. Each of them is a library.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ቤተ-መጻሕፍቶች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المكتبات"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "লাইব্রেরি"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Knihovny"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteker"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mediatheken"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Βιβλιοθήκες"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotecas"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کتابخانه‌ها"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kirjastot"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga Library"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliothèques"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "લાઇબ્રેરીઓ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laburori"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ספריות"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लाइब्रेरी"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Könyvtárak"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perpustakaan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Librerie"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライブラリ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಲೈಬ್ರರಿಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보관함"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ലൈബ്രറികൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लायब्ररी"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pustaka"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteker"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotheken"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਲਾਇਬ੍ਰੇਰੀਆਂ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteki"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotecas"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotecas"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteci"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotek"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maktaba"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "லைப்ரரிகள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "లైబ్రరీలు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "คลัง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arşivler"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Медіатеки"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لائبریریاں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thư viện"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "资料库"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資料庫"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資料庫"
+          }
+        }
+      }
+    },
+    "Choose Another Library": {
+      "comment": "Menu item on the iPhone's Output screen: goes back to the list of Macs, shares and folders.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሌላ ቤተ-መጻሕፍት ምረጥ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اختيار مكتبة أخرى"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অন্য লাইব্রেরি বেছে নিন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vybrat jinou knihovnu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vælg et andet bibliotek"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andere Mediathek wählen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Επιλογή άλλης βιβλιοθήκης"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elegir otra biblioteca"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتخاب کتابخانه دیگر"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valitse toinen kirjasto"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pumili ng Ibang Library"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisir une autre bibliothèque"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "બીજી લાઇબ્રેરી પસંદ કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zaɓi Wata Laburare"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בחר ספריה אחרת"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कोई और लाइब्रेरी चुनें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Másik könyvtár kiválasztása"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih Perpustakaan Lain"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli un’altra libreria"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "別のライブラリを選択"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಬೇರೆ ಲೈಬ್ರರಿ ಆರಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 보관함 선택"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മറ്റൊരു ലൈബ്രറി തിരഞ്ഞെടുക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दुसरी लायब्ररी निवडा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih Pustaka Lain"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velg et annet bibliotek"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies een andere bibliotheek"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕੋਈ ਹੋਰ ਲਾਇਬ੍ਰੇਰੀ ਚੁਣੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz inną bibliotekę"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolher Outra Biblioteca"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolher outra biblioteca"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alege altă bibliotecă"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Välj ett annat bibliotek"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chagua Maktaba Nyingine"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வேறொரு லைப்ரரியைத் தேர்வுசெய்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మరొక లైబ్రరీని ఎంచుకో"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เลือกคลังอื่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başka Bir Arşiv Seç"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вибрати іншу медіатеку"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوئی اور لائبریری منتخب کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn thư viện khác"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选取其他资料库"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇其他資料庫"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇另一個資料庫"
+          }
+        }
+      }
+    },
     "Looking for Macs on this network…": {
       "localizations": {
         "am": {
@@ -42541,275 +42811,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "MacBook Pro 揚聲器"
-          }
-        }
-      }
-    },
-    "Macs": {
-      "comment": "Button and title: the list of Macs this device is paired with.",
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macዎች"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أجهزة Mac"
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macy"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-computere"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macs"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macها"
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macit"
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mga Mac"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-Mac"
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "מחשבי Mac"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macek"
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac ಗಳು"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-കൾ"
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macer"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macs"
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Maki"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macs"
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macs"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-uri"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-datorer"
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-கள்"
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macలు"
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac’ler"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Комп’ютери Mac"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macs"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Máy Mac"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
           }
         }
       }
@@ -67247,6 +67248,1620 @@
           "stringUnit": {
             "state": "translated",
             "value": "由 iOS 重新取樣"
+          }
+        }
+      }
+    },
+    "switching to %@ kHz…": {
+      "comment": "Signal chip on the iPhone, lowercase: the DAC was asked for this sample rate and iOS hasn't switched to it yet. %@ is a rate such as 96.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ወደ %@ kHz በመቀየር ላይ…"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "جارٍ التبديل إلى %@ kHz…"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz-এ বদলানো হচ্ছে…"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "přepíná se na %@ kHz…"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "skifter til %@ kHz…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "wechselt zu %@ kHz…"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "αλλαγή σε %@ kHz…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "cambiando a %@ kHz…"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "در حال تغییر به %@ kHz…"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "vaihdetaan: %@ kHz…"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "lumilipat sa %@ kHz…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "passage à %@ kHz…"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz પર બદલાઈ રહ્યું છે…"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ana sauyawa zuwa %@ kHz…"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "מחליף ל־%@ kHz…"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz पर बदला जा रहा है…"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "váltás erre: %@ kHz…"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "beralih ke %@ kHz…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "passaggio a %@ kHz…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHzに切り替え中…"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz ಗೆ ಬದಲಾಗುತ್ತಿದೆ…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz로 전환 중…"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz-ലേക്ക് മാറുന്നു…"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz वर बदलत आहे…"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bertukar ke %@ kHz…"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "bytter til %@ kHz…"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "schakelt over naar %@ kHz…"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz ’ਤੇ ਬਦਲ ਰਿਹਾ ਹੈ…"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "przełączanie na %@ kHz…"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "mudando para %@ kHz…"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "a mudar para %@ kHz…"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "se comută la %@ kHz…"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "byter till %@ kHz…"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "inabadilisha kwenda kHz %@…"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz-க்கு மாறுகிறது…"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHzకి మారుతోంది…"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กำลังสลับเป็น %@ kHz…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz’e geçiliyor…"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "перемикання на %@ kHz…"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ kHz پر تبدیل ہو رہا ہے…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "đang chuyển sang %@ kHz…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在切换到 %@ kHz…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在切換至 %@ kHz…"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在切換至 %@ kHz…"
+          }
+        }
+      }
+    },
+    "Not reported by iOS": {
+      "comment": "Value on the iPhone's Output screen, for the row Volume: iOS gave the app no volume level for this output. iOS stays as it is.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS አላሳወቀም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لم يُبلغ عنه iOS"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS জানায়নি"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS neuvádí"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ikke oplyst af iOS"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von iOS nicht gemeldet"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Δεν αναφέρεται από το iOS"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS no lo indica"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS گزارش نکرده است"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ei ilmoita"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi iniulat ng iOS"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non indiqué par iOS"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS એ જણાવ્યું નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS bai bayyana ba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "לא דווח על־ידי iOS"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ने नहीं बताया"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az iOS nem közli"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak dilaporkan iOS"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non indicato da iOS"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOSから報告なし"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ತಿಳಿಸಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS에서 보고되지 않음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS അറിയിച്ചിട്ടില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ने कळवलेले नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak dilaporkan oleh iOS"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ikke oppgitt av iOS"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niet gemeld door iOS"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ਨੇ ਨਹੀਂ ਦੱਸਿਆ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS nie podaje"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não informado pelo iOS"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não indicado pelo iOS"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neraportat de iOS"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rapporteras inte av iOS"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haijaripotiwa na iOS"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS தெரிவிக்கவில்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS తెలియజేయలేదు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ไม่ได้รายงาน"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS bildirmiyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS не повідомляє"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS نے نہیں بتایا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS không báo"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS 未报告"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS 未回報"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS 未有報告"
+          }
+        }
+      }
+    },
+    "Asked iOS for": {
+      "comment": "Row label on the iPhone's Output screen: the sample rate the app asked iOS to run the DAC at, which iOS hasn't switched to yet. The value is a rate such as 96 kHz. iOS stays as it is.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ከiOS የተጠየቀው"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المطلوب من iOS"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS-এর কাছে চাওয়া হয়েছে"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vyžádáno od iOS"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS er bedt om"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Von iOS angefordert"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ζητήθηκε από το iOS"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitado a iOS"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "درخواست‌شده از iOS"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS:ltä pyydetty"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiniling sa iOS"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demandé à iOS"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS પાસે માગેલું"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An nema daga iOS"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "התבקש מ־iOS"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS से माँगा गया"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az iOS-től kérve"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diminta ke iOS"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiesto a iOS"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOSに要求したレート"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ಗೆ ಕೇಳಿದ್ದು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS에 요청한 값"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS-നോട് ആവശ്യപ്പെട്ടത്"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS कडे मागितलेले"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diminta daripada iOS"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS er bedt om"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aan iOS gevraagd"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ਤੋਂ ਮੰਗਿਆ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zażądano od iOS"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitado ao iOS"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pedido ao iOS"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerut de la iOS"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Begärt av iOS"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imeombwa kwa iOS"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS-இடம் கேட்டது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOSని అడిగినది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ที่ขอจาก iOS"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS’ten istenen"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Запитано в iOS"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS سے مانگا گیا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã yêu cầu iOS"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向 iOS 请求的采样率"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向 iOS 要求的取樣率"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向 iOS 要求的取樣率"
+          }
+        }
+      }
+    },
+    "Waiting for iOS to switch": {
+      "comment": "Value on the iPhone's Output screen, for the row Resampled by iOS: the DAC was asked for the song's sample rate and iOS hasn't switched yet, so it isn't known. iOS stays as it is.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS እስኪቀይር በመጠበቅ ላይ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "بانتظار تبديل iOS"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS বদলানোর অপেক্ষায়"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Čeká se na přepnutí iOS"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Venter på, at iOS skifter"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warten auf Umschaltung durch iOS"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αναμονή αλλαγής από το iOS"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando a que iOS cambie"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "در انتظار تغییر iOS"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Odotetaan iOS:n vaihtoa"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hinihintay na lumipat ang iOS"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En attente du changement par iOS"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS બદલે તેની રાહ જોવાય છે"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ana jiran iOS ya sauya"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ממתין להחלפה על־ידי iOS"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS के बदलने की प्रतीक्षा"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Várakozás az iOS váltására"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menunggu iOS beralih"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In attesa del cambio da parte di iOS"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOSの切り替えを待機中"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ಬದಲಾಯಿಸಲು ಕಾಯಲಾಗುತ್ತಿದೆ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS 전환 대기 중"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS മാറുന്നതിനായി കാത്തിരിക്കുന്നു"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS बदलण्याची प्रतीक्षा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Menunggu iOS bertukar"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Venter på at iOS bytter"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wachten tot iOS overschakelt"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ਦੇ ਬਦਲਣ ਦੀ ਉਡੀਕ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oczekiwanie na przełączenie przez iOS"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aguardando o iOS mudar"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A aguardar que o iOS mude"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se așteaptă comutarea de către iOS"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Väntar på att iOS byter"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inasubiri iOS ibadilishe"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS மாறுவதற்காகக் காத்திருக்கிறது"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS మారడం కోసం వేచి ఉంది"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "กำลังรอ iOS สลับ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS’in geçmesi bekleniyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Очікування перемикання iOS"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS کے تبدیل ہونے کا انتظار"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang chờ iOS chuyển"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待 iOS 切换"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待 iOS 切換"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待 iOS 切換"
+          }
+        }
+      }
+    },
+    "Can’t say: iOS reports no volume": {
+      "comment": "Value on the iPhone's Output screen, for the row Original file: iOS gives no volume level for this DAC, so the app can't say whether the song's samples reach it unchanged. iOS stays as it is.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "መናገር አይቻልም፦ iOS የድምፅ መጠን አያሳውቅም"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لا يمكن الجزم: iOS لا يُبلغ عن مستوى الصوت"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "বলা যাচ্ছে না: iOS কোনো ভলিউম জানায় না"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nelze říci: iOS neuvádí hlasitost"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan ikke siges: iOS oplyser ingen lydstyrke"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unklar: iOS meldet keine Lautstärke"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Άγνωστο: το iOS δεν αναφέρει ένταση ήχου"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se sabe: iOS no indica el volumen"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "نامشخص: iOS بلندی صدا را گزارش نمی‌کند"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ei tiedossa: iOS ei ilmoita äänenvoimakkuutta"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hindi masabi: walang iniuulat na volume ang iOS"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible à dire : iOS n’indique aucun volume"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "કહી શકાતું નથી: iOS કોઈ વૉલ્યૂમ જણાવતું નથી"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ba a iya faɗa ba: iOS bai bayyana ƙarar sauti ba"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "אי אפשר לדעת: iOS לא מדווח על עוצמת קול"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कहा नहीं जा सकता: iOS कोई वॉल्यूम नहीं बताता"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nem tudható: az iOS nem közöl hangerőt"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak dapat dipastikan: iOS tidak melaporkan volume"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile dirlo: iOS non indica il volume"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不明：iOSが音量を報告しません"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಹೇಳಲಾಗದು: iOS ಯಾವುದೇ ವಾಲ್ಯೂಮ್ ತಿಳಿಸುವುದಿಲ್ಲ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "알 수 없음: iOS가 음량을 보고하지 않음"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "പറയാനാവില്ല: iOS വോളിയം അറിയിക്കുന്നില്ല"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "सांगता येत नाही: iOS कोणताही व्हॉल्यूम कळवत नाही"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tidak dapat dipastikan: iOS tidak melaporkan kelantangan"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kan ikke sies: iOS oppgir ikke volum"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niet te zeggen: iOS meldt geen volume"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕਿਹਾ ਨਹੀਂ ਜਾ ਸਕਦਾ: iOS ਕੋਈ ਵੌਲਿਊਮ ਨਹੀਂ ਦੱਸਦਾ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nie wiadomo: iOS nie podaje głośności"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não dá para saber: o iOS não informa o volume"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Não é possível saber: o iOS não indica o volume"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nu se poate spune: iOS nu raportează volumul"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Går inte att säga: iOS rapporterar ingen volym"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haijulikani: iOS hairipoti kiwango cha sauti"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "சொல்ல முடியாது: iOS ஒலியளவைத் தெரிவிக்கவில்லை"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "చెప్పలేము: iOS వాల్యూమ్‌ను తెలియజేయదు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "บอกไม่ได้: iOS ไม่รายงานระดับเสียง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Söylenemez: iOS ses düzeyi bildirmiyor"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Невідомо: iOS не повідомляє гучність"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کہا نہیں جا سکتا: iOS کوئی والیوم نہیں بتاتا"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể xác định: iOS không báo âm lượng"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法确定：iOS 未报告音量"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法確定：iOS 未回報音量"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "無法確定：iOS 未有報告音量"
+          }
+        }
+      }
+    },
+    "Changed by the volume (below 100%)": {
+      "comment": "Value on the iPhone's Output screen, for the row Original file: the device's volume is below 100%, so iOS scales the song's samples before the DAC gets them.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "በድምፅ መጠኑ ተለውጧል (ከ100% በታች)"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "غيّره مستوى الصوت (أقل من 100%)"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ভলিউমের কারণে বদলেছে (100%-এর নিচে)"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Změněno hlasitostí (pod 100 %)"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ændret af lydstyrken (under 100 %)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durch die Lautstärke verändert (unter 100 %)"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Αλλαγμένο από την ένταση ήχου (κάτω από 100%)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alterado por el volumen (menos del 100 %)"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "تغییریافته با بلندی صدا (کمتر از ۱۰۰٪)"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Äänenvoimakkuus muuttaa (alle 100 %)"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Binago ng volume (mas mababa sa 100%)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifié par le volume (inférieur à 100 %)"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "વૉલ્યૂમને કારણે બદલાયેલું (100%થી ઓછું)"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ƙarar sauti ta canza shi (ƙasa da 100%)"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "שונה על־ידי עוצמת הקול (מתחת ל־100%)"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "वॉल्यूम के कारण बदला हुआ (100% से कम)"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A hangerő módosítja (100%-nál kisebb)"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diubah oleh volume (di bawah 100%)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modificato dal volume (sotto il 100%)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "音量により変化（100%未満）"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ವಾಲ್ಯೂಮ್‌ನಿಂದ ಬದಲಾಗಿದೆ (100% ಗಿಂತ ಕಡಿಮೆ)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "음량에 의해 변경됨(100% 미만)"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "വോളിയം കാരണം മാറിയത് (100%-ൽ താഴെ)"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "व्हॉल्यूममुळे बदललेले (100% पेक्षा कमी)"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diubah oleh kelantangan (di bawah 100%)"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Endret av volumet (under 100 %)"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gewijzigd door het volume (lager dan 100%)"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਵੌਲਿਊਮ ਕਾਰਨ ਬਦਲਿਆ (100% ਤੋਂ ਘੱਟ)"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zmienione przez głośność (poniżej 100%)"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alterado pelo volume (abaixo de 100 %)"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alterado pelo volume (abaixo de 100%)"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modificat de volum (sub 100%)"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ändrat av volymen (under 100 %)"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imebadilishwa na kiwango cha sauti (chini ya 100%)"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ஒலியளவால் மாற்றப்பட்டது (100%-க்குக் கீழ்)"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "వాల్యూమ్ వల్ల మారింది (100% కంటే తక్కువ)"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ถูกเปลี่ยนโดยระดับเสียง (ต่ำกว่า 100%)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses düzeyi değiştiriyor (%100’ün altında)"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Змінено гучністю (нижче за 100%)"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "والیوم کی وجہ سے تبدیل شدہ (100% سے کم)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bị âm lượng thay đổi (dưới 100%)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已被音量改变（低于 100%）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已因音量而改變（低於 100%）"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已因音量而改變（低於 100%）"
           }
         }
       }

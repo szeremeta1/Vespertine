@@ -241,6 +241,38 @@ struct DemoMacTests {
         mac.close()
     }
 
+    /// TestFlight feedback ACUpAP5U-pTc3fiJ6CwJ0Z0 and AOf1M7oLiLlxngkwwaWog5Y: the last song of a playlist plays when it is
+    /// tapped, and in a playlist that holds one song more than once the place tapped is what plays, not the song's first place.
+    @Test func aPlaylistsLastSongAndASongItHoldsTwicePlayFromThePlaceTapped() async throws {
+        let (mac, pushes) = try await opened()
+        guard case .songs(let songs, _) = try await ask(mac, .songs(offset: 0, limit: 3)) else { Issue.record("no songs"); return }
+        let ids = songs.compactMap(\.id)
+        try #require(ids.count == 3)
+        let twice = [ids[0], ids[1], ids[0], ids[2]]
+        guard case .playlists(let lists) = try await ask(mac, .createPlaylist(name: "Twice", ids: twice)) else { Issue.record("not made"); return }
+        let list = try #require(lists.last)
+        #expect(list.trackCount == 4)
+        #expect(try await ask(mac, .setShuffle(on: false)) == .ok)
+
+        // The second place of the song held twice: what follows is what follows that place.
+        #expect(try await ask(mac, .playPlaylist(id: list.id, startAt: 2, shuffled: nil)) == .ok)
+        var queue = try #require(pushes.lastQueue)
+        #expect(queue.current?.track.id == ids[0] && queue.continuing.map(\.track.id) == [ids[2]])
+        // Its first place: the whole playlist follows.
+        #expect(try await ask(mac, .playPlaylist(id: list.id, startAt: 0, shuffled: nil)) == .ok)
+        queue = try #require(pushes.lastQueue)
+        #expect(queue.current?.track.id == ids[0] && queue.continuing.map(\.track.id) == [ids[1], ids[0], ids[2]])
+        // The last song: it plays, and nothing comes after it.
+        #expect(try await ask(mac, .playPlaylist(id: list.id, startAt: 3, shuffled: nil)) == .ok)
+        queue = try #require(pushes.lastQueue)
+        #expect(queue.current?.track.id == ids[2] && queue.continuing.isEmpty)
+        // Shuffle plays every place once, the song held twice twice.
+        #expect(try await ask(mac, .playPlaylist(id: list.id, shuffled: true)) == .ok)
+        queue = try #require(pushes.lastQueue)
+        #expect(([queue.current].compactMap { $0 } + queue.continuing).compactMap(\.track.id).sorted() == twice.sorted())
+        mac.close()
+    }
+
     @Test func playlistsSayWhatTheyHoldAndTakeMore() async throws {
         let (mac, pushes) = try await opened()
         guard case .playlists(let lists) = try await ask(mac, .playlists) else { Issue.record("no playlists"); return }

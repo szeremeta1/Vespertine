@@ -189,7 +189,7 @@ struct MacsView: View {
             .obsidianList()
             .readablePane(maxWidth: 760)
             .onChange(of: model.unpairedMacs.count, initial: true) { model.searchChanged() }
-            .navigationTitle("Macs")
+            .navigationTitle("Libraries")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

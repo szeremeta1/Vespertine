@@ -21,7 +21,8 @@ final class AdaptiveNavigationTests: XCTestCase {
     }
 
     private func launch(screen: String = "nowPlaying", width: Int? = nil, largeText: Bool = false) {
-        app.launchArguments = ["-VTDemo", "YES", "-VTPlay", "YES", "-VTScreen", screen, "-VTVinyl", "NO"]
+        // The demo plays on its pretend Mac whatever an earlier run left chosen, so no test makes a sound.
+        app.launchArguments = ["-VTDemo", "YES", "-VTPlay", "YES", "-VTScreen", screen, "-VTVinyl", "NO", "-playsOnThisDevice", "NO"]
         if let width { app.launchArguments += ["-VTTestWindowWidth", "\(width)"] }
         if largeText { app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"] }
         app.launch()
@@ -153,7 +154,7 @@ final class AdaptiveNavigationTests: XCTestCase {
         for _ in 0..<4 { app.swipeDown() }
         element("output-gear").tap()
         XCTAssertTrue(app.buttons["Settings"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["Choose Another Mac"].exists)
+        XCTAssertTrue(app.buttons["Choose Another Library"].exists)
     }
 
     func testRotationRetainsQueueAndControlsRemainReachable() {
@@ -218,6 +219,44 @@ final class AdaptiveNavigationTests: XCTestCase {
         XCTAssertEqual(again.label, "Record")
         again.tap()
         XCTAssertTrue(app.descendants(matching: .any).matching(identifier: "now-playing-art").matching(NSPredicate(format: "label == %@", "Cover")).firstMatch.waitForExistence(timeout: 5))
+    }
+
+    /// TestFlight AGWqTwVAvOJJl42tjue-P-M: dragging the position slider to the middle of a song and letting go moves the
+    /// song there, and the knob stays there.
+    func testDraggingThePositionSliderMidSongSeeksThere() throws {
+        launch()
+        let slider = app.sliders["Position"].firstMatch
+        XCTAssertTrue(slider.waitForExistence(timeout: 10))
+        let before = try XCTUnwrap(Self.times(slider.value as? String))
+        XCTAssertGreaterThan(before.duration, 60)
+        // From the knob to the far part of the song, then let go.
+        let here = before.position / before.duration
+        let there = here < 0.5 ? 0.9 : 0.1
+        let from = slider.coordinate(withNormalizedOffset: CGVector(dx: here, dy: 0.5))
+        let to = slider.coordinate(withNormalizedOffset: CGVector(dx: there, dy: 0.5))
+        from.press(forDuration: 0.2, thenDragTo: to)
+        let near: (Double) -> Bool = { abs($0 - there * before.duration) < 0.15 * before.duration }
+        let moved = expectation(for: NSPredicate { element, _ in
+            Self.times((element as? XCUIElement)?.value as? String).map { near($0.position) } ?? false
+        }, evaluatedWith: slider)
+        wait(for: [moved], timeout: 5)
+        capture("scrubbed")
+        // And it stays: a few seconds on, the song plays on from where it was put, not from where it was.
+        sleep(4)
+        let after = try XCTUnwrap(Self.times(slider.value as? String))
+        XCTAssertTrue(near(after.position - 4) || near(after.position), "at \(after.position) of \(after.duration), put at \(there * before.duration)")
+    }
+
+    /// "2:47 of 5:15" as (167, 315).
+    private static func times(_ value: String?) -> (position: Double, duration: Double)? {
+        func seconds(_ text: Substring) -> Double? {
+            let parts = text.split(separator: ":").map { Double($0) }
+            guard !parts.isEmpty, !parts.contains(nil) else { return nil }
+            return parts.compactMap { $0 }.reduce(0) { $0 * 60 + $1 }
+        }
+        guard let words = value?.split(separator: " "), let first = words.first, let last = words.last,
+              let position = seconds(first), let duration = seconds(last), duration > 0 else { return nil }
+        return (position, duration)
     }
 
     /// Saves the screen next to the test results when VT_SHOTS names a folder.
