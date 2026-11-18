@@ -31,15 +31,22 @@
 # - pull requests restore the SwiftPM caches but only main saves them, so per-PR copies (0.7 to 1.3 GB each) don't
 #   push main's out of the repository's 10 GB cache;
 # - every job has a timeout of about twice its longest run so far, so a hung test can't hold a runner for an hour;
-# - a macOS job runs on GitHub's runner (macos-26) or on one of the project's own two Macs, whichever would finish it
-#   first: scripts/ci-pick-runners.py decides for each job, from which Macs are taking jobs right now and what is
-#   already waiting where, and says why in the run's summary. A Mac that is off, asleep or unplugged gets nothing, and
+# - a macOS job runs on GitHub's runner (macos-26) or on the project's own Macs, whichever would finish it first:
+#   scripts/ci-pick-runners.py decides for each job, from which Macs are taking jobs right now and what is already
+#   waiting where, and says why in the run's summary. A job sent to the project's Macs is taken by whichever of them
+#   is free first. A Mac that is off, asleep or unplugged gets nothing, and
 #   the job runs on GitHub's runner as before. Pull requests from forks never run on the project's Macs (the script
 #   refuses, and the repository asks for approval before any workflow from an outside contributor runs at all).
 #   Setting the repository variable CI_OWN_MACS to "off", or choosing "github" on a manual run, sends everything to
-#   GitHub's runners. The project's Macs keep their files between runs, so the steps below leave nothing behind that a
-#   later run reads: the checkout is cleaned, the app's tests get a bundle identifier and data directory of their own,
-#   and no test that opens a real audio device is on (they are all opt-in, by environment variables no runner sets).
+#   GitHub's runners ("own" on a manual run uses the Macs even then, to try a change to them before switching back on).
+#   The project's Macs keep their files between runs, so the steps below leave nothing behind that a later run reads:
+#   the checkout is cleaned, the app's tests get a bundle identifier and data directory of their own.
+#   Those Macs are in use (one may be playing music, another carrying a call), so no test there can talk to macOS's
+#   audio system: the runner starts `swift test` in a sandbox that can't, and tells the tests so
+#   (VESPERTINE_CI_NO_AUDIO=1); told the same, the debug app that hosts the app's tests shuts itself off first thing
+#   (CIQuiet). The tests then see no audio devices at all, whatever they try: one that needs a device to exist says so
+#   and is skipped there (GitHub's runners have one), and one test in the kit and one in the app fail if they can see
+#   a device after all.
 name: CI
 
 on:
@@ -51,9 +58,9 @@ on:
   workflow_dispatch:
     inputs:
       macs:
-        description: Where the macOS jobs run (auto picks the project's Macs or GitHub's runners, whichever is quicker)
+        description: Where the macOS jobs run (auto picks the project's Macs or GitHub's runners, whichever is quicker; own is the project's Macs even while CI_OWN_MACS is off)
         type: choice
-        options: [auto, github]
+        options: [auto, github, own]
         default: auto
 
 # Actions are pinned by commit (a tag can be moved); Dependabot proposes updates. The Linux image is pinned by digest.
@@ -251,6 +258,9 @@ jobs:
           mkdir -p build
           rm -rf /tmp/vespertine-test-host-library
           defaults delete org.szeremeta.Vespertine.ci 2>/dev/null || true
+          # Xcode inserts the library that loads the tests into the app. A runner that sets this replaces Xcode's list,
+          # and the app then starts with no tests in it ("The test runner hung before establishing connection").
+          unset TEST_RUNNER_DYLD_INSERT_LIBRARIES
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Debug -destination 'platform=macOS' \
             -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile ${CI_BUILD_JOBS:+-jobs $CI_BUILD_JOBS} \
             CODE_SIGNING_ALLOWED=NO PRODUCT_BUNDLE_IDENTIFIER=org.szeremeta.Vespertine.ci test 2>&1 | tee build/app-tests.log \
