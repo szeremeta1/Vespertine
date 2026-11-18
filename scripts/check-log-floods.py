@@ -16,6 +16,10 @@ FLOODS = {
     # device RGB bitmap). Logged once or twice per call.
     "Unrecognized colorspace number": 200,
     "Unknown number of components for colorspace model": 200,
+    # SQLite, for a database whose files were deleted while it was open (a test deleting its scratch folder before
+    # closing the library in it: removeScratch). Two lines per file; a run had about 485 before every test closed its
+    # libraries, and has none since.
+    "vnode unlinked while in use": 20,
 }
 
 
