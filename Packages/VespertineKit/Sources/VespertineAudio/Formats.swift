@@ -83,15 +83,24 @@ public struct DeviceCapabilities: Sendable, Hashable, Codable {
     /// Each output stream's own formats, in stream order, when the device has more than one stream (an 8-channel DAC as
     /// four stereo streams). `physicalFormats` merges them. nil for a single stream, or when not known.
     public var streamFormats: [[PhysicalFormat]]?
+    /// DoP carrier rates this DAC offers as PCM rates but doesn't play DSD at (`DoPKnownDAC.noDoPCarriers`). nil: none known.
+    public var dopUnplayedCarriers: [Double]?
 
     public init(sampleRates: [Double], physicalFormats: [PhysicalFormat], outputChannels: Int, supportsDoP: Bool,
-                speakerLayoutChannels: Int? = nil, streamFormats: [[PhysicalFormat]]? = nil) {
+                speakerLayoutChannels: Int? = nil, streamFormats: [[PhysicalFormat]]? = nil, dopUnplayedCarriers: [Double]? = nil) {
         self.sampleRates = sampleRates.sorted()
         self.physicalFormats = physicalFormats
         self.outputChannels = outputChannels
         self.supportsDoP = supportsDoP
         self.speakerLayoutChannels = speakerLayoutChannels
         self.streamFormats = streamFormats
+        self.dopUnplayedCarriers = dopUnplayedCarriers
+    }
+
+    /// Whether DSD carried at `carrier` goes to this DAC natively: DoP is on for it, and the carrier isn't one it is
+    /// known not to play.
+    public func playsDoP(at carrier: Double) -> Bool {
+        supportsDoP && !(dopUnplayedCarriers ?? []).contains { abs($0 - carrier) < 0.5 }
     }
 
     public func supports(rate: Double) -> Bool {

@@ -180,7 +180,7 @@ enum DeviceQuery {
         return rates.sorted()
     }
 
-    static func capabilities(_ device: AudioObjectID, supportsDoP: Bool) -> DeviceCapabilities {
+    static func capabilities(_ device: AudioObjectID, supportsDoP: Bool, dopUnplayedCarriers: [Double]? = nil) -> DeviceCapabilities {
         var formats: [PhysicalFormat] = []
         var perStream: [[PhysicalFormat]] = []
         for stream in outputStreams(device) {
@@ -208,7 +208,7 @@ enum DeviceQuery {
         return DeviceCapabilities(sampleRates: nominalRates(device), physicalFormats: Array(Set(formats)),
                                   outputChannels: channels, supportsDoP: supportsDoP,
                                   speakerLayoutChannels: speakerLayout(device).flatMap { $0.hasSpeakerPositions ? Int($0.channelCount) : nil },
-                                  streamFormats: perStream.count > 1 ? perStream : nil)
+                                  streamFormats: perStream.count > 1 ? perStream : nil, dopUnplayedCarriers: dopUnplayedCarriers)
     }
 
     /// Channels the device can carry: per stream, the widest format it offers (or its current one,
@@ -270,7 +270,8 @@ enum DeviceQuery {
             modelUID: modelUID,
             transport: transport,
             nominalSampleRate: (try? HAL.get(id, .global(kAudioDevicePropertyNominalSampleRate), initial: Float64(0))) ?? 0,
-            capabilities: capabilities(id, supportsDoP: dopEnabledUIDs.contains(uid)),
+            capabilities: capabilities(id, supportsDoP: dopEnabledUIDs.contains(uid),
+                                       dopUnplayedCarriers: DoPDACListStore.shared.list.knownDAC(for: USBIdentity.identity(forUID: uid))?.noDoPCarriers),
             hasHardwareVolume: !volumeElements(id).isEmpty,
             isDefault: id == defaultID,
             builtInDataSource: transport == .builtIn ? try? HAL.get(id, .output(kAudioDevicePropertyDataSource), initial: UInt32(0)) : nil)

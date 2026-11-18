@@ -52,7 +52,7 @@ Vespertine remembers the output you chose. If it isn't connected, Settings › P
 
 ## DSD and AirPods Max
 
-DSF and DSDIFF files decode from DSD64 to DSD512. On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate. Otherwise it becomes high-rate PCM, with the conversion shown in the signal path. DoP is off until enabled for a device because a non-DoP DAC would play the carrier as noise. DACs known to take it (the FiiO K11 and Fosi Audio ZD3) start with it on. DoP is reported to work up to DSD256 on a Fosi Audio ZD3 and up to DSD128 on a FiiO K11 (developer reports, no capture); DSD512 over DoP has not been tested on hardware. DSD512 file support does not establish native playback at that rate on a real DAC.
+DSF and DSDIFF files decode from DSD64 to DSD512. On a DAC marked DoP-capable, DSD is packed into DoP frames when the DAC supports the carrier rate. Otherwise it becomes high-rate PCM, with the conversion shown in the signal path. So does DSD at a carrier rate a listed DAC is known not to play (a FiiO K11 at 192 and 384 kHz). DoP is off until enabled for a device because a non-DoP DAC would play the carrier as noise. DACs known to take it (the FiiO K11 and Fosi Audio ZD3) start with it on. DoP is reported to work up to DSD256 on a Fosi Audio ZD3 and up to DSD128 on a FiiO K11 (developer reports, no capture); DSD512 over DoP has not been tested on hardware. DSD512 file support does not establish native playback at that rate on a real DAC.
 
 ![A DSD128 file playing natively over DoP on a Fosi Audio ZD3](screenshots/dsd-native-dop.png)
 

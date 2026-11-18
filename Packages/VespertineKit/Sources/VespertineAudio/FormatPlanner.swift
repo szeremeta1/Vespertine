@@ -143,7 +143,7 @@ public enum FormatPlanner {
         if source.encoding == .dsd {
             let carrier = dopCarrierRate(source.sampleRate)
             let dopDepth = dopCarrierDepth(device, carrier: carrier, channels: channels)
-            if !dsdToPCMForRoom, !dsdToPCMForTransitions, channels == source.channels, device.supportsDoP, device.supports(rate: carrier), dopDepth >= 24 {
+            if !dsdToPCMForRoom, !dsdToPCMForTransitions, channels == source.channels, device.playsDoP(at: carrier), device.supports(rate: carrier), dopDepth >= 24 {
                 return OutputPlan(mode: .dop, deviceSampleRate: carrier, decodedSampleRate: carrier,
                                   physicalBitDepth: dopDepth, channels: channels,
                                   dsdConvertedToPCM: false,
@@ -155,6 +155,8 @@ public enum FormatPlanner {
                 ? "Room correction is on; \(source.dsdName ?? "DSD") converted to PCM so it can be corrected"
                 : dsdToPCMForTransitions
                 ? "Transitions come first; \(source.dsdName ?? "DSD") converted to PCM so songs can blend"
+                : device.supportsDoP && !device.playsDoP(at: carrier) && device.supports(rate: carrier) && channels == source.channels
+                ? "This DAC doesn't play DSD natively at \(SampleRate.format(carrier)) kHz; \(source.dsdName ?? "DSD") converted to PCM"
                 : device.supportsDoP && device.supports(rate: carrier) && channels == source.channels
                 ? "DoP needs a 24-bit integer format at \(SampleRate.format(carrier)) kHz, which this device doesn't offer; converted to PCM"
                 : device.supportsDoP

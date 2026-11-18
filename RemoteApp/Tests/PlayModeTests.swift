@@ -39,6 +39,25 @@ import Testing
 }
 
 @MainActor
+@Suite struct OutputScreen {
+    @Test func eachSidesOutputsShowOnlyWhileThatSidePlays() {
+        // The Mac plays: its outputs, and nothing of this device's.
+        #expect(OutputLayout.showsMacOutputs(playsHere: false, share: false))
+        #expect(!OutputLayout.showsThisDevice(playsHere: false, share: false))
+        // This device plays a Mac's songs: its own output, and none of the Mac's.
+        #expect(OutputLayout.showsThisDevice(playsHere: true, share: false))
+        #expect(!OutputLayout.showsMacOutputs(playsHere: true, share: false))
+    }
+
+    @Test func aShareOrFolderOnlyEverShowsThisDevice() {
+        for playsHere in [true, false] {
+            #expect(OutputLayout.showsThisDevice(playsHere: playsHere, share: true))
+            #expect(!OutputLayout.showsMacOutputs(playsHere: playsHere, share: true))
+        }
+    }
+}
+
+@MainActor
 @Suite struct DeviceVolumeSlider {
     @Test func theSliderShowsWhatIOSReportsUntilItIsDragged() {
         let volume = DeviceVolume()
