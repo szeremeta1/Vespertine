@@ -165,7 +165,7 @@
         "links": [
           "Grup speaker secara rinci"
         ],
-        "alt": "Editor grup speaker Vespertine untuk quad: gambar ruangan dari atas dengan empat speaker mengelilingi posisi dengar, serta jarak, sudut, penundaan, dan level tiap speaker.",
+        "alt": "Editor grup speaker Vespertine untuk quad: ruangan yang digambar dalam tiga dimensi dengan empat speaker di atas penyangga mengelilingi posisi dengar, serta lebar, kedalaman, dan tinggi langit-langit ruangan.",
         "floatAlt": "Peta kanal: setiap kanal pada setiap output ditetapkan ke sebuah speaker, dengan tombol “Identify” dan kotak “Inverted” di tiap kanal.",
         "floatCaption": "Peta kanal"
       },
@@ -274,7 +274,8 @@
           "Share jaringan melalui SMB, NFS, atau WebDAV, dengan caching, Simpan Offline, dan pemutaran yang dirancang untuk server lambat: trek di-buffer di Mac Anda sebelum diputar, dengan cincin pemuatan pada tombol putar selama proses itu berlangsung.",
           "Temukan Musik menelusuri setiap drive untuk menemukan musik Anda yang sebenarnya dan mengabaikan file yang tidak perlu. Pengaturan singkat saat pertama kali dibuka memilih output Anda dan menjelaskan fungsi akses eksklusif dan ReplayGain.",
           "EQ parametrik per output yang dapat mengimpor preset AutoEQ dan Equalizer APO. Mati secara default; saat aktif, jalur sinyal menampilkan <span class=\"mono nowrap\">EKUALISER</span>, bukan <span class=\"mono nowrap\">BIT-PERFECT</span>.",
-          "Pemutar Mini, ikon di bar menu, tombol media, ReplayGain, serta pembaruan otomatis yang ditandatangani."
+          "Pemutar Mini, ikon di bar menu, tombol media, ReplayGain, serta pembaruan otomatis yang ditandatangani.",
+          "Opsional, dan nonaktif sampai Anda menyalakannya: pemutar jaringan (UPnP) dan penerima AirPlay sebagai output, server OpenSubsonic Anda sendiri di bar samping, kendali jauh untuk ponsel atau browser apa pun di jaringan Anda, visualizer, dan transisi antarlagu."
         ],
         "links": [
           "Semua fitur, secara mendetail"
@@ -525,7 +526,7 @@
         },
         {
           "q": "Apakah bisa streaming dari Qobuz, TIDAL, atau Apple Music?",
-          "a": "Tidak. Vespertine memutar musik milik Anda, di Mac Anda, di drive eksternal, atau di share jaringan. Unduhan langganan Apple Music yang dilindungi DRM tidak dapat diputar."
+          "a": "Tidak dari layanan komersial: Vespertine tidak punya klien untuk Qobuz, TIDAL, atau Apple Music, dan unduhan Apple Music yang dilindungi DRM tidak dapat diputar. Vespertine memutar musik milik Anda, di Mac Anda, di drive eksternal, atau di share jaringan. Dua fitur beta opsional menambahkan server OpenSubsonic Anda sendiri (Navidrome dan lainnya) serta musik yang dikirim oleh app kontrol UPnP."
         },
         {
           "q": "Bagaimana saya tahu pemutarannya benar-benar bit-perfect?",
