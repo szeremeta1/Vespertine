@@ -8,6 +8,7 @@ USB DACs never say whether they decode DSD over PCM (DoP), and a DAC that doesn'
 
 - **Matching** uses the USB vendor and product ID where macOS gives them (read from the I/O Registry, `USBIdentity`), or the vendor and model names in the Core Audio UID (`AppleUSBAudioEngine:<vendor>:<model>:<serial>:<n>`). The serial and the port number are never looked at.
 - **Every entry carries a `source`**: an https link to where the claim comes from (the maker's spec page, a device report, this repository's [device notes](DEVICES.md)), with a few words on what it shows, and an `evidence` of `hardware`, `owner-report` or `manufacturer`. A test fails for an entry with no source, no `https`, or nothing to match on. No source, no entry.
+- **`noDoPCarriers`** (optional) lists DoP carrier rates in Hz that a DAC offers as PCM rates but does not play DSD at. DSD that would need one is converted to PCM for that DAC, and the signal path says so; the carriers it does play still go natively. The FiiO K11 has 192000 and 384000 (see the [device notes](DEVICES.md)). Older builds ignore the field.
 - **`makers`** lists makers known for DSD DACs. It is only a hint: a DAC from a listed maker that isn't in `dacs` is *suggested* the test (part 3), never switched on.
 
 ### Adding a DAC
