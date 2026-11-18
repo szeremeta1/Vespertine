@@ -79,7 +79,7 @@ struct DoPEngineStreamTests {
     }
 
     struct Seen: Sendable {
-        var played = false, resumed = false, soughtForward = false, soughtBack = false
+        var played = false, released = false, resumed = false, soughtForward = false, soughtBack = false
         var playedAsDoP = false
         var pausedAt = 0.0
     }
@@ -114,6 +114,7 @@ struct DoPEngineStreamTests {
         settings.dopDeviceUIDs = [device.uid]
         settings.releaseExclusiveAfterPause = 0.3
         engine.update(settings: settings)
+        let held = { var later = settings; later.releaseExclusiveAfterPause = 3600; return later }()
         let item = PlayableItem(url: file)
 
         // On a thread of its own: the waits are short polls, which must not hold one of Swift's few cooperative threads.
@@ -135,9 +136,11 @@ struct DoPEngineStreamTests {
                 engine.pause()
                 _ = wait { $0.state == .paused }
                 seen.pausedAt = engine.snapshot.position
-                Thread.sleep(forTimeInterval: 1.5)
+                seen.released = wait { _ in outputs.withLock { $0.first?.isShutDown == true } }
                 engine.resume()
                 seen.resumed = wait { $0.state == .playing && $0.position >= seen.pausedAt + 0.5 }
+                // From here no pause lets the output go, however long a busy machine makes the next one.
+                engine.update(settings: held)
                 engine.seek(to: 8)
                 seen.soughtForward = wait { $0.state == .playing && $0.position >= 8.5 }
                 engine.pause()
@@ -152,7 +155,7 @@ struct DoPEngineStreamTests {
             thread.name = "DoP stream script"
             thread.start()
         }
-        #expect(seen.played && seen.resumed && seen.soughtForward && seen.soughtBack, "the script ran through: \(seen)")
+        #expect(seen.played && seen.released && seen.resumed && seen.soughtForward && seen.soughtBack, "the script ran through: \(seen)")
         #expect(seen.playedAsDoP)
 
         let captured = outputs.withLock { $0.map(\.captured) }
