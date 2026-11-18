@@ -174,7 +174,7 @@ public final class DemoMac: RemoteChannel {
 
     private func perform(_ command: RemoteCommand) -> RemoteReply {
         switch command {
-        case .hello(_, _, let version, let highest):
+        case .hello(_, _, let version, let highest, _):
             return RemoteProtocol.negotiate(baseline: version, highest: highest) != nil ? .welcome(info) : .failed(reason: "")
         case .pair:
             return .failed(reason: "")

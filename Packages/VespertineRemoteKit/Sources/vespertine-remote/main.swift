@@ -20,6 +20,7 @@ struct SavedPairing: Codable {
     var name: String
     var device: String
     var key: Data
+    var helloProof: Data { HelloProof.make(key: key, serverID: serverID, device: device) }
 }
 
 let configURL = URL(fileURLWithPath: ProcessInfo.processInfo.environment["VESPERTINE_REMOTE_CONFIG"]
@@ -142,7 +143,7 @@ func signIn(printingPushes: Bool = false) -> Link {
     let link = Link(endpoint: mac.endpoint, key: .init(identity: saved.device, key: saved.key))
     link.printPushes = printingPushes
     link.open()
-    let welcome = link.call(.hello(device: saved.device, name: "vespertine-remote on \(ProcessInfo.processInfo.hostName)", protocolVersion: RemoteProtocol.minimumVersion, highestProtocolVersion: RemoteProtocol.version))
+    let welcome = link.call(.hello(device: saved.device, name: "vespertine-remote on \(ProcessInfo.processInfo.hostName)", protocolVersion: RemoteProtocol.minimumVersion, highestProtocolVersion: RemoteProtocol.version, proof: saved.helloProof))
     guard case .welcome = welcome else { printJSON(welcome); fail("The Mac didn't let this remote in.") }
     return link
 }

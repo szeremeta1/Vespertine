@@ -42,7 +42,7 @@ final class StreamMac: @unchecked Sendable {
                     guard error == nil, let content, let message = try? RemoteProtocol.decoder().decode(ClientMessage.self, from: content) else {
                         connection.cancel(); return
                     }
-                    if case .hello(_, _, let baseline, let highest) = message.command {
+                    if case .hello(_, _, let baseline, let highest, _) = message.command {
                         let negotiated = RemoteProtocol.negotiate(baseline: baseline, highest: highest) ?? 1
                         version.value = negotiated
                         var served = info
