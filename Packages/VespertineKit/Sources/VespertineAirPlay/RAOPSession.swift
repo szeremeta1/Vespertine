@@ -91,6 +91,8 @@ public final class RAOPSession: @unchecked Sendable {
         var format = AirPlayFormat.cd
         /// AirPlay 2: the audio goes as the blocks of a buffered stream, played at moments named on the session's clock.
         var buffered = false
+        /// AirPlay 2: a buffered stream's setup was begun (whether or not the receiver took it).
+        var triedBuffered = false
         /// The next block's number.
         var block: UInt32 = 0
         var host = ""
@@ -180,6 +182,9 @@ public final class RAOPSession: @unchecked Sendable {
     public var format: AirPlayFormat { state.withLock { $0.format } }
     /// The audio goes as a buffered stream. Settled by `connect`.
     public var isBuffered: Bool { state.withLock { $0.buffered } }
+    /// `connect` got as far as asking the receiver for a buffered stream. When it then threw, the receiver may still take
+    /// a realtime one: from another session, made without a clock.
+    public var triedBuffered: Bool { state.withLock { $0.triedBuffered } }
     /// Packets sent again on the receiver's request.
     public var resentPackets: Int { state.withLock { $0.resent } }
 
@@ -352,7 +357,7 @@ public final class RAOPSession: @unchecked Sendable {
     private func setUpBuffered(host: String, key: Data, kind: AirPlay2Buffered.Kind, clock: PTPClock) async throws {
         let local = parts.withLock { $0.localAddress }
         parts.withLock { $0.audioKey = SymmetricKey(data: key) }
-        state.withLock { $0.sealed = 0; $0.block = 0 }
+        state.withLock { $0.sealed = 0; $0.block = 0; $0.triedBuffered = true }
         let plist = [("Content-Type", AirPlay2Message.contentType)]
         let introduced = try await request("SETUP", headers: plist, body: AirPlay2Message.bufferedSessionSetup(sender: sender, sessionUUID: UUID(), groupUUID: UUID(),
                                                                                                          addresses: [local]))

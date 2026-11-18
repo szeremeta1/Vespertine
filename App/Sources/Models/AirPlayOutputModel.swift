@@ -176,6 +176,9 @@ final class AirPlayOutputModel {
         guard let made = AirPlayPlayback(device: device) else { playback = nil; return nil }
         made.update(settings: settings)
         made.setReceiverVolume(decibels: receiverVolumeDB)
+        // Buffered streams (24-bit at 48 kHz to an Apple TV) are off until one has been heard working:
+        // `defaults write <bundle id> AirPlayBufferedStreams -bool YES` turns them on.
+        made.buffersStreams = UserDefaults.standard.bool(forKey: "AirPlayBufferedStreams")
         let passwords = self.passwords
         made.passwordProvider = { passwords.read(device.deviceID) }
         // A missing, changed or mistyped password: the listener is asked (again).
