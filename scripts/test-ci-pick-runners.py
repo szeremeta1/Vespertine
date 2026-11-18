@@ -68,6 +68,11 @@ class Plan(unittest.TestCase):
         self.assertEqual(chosen["app"], "own")
         self.assertEqual(pick.plan(ALL, {"shared"}, waiting=30)["verification"], "hosted")
 
+    def test_the_engine_job_never_goes_to_the_low_priority_mac(self):
+        self.assertEqual(pick.plan(ALL, {"shared"})["packages"], "hosted")
+        self.assertEqual(pick.plan(ALL, {"shared"}, hosted_busy=40)["packages"], "hosted")
+        self.assertEqual(pick.plan(ALL, {"fast", "shared"})["packages"], "own")
+
     def test_a_burst_uses_both_places(self):
         waiting, hosted_busy, used = 0.0, 0, set()
         for _ in range(8):
@@ -111,6 +116,7 @@ class Script(unittest.TestCase):
     def test_a_pull_request_from_the_repository_uses_them(self):
         out = run(pull_request("szeremeta1/Vespertine"), **self.fresh)
         self.assertEqual(out["app_runner"], ["self-hosted", "macOS", "vespertine"])
+        self.assertEqual(out["packages_runner"], ["self-hosted", "macOS", "vespertine-fast"])
 
     def test_nothing_readable_is_hosted(self):
         self.assertEqual(run({}), self.hosted)
@@ -121,8 +127,11 @@ class Script(unittest.TestCase):
         self.assertEqual(run({}, CI_MACS_INPUT="github", **self.fresh), self.hosted)
 
     def test_a_manual_run_can_ask_for_the_macs_while_they_are_switched_off(self):
-        own = {f"{job}_runner": pick.OWN for job in ALL}
+        own = {f"{job}_runner": pick.OWN_FAST if job in pick.FAST_ONLY else pick.OWN for job in ALL}
         self.assertEqual(run({}, CI_OWN_MACS="off", CI_MACS_INPUT="own", **self.fresh), own)
+        shared_only = run({}, CI_MACS_INPUT="own", CI_MAC_SHARED_SEEN=str(int(time.time())))
+        self.assertEqual(shared_only["packages_runner"], pick.HOSTED)
+        self.assertEqual(shared_only["app_runner"], pick.OWN)
         self.assertEqual(run({}, CI_OWN_MACS="off", CI_MACS_INPUT="own"), self.hosted)  # no Mac is taking jobs
         self.assertEqual(run(pull_request("someone/Vespertine"), CI_MACS_INPUT="own", **self.fresh), self.hosted)
 
