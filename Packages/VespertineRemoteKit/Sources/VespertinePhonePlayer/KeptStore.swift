@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import VespertineRemoteClient
 import VespertineRemoteProtocol
 
 /// An album or a playlist kept on this device.
@@ -175,6 +176,43 @@ public final class KeptStore {
         guard var record = songs[song], record.replayGain != values else { return }
         record.replayGain = values
         songs[song] = record
+        save()
+    }
+
+    /// Takes in what was kept from one library by itself (the folder at `other`), now that the library is one of several
+    /// joined as one: its lists and songs are known here by their joined names (see `JoinedID`), the song files are moved,
+    /// not fetched again, and the old folder goes. A list already here under its joined name is left as it is.
+    public func adopt(_ other: URL, slot: Int) {
+        defer { try? FileManager.default.removeItem(at: other) }
+        guard other.standardizedFileURL != directory.standardizedFileURL,
+              let data = try? Data(contentsOf: other.appendingPathComponent("index.json")),
+              let index = try? RemoteProtocol.decoder().decode(Index.self, from: data) else { return }
+        for var list in index.lists {
+            switch list.kind {
+            case .album:
+                list.reference = JoinedID.join(list.reference, slot: slot)
+                list.id = KeptList.albumID(list.reference)
+            case .playlist:
+                break
+            }
+            guard self.list(list.id) == nil else { continue }
+            list.artworkKey = list.artworkKey.map { JoinedID.join($0, slot: slot) }
+            list.tracks = list.tracks.map { JoinedLibrary.joined($0, slot) }
+            lists.append(list)
+        }
+        for (key, record) in index.songs {
+            guard let old = Int64(key), let id = JoinedID.join(old, slot: slot), songs[id] == nil else { continue }
+            // Two libraries number their songs alike: the slot in the name keeps their files apart.
+            let name = "s\(slot)-\(record.name)"
+            do {
+                try FileManager.default.moveItem(at: other.appendingPathComponent(record.name), to: directory.appendingPathComponent(name))
+            } catch {
+                continue
+            }
+            songs[id] = Record(name: name, descriptor: record.descriptor, replayGain: record.replayGain)
+            bytes += record.descriptor.byteSize
+        }
+        prune()
         save()
     }
 

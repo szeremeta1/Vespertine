@@ -8,6 +8,24 @@ import Testing
 @testable import VespertineRemoteClient
 import VespertineRemoteProtocol
 
+/// A channel that only counts how often it was opened and closed, and answers nothing unless open.
+@MainActor
+private final class Door: RemoteChannel {
+    var onPush: (@MainActor (ServerMessage) -> Void)?
+    var onClose: (@MainActor (String?) -> Void)?
+    var opened = 0
+    var closed = 0
+    private var isOpen = false
+
+    func open(timeout: Duration) async throws { opened += 1; isOpen = true }
+    func close() { closed += 1; isOpen = false }
+    func request(_ command: RemoteCommand, timeout: Duration) async throws -> RemoteReply {
+        guard isOpen else { throw RemoteLinkError.closed }
+        if case .albums = command { return .albums(items: [], total: 0) }
+        return .ok
+    }
+}
+
 /// A made-up library: albums with songs, answered as a Mac or a share answers. It writes down what it was asked.
 @MainActor
 private final class FakeLibrary: LibraryMember {
@@ -410,6 +428,24 @@ private final class FakeLibrary: LibraryMember {
         #expect(await eventually { pushed.count == 3 })
         guard case .player(let state) = pushed[0] else { Issue.record("no player"); return }
         #expect(state.playback == .stopped && state.nowPlaying == nil)
+    }
+
+    @Test func aShareInTheMixIsOpenedAndClosedWithIt() async throws {
+        let door = Door()
+        let library = JoinedLibrary(name: "Library", members: [.init(slot: 3, name: "NAS", kind: .share, library: ChannelMember(door))])
+        try await library.open(timeout: .seconds(1))
+        #expect(door.opened == 1 && door.closed == 0)
+        #expect(try await ask(library, .ping) == .ok)
+        library.close()
+        #expect(door.closed == 1)
+        // Opened again with the library (the app came back to the front), not left shut.
+        try await library.open(timeout: .seconds(1))
+        #expect(door.opened == 2)
+        // One added while the library is open is opened the first time it is asked.
+        let late = Door()
+        library.members.append(.init(slot: 4, name: "Files", kind: .folder, library: ChannelMember(late)))
+        _ = try await ask(library, .albums(offset: 0, limit: 10, sort: nil))
+        #expect(late.opened == 1 && door.opened == 2)
     }
 
     @MainActor
