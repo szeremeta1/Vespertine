@@ -17,6 +17,9 @@ pick = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(pick)
 
 ALL = list(pick.JOBS)
+gate_spec = importlib.util.spec_from_file_location("ci_gate", os.path.join(HERE, "ci-runner-job-gate.py"))
+gate = importlib.util.module_from_spec(gate_spec)
+gate_spec.loader.exec_module(gate)
 
 
 def run(event, **env):
@@ -108,6 +111,17 @@ class Script(unittest.TestCase):
         self.assertEqual(run({"pull_request": {"head": {"repo": None}}, "repository": {"full_name": "szeremeta1/Vespertine"}},
                              **self.fresh), self.hosted)
 
+    def test_a_bots_pull_request_never_reaches_the_projects_macs(self):
+        # Dependabot's branch is in the repository itself, so it is not a fork: it is told apart by who opened it.
+        for author in ({"login": "dependabot[bot]", "type": "Bot"}, {"login": "some-app[bot]"}, {"login": "renovate", "type": "Bot"}):
+            event = {"pull_request": {"head": {"repo": {"full_name": "a/b"}}, "user": author}, "repository": {"full_name": "a/b"}}
+            self.assertTrue(pick.from_a_bot(event))
+            out = run(event, CI_MAC_FAST_SEEN=str(int(time.time())), CI_MAC_SHARED_SEEN=str(int(time.time())))
+            self.assertEqual(set(map(json.dumps, out.values())), {json.dumps(pick.HOSTED)})
+        person = {"pull_request": {"head": {"repo": {"full_name": "a/b"}}, "user": {"login": "szeremeta1", "type": "User"}}, "repository": {"full_name": "a/b"}}
+        self.assertFalse(pick.from_a_bot(person))
+        self.assertFalse(pick.from_a_bot({"ref": "refs/heads/main"}))
+
     def test_a_pull_request_from_the_repository_uses_them(self):
         out = run(pull_request("szeremeta1/Vespertine"), **self.fresh)
         self.assertEqual(out["app_runner"], ["self-hosted", "macOS", "vespertine"])
@@ -130,6 +144,43 @@ class Script(unittest.TestCase):
         out = run({}, NEED_VERIFICATION="false", **self.fresh)
         self.assertEqual(out["verification_runner"], pick.HOSTED)
         self.assertNotEqual(out["app_runner"], pick.HOSTED)
+
+
+class Gate(unittest.TestCase):
+    """scripts/ci-runner-job-gate.py: what a Mac itself refuses, whatever the pull request's own workflow asked for."""
+    repo = "szeremeta1/Vespertine"
+
+    def pull(self, head, login="szeremeta1", kind="User"):
+        return {"pull_request": {"head": {"repo": {"full_name": head} if head else None}, "user": {"login": login, "type": kind}}}
+
+    def test_a_fork_is_refused(self):
+        self.assertIn("another repository", gate.refusal("pull_request", self.pull("someone/Vespertine"), self.repo))
+        self.assertIn("another repository", gate.refusal("pull_request", self.pull(None), self.repo))
+        self.assertIsNotNone(gate.refusal("pull_request", self.pull(self.repo), ""))
+
+    def test_a_bot_is_refused(self):
+        self.assertIn("bot", gate.refusal("pull_request", self.pull(self.repo, "dependabot[bot]", "Bot"), self.repo))
+
+    def test_what_cannot_be_read_is_refused(self):
+        self.assertIsNotNone(gate.refusal("pull_request", None, self.repo))
+        self.assertIsNotNone(gate.refusal("pull_request", {}, self.repo))
+        self.assertIsNotNone(gate.refusal("push", None, self.repo))
+        self.assertIsNotNone(gate.refusal("pull_request_target", self.pull(self.repo), self.repo))
+
+    def test_the_repositorys_own_work_runs(self):
+        self.assertIsNone(gate.refusal("pull_request", self.pull(self.repo), self.repo))
+        self.assertIsNone(gate.refusal("pull_request", self.pull("Szeremeta1/vespertine"), self.repo))
+        self.assertIsNone(gate.refusal("push", {"ref": "refs/heads/main"}, self.repo))
+        self.assertIsNone(gate.refusal("workflow_dispatch", {"inputs": {"macs": "own"}}, self.repo))
+
+    def test_the_script_fails_the_job(self):
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as file:
+            json.dump(self.pull("someone/Vespertine"), file)
+        env = {"PATH": os.environ.get("PATH", ""), "GITHUB_EVENT_PATH": file.name, "GITHUB_EVENT_NAME": "pull_request", "GITHUB_REPOSITORY": self.repo}
+        refused = subprocess.run([sys.executable, os.path.join(HERE, "ci-runner-job-gate.py")], env=env, capture_output=True, text=True)
+        os.unlink(file.name)
+        self.assertEqual(refused.returncode, 1)
+        self.assertIn("::error::", refused.stdout)
 
 
 if __name__ == "__main__":
