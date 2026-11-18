@@ -56,24 +56,21 @@ struct OutputsView: View {
                         }
                     }
                     if playsHere {
-                        // Head Tracked chosen on a system that can't do it is shown as what plays: Fixed.
+                        // Off, or Spatial Audio: iOS renders it, Fixed or Head Tracked as chosen in Control Center.
                         Picker("Surround on Headphones", selection: Binding(get: {
-                            PlayTarget.surroundChoices.contains(PlayTarget.shared.surround) ? PlayTarget.shared.surround : .fixed
+                            PlayTarget.pickerValue(PlayTarget.shared.surround)
                         }, set: { PlayTarget.shared.surround = $0 })) {
                             Text("Off").tag(SpatialModeChoice.off)
-                            Text("Fixed").tag(SpatialModeChoice.fixed)
-                            if PlayTarget.surroundChoices.contains(.headTracked) {
-                                Text("Head Tracked").tag(SpatialModeChoice.headTracked)
-                            }
+                            Text("Spatial Audio").tag(SpatialModeChoice.fixed)
                         }
                     }
                 } footer: {
                     if session.isFolder {
-                        Text("This device plays the songs from the folder itself, through its speaker, headphones or a DAC. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
+                        Text("This device plays the songs from the folder itself, through its speaker, headphones or a DAC. Surround songs (5.1, 7.1, Dolby Atmos) go to iOS with all their channels, and iOS plays them as Spatial Audio on AirPods and Beats that have it on, as Apple Music does; choose Fixed or Head Tracked in Control Center (touch and hold the volume slider). Other headphones get Vespertine’s own fixed rendering. On speakers, or when this is Off, they’re folded to stereo.")
                     } else if session.isShare {
-                        Text("This device reads the songs from the share itself and plays them, through its speaker, headphones or a DAC. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
+                        Text("This device reads the songs from the share itself and plays them, through its speaker, headphones or a DAC. Surround songs (5.1, 7.1, Dolby Atmos) go to iOS with all their channels, and iOS plays them as Spatial Audio on AirPods and Beats that have it on, as Apple Music does; choose Fixed or Head Tracked in Control Center (touch and hold the volume slider). Other headphones get Vespertine’s own fixed rendering. On speakers, or when this is Off, they’re folded to stereo.")
                     } else {
-                        Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched. Surround songs (5.1, 7.1) are rendered as Spatial Audio on headphones, and folded to stereo on speakers or when this is Off; Head Tracked needs AirPods or Beats that follow your head.")
+                        Text("The Mac sends the songs and this device plays them, through its speaker, headphones or a DAC. The Mac’s own playback isn’t touched. Surround songs (5.1, 7.1, Dolby Atmos) go to iOS with all their channels, and iOS plays them as Spatial Audio on AirPods and Beats that have it on, as Apple Music does; choose Fixed or Head Tracked in Control Center (touch and hold the volume slider). Other headphones get Vespertine’s own fixed rendering. On speakers, or when this is Off, they’re folded to stereo.")
                     }
                 }
                 if playsHere {
@@ -95,7 +92,7 @@ struct OutputsView: View {
                     } header: {
                         Text("What Reaches the Output")
                     } footer: {
-                        Text("Read back from iOS while the song plays, not assumed. Vespertine asks a DAC for each song’s own rate and, for surround, an interface for a channel per output (in the order L, R, C, LFE, back pair, side pair). iOS doesn’t tell apps an output’s bit depth. With the volume below 100%, a DAC doesn’t receive the song’s samples unchanged.")
+                        Text("Read back from iOS while the song plays, not assumed. Vespertine asks a DAC for each song’s own rate and, for surround, an interface for a channel per output (in the order L, R, C, LFE, back pair, side pair). iOS doesn’t tell apps an output’s bit depth. With the volume below 100%, a DAC doesn’t receive the song’s samples unchanged. On AirPods, iOS makes the two channels your ears get from the channels it was sent, so the output itself always has two.")
                     }
                 }
                 if playsHere, !session.isDemo, let phone = session.phone, DoPGate.canTest(phone.route) {
@@ -156,12 +153,12 @@ struct OutputsView: View {
             .obsidianList()
             .navigationTitle("Output").screenTitleStyle()
             .toolbar {
-                // On an iPad's wide window the gear and "Macs" are in the window's own bars.
+                // On an iPad's wide window the gear and "Libraries" are in the window's own bars.
                 if sizeClass != .regular {
                     ToolbarItem(placement: .topBarTrailing) {
                         Menu {
                             Button { showingSettings = true } label: { Label("Settings", systemImage: "gearshape") }
-                            Button { model.leave() } label: { Label("Choose Another Mac", systemImage: "desktopcomputer") }
+                            Button { model.leave() } label: { Label("Choose Another Library", systemImage: "music.note.house") }
                         } label: {
                             Image(systemName: "gearshape")
                         }

@@ -70,6 +70,12 @@ public final class PhoneSystem {
         observers.append(Self.observe(AVAudioSession.spatialPlaybackCapabilitiesChangedNotification, session) { [weak self] _, _, _ in
             Task { @MainActor in self?.refreshRoute() }
         })
+        // What iOS renders the app's audio as (stereo, surround, Spatial Audio, Dolby Atmos): the badge says only what this says.
+        if #available(iOS 17.2, *) {
+            observers.append(Self.observe(AVAudioSession.renderingModeChangeNotification, session) { [weak self] _, _, _ in
+                Task { @MainActor in self?.refreshRendering() }
+            })
+        }
         observers.append(Self.observe(AVAudioSession.mediaServicesWereResetNotification, session) { [weak self] _, _, _ in
             Task { @MainActor in self?.outputChanged() }
         })
@@ -93,6 +99,7 @@ public final class PhoneSystem {
         commands = []
         coverTask?.cancel()
         settling?.cancel()
+        renderingCheck?.cancel()
         volumeWatch = nil
         controls.withLock { $0 = .none }
         remote.onTransport = nil
@@ -136,6 +143,32 @@ public final class PhoneSystem {
                        maximumChannels: $0.maximumChannels, channelLabels: $0.channelLabels, uid: $0.uid)
         }
         if remote.route != route { remote.route = route }
+        refreshRendering()
+    }
+
+    private var renderingCheck: Task<Void, Never>?
+    private var renderingSeen: (PhonePlayer.Rendering, Bool)?
+
+    /// A song started, stopped or changed path: iOS resolves its rendering once audio flows, so it is read again shortly.
+    private func settleRendering(_ rendering: PhonePlayer.Rendering, playing: Bool) {
+        guard renderingSeen.map({ $0.0 != rendering || $0.1 != playing }) ?? true else { return }
+        renderingSeen = (rendering, playing)
+        refreshRendering()
+        renderingCheck?.cancel()
+        renderingCheck = Task { [weak self] in
+            for delay in [300, 1_000, 3_000] {
+                try? await Task.sleep(for: .milliseconds(delay))
+                guard !Task.isCancelled else { return }
+                self?.refreshRendering()
+            }
+        }
+    }
+
+    /// Reads what iOS says it renders the app's audio as. Also read a moment after a song starts, since iOS settles it
+    /// once audio flows.
+    func refreshRendering() {
+        let mode = PhoneAudioSession.renderingMode()
+        if remote.systemRendering != mode { remote.systemRendering = mode }
     }
 
     /// A DAC (or the headphone adapter) is asked to run at the song's rate, and an interface with more than two outputs
@@ -287,6 +320,7 @@ public final class PhoneSystem {
         // Read so a seek or a stall brings this back; the lock screen is told where the song is this instant.
         _ = playback.anchor
         askOutput()
+        settleRendering(playback.player.rendering, playing: playback.player.state == .playing)
         // Shuffle, repeat and edits change what Next can do and where the song is in the queue.
         let queue = playback.queue
         let card = NowPlayingCard(queue: queue, nowPlaying: playback.nowPlaying, duration: playback.duration, position: playback.livePosition,

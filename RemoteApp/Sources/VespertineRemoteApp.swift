@@ -20,6 +20,7 @@ struct VespertineRemoteApp: App {
                 .onOpenURL { url in model.open(url) }
                 #if DEBUG
                 .task { await BenchLaunch.runIfAsked() }
+                .task { await SpatialProbe.runIfAsked() }
                 #endif
                 .tint(Color.accentColor)
                 .foregroundStyle(Palette.text)

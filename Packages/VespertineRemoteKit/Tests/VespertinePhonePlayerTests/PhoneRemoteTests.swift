@@ -21,7 +21,7 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
 @MainActor private final class FakeLibrary {
     var asked: [RemoteCommand] = []
     let albums: [String: [TrackSummary]] = ["a": (1...4).map { song($0) }, "b": (10...11).map { song($0, album: "b") }]
-    let playlist: [TrackSummary] = [song(11, album: "b"), song(2)]
+    var playlist: [TrackSummary] = [song(11, album: "b"), song(2)]
 
     func answer(_ command: RemoteCommand) async -> RemoteReply {
         asked.append(command)
@@ -128,6 +128,25 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         remote.playback.stop()
     }
 
+    @Test func aPlaylistsLastSongAndASongItHoldsTwicePlayFromThePlaceTapped() async throws {
+        // TestFlight feedback ACUpAP5U-pTc3fiJ6CwJ0Z0 and AOf1M7oLiLlxngkwwaWog5Y.
+        let (remote, library) = try made()
+        library.playlist = [song(1), song(2), song(1), song(3)]
+        // The second place of the song held twice: what follows is what follows that place.
+        #expect(await remote.run(.playPlaylist(id: 5, startAt: 2, shuffled: nil)) == .ok)
+        #expect(remote.queueState.current?.track.id == 1 && remote.queueState.continuing.map(\.track.id) == [3])
+        // Its first place: the whole playlist follows.
+        #expect(await remote.run(.playPlaylist(id: 5, startAt: 0, shuffled: nil)) == .ok)
+        #expect(remote.queueState.current?.track.id == 1 && remote.queueState.continuing.map(\.track.id) == [2, 1, 3])
+        // The last song: it plays, and nothing comes after it.
+        #expect(await remote.run(.playPlaylist(id: 5, startAt: 3, shuffled: nil)) == .ok)
+        #expect(remote.queueState.current?.track.id == 3 && remote.queueState.continuing.isEmpty)
+        // Shuffle plays every place once, the song held twice twice.
+        #expect(await remote.run(.playPlaylist(id: 5, shuffled: true)) == .ok)
+        #expect(([remote.queueState.current].compactMap { $0 } + remote.queueState.continuing).compactMap(\.track.id).sorted() == [1, 1, 2, 3])
+        remote.playback.stop()
+    }
+
     @Test func aPlaylistIsReadAPageAtATime() async throws {
         // TestFlight feedback AOf1M7oLiLlxngkwwaWog5Y: a long playlist must fit in the Mac's replies.
         let (remote, library) = try made()
@@ -219,12 +238,22 @@ private func song(_ id: Int64, album: String = "a") -> TrackSummary {
         remote.route = pods
         #expect(remote.surroundChoice == .off)
         #expect(remote.playback.player.spatialMode == .off, "nobody chose a spatial rendering")
+        #expect(!remote.playback.player.systemSpatial)
         remote.surroundChoice = .fixed
-        #expect(remote.playback.player.spatialMode == .fixed)
+        // AirPods with Spatial Audio on: the channels go to iOS, which renders them; the app's own mixer stays out.
+        #expect(remote.playback.player.systemSpatial && remote.playback.player.spatialMode == .off)
+        remote.surroundChoice = .headTracked
+        #expect(remote.playback.player.systemSpatial && remote.playback.player.spatialMode == .off)
+        // Wired headphones iOS doesn't spatialize: the app's own fixed rendering.
+        remote.route = PhoneRoute(name: "Headphones", portType: "Headphones", sampleRate: 48_000, channels: 2, spatial: false)
+        #expect(!remote.playback.player.systemSpatial && remote.playback.player.spatialMode == .fixed)
         remote.route = PhoneRoute(name: "K11", portType: "USBAudio", sampleRate: 48_000, channels: 6, spatial: false, maximumChannels: 6)
-        #expect(remote.playback.player.spatialMode == .off, "an interface gets the channels")
+        #expect(remote.playback.player.spatialMode == .off && !remote.playback.player.systemSpatial, "an interface gets the channels")
         remote.route = PhoneRoute(name: "Speaker", portType: "Speaker", sampleRate: 48_000, channels: 2, spatial: false)
-        #expect(remote.playback.player.spatialMode == .off)
+        #expect(remote.playback.player.spatialMode == .off && !remote.playback.player.systemSpatial)
+        remote.route = pods
+        remote.surroundChoice = .off
+        #expect(remote.playback.player.spatialMode == .off && !remote.playback.player.systemSpatial, "Off folds")
     }
 
     @Test func theSignalSaysWhatTheOutputGaveAndWhetherTheVolumeIsAtItsTop() {

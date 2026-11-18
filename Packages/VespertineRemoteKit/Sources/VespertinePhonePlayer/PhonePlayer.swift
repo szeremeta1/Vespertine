@@ -77,6 +77,9 @@ public final class PhonePlayer {
         case spatial(headTracked: Bool)
         /// Surround on a multichannel output, each channel on an output of its own, with no mixer in the path.
         case discrete(outputs: Int)
+        /// Surround handed to iOS whole (iOS's sample buffer renderer), every channel and its layout, for iOS's own Spatial
+        /// Audio to render. What iOS then does is read back from the audio session, not assumed here.
+        case system(channels: Int)
     }
     public private(set) var rendering: Rendering = .untouched
 
@@ -86,9 +89,48 @@ public final class PhonePlayer {
     /// Changing it while a surround song plays carries on from the same place.
     public var spatialMode: SpatialMode = .off {
         didSet {
-            guard spatialMode != oldValue, (pump.processingFormat()?.channelCount ?? 0) > 2 else { return }
+            guard spatialMode != oldValue, !settingBoth, (pump.processingFormat()?.channelCount ?? 0) > 2 else { return }
             recoverFromConfigurationChange()
         }
+    }
+    /// Surround songs are handed to iOS whole, for iOS's Spatial Audio to render (`SurroundPath.system`), instead of going
+    /// through the engine (where a Bluetooth route has two channels). Stereo and mono, and surround on an interface with an
+    /// output per channel, never are. Changing it while a surround song plays carries on from the same place.
+    public var systemSpatial = false {
+        didSet {
+            guard systemSpatial != oldValue, !settingBoth, (pump.processingFormat()?.channelCount ?? 0) > 2 else { return }
+            recoverFromConfigurationChange()
+        }
+    }
+    @ObservationIgnored private var settingBoth = false
+
+    /// Sets both at once: a surround song playing is connected again once, not twice.
+    public func setSurround(spatialMode: SpatialMode, systemSpatial: Bool) {
+        let changed = spatialMode != self.spatialMode || systemSpatial != self.systemSpatial
+        settingBoth = true
+        self.spatialMode = spatialMode
+        self.systemSpatial = systemSpatial
+        settingBoth = false
+        if changed, (pump.processingFormat()?.channelCount ?? 0) > 2 { recoverFromConfigurationChange() }
+    }
+
+    /// Makes the sink that hands audio to iOS whole (tests put a stand-in here).
+    @ObservationIgnored var makeSystemSink: () -> PlayerSink = {
+        #if os(iOS)
+        RendererSink()
+        #else
+        // Only the package's tests run this off iOS: they must never make a sound on the machine running them.
+        RendererSink(muted: true)
+        #endif
+    }
+    @ObservationIgnored private var systemSink: PlayerSink?
+    @ObservationIgnored private let nodeSink: NodeSink
+    /// Where audio goes now.
+    private var output: PlayerSink { pump.currentSink() }
+    /// What iOS's renderer reports, for the readback: nil unless surround is being handed to iOS.
+    public var systemRendererStatus: (status: Int, error: String?)? {
+        guard case .system = rendering, let sink = systemSink as? RendererSink else { return nil }
+        return (sink.status.rawValue, sink.error?.localizedDescription)
     }
     @ObservationIgnored private var environment: AVAudioEnvironmentNode?
 
@@ -127,6 +169,11 @@ public final class PhonePlayer {
     /// Seconds of audio decoded ahead of what is being heard: what plays on if the Mac went away now.
     public var decodedAhead: Double { pump.ahead() }
 
+    /// Returns once any fill already running on the decoding queue has handed its buffers to the output. `decodedAhead` counts a
+    /// buffer a moment before it is handed over, so a test that waits on it and then renders must settle first, or a slow machine
+    /// renders silence where the last buffer was about to be. Never called from the decoding queue.
+    func settle() { pump.queue.sync {} }
+
     /// Where the song is, in seconds.
     public var position: Double {
         if state == .paused, let held { return held }
@@ -150,7 +197,8 @@ public final class PhonePlayer {
         engine.attach(node)
         // "Played back" allows for the output's latency (a Bluetooth route's is long); an engine rendering offline has no
         // output to wait for and only says "rendered".
-        pump = Pump(node: node, engine: engine, completion: engine.isInManualRenderingMode ? .dataRendered : .dataPlayedBack)
+        nodeSink = NodeSink(node: node, completion: engine.isInManualRenderingMode ? .dataRendered : .dataPlayedBack)
+        pump = Pump(sink: nodeSink, engine: engine)
         pump.send = { [weak self] event in
             Task { @MainActor in self?.handle(event) }
         }
@@ -183,7 +231,7 @@ public final class PhonePlayer {
     private func reopen() {
         guard let item = current, state == .ready || state == .playing || state == .paused else { return }
         let was = state, place = position, rate = pump.sampleRate()
-        node.stop()
+        output.stop()
         held = nil
         finished = false
         isBuffering = false
@@ -243,10 +291,35 @@ public final class PhonePlayer {
         guard let processing = pump.processingFormat() else { return }
         duration = pump.duration(of: currentID)
         let discrete = pump.isDiscrete()
+        let toSystem = systemSpatial && !discrete && processing.channelCount > 2
         // The output's own connection is about to change (or the node on it): not under a running engine.
-        if discrete || direct, engine.isRunning { engine.stop() }
+        if discrete || direct || toSystem, engine.isRunning { engine.stop() }
         engine.disconnectNodeOutput(node)
         if let environment { engine.disconnectNodeOutput(environment) }
+        if toSystem {
+            // Surround handed to iOS whole: the engine is out of the path, and stays stopped.
+            let sink = systemSink ?? {
+                let made = makeSystemSink()
+                if let renderer = made as? RendererSink {
+                    renderer.onFlushed = { [weak self] in Task { @MainActor in self?.recoverFromConfigurationChange() } }
+                    renderer.onFailed = { [weak self] error in
+                        Task { @MainActor in
+                            guard let self, case .system = self.rendering else { return }
+                            self.halt()
+                            self.onFailure?(Failure.engine(error.localizedDescription))
+                        }
+                    }
+                }
+                systemSink = made
+                return made
+            }()
+            switchSink(to: sink)
+            rendering = .system(channels: Int(processing.channelCount))
+            noteGain()
+            pump.setAhead(seconds: scheduleAhead)
+            return
+        }
+        switchSink(to: nodeSink)
         engine.mainMixerNode.outputVolume = 1
         node.volume = 1
         node.pan = 0
@@ -284,6 +357,14 @@ public final class PhonePlayer {
         pump.setAhead(seconds: scheduleAhead)
     }
 
+    /// Audio goes to `sink` from now on; what the other one had queued is dropped.
+    private func switchSink(to sink: PlayerSink) {
+        let old = pump.currentSink()
+        guard old !== sink else { return }
+        old.stop()
+        pump.setSink(sink)
+    }
+
     /// Reads the gain of the song being heard, and with it whether the path is still the untouched one.
     private func noteGain() {
         let now = current?.gain ?? 1
@@ -304,11 +385,14 @@ public final class PhonePlayer {
         #if os(iOS)
         do { try PhoneAudioSession.activate() } catch { throw Failure.engine(error.localizedDescription) }
         #endif
-        if !engine.isRunning {
+        if case .system = rendering {
+            // iOS's renderer plays it; the engine would only add silence of its own to the output.
+            if engine.isRunning { engine.stop() }
+        } else if !engine.isRunning {
             engine.prepare()
             do { try engine.start() } catch { throw Failure.engine(error.localizedDescription) }
         }
-        node.play()
+        output.play()
         pump.setRunning(true)
         state = .playing
     }
@@ -318,7 +402,7 @@ public final class PhonePlayer {
         guard state == .playing else { return }
         // A paused node keeps its scheduled audio and its clock: play() carries on from here.
         held = position
-        node.pause()
+        output.pause()
         state = .paused
     }
 
@@ -326,7 +410,7 @@ public final class PhonePlayer {
     public func stop() {
         guard let item = current else { halt(); return }
         guard item.source.isComplete else { halt(); return }
-        node.stop()
+        output.stop()
         held = nil
         finished = false
         wantsPlay = false
@@ -340,7 +424,7 @@ public final class PhonePlayer {
 
     /// Stops and forgets the song.
     public func halt() {
-        node.stop()
+        output.stop()
         _ = pump.reset(keepingNext: false)
         pump.setNext(nil)
         current = nil
@@ -359,6 +443,7 @@ public final class PhonePlayer {
     /// silence) while something else plays to it. `play()` starts the engine again.
     public func rest() {
         halt()
+        systemSink?.stop()
         if engine.isRunning { engine.stop() }
     }
 
@@ -370,7 +455,7 @@ public final class PhonePlayer {
         let was = state
         let target = max(0, min(seconds, duration))
         let frame = Int64(target * rate)
-        node.stop()
+        output.stop()
         finished = false
         let generation = pump.reset(keepingNext: true, id: item.id, at: frame)
         if item.source.isComplete {
@@ -390,7 +475,7 @@ public final class PhonePlayer {
         }
         switch was {
         case .playing:
-            node.play()
+            output.play()
             pump.setRunning(true)
         case .paused:
             held = target
@@ -421,7 +506,7 @@ public final class PhonePlayer {
         guard current != nil, state == .playing || state == .paused || state == .ready else { return }
         let was = state
         let place = position
-        node.stop()
+        output.stop()
         connect()
         state = was == .playing ? .paused : was
         held = place
@@ -454,7 +539,7 @@ public final class PhonePlayer {
         case .finished(let generation):
             guard pump.isCurrent(generation), state == .playing || state == .paused else { return }
             tick()
-            node.stop()
+            output.stop()
             pump.setRunning(false)
             finished = true
             held = nil
@@ -493,7 +578,9 @@ private final class Pump: @unchecked Sendable {
         case failed(Int, Error)
     }
 
-    let node: AVAudioPlayerNode
+    /// Where the audio goes: the engine's node, or iOS's renderer. Swapped under `gate`, so a fill never hands a buffer
+    /// to one it has stopped being.
+    private var sink: PlayerSink
     let queue = DispatchQueue(label: "org.szeremeta.vespertine.phone-pump", qos: .userInitiated)
     private let prepare = DispatchQueue(label: "org.szeremeta.vespertine.phone-prepare", qos: .utility)
     var send: @Sendable (Event) -> Void = { _ in }
@@ -521,17 +608,17 @@ private final class Pump: @unchecked Sendable {
     /// The speakers of a multichannel output: surround is decoded onto them.
     private var outputs: [AudioChannelLabel]?
 
-    private let completion: AVAudioPlayerNodeCompletionCallbackType
-
     /// Held so the node keeps its engine for as long as a fill may be in flight: a buffer scheduled on a node whose engine
     /// has gone is an exception, and the player can be let go while the pump's queue is still decoding.
     private let engine: AVAudioEngine
 
-    init(node: AVAudioPlayerNode, engine: AVAudioEngine, completion: AVAudioPlayerNodeCompletionCallbackType) {
-        self.node = node
+    init(sink: PlayerSink, engine: AVAudioEngine) {
+        self.sink = sink
         self.engine = engine
-        self.completion = completion
     }
+
+    func currentSink() -> PlayerSink { gate.withLock { sink } }
+    func setSink(_ new: PlayerSink) { gate.withLock { sink = new } }
 
     /// Seconds of audio decoded and not yet played.
     func ahead() -> Double {
@@ -587,7 +674,7 @@ private final class Pump: @unchecked Sendable {
         // Emptied only now that nothing of the old run can be scheduled any more. Stopped before that, the node could be
         // handed more of the old audio by a fill still at work (a song's first seconds are decoded while it already
         // plays), and would play it first: the old place heard for a moment, and every place after it told wrong.
-        node.stop()
+        currentSink().stop()
         // A decoder waiting for bytes must not hold up the seek or the next song.
         for source in waiting { source.interruptReads() }
         return mine
@@ -628,11 +715,8 @@ private final class Pump: @unchecked Sendable {
         }
     }
 
-    /// Frames the node has rendered since it last started, or nil while it isn't playing.
-    private func rendered() -> Int64? {
-        guard let time = node.lastRenderTime, time.isSampleTimeValid, let player = node.playerTime(forNodeTime: time) else { return nil }
-        return max(0, player.sampleTime)
-    }
+    /// Frames the output has sounded since it last started, or nil while it isn't playing.
+    private func rendered() -> Int64? { currentSink().rendered() }
 
     // MARK: On the decoding queue
 
@@ -704,7 +788,7 @@ private final class Pump: @unchecked Sendable {
             guard live else { return }
             let handed: Bool = gate.withLock {
                 guard lock.withLock({ generation == mine }) else { return false }
-                node.scheduleBuffer(buffer, completionCallbackType: completion) { [weak self] _ in
+                sink.schedule(buffer) { [weak self] in
                     self?.played(Int64(count), mine)
                 }
                 return true

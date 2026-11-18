@@ -65,6 +65,9 @@ final class RemoteAppModel {
     @ObservationIgnored private var shareRevisionSeen = 0
     @ObservationIgnored private let pathMonitor = NWPathMonitor()
     private static let lastMacKey = "lastMac"
+    /// First-run setup is showing and hasn't reached pairing yet: the search for Macs, which makes iOS ask about the
+    /// local network, hasn't started.
+    @ObservationIgnored private var discoveryHeld = false
 
     init() {
         pairings = keychain.load().sorted { $0.pairedAt < $1.pairedAt }
@@ -72,7 +75,9 @@ final class RemoteAppModel {
         folders = folderShelf.load()
         ownFolderInUse = OpenedFiles.holdsAnything(SavedFolder.ownURL)
         discovery.onChange = { [weak self] macs in self?.discovered(macs) }
-        discovery.start()
+        // On a first run the search for Macs waits for the setup step that needs it (see `lookForMacs`).
+        discoveryHeld = SetupAssistant.shared.launched(pairings: pairings.count, shares: shares.count, folders: shownFolders.count)
+        if !discoveryHeld { discovery.start() }
         searchChanged()
         pathMonitor.pathUpdateHandler = { [weak self] path in
             let online = path.status == .satisfied
@@ -405,6 +410,14 @@ final class RemoteAppModel {
         return discovery.macs.filter { !isPaired($0) }
     }
 
+    /// Setup reached pairing, or ended: the search for Macs starts if it was waiting.
+    func lookForMacs() {
+        guard discoveryHeld else { return }
+        discoveryHeld = false
+        discovery.start()
+        searchChanged()
+    }
+
     /// The search for Macs, or what it found, changed: the wait before "No Macs found" follows it.
     func searchChanged() {
         search.update(looking: discovery.isBrowsing, found: unpairedMacs.count)
@@ -524,6 +537,7 @@ final class RemoteAppModel {
     }
 
     func pair(link: PairingLink) {
+        lookForMacs()
         pendingLink = link
         pairingError = nil
         linkWatch?.cancel()
@@ -574,7 +588,7 @@ final class RemoteAppModel {
     func scenePhaseChanged(_ phase: ScenePhase) {
         switch phase {
         case .active:
-            discovery.start()
+            if !discoveryHeld { discovery.start() }
             searchChanged()
             // A connection kept while the app was away may have died without a word: ask, and connect if there is none.
             session?.checkLink()

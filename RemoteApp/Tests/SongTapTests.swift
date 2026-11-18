@@ -15,6 +15,9 @@ import VespertineRemoteProtocol
         let tap = SongTap.playlist(id: 9)
         #expect(tap(0) == .playPlaylist(id: 9, startAt: 0, shuffled: nil))
         #expect(tap(3) == .playPlaylist(id: 9, startAt: 3, shuffled: nil))
+        // The last song of a long playlist, and each place of a song the playlist holds twice: the place is what is sent, never the song.
+        #expect(tap(1_199) == .playPlaylist(id: 9, startAt: 1_199, shuffled: nil))
+        #expect(tap(2) != tap(0))
     }
 
     @Test func otherListsPlayFromTheSongTapped() {
