@@ -481,7 +481,7 @@ struct SetupFlow: View {
         let sides = PlayTarget.shared.sides
         return VStack(spacing: 22) {
             if !typeSize.isAccessibilitySize {
-                SetupFlowPicture(leading: "desktopcomputer", trailing: pad ? "ipad" : "iphone", towardTrailing: here, sounds: here ? .trailing : .leading)
+                SetupFlowPicture(leading: "desktopcomputer", trailing: pad ? "ipad" : "iphone", towardTrailing: here, sounds: here ? .trailing : .leading, soundsBoth: sides == .both && canPlayHere)
                     .setupReveal(shown(.output))
             }
             SetupHeading(title: Text("Choose where it plays"),
