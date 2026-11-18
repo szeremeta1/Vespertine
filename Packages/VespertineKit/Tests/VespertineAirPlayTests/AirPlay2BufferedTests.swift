@@ -195,6 +195,12 @@ struct AirPlay2BufferedTests {
         #expect(said["networkTimeSecs"] as? Int == 1_763_400_000)
         #expect((said["networkTimeFrac"] as? Int).map { UInt64(bitPattern: Int64($0)) } == 0xC000_0000_0000_0001)
         #expect((said["networkTimeTimelineID"] as? Int).map { UInt64(bitPattern: Int64($0)) } == clock)
+        // An Apple TV answers 400 without it.
+        #expect(said["networkTimeFlags"] as? Int == 0)
+        // 200 either way: an empty answer took the moment, one with a status that isn't 0 did not.
+        #expect(AirPlay2Message.tookMoment(Data()))
+        #expect(AirPlay2Message.tookMoment(AirPlay2Message.encode(["status": 0])))
+        #expect(!AirPlay2Message.tookMoment(AirPlay2Message.encode(["status": -71_974])))
 
         let paused = try #require(AirPlay2Message.decode(AirPlay2Message.pause()))
         #expect(paused["rate"] as? Int == 0)
