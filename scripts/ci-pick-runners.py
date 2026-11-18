@@ -8,7 +8,10 @@ There are two places a macOS job can run:
   own      the project's own Macs (label vespertine), each running one job at a time. "fast" works at full speed when
            it is plugged in; "shared" is always on but works at low priority, compiling on half its cores, because
            it has other work to do. A job sent to the project's Macs is taken by whichever is free first, so neither
-           sits idle while the other has a queue.
+           sits idle while the other has a queue. The one exception is the engine job: its tests keep time (waits
+           of milliseconds, real-time deadlines), and on a Mac working at low priority they are starved whenever its
+           other work is busy (one run took 35 minutes and tests that take milliseconds took 231 s). So that job asks
+           for the fast Mac by name, and goes to GitHub's runners when the fast Mac is away.
 
 Each of the project's Macs writes the time into a repository variable once a minute while it is taking jobs
 (CI_MAC_FAST_SEEN, CI_MAC_SHARED_SEEN; 0 when it stops). A Mac not heard from for three minutes is treated as away, so
@@ -29,6 +32,8 @@ import calendar, json, os, sys, time, urllib.request
 
 HOSTED = "macos-26"
 OWN = ["self-hosted", "macOS", "vespertine"]
+OWN_FAST = ["self-hosted", "macOS", "vespertine-fast"]
+FAST_ONLY = ("packages",)  # jobs whose tests keep time: never on a Mac that works at low priority
 # The label every one of the project's Macs carries, and the ones that name a single Mac (older runs asked for those).
 OWN_LABELS = ("vespertine", "vespertine-fast", "vespertine-shared")
 JOBS = ("app", "packages", "verification")  # the order they are placed in: the longest first
@@ -69,8 +74,12 @@ def plan(needed, macs, waiting=0.0, hosted_busy=0):
         over = hosted_busy - HOSTED_AT_ONCE + 1
         hosted_wait = HOSTED_START if over <= 0 else over * sum(HOSTED_MINUTES.values()) / 3 / HOSTED_AT_ONCE
         hosted_finish = hosted_wait + HOSTED_MINUTES[job]
-        # The Macs work through what is waiting together; the job itself may land on the slowest of them.
-        own_finish = waiting / rate + OWN_MINUTES[job] / min(SPEED[mac] for mac in macs) if macs else None
+        if job in FAST_ONLY:
+            # Only the fast Mac may take it, and what is waiting may all be in front of it there.
+            own_finish = waiting / SPEED["fast"] + OWN_MINUTES[job] if "fast" in macs else None
+        else:
+            # The Macs work through what is waiting together; the job itself may land on the slowest of them.
+            own_finish = waiting / rate + OWN_MINUTES[job] / min(SPEED[mac] for mac in macs) if macs else None
         if own_finish is not None and own_finish <= hosted_finish:
             result[job] = "own"
             waiting += OWN_MINUTES[job]
@@ -142,14 +151,19 @@ def main():
             waiting, hosted_busy = load(unfinished_jobs(env["GITHUB_REPOSITORY"], env["GITHUB_TOKEN"], env.get("GITHUB_RUN_ID")), now)
         except Exception as error:  # the queue is only a refinement: without it the Macs count as free
             print(f"could not read the queue ({error}): counting every runner as free", file=sys.stderr)
-    chosen = {job: "own" for job in needed} if forced and macs else plan(needed, macs, waiting, hosted_busy)
+    if forced and macs:
+        chosen = {job: "own" if job not in FAST_ONLY or "fast" in macs else "hosted" for job in needed}
+    else:
+        chosen = plan(needed, macs, waiting, hosted_busy)
     summary = [f"Macs taking jobs: {', '.join(sorted(macs)) or 'none'}" + (f" ({why})" if why else ""),
                f"Already waiting: {waiting:.0f} min of work on the project's Macs, {hosted_busy} macOS jobs on GitHub's runners"]
     for job in JOBS:
         place = chosen.get(job, "hosted")
-        print(f"{job}_runner={json.dumps(OWN if place == 'own' else HOSTED)}")
+        own = OWN_FAST if job in FAST_ONLY else OWN
+        print(f"{job}_runner={json.dumps(own if place == 'own' else HOSTED)}")
         if job in chosen:
-            summary.append(f"{JOB_NAMES[job]}: {'the project\'s Macs' if place == 'own' else 'GitHub'}")
+            where = "GitHub" if place != "own" else "the fast Mac" if job in FAST_ONLY else "the project's Macs"
+            summary.append(f"{JOB_NAMES[job]}: {where}")
     print("\n".join(summary), file=sys.stderr)
     if env.get("GITHUB_STEP_SUMMARY"):
         with open(env["GITHUB_STEP_SUMMARY"], "a") as file:
