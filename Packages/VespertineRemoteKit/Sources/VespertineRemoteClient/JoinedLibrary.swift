@@ -22,23 +22,39 @@ public protocol LibraryMember: AnyObject {
     func readStream(_ stream: Int, offset: Int64, length: Int) async throws -> StreamFrame
 }
 
-/// A library that is a channel itself (a share, a folder, the demo), asked directly.
+/// A library that is a channel itself (a share, a folder, the demo), asked directly. It is opened when the joined
+/// library is (a share starts looking for new songs then), and closed with it.
 @MainActor
 public final class ChannelMember: LibraryMember {
     public let channel: any RemoteChannel
     public var timeout: Duration
+    public private(set) var isOpen = false
 
     public init(_ channel: any RemoteChannel, timeout: Duration = .seconds(30)) {
         self.channel = channel
         self.timeout = timeout
     }
 
+    public func open() async {
+        guard !isOpen else { return }
+        isOpen = true
+        do { try await channel.open(timeout: timeout) } catch { isOpen = false }
+    }
+
+    public func close() {
+        guard isOpen else { return }
+        isOpen = false
+        channel.close()
+    }
+
     public func send(_ command: RemoteCommand) async -> RemoteReply {
-        (try? await channel.request(command, timeout: timeout)) ?? .failed(reason: "")
+        await open()
+        return (try? await channel.request(command, timeout: timeout)) ?? .failed(reason: "")
     }
 
     public func readStream(_ stream: Int, offset: Int64, length: Int) async throws -> StreamFrame {
-        try await channel.read(stream: stream, offset: offset, length: length, timeout: timeout)
+        await open()
+        return try await channel.read(stream: stream, offset: offset, length: length, timeout: timeout)
     }
 }
 
@@ -204,12 +220,16 @@ public final class JoinedLibrary: RemoteChannel {
 
     // MARK: RemoteChannel
 
-    public func open(timeout: Duration) async throws { isOpen = true }
+    public func open(timeout: Duration) async throws {
+        isOpen = true
+        for member in members { await (member.library as? ChannelMember)?.open() }
+    }
 
     public func close() {
         guard isOpen else { return }
         isOpen = false
         streams.removeAll()
+        for member in members { (member.library as? ChannelMember)?.close() }
         onClose?(nil)
     }
 
@@ -564,7 +584,7 @@ public final class JoinedLibrary: RemoteChannel {
         return order.map { ($0, groups[$0] ?? []) }
     }
 
-    static func joined(_ track: TrackSummary, _ slot: Int) -> TrackSummary {
+    public nonisolated static func joined(_ track: TrackSummary, _ slot: Int) -> TrackSummary {
         var track = track
         track.id = track.id.flatMap { JoinedID.join($0, slot: slot) }
         track.albumKey = JoinedID.join(track.albumKey, slot: slot)
