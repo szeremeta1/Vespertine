@@ -361,6 +361,9 @@ jobs:
         with:
           path: verification-carriers
           key: verification-carriers-${{ github.run_id }}-${{ github.run_attempt }}
+          # A re-run of this job alone is a new attempt whose macOS job didn't run again: it reads the carriers the
+          # last attempt that did run it wrote.
+          restore-keys: verification-carriers-${{ github.run_id }}-
           enableCrossOsArchive: true
           fail-on-cache-miss: true
       - name: FFmpeg 6.1.1 (the version the oracle record pins)
