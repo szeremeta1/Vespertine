@@ -46,6 +46,9 @@ final class SimulatedOutput: @unchecked Sendable {
 
     var held: Bool { get { holding.withLock { $0 } } set { holding.withLock { $0 = newValue } } }
 
+    /// The session that owned this output let it go (`shutdown()`): a test waits for this, not for an amount of time.
+    var isShutDown: Bool { flags.withLock { $0.cancelled } }
+
     func start() { render.withLock { flags.withLock { $0.running = true } } }
     func stop() { render.withLock { flags.withLock { $0.running = false } } }
 
