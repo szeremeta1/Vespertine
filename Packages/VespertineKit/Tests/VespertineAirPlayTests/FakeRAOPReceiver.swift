@@ -136,6 +136,13 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private var _peers: [String] = []
     var anchors: [[String: Any]] { lock.withLock { _anchors } }
     private var _anchors: [[String: Any]] = []
+    /// How many more SETRATEANCHORTIMEs are answered "not yet" (200, with status -71974), as an Apple TV answers until
+    /// it follows the sender's clock.
+    var anchorsNotYet: Int {
+        get { lock.withLock { _anchorsNotYet } }
+        set { lock.withLock { _anchorsNotYet = newValue } }
+    }
+    private var _anchorsNotYet = 0
     var bufferedFlushes: [[String: Any]] { lock.withLock { _bufferedFlushes } }
     private var _bufferedFlushes: [[String: Any]] = []
     var blockConnections: Int { lock.withLock { _blockConnections } }
@@ -462,7 +469,17 @@ final class FakeRAOPReceiver: @unchecked Sendable {
             lock.withLock { _peers = list }
         case "SETRATEANCHORTIME":
             guard let said = AirPlay2Message.decode(request.body) else { return .response(400, "Bad Request", headers: headers) }
-            lock.withLock { _anchors.append(said) }
+            // As an Apple TV does: a moment to play without its flags is a bad request.
+            if said["rate"] as? Int != 0, said["networkTimeFlags"] == nil { return .response(400, "Bad Request", headers: headers) }
+            let early = lock.withLock { () -> Bool in
+                _anchors.append(said)
+                guard _anchorsNotYet > 0 else { return false }
+                _anchorsNotYet -= 1
+                return true
+            }
+            if early {
+                return .response(200, "OK", headers: headers + [("Content-Type", AirPlay2Message.contentType)], body: AirPlay2Message.encode(["status": -71_974]))
+            }
         case "FLUSHBUFFERED":
             guard let said = AirPlay2Message.decode(request.body) else { return .response(400, "Bad Request", headers: headers) }
             lock.withLock { _bufferedFlushes.append(said) }
