@@ -19,6 +19,8 @@ actor StreamLine {
     private let dop: Double?
     private let patience: Duration
     private let pause: Duration
+    private let now: @Sendable () -> ContinuousClock.Instant
+    private let rest: @Sendable (Duration) async throws -> Void
     /// The stream's number on the Mac for the connection it was last opened on.
     private(set) var number: Int
     private var reopening: Task<Void, Error>?
@@ -29,8 +31,12 @@ actor StreamLine {
 
     /// `patience`: how long a read waits for the Mac to come back. `pause`: between looks at the connection.
     /// `dop`: the carrier ceiling the stream was asked for with, when it was (the same is asked for when it is opened again).
+    /// `now` and `rest`: the clock the patience is measured on and the pause itself. The app uses the real ones; a test
+    /// gives its own, so that its time passes only as the line pauses and a machine that stalls can't spend the patience.
     init(client: PhoneStreamClient, song: Int64, descriptor: StreamDescriptor, maxSampleRate: Double?, dop: Double? = nil,
-         patience: Duration = .seconds(120), pause: Duration = .milliseconds(300)) {
+         patience: Duration = .seconds(120), pause: Duration = .milliseconds(300),
+         now: @escaping @Sendable () -> ContinuousClock.Instant = { ContinuousClock.now },
+         rest: @escaping @Sendable (Duration) async throws -> Void = { try await Task.sleep(for: $0) }) {
         self.dop = dop
         self.client = client
         self.song = song
@@ -40,6 +46,8 @@ actor StreamLine {
         self.maxSampleRate = maxSampleRate
         self.patience = patience
         self.pause = pause
+        self.now = now
+        self.rest = rest
     }
 
     /// Called with true when a read starts waiting for the Mac, and false when the stream is open again (or given up on).
@@ -81,7 +89,7 @@ actor StreamLine {
     private func openAgain(after error: Error) async throws {
         waiting?(true)
         defer { waiting?(false) }
-        let deadline = ContinuousClock.now + patience
+        let deadline = now() + patience
         let last = (error as? LocalizedError)?.errorDescription ?? String(describing: error)
         while true {
             try Task.checkCancellation()
@@ -95,14 +103,14 @@ actor StreamLine {
                     }
                     number = descriptor.stream
                     return
-                case .failed(let reason) where !reason.isEmpty && ContinuousClock.now >= deadline:
+                case .failed(let reason) where !reason.isEmpty && now() >= deadline:
                     throw StreamSource.Failure.unreachable(reason)
                 default:
                     break   // still converting, or the connection went again: ask once more
                 }
             }
-            guard ContinuousClock.now < deadline else { throw StreamSource.Failure.unreachable(last) }
-            try await Task.sleep(for: pause)
+            guard now() < deadline else { throw StreamSource.Failure.unreachable(last) }
+            try await rest(pause)
         }
     }
 }

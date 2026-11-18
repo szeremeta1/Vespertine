@@ -28,7 +28,7 @@ ORACLES = {
         "base": "https://raw.githubusercontent.com/sacd-ripper/sacd-ripper/"
                 "a3d981c935c3224217e2842cd492f9351106c81e/libs/libdstdec/",
     },
-    # FFmpeg's S/PDIF (IEC 61937) demuxer, the version Ubuntu 24.04 ships (CI runs that build of ffmpeg).
+    # FFmpeg's S/PDIF (IEC 61937) demuxer at n6.1.1 (CI builds ffmpeg from that tag: oracles/iec61937/build_ffmpeg.sh).
     "ffmpeg-spdif": {
         "record": "IEC-O-001",
         "base": "https://raw.githubusercontent.com/FFmpeg/FFmpeg/n6.1.1/libavformat/",
