@@ -345,7 +345,7 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
 
     func entry(key: String, url: URL, reader: (any PlaybackCacheReader)? = nil, foreground: Bool = true,
                cancelled: () -> Bool = { false }) throws -> Entry {
-        if let existing = lock.withLock({ entries[key]?.value }) {
+        if let existing = lock.withLock({ entries[key]?.value }), !existing.isGivenUp {
             if foreground { existing.promote() }
             return existing
         }
@@ -360,10 +360,19 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         let reopen: Reopen? = reader != nil ? nil : Self.reopener(url: url, remote: remote, factory: readerFactory)
         // Opened here and not used after all (another caller made the entry first, or it does not fit): closed on the closing queue.
         defer { Self.letGo(&source) }
+        // A copy that was given up before it finished (the song was skipped past, and something still holds its copy: the press's
+        // warm-up, a probe) is not the song's copy any more: its missing bytes never arrive, and a song handed it started on what
+        // was local and failed, "The operation was cancelled", where the copy had stopped. The song gets a copy of its own. The
+        // old one is let go after the lock, as in `prefetch`.
+        var stale: Entry?
+        defer { withExtendedLifetime(stale) {} }
         return try lock.withLock {
             if let existing = entries[key]?.value {
-                if foreground { existing.promote() }
-                return existing
+                if !existing.isGivenUp {
+                    if foreground { existing.promote() }
+                    return existing
+                }
+                if next === existing { stale = next; next = nil }
             }
             guard let opened = source else { throw Failure.cancelled }
             let size = opened.size
@@ -477,6 +486,9 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         let live = lock.withLock { entries.values.compactMap(\.value) }
         return live.compactMap(\.silence).max()
     }
+
+    /// For tests: whether the cache itself holds a copy for the song chosen or lined up last (the press's warm-up, the prefetch).
+    var holdsNext: Bool { lock.withLock { next != nil } }
 
     /// Prefetches waiting for their file on the share to open (for tests).
     var waitingPrefetches: Int { prefetchWaits.withLock { $0 } }
@@ -616,6 +628,9 @@ public final class NetworkPlaybackCache: @unchecked Sendable {
         var url: URL { storage.url }
         var size: Int64 { storage.size }
         var isComplete: Bool { storage.condition.withLock { storage.ready.count == storage.blocks } }
+        /// The copy was given up (`cancel`) with bytes still missing: they never arrive, and a read of them fails. A copy that
+        /// had finished reads as before. The cache never hands such a copy out again (`entry(key:)` makes the song a new one).
+        var isGivenUp: Bool { storage.condition.withLock { storage.cancelled && storage.ready.count < storage.blocks } }
         var isWaiting: Bool { storage.condition.withLock { storage.starting || storage.waiters > 0 } }
         /// How many reads are parked waiting for bytes that are not on disk yet (each has stamped the start of its wait).
         var readsWaiting: Int { storage.condition.withLock { storage.waiters } }
