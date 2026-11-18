@@ -126,14 +126,19 @@ struct StreamSourceTests {
         let reading = Task { try await blockingRead(source, at: 50_250, length: 500) }
         // The Mac answers nothing until the read is waiting, so at most the two reads already asked for are ahead of it.
         try await untilAReadWaits(source)
-        // Only those two are answered. The two asked for next are held at the Mac, so both are on its list before either
-        // can finish: the list is in the order the reads reached the Mac, and with every read answered at once one of them
-        // could be asked, answered and followed by another before the other had reached the Mac at all.
-        mac.allow(0, 1000)
-        try await until { mac.offsets.count >= 4 }
-        // It did not wait for the fifty chunks before it: its chunk is one of the next two asked for. Two reads run at a
-        // time, and the two that follow the ones in flight are the read's own chunk and the one after it, in either order.
-        #expect(Set(mac.offsets.prefix(4)) == [0, 1000, 50_000, 51_000])
+        // Both workers have asked for something by now. If neither asked for the read's chunk (both had started on the
+        // front of the file before the read arrived), only those two are answered, and the two asked for next are held at
+        // the Mac: both are on its list before either can finish. The list is in the order the reads reached the Mac, and
+        // with every read answered at once one worker could be asked, answered and asked again before the other, which
+        // had taken the read's chunk, had reached the Mac at all.
+        try await until { mac.offsets.count >= 2 }
+        let ahead = mac.offsets
+        if !ahead.contains(50_000) {
+            mac.allow(ahead[0], ahead[1])
+            try await until { mac.offsets.count >= 4 }
+        }
+        // It did not wait for the fifty chunks before it: its chunk is one of the next two asked for.
+        #expect(mac.offsets.prefix(4).contains(50_000))
         mac.allowAll()
         #expect(try await reading.value == data[50_250..<50_750])
         // And the gap is still filled in afterwards.
