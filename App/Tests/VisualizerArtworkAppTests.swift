@@ -36,7 +36,7 @@ struct VisualizerArtworkAppTests {
 
     @Test("The picture for a key is not remembered as missing: it shows once its file is there")
     func pictureAppearsLater() async throws {
-        let root = try scratch(); defer { try? FileManager.default.removeItem(at: root) }
+        let root = try scratch(); defer { removeScratch(root) }
         let store = ArtworkStore(directory: root.appendingPathComponent("Artwork"))
         let cache = ArtworkCache()
         cache.store = store
@@ -52,7 +52,7 @@ struct VisualizerArtworkAppTests {
 
     @Test("A cover that lost its original still reaches the visualizer from its thumbnails")
     func fallsBackToThumbnails() async throws {
-        let root = try scratch(); defer { try? FileManager.default.removeItem(at: root) }
+        let root = try scratch(); defer { removeScratch(root) }
         let store = ArtworkStore(directory: root.appendingPathComponent("Artwork"))
         let cache = ArtworkCache()
         cache.store = store
@@ -64,7 +64,7 @@ struct VisualizerArtworkAppTests {
 
     @Test("The library resolves a cover for a song its scan found none for, from the folder added since")
     func libraryResolvesAtPlayTime() async throws {
-        let root = try scratch(); defer { try? FileManager.default.removeItem(at: root) }
+        let root = try scratch(); defer { removeScratch(root) }
         let music = root.appendingPathComponent("Music/Artist/Album")
         try FileManager.default.createDirectory(at: music, withIntermediateDirectories: true)
         let wav = music.appendingPathComponent("01 One.wav")
@@ -100,7 +100,7 @@ struct VisualizerArtworkAppTests {
 
     @Test("Album Art colours: a song's cover from the library's store reaches the visualizer as that cover's colours")
     func coverBecomesColours() async throws {
-        let root = try scratch(); defer { try? FileManager.default.removeItem(at: root) }
+        let root = try scratch(); defer { removeScratch(root) }
         let music = root.appendingPathComponent("Music/The Vesper Quartet/Blue Hour")
         try FileManager.default.createDirectory(at: music, withIntermediateDirectories: true)
         let wav = music.appendingPathComponent("01 Blue Hour.wav")

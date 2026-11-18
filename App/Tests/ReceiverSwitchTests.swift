@@ -45,7 +45,7 @@ struct ReceiverSwitchTests {
     private func clean(_ scratch: Scratch) {
         scratch.player.stop()
         scratch.defaults.removePersistentDomain(forName: scratch.suite)
-        try? FileManager.default.removeItem(at: scratch.root)
+        removeScratch(scratch.root)
     }
 
     /// The receiver on loopback, announcing to a port of this test's instead of the network.

@@ -25,7 +25,7 @@ struct AppAuditTests {
     func matchSixteenBitSetting() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-16bit-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
@@ -38,7 +38,7 @@ struct AppAuditTests {
     func visualizerSettings() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-visualizer-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
@@ -61,7 +61,7 @@ struct AppAuditTests {
     func relayVolumeKeysSetting() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-relay-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
@@ -74,7 +74,7 @@ struct AppAuditTests {
     func airPodsMaxReferenceEQIsOptIn() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-eq-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
@@ -94,7 +94,7 @@ struct AppAuditTests {
     func equalizerOffIsRemembered() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-eq-off-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
@@ -113,7 +113,7 @@ struct AppAuditTests {
     func deletedReferencePresetStaysDeleted() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-eq-delete-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
         // Upgrading with presets of one's own: the reference presets are added once, after them.
@@ -132,7 +132,7 @@ struct AppAuditTests {
     func appVolumePerOutput() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-volume-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
         let settings = AppSettings(defaults: defaults, dataDirectory: root)
@@ -157,7 +157,7 @@ struct AppAuditTests {
     @Test func queueClearingAndReorderingSurviveShuffle() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-audit-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let url = root.appendingPathComponent("sample.wav")
         do {
             let f = try AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatLinearPCM,
@@ -199,7 +199,7 @@ struct AppAuditTests {
     @Test func playingNextComesBeforeTheRest() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-audit-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let url = root.appendingPathComponent("sample.wav")
         do {
             let f = try AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatLinearPCM,
@@ -265,7 +265,7 @@ struct AppAuditTests {
     @Test func playlistTransitionsBelongToTheListPlayed() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-playlist-transitions-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let library = try LibraryStore(dataDirectory: root.appendingPathComponent("database"))
         let party = try #require(library.createPlaylist(name: "Party")), plain = try #require(library.createPlaylist(name: "Plain"))
         library.setTransitions(.liveSet, for: party)
@@ -281,7 +281,7 @@ struct AppAuditTests {
     @Test func copiesPlayAsChosen() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-app-copies-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let url = root.appendingPathComponent("sample.wav")
         do {
             let f = try AVAudioFile(forWriting: url, settings: [AVFormatIDKey: kAudioFormatLinearPCM,
@@ -394,7 +394,7 @@ struct AppAuditTests {
     @Test func recoveryDirectoryOverridesLaunchArgument() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-recovery-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let (defaults, suite) = try scratchDefaults(in: root)
         defer { defaults.removePersistentDomain(forName: suite) }
         defaults.set("/bad/library", forKey: "VespertineDataDirectory")
@@ -404,7 +404,7 @@ struct AppAuditTests {
     @Test func corruptDatabaseProducesRecoverableError() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-corrupt-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let data = Data("This is not SQLite".utf8)
         let url = root.appendingPathComponent("Library.sqlite")
         try data.write(to: url)

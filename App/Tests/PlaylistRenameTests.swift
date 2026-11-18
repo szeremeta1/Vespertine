@@ -12,7 +12,7 @@ struct PlaylistRenameTests {
     func emptyNamesAreIgnored() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-playlist-rename-\(UUID())")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         let library = try LibraryStore(dataDirectory: root.appendingPathComponent("database"))
         let playlist = try #require(library.createPlaylist(name: "Road Trip"))
         func name() throws -> String? { try library.database.playlists().first { $0.id == playlist.id }?.name }

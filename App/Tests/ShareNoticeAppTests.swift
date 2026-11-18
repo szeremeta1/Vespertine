@@ -29,7 +29,7 @@ struct ShareNoticeAppTests {
     @Test("The snapshot's silence shows as a notice in the Inspector and the banner; its end takes both away")
     func noticeAppearsAndGoes() throws {
         let (player, root, track) = try rig()
-        defer { player.stop(); try? FileManager.default.removeItem(at: root) }
+        defer { player.stop(); removeScratch(root) }
         player.play([track])
         var snapshot = player.engine.snapshot
         snapshot.lastError = nil
@@ -59,7 +59,7 @@ struct ShareNoticeAppTests {
     @Test("When the notice goes, its banner goes with it; a banner about something else stays")
     func bannerClearedOnlyIfItsOwn() throws {
         let (player, root, track) = try rig()
-        defer { player.stop(); try? FileManager.default.removeItem(at: root) }
+        defer { player.stop(); removeScratch(root) }
         player.play([track])
         var snapshot = player.engine.snapshot
         snapshot.lastError = nil

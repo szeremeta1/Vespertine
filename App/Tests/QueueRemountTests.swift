@@ -14,7 +14,7 @@ struct QueueRemountTests {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("vespertine-remount-\(UUID())")
         let music = root.appendingPathComponent("Music")
         try FileManager.default.createDirectory(at: music, withIntermediateDirectories: true)
-        defer { try? FileManager.default.removeItem(at: root) }
+        defer { removeScratch(root) }
         for name in ["one", "two", "three"] {
             let file = try AVAudioFile(forWriting: music.appendingPathComponent("\(name).wav"), settings: [
                 AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: 44100.0, AVNumberOfChannelsKey: 2, AVLinearPCMBitDepthKey: 16])

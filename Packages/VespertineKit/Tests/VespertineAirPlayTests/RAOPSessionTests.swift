@@ -39,6 +39,18 @@ struct RAOPSessionTests {
         #expect(!header.contains("secret"))
     }
 
+    @Test("Every request names AirPlay first in its User-Agent: an Apple TV answers 403 to one that names anything else first")
+    func userAgent() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        let session = RAOPSession(name: "Fake", endpoint: endpoint(receiver), encryption: .none)
+        try await session.connect(volumeDB: -20)
+        await session.teardown()
+        #expect(receiver.methods == ["OPTIONS", "ANNOUNCE", "SETUP", "RECORD", "SET_PARAMETER", "TEARDOWN"])
+        #expect(receiver.requests.allSatisfy { $0["User-Agent"] == RAOPSession.userAgent })
+        #expect(RAOPSession.userAgent.hasPrefix("AirPlay/"))
+    }
+
     @Test("A receiver with a password takes the session once its challenge is answered; every later request carries the digest")
     func password() async throws {
         let receiver = try FakeRAOPReceiver()
