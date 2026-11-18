@@ -12693,274 +12693,6 @@
         }
       }
     },
-    "Choose Another Mac": {
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ሌላ Mac ምረጥ"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "اختيار Mac آخر"
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "অন্য Mac বেছে নিন"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vybrat jiný Mac"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vælg en anden Mac"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Anderen Mac wählen"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Επιλογή άλλου Mac"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Elegir otro Mac"
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "انتخاب Mac دیگر"
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Valitse toinen Mac"
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pumili ng Ibang Mac"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choisir un autre Mac"
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "બીજું Mac પસંદ કરો"
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zaɓi Wata Mac"
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "בחר Mac אחר"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "कोई और Mac चुनें"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Másik Mac kiválasztása"
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pilih Mac Lain"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Scegli un altro Mac"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "別のMacを選択"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ಬೇರೆ Mac ಆರಿಸಿ"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "다른 Mac 선택"
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "മറ്റൊരു Mac തിരഞ്ഞെടുക്കുക"
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "दुसरा Mac निवडा"
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pilih Mac Lain"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Velg en annen Mac"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kies een andere Mac"
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "ਕੋਈ ਹੋਰ Mac ਚੁਣੋ"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Wybierz innego Maca"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Escolher Outro Mac"
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Escolher outro Mac"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Alege alt Mac"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Välj en annan Mac"
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chagua Mac Nyingine"
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "வேறொரு Mac-ஐத் தேர்வுசெய்"
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "మరొక Macను ఎంచుకో"
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "เลือก Mac เครื่องอื่น"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Başka Bir Mac Seç"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Вибрати інший Mac"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "کوئی اور Mac منتخب کریں"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chọn máy Mac khác"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "選擇另一部 Mac"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选取其他 Mac"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "選擇其他 Mac"
-          }
-        }
-      }
-    },
     "Choose one of these and Vespertine on the Mac plays there.": {
       "localizations": {
         "am": {
@@ -29366,6 +29098,544 @@
         }
       }
     },
+    "Libraries": {
+      "comment": "Button and title on the iPhone and iPad: the screen that lists the Macs, shares and folders this device plays music from. Each of them is a library.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ቤተ-መጻሕፍቶች"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "المكتبات"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "লাইব্রেরি"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Knihovny"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteker"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mediatheken"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Βιβλιοθήκες"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotecas"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کتابخانه‌ها"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kirjastot"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mga Library"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliothèques"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "લાઇબ્રેરીઓ"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laburori"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ספריות"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लाइब्रेरी"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Könyvtárak"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perpustakaan"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Librerie"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ライブラリ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಲೈಬ್ರರಿಗಳು"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보관함"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ലൈബ്രറികൾ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "लायब्ररी"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pustaka"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteker"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotheken"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਲਾਇਬ੍ਰੇਰੀਆਂ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteki"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotecas"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotecas"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biblioteci"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bibliotek"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maktaba"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "லைப்ரரிகள்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "లైబ్రరీలు"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "คลัง"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arşivler"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Медіатеки"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "لائبریریاں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thư viện"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "资料库"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資料庫"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "資料庫"
+          }
+        }
+      }
+    },
+    "Choose Another Library": {
+      "comment": "Menu item on the iPhone's Output screen: goes back to the list of Macs, shares and folders.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ሌላ ቤተ-መጻሕፍት ምረጥ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "اختيار مكتبة أخرى"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "অন্য লাইব্রেরি বেছে নিন"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vybrat jinou knihovnu"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vælg et andet bibliotek"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andere Mediathek wählen"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Επιλογή άλλης βιβλιοθήκης"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elegir otra biblioteca"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "انتخاب کتابخانه دیگر"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Valitse toinen kirjasto"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pumili ng Ibang Library"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisir une autre bibliothèque"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "બીજી લાઇબ્રેરી પસંદ કરો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zaɓi Wata Laburare"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "בחר ספריה אחרת"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "कोई और लाइब्रेरी चुनें"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Másik könyvtár kiválasztása"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih Perpustakaan Lain"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli un’altra libreria"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "別のライブラリを選択"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ಬೇರೆ ಲೈಬ್ರರಿ ಆರಿಸಿ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 보관함 선택"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "മറ്റൊരു ലൈബ്രറി തിരഞ്ഞെടുക്കുക"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "दुसरी लायब्ररी निवडा"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pilih Pustaka Lain"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Velg et annet bibliotek"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kies een andere bibliotheek"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ਕੋਈ ਹੋਰ ਲਾਇਬ੍ਰੇਰੀ ਚੁਣੋ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wybierz inną bibliotekę"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolher Outra Biblioteca"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escolher outra biblioteca"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alege altă bibliotecă"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Välj ett annat bibliotek"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chagua Maktaba Nyingine"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "வேறொரு லைப்ரரியைத் தேர்வுசெய்"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "మరొక లైబ్రరీని ఎంచుకో"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "เลือกคลังอื่น"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Başka Bir Arşiv Seç"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Вибрати іншу медіатеку"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "کوئی اور لائبریری منتخب کریں"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn thư viện khác"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选取其他资料库"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇其他資料庫"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇另一個資料庫"
+          }
+        }
+      }
+    },
     "Looking for Macs on this network…": {
       "localizations": {
         "am": {
@@ -42005,275 +42275,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "MacBook Pro 揚聲器"
-          }
-        }
-      }
-    },
-    "Macs": {
-      "comment": "Button and title: the list of Macs this device is paired with.",
-      "localizations": {
-        "am": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macዎች"
-          }
-        },
-        "ar": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "أجهزة Mac"
-          }
-        },
-        "bn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "cs": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macy"
-          }
-        },
-        "da": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-computere"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macs"
-          }
-        },
-        "el": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "fa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macها"
-          }
-        },
-        "fi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macit"
-          }
-        },
-        "fil": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mga Mac"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "gu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "ha": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-Mac"
-          }
-        },
-        "he": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "מחשבי Mac"
-          }
-        },
-        "hi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macek"
-          }
-        },
-        "id": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "kn": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac ಗಳು"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "ml": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-കൾ"
-          }
-        },
-        "mr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "ms": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "nb": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macer"
-          }
-        },
-        "nl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macs"
-          }
-        },
-        "pa": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "pl": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Maki"
-          }
-        },
-        "pt-BR": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macs"
-          }
-        },
-        "pt-PT": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macs"
-          }
-        },
-        "ro": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-uri"
-          }
-        },
-        "sv": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-datorer"
-          }
-        },
-        "sw": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "ta": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac-கள்"
-          }
-        },
-        "te": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macలు"
-          }
-        },
-        "th": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac’ler"
-          }
-        },
-        "uk": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Комп’ютери Mac"
-          }
-        },
-        "ur": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Macs"
-          }
-        },
-        "vi": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Máy Mac"
-          }
-        },
-        "zh-HK": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mac"
           }
         }
       }

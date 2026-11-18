@@ -154,7 +154,7 @@ final class AdaptiveNavigationTests: XCTestCase {
         for _ in 0..<4 { app.swipeDown() }
         element("output-gear").tap()
         XCTAssertTrue(app.buttons["Settings"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["Choose Another Mac"].exists)
+        XCTAssertTrue(app.buttons["Choose Another Library"].exists)
     }
 
     func testRotationRetainsQueueAndControlsRemainReachable() {
