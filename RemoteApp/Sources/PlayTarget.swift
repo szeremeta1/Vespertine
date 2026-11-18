@@ -204,17 +204,28 @@ final class PlayTarget {
         return rows
     }
 
-    /// What the output runs at, and that iOS changed the rate to get there when it did.
+    /// What the output runs at, and that iOS changed the rate to get there when it did. While a rate that was asked for
+    /// hasn't arrived, the chip says the output is switching to it: the rate on its way out is never shown as settled.
     static func output(_ signal: PhoneSignal) -> String {
         guard let rate = signal.outputRate, rate > 0 else { return "" }
-        let kilohertz = PhoneSignal.kilohertz(rate)
-        var text = signal.resampled ? String(localized: "\(kilohertz) kHz, resampled by iOS", comment: "Signal chip on the iPhone: the output's sample rate, which differs from the song's.")
+        var text: String
+        if let asked = signal.switchingTo {
+            text = String(localized: "switching to \(PhoneSignal.kilohertz(asked)) kHz…", comment: "Signal chip on the iPhone, lowercase: the DAC was asked for this sample rate and iOS hasn't switched to it yet. %@ is a rate such as 96.")
+        } else {
+            let kilohertz = PhoneSignal.kilohertz(rate)
+            text = signal.resampled ? String(localized: "\(kilohertz) kHz, resampled by iOS", comment: "Signal chip on the iPhone: the output's sample rate, which differs from the song's.")
                                     : String(localized: "\(kilohertz) kHz", comment: "Signal chip: a sample rate.")
+        }
         // On a DAC, a volume below the top means it isn't getting the song's own samples: said, not hidden.
         if signal.onDAC, signal.volumeReduced, let volume = signal.volume {
             text += " · " + String(localized: "volume \(percent(volume))", comment: "Signal chip on the iPhone, after the sample rate: the device's volume when it is not at 100%, lowercase. %@ is a percentage such as 80%.")
         }
         return text
+    }
+
+    /// The volume as the Output screen says it: a percentage, or that iOS gives none.
+    static func volumeWords(_ volume: Double?) -> String {
+        volume.map(percent) ?? String(localized: "Not reported by iOS", comment: "Value on the iPhone's Output screen, for the row Volume: iOS gave the app no volume level for this output. iOS stays as it is.")
     }
 
     static func percent(_ level: Double) -> String {
@@ -240,8 +251,16 @@ final class PlayTarget {
             if route.channels > 0 {
                 rows.append((String(localized: "Output’s channels", comment: "Row label on the iPhone's Output screen: how many channels the output device runs with now."), String(route.channels)))
             }
-            rows.append((String(localized: "Resampled by iOS", comment: "Row label on the iPhone's Output screen: whether iOS changes the song's sample rate on the way to the output. The value is Yes or No."),
-                         signal.resampled ? String(localized: "Yes") : String(localized: "No")))
+            if let asked = signal.switchingTo {
+                // Asked and not yet given: whether iOS resamples isn't known until it answers.
+                rows.append((String(localized: "Asked iOS for", comment: "Row label on the iPhone's Output screen: the sample rate the app asked iOS to run the DAC at, which iOS hasn't switched to yet. The value is a rate such as 96 kHz. iOS stays as it is."),
+                             String(localized: "\(PhoneSignal.kilohertz(asked)) kHz", comment: "Signal chip: a sample rate.")))
+                rows.append((String(localized: "Resampled by iOS", comment: "Row label on the iPhone's Output screen: whether iOS changes the song's sample rate on the way to the output. The value is Yes or No."),
+                             String(localized: "Waiting for iOS to switch", comment: "Value on the iPhone's Output screen, for the row Resampled by iOS: the DAC was asked for the song's sample rate and iOS hasn't switched yet, so it isn't known. iOS stays as it is.")))
+            } else {
+                rows.append((String(localized: "Resampled by iOS", comment: "Row label on the iPhone's Output screen: whether iOS changes the song's sample rate on the way to the output. The value is Yes or No."),
+                             signal.resampled ? String(localized: "Yes") : String(localized: "No")))
+            }
         }
         if signal.discreteOutputs != nil {
             rows.append((String(localized: "Surround"), String(localized: "A channel to each output", comment: "Value on the iPhone's Output screen, for the row Surround: each channel of a surround song goes to its own output of an audio interface, unmixed.")))
@@ -268,7 +287,14 @@ final class PlayTarget {
         } else if signal.replayGainHasNothing {
             rows.append((String(localized: "ReplayGain"), String(localized: "None for this song", comment: "Value on the iPhone's Output screen, for the row ReplayGain: ReplayGain is turned on, but the playing song has no ReplayGain values (or is DSD sent as DoP), so it plays unchanged.")))
         }
-        if let volume = signal.volume { rows.append((String(localized: "Volume"), percent(volume))) }
+        // Always said while there is an output: a volume iOS doesn't report is a fact too, and it rules out "no processing".
+        if route != nil { rows.append((String(localized: "Volume"), volumeWords(signal.volume))) }
+        if signal.onDAC, signal.volumeReduced || signal.volume == nil, signal.wouldBeUntouchedAtFullVolume {
+            rows.append((String(localized: "Original file", comment: "Row label on the iPhone's Output screen: the song's own lossless file is playing. The value is No processing or Verified on this DAC."),
+                         signal.volume == nil
+                            ? String(localized: "Can’t say: iOS reports no volume", comment: "Value on the iPhone's Output screen, for the row Original file: iOS gives no volume level for this DAC, so the app can't say whether the song's samples reach it unchanged. iOS stays as it is.")
+                            : String(localized: "Changed by the volume (below 100%)", comment: "Value on the iPhone's Output screen, for the row Original file: the device's volume is below 100%, so iOS scales the song's samples before the DAC gets them.")))
+        }
         if signal.untouched {
             rows.append((String(localized: "Original file", comment: "Row label on the iPhone's Output screen: the song's own lossless file is playing. The value is No processing or Verified on this DAC."),
                          signal.verifiedOnDAC ? String(localized: "Verified on this DAC", comment: "Value on the iPhone's Output screen, for the row Original file: this DAC passed the DoP listening test at this song's sample rate. DAC stays as it is.")

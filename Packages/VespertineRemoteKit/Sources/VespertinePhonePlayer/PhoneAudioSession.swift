@@ -65,4 +65,22 @@ public enum PhoneAudioSession {
                      maximumChannels: session.maximumOutputNumberOfChannels, channelLabels: output.channels?.map(\.channelLabel) ?? [], uid: output.uid)
     }
 }
+/// iOS's audio session as the output's state is read from it (`OutputWatch`): one call reads the output, its rate and
+/// channels, the volume and the rendering mode.
+@MainActor
+final class SystemOutputSession: OutputSession {
+    func read() -> OutputReading {
+        let session = AVAudioSession.sharedInstance()
+        let route = PhoneAudioSession.currentRoute().map {
+            PhoneRoute(name: $0.outputName, portType: $0.portType, sampleRate: $0.sampleRate, channels: $0.outputChannels, spatial: $0.isSpatialAudioEnabled,
+                       maximumChannels: $0.maximumChannels, channelLabels: $0.channelLabels, uid: $0.uid)
+        }
+        // iOS's volume for the output it names; with no output there is nothing the number would be about.
+        return OutputReading(route: route, volume: route == nil ? nil : Double(session.outputVolume), rendering: PhoneAudioSession.renderingMode())
+    }
+
+    func ask(rate: Double) { try? AVAudioSession.sharedInstance().setPreferredSampleRate(rate) }
+
+    func ask(channels: Int) { try? AVAudioSession.sharedInstance().setPreferredOutputNumberOfChannels(channels) }
+}
 #endif

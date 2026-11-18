@@ -147,6 +147,48 @@ import VespertineRemoteProtocol
 
     // MARK: The original file on a DAC: what is said, and what takes it back
 
+    // TestFlight build 7: a 24/96 FLAC on a FiiO K11 showed "48 kHz" while the DAC's own display said 44.1 kHz, and the
+    // volume chip stayed at 30% with the phone at 100%.
+    @Test func aRateAskedForAndNotYetGivenIsShownAsSwitchingNeverAsSettled() {
+        var before = dac
+        before.sampleRate = 48_000
+        var said = signal(rate: 96_000, route: before)
+        said.pendingRate = 96_000
+        said.volume = 0.3
+        #expect(PlayTarget.output(said) == "switching to 96 kHz… · volume 30%")
+        let rows = PlayTarget.report(said, route: before)
+        #expect(rows.first { $0.label == "Asked iOS for" }?.value == "96 kHz")
+        #expect(rows.first { $0.label == "Resampled by iOS" }?.value == "Waiting for iOS to switch")
+        #expect(rows.first { $0.label == "Output runs at" }?.value == "48 kHz")
+        // iOS gave it: one reading has the rate and the volume.
+        var after = dac
+        after.sampleRate = 96_000
+        var settled = signal(rate: 96_000, route: after)
+        settled.pendingRate = nil
+        settled.volume = 0.3
+        #expect(PlayTarget.output(settled) == "96 kHz · volume 30%")
+        #expect(!PlayTarget.report(settled, route: after).contains { $0.label == "Asked iOS for" })
+        settled.volume = 1
+        #expect(PlayTarget.output(settled) == "96 kHz")
+        #expect(PlayTarget.badge(settled) == "ORIGINAL FILE · NO PROCESSING")
+        // iOS declined it: the rate it reports, and that it resamples.
+        var declined = signal(rate: 96_000, route: before)
+        declined.volume = 1
+        #expect(PlayTarget.output(declined) == "48 kHz, resampled by iOS")
+        #expect(PlayTarget.badge(declined) == "ORIGINAL FILE")
+    }
+
+    @Test func aVolumeIOSDoesNotReportIsSaidPlainly() {
+        var said = signal(rate: 192_000, route: dac)
+        said.volume = nil
+        let rows = PlayTarget.report(said, route: dac)
+        #expect(rows.first { $0.label == "Volume" }?.value == "Not reported by iOS")
+        #expect(rows.first { $0.label == "Original file" }?.value == "Can’t say: iOS reports no volume")
+        #expect(PlayTarget.badge(said) == "ORIGINAL FILE")
+        // No output at all: no volume row to speak of.
+        #expect(!PlayTarget.report(signal(rate: 192_000, route: nil), route: nil).contains { $0.label == "Volume" })
+    }
+
     private let tested = PhoneRoute(name: "K11", portType: "USBAudio", sampleRate: 192_000, channels: 2, spatial: false, uid: "usb:k11")
     private var results: DoPDACs {
         var dacs = DoPDACs()
@@ -185,7 +227,8 @@ import VespertineRemoteProtocol
         let rows = PlayTarget.report(original(on: tested, passed: true), route: tested, dop: results)
         #expect(rows.first { $0.label == "Original file" }?.value == "Verified on this DAC")
         #expect(PlayTarget.report(original(on: tested), route: tested).first { $0.label == "Original file" }?.value == "No processing")
-        #expect(!PlayTarget.report(original(on: tested, volume: 0.8), route: tested).contains { $0.label == "Original file" })
+        // Below 100% the row stays and says why the song's samples aren't what the DAC gets.
+        #expect(PlayTarget.report(original(on: tested, volume: 0.8), route: tested).first { $0.label == "Original file" }?.value == "Changed by the volume (below 100%)")
         for words in [PlayTarget.badge(original(on: tested)), PlayTarget.badge(original(on: tested, passed: true))] + rows.flatMap({ [$0.label, $0.value] }) {
             #expect(!words.lowercased().contains("bit-perfect") && !words.lowercased().contains("bit perfect"))
         }
