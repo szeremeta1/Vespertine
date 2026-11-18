@@ -295,4 +295,44 @@ struct TrackTableSortTests {
                 "selected songs \(model.selectedTrackIDs.sorted()), AppKit's selected rows \(Array(table.selectedRowIndexes))")
         #expect(Array(table.selectedRowIndexes) == [7])
     }
+
+    // DIAGNOSTIC (temporary, removed before merge): the CI sequence of main 43af78c, two tables, several times.
+    @Test("DIAG two tables")
+    func diagTwoTables() async throws {
+        let model = try #require(LibraryStartup.current?.model)
+        let before = model.selectedTrackIDs
+        defer { model.selectedTrackIDs = before }
+        var report: [String] = []
+        for round in 0..<5 {
+            let big = try SortFixture.library(20_000)
+            let a = try await makeRig(big)
+            await settle(1)
+            let natural = topRows(a.table)
+            let time = try #require(a.table.tableColumns.last?.sortDescriptorPrototype)
+            a.table.sortDescriptors = [time]
+            await until { topRows(a.table) != natural }
+            await settle(0.3)
+            a.table.sortDescriptors = [try #require(a.table.tableColumns.first?.sortDescriptorPrototype)]
+            var line = "r\(round):"
+            for row in [2, 7, 11] {
+                a.table.selectRowIndexes(IndexSet(integer: row), byExtendingSelection: false)
+                line += " sel\(row)->\(model.selectedTrackIDs.sorted())"
+                await settle(0.5)
+                line += "/\(model.selectedTrackIDs.sorted()) A\(Array(a.table.selectedRowIndexes))"
+            }
+            line += " landed=\(topRows(a.table) == natural)"
+            a.window.close()
+            let tracks = try SortFixture.library(3000)
+            let b = try await makeRig(tracks)
+            line += " Bopen model\(model.selectedTrackIDs.sorted()) B\(Array(b.table.selectedRowIndexes)) A\(Array(a.table.selectedRowIndexes))"
+            b.table.selectRowIndexes(IndexSet([2, 40]), byExtendingSelection: false)
+            for _ in 0..<60 where model.selectedTrackIDs != [3, 41] { await settle(0.05) }
+            await settle(1)
+            line += " after model\(model.selectedTrackIDs.sorted()) B\(Array(b.table.selectedRowIndexes)) A\(Array(a.table.selectedRowIndexes))"
+            b.window.close()
+            report.append(line)
+            await settle(0.5)
+        }
+        Issue.record("DIAG \(report.joined(separator: " || "))")
+    }
 }
