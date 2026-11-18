@@ -93,11 +93,14 @@ struct Harness {
     }
 
     /// The song playing reaches its end on the renderer (the fake's songs are 200 s long): the position is seen there by a
-    /// poll first, as it is on a real one.
+    /// poll first, as it is on a real one. Each step is waited for by count, not by time: a poll that came late on a
+    /// busy machine once left the position unseen, and the end was then taken for a stop in the middle of the song.
     func playToEnd() async throws {
         fake.setPosition(198)
-        for _ in 0..<100 where playback.snapshot.position < 190 { try await Task.sleep(for: .milliseconds(20)) }
+        await playback.settleForTests()   // a poll has seen the position
         fake.advance()
+        // "Stopped" is believed at the second poll that sees it; the third carries out what followed (the next song).
+        for _ in 0..<3 { await playback.settleForTests() }
     }
 
     func close() {
@@ -149,10 +152,10 @@ struct RendererPlaybackTests {
         h.playback.play(h.queue[0])
         #expect(await h.events.wait(for: "started"))
         h.fake.setPosition(60)
-        for _ in 0..<100 where h.playback.snapshot.position < 50 { try await Task.sleep(for: .milliseconds(20)) }
+        await h.playback.settleForTests()   // a poll has seen the position
         let uri = h.fake.currentURI
         h.fake.stopOnDevice()
-        for _ in 0..<100 where h.playback.snapshot.state == .playing { try await Task.sleep(for: .milliseconds(20)) }
+        for _ in 0..<2 { await h.playback.settleForTests() }   // "stopped" is believed at the second poll that sees it
         #expect(h.playback.snapshot.state == .paused)
         #expect(!h.playback.wantsPlaying)
         #expect(h.playback.snapshot.item?.id == h.queue[0].id)

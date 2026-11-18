@@ -262,9 +262,13 @@ struct SignalPathVerdict: BadgeVerdict {
             case .airPodsMaxBluetooth: ("AirPods Max", .bluetooth)
             case .other: ("HDMI", .hdmi)
         }
-        return OutputDevice(id: 0, uid: "", name: name, manufacturer: "", modelUID: nil, transport: transport, nominalSampleRate: 48_000,
-                            capabilities: DeviceCapabilities(sampleRates: [48_000], physicalFormats: [], outputChannels: 2, supportsDoP: false),
-                            hasHardwareVolume: false, isDefault: false)
+        var device = OutputDevice(id: 0, uid: "", name: name, manufacturer: "", modelUID: nil, transport: transport, nominalSampleRate: 48_000,
+                                  capabilities: DeviceCapabilities(sampleRates: [48_000], physicalFormats: [], outputChannels: 2, supportsDoP: false),
+                                  hasHardwareVolume: false, isDefault: false)
+        // Said, not read: left unset, the device profile asks this Mac's USB bus whether AirPods Max are on their cable, and
+        // a CI Mac with real AirPods Max plugged in turned the Bluetooth case into the USB-C one (BIT-PERFECT, BPV-010).
+        device.airPodsMaxCableAttached = c == .airPodsMaxUSBC
+        return device
     }
 }
 

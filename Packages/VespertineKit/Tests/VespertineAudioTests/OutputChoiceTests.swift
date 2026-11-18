@@ -8,9 +8,11 @@ import Testing
 private func output(_ uid: String, _ name: String, _ transport: Transport, rates: [Double] = [44_100, 48_000], depths: [Int] = [24],
                     isDefault: Bool = false, dop: Bool = false, model: String? = nil, id: UInt32 = 0) -> OutputDevice {
     let formats = depths.map { PhysicalFormat(minRate: rates.min()!, maxRate: rates.max()!, bitDepth: $0, isInteger: true, isMixable: true, channels: 2) }
-    return OutputDevice(id: id, uid: uid, name: name, manufacturer: "", modelUID: model, transport: transport, nominalSampleRate: rates[0],
-                        capabilities: DeviceCapabilities(sampleRates: rates, physicalFormats: formats, outputChannels: 2, supportsDoP: dop),
-                        hasHardwareVolume: true, isDefault: isDefault)
+    var device = OutputDevice(id: id, uid: uid, name: name, manufacturer: "", modelUID: model, transport: transport, nominalSampleRate: rates[0],
+                              capabilities: DeviceCapabilities(sampleRates: rates, physicalFormats: formats, outputChannels: 2, supportsDoP: dop),
+                              hasHardwareVolume: true, isDefault: isDefault)
+    device.airPodsMaxCableAttached = false   // said, or the profile asks the Mac running the test whether a pair is on its cable
+    return device
 }
 
 private let speakers = output("BuiltInSpeakerDevice", "MacBook Pro Speakers", .builtIn, rates: [44_100, 48_000, 88_200, 96_000])

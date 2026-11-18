@@ -178,7 +178,8 @@ extension AirPlay2Message {
     }
 
     /// SETRATEANCHORTIME to play: the frame with timestamp `rtpTime` is to sound at `time` on the clock called `clock`
-    /// (this Mac's PTP clock identity). Numbers that fill 64 bits are written bit for bit.
+    /// (this Mac's PTP clock identity). Numbers that fill 64 bits are written bit for bit. `networkTimeFlags` says nothing
+    /// and has to be there: an Apple TV answers 400 to a moment without it.
     static func play(rtpTime: UInt32, at time: AirPlay2NetworkTime, clock: UInt64) -> Data {
         encode([
             "rate": 1,
@@ -186,7 +187,15 @@ extension AirPlay2Message {
             "networkTimeSecs": Int(Int64(bitPattern: time.seconds)),
             "networkTimeFrac": Int(Int64(bitPattern: time.fraction)),
             "networkTimeTimelineID": Int(Int64(bitPattern: clock)),
+            "networkTimeFlags": 0,
         ])
+    }
+
+    /// Whether the answer to a SETRATEANCHORTIME took the moment. An Apple TV answers 200 either way; until it follows the
+    /// session's clock (most of a second after the clock starts) the answer carries a `status` that isn't 0 (-71974).
+    static func tookMoment(_ reply: Data) -> Bool {
+        guard let status = decode(reply)?["status"] as? Int else { return true }
+        return status == 0
     }
 
     /// SETRATEANCHORTIME to pause: what the receiver holds stays held.

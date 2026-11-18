@@ -14,10 +14,12 @@ private let airPodsOutput = "70-F9-4A-BF-8C-C7:output"
 private let vespertinePID: Int32 = 29289
 
 private func airPods(rate: Double, channels: Int = 2, transport: Transport = .bluetooth) -> OutputDevice {
-    OutputDevice(id: 7101, uid: airPodsOutput, name: "Alex’s AirPods Max", manufacturer: "Apple Inc.", modelUID: nil, transport: transport,
+    var device = OutputDevice(id: 7101, uid: airPodsOutput, name: "Alex’s AirPods Max", manufacturer: "Apple Inc.", modelUID: nil, transport: transport,
                  nominalSampleRate: rate,
                  capabilities: DeviceCapabilities(sampleRates: [24_000, 44_100, 48_000], physicalFormats: [], outputChannels: channels, supportsDoP: false),
                  hasHardwareVolume: true, isDefault: true)
+    device.airPodsMaxCableAttached = false   // said, or the profile asks the Mac running the test whether a pair is on its cable
+    return device
 }
 
 private let soundPane = AudioInputProcess(pid: 19073, bundleID: "com.apple.Sound-Settings.extension", name: "Sound",
