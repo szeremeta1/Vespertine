@@ -15,6 +15,31 @@ import Testing
         #expect(!PlayMode.offersSwitch(share: true))
     }
 
+    @Test func nowPlayingHasTheSwitchOnlyWhileBothSidesCanPlay() {
+        #expect(PlayMode.offersSwitch(share: false, both: true))
+        #expect(!PlayMode.offersSwitch(share: false, both: false))
+        #expect(!PlayMode.offersSwitch(share: true, both: true))
+    }
+
+    @Test func setupsTwoCardsTurnASideOnOrOffAndTheLastOneStaysOn() {
+        #expect(PlaySides.both.toggling(mac: true) == .device)
+        #expect(PlaySides.both.toggling(mac: false) == .mac)
+        #expect(PlaySides.mac.toggling(mac: false) == .both)
+        #expect(PlaySides.device.toggling(mac: true) == .both)
+        #expect(PlaySides.mac.toggling(mac: true) == .mac)
+        #expect(PlaySides.device.toggling(mac: false) == .device)
+    }
+
+    @Test func choosingTheSideLeftOutBringsBothBack() {
+        #expect(PlaySides.including(.mac, thisDevice: true) == .both)
+        #expect(PlaySides.including(.device, thisDevice: false) == .both)
+        #expect(PlaySides.including(.mac, thisDevice: false) == .mac)
+        #expect(PlaySides.including(.device, thisDevice: true) == .device)
+        #expect(PlaySides.including(.both, thisDevice: true) == .both)
+        #expect(PlaySides.both.hasMac && PlaySides.both.hasDevice)
+        #expect(!PlaySides.mac.hasDevice && !PlaySides.device.hasMac)
+    }
+
     @Test func theModeIsWhoThePlayerIs() {
         #expect(PlayMode.current(playsHere: true) == .device)
         #expect(PlayMode.current(playsHere: false) == .mac)

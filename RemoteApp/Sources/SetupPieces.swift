@@ -261,10 +261,10 @@ struct SetupChoice: View {
         .buttonStyle(.plain)
         .disabled(!enabled)
         .opacity(enabled ? 1 : 0.5)
-        .accessibilityElement(children: .ignore)
+        // The button is the one thing VoiceOver lands on: a second element made around it had the card read twice.
         // What the choice means is part of what it is called: a hint is spoken late, and not at all when hints are off.
         .accessibilityLabel(Text(verbatim: SetupChoice.spoken(title: title, detail: detail)))
-        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityAddTraits(selected ? .isSelected : [])
         .sensoryFeedback(.selection, trigger: selected)
     }
 }
@@ -317,13 +317,15 @@ struct SetupFlowPicture: View {
     var towardTrailing = true
     /// Which of the two makes the sound, if either.
     var sounds: HorizontalEdge?
+    /// Both can make the sound (setup's Output step with both sides turned on).
+    var soundsBoth = false
     /// Rings spread from the trailing thing while it looks for the other.
     var searching = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(spacing: 0) {
-            endpoint(leading, sounding: sounds == .leading, rings: false)
+            endpoint(leading, sounding: soundsBoth || sounds == .leading, rings: false)
             TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion)) { timeline in
                 let time = reduceMotion ? 0.4 : timeline.date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 1_000)
                 Canvas { context, size in
@@ -331,7 +333,7 @@ struct SetupFlowPicture: View {
                 }
             }
             .frame(width: 84, height: 30)
-            endpoint(trailing, sounding: sounds == .trailing, rings: searching)
+            endpoint(trailing, sounding: soundsBoth || sounds == .trailing, rings: searching)
         }
         // A picture of two machines, not text: the same way round in every language.
         .environment(\.layoutDirection, .leftToRight)

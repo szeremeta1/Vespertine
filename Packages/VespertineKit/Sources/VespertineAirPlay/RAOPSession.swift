@@ -54,6 +54,10 @@ public final class RAOPSession: @unchecked Sendable {
     private let clock: PTPClock?
     /// Where the receiver takes the clock's messages (tests give their follower's ports).
     var clockPeerPorts: (event: UInt16, general: UInt16) = (319, 320)
+    /// How often a receiver that isn't following the session's clock yet is told again when to play, and how long
+    /// between: five seconds in all, where an Apple TV takes under one.
+    static let anchorTries = 20
+    var anchorPause: Duration = .milliseconds(250)
     /// An AirPlay 2 session: paired first, set up with property lists, its audio sealed, kept open with /feedback.
     private var usesPairing: Bool { if case .none = pairing { false } else { true } }
     private let log = Logger(subsystem: "org.szeremeta.vespertine.player", category: "airplay")
@@ -382,15 +386,27 @@ public final class RAOPSession: @unchecked Sendable {
 
     /// SETRATEANCHORTIME: the frame the stream is anchored at sounds its latency after the moment it was anchored, on the
     /// session's clock (whose time is this Mac's uptime).
+    ///
+    /// A receiver takes the moment only once it follows the session's clock, which starts with the session: until then
+    /// it answers "not yet", and is told again. A flush in between drops the moment, and the next block says its own.
     private func sendAnchor() async {
         guard let clock, let (rtp, nanos, format) = state.withLock({ s in s.anchor.map { ($0.rtp, $0.nanos, s.format) } }) else { return }
         let lead = UInt64(format.latencyFrames) * 1_000_000_000 / UInt64(format.sampleRate)
         let body = AirPlay2Message.play(rtpTime: rtp, at: AirPlay2NetworkTime(nanoseconds: nanos &+ lead), clock: clock.identity)
-        do {
-            _ = try await request("SETRATEANCHORTIME", headers: [("Content-Type", AirPlay2Message.contentType)], body: body)
-        } catch {
-            log.error("AirPlay \(self.name, privacy: .public) was not told when to play: \(String(describing: error), privacy: .public)")
+        for attempt in 1...Self.anchorTries {
+            do {
+                let answer = try await request("SETRATEANCHORTIME", headers: [("Content-Type", AirPlay2Message.contentType)], body: body)
+                if AirPlay2Message.tookMoment(answer.body) { return }
+            } catch {
+                log.error("AirPlay \(self.name, privacy: .public) was not told when to play: \(String(describing: error), privacy: .public)")
+                return
+            }
+            guard attempt < Self.anchorTries else { break }
+            try? await Task.sleep(for: anchorPause)
+            let still = state.withLock { s in s.anchor.map { $0.rtp == rtp && $0.nanos == nanos } ?? false }
+            guard still else { return }
         }
+        log.error("AirPlay \(self.name, privacy: .public) never took the moment to play: it isn't following this Mac's clock")
     }
 
     /// The event connection, open and being read (what arrives is sealed, and dropped unread).

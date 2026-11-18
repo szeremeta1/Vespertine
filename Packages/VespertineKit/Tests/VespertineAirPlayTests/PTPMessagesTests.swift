@@ -31,32 +31,35 @@ struct PTPMessagesTests {
         #expect(PTPTimestamp(inside, at: 2) == far)
     }
 
-    @Test("Announce: this clock, its own master, claiming the least")
+    @Test("Announce: this clock, its own master, claiming enough to lead an Apple TV's own clock, and naming itself as the path")
     func announce() throws {
         let message = PTPMessage.announce(clock: clock, sequence: 0x0102)
-        #expect(message == hex("1b02004000000008000000000000000000000000021afffffe009c0700010102050000000000000000000000002500f8f8fe436af8021afffffe009c070000a0"))
-        #expect(message.count == 64)
+        #expect(message == hex("1b02004c00000408000000000000000000000000021afffffe009c0780050102050000000000000000000000002500800621436a80021afffffe009c0700002000080008021afffffe009c07"))
+        #expect(message.count == 76)
+        // Less is better: an Apple TV announces 248, 248 and 0x21, and follows a clock that beats that.
+        #expect(PTPMessage.priority < 248 && PTPMessage.clockClass < 248 && PTPMessage.clockAccuracy <= 0x21)
         let read = try #require(PTPMessage.read(message))
         #expect(read.kind == .announce)
         #expect(read.clock == clock)
-        #expect(read.port == 1)
+        #expect(read.port == 0x8005)
         #expect(read.sequence == 0x0102)
-        #expect(read.flags == 0x0008)
-        #expect(read.body.count == 30)
+        #expect(read.flags == 0x0408)
+        #expect(read.body.count == 42)
     }
 
     @Test("Sync carries no moment of its own; the Follow_Up with the same number says when it left")
     func syncAndFollowUp() throws {
         let sync = PTPMessage.sync(clock: clock, sequence: 7)
-        #expect(sync == hex("1002002c00000208000000000000000000000000021afffffe009c070001000700fd00000000000000000000"))
+        #expect(sync == hex("1002002c00000608000000000000000000000000021afffffe009c078005000700fd00000000000000000000"))
         let sent = PTPTimestamp(seconds: 1_763_400_000, nanoseconds: 123_456_789)
         let follow = PTPMessage.followUp(clock: clock, sequence: 7, sent: sent)
-        #expect(follow == hex("1802002c00000008000000000000000000000000021afffffe009c070001000702fd0000691b5940075bcd15"))
+        #expect(follow == hex("1802006000000408000000000000000000000000021afffffe009c078005000702fd0000691b5940075bcd15"
+                              + "0003001c0080c2000001" + String(repeating: "00", count: 22) + "00030010000d93000004021afffffe009c070000"))
         let read = try #require(PTPMessage.read(follow))
         #expect(read.kind == .followUp)
         #expect(read.sequence == 7)
         #expect(read.time == sent)
-        #expect(PTPMessage.read(sync)?.flags == 0x0208)
+        #expect(PTPMessage.read(sync)?.flags == 0x0608)
         #expect(PTPMessage.read(sync)?.time == PTPTimestamp(seconds: 0, nanoseconds: 0))
     }
 
@@ -68,7 +71,7 @@ struct PTPMessagesTests {
         #expect(request == PTPMessage.Request(clock: 0xF018_98FF_FE12_3456, port: 0x8001, sequence: 0x0BB8))
         let received = PTPTimestamp(seconds: 1_763_400_001, nanoseconds: 5)
         let answer = PTPMessage.delayResponse(clock: clock, to: request, received: received)
-        #expect(answer == hex("1902003600000008000000000000000000000000021afffffe009c0700010bb803000000691b594100000005f01898fffe1234568001"))
+        #expect(answer == hex("1902003600000608000000000000000000000000021afffffe009c0780050bb803fd0000691b594100000005f01898fffe1234568001"))
         let read = try #require(PTPMessage.read(answer))
         #expect(read.kind == .delayResponse)
         #expect(read.time == received)

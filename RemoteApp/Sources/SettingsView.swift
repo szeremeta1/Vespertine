@@ -76,6 +76,12 @@ struct SettingsView: View {
                     }
                 }
                 Section {
+                    // Where Macs, shares and folders are added, and where what the library is made of is chosen.
+                    Button("Libraries") {
+                        dismiss()
+                        model.leave()
+                    }
+                    .accessibilityIdentifier("settings-libraries")
                     Button("Setup Assistant…") {
                         dismiss()
                         SetupAssistant.shared.runAgain()

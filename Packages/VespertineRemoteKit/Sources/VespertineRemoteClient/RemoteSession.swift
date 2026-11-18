@@ -73,6 +73,9 @@ public final class RemoteSession {
     /// The Mac closed this phone's streams and won't open more (it was told to stop sending songs here, or this phone was
     /// removed from it), with its words when it gave some.
     @ObservationIgnored public var onStreamsClosed: (@MainActor (String?) -> Void)?
+    /// Everything the Mac says unasked (what's playing, its queue, its outputs), as it arrives: how a `JoinedLibrary` this
+    /// Mac is one member of hears it.
+    @ObservationIgnored public var onPush: (@MainActor (ServerMessage) -> Void)?
     /// Called once signed in, with the address the Mac answered at (to remember for next time).
     @ObservationIgnored public var onConnected: (@MainActor (RemoteRoute.Kind?, RemoteAddress?) -> Void)?
     /// The language this phone shows, told to the Mac after signing in so its refusals come back in it (nil: not told).
@@ -135,10 +138,25 @@ public final class RemoteSession {
     public var isDemo: Bool { pairing.serverID == DemoMac.serverID }
     /// The "Mac" is a share the phone reads itself (see VespertineShare): there is no Mac, and music plays on this device.
     public static let sharePrefix = "share-"
-    public var isShare: Bool { pairing.serverID.hasPrefix(Self.sharePrefix) }
+    public var isShare: Bool { mix.map { !$0.hasMac } ?? pairing.serverID.hasPrefix(Self.sharePrefix) }
     /// The share is a folder on this device (chosen in Files, or the app's own) rather than one on a server.
     public static let folderPrefix = sharePrefix + "folder-"
-    public var isFolder: Bool { pairing.serverID.hasPrefix(Self.folderPrefix) }
+    public var isFolder: Bool { mix.map { $0.onlyFolders } ?? pairing.serverID.hasPrefix(Self.folderPrefix) }
+    /// What a session over several libraries at once (a `JoinedLibrary`) is made of; nil for a session with one thing.
+    /// It answers `isShare` and `isFolder` for the mix: no Mac in it means music can only play on this device, and
+    /// nothing but folders means there is no server to reach.
+    public struct Mix: Equatable, Sendable {
+        public var hasMac: Bool
+        public var onlyFolders: Bool
+
+        public init(hasMac: Bool, onlyFolders: Bool) {
+            self.hasMac = hasMac
+            self.onlyFolders = onlyFolders
+        }
+    }
+    public var mix: Mix?
+    /// Whether this session is over several libraries joined as one.
+    public var isJoined: Bool { pairing.serverID == JoinedLibrary.serverID }
 
     public var isConnected: Bool { phase == .connected }
     /// Whether the Mac speaks protocol 2: it can stream songs to this phone (an older Mac only takes commands).
@@ -344,6 +362,7 @@ public final class RemoteSession {
     }
 
     private func received(_ message: ServerMessage) {
+        onPush?(message)
         switch message {
         case .player(let state):
             // Another output has its own level: nothing held from the one before applies to it.
@@ -432,4 +451,5 @@ public final class RemoteSession {
         }
     }
 }
+extension RemoteSession: LibraryMember {}
 #endif

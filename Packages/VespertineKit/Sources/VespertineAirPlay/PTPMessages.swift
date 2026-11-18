@@ -15,11 +15,14 @@
 //   2   flags
 //   8   a correction, in nanoseconds * 65536: always 0 here
 //   4   nothing
-//   8   the clock's identity, then 2 for its port number: 1
+//   8   the clock's identity, then 2 for its port number: 0x8005, as an iPhone's
 //   2   a number counted up per kind of message
 //   1   the "control" field of the older version, by kind
 //   1   how often such messages come, as a power of two of a second
 // Moments are 6 bytes of seconds and 4 of nanoseconds.
+//
+// The messages are shaped as an iPhone's are (flags, port number, and the extra fields after an Announce and a
+// Follow_Up), which is what an Apple TV was seen to follow; OwnTone's libairptp does the same.
 //
 // Nothing here sends anything: these are the messages, made and read back, for the clock that will use them.
 // SPDX-License-Identifier: GPL-3.0-or-later
@@ -88,17 +91,26 @@ enum PTPMessage {
     static let twoStep: UInt16 = 0x0200
     /// Flags: the clock counts PTP time (TAI), not a time of its own.
     static let ptpTimescale: UInt16 = 0x0008
+    /// Flags: sent to one peer, not to a group address.
+    static let unicast: UInt16 = 0x0400
+    /// The port number after the clock's identity.
+    static let portNumber: UInt16 = 0x8005
     /// How often, as powers of two of a second: an Announce every second, a Sync every eighth of one.
     static let announceInterval: Int8 = 0
     static let syncInterval: Int8 = -3
-    /// What this clock says of itself: as Apple's devices do, the least a clock can claim (priority 248, class 248,
-    /// accuracy unknown), so that it leads only a session where nothing better announces itself.
-    static let priority: UInt8 = 248
-    static let clockClass: UInt8 = 248
-    static let clockAccuracy: UInt8 = 0xFE
+    /// What this clock says of itself: enough to lead the session. A receiver follows whichever clock claims the most,
+    /// and an Apple TV claims priority 248, class 248 and accuracy 0x21 for its own: against a sender that claimed the
+    /// least it kept its own clock, and refused every moment named on the sender's. An iPhone claims these.
+    static let priority: UInt8 = 128
+    static let clockClass: UInt8 = 6
+    static let clockAccuracy: UInt8 = 0x21
     static let clockVariance: UInt16 = 0x436A
-    /// Where the time comes from: this machine's own oscillator.
-    static let internalOscillator: UInt8 = 0xA0
+    /// Where the time is said to come from, as an iPhone says it.
+    static let timeSource: UInt8 = 0x20
+    /// An extra field: one made up by an organisation, which it names in three bytes.
+    static let organizationExtension: UInt16 = 0x0003
+    /// An extra field: the clocks the time came through.
+    static let pathTrace: UInt16 = 0x0008
 
     /// A clock's identity from a 6-byte address, as EUI-64: FF FE in the middle.
     static func identity(address: [UInt8]) -> UInt64 {
@@ -113,40 +125,48 @@ enum PTPMessage {
         var d = Data([0x10 | kind.rawValue, 0x02])
         d += RAOPPacket.be16(UInt16(length)) + [0, 0] + RAOPPacket.be16(flags)
         d += [UInt8](repeating: 0, count: 12)
-        d += be64(clock) + RAOPPacket.be16(1) + RAOPPacket.be16(sequence)
+        d += be64(clock) + RAOPPacket.be16(portNumber) + RAOPPacket.be16(sequence)
         d += [kind.control, UInt8(bitPattern: interval)]
         return d
     }
 
-    /// "I am a clock, and my own master": sent to the general port.
+    /// "I am a clock, and my own master": sent to the general port. After it, the clocks the time came through: this one.
     static func announce(clock: UInt64, sequence: UInt16) -> Data {
-        var d = header(.announce, length: headerLength + 30, flags: ptpTimescale, clock: clock, sequence: sequence, interval: announceInterval)
+        var d = header(.announce, length: headerLength + 30 + 12, flags: unicast | ptpTimescale, clock: clock, sequence: sequence,
+                       interval: announceInterval)
         d += PTPTimestamp(seconds: 0, nanoseconds: 0).bytes
         d += RAOPPacket.be16(37)                    // seconds between TAI and UTC
         d += [0, priority, clockClass, clockAccuracy] + RAOPPacket.be16(clockVariance) + [priority]
         d += be64(clock)                            // the grandmaster: this clock
         d += RAOPPacket.be16(0)                     // steps removed from it: none
-        d += [internalOscillator]
+        d += [timeSource]
+        d += RAOPPacket.be16(pathTrace) + RAOPPacket.be16(8) + be64(clock)
         return d
     }
 
     /// "It is now": sent to the event port, its moment left at zero for the Follow_Up to say.
     static func sync(clock: UInt64, sequence: UInt16) -> Data {
-        var d = header(.sync, length: headerLength + 10, flags: twoStep | ptpTimescale, clock: clock, sequence: sequence, interval: syncInterval)
+        var d = header(.sync, length: headerLength + 10, flags: unicast | twoStep | ptpTimescale, clock: clock, sequence: sequence,
+                       interval: syncInterval)
         d += PTPTimestamp(seconds: 0, nanoseconds: 0).bytes
         return d
     }
 
-    /// "The Sync numbered `sequence` left at `sent`": sent to the general port.
+    /// "The Sync numbered `sequence` left at `sent`": sent to the general port. After it, two fields an iPhone sends:
+    /// 802.1AS's account of how the clock has drifted (all zero: it hasn't), and Apple's, which names the clock again.
     static func followUp(clock: UInt64, sequence: UInt16, sent: PTPTimestamp) -> Data {
-        var d = header(.followUp, length: headerLength + 10, flags: ptpTimescale, clock: clock, sequence: sequence, interval: syncInterval)
+        var d = header(.followUp, length: headerLength + 10 + 52, flags: unicast | ptpTimescale, clock: clock, sequence: sequence,
+                       interval: syncInterval)
         d += sent.bytes
+        d += RAOPPacket.be16(organizationExtension) + RAOPPacket.be16(28) + [0x00, 0x80, 0xC2, 0x00, 0x00, 0x01] + [UInt8](repeating: 0, count: 22)
+        d += RAOPPacket.be16(organizationExtension) + RAOPPacket.be16(16) + [0x00, 0x0D, 0x93, 0x00, 0x00, 0x04] + be64(clock) + [0, 0]
         return d
     }
 
     /// The answer to a Delay_Req: its number, who asked, and the moment it arrived. Sent to the general port.
     static func delayResponse(clock: UInt64, to request: Request, received: PTPTimestamp) -> Data {
-        var d = header(.delayResponse, length: headerLength + 20, flags: ptpTimescale, clock: clock, sequence: request.sequence, interval: 0)
+        var d = header(.delayResponse, length: headerLength + 20, flags: unicast | twoStep | ptpTimescale, clock: clock,
+                       sequence: request.sequence, interval: syncInterval)
         d += received.bytes
         d += be64(request.clock) + RAOPPacket.be16(request.port)
         return d

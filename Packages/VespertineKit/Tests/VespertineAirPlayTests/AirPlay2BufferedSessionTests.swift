@@ -127,6 +127,32 @@ struct AirPlay2BufferedSessionTests {
         await session.teardown()
     }
 
+    @Test("A receiver that isn't following the clock yet answers \"not yet\", and is told the same moment again until it takes it")
+    func anchorAgain() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        let follower = try FakePTPFollower()
+        defer { follower.stop() }
+        receiver.pairing = FakePairing()
+        receiver.info = Self.appleTVInfo
+        receiver.anchorsNotYet = 2
+        let clock = try makeClock()
+        let session = open(receiver, clock: clock, follower: follower)
+        session.anchorPause = .milliseconds(1)
+        try await session.connect(volumeDB: nil)
+        let head = session.nextTimestamp
+        let packets = AirPlay2SessionTests.deepPackets(2)
+        session.send(samples: packets[0], startNanos: 5_000_000_000)
+        // Refused twice, taken the third time.
+        await receiver.waitFor { receiver.anchors.count == 3 }
+        session.send(samples: packets[1], startNanos: 6_000_000_000)
+        await receiver.waitFor { receiver.packetCount == 2 }
+        #expect(receiver.anchors.count == 3)
+        #expect(receiver.anchorsNotYet == 0)
+        #expect(receiver.anchors.allSatisfy { $0["rtpTime"] as? Int == Int(head) && $0["networkTimeSecs"] as? Int == 7 && $0["networkTimeFlags"] as? Int == 0 })
+        await session.teardown()
+    }
+
     @Test("A flush drops what the receiver holds before the next block, and the next block is anchored anew")
     func flush() async throws {
         let receiver = try FakeRAOPReceiver()
