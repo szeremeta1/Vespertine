@@ -19,6 +19,7 @@ final class FakeRAOPReceiver: @unchecked Sendable {
     private var _requests: [RTSPMessage] = []
     private var _packets: [UInt32: [Int32]] = [:]
     private var _firstTimestamp: UInt32?
+    private var _realtimeFrames = 0
     private var _syncs: [Data] = []
     private var _timingReplies: [Data] = []
     private var _markers = 0
@@ -274,6 +275,9 @@ final class FakeRAOPReceiver: @unchecked Sendable {
                 .map { Int16(truncatingIfNeeded: $0) }
         }
     }
+
+    /// Frames that came as a realtime stream's packets (a buffered stream's blocks aren't counted), each packet once.
+    var realtimeFrames: Int { lock.withLock { _realtimeFrames } }
 
     /// Forgets the audio received so far (a test that looks at what came after a flush).
     func clearAudio() { lock.withLock { _packets = [:]; _firstTimestamp = nil } }
@@ -615,6 +619,7 @@ final class FakeRAOPReceiver: @unchecked Sendable {
             guard let samples else { return }
             if _firstTimestamp == nil { _firstTimestamp = packet.timestamp }
             if resent { _resent += 1 }
+            if _packets[packet.timestamp] == nil { _realtimeFrames += samples.count / 2 }
             _packets[packet.timestamp] = samples
         }
     }
