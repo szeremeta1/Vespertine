@@ -333,6 +333,6 @@ struct TrackTableSortTests {
             report.append(line)
             await settle(0.5)
         }
-        Issue.record("DIAG \(report.joined(separator: " || "))")
+        Issue.record("x: error: DIAG \(report.joined(separator: " || "))")
     }
 }
