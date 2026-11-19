@@ -20,7 +20,7 @@ enum TrackTableKind: String, CaseIterable, Sendable {
 /// A column a track table can show. The raw value names it in the saved layout: never change one.
 nonisolated enum TrackColumn: String, CaseIterable, Sendable {
     case number, title, artist, album, albumArtist, composer, genre, year, trackNumber, discNumber, format, source, favorite,
-         time, plays, lastPlayed, dateAdded, rating, bpm, size
+         time, plays, lastPlayed, dateAdded, rating, bpm, size, skips, lastSkipped
 
     /// The comparator the table sorts this column with. nil: a column that isn't sorted (the heart, the source).
     func comparator(forward: Bool = true) -> KeyPathComparator<TrackRow>? {
@@ -44,6 +44,8 @@ nonisolated enum TrackColumn: String, CaseIterable, Sendable {
         case .rating: KeyPathComparator(\TrackRow.track.ratingOrNone, order: order)
         case .bpm: KeyPathComparator(\TrackRow.track.bpmOrNone, order: order)
         case .size: KeyPathComparator(\TrackRow.track.fileSize, order: order)
+        case .skips: KeyPathComparator(\TrackRow.track.skipsOrNone, order: order)
+        case .lastSkipped: KeyPathComparator(\TrackRow.track.lastSkippedOrNever, order: order)
         case .source, .favorite: nil
         }
     }
@@ -74,6 +76,8 @@ nonisolated enum TrackColumn: String, CaseIterable, Sendable {
         case .rating: .numbers(tracks.map { Double($0.ratingOrNone) })
         case .bpm: .numbers(tracks.map { Double($0.bpmOrNone) })
         case .size: .numbers(tracks.map { Double($0.fileSize) })
+        case .skips: .numbers(tracks.map { Double($0.skipsOrNone) })
+        case .lastSkipped: .numbers(tracks.map(\.lastSkippedOrNever))
         case .source, .favorite: nil
         }
     }
@@ -90,6 +94,9 @@ nonisolated extension Track {
     var bpmOrNone: Int { bpm ?? -1 }
     /// A song never played sorts as played before any that was.
     var lastPlayedOrNever: Double { lastPlayedAt?.timeIntervalSinceReferenceDate ?? -.greatestFiniteMagnitude }
+    /// Skips: a library from before they were counted has none (0).
+    var skipsOrNone: Int { skipCount ?? 0 }
+    var lastSkippedOrNever: Double { lastSkippedAt?.timeIntervalSinceReferenceDate ?? -.greatestFiniteMagnitude }
 
     /// The rating as stars: a 0–5 rating as it is, a 0–100 one (as most taggers write RATING) in fifths, a 0–255 one
     /// (ID3's POPM) the same way. Empty when there is none.

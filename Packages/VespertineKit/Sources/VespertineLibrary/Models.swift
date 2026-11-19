@@ -128,6 +128,10 @@ public struct Track: Codable, Sendable, Hashable, Identifiable, FetchableRecord,
     public var playCount: Int
     public var lastPlayedAt: Date?
     public var isMissing: Bool
+    /// The times the listener moved on from the song after a few seconds, before it counted as a play (as Music counts
+    /// skips), and the last time. nil: never (and a row from before skips were counted).
+    public var skipCount: Int?
+    public var lastSkippedAt: Date?
 
     // Analysis
     public var effectiveBitDepth: Int?

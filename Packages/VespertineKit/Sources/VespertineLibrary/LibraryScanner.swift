@@ -675,6 +675,8 @@ public actor LibraryScanner {
                     track.addedAt = existing.addedAt
                     track.playCount = existing.playCount
                     track.lastPlayedAt = existing.lastPlayedAt
+                    track.skipCount = existing.skipCount
+                    track.lastSkippedAt = existing.lastSkippedAt
                     if track.rating == nil { track.rating = existing.rating }
                     // Re-read but unchanged (a forced re-read, a tag-only look): its analysis still holds.
                     let stored = existing.codec == track.codec ? try Data.fetchOne(db, sql: """

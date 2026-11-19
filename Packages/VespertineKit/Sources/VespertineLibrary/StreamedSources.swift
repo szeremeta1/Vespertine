@@ -388,6 +388,8 @@ public extension LibraryDatabase {
                     track.addedAt = existing.addedAt
                     track.playCount = existing.playCount
                     track.lastPlayedAt = existing.lastPlayedAt
+                    track.skipCount = existing.skipCount
+                    track.lastSkippedAt = existing.lastSkippedAt
                     track.rating = existing.rating
                     if track.artworkKey == nil { track.artworkKey = existing.artworkKey }
                     if !existing.formatIsListed, existing.fileSize == track.fileSize {

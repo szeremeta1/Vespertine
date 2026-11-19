@@ -455,6 +455,24 @@ public final class LibraryDatabase: Sendable {
             // backwards, and a row that goes leaves them for the song's return. Nothing already in the library changes.
             try createKeptStats(db)
         }
+        m.registerMigration("v25-skips") { db in
+            // Skips, as Music counts them: library state like plays, kept the same way (KeptStats.swift).
+            // (A test library written by this build's scanner before migrating may have them already.)
+            let columns = Set(try db.columns(in: "track").map(\.name))
+            if !columns.contains("skipCount") || !columns.contains("lastSkippedAt") {
+                try db.alter(table: "track") { t in
+                    if !columns.contains("skipCount") { t.add(column: "skipCount", .integer) }
+                    if !columns.contains("lastSkippedAt") { t.add(column: "lastSkippedAt", .datetime) }
+                }
+            }
+            try db.alter(table: "keptStats") { t in
+                t.add(column: "skipCount", .integer)
+                t.add(column: "lastSkippedAt", .datetime)
+            }
+            try db.execute(sql: "DROP TRIGGER track_stats_never_lower")
+            try db.execute(sql: "DROP TRIGGER track_keep_stats")
+            try createKeptStatsTriggers(db)
+        }
         return m
     }
 }
@@ -1120,6 +1138,13 @@ Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE filePath 
         }
     }
 
+    /// The listener moved on from the song before it counted as a play.
+    func markSkipped(_ trackID: Int64, at date: Date = .now) throws {
+        try writer.write { db in
+            try db.execute(sql: "UPDATE track SET skipCount = coalesce(skipCount, 0) + 1, lastSkippedAt = ? WHERE id = ?", arguments: [date, trackID])
+        }
+    }
+
     func setRating(_ rating: Int?, trackIDs: [Int64]) throws {
         try writer.write { db in
             for id in trackIDs { try db.execute(sql: "UPDATE track SET rating = ? WHERE id = ?", arguments: [rating, id]) }
@@ -1458,6 +1483,12 @@ extension LibraryDatabase {
                     WHEN (SELECT lastPlayedAt FROM track WHERE id = :old) IS NULL THEN lastPlayedAt
                     WHEN lastPlayedAt IS NULL THEN (SELECT lastPlayedAt FROM track WHERE id = :old)
                     ELSE max(lastPlayedAt, (SELECT lastPlayedAt FROM track WHERE id = :old)) END,
+                  skipCount = CASE WHEN coalesce(skipCount, 0) + coalesce((SELECT skipCount FROM track WHERE id = :old), 0) = 0 THEN skipCount
+                    ELSE coalesce(skipCount, 0) + coalesce((SELECT skipCount FROM track WHERE id = :old), 0) END,
+                  lastSkippedAt = CASE
+                    WHEN (SELECT lastSkippedAt FROM track WHERE id = :old) IS NULL THEN lastSkippedAt
+                    WHEN lastSkippedAt IS NULL THEN (SELECT lastSkippedAt FROM track WHERE id = :old)
+                    ELSE max(lastSkippedAt, (SELECT lastSkippedAt FROM track WHERE id = :old)) END,
                   rating = coalesce(rating, (SELECT rating FROM track WHERE id = :old)),
                   addedAt = min(addedAt, (SELECT addedAt FROM track WHERE id = :old))
                 WHERE id = :new

@@ -953,10 +953,23 @@ final class PlayerController {
         updateNowPlayingInfo()
     }
 
+    /// Seconds a song must have played for Next to count as skipping it (Music's rule): quicker than that is moving
+    /// through the queue, not passing over a song.
+    static let skipAfter: TimeInterval = 2
+
     func next() {
         guard let i = currentIndex else { return }
+        countSkip()
         if i + 1 < queue.count { currentIndex = i + 1; start(queue[i + 1]) }
         else if repeatMode == .all, receiverSession == nil, let first = queue.first { currentIndex = 0; start(first) }
+    }
+
+    /// Next pressed on a song heard for a moment, before it counted as a play: one skip more for it, as Music counts them.
+    /// Songs from a control app (not the library's) and a song already counted as played aren't counted.
+    private func countSkip() {
+        guard let entry = current, !entry.received, let id = entry.track.id, listenedEntry == entry.id, scrobbledEntry != entry.id,
+              listened >= Self.skipAfter else { return }
+        library.markSkipped(id)
     }
 
     func previous() {
