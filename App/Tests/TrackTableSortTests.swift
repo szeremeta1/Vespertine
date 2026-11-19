@@ -275,7 +275,7 @@ struct TrackTableSortTests {
         let natural = topRows(table)
 
         // By time: the songs 400 and 800 places on tie with the first, so they come second and third.
-        let time = try #require(table.tableColumns.last?.sortDescriptorPrototype)
+        let time = try #require(table.tableColumns.last { !$0.isHidden }?.sortDescriptorPrototype)
         table.sortDescriptors = [time]
         await until { topRows(table) != natural }
         await settle(0.3)
