@@ -87,6 +87,8 @@ struct TrackTable: View {
     @State private var selectedPlaces = Set<Int>()
     @State private var sortOrder: [KeyPathComparator<TrackRow>] = []
     @State private var sorted = SortedRows()
+    /// Where the table is: whether its window is on screen.
+    @State private var host = TableHost()
 
     /// Album pages of multi-disc albums number tracks "2·1", "2·2"…, so disc 2 doesn't look like the list restarting.
     private func numbersDiscs(_ tracks: [Track]) -> Bool { !showAlbum && Set(tracks.compactMap(\.discNumber)).count > 1 }
@@ -193,6 +195,7 @@ struct TrackTable: View {
         .tableStyle(.inset(alternatesRowBackgrounds: false))
         .scrollContentBackground(.hidden)
         .background(Palette.window)
+        .background(TableHost.Probe(host: host))
         // A column added to a table already on screen lands past its right edge. A table made anew fits all of them, so the
         // table is made anew when the Source column comes or goes (a music server signed in to, or the switch turned off).
         .id(showsSource)
@@ -238,6 +241,14 @@ struct TrackTable: View {
             // Shift- or Command-click selection on the page in front shrank to the songs both pages list.
             defer { mirrored = nil }
             guard new != mirrored else { return }
+            // A table whose window has closed lives on for a while and still follows the app's selection, with rows out
+            // of sight that only SwiftUI holds. What it reports then is not a selection anyone made (on CI a closed
+            // table handed a song it had selected out of sight back into the next table's selection): it goes back
+            // to following the app's.
+            guard host.isOnScreen else {
+                mirror(Set(rows.filter { model.selectedTrackIDs.contains($0.trackID ?? -1) }.map(\.id)))
+                return
+            }
             model.selectedTrackIDs = Set(rows.filter { new.contains($0.id) }.compactMap(\.trackID))
             if !new.isEmpty, model.inspectorTab == .nowPlaying, model.player.current == nil { model.inspectorTab = .details }
         }
@@ -306,6 +317,25 @@ extension TrackTable {
             if wanted.contains(copy) { selected.insert(row) }
         }
         return selected
+    }
+}
+
+/// Where a track table is, found through a view put behind it: whether it is in a window on screen.
+@MainActor
+final class TableHost {
+    fileprivate weak var view: NSView?
+
+    /// In a window that is showing. A closed window's table (SwiftUI keeps it a while) is not.
+    var isOnScreen: Bool { view?.window?.isVisible ?? false }
+
+    struct Probe: NSViewRepresentable {
+        let host: TableHost
+        func makeNSView(context: Context) -> NSView {
+            let view = NSView()
+            host.view = view
+            return view
+        }
+        func updateNSView(_ view: NSView, context: Context) { host.view = view }
     }
 }
 

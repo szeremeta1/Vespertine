@@ -23,7 +23,7 @@ APP_CODE = [
     "Packages/VespertineAnalysis/Sources/x.swift", "Packages/VespertineRemoteKit/Sources/x.swift",
     "Driver/VespertineSound/VespertineSound.c", "Helper/Sources/main.swift", "Helper/LaunchAgents/x.plist",
     "RemoteApp/project.yml", "RemoteApp/Sources/x.swift",
-    "scripts/generate-project.sh", "scripts/check-lockfiles.py", "scripts/ci-changes.py",
+    "scripts/generate-project.sh", "scripts/check-lockfiles.py", "scripts/ci-changes.py", "scripts/check-log-floods.py",
     ".github/workflows/ci.yml", "LICENSE", "THIRD-PARTY-NOTICES.md",
     # a directory that doesn't exist yet, by extension
     "NewModule/Sources/Thing.swift", "Shared/thing.h", "Extras/Info.plist", "Extras/Strings.xcstrings",

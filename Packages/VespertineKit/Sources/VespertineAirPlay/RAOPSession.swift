@@ -134,6 +134,14 @@ public final class RAOPSession: @unchecked Sendable {
     }
     private let hooks = Locked<(@Sendable () -> Void)?>(nil)
 
+    /// AirPlay 2, a buffered stream: the receiver was told when to play and never took it (it isn't following this
+    /// session's clock, or refused outright), so nothing sent is heard. The playback is told, once for each moment.
+    public var onUnanchored: (@Sendable () -> Void)? {
+        get { unanchoredHook.withLock { $0 } }
+        set { unanchoredHook.withLock { $0 = newValue } }
+    }
+    private let unanchoredHook = Locked<(@Sendable () -> Void)?>(nil)
+
     public static let backlogPackets = 1024
     public static let keepAliveInterval: Duration = .seconds(25)
     /// A receiver that was asking the time and has asked nothing for this long, while audio goes to it, is asked at once
@@ -399,6 +407,8 @@ public final class RAOPSession: @unchecked Sendable {
                 if AirPlay2Message.tookMoment(answer.body) { return }
             } catch {
                 log.error("AirPlay \(self.name, privacy: .public) was not told when to play: \(String(describing: error), privacy: .public)")
+                // A session closed meanwhile has nothing left to say.
+                if isConnected { onUnanchored?() }
                 return
             }
             guard attempt < Self.anchorTries else { break }
@@ -407,6 +417,7 @@ public final class RAOPSession: @unchecked Sendable {
             guard still else { return }
         }
         log.error("AirPlay \(self.name, privacy: .public) never took the moment to play: it isn't following this Mac's clock")
+        onUnanchored?()
     }
 
     /// The event connection, open and being read (what arrives is sealed, and dropped unread).

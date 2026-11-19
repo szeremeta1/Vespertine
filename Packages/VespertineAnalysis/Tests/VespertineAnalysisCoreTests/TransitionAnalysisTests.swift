@@ -395,22 +395,28 @@ struct BeatTests {
 
 @Suite("Transition analysis speed")
 struct TransitionAnalysisSpeedTests {
+    /// Processor time this thread has used, in seconds. The analyzer works on the thread that feeds it.
+    private static func threadSeconds() -> Double {
+        var t = timespec()
+        clock_gettime(CLOCK_THREAD_CPUTIME_ID, &t)
+        return Double(t.tv_sec) + Double(t.tv_nsec) / 1e9
+    }
+
     @Test("A just-in-time measurement (40 s tail + 20 s head, 96 kHz stereo) and a whole 5-minute song: timed")
     func speed() {
         func time(_ seconds: Double, rate: Double) -> Double {
             let x = Synth.noise(seconds, dbfs: -16, rate: rate)
-            let start = Date()
+            let start = Self.threadSeconds()
             _ = Synth.profile(x, rate: rate)
-            return Date().timeIntervalSince(start)
+            return Self.threadSeconds() - start
         }
         let edges = time(60, rate: 96_000)
         let song = time(300, rate: 44_100)
-        print("Transition analysis: 60 s at 96 kHz in \(String(format: "%.2f", edges)) s; 300 s at 44.1 kHz in \(String(format: "%.2f", song)) s")
-        // Generous bounds (a debug build, other suites running alongside), scaled with the machine's load per core as
-        // rt-audit's watchdog is, and never looser than real time: a measurement must keep ahead of playback.
-        var avg = [0.0, 0.0, 0.0]
-        let busy = getloadavg(&avg, 3) == 3 ? max(avg[0], avg[1]) / Double(ProcessInfo.processInfo.activeProcessorCount) : 1
-        let scale = max(1, busy)
-        #expect(edges < min(30 * scale, 60) && song < min(60 * scale, 300))
+        print("Transition analysis: 60 s at 96 kHz in \(String(format: "%.2f", edges)) s of processor time; 300 s at 44.1 kHz in \(String(format: "%.2f", song)) s")
+        // What is held to a bound is the work a measurement costs: the processor time of the thread doing it, not the time
+        // on the wall. On a Mac whose processor was shared out to other jobs the wall said 80 s for 60 s of audio, and the
+        // machine's load average, which the bound used to be scaled by, doesn't show a share. The bounds are generous (a
+        // debug build) and well under real time: a measurement must keep ahead of playback.
+        #expect(edges < 30 && song < 60)
     }
 }

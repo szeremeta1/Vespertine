@@ -261,10 +261,10 @@ struct SetupChoice: View {
         .buttonStyle(.plain)
         .disabled(!enabled)
         .opacity(enabled ? 1 : 0.5)
-        .accessibilityElement(children: .ignore)
+        // The button is the one thing VoiceOver lands on: a second element made around it had the card read twice.
         // What the choice means is part of what it is called: a hint is spoken late, and not at all when hints are off.
         .accessibilityLabel(Text(verbatim: SetupChoice.spoken(title: title, detail: detail)))
-        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityAddTraits(selected ? .isSelected : [])
         .sensoryFeedback(.selection, trigger: selected)
     }
 }

@@ -100,6 +100,16 @@ struct TrackTableSortTests {
         return bitmap.representation(using: .png, properties: [:])
     }
 
+    /// The first `count` rows of the table as they are drawn now. Row 0 alone can't tell some orders apart: sorted by
+    /// time, the fixture's first song stays first (its 2:00 ties with the songs 400 and 800 places on).
+    private func topRows(_ table: NSTableView, _ count: Int = 4) -> [Data?] {
+        (0..<count).map { row in
+            guard let view = table.rowView(atRow: row, makeIfNecessary: false), let bitmap = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return nil }
+            view.cacheDisplay(in: view.bounds, to: bitmap)
+            return bitmap.representation(using: .png, properties: [:])
+        }
+    }
+
     private func rowViews(_ table: NSTableView) -> Int {
         var count = 0
         table.enumerateAvailableRowViews { _, _ in count += 1 }
@@ -120,6 +130,7 @@ struct TrackTableSortTests {
         let table = rig.table
         await settle(1)
         let unsorted = try #require(topRow(table))
+        let unsortedRows = topRows(table)
         let firstRowView = try #require(table.rowView(atRow: 0, makeIfNecessary: false))
         let onScreen = rowViews(table)
         let busy = BusyWatch()
@@ -152,9 +163,11 @@ struct TrackTableSortTests {
         }
 
         // Back in the list's own order, the table shows what it showed at first.
+        // The last sort was by time, whose first row is the list's first song too: wait for more rows than that.
         table.sortDescriptors = [try #require(sortable.first?.sortDescriptorPrototype)]
-        await until { topRow(table) == unsorted }
+        await until { topRows(table) == unsortedRows }
         #expect(topRow(table) == unsorted)
+        #expect(topRows(table) == unsortedRows)
 
         var selecting: [Double] = []
         for row in [2, 7, 11] {
@@ -217,5 +230,94 @@ struct TrackTableSortTests {
         #expect(await selected(2))
         #expect(await selected(40))
         #expect(await !selected(count - 3))
+    }
+
+    /// The table follows the app's selection to a song out of sight (selected on another page, or kept through a sort).
+    /// Selecting a row after that is a new selection: the song out of sight is let go, not kept beside it.
+    @Test("Selecting a row lets go of a selected song that is out of sight")
+    func selectingLetsGoOfASongOutOfSight() async throws {
+        let tracks = try SortFixture.library(3000)
+        let rig = try await makeRig(tracks)
+        defer { rig.window.close() }
+        let table = rig.table
+        let model = try #require(LibraryStartup.current?.model)
+        let before = model.selectedTrackIDs
+        defer { model.selectedTrackIDs = before }
+
+        let far = try #require(tracks[800].id)
+        model.selectedTrackIDs = [far]
+        await settle(0.5)
+        #expect(model.selectedTrackIDs == [far], "following the app's selection is not a selection of the table's own")
+
+        table.selectRowIndexes(IndexSet(integer: 2), byExtendingSelection: false)
+        let chosen: Set<Int64> = [try #require(tracks[2].id)]
+        await until { model.selectedTrackIDs == chosen }
+        #expect(model.selectedTrackIDs == chosen,
+                "selected songs \(model.selectedTrackIDs.sorted()), AppKit's selected rows \(Array(table.selectedRowIndexes))")
+        #expect(Array(table.selectedRowIndexes) == [2])
+    }
+
+    /// What left a song nobody selected in the selection on CI (main 43af78c): a row selected while a long list's sort
+    /// was still being worked out selects the song shown there then, which the finished sort puts out of sight. The
+    /// next row selected must replace it.
+    @Test("A row selected while a sort is still landing is replaced by the next row selected")
+    func selectingDuringASortThenAgain() async throws {
+        let tracks = try SortFixture.library(3000)    // past SortedRows.immediateLimit: sorted off the main thread
+        let rig = try await makeRig(tracks)
+        defer { rig.window.close() }
+        let table = rig.table
+        let model = try #require(LibraryStartup.current?.model)
+        let before = model.selectedTrackIDs
+        defer { model.selectedTrackIDs = before }
+        await settle(0.5)
+        let natural = topRows(table)
+
+        // By time: the songs 400 and 800 places on tie with the first, so they come second and third.
+        let time = try #require(table.tableColumns.last?.sortDescriptorPrototype)
+        table.sortDescriptors = [time]
+        await until { topRows(table) != natural }
+        await settle(0.3)
+        let byTime = topRows(table)
+        try #require(byTime != natural)
+
+        // Back to the list's order, and a row selected before that has landed: the third row still shows song 801.
+        let number = try #require(table.tableColumns.first?.sortDescriptorPrototype)
+        table.sortDescriptors = [number]
+        table.selectRowIndexes(IndexSet(integer: 2), byExtendingSelection: false)
+        await until { topRows(table) == natural }
+        await settle(0.5)
+        #expect(topRows(table) == natural)
+
+        table.selectRowIndexes(IndexSet(integer: 7), byExtendingSelection: false)
+        let chosen: Set<Int64> = [try #require(tracks[7].id)]
+        await until { model.selectedTrackIDs == chosen }
+        #expect(model.selectedTrackIDs == chosen,
+                "selected songs \(model.selectedTrackIDs.sorted()), AppKit's selected rows \(Array(table.selectedRowIndexes))")
+        #expect(Array(table.selectedRowIndexes) == [7])
+    }
+
+    /// A table outlives its window for a while (a page closed, a window shut), and goes on following the app's
+    /// selection. On CI (main 43af78c) the closed window of the test before still held a song it had selected out of
+    /// sight, and handed it back as part of the next table's selection. Only a table on screen sets the app's selection.
+    @Test("A table whose window has closed follows the app's selection and never sets it")
+    func closedTableNeverSetsTheSelection() async throws {
+        let tracks = try SortFixture.library(3000)
+        let rig = try await makeRig(tracks)
+        let table = rig.table
+        let model = try #require(LibraryStartup.current?.model)
+        let before = model.selectedTrackIDs
+        defer { model.selectedTrackIDs = before }
+
+        table.selectRowIndexes(IndexSet(integer: 4), byExtendingSelection: false)
+        let chosen: Set<Int64> = [try #require(tracks[4].id)]
+        await until { model.selectedTrackIDs == chosen }
+        try #require(model.selectedTrackIDs == chosen, "on screen, the table sets the app's selection")
+
+        rig.window.close()
+        table.selectRowIndexes(IndexSet(integer: 9), byExtendingSelection: false)
+        await settle(0.5)
+        #expect(model.selectedTrackIDs == chosen, "selected songs \(model.selectedTrackIDs.sorted())")
+        await until { Array(table.selectedRowIndexes) == [4] }
+        #expect(Array(table.selectedRowIndexes) == [4], "it goes back to following the app's selection")
     }
 }
