@@ -450,6 +450,11 @@ public final class LibraryDatabase: Sendable {
                 t.column("remoteId", .text).notNull()
             }
         }
+        m.registerMigration("v24-kept-stats") { db in
+            // Listening statistics outlast the rows that hold them (KeptStats.swift): written again they never go
+            // backwards, and a row that goes leaves them for the song's return. Nothing already in the library changes.
+            try createKeptStats(db)
+        }
         return m
     }
 }
@@ -1093,8 +1098,11 @@ Self.albumOrder(try Track.fetchAll(db, sql: "SELECT * FROM track WHERE filePath 
     @discardableResult
     func removeMissingSongs() throws -> Int {
         try writer.write { db in
-            try db.execute(sql: "DELETE FROM track WHERE isMissing = 1")
-            return db.changesCount
+            // The one way to forget statistics on purpose (its confirmation says so): they aren't kept for a return.
+            try Self.withoutKeepingStats(db) {
+                try db.execute(sql: "DELETE FROM track WHERE isMissing = 1")
+                return db.changesCount
+            }
         }
     }
 
@@ -1446,12 +1454,14 @@ extension LibraryDatabase {
             try db.execute(sql: """
                 UPDATE track SET
                   playCount = playCount + (SELECT playCount FROM track WHERE id = :old),
-                  lastPlayedAt = max(coalesce(lastPlayedAt, 0), coalesce((SELECT lastPlayedAt FROM track WHERE id = :old), 0)),
+                  lastPlayedAt = CASE
+                    WHEN (SELECT lastPlayedAt FROM track WHERE id = :old) IS NULL THEN lastPlayedAt
+                    WHEN lastPlayedAt IS NULL THEN (SELECT lastPlayedAt FROM track WHERE id = :old)
+                    ELSE max(lastPlayedAt, (SELECT lastPlayedAt FROM track WHERE id = :old)) END,
                   rating = coalesce(rating, (SELECT rating FROM track WHERE id = :old)),
                   addedAt = min(addedAt, (SELECT addedAt FROM track WHERE id = :old))
                 WHERE id = :new
                 """, arguments: ["old": old, "new": new])
-            try db.execute(sql: "UPDATE track SET lastPlayedAt = NULL WHERE id = ? AND lastPlayedAt = 0", arguments: [new])
             if sameFile, try Bool.fetchOne(db, sql: "SELECT NOT EXISTS (SELECT 1 FROM analysis WHERE trackId = ?)", arguments: [new]) == true {
                 // Same bytes, so the analysis still holds.
                 try db.execute(sql: """
@@ -1473,7 +1483,8 @@ extension LibraryDatabase {
                     WHERE trackId = :old AND fileSize = (SELECT fileSize FROM track WHERE id = :new)
                     """, arguments: ["old": old, "new": new])
             }
-            try db.execute(sql: "DELETE FROM track WHERE id = ?", arguments: [old])
+            // Everything the old entry had is the new one's now: nothing is left to keep for it.
+            try Self.withoutKeepingStats(db) { try db.execute(sql: "DELETE FROM track WHERE id = ?", arguments: [old]) }
         }
         return Dictionary(uniqueKeysWithValues: pairs.map { ($0.old, $0.new) })
     }

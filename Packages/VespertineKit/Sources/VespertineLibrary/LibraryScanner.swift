@@ -702,6 +702,9 @@ public actor LibraryScanner {
                 } else {
                     try track.insert(db)
                     added += 1
+                    // A song that was in the library before (its folder taken out and added again, the file moved in from
+                    // elsewhere) takes back its plays, rating, favorite and history.
+                    if let id = track.id { try LibraryDatabase.restoreKeptStats(db, trackIDs: [id]) }
                 }
             }
             return (added, updated)
