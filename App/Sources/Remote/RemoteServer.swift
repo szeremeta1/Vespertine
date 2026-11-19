@@ -524,8 +524,18 @@ final class RemoteServer {
         }
     }
 
-    fileprivate func authenticated(_ client: RemoteClient, device: String, name: String) -> Bool {
+    /// Whether a `hello` naming `device` is let in. The TLS handshake showed only that the connection holds one of the keys
+    /// the listener accepts (any paired phone's, or a pairing key while a window is open), not which: `proof` shows it is
+    /// this device's (`HelloProof`). A phone app from before the proof sends none and is let in until it first does.
+    fileprivate func authenticated(_ client: RemoteClient, device: String, name: String, proof: Data?) -> Bool {
         guard let paired = store.device(device), !paired.isWeb else { return false }
+        switch HelloProof.verdict(proof: proof, key: paired.key, serverID: store.serverID, device: device, provedBefore: paired.proves == true) {
+        case .refused:
+            Self.log.error("A remote said hello as a paired device without showing that device's key: refused.")
+            return false
+        case .admitted(let proved):
+            if proved { store.setProves(device) }
+        }
         store.touch(device, name: name)
         connected.insert(device)
         throttle.succeeded(host: client.host)
@@ -675,9 +685,11 @@ final class RemoteClient {
             return
         }
         switch message.command {
-        case .hello(let device, let name, let version, let highest):
+        case .hello(let device, let name, let version, let highest, let proof):
             guard let negotiated = RemoteProtocol.negotiate(baseline: version, highest: highest) else { return close(saying: .protocolMismatch) }
-            guard let server, server.authenticated(self, device: device, name: name) else { return close(saying: .notPaired) }
+            // A connection is one device: a later hello can't make it count as another.
+            guard self.device == nil || self.device == device else { return close(saying: .notPaired) }
+            guard let server, server.authenticated(self, device: device, name: name, proof: proof) else { return close(saying: .notPaired) }
             self.device = device
             protocolVersion = negotiated
             isSignedIn = true

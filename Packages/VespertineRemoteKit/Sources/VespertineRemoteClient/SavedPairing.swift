@@ -97,6 +97,9 @@ public struct SavedPairing: Codable, Sendable, Equatable, Identifiable {
         return copy
     }
 
+    /// What this phone adds to its `hello` so the Mac knows it holds this device's own key (`HelloProof`).
+    public var helloProof: Data { HelloProof.make(key: key, serverID: serverID, device: device) }
+
     public var presharedKey: RemoteTransport.PresharedKey {
         .init(identity: device, key: key)
     }

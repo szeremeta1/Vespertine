@@ -19,6 +19,9 @@ nonisolated struct PairedRemote: Codable, Equatable, Identifiable, Sendable {
     /// Settings › Remote: false once this phone was told it may not play songs itself. nil (every pairing made before the
     /// setting existed) and true both mean it may, while Stream to Phones is on.
     var streams: Bool?
+    /// This phone has shown, in a `hello`, that it holds this key (`HelloProof`): from then on a `hello` in its name
+    /// without that proof is refused. nil: its app has never sent one (a version from before the proof).
+    var proves: Bool?
 
     var isWeb: Bool { web == true }
 }
@@ -125,6 +128,13 @@ final class RemoteStore {
     func setMayStream(_ id: String, _ may: Bool) {
         guard let index = devices.firstIndex(where: { $0.id == id }), (devices[index].streams != false) != may else { return }
         devices[index].streams = may
+        save()
+    }
+
+    /// Notes that a phone proved it holds its key, so every later `hello` in its name must too.
+    func setProves(_ id: String) {
+        guard let index = devices.firstIndex(where: { $0.id == id }), devices[index].proves != true else { return }
+        devices[index].proves = true
         save()
     }
 

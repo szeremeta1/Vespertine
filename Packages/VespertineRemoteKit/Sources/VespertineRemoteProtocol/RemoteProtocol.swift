@@ -90,7 +90,9 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     /// First message on a connection made with a device key. `device` is the ID the Mac gave at pairing.
     /// `protocolVersion` is the baseline every Mac reads (1); `highestProtocolVersion` the newest the phone speaks (nil from a
     /// version 1 phone), which an old Mac ignores and a new one answers in `ServerInfo.protocolVersion`.
-    case hello(device: String, name: String, protocolVersion: Int, highestProtocolVersion: Int? = nil)
+    /// `proof` (`HelloProof.make`) shows the phone holds the key of the device it names: the TLS handshake only shows it
+    /// holds one of the keys the Mac accepts. Absent from a phone app from before it, and ignored by a Mac from before it.
+    case hello(device: String, name: String, protocolVersion: Int, highestProtocolVersion: Int? = nil, proof: Data? = nil)
     /// First message on a connection made with a pairing key: asks to be paired under `name` ("Alex's iPhone").
     case pair(name: String, protocolVersion: Int, highestProtocolVersion: Int? = nil)
     /// Asks whether the Mac is still there (answered with `.ok`). A phone sends it when its network changes, to learn at

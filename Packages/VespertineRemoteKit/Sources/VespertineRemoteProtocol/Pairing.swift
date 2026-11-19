@@ -110,6 +110,40 @@ public struct DeviceCredential: Codable, Sendable, Equatable {
 }
 
 #if canImport(CryptoKit)
+/// What a phone adds to its `hello` to show it holds the key of the device it says it is.
+///
+/// The Mac's listener accepts every paired phone's key (and the pairing keys while a pairing window is open), and TLS does
+/// not tell it which of them a connection used. Without this, a connection made with any accepted key could say `hello`
+/// as any other paired device: a phone kept from streaming could sign in as one that may, a phone removed in Settings
+/// could stay on under another's name, and whoever read the pairing code could sign in as a paired phone without pairing.
+/// The proof is an HMAC under the named device's own key, so only that device can make it; it travels inside the TLS
+/// connection, which only a holder of an accepted key can open, and it is bound to this Mac and this device.
+public enum HelloProof {
+    public static func make(key: Data, serverID: String, device: String) -> Data {
+        let code = HMAC<SHA256>.authenticationCode(for: Data("vespertine-remote-hello\u{1F}\(serverID)\u{1F}\(device)".utf8), using: SymmetricKey(data: key))
+        return Data(code)
+    }
+
+    public enum Verdict: Sendable, Equatable {
+        /// Not let in: the proof is wrong, or this device has proved itself before and sent none now.
+        case refused
+        /// Let in. `proved`: it sent a valid proof, so from now on a `hello` in its name without one is refused.
+        case admitted(proved: Bool)
+    }
+
+    /// Whether a `hello` naming the device with `key` is let in. `provedBefore`: this device has sent a valid proof on an
+    /// earlier connection (its app is new enough to), so one is required. A phone app from before the proof never sends
+    /// one and is still let in, until the first time it does.
+    public static func verdict(proof: Data?, key: Data, serverID: String, device: String, provedBefore: Bool) -> Verdict {
+        guard let proof else { return provedBefore ? .refused : .admitted(proved: false) }
+        let expected = make(key: key, serverID: serverID, device: device)
+        guard proof.count == expected.count else { return .refused }
+        var difference: UInt8 = 0
+        for (a, b) in zip(proof, expected) { difference |= a ^ b }
+        return difference == 0 ? .admitted(proved: true) : .refused
+    }
+}
+
 public enum PairingKey {
     /// The TLS pre-shared key both sides use while pairing with `secret` (a link's secret, or a typed code as
     /// `PairingSecret.normalizedCode` gives it) with the Mac whose server ID is `serverID`.

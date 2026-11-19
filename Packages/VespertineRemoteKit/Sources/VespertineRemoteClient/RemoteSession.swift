@@ -250,7 +250,7 @@ public final class RemoteSession {
             self.lost(link, reason: reason)
         }
         do {
-            let reply = try await link.request(.hello(device: pairing.device, name: clientName, protocolVersion: RemoteProtocol.minimumVersion, highestProtocolVersion: RemoteProtocol.version), timeout: .seconds(15))
+            let reply = try await link.request(.hello(device: pairing.device, name: clientName, protocolVersion: RemoteProtocol.minimumVersion, highestProtocolVersion: RemoteProtocol.version, proof: pairing.helloProof), timeout: .seconds(15))
             guard self.link === link else { return }
             if case .welcome(let info) = reply {
                 server = info

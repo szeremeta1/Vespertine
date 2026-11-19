@@ -135,6 +135,16 @@ struct RemoteTests {
         #expect(HTTPRequest(Data("GET / HTTP/1.1\r\n\r\n".utf8))?.path == "/")
     }
 
+    /// Anything on the network can connect to the web remote before it has paired: it takes a bounded number of
+    /// connections, and a silent one doesn't keep its place for long.
+    @Test func theWebRemoteTakesOnlySoManyConnections() {
+        #expect(RemoteWebServer.admits(open: 0))
+        #expect(RemoteWebServer.admits(open: RemoteWebServer.maximumConnections - 1))
+        #expect(!RemoteWebServer.admits(open: RemoteWebServer.maximumConnections))
+        #expect(RemoteWebServer.maximumConnections <= 64)
+        #expect(RemoteWebServer.requestTimeout <= .seconds(30))
+    }
+
     @Test func browserTokensCompareWholly() {
         let hash = RemoteWebServer.hash("token")
         #expect(RemoteWebServer.constantTimeEqual(hash, RemoteWebServer.hash("token")))

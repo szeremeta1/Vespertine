@@ -22,7 +22,13 @@ read from the repository's queued and running jobs, plus how long the job takes 
 single pull request lands on the project's Macs, and a burst of them spills over to GitHub's runners.
 
 Always GitHub's runners:
-  - a pull request from a fork. The project's Macs never run code from outside the repository;
+  - a pull request from a fork. The project's Macs never run code from outside the repository. This script is only
+    the courtesy half of that rule: a pull request brings its own copy of this script and of the workflow, so one from a
+    fork could ask for the Macs anyway. What holds is the repository's setting that no workflow from an outside
+    contributor runs until the maintainer approves it, and a check on the Macs themselves (a runner job-started hook
+    that refuses a fork's job: scripts/ci-runner-job-gate.sh). Read a fork's changes to .github/ and scripts/ci-* before approving;
+  - a pull request opened by a bot (Dependabot's updates to the pinned actions): it runs without anybody having read
+    it, and a job on the project's Macs runs as the person who uses that Mac;
   - when the repository variable CI_OWN_MACS is "off", or a manual run asks for GitHub's runners (a manual run that
     asks for the project's Macs gets them whenever one is taking jobs, even with the variable off: that is how a change
     to the Macs is tried before they are switched back on for everyone);
@@ -129,6 +135,13 @@ def from_fork(event):
     return "pull_request" in event and (head.get("repo") or {}).get("full_name") != (event.get("repository") or {}).get("full_name")
 
 
+def from_a_bot(event):
+    """A pull request opened by a bot (Dependabot's updates to the pinned actions): what it proposes is code nobody has
+    read yet, and the jobs on the project's Macs would run it as the person who uses that Mac."""
+    author = (event.get("pull_request") or {}).get("user") or {}
+    return "pull_request" in event and (author.get("type") == "Bot" or str(author.get("login") or "").endswith("[bot]"))
+
+
 def main():
     env = os.environ
     needed = [job for job in JOBS if env.get(f"NEED_{job.upper()}", "true") != "false"]
@@ -142,6 +155,8 @@ def main():
     forced = env.get("CI_MACS_INPUT") == "own"  # a manual run that asks for the project's Macs
     if from_fork(event):
         why = "a pull request from a fork runs on GitHub's runners only"
+    elif from_a_bot(event):
+        why = "a pull request opened by a bot runs on GitHub's runners only"
     elif env.get("CI_MACS_INPUT") == "github" or (env.get("CI_OWN_MACS", "").strip().lower() == "off" and not forced):
         why = "the project's Macs are switched off for CI"
     macs = set() if why else online({"fast": env.get("CI_MAC_FAST_SEEN"), "shared": env.get("CI_MAC_SHARED_SEEN")}, now)

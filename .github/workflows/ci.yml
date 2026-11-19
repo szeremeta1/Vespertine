@@ -35,8 +35,11 @@
 #   scripts/ci-pick-runners.py decides for each job, from which Macs are taking jobs right now and what is already
 #   waiting where, and says why in the run's summary. A job sent to the project's Macs is taken by whichever of them
 #   is free first. A Mac that is off, asleep or unplugged gets nothing, and
-#   the job runs on GitHub's runner as before. Pull requests from forks never run on the project's Macs (the script
-#   refuses, and the repository asks for approval before any workflow from an outside contributor runs at all).
+#   the job runs on GitHub's runner as before. Pull requests from forks and from bots (Dependabot) never run on the
+#   project's Macs: the script sends them to GitHub's runners. A pull request brings its own copy of that script and of
+#   this file, though, so what really holds for a fork is that the repository asks for approval before any workflow
+#   from an outside contributor runs at all (read its changes to .github/ and scripts/ci-* before approving), and
+#   that each Mac refuses such a job itself (scripts/ci-runner-job-gate.sh, set as the runner's job-started hook).
 #   Setting the repository variable CI_OWN_MACS to "off", or choosing "github" on a manual run, sends everything to
 #   GitHub's runners ("own" on a manual run uses the Macs even then, to try a change to them before switching back on).
 #   The project's Macs keep their files between runs, so the steps below leave nothing behind that a later run reads:

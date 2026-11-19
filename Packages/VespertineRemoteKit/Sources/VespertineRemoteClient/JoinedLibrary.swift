@@ -262,7 +262,7 @@ public final class JoinedLibrary: RemoteChannel {
     public func request(_ command: RemoteCommand, timeout: Duration) async throws -> RemoteReply {
         guard isOpen else { throw RemoteLinkError.closed }
         switch command {
-        case .hello(_, _, let version, let highest):
+        case .hello(_, _, let version, let highest, _):
             guard RemoteProtocol.negotiate(baseline: version, highest: highest) != nil else { return .failed(reason: "") }
             Task { [weak self] in
                 guard let self, self.isOpen else { return }
