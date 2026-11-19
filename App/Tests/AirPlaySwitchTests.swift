@@ -131,6 +131,37 @@ struct AirPlaySwitchTests {
         #expect(AirPlaySwitch.explanation.contains("16-bit / 44.1 kHz"))
     }
 
+    @Test("Its line and the notes under an AirPlay output say what an Apple TV 4K gets")
+    func appleTVWords() {
+        #expect(AirPlaySwitch.explanation.contains("24-bit / 48 kHz"))
+        #expect(AirPlayText.advice.contains(AirPlayText.appleTV))
+    }
+
+    @Test("An Apple TV 4K is sent 24-bit / 48 kHz unless the hidden default says no")
+    func buffersStreams() throws {
+        let name = "AirPlaySwitchTests.buffers.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: name))
+        defer { defaults.removePersistentDomain(forName: name) }
+        #expect(AirPlaySwitch.buffersStreams(defaults))
+        defaults.set(false, forKey: "AirPlayBufferedStreams")
+        #expect(!AirPlaySwitch.buffersStreams(defaults))
+        defaults.set(true, forKey: "AirPlayBufferedStreams")
+        #expect(AirPlaySwitch.buffersStreams(defaults))
+    }
+
+    @Test("“Sent as” says 24-bit / 48 kHz only while a song goes to an AirPlay receiver that way")
+    func sentAs() {
+        func stage(_ rate: Double, _ bits: Int, _ transport: SignalPath.RendererStage.Transport) -> SignalPath.RendererStage {
+            SignalPath.RendererStage(name: "Dorm", protocolName: "AirPlay", processing: [], sentCodec: "ALAC", sentSampleRate: rate, sentBitDepth: bits,
+                                     sentChannels: 2, gapless: true, transport: transport)
+        }
+        #expect(AirPlayText.sentAs(nil) == "ALAC 16-bit / 44.1 kHz, stereo")
+        #expect(AirPlayText.sentAs(stage(44_100, 16, .airPlay)) == "ALAC 16-bit / 44.1 kHz, stereo")
+        #expect(AirPlayText.sentAs(stage(48_000, 24, .airPlay)) == "ALAC 24-bit / 48 kHz, stereo")
+        // A network player's 24/48 is not this receiver's.
+        #expect(AirPlayText.sentAs(stage(48_000, 24, .pull)) == "ALAC 16-bit / 44.1 kHz, stereo")
+    }
+
     @Test("A new install starts with it off, nothing stored, and no model (so Bonjour is never browsed)")
     func offByDefault() throws {
         let (root, defaults, suite) = try scratch()

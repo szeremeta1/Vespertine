@@ -656272,6 +656272,544 @@
           }
         }
       }
+    },
+    "ALAC 24-bit / 48 kHz, stereo": {
+      "comment": "Output details: what is sent to an AirPlay receiver that takes more than CD quality (an Apple TV 4K) while a song above CD quality plays.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz፣ ስቴሪዮ"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 بت / 48 kHz، ستيريو"
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, স্টেরিও"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 bitů / 48 kHz, stereo"
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, stereo"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 Bit / 48 kHz, Stereo"
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 bit / 48 kHz, στερεοφωνικό"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC de 24 bits / 48 kHz, estéreo"
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC ۲۴ بیتی / ۴۸ kHz، استریو"
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC, 24-bittinen / 48 kHz, stereo"
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, stereo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 bits / 48 kHz, stéréo"
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, સ્ટીરિયો"
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC bit 24 / 48 kHz, stereo"
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC ב־24 סיביות / 48 kHz, סטריאו"
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, स्टीरियो"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 bit / 48 kHz, sztereó"
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, stereo"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC a 24 bit / 48 kHz, stereo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24ビット / 48 kHz、ステレオ"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, ಸ್ಟೀರಿಯೋ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24비트 / 48 kHz, 스테레오"
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, സ്റ്റീരിയോ"
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, स्टिरिओ"
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, stereo"
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, stereo"
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 bit / 48 kHz, stereo"
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, ਸਟੀਰੀਓ"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, stereo"
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC de 24 bits / 48 kHz, estéreo"
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC de 24 bits / 48 kHz, estéreo"
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC pe 24 biți / 48 kHz, stereo"
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 bitar / 48 kHz, stereo"
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC ya biti 24 / 48 kHz, stereo"
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, ஸ்டீரியோ"
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz, స్టీరియో"
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 บิต / 48 kHz, สเตอริโอ"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 bit / 48 kHz, stereo"
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 біт / 48 kHz, стерео"
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24-bit / 48 kHz، اسٹیریو"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 bit / 48 kHz, stereo"
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 位元 / 48 kHz，立體聲"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 位 / 48 kHz，立体声"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ALAC 24 位元 / 48 kHz，立體聲"
+          }
+        }
+      }
+    },
+    "An Apple TV 4K also takes 24-bit / 48 kHz, which Vespertine sends for songs above CD quality.": {
+      "comment": "AirPlay: an Apple TV 4K is sent 24-bit / 48 kHz when the song has more than CD quality. Shown under the AirPlay Players switch in Settings and in the notes under an AirPlay output.",
+      "localizations": {
+        "am": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 24-bit / 48 kHz ጭምር ይቀበላል፤ Vespertine ከCD ጥራት በላይ ለሆኑ ዘፈኖች ይህንኑ ይልካል።"
+          }
+        },
+        "ar": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "يستقبل Apple TV 4K أيضًا 24 بت / 48 kHz، ويرسلها Vespertine للأغاني التي تتجاوز جودة CD."
+          }
+        },
+        "bn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 24-bit / 48 kHz-ও গ্রহণ করে; CD-মানের চেয়ে উঁচু মানের গানের ক্ষেত্রে Vespertine সেটিই পাঠায়।"
+          }
+        },
+        "cs": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K přijímá také 24 bitů / 48 kHz; Vespertine je posílá u skladeb ve vyšší než CD kvalitě."
+          }
+        },
+        "da": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K modtager også 24-bit / 48 kHz, som Vespertine sender for sange over cd-kvalitet."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Apple TV 4K nimmt auch 24 Bit / 48 kHz an; das sendet Vespertine bei Titeln oberhalb der CD-Qualität."
+          }
+        },
+        "el": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ένα Apple TV 4K δέχεται επίσης 24 bit / 48 kHz, τα οποία στέλνει το Vespertine για τραγούδια πάνω από την ποιότητα CD."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un Apple TV 4K también acepta 24 bits / 48 kHz, que Vespertine envía para las canciones por encima de la calidad de CD."
+          }
+        },
+        "fa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K صدای ۲۴ بیتی / ۴۸ kHz را هم می‌پذیرد و Vespertine آن را برای آهنگ‌های بالاتر از کیفیت CD می‌فرستد."
+          }
+        },
+        "fi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K ottaa vastaan myös 24-bittistä / 48 kHz:n ääntä, jota Vespertine lähettää CD-laatua paremmista kappaleista."
+          }
+        },
+        "fil": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tumatanggap din ang Apple TV 4K ng 24-bit / 48 kHz, na ipinapadala ng Vespertine para sa mga kantang mas mataas sa CD-quality."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une Apple TV 4K accepte aussi le 24 bits / 48 kHz, que Vespertine envoie pour les morceaux au-delà de la qualité CD."
+          }
+        },
+        "gu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 24-bit / 48 kHz પણ સ્વીકારે છે, જે Vespertine CD-ગુણવત્તાથી ઊંચાં ગીતો માટે મોકલે છે."
+          }
+        },
+        "ha": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K yana karɓar bit 24 / 48 kHz ma, wanda Vespertine ke aikawa don waƙoƙin da suka fi ingancin CD."
+          }
+        },
+        "he": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K מקבל גם 24 סיביות / 48 kHz, ו־Vespertine שולח זאת עבור שירים באיכות גבוהה מ־CD."
+          }
+        },
+        "hi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 24-bit / 48 kHz भी लेता है, जिसे Vespertine CD-क्वालिटी से ऊपर के गानों के लिए भेजता है।"
+          }
+        },
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az Apple TV 4K 24 bit / 48 kHz-et is fogad; a Vespertine ezt küldi a CD-minőségnél jobb dalokhoz."
+          }
+        },
+        "id": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K juga menerima 24-bit / 48 kHz, yang dikirim Vespertine untuk lagu di atas kualitas CD."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una Apple TV 4K accetta anche 24 bit / 48 kHz, che Vespertine invia per i brani oltre la qualità CD."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4Kは24ビット / 48 kHzも受け取れます。CD品質を超える曲では、Vespertineはこの形式で送ります。"
+          }
+        },
+        "kn": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 24-bit / 48 kHz ಅನ್ನೂ ಸ್ವೀಕರಿಸುತ್ತದೆ; CD-ಗುಣಮಟ್ಟಕ್ಕಿಂತ ಹೆಚ್ಚಿನ ಹಾಡುಗಳಿಗೆ Vespertine ಅದನ್ನೇ ಕಳುಹಿಸುತ್ತದೆ."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K는 24비트 / 48 kHz도 받으며, Vespertine은 CD 음질을 넘는 곡을 이 형식으로 보냅니다."
+          }
+        },
+        "ml": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 24-bit / 48 kHz കൂടി സ്വീകരിക്കും; CD നിലവാരത്തിനു മുകളിലുള്ള ഗാനങ്ങൾക്ക് Vespertine അതാണ് അയയ്ക്കുന്നത്."
+          }
+        },
+        "mr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 24-bit / 48 kHz देखील स्वीकारते; CD-दर्जापेक्षा वरच्या गाण्यांसाठी Vespertine तेच पाठवते."
+          }
+        },
+        "ms": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K juga menerima 24-bit / 48 kHz, yang dihantar oleh Vespertine untuk lagu melebihi kualiti CD."
+          }
+        },
+        "nb": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K tar også imot 24-bit / 48 kHz, som Vespertine sender for låter over CD-kvalitet."
+          }
+        },
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Een Apple TV 4K accepteert ook 24 bit / 48 kHz, dat Vespertine verstuurt voor nummers boven cd-kwaliteit."
+          }
+        },
+        "pa": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 24-bit / 48 kHz ਵੀ ਲੈਂਦਾ ਹੈ, ਜੋ Vespertine CD-ਕੁਆਲਟੀ ਤੋਂ ਉੱਪਰ ਦੇ ਗੀਤਾਂ ਲਈ ਭੇਜਦਾ ਹੈ।"
+          }
+        },
+        "pl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K przyjmuje też 24 bity / 48 kHz, które Vespertine wysyła dla utworów o jakości wyższej niż CD."
+          }
+        },
+        "pt-BR": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um Apple TV 4K também aceita 24 bits / 48 kHz, que o Vespertine envia para músicas acima da qualidade de CD."
+          }
+        },
+        "pt-PT": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Um Apple TV 4K também aceita 24 bits / 48 kHz, que o Vespertine envia para músicas acima da qualidade de CD."
+          }
+        },
+        "ro": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un Apple TV 4K acceptă și 24 de biți / 48 kHz, pe care Vespertine îi trimite pentru melodiile peste calitatea CD."
+          }
+        },
+        "sv": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En Apple TV 4K tar även emot 24 bitar / 48 kHz, som Vespertine skickar för låtar över CD-kvalitet."
+          }
+        },
+        "sw": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K pia hupokea biti 24 / 48 kHz, ambazo Vespertine hutuma kwa nyimbo zilizo juu ya ubora wa CD."
+          }
+        },
+        "ta": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 24-bit / 48 kHz-ஐயும் ஏற்கும்; CD தரத்தை விட உயர்ந்த பாடல்களுக்கு Vespertine அதையே அனுப்பும்."
+          }
+        },
+        "te": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 24-bit / 48 kHzను కూడా స్వీకరిస్తుంది; CD-నాణ్యత కంటే ఎక్కువ ఉన్న పాటలకు Vespertine దాన్నే పంపుతుంది."
+          }
+        },
+        "th": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K รับ 24 บิต / 48 kHz ได้ด้วย ซึ่ง Vespertine จะส่งให้สำหรับเพลงที่สูงกว่าคุณภาพระดับ CD"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K, 24 bit / 48 kHz de alır; Vespertine bunu CD kalitesinin üzerindeki şarkılar için gönderir."
+          }
+        },
+        "uk": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K приймає також 24 біт / 48 kHz, які Vespertine надсилає для пісень із якістю, вищою за CD."
+          }
+        },
+        "ur": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K، 24-bit / 48 kHz بھی لیتا ہے، جو Vespertine، CD معیار سے اوپر کے گانوں کے لیے بھیجتا ہے۔"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K cũng nhận 24 bit / 48 kHz, được Vespertine gửi cho các bài hát trên chất lượng CD."
+          }
+        },
+        "zh-HK": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 亦接受 24 位元 / 48 kHz；高於 CD 質素的歌曲，Vespertine 會以此格式傳送。"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 还可接收 24 位 / 48 kHz；对于高于 CD 品质的歌曲，Vespertine 会以此格式发送。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple TV 4K 也可接收 24 位元 / 48 kHz；高於 CD 品質的歌曲，Vespertine 會以此格式傳送。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
