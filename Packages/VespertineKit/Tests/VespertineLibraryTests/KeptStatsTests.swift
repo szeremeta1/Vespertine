@@ -122,13 +122,16 @@ struct KeptStatsTests {
         a.lastPlayedAt = nil
         a.addedAt = .now
         a.title = "Retitled"
-        try db.writer.write { db in try a.update(db) }
+        let rewritten = a
+        try await db.writer.write { db in var row = rewritten; try row.update(db) }
         let after = try track(db, "a")
         #expect(after.title == "Retitled", "the rest of the row is written")
         #expect(after.playCount == 12 && after.lastPlayedAt == lastPlayed && after.addedAt == added)
 
-        try db.writer.write { db in try db.execute(sql: "UPDATE track SET playCount = playCount + 1, lastPlayedAt = ? WHERE id = ?",
-                                                     arguments: [lastPlayed.addingTimeInterval(60), a.id]) }
+        let id = a.id, later = lastPlayed.addingTimeInterval(60)
+        try await db.writer.write { db in
+            try db.execute(sql: "UPDATE track SET playCount = playCount + 1, lastPlayedAt = ? WHERE id = ?", arguments: [later, id])
+        }
         #expect(try track(db, "a").playCount == 13, "a play still counts")
         #expect(try track(db, "a").lastPlayedAt == lastPlayed.addingTimeInterval(60))
     }
@@ -170,7 +173,7 @@ struct KeptStatsTests {
         let url = dir.appendingPathComponent("Library.sqlite")
         let pool = try DatabasePool(path: url.path)
         try LibraryDatabase.migrator.migrate(pool, upTo: "v23-streamed")
-        try pool.write { db in
+        try await pool.write { db in
             try db.execute(sql: "INSERT INTO source (path, mode, addedAt) VALUES ('/Music', 'reference', '2025-01-01 00:00:00.000')")
             try db.execute(sql: """
                 INSERT INTO track (sourceId, location, filePath, fileSize, modifiedAt, addedAt, codec, isLossless, isDSD, sampleRate,
