@@ -111,6 +111,12 @@ struct SACDLibraryTests {
         """.write(to: dir.appendingPathComponent("Compressed.cue"), atomically: true, encoding: .utf8)
         let writer = try DatabaseQueue(configuration: LibraryDatabase.queueConfiguration())
         try LibraryDatabase.migrator.migrate(writer, upTo: "v16-meta")
+        // This build's scanner stands in for the older one that wrote the library: give it the columns its songs have
+        // since (skips, v25) so it can write them. The tables and triggers of later migrations stay out until they run.
+        try await writer.write { db in
+            try db.execute(sql: "ALTER TABLE track ADD COLUMN skipCount INTEGER")
+            try db.execute(sql: "ALTER TABLE track ADD COLUMN lastSkippedAt DATETIME")
+        }
         let db = try LibraryDatabase(writer: writer, migrate: false)
         let scanner = LibraryScanner(database: db, artwork: ArtworkStore(directory: dir.appendingPathComponent(".art")))
         await scanner.setSkipsNonMusic(false)

@@ -457,9 +457,13 @@ public final class LibraryDatabase: Sendable {
         }
         m.registerMigration("v25-skips") { db in
             // Skips, as Music counts them: library state like plays, kept the same way (KeptStats.swift).
-            try db.alter(table: "track") { t in
-                t.add(column: "skipCount", .integer)
-                t.add(column: "lastSkippedAt", .datetime)
+            // (A test library written by this build's scanner before migrating may have them already.)
+            let columns = Set(try db.columns(in: "track").map(\.name))
+            if !columns.contains("skipCount") || !columns.contains("lastSkippedAt") {
+                try db.alter(table: "track") { t in
+                    if !columns.contains("skipCount") { t.add(column: "skipCount", .integer) }
+                    if !columns.contains("lastSkippedAt") { t.add(column: "lastSkippedAt", .datetime) }
+                }
             }
             try db.alter(table: "keptStats") { t in
                 t.add(column: "skipCount", .integer)
