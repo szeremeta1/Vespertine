@@ -137,8 +137,10 @@ struct TrackTableSortTests {
         defer { busy.stop() }
 
         var worstSort = 0.0, report: [String] = []
-        let sortable = table.tableColumns.filter { $0.sortDescriptorPrototype != nil }
+        // The columns shown at first; the rest wait in the header's menu, hidden (TrackColumnsTests sorts them).
+        let sortable = table.tableColumns.filter { $0.sortDescriptorPrototype != nil && !$0.isHidden }
         #expect(sortable.count == 6, "number, title, artist, album, format and time sort")
+        #expect(table.tableColumns.filter(\.isHidden).count == 12, "album artist, composer, genre, year, track, disc, plays, last played, date added, rating, BPM and size")
         for column in sortable {
             let prototype = try #require(column.sortDescriptorPrototype)
             let backward = try #require(prototype.reversedSortDescriptor as? NSSortDescriptor)
@@ -273,7 +275,7 @@ struct TrackTableSortTests {
         let natural = topRows(table)
 
         // By time: the songs 400 and 800 places on tie with the first, so they come second and third.
-        let time = try #require(table.tableColumns.last?.sortDescriptorPrototype)
+        let time = try #require(table.tableColumns.last { !$0.isHidden }?.sortDescriptorPrototype)
         table.sortDescriptors = [time]
         await until { topRows(table) != natural }
         await settle(0.3)
