@@ -186,7 +186,7 @@ public final class JoinedLibrary: RemoteChannel {
     private var streams: [Int: (slot: Int, stream: Int)] = [:]
     private var nextStream = 0
     private var albumLists: [String: Merge<AlbumSummary>] = [:]
-    private var songList: Merge<TrackSummary>?
+    private var songLists: [SongSort: Merge<TrackSummary>] = [:]
     private var artistList: [ArtistSummary]?
     private var genreList: [GenreSummary]?
 
@@ -205,7 +205,7 @@ public final class JoinedLibrary: RemoteChannel {
     /// A library in the mix says its own lists changed (a share's scan found new songs, a Mac came back).
     public func changed() {
         albumLists = [:]
-        songList = nil
+        songLists = [:]
         artistList = nil
         genreList = nil
         revision += 1
@@ -399,8 +399,8 @@ public final class JoinedLibrary: RemoteChannel {
         case .albums(let offset, let limit, let sort, let filter):
             let page = await albums(sort: sort, filter: filter).page(offset: offset, limit: limit)
             return .albums(items: page.items, total: page.total)
-        case .songs(let offset, let limit):
-            let page = await songs().page(offset: offset, limit: limit)
+        case .songs(let offset, let limit, let sort):
+            let page = await songs(sort: sort).page(offset: offset, limit: limit)
             return .songs(items: page.items, total: page.total)
         case .artists:
             return .artists(items: await artists())
@@ -478,16 +478,20 @@ public final class JoinedLibrary: RemoteChannel {
         return list
     }
 
-    private func songs() -> Merge<TrackSummary> {
-        if let songList { return songList }
+    /// Every library's songs in `sort`'s order, each library asked for its own in that order. A library that doesn't sort by
+    /// it (an older Mac, a share the phone reads, which has no plays) answers by title, and its songs fall in by `sort`'s rule.
+    private func songs(sort: SongSort?) -> Merge<TrackSummary> {
+        let sort = sort ?? .title
+        if let list = songLists[sort] { return list }
         let size = pageSize
         let list = Merge<TrackSummary>(feeds: listed.map { member in
             { offset in
-                guard case .songs(let items, let total) = await member.library.send(.songs(offset: offset, limit: size)) else { return nil }
+                guard case .songs(let items, let total) = await member.library.send(.songs(offset: offset, limit: size, sort: sort == .title ? nil : sort))
+                else { return nil }
                 return (items.map { Self.joined($0, member.slot) }, total)
             }
-        }, before: { Self.words($0.title, before: $1.title) })
-        songList = list
+        }, before: SongListing.order(sort))
+        songLists[sort] = list
         return list
     }
 

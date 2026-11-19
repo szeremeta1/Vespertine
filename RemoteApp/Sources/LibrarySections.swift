@@ -111,17 +111,24 @@ struct SourcePage: View {
     }
 }
 
-/// Every song, by title, a page at a time.
+/// Every song, a page at a time, in the order chosen from the sort menu (kept on the phone). The Mac sorts its whole
+/// library for each order, so Most Played lists the songs played most across all of it, not just the pages loaded.
 struct SongsList: View {
     let session: RemoteSession
+    @AppStorage("songSort") private var sortName = SongSort.title.rawValue
     @State private var songs: [TrackSummary] = []
     @State private var total: Int?
-    @State private var loading = false
+    /// The order the songs listed came in; a change of sort starts the list again.
+    @State private var listedSort: SongSort?
+    /// The order of the page on its way, if one is.
+    @State private var loadingSort: SongSort?
+    private var sort: SongSort { SongSort(rawValue: sortName) ?? .title }
 
     var body: some View {
         List {
             // A tap plays the songs listed so far from that one, as a double-click in the Mac's Songs page plays from there.
-            TrackRows(session: session, tracks: songs, play: { index in .playTracks(ids: songs.compactMap(\.id), startAt: index, shuffled: nil) })
+            TrackRows(session: session, tracks: songs, play: { index in .playTracks(ids: songs.compactMap(\.id), startAt: index, shuffled: nil) },
+                      detail: SongSortMenu.detail(for: sort))
             if let total, songs.count < total {
                 HStack { Spacer(); ProgressView(); Spacer() }
                     .listRowBackground(Color.clear)
@@ -130,18 +137,56 @@ struct SongsList: View {
         }
         .obsidianList()
         .navigationTitle("Songs").screenTitleStyle()
+        .toolbar { ToolbarItem(placement: .topBarTrailing) { SongSortMenu(sortName: $sortName) } }
         .accessibilityIdentifier("songs-list")
-        .task(id: session.isConnected) { if songs.isEmpty { await loadMore() } }
+        .task(id: "\(session.isConnected) \(sortName)") { if songs.isEmpty || listedSort != sort { await loadMore() } }
     }
 
     private func loadMore() async {
-        guard !loading else { return }
+        let sort = sort
+        if listedSort != sort { songs = []; total = nil; listedSort = sort }
+        guard loadingSort != sort else { return }
         if let total, songs.count >= total { return }
-        loading = true
-        defer { loading = false }
-        if case .songs(let items, let all) = await session.send(.songs(offset: songs.count, limit: 200)) {
+        loadingSort = sort
+        defer { if loadingSort == sort { loadingSort = nil } }
+        // Title is the order every Mac knows; it goes as no sort at all, so an older Mac answers it too.
+        if case .songs(let items, let all) = await session.send(.songs(offset: songs.count, limit: 200, sort: sort == .title ? nil : sort)),
+           listedSort == sort {
             songs += items
             total = all
+        }
+    }
+}
+
+/// The phone's song orders, for Songs and Favorites.
+struct SongSortMenu: View {
+    @Binding var sortName: String
+
+    var body: some View {
+        Menu {
+            Picker("Sort By", selection: $sortName) {
+                Text("Title").tag(SongSort.title.rawValue)
+                Text("Artist").tag(SongSort.artist.rawValue)
+                Text("Album").tag(SongSort.album.rawValue)
+                Text("Most Played").tag(SongSort.mostPlayed.rawValue)
+                Text("Recently Played").tag(SongSort.recentlyPlayed.rawValue)
+                Text("Recently Added").tag(SongSort.recentlyAdded.rawValue)
+            }
+        } label: {
+            Image(systemName: "arrow.up.arrow.down.circle")
+        }
+        .accessibilityLabel(Text("Sort By"))
+        .accessibilityIdentifier("song-sort")
+    }
+
+    /// What a row says beside the song for an order that sorts by a statistic: how often or when it was played, or
+    /// when it was added. Nil for the orders a row's own words already show.
+    static func detail(for sort: SongSort) -> ((TrackSummary) -> String?)? {
+        switch sort {
+        case .title, .artist, .album: return nil
+        case .mostPlayed: return { track in track.plays.map { String(localized: "Plays: \($0)") } }
+        case .recentlyPlayed: return { track in track.lastPlayed.map { Date(timeIntervalSince1970: $0).formatted(date: .abbreviated, time: .omitted) } }
+        case .recentlyAdded: return { track in track.added.map { Date(timeIntervalSince1970: $0).formatted(date: .abbreviated, time: .omitted) } }
         }
     }
 }

@@ -59,6 +59,26 @@ struct RemoteLibraryTests {
         #expect(RemoteBridge.songs(of: library).map(\.title) == ["Apple 2", "apple 10", "Éclair", "Mango", "Zebra Crossing"])
     }
 
+    @Test("A phone can list the songs played most or last first, and a play counted moves the song at once")
+    func songsSortedByPlays() async throws {
+        let (library, root) = try await library(songs: ["Apple", "Banana", "Cherry"])
+        defer { removeScratch(root) }
+        let id = { (title: String) in try #require(RemoteBridge.songs(of: library).first { $0.title == title }?.id) }
+        let banana = try id("Banana"), cherry = try id("Cherry")
+        library.markPlayed(cherry)
+        library.markPlayed(banana)
+        library.markPlayed(banana)
+        #expect(RemoteBridge.songs(of: library, sort: .mostPlayed).map(\.title) == ["Banana", "Cherry", "Apple"])
+        #expect(RemoteBridge.songs(of: library, sort: .recentlyPlayed).map(\.title) == ["Banana", "Cherry", "Apple"])
+        // The kept order isn't served stale: three more plays put Cherry first.
+        for _ in 0..<3 { library.markPlayed(cherry) }
+        #expect(RemoteBridge.songs(of: library, sort: .mostPlayed).map(\.title) == ["Cherry", "Banana", "Apple"])
+        #expect(RemoteBridge.songs(of: library).map(\.title) == ["Apple", "Banana", "Cherry"])
+
+        // The counts the phone is told beside each song are these.
+        #expect(RemoteBridge.songs(of: library, sort: .mostPlayed).map(\.playCount) == [4, 2, 0])
+    }
+
     @Test("The count beside Songs is the length of the list a phone is given, not the number of files")
     func songCountMatchesTheList() async throws {
         let (library, root) = try await library(songs: ["Tide", "Tide (5.1)", "Harbor"])

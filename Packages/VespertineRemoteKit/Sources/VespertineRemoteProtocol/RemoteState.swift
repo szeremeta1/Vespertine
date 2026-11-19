@@ -214,10 +214,15 @@ public struct TrackSummary: Codable, Sendable, Equatable, Identifiable {
     /// mix), when the library has one and treats the two as one song: a phone that plays the song itself picks between
     /// them by its own output. nil for a song in one layout, and where versions aren't combined.
     public var otherLayout: TrackVersion?
+    /// The song's statistics in the Mac's library: how many times it was played, when last (seconds since 1970), and when
+    /// it was added. nil from an older Mac and for songs the phone reads itself.
+    public var plays: Int?
+    public var lastPlayed: Double?
+    public var added: Double?
 
     public init(id: Int64?, title: String, artist: String, album: String, albumKey: String, duration: Double,
                 trackNumber: Int?, discNumber: Int?, format: String, artworkKey: String?, favorite: Bool, copies: [TrackCopy]? = nil,
-                surround: Bool? = nil, otherLayout: TrackVersion? = nil) {
+                surround: Bool? = nil, otherLayout: TrackVersion? = nil, plays: Int? = nil, lastPlayed: Double? = nil, added: Double? = nil) {
         self.id = id
         self.title = title
         self.artist = artist
@@ -232,6 +237,9 @@ public struct TrackSummary: Codable, Sendable, Equatable, Identifiable {
         self.copies = copies
         self.surround = surround
         self.otherLayout = otherLayout
+        self.plays = plays
+        self.lastPlayed = lastPlayed
+        self.added = added
     }
 
     /// The song as its version in the other layout, with this one as that version's other layout, so the choice can be
@@ -241,7 +249,8 @@ public struct TrackSummary: Codable, Sendable, Equatable, Identifiable {
         return TrackSummary(id: other.id, title: title, artist: artist, album: other.album, albumKey: other.albumKey, duration: other.duration,
                             trackNumber: trackNumber, discNumber: discNumber, format: other.format, artworkKey: other.artworkKey,
                             favorite: favorite, copies: copies, surround: !surround,
-                            otherLayout: TrackVersion(id: id, album: album, albumKey: albumKey, duration: duration, format: format, artworkKey: artworkKey))
+                            otherLayout: TrackVersion(id: id, album: album, albumKey: albumKey, duration: duration, format: format, artworkKey: artworkKey),
+                            plays: plays, lastPlayed: lastPlayed, added: added)
     }
 }
 
