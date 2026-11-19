@@ -40,7 +40,7 @@ struct LibraryView: View {
                 case "recentlyAdded": AlbumsGrid(session: session, listing: .recentlyAdded)
                 case "playlists": PlaylistsList(session: session)
                 case "kept": KeptListsView(session: session)
-                case "favorites": TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil)
+                case "favorites": TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil, sorts: true)
                 default: AlbumsGrid(session: session)
                 }
             }
@@ -112,7 +112,7 @@ struct LibraryView: View {
             case .recentlyAdded: AlbumsGrid(session: session, listing: .recentlyAdded)
             case .playlists: PlaylistsList(session: session).readablePane()
             case .kept: KeptListsView(session: session).readablePane()
-            case .favorites: TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil).readablePane()
+            case .favorites: TrackListView(session: session, title: Text("Favorites"), load: .favorites, play: nil, sorts: true).readablePane()
             case .source(let id):
                 if let source = overview?.sources.first(where: { $0.id == id }) {
                     SourcePage(session: session, source: source)
@@ -535,10 +535,17 @@ struct TrackListView: View {
     let load: RemoteCommand
     /// How to play from a row (nil: play these songs from that row).
     let play: ((Int) -> RemoteCommand)?
-    @State private var tracks: [TrackSummary] = []
+    /// Offers the sort menu (Favorites), the order kept on the phone; the list is sorted here, as it comes whole.
+    var sorts = false
+    @AppStorage("favoriteSort") private var sortName = SongSort.title.rawValue
+    @State private var loaded: [TrackSummary] = []
     @State private var feedback = CommandFeedback()
+    private var sort: SongSort? { sorts ? SongSort(rawValue: sortName) ?? .title : nil }
+    /// The songs as listed: as the Mac sent them, or in the order chosen.
+    private var tracks: [TrackSummary] { sort.map { SongListing.arrange(loaded, sort: $0) } ?? loaded }
 
     var body: some View {
+        let tracks = tracks
         List {
             // Play and Shuffle, as a playlist's page has them (Favorites is a list of songs like one).
             if !tracks.isEmpty {
@@ -556,12 +563,13 @@ struct TrackListView: View {
                 .disabled(!session.isConnected)
                 .listRowBackground(Color.clear)
             }
-            TrackRows(session: session, tracks: tracks, play: play ?? SongTap.songs(tracks))
+            TrackRows(session: session, tracks: tracks, play: play ?? SongTap.songs(tracks), detail: sort.flatMap(SongSortMenu.detail(for:)))
         }
         .feedback(feedback)
         .obsidianList()
         .navigationTitle(title).screenTitleStyle()
-        .task(id: session.isConnected) { if case .tracks(let items) = await session.send(load) { tracks = items } }
+        .toolbar { if sorts { ToolbarItem(placement: .topBarTrailing) { SongSortMenu(sortName: $sortName) } } }
+        .task(id: session.isConnected) { if case .tracks(let items) = await session.send(load) { loaded = items } }
     }
 }
 
@@ -572,6 +580,8 @@ struct TrackRows: View {
     let tracks: [TrackSummary]
     let play: (Int) -> RemoteCommand
     var numbered = false
+    /// A word beside each song (its plays or a date, when the list is sorted by one); nil: none.
+    var detail: ((TrackSummary) -> String?)? = nil
     @Environment(\.horizontalSizeClass) private var sizeClass
     @Environment(\.dynamicTypeSize) private var typeSize
     @State private var feedback = CommandFeedback()
@@ -592,6 +602,9 @@ struct TrackRows: View {
                             ArtworkView(key: track.artworkKey, size: 120, cornerRadius: 4).frame(width: 44)
                         }
                     } trailing: {
+                        if let detail, let words = detail(track) {
+                            Text(words).font(.caption.monospacedDigit()).foregroundStyle(.secondary).lineLimit(1)
+                        }
                         if track.favorite {
                             Image(systemName: "heart.fill").font(.caption).foregroundStyle(.secondary)
                                 .accessibilityLabel(Text("Favorites"))

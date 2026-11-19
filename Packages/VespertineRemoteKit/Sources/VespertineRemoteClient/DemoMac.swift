@@ -334,8 +334,8 @@ public final class DemoMac: RemoteChannel {
                 return words.allSatisfy { haystack.contains($0) }
             }
             return .tracks(items: Array(found.prefix(min(max(1, limit), 500))))
-        case .songs(let offset, let limit):
-            let songs = allTracks.sorted { ($0.title, $0.id ?? 0) < ($1.title, $1.id ?? 0) }
+        case .songs(let offset, let limit, let sort):
+            let songs = SongListing.arrange(allTracks.sorted { ($0.title, $0.id ?? 0) < ($1.title, $1.id ?? 0) }, sort: sort == .title ? nil : sort)
             let start = min(max(0, offset), songs.count)
             let end = min(songs.count, start + min(max(1, limit), 500))
             return .songs(items: Array(songs[start..<end]), total: songs.count)

@@ -150,7 +150,8 @@ struct RemoteBridge {
         TrackSummary(id: track.id, title: track.title, artist: track.displayArtist.libraryDisplayName, album: track.displayAlbum.libraryDisplayName,
                      albumKey: track.albumKey, duration: track.duration, trackNumber: track.trackNumber, discNumber: track.discNumber,
                      format: track.formatSummary, artworkKey: model.artworkKey(track), favorite: library.isFavorite(track),
-                     surround: track.isMultichannel)
+                     surround: track.isMultichannel, plays: track.playCount, lastPlayed: track.lastPlayedAt?.timeIntervalSince1970,
+                     added: track.addedAt.timeIntervalSince1970)
     }
 
     /// Songs as a phone that plays them itself is given them: each with its version in the other layout beside it
@@ -322,15 +323,58 @@ struct RemoteBridge {
     /// `oneCopyEach`: the songs with each song once, as the copy that plays on this output (`AppModel.oneCopyEach`), while a
     /// song's versions are combined; `surround` is what that choice hangs on (whether the output wants surround), so the
     /// list is made again when it changes.
-    static func songs(of library: LibraryStore, surround: Bool? = nil, oneCopyEach: ([Track]) -> [Track] = { $0 }) -> [Track] {
+    static func songs(of library: LibraryStore, surround: Bool? = nil, oneCopyEach: ([Track]) -> [Track] = { $0 },
+                      sort: SongSort? = nil) -> [Track] {
         let id = ObjectIdentifier(library)
+        let byTitle: [Track]
         if let songList, songList.library == id, songList.revision == library.revision, songList.count == library.stats.tracks,
            songList.surround == surround {
-            return songList.tracks
+            byTitle = songList.tracks
+        } else {
+            byTitle = Self.byTitle(oneCopyEach(library.allTracks()))
+            songList = (id, library.revision, library.stats.tracks, surround, byTitle)
+            sortedSongs = [:]
         }
-        let tracks = byTitle(oneCopyEach(library.allTracks()))
-        songList = (id, library.revision, library.stats.tracks, surround, tracks)
-        return tracks
+        guard let sort, sort != .title else { return byTitle }
+        if let kept = sortedSongs[sort] { return kept }
+        let sorted = arrange(byTitle, sort: sort)
+        sortedSongs[sort] = sorted
+        return sorted
+    }
+
+    /// The other orders of the song list, worked out from the one by title as a phone first asks for each.
+    private static var sortedSongs: [SongSort: [Track]] = [:]
+
+    /// Songs by title put in `sort`'s order, as `SongListing.order` has it for the phone: ties stay in title order.
+    nonisolated static func arrange(_ byTitle: [Track], sort: SongSort) -> [Track] {
+        func words(_ a: String, _ b: String) -> Bool? {
+            switch a.compare(b, options: [.caseInsensitive, .diacriticInsensitive]) {
+            case .orderedAscending: true
+            case .orderedDescending: false
+            case .orderedSame: nil
+            }
+        }
+        func inAlbum(_ a: Track, _ b: Track) -> Bool? {
+            let x = (a.discNumber ?? 0, a.trackNumber ?? 0), y = (b.discNumber ?? 0, b.trackNumber ?? 0)
+            return x == y ? nil : x < y
+        }
+        func newest(_ a: Date?, _ b: Date?) -> Bool? {
+            switch (a, b) {
+            case (nil, nil): nil
+            case (nil, _): false
+            case (_, nil): true
+            case (let x?, let y?): x == y ? nil : x > y
+            }
+        }
+        let earlier: (Track, Track) -> Bool? = switch sort {
+        case .title: { _, _ in nil }
+        case .artist: { a, b in words(a.displayArtist, b.displayArtist) ?? words(a.displayAlbum, b.displayAlbum) ?? inAlbum(a, b) }
+        case .album: { a, b in words(a.displayAlbum, b.displayAlbum) ?? inAlbum(a, b) }
+        case .mostPlayed: { a, b in a.playCount == b.playCount ? nil : a.playCount > b.playCount }
+        case .recentlyPlayed: { a, b in newest(a.lastPlayedAt, b.lastPlayedAt) }
+        case .recentlyAdded: { a, b in newest(a.addedAt, b.addedAt) }
+        }
+        return byTitle.enumerated().sorted { earlier($0.element, $1.element) ?? ($0.offset < $1.offset) }.map(\.element)
     }
 
     /// Songs in the order a list of titles reads: by title as the Finder would sort it, then artist and album.
@@ -475,8 +519,9 @@ struct RemoteBridge {
             guard !trimmed.isEmpty else { return .tracks(items: []) }
             return .tracks(items: model.oneCopyEach(library.search(trimmed)).prefix(min(max(1, limit), 500)).map(trackSummary))
 
-        case .songs(let offset, let limit):
-            let songs = Self.songs(of: library, surround: library.combinesVersions ? model.outputWantsMultichannel() : nil, oneCopyEach: model.oneCopyEach)
+        case .songs(let offset, let limit, let sort):
+            let songs = Self.songs(of: library, surround: library.combinesVersions ? model.outputWantsMultichannel() : nil, oneCopyEach: model.oneCopyEach,
+                                   sort: sort)
             let start = min(max(0, offset), songs.count)
             let end = min(start + min(max(1, limit), 500), songs.count)
             // Each song's other copies go with it, so the phone can list and play them (as on Favorites).

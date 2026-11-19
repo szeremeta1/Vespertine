@@ -158,8 +158,9 @@ public enum RemoteCommand: Codable, Sendable, Equatable {
     case playlistTracks(id: Int64, offset: Int? = nil, limit: Int? = nil)
     case favorites
     case search(text: String, limit: Int)
-    /// Every song, by title, a page at a time (answered with `.songs`).
-    case songs(offset: Int, limit: Int)
+    /// Every song, a page at a time (answered with `.songs`): by title, or as `sort` says (a newer phone). An older Mac
+    /// ignores `sort` and answers by title, which `TrackSummary.plays` being nil tells the phone.
+    case songs(offset: Int, limit: Int, sort: SongSort? = nil)
     /// A search answered in groups (`.found`): songs, albums, artists and playlists, up to `limit` of each.
     case find(text: String, limit: Int)
     /// The library at a glance (answered with `.library`): how much it holds, and its sources.
@@ -222,6 +223,68 @@ public enum AlbumSort: String, Codable, Sendable, Equatable, CaseIterable {
     /// By year, newest first; albums without a year come last.
     case newest
     case oldest
+}
+
+/// How the Songs and Favorites pages are ordered.
+public enum SongSort: String, Codable, Sendable, Equatable, CaseIterable {
+    /// By title (the Mac's Songs order for remotes).
+    case title
+    /// By artist, then album, disc and track.
+    case artist
+    /// By album, then disc and track.
+    case album
+    /// The songs played most first; songs never played by title after them.
+    case mostPlayed
+    /// The songs played last first; songs never played by title after them.
+    case recentlyPlayed
+    /// The songs added last first.
+    case recentlyAdded
+}
+
+public enum SongListing {
+    static func words(_ a: String, before b: String) -> Bool? {
+        switch a.compare(b, options: [.caseInsensitive, .diacriticInsensitive]) {
+        case .orderedAscending: true
+        case .orderedDescending: false
+        case .orderedSame: nil
+        }
+    }
+
+    /// Whether `a` comes before `b` for `sort`; nil when the two tie (the list's own order decides). A song a library
+    /// gave no statistics for (an older Mac, a share the phone reads itself) counts as never played, added at no date.
+    public static func order(_ sort: SongSort?) -> (TrackSummary, TrackSummary) -> Bool? {
+        func numbers(_ a: Int, _ b: Int) -> Bool? { a == b ? nil : a < b }
+        func newest(_ a: Double?, _ b: Double?) -> Bool? {
+            switch (a, b) {
+            case (nil, nil): nil
+            case (nil, _): false
+            case (_, nil): true
+            case (let x?, let y?): x == y ? nil : x > y
+            }
+        }
+        let byTitle: (TrackSummary, TrackSummary) -> Bool? = { words($0.title, before: $1.title) ?? words($0.artist, before: $1.artist) }
+        let inAlbum: (TrackSummary, TrackSummary) -> Bool? = {
+            numbers($0.discNumber ?? 0, $1.discNumber ?? 0) ?? numbers($0.trackNumber ?? 0, $1.trackNumber ?? 0)
+        }
+        switch sort ?? .title {
+        case .title: return byTitle
+        case .artist: return { words($0.artist, before: $1.artist) ?? words($0.album, before: $1.album) ?? inAlbum($0, $1) ?? byTitle($0, $1) }
+        case .album: return { words($0.album, before: $1.album) ?? inAlbum($0, $1) ?? byTitle($0, $1) }
+        case .mostPlayed:
+            return { a, b in
+                let x = a.plays ?? 0, y = b.plays ?? 0
+                return x == y ? byTitle(a, b) : x > y
+            }
+        case .recentlyPlayed: return { newest($0.lastPlayed, $1.lastPlayed) ?? byTitle($0, $1) }
+        case .recentlyAdded: return { newest($0.added, $1.added) ?? byTitle($0, $1) }
+        }
+    }
+
+    /// `songs` in `sort`'s order; ties keep the order they came in.
+    public static func arrange(_ songs: [TrackSummary], sort: SongSort?) -> [TrackSummary] {
+        let earlier = order(sort)
+        return songs.enumerated().sorted { earlier($0.element, $1.element) ?? ($0.offset < $1.offset) }.map(\.element)
+    }
 }
 
 /// Which albums the Albums page shows.

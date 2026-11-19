@@ -64,8 +64,8 @@ private final class FakeLibrary: LibraryMember {
             return .albums(items: Array(listed.dropFirst(offset).prefix(limit)), total: listed.count)
         case .albumTracks(let key):
             return songs[key].map { .tracks(items: $0) } ?? .failed(reason: "no such album")
-        case .songs(let offset, let limit):
-            let sorted = all.sorted { $0.title < $1.title }
+        case .songs(let offset, let limit, let sort):
+            let sorted = SongListing.arrange(all.sorted { $0.title < $1.title }, sort: sort)
             return .songs(items: Array(sorted.dropFirst(offset).prefix(limit)), total: sorted.count)
         case .tracks(let ids):
             return .tracks(items: ids.compactMap { id in all.first { $0.id == id } })
@@ -229,6 +229,39 @@ private final class FakeLibrary: LibraryMember {
         #expect(items.count == 11)
         #expect(items.map(\.title) == items.map(\.title).sorted())
         #expect(Set(items.compactMap(\.id)).count == 11)
+    }
+
+    @Test func mostPlayedSongsComeFirstAcrossLibrariesAndTheShareFollowsByTitle() async throws {
+        let rig = try await rig()
+        // The Mac's songs have plays; the share and folder have none, as a share the phone reads never does.
+        for (key, list) in rig.mac.songs {
+            rig.mac.songs[key] = list.enumerated().map { i, song in
+                var song = song
+                song.plays = song.title == "Kind of Blue 2" ? 40 : i
+                song.lastPlayed = song.plays == 0 ? nil : 1_700_000_000 + Double(song.plays ?? 0)
+                return song
+            }
+        }
+        guard case .songs(let items, let total) = try await ask(rig.library, .songs(offset: 0, limit: 50, sort: .mostPlayed))
+        else { Issue.record("no songs"); return }
+        #expect(total == 11)
+        #expect(items.prefix(3).map(\.title) == ["Kind of Blue 2", "Waltz for Debby 3", "Waltz for Debby 2"])
+        let rest = items.dropFirst(3).map(\.title)
+        #expect(rest == rest.sorted(), "never played: by title")
+        #expect(rig.mac.asked.contains(.songs(offset: 0, limit: 1, sort: .mostPlayed)), "each library is asked for its own most played")
+
+        guard case .songs(let recent, _) = try await ask(rig.library, .songs(offset: 0, limit: 3, sort: .recentlyPlayed))
+        else { Issue.record("no songs"); return }
+        #expect(recent.map(\.title) == ["Kind of Blue 2", "Waltz for Debby 3", "Waltz for Debby 2"])
+    }
+
+    @Test func songsSortByArtistThenAlbumAndTrack() async throws {
+        let rig = try await rig()
+        guard case .songs(let items, _) = try await ask(rig.library, .songs(offset: 0, limit: 50, sort: .artist))
+        else { Issue.record("no songs"); return }
+        #expect(items.map(\.artist) == items.map(\.artist).sorted())
+        #expect(items.filter { $0.artist == "Bill Evans" }.map(\.title)
+                == ["Moon Beams 1", "Moon Beams 2", "Waltz for Debby 1", "Waltz for Debby 2", "Waltz for Debby 3"])
     }
 
     @Test func anArtistInTwoLibrariesIsOneRowAndTheCountsSayWhatTheListsShow() async throws {

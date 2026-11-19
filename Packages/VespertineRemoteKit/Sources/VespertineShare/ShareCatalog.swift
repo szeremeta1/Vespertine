@@ -277,11 +277,13 @@ public struct ShareCatalog: Sendable {
                              playlists: [])
     }
 
-    public func songs(offset: Int, limit: Int) -> (items: [TrackSummary], total: Int) {
-        let sorted = listedTracks.sorted {
+    /// A page of the songs by title, or by artist or album. A share has no plays or dates added: a sort by them is by title.
+    public func songs(offset: Int, limit: Int, sort: SongSort? = nil) -> (items: [TrackSummary], total: Int) {
+        var sorted = listedTracks.sorted {
             let order = $0.title.compare($1.title, options: [.caseInsensitive, .diacriticInsensitive, .numeric])
             return order != .orderedSame ? order == .orderedAscending : ($0.id ?? 0) < ($1.id ?? 0)
         }
+        if sort == .artist || sort == .album { sorted = SongListing.arrange(sorted, sort: sort) }
         let start = min(max(0, offset), sorted.count)
         return (Array(sorted[start..<min(sorted.count, start + min(max(1, limit), 500))]), sorted.count)
     }

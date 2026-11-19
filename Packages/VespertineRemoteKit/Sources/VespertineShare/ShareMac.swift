@@ -630,8 +630,8 @@ public final class ShareMac: RemoteChannel {
             return .albums(items: catalog.albums.map(\.summary), total: catalog.albums.count)
         case .search(let text, let limit):
             return .tracks(items: catalog.search(text, limit: limit))
-        case .songs(let offset, let limit):
-            let page = catalog.songs(offset: offset, limit: limit)
+        case .songs(let offset, let limit, let sort):
+            let page = catalog.songs(offset: offset, limit: limit, sort: sort)
             return .songs(items: page.items, total: page.total)
         case .find(let text, let limit):
             return .found(catalog.find(text, limit: limit))
