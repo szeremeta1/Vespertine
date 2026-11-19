@@ -402,6 +402,8 @@ public extension LibraryDatabase {
                 } else {
                     try track.insert(db)
                     added += 1
+                    // A song of an account signed out of and back in to takes back its plays, rating, favorite and history.
+                    if let id = track.id { try LibraryDatabase.restoreKeptStats(db, trackIDs: [id]) }
                 }
                 guard let id = track.id else { continue }
                 try db.execute(sql: """
