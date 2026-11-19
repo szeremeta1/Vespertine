@@ -157,8 +157,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     /// This Mac as an AirPlay 2 receiver is told of it.
     var sender = AirPlay2Sender.thisMac
     /// Send a song that 24-bit at 48 kHz serves as a buffered stream, to an AirPlay 2 receiver that says its buffered
-    /// streams take it (an Apple TV 4K's do, though its realtime ones stop at 16-bit and 44.1 kHz). Off unless set: no
-    /// receiver has been heard playing one from Vespertine yet. A receiver that refuses it, or takes it and then never
+    /// streams take it (an Apple TV 4K's do, though its realtime ones stop at 16-bit and 44.1 kHz). Off unless set; the
+    /// app sets it (an Apple TV 4K has been heard playing one from Vespertine). A receiver that refuses it, or takes it and then never
     /// says when it will play it, gets the realtime stream, and isn't asked again while this playback lasts.
     public var buffersStreams = false
     /// Tests: the ports the session's clock is made on (0: any free ones) and the ones the receiver takes its messages

@@ -176,9 +176,9 @@ final class AirPlayOutputModel {
         guard let made = AirPlayPlayback(device: device) else { playback = nil; return nil }
         made.update(settings: settings)
         made.setReceiverVolume(decibels: receiverVolumeDB)
-        // Buffered streams (24-bit at 48 kHz to an Apple TV) are off until one has been heard working:
-        // `defaults write <bundle id> AirPlayBufferedStreams -bool YES` turns them on.
-        made.buffersStreams = UserDefaults.standard.bool(forKey: "AirPlayBufferedStreams")
+        // Buffered streams (24-bit at 48 kHz to an Apple TV 4K, for a song with more than CD quality) are on:
+        // `defaults write <bundle id> AirPlayBufferedStreams -bool NO` turns them off.
+        made.buffersStreams = Self.buffersStreams(UserDefaults.standard)
         let passwords = self.passwords
         made.passwordProvider = { passwords.read(device.deviceID) }
         // A missing, changed or mistyped password: the listener is asked (again).
@@ -362,6 +362,12 @@ enum AirPlaySwitch {
 
     static var explanation: String {
         String(localized: "Sends ALAC 16-bit / 44.1 kHz to AirPlay receivers (AirPlay 1), CD-quality files exactly as they are. Off, Vespertine doesn't look for them, opens no port for them, and plays as before; macOS's own AirPlay outputs stay as they are.", comment: "Settings › Playback: the caption under the AirPlay Players (beta) switch.")
+            + " " + AirPlayText.appleTV
+    }
+
+    /// Whether an Apple TV 4K is sent 24-bit / 48 kHz as a buffered stream: yes, unless the hidden default says no.
+    static func buffersStreams(_ defaults: UserDefaults) -> Bool {
+        defaults.object(forKey: "AirPlayBufferedStreams") as? Bool ?? true
     }
 
     /// Turns the feature on or off and answers the model that should exist now: `current` or a new, started one while on; nil off.

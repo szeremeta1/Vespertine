@@ -174,9 +174,26 @@ enum AirPlayText {
         }
     }
 
+    /// What an Apple TV 4K gets beyond the 16-bit / 44.1 kHz every receiver does.
+    static var appleTV: String {
+        String(localized: "An Apple TV 4K also takes 24-bit / 48 kHz, which Vespertine sends for songs above CD quality.",
+               comment: "AirPlay: an Apple TV 4K is sent 24-bit / 48 kHz when the song has more than CD quality. Shown under the AirPlay Players switch in Settings and in the notes under an AirPlay output.")
+    }
+
+    /// The “Sent as” value under the output list: what the song playing now is sent as (24-bit / 48 kHz to a receiver
+    /// that took it), and what every receiver takes when nothing says more.
+    static func sentAs(_ stage: SignalPath.RendererStage?) -> String {
+        if let stage, stage.transport == .airPlay, stage.sentBitDepth == 24, stage.sentSampleRate == 48_000 {
+            return String(localized: "ALAC 24-bit / 48 kHz, stereo",
+                          comment: "Output details: what is sent to an AirPlay receiver that takes more than CD quality (an Apple TV 4K) while a song above CD quality plays.")
+        }
+        return String(localized: "ALAC 16-bit / 44.1 kHz, stereo")
+    }
+
     static var advice: [String] {
         [
             String(localized: "AirPlay carries 16-bit / 44.1 kHz. CD-quality files go exactly as they are; for hi-res, a network player (UPnP) receives the original file."),
+            appleTV,
             String(localized: "The receiver keeps in step with this Mac's clock by adding or dropping samples now and then. On shairport-sync (moOde, Volumio), “disable_synchronization” or the pipe backend leaves them alone."),
             String(localized: "Use a hardware mixer or no volume on the receiver (shairport-sync: “ignore_volume_control” or a hardware “mixer_control_name”): software volume there changes the samples Vespertine sent."),
             String(localized: "On shairport-sync, the metadata “sdsc” and “odsc” say what it received and what it plays out."),
@@ -198,7 +215,7 @@ struct AirPlayDetails: View {
             VStack(alignment: .leading, spacing: 4) {
                 row(String(localized: "Model"), device.model ?? "")
                 row(String(localized: "Protocol"), device.usesAirPlay2 ? "AirPlay 2" : String(localized: "AirPlay 1 (RAOP)"))
-                row(String(localized: "Sent as"), String(localized: "ALAC 16-bit / 44.1 kHz, stereo"))
+                row(String(localized: "Sent as"), AirPlayText.sentAs(model.player.signalPath?.renderer))
                 row(String(localized: "Encryption"), encryption)
                 row(String(localized: "Titles"), device.metadata.contains(0) ? String(localized: "Sent") : String(localized: "Not taken by the receiver"))
                 if let version = raop?.version { row(String(localized: "Version"), version) }
