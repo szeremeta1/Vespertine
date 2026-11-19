@@ -201,7 +201,19 @@ public final class SMBConnection: @unchecked Sendable {
 
     private func signIn(_ credentials: SMBCredentials) throws {
         guard credentials.isGuest else {
-            return try signIn(user: credentials.user, domain: credentials.domain, password: credentials.password)
+            try signIn(user: credentials.user, domain: credentials.domain, password: credentials.password)
+            // A name and password were given and the server says it let us in as a guest (or as nobody). Such a session has
+            // no keys, so nothing after it is signed: whoever sits between the phone and the server could have set that
+            // flag in the (unsigned) answer and then change every file on the way. A server that maps a wrong name to its
+            // guest account is answered the same way: the name or password didn't work. A guest is added with no name.
+            if guest {
+                sessionID = 0
+                signingKey = nil
+                sealing = nil
+                guest = false
+                throw SMBError.signInFailed
+            }
+            return
         }
         // A guest: by the name servers keep for one (a NAS with its guest account on, a Mac, Windows, Samba set to treat
         // unknown names as guests), and where that name is refused, as nobody at all, which Samba lets in to a share

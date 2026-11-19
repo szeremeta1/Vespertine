@@ -98,6 +98,30 @@ private func exchange(port: NWEndpoint.Port, key: RemoteTransport.PresharedKey, 
     }
 }
 
+/// Connects with `parameters` and returns the cipher suite TLS agreed on (nil: no connection within five seconds).
+private func agreedSuite(port: NWEndpoint.Port, parameters: NWParameters) async -> UInt16? {
+    let connection = NWConnection(host: "127.0.0.1", port: port, using: parameters)
+    let queue = DispatchQueue(label: "remote-transport-test.suite")
+    defer { connection.cancel() }
+    return await withCheckedContinuation { (continuation: CheckedContinuation<UInt16?, Never>) in
+        let once = Once()
+        queue.asyncAfter(deadline: .now() + 5) { once.run { continuation.resume(returning: nil) } }
+        connection.stateUpdateHandler = { state in
+            switch state {
+            case .ready:
+                let metadata = connection.metadata(definition: NWProtocolTLS.definition) as? NWProtocolTLS.Metadata
+                let suite = metadata.map { sec_protocol_metadata_get_negotiated_tls_ciphersuite($0.securityProtocolMetadata).rawValue }
+                once.run { continuation.resume(returning: suite) }
+            case .failed, .cancelled, .waiting:
+                once.run { continuation.resume(returning: nil) }
+            default:
+                break
+            }
+        }
+        connection.start(queue: queue)
+    }
+}
+
 /// Builds the transport with parts switched on or off, to see which part a failure comes from.
 private func variant(keys: [RemoteTransport.PresharedKey], tls: Bool, versionLimits: Bool, framing: Bool) -> NWParameters {
     let tcp = NWProtocolTCP.Options()
@@ -180,6 +204,35 @@ private func variant(keys: [RemoteTransport.PresharedKey], tls: Bool, versionLim
         let wrongCode = RemoteTransport.PresharedKey(identity: RemoteProtocol.pairingCodeIdentity, key: PairingKey.derive(secret: "000000", serverID: "S1"))
         #expect(await exchange(port: port, key: wrongCode) == nil)
         withExtendedLifetime(server) {}
+    }
+
+    /// Two ends of this version agree on ECDHE-PSK, so a recording of a pairing by typed code can't be opened by trying all
+    /// 900,000 codes; an end from before (plain PSK only) still gets in, either way round.
+    @Test func newEndsAgreeOnForwardSecrecyAndOldEndsStillConnect() async throws {
+        let ecdhePSK: UInt16 = 0xCCAC, plainPSK = UInt16(TLS_PSK_WITH_AES_128_GCM_SHA256)
+        let code = PairingSecret.makeTypedCode()
+        let pairing = RemoteTransport.PresharedKey(identity: RemoteProtocol.pairingCodeIdentity, key: PairingKey.derive(secret: code, serverID: "S1"))
+        #expect(RemoteTransport.cipherSuites.first?.rawValue == ecdhePSK)
+
+        let mac = try EchoServer(keys: [alex, pairing])
+        let port = try await mac.start()
+        #expect(await agreedSuite(port: port, parameters: RemoteTransport.parameters(keys: [pairing])) == ecdhePSK)
+        #expect(await agreedSuite(port: port, parameters: RemoteTransport.parameters(keys: [alex])) == ecdhePSK)
+        #expect(await exchange(port: port, key: pairing) == "echo: hello")
+        // A phone app from before offers plain PSK only.
+        let oldPhone = variant(keys: [alex], tls: true, versionLimits: true, framing: true)
+        #expect(await agreedSuite(port: port, parameters: oldPhone) == plainPSK)
+        // A wrong code still gets nowhere.
+        let wrong = RemoteTransport.PresharedKey(identity: RemoteProtocol.pairingCodeIdentity, key: PairingKey.derive(secret: "000000", serverID: "S1"))
+        #expect(await agreedSuite(port: port, parameters: RemoteTransport.parameters(keys: [wrong])) == nil)
+        withExtendedLifetime(mac) {}
+
+        // A Mac from before takes plain PSK only: a new phone still connects to it.
+        let oldMac = try EchoServer(keys: [alex], parameters: variant(keys: [alex], tls: true, versionLimits: true, framing: true))
+        let oldPort = try await oldMac.start()
+        #expect(await agreedSuite(port: oldPort, parameters: RemoteTransport.parameters(keys: [alex])) == plainPSK)
+        #expect(await exchange(port: oldPort, key: alex) == "echo: hello")
+        withExtendedLifetime(oldMac) {}
     }
 }
 #endif

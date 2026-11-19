@@ -196,6 +196,25 @@ func recordedConversation(_ connection: SMBConnection, credentials: SMBCredentia
         #expect(transport.mismatch == nil)
     }
 
+    /// Someone between the phone and the server sets "signed in as a guest" in the server's last sign-in answer to a name and
+    /// password. Taken at its word, the session would have no keys, nothing would be signed, and every answer after it (a
+    /// file's bytes included) could be changed on the way unnoticed. A name was given, so a guest's session is refused.
+    @Test(arguments: ["smb210", "smb302", "smb311"]) func aGuestSessionInAnswerToANameIsRefused(name: String) throws {
+        var recording = try #require(SMBRecordings.all[name])
+        // The last SESSION_SETUP answer: SMB2 header, status 0, command 1; its SessionFlags follow the body's size (9).
+        let index = try #require(recording.received.lastIndex { $0.hasPrefix("fe534d42") && $0.dropFirst(16).hasPrefix("00000000") && $0.dropFirst(24).hasPrefix("0100") })
+        let answer = recording.received[index]
+        let flags = answer.index(answer.startIndex, offsetBy: 128 + 4)
+        #expect(answer[answer.index(answer.startIndex, offsetBy: 128)..<flags] == "0900")
+        recording.received[index] = answer.replacingCharacters(in: flags..<answer.index(flags, offsetBy: 4), with: "0100")
+        // And the file's contents changed on the way, which a signed session would catch.
+        let read = try #require(recording.received.firstIndex { $0.hasSuffix("68656c6c6f0a") })
+        recording.received[read] = String(recording.received[read].dropLast(2)) + "0b"
+        let connection = SMBConnection(transport: ReplayTransport(recording), options: recordedOptions)
+        #expect(throws: SMBError.signInFailed) { try recordedConversation(connection) }
+        #expect(!connection.guest)
+    }
+
     @Test func aGuestIsTriedByNameAndThenAsNobody() throws {
         // The server that doesn't know "guest" refuses it; the client signs in again on the same connection with no name.
         let recording = try #require(SMBRecordings.all["smb311nobody"])
