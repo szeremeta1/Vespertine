@@ -158,14 +158,16 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     var sender = AirPlay2Sender.thisMac
     /// Send a song that 24-bit at 48 kHz serves as a buffered stream, to an AirPlay 2 receiver that says its buffered
     /// streams take it (an Apple TV 4K's do, though its realtime ones stop at 16-bit and 44.1 kHz). Off unless set: no
-    /// receiver has been heard playing one from Vespertine yet. A receiver that refuses it gets the realtime stream, and
-    /// isn't asked again while this playback lasts.
+    /// receiver has been heard playing one from Vespertine yet. A receiver that refuses it, or takes it and then never
+    /// says when it will play it, gets the realtime stream, and isn't asked again while this playback lasts.
     public var buffersStreams = false
     /// Tests: the ports the session's clock is made on (0: any free ones) and the ones the receiver takes its messages
     /// on. nil: 319 and 320 for both, as PTP has them.
     var clockPorts: (own: (event: UInt16, general: UInt16), peer: (event: UInt16, general: UInt16))?
     /// A buffered stream was tried and the receiver didn't take it. Only the worker touches it.
     private var bufferedRefused = false
+    /// Tests: how long a session waits before telling a receiver again when to play (nil: the session's own).
+    var anchorPause: Duration?
     /// How long a song may take to open before it fails (as long as the network cache waits for a share that sends nothing).
     var openTimeout: TimeInterval = 120
     /// Tests: the next song opened ahead, if any.
@@ -200,6 +202,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
     enum Command {
         case play(PlayableItem, at: TimeInterval, announce: Bool, generation: Int)
         case pause, stop, queueChanged, settings(RendererSettings), volume, heard(Segment), lost, ended
+        /// This session's buffered stream was never given a moment to play by the receiver: nothing of it is heard.
+        case unanchored(ObjectIdentifier)
         /// Nothing has played since the pause or the queue's end of this generation: the session is closed.
         case idle(generation: Int)
         /// The hold for `next` ran too long: the stream starts again with it once it opens.
@@ -457,6 +461,20 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                 return s.snapshot.state != .stopped
             }
             if wasActive { emit(.deviceLost(device.name)) }
+        case .unanchored(let id):
+            // The receiver set the buffered stream up and then never said when it would play it: what was sent sits
+            // unheard. The song starts again where this stream began, as the realtime stream the receiver does play,
+            // and no buffered one is tried again while this playback lasts.
+            guard let session, ObjectIdentifier(session) == id else { return }
+            log.info("AirPlay \(self.device.name, privacy: .public) never said when its buffered stream would play; sending a realtime one")
+            bufferedRefused = true
+            await halt()
+            await session.teardown()
+            self.session = nil
+            let (first, playing) = state.withLock { ($0.segments.first, $0.snapshot.state == .playing) }
+            // Paused or stopped meanwhile: Play opens the new session.
+            guard playing, let first else { return }
+            await begin(first.item, at: first.offset, announce: first.announces && !first.heard, generation: generation.withLock { $0 })
         case .gap(let previous, let next, let since, let g):
             guard generation.withLock({ $0 }) == g else { return }
             await recover(after: previous, next: next, since: since, generation: g)
@@ -478,6 +496,7 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                                authSetup: device.needsAuthSetup, password: device.needsPassword ? passwordProvider?() : nil,
                                pairing: try sessionPairing(), sender: sender, wish: wish, clock: clock)
         if let peer = clockPorts?.peer { made.clockPeerPorts = peer }
+        if let anchorPause { made.anchorPause = anchorPause }
         return made
     }
 
@@ -554,6 +573,8 @@ public final class AirPlayPlayback: NetworkPlayback, @unchecked Sendable {
                     try await made.connect(volumeDB: volume)
                 }
                 made.onLost = { [weak self] in self?.enqueue.yield(.lost) }
+                let id = ObjectIdentifier(made)
+                made.onUnanchored = { [weak self] in self?.enqueue.yield(.unanchored(id)) }
                 state.withLock { $0.sentVolumeDB = volume }
                 session = made
             }

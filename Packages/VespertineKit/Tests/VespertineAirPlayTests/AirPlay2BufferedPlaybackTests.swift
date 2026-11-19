@@ -90,6 +90,39 @@ struct AirPlay2BufferedPlaybackTests {
         #expect(abs(Double(receiver.samples.count / 2) - expected) < 800)
     }
 
+    @Test("A receiver that sets the buffered stream up and then never takes the moment to play gets the song all the same: from its start, as the realtime stream, said to have started once")
+    func neverAnchored() async throws {
+        let receiver = try FakeRAOPReceiver()
+        defer { receiver.stop() }
+        let follower = try FakePTPFollower()
+        defer { follower.stop() }
+        receiver.pairing = FakePairing()
+        receiver.info = AirPlay2BufferedSessionTests.appleTVInfo
+        receiver.anchorsNotYet = .max
+        let (url, samples) = try writeWAV(seconds: 0.6, rate: 48_000, bits: 24, seed: 64)
+        defer { try? FileManager.default.removeItem(at: url) }
+        let (p, log) = try playback(receiver, follower: follower)
+        defer { p.shutdown() }
+        p.anchorPause = .milliseconds(1)
+        let item = PlayableItem(url: url)
+        p.play(item, at: 0)
+        // The path says 24/48 while the buffered stream is tried, and what is really sent once it has been given up.
+        await untilTrue { p.snapshot.signalPath?.renderer?.sentSampleRate == 44_100 || log.ended || !log.failures.isEmpty }
+        let stage = try #require(p.snapshot.signalPath?.renderer)
+        #expect(stage.sentSampleRate == 44_100)
+        #expect(stage.sentBitDepth == 16)
+        await untilTrue { log.ended || !log.failures.isEmpty }
+        #expect(log.failures.isEmpty)
+        #expect(log.started == [item.id])
+        // Asked as often as a session asks, by the one session: the realtime one that follows names no moment.
+        #expect(receiver.anchors.count == RAOPSession.anchorTries)
+        #expect(receiver.streamFormat == .cd)
+        #expect(receiver.blockConnections == 1)
+        // The whole song, from its start, as the realtime stream.
+        let expected = Double(samples.count / 2) * 44_100 / 48_000
+        #expect(abs(Double(receiver.realtimeFrames) - expected) < 800)
+    }
+
     @Test("Switched off, as it is unless set, the same receiver gets the realtime stream and is told of no clock")
     func off() async throws {
         let receiver = try FakeRAOPReceiver()

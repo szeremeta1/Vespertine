@@ -284,6 +284,8 @@ jobs:
             -derivedDataPath build/CI -onlyUsePackageVersionsFromResolvedFile ${CI_BUILD_JOBS:+-jobs $CI_BUILD_JOBS} \
             CODE_SIGNING_ALLOWED=NO PRODUCT_BUNDLE_IDENTIFIER=org.szeremeta.Vespertine.ci test 2>&1 | tee build/app-tests.log \
             || { echo "::group::Errors"; grep -E ': error: |While evaluating request|While emitting' build/app-tests.log | sort -u; echo "::endgroup::"; exit 1; }
+      - name: App tests kept the log quiet
+        run: python3 scripts/check-log-floods.py build/app-tests.log
       - name: Universal Release build
         run: |
           xcodebuild -project Vespertine.xcodeproj -scheme Vespertine -configuration Release -destination 'generic/platform=macOS' \
@@ -338,6 +340,10 @@ jobs:
       - name: macOS runner choice tests
         if: ${{ !cancelled() }}
         run: python3 scripts/test-ci-pick-runners.py
+      # And the check that the app's tests didn't flood the log (run by "App (macOS)").
+      - name: Log flood check tests
+        if: ${{ !cancelled() }}
+        run: python3 scripts/test-check-log-floods.py
       # Not verification, but a Linux job every change runs (no path filter), so a catalog or Swift string change
       # can't skip it: every string translated, placeholders matching, every localized literal in the catalog.
       - name: String Catalogs complete
