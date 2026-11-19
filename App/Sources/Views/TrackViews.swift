@@ -114,6 +114,171 @@ struct TrackTable: View {
         return model.library.sources.first { $0.id == track.sourceId }?.displayName ?? ""
     }
 
+    // The columns, in three builders: one builder with all of them is more than the type checker manages in time.
+
+    /// The song: its place, title, who and what it is.
+    @TableColumnBuilder<TrackRow, KeyPathComparator<TrackRow>>
+    private func nameColumns(discs: Bool) -> some TableColumnContent<TrackRow, KeyPathComparator<TrackRow>> {
+            TableColumn("#", value: \.index) { row in
+                if model.player.current?.track.id == row.track.id, model.player.state != .stopped {
+                    Image(systemName: model.player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
+                        .font(.system(size: 10))
+                        .rowForeground(Palette.brass)
+                        .accessibilityLabel("Now Playing")
+                } else {
+                    Text(showAlbum ? "\(row.index + 1)" : number(row.track, discs: discs))
+                        .font(Typeface.mono(11.5))
+                        .rowForeground(Palette.text3)
+                }
+            }
+            .width(discs ? 44 : 36)
+            .customizationID(TrackColumn.number.rawValue)
+
+            TableColumn("Title", value: \.track.title) { row in
+                Text(row.track.title)
+                    .font(Typeface.ui(13))
+                    .rowForeground(model.player.current?.track.id == row.track.id ? Palette.brassHi : Palette.text)
+                    .opacity(row.track.isMissing ? 0.45 : 1)
+            }
+            .width(min: 160, ideal: ideal.title)
+            .customizationID(TrackColumn.title.rawValue)
+            .disabledCustomizationBehavior(.visibility)
+
+            if showArtist {
+                TableColumn("Artist", value: \.track.displayArtist) { row in
+                    Text(row.track.displayArtist.libraryDisplayName).font(Typeface.ui(12.5)).rowForeground(Palette.text2)
+                }
+                .width(min: 100, ideal: ideal.artist)
+                .customizationID(TrackColumn.artist.rawValue)
+            }
+            if showAlbum {
+                TableColumn("Album", value: \.track.displayAlbum) { row in
+                    Text(row.track.displayAlbum.libraryDisplayName).font(Typeface.ui(12.5)).rowForeground(Palette.text2)
+                }
+                .width(min: 100, ideal: ideal.album)
+                .customizationID(TrackColumn.album.rawValue)
+            }
+            TableColumn("Album Artist", value: \.track.displayAlbumArtist) { row in
+                textCell(row.track.displayAlbumArtist.libraryDisplayName)
+            }
+            .width(min: 80, ideal: 130)
+            .customizationID(TrackColumn.albumArtist.rawValue)
+            .defaultVisibility(.hidden)
+
+            TableColumn("Composer", value: \.track.composerOrEmpty) { row in textCell(row.track.composerOrEmpty) }
+                .width(min: 80, ideal: 130)
+                .customizationID(TrackColumn.composer.rawValue)
+                .defaultVisibility(.hidden)
+
+            TableColumn("Genre", value: \.track.genreOrEmpty) { row in textCell(row.track.genreOrEmpty) }
+                .width(min: 60, ideal: 100)
+                .customizationID(TrackColumn.genre.rawValue)
+                .defaultVisibility(.hidden)
+    }
+
+    /// The file: its tags, format, source, the heart and length, and its plays.
+    @TableColumnBuilder<TrackRow, KeyPathComparator<TrackRow>>
+    private func fileColumns(tracks: [Track]) -> some TableColumnContent<TrackRow, KeyPathComparator<TrackRow>> {
+            TableColumn("Year", value: \.track.yearOrNone) { row in numberCell(row.track.year.map(String.init)) }
+                .width(min: 40, ideal: 48)
+                .customizationID(TrackColumn.year.rawValue)
+                .defaultVisibility(.hidden)
+
+            TableColumn("Track", value: \.track.trackNumberOrNone) { row in numberCell(row.track.trackNumber.map(String.init)) }
+                .width(min: 36, ideal: 44)
+                .customizationID(TrackColumn.trackNumber.rawValue)
+                .defaultVisibility(.hidden)
+
+            TableColumn("Disc", value: \.track.discNumberOrNone) { row in numberCell(row.track.discNumber.map(String.init)) }
+                .width(min: 36, ideal: 40)
+                .customizationID(TrackColumn.discNumber.rawValue)
+                .defaultVisibility(.hidden)
+
+            TableColumn("Format", value: \.track.sampleRate) { row in
+                HStack(spacing: 8) {
+                    Text(row.track.formatSummary).font(Typeface.mono(11)).rowForeground(Palette.text2)
+                        .lineLimit(1).fixedSize()
+                    AnalysisTag(track: row.track).fixedSize()
+                    if row.track.isStreamed, let account = model.streaming.account(of: row.track) {
+                        StreamMarkView(name: account.displayName).fixedSize()
+                    }
+                    if let copies = row.track.id.flatMap({ self.copies[$0] }) {
+                        SongCopiesButton(model: model, track: row.track, copies: copies, list: tracks)
+                    }
+                }
+            }
+            .width(min: 150, ideal: ideal.format)
+            .customizationID(TrackColumn.format.rawValue)
+
+            // Where each song comes from. There only while a music server is on and has an account: with files alone it
+            // would say nothing.
+            if showsSource {
+                TableColumn("Source") { row in
+                    Text(sourceName(row.track)).font(Typeface.ui(12)).rowForeground(Palette.text3).lineLimit(1)
+                }
+                .width(min: 70, ideal: ideal.source)
+                .customizationID(TrackColumn.source.rawValue)
+            }
+
+            TableColumn(Text(Image(systemName: "heart")).foregroundStyle(Palette.text3).accessibilityLabel("Favorite")) { row in
+                // Selected rows show the heart through the row's own highlight (FavoriteCell), not by reading the
+                // selection here: that redrew every row of the table on each click, which on a large library lagged
+                // behind Shift- and Command-clicks.
+                FavoriteCell(model: model, track: row.track, emphasized: model.player.current?.track.id == row.track.id)
+            }
+            .width(22)
+            .customizationID(TrackColumn.favorite.rawValue)
+            .disabledCustomizationBehavior(.visibility)
+
+            TableColumn("Time", value: \.track.duration) { row in
+                Text(row.track.duration.clock).font(Typeface.mono(11.5)).rowForeground(Palette.text3)
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+            }
+            .width(56)
+            .customizationID(TrackColumn.time.rawValue)
+
+            TableColumn("Plays", value: \.track.playCount) { row in
+                numberCell(row.track.playCount > 0 ? row.track.playCount.formatted() : nil)
+            }
+            .width(min: 40, ideal: 50)
+            .customizationID(TrackColumn.plays.rawValue)
+            .defaultVisibility(.hidden)
+    }
+
+    /// When it was played and added, its rating, tempo and size.
+    @TableColumnBuilder<TrackRow, KeyPathComparator<TrackRow>>
+    private var statColumns: some TableColumnContent<TrackRow, KeyPathComparator<TrackRow>> {
+        TableColumn("Last Played", value: \.track.lastPlayedOrNever) { row in dateCell(row.track.lastPlayedAt) }
+            .width(min: 70, ideal: 96)
+            .customizationID(TrackColumn.lastPlayed.rawValue)
+            .defaultVisibility(.hidden)
+
+        TableColumn("Date Added", value: \.track.addedAt) { row in dateCell(row.track.addedAt) }
+            .width(min: 70, ideal: 96)
+            .customizationID(TrackColumn.dateAdded.rawValue)
+            .defaultVisibility(.hidden)
+
+        TableColumn("Rating", value: \.track.ratingOrNone) { row in
+            Text(row.track.ratingStars).font(.system(size: 10)).rowForeground(Palette.brass).lineLimit(1)
+                .accessibilityLabel(row.track.ratingStars.isEmpty ? "" : "\(row.track.ratingStars.count) ★")
+        }
+        .width(min: 50, ideal: 64)
+        .customizationID(TrackColumn.rating.rawValue)
+        .defaultVisibility(.hidden)
+
+        TableColumn("BPM", value: \.track.bpmOrNone) { row in numberCell(row.track.bpm.map(String.init)) }
+            .width(min: 36, ideal: 44)
+            .customizationID(TrackColumn.bpm.rawValue)
+            .defaultVisibility(.hidden)
+
+        TableColumn("Size", value: \.track.fileSize) { row in
+            numberCell(row.track.isStreamed || row.track.fileSize <= 0 ? nil : row.track.fileSize.byteString)
+        }
+        .width(min: 56, ideal: 70)
+        .customizationID(TrackColumn.size.rawValue)
+        .defaultVisibility(.hidden)
+    }
+
     /// The table's sort: kept for the next launch on pages that keep one (`TrackTableKind.keepsSort`).
     private var sortBinding: Binding<[KeyPathComparator<TrackRow>]> {
         guard kind.keepsSort else { return $sortOrder }
@@ -151,162 +316,9 @@ struct TrackTable: View {
         Table(rows, selection: $selection, sortOrder: sortBinding, columnCustomization: columnsBinding) {
             // Ideal widths add up to about 810 pt: what's left beside the sidebar and inspector in a 1440 pt window. The
             // columns shown at first are the ones there have always been; the rest are a right-click on the header away.
-            Group {
-                TableColumn("#", value: \.index) { row in
-                    if model.player.current?.track.id == row.track.id, model.player.state != .stopped {
-                        Image(systemName: model.player.isPlaying ? "speaker.wave.2.fill" : "speaker.fill")
-                            .font(.system(size: 10))
-                            .rowForeground(Palette.brass)
-                            .accessibilityLabel("Now Playing")
-                    } else {
-                        Text(showAlbum ? "\(row.index + 1)" : number(row.track, discs: discs))
-                            .font(Typeface.mono(11.5))
-                            .rowForeground(Palette.text3)
-                    }
-                }
-                .width(discs ? 44 : 36)
-                .customizationID(TrackColumn.number.rawValue)
-
-                TableColumn("Title", value: \.track.title) { row in
-                    Text(row.track.title)
-                        .font(Typeface.ui(13))
-                        .rowForeground(model.player.current?.track.id == row.track.id ? Palette.brassHi : Palette.text)
-                        .opacity(row.track.isMissing ? 0.45 : 1)
-                }
-                .width(min: 160, ideal: ideal.title)
-                .customizationID(TrackColumn.title.rawValue)
-                .disabledCustomizationBehavior(.visibility)
-
-                if showArtist {
-                    TableColumn("Artist", value: \.track.displayArtist) { row in
-                        Text(row.track.displayArtist.libraryDisplayName).font(Typeface.ui(12.5)).rowForeground(Palette.text2)
-                    }
-                    .width(min: 100, ideal: ideal.artist)
-                    .customizationID(TrackColumn.artist.rawValue)
-                }
-                if showAlbum {
-                    TableColumn("Album", value: \.track.displayAlbum) { row in
-                        Text(row.track.displayAlbum.libraryDisplayName).font(Typeface.ui(12.5)).rowForeground(Palette.text2)
-                    }
-                    .width(min: 100, ideal: ideal.album)
-                    .customizationID(TrackColumn.album.rawValue)
-                }
-                TableColumn("Album Artist", value: \.track.displayAlbumArtist) { row in
-                    textCell(row.track.displayAlbumArtist.libraryDisplayName)
-                }
-                .width(min: 80, ideal: 130)
-                .customizationID(TrackColumn.albumArtist.rawValue)
-                .defaultVisibility(.hidden)
-
-                TableColumn("Composer", value: \.track.composerOrEmpty) { row in textCell(row.track.composerOrEmpty) }
-                    .width(min: 80, ideal: 130)
-                    .customizationID(TrackColumn.composer.rawValue)
-                    .defaultVisibility(.hidden)
-
-                TableColumn("Genre", value: \.track.genreOrEmpty) { row in textCell(row.track.genreOrEmpty) }
-                    .width(min: 60, ideal: 100)
-                    .customizationID(TrackColumn.genre.rawValue)
-                    .defaultVisibility(.hidden)
-            }
-
-            Group {
-                TableColumn("Year", value: \.track.yearOrNone) { row in numberCell(row.track.year.map(String.init)) }
-                    .width(min: 40, ideal: 48)
-                    .customizationID(TrackColumn.year.rawValue)
-                    .defaultVisibility(.hidden)
-
-                TableColumn("Track", value: \.track.trackNumberOrNone) { row in numberCell(row.track.trackNumber.map(String.init)) }
-                    .width(min: 36, ideal: 44)
-                    .customizationID(TrackColumn.trackNumber.rawValue)
-                    .defaultVisibility(.hidden)
-
-                TableColumn("Disc", value: \.track.discNumberOrNone) { row in numberCell(row.track.discNumber.map(String.init)) }
-                    .width(min: 36, ideal: 40)
-                    .customizationID(TrackColumn.discNumber.rawValue)
-                    .defaultVisibility(.hidden)
-
-                TableColumn("Format", value: \.track.sampleRate) { row in
-                    HStack(spacing: 8) {
-                        Text(row.track.formatSummary).font(Typeface.mono(11)).rowForeground(Palette.text2)
-                            .lineLimit(1).fixedSize()
-                        AnalysisTag(track: row.track).fixedSize()
-                        if row.track.isStreamed, let account = model.streaming.account(of: row.track) {
-                            StreamMarkView(name: account.displayName).fixedSize()
-                        }
-                        if let copies = row.track.id.flatMap({ self.copies[$0] }) {
-                            SongCopiesButton(model: model, track: row.track, copies: copies, list: tracks)
-                        }
-                    }
-                }
-                .width(min: 150, ideal: ideal.format)
-                .customizationID(TrackColumn.format.rawValue)
-
-                // Where each song comes from. There only while a music server is on and has an account: with files alone it
-                // would say nothing.
-                if showsSource {
-                    TableColumn("Source") { row in
-                        Text(sourceName(row.track)).font(Typeface.ui(12)).rowForeground(Palette.text3).lineLimit(1)
-                    }
-                    .width(min: 70, ideal: ideal.source)
-                    .customizationID(TrackColumn.source.rawValue)
-                }
-
-                TableColumn(Text(Image(systemName: "heart")).foregroundStyle(Palette.text3).accessibilityLabel("Favorite")) { row in
-                    // Selected rows show the heart through the row's own highlight (FavoriteCell), not by reading the
-                    // selection here: that redrew every row of the table on each click, which on a large library lagged
-                    // behind Shift- and Command-clicks.
-                    FavoriteCell(model: model, track: row.track, emphasized: model.player.current?.track.id == row.track.id)
-                }
-                .width(22)
-                .customizationID(TrackColumn.favorite.rawValue)
-                .disabledCustomizationBehavior(.visibility)
-
-                TableColumn("Time", value: \.track.duration) { row in
-                    Text(row.track.duration.clock).font(Typeface.mono(11.5)).rowForeground(Palette.text3)
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                .width(56)
-                .customizationID(TrackColumn.time.rawValue)
-
-                TableColumn("Plays", value: \.track.playCount) { row in
-                    numberCell(row.track.playCount > 0 ? row.track.playCount.formatted() : nil)
-                }
-                .width(min: 40, ideal: 50)
-                .customizationID(TrackColumn.plays.rawValue)
-                .defaultVisibility(.hidden)
-            }
-
-            Group {
-                TableColumn("Last Played", value: \.track.lastPlayedOrNever) { row in dateCell(row.track.lastPlayedAt) }
-                    .width(min: 70, ideal: 96)
-                    .customizationID(TrackColumn.lastPlayed.rawValue)
-                    .defaultVisibility(.hidden)
-
-                TableColumn("Date Added", value: \.track.addedAt) { row in dateCell(row.track.addedAt) }
-                    .width(min: 70, ideal: 96)
-                    .customizationID(TrackColumn.dateAdded.rawValue)
-                    .defaultVisibility(.hidden)
-
-                TableColumn("Rating", value: \.track.ratingOrNone) { row in
-                    Text(row.track.ratingStars).font(.system(size: 10)).rowForeground(Palette.brass).lineLimit(1)
-                        .accessibilityLabel(row.track.ratingStars.isEmpty ? "" : "\(row.track.ratingStars.count) ★")
-                }
-                .width(min: 50, ideal: 64)
-                .customizationID(TrackColumn.rating.rawValue)
-                .defaultVisibility(.hidden)
-
-                TableColumn("BPM", value: \.track.bpmOrNone) { row in numberCell(row.track.bpm.map(String.init)) }
-                    .width(min: 36, ideal: 44)
-                    .customizationID(TrackColumn.bpm.rawValue)
-                    .defaultVisibility(.hidden)
-
-                TableColumn("Size", value: \.track.fileSize) { row in
-                    numberCell(row.track.isStreamed || row.track.fileSize <= 0 ? nil : row.track.fileSize.byteString)
-                }
-                .width(min: 56, ideal: 70)
-                .customizationID(TrackColumn.size.rawValue)
-                .defaultVisibility(.hidden)
-            }
+            nameColumns(discs: discs)
+            fileColumns(tracks: tracks)
+            statColumns
         }
         .tableStyle(.inset(alternatesRowBackgrounds: false))
         .scrollContentBackground(.hidden)
