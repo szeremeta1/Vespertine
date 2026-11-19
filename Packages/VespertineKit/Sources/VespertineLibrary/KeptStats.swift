@@ -109,7 +109,9 @@ extension LibraryDatabase {
     /// given back is gone. Returns the track IDs that took statistics back.
     @discardableResult
     static func restoreKeptStats(_ db: Database, trackIDs: [Int64]) throws -> [Int64] {
-        guard !trackIDs.isEmpty, try Bool.fetchOne(db, sql: "SELECT EXISTS (SELECT 1 FROM keptStats)") == true else { return [] }
+        // A library this build's scanner writes before it is migrated (a test's) has no kept statistics yet.
+        guard !trackIDs.isEmpty, try db.tableExists("keptStats"),
+              try Bool.fetchOne(db, sql: "SELECT EXISTS (SELECT 1 FROM keptStats)") == true else { return [] }
         var restored: [Int64] = []
         for id in trackIDs {
             guard let kept = try Int64.fetchOne(db, sql: """
