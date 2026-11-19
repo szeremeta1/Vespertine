@@ -464,7 +464,7 @@ struct AlbumDetailView: View {
                 Hairline()
             }
             TrackTable(tracks: shown, showAlbum: false, showArtist: shown.contains { $0.artist != album?.artist && $0.artist != nil },
-                       copies: songCopies)
+                       copies: songCopies, kind: .album)
         }
         .background(Palette.window)
         .navigationTitle(album?.title ?? String(localized: "Album"))
