@@ -245,12 +245,24 @@ struct TrackTable: View {
             .defaultVisibility(.hidden)
     }
 
-    /// When it was played and added, its rating, tempo and size.
+    /// When it was played, skipped and added, its rating, tempo and size.
     @TableColumnBuilder<TrackRow, KeyPathComparator<TrackRow>>
     private var statColumns: some TableColumnContent<TrackRow, KeyPathComparator<TrackRow>> {
         TableColumn("Last Played", value: \.track.lastPlayedOrNever) { row in dateCell(row.track.lastPlayedAt) }
             .width(min: 70, ideal: 96)
             .customizationID(TrackColumn.lastPlayed.rawValue)
+            .defaultVisibility(.hidden)
+
+        TableColumn("Skips", value: \.track.skipsOrNone) { row in
+            numberCell(row.track.skipsOrNone > 0 ? row.track.skipsOrNone.formatted() : nil)
+        }
+        .width(min: 40, ideal: 50)
+        .customizationID(TrackColumn.skips.rawValue)
+        .defaultVisibility(.hidden)
+
+        TableColumn("Last Skipped", value: \.track.lastSkippedOrNever) { row in dateCell(row.track.lastSkippedAt) }
+            .width(min: 70, ideal: 96)
+            .customizationID(TrackColumn.lastSkipped.rawValue)
             .defaultVisibility(.hidden)
 
         TableColumn("Date Added", value: \.track.addedAt) { row in dateCell(row.track.addedAt) }

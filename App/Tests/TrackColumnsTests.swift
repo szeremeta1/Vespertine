@@ -46,6 +46,18 @@ struct TrackColumnsTests {
         #expect(try sorted(tracks, by: .dateAdded, forward: false) == [1, 2, 3, 4, 5])
     }
 
+    @Test("Most skipped first; a library from before skips were counted has none, and sorts as never skipped")
+    func mostSkipped() throws {
+        var tracks = try songs()
+        let skips: [Int?] = [2, nil, 9, 0, 2]
+        for i in tracks.indices {
+            tracks[i].skipCount = skips[i]
+            tracks[i].lastSkippedAt = (skips[i] ?? 0) == 0 ? nil : Date(timeIntervalSince1970: 1_700_000_000 - Double(i) * 3600)
+        }
+        #expect(try sorted(tracks, by: .skips, forward: false) == [3, 1, 5, 2, 4])
+        #expect(try sorted(tracks, by: .lastSkipped, forward: false) == [1, 3, 5, 2, 4])
+    }
+
     @Test("A song without a year or a rating sorts before the others, and after them reversed")
     func emptyFieldsFirst() throws {
         let tracks = try songs()
