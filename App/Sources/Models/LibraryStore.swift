@@ -924,6 +924,11 @@ final class LibraryStore {
         revision += 1   // play counts in lists and the inspector
     }
 
+    func markSkipped(_ trackID: Int64) {
+        try? database.markSkipped(trackID)
+        revision += 1   // skip counts in lists
+    }
+
     // MARK: Play history
 
     /// Bumped whenever the history changes, so History reloads.

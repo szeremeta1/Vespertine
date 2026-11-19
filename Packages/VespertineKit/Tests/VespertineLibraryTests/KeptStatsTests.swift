@@ -207,4 +207,31 @@ struct KeptStatsTests {
         #expect(restored.playCount == 31 && restored.rating == 60, "the same title, artist, format and length")
         #expect(try db.favoriteTracks().map(\.id) == [restored.id])
     }
+
+    @Test("Skips count, never go down when a row is written again, and come back with a folder added again")
+    func skips() async throws {
+        let (db, scanner, source, dir) = try await library(["a"])
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let id = try #require(try track(db, "a").id)
+        #expect(try track(db, "a").skipCount == nil, "never skipped")
+        try db.markSkipped(id, at: lastPlayed)
+        try db.markSkipped(id, at: lastPlayed.addingTimeInterval(60))
+        #expect(try track(db, "a").skipCount == 2 && track(db, "a").lastSkippedAt == lastPlayed.addingTimeInterval(60))
+
+        var stale = try track(db, "a")
+        stale.skipCount = nil
+        stale.lastSkippedAt = nil
+        let rewritten = stale
+        try await db.writer.write { db in var row = rewritten; try row.update(db) }
+        #expect(try track(db, "a").skipCount == 2 && track(db, "a").lastSkippedAt == lastPlayed.addingTimeInterval(60))
+
+        try await scanner.scan(source, restart: true)
+        #expect(try track(db, "a").skipCount == 2, "a rescan keeps them")
+
+        try db.removeSource(try #require(source.id))
+        #expect(try db.keptStatsCount() == 1, "a song only skipped is kept too")
+        try await scanner.scan(try db.addSource(LibrarySource(path: source.path, mode: .reference)))
+        #expect(try track(db, "a").skipCount == 2 && track(db, "a").lastSkippedAt == lastPlayed.addingTimeInterval(60))
+        #expect(try track(db, "a").playCount == 0)
+    }
 }

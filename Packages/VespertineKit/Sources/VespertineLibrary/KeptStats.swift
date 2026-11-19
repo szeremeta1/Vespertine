@@ -46,7 +46,7 @@ extension LibraryDatabase {
             t.column("history", .jsonText).notNull().defaults(to: "[]")
             t.column("keptAt", .datetime).notNull()
         }
-        try createKeptStatsTriggers(db)
+        try createKeptStatsTriggersV24(db)
     }
 
     /// The key a file keeps when it is moved or renamed: the same expression as `reconcileMovedTracks`'s file key.
@@ -65,7 +65,8 @@ extension LibraryDatabase {
         """
     }
 
-    static func createKeptStatsTriggers(_ db: Database) throws {
+    /// The triggers as the migration that made them (v24) wrote them, before skips were counted: a migration never changes.
+    static func createKeptStatsTriggersV24(_ db: Database) throws {
         // 1. A row written again never loses plays, its last play or the date it came into the library. (The update below
         // sets the old values back; recursive triggers are off, so it doesn't run this trigger again.)
         try db.execute(sql: """
@@ -103,6 +104,51 @@ extension LibraryDatabase {
             """)
     }
 
+    /// The triggers as they are now (from v25, which counts skips).
+    static func createKeptStatsTriggers(_ db: Database) throws {
+        // 1. A row written again never loses plays or skips, the last of either, or the date it came into the library. (The
+        // update below sets the old values back; recursive triggers are off, so it doesn't run this trigger again.)
+        try db.execute(sql: """
+            CREATE TRIGGER track_stats_never_lower AFTER UPDATE OF playCount, lastPlayedAt, addedAt, skipCount, lastSkippedAt ON track
+            WHEN NEW.playCount < OLD.playCount
+              OR (OLD.lastPlayedAt IS NOT NULL AND (NEW.lastPlayedAt IS NULL OR NEW.lastPlayedAt < OLD.lastPlayedAt))
+              OR NEW.addedAt > OLD.addedAt
+              OR coalesce(NEW.skipCount, 0) < coalesce(OLD.skipCount, 0)
+              OR (OLD.lastSkippedAt IS NOT NULL AND (NEW.lastSkippedAt IS NULL OR NEW.lastSkippedAt < OLD.lastSkippedAt))
+            BEGIN
+              UPDATE track SET
+                playCount = max(NEW.playCount, OLD.playCount),
+                lastPlayedAt = CASE WHEN OLD.lastPlayedAt IS NULL THEN NEW.lastPlayedAt
+                                    WHEN NEW.lastPlayedAt IS NULL OR NEW.lastPlayedAt < OLD.lastPlayedAt THEN OLD.lastPlayedAt
+                                    ELSE NEW.lastPlayedAt END,
+                addedAt = min(NEW.addedAt, OLD.addedAt),
+                skipCount = CASE WHEN coalesce(NEW.skipCount, 0) < coalesce(OLD.skipCount, 0) THEN OLD.skipCount ELSE NEW.skipCount END,
+                lastSkippedAt = CASE WHEN OLD.lastSkippedAt IS NULL THEN NEW.lastSkippedAt
+                                     WHEN NEW.lastSkippedAt IS NULL OR NEW.lastSkippedAt < OLD.lastSkippedAt THEN OLD.lastSkippedAt
+                                     ELSE NEW.lastSkippedAt END
+              WHERE id = NEW.id;
+            END
+            """)
+        // 2. A row that goes keeps what it has. BEFORE, so the favorite and history rows a cascade is about to take are
+        // still there to read.
+        try db.execute(sql: """
+            CREATE TRIGGER track_keep_stats BEFORE DELETE ON track
+            WHEN OLD.playCount > 0 OR coalesce(OLD.skipCount, 0) > 0 OR OLD.rating IS NOT NULL
+              OR EXISTS (SELECT 1 FROM favorite WHERE trackId = OLD.id)
+              OR EXISTS (SELECT 1 FROM playHistory WHERE trackId = OLD.id)
+            BEGIN
+              INSERT INTO keptStats (location, fileKey, tagKey, playCount, lastPlayedAt, skipCount, lastSkippedAt, rating, addedAt,
+                                     favoritedAt, favoriteBorrowed, history, keptAt)
+              VALUES (OLD.location, \(fileKeySQL("OLD")), \(tagKeySQL("OLD")), OLD.playCount, OLD.lastPlayedAt, OLD.skipCount,
+                      OLD.lastSkippedAt, OLD.rating, OLD.addedAt,
+                      (SELECT favoritedAt FROM favorite WHERE trackId = OLD.id),
+                      (SELECT borrowed FROM favorite WHERE trackId = OLD.id),
+                      coalesce((SELECT json_group_array(playedAt) FROM (SELECT playedAt FROM playHistory WHERE trackId = OLD.id ORDER BY playedAt)), '[]'),
+                      strftime('%Y-%m-%d %H:%M:%f', 'now'));
+            END
+            """)
+    }
+
     /// Gives songs just added the statistics kept for them, if any: the song kept at the same place first, else the one
     /// file of the same size, length, CUE start and channels, else the one recording with the same tags, format and length.
     /// A key two kept songs share is passed over: their statistics wait for a song that is theirs alone. A kept entry
@@ -126,6 +172,12 @@ extension LibraryDatabase {
                     WHEN (SELECT lastPlayedAt FROM keptStats WHERE id = :kept) IS NULL THEN lastPlayedAt
                     WHEN lastPlayedAt IS NULL THEN (SELECT lastPlayedAt FROM keptStats WHERE id = :kept)
                     ELSE max(lastPlayedAt, (SELECT lastPlayedAt FROM keptStats WHERE id = :kept)) END,
+                  skipCount = CASE WHEN coalesce((SELECT skipCount FROM keptStats WHERE id = :kept), 0) = 0 THEN skipCount
+                    ELSE coalesce(skipCount, 0) + (SELECT skipCount FROM keptStats WHERE id = :kept) END,
+                  lastSkippedAt = CASE
+                    WHEN (SELECT lastSkippedAt FROM keptStats WHERE id = :kept) IS NULL THEN lastSkippedAt
+                    WHEN lastSkippedAt IS NULL THEN (SELECT lastSkippedAt FROM keptStats WHERE id = :kept)
+                    ELSE max(lastSkippedAt, (SELECT lastSkippedAt FROM keptStats WHERE id = :kept)) END,
                   rating = coalesce(rating, (SELECT rating FROM keptStats WHERE id = :kept)),
                   addedAt = min(addedAt, coalesce((SELECT addedAt FROM keptStats WHERE id = :kept), addedAt))
                 WHERE id = :track
