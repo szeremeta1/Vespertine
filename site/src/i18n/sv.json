@@ -289,7 +289,7 @@
         "lede": "Varje meny, inställning och meddelande i signalvägen är översatt till {languages} språk utöver engelska.",
         "body": [
           "Från ukrainska, tyska och japanska till swahili, tamil och hausa, med lokala pluralformer och talformat, och förenklad kinesiska, traditionell kinesiska och kinesiska för Hongkong, var och en med sitt eget ordförråd. Arabiska, hebreiska, persiska och urdu får en layout från höger till vänster.",
-          "Så kontrolleras översättningarna: en automatisk kontroll vid varje ändring bekräftar att varje sträng i appen finns på alla 44 språk med samma platshållare och de pluralformer varje språk behöver, och huvudskärmarna har kontrollerats på flera språk efter avklippt eller överlappande text och spegling för höger till vänster. De började som noggranna maskinöversättningar, så rättelser från modersmålstalare tas tacksamt emot på <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a>."
+          "Så kontrolleras översättningarna: en automatisk kontroll vid varje ändring bekräftar att varje sträng i appen finns på alla 44 språk med samma platshållare och de pluralformer varje språk behöver, och huvudskärmarna har kontrollerats på flera språk efter avklippt eller överlappande text och spegling för höger till vänster. De började som noggranna maskinöversättningar, så rättelser från modersmålstalare tas tacksamt emot på <a href=\"https://github.com/vespertineapp/Vespertine/issues/new/choose\">GitHub</a>."
         ],
         "alt": "Vespertine skrivet på vart och ett av dess {languagesTotal} gränssnittsspråk, från ヴェスパタイン och Веспертайн till فسبرتاين och वेस्परटाइन, i blandade storlekar och typsnitt.",
         "wallLabel": "Vespertine på vart och ett av sina språk"

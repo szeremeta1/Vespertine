@@ -4,7 +4,7 @@
 import releases from './releases.json';
 
 export const SITE = 'https://vespertineapp.com';
-export const REPO = 'https://github.com/szeremeta1/Vespertine';
+export const REPO = 'https://github.com/vespertineapp/Vespertine';
 const BLOB = `${REPO}/blob/main`;
 
 export type Release = (typeof releases)[number];
@@ -62,8 +62,8 @@ export const links = {
   development: `${BLOB}/docs/DEVELOPMENT.md`,
   contributing: `${BLOB}/CONTRIBUTING.md`,
   signalPath: `${BLOB}/Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift`,
-  brandGuide: 'https://raw.githubusercontent.com/szeremeta1/Vespertine/main/docs/brand/brand-guide.pdf',
-  raw: 'https://raw.githubusercontent.com/szeremeta1/Vespertine/main',
+  brandGuide: 'https://raw.githubusercontent.com/vespertineapp/Vespertine/main/docs/brand/brand-guide.pdf',
+  raw: 'https://raw.githubusercontent.com/vespertineapp/Vespertine/main',
   ukraine: [
     { name: 'United24', url: 'https://u24.gov.ua/' },
     { name: 'Come Back Alive', url: 'https://savelife.in.ua/en/donate-en/' },
