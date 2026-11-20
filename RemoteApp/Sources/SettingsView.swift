@@ -90,7 +90,7 @@ struct SettingsView: View {
                 }
                 Section("About") {
                     LabeledContent("Version", value: Self.version)
-                    if let url = URL(string: "https://github.com/szeremeta1/Vespertine") {
+                    if let url = URL(string: "https://github.com/vespertineapp/Vespertine") {
                         Link("Source Code", destination: url)
                     }
                     NavigationLink("Licenses") { LicensesView() }
