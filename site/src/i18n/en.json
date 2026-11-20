@@ -289,7 +289,7 @@
         "lede": "Every menu, setting and signal-path message is translated into {languages} languages besides English.",
         "body": [
           "From Ukrainian, German and Japanese to Swahili, Tamil and Hausa, with local plurals and number formats, and Simplified, Traditional and Hong Kong Chinese each with their own vocabulary. Arabic, Hebrew, Persian and Urdu get a right-to-left layout.",
-          "How the translations are checked: an automatic check on every change confirms every string in the app exists in all 44 languages with the same placeholders and the plural forms each language needs, and the main screens were checked in several languages for clipped or overlapping text and right-to-left mirroring. They began as careful machine translations, so corrections from native speakers are very welcome on <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHub</a>."
+          "How the translations are checked: an automatic check on every change confirms every string in the app exists in all 44 languages with the same placeholders and the plural forms each language needs, and the main screens were checked in several languages for clipped or overlapping text and right-to-left mirroring. They began as careful machine translations, so corrections from native speakers are very welcome on <a href=\"https://github.com/vespertineapp/Vespertine/issues/new/choose\">GitHub</a>."
         ],
         "alt": "Vespertine written in each of its {languagesTotal} interface languages, from ヴェスパタイン and Веспертайн to فسبرتاين and वेस्परटाइन, at mixed sizes and typefaces.",
         "wallLabel": "Vespertine in each of its languages"

@@ -5,7 +5,7 @@
 //   node scripts/fetch-releases.mjs        (GITHUB_TOKEN, if set, raises the rate limit)
 import { readFileSync, writeFileSync } from 'node:fs';
 
-const REPO = 'szeremeta1/Vespertine';
+const REPO = 'vespertineapp/Vespertine';
 const KEEP = 6;
 const out = new URL('../src/data/releases.json', import.meta.url);
 

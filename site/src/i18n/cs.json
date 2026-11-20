@@ -289,7 +289,7 @@
         "lede": "Každá nabídka, nastavení i hlášení signálové cesty je kromě angličtiny přeloženo do {languages} jazyků.",
         "body": [
           "Od ukrajinštiny, němčiny a japonštiny po svahilštinu, tamilštinu a hausštinu, s místními tvary množného čísla a formáty čísel, a zjednodušená, tradiční i hongkongská čínština mají každá vlastní slovní zásobu. Arabština, hebrejština, perština a urdština mají rozvržení zprava doleva.",
-          "Jak se překlady kontrolují: automatická kontrola při každé změně ověří, že každý řetězec v aplikaci existuje ve všech 44 jazycích se stejnými zástupnými symboly a s tvary množného čísla, které daný jazyk potřebuje, a hlavní obrazovky byly v několika jazycích zkontrolovány kvůli oříznutému nebo překrývajícímu se textu a zrcadlení zprava doleva. Překlady vznikly jako pečlivé strojové překlady, takže opravy od rodilých mluvčích jsou na <a href=\"https://github.com/szeremeta1/Vespertine/issues/new/choose\">GitHubu</a> velmi vítány."
+          "Jak se překlady kontrolují: automatická kontrola při každé změně ověří, že každý řetězec v aplikaci existuje ve všech 44 jazycích se stejnými zástupnými symboly a s tvary množného čísla, které daný jazyk potřebuje, a hlavní obrazovky byly v několika jazycích zkontrolovány kvůli oříznutému nebo překrývajícímu se textu a zrcadlení zprava doleva. Překlady vznikly jako pečlivé strojové překlady, takže opravy od rodilých mluvčích jsou na <a href=\"https://github.com/vespertineapp/Vespertine/issues/new/choose\">GitHubu</a> velmi vítány."
         ],
         "alt": "Vespertine napsané v každém z {languagesTotal} jazyků rozhraní, od ヴェスパタイン a Веспертайн po فسبرتاين a वेस्परटाइन, v různých velikostech a písmech.",
         "wallLabel": "Vespertine ve všech jeho jazycích"
