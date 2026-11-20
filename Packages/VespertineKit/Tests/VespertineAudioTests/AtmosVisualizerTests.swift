@@ -35,7 +35,7 @@ private final class FakeAtmosRender: SystemRenderTap, @unchecked Sendable {
 private final class FakeBedReader: BedReading, @unchecked Sendable {
     struct Failure: Error {}
     let frames: Int, buffers: Int, failAfter: Int?, firstFrame: Int64
-    private(set) var cancelled = false
+    private let cancellation = DispatchSemaphore(value: 0)
     private var handedOut = 0
 
     init(frames: Int, buffers: Int, failAfter: Int? = nil, firstFrame: Int64 = 0) {
@@ -43,7 +43,10 @@ private final class FakeBedReader: BedReading, @unchecked Sendable {
     }
 
     func start() throws {}
-    func cancel() { cancelled = true }
+    func cancel() { cancellation.signal() }
+    func waitUntilCancelled(timeout: TimeInterval = 20) -> Bool {
+        cancellation.wait(timeout: .now() + timeout) == .success
+    }
 
     func next() throws -> BedBuffer? {
         if let failAfter, handedOut == failAfter { throw Failure() }
@@ -409,11 +412,11 @@ struct AtmosVisualizerTests {
         decoder.start(at: 0) { 100 }
         defer { decoder.stop() }
         try Self.waitForBed(decoder, through: 3 * 8192, timeout: 20)
-        let deadline = Date().addingTimeInterval(20)
-        while decoder.error == nil, Date() < deadline { Thread.sleep(forTimeInterval: 0.01) }
+        // Recording the error precedes the run's deferred cancel, so the error alone doesn't mean cleanup has finished.
+        // Wait for the reader's signal before inspecting the failed run or starting another one.
+        try #require(reader.waitUntilCancelled(), "the failed reader was not cancelled within 20 s")
         #expect(decoder.error is FakeBedReader.Failure)
         #expect(decoder.tap.endFrame == 3 * 8192)
-        #expect(reader.cancelled)
         // A new start clears the error and decodes again.
         decoder.start(at: 0) { 100 }
         #expect(decoder.error == nil)
