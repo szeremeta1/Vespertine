@@ -13,7 +13,7 @@ USB DACs never say whether they decode DSD over PCM (DoP), and a DAC that doesn'
 
 ### Adding a DAC
 
-1. Get a source that says the DAC decodes DoP on a Mac: a maker's manual or spec page that says "DoP", or a report from the DAC's owner that DSD played natively once DoP was on (a [device report](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml) is the right place for it).
+1. Get a source that says the DAC decodes DoP on a Mac: a maker's manual or spec page that says "DoP", or a report from the DAC's owner that DSD played natively once DoP was on (a [device report](https://github.com/vespertineapp/Vespertine/issues/new?template=dac_report.yml) is the right place for it).
 2. Read its Core Audio UID (`defaults read org.szeremeta.Vespertine dopDeviceUIDs` after turning DoP on for it) for the vendor and model names, and its USB ID from System Information › USB if you want to match by that too.
 3. Add the entry with its `source`, raise `revision`, run `swift test --filter DoP` in `Packages/VespertineKit`.
 

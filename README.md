@@ -12,13 +12,13 @@
 Vespertine plays your stereo and surround music from one library: SACD images, DVD-Video discs, DTS CDs, Dolby TrueHD, DTS-HD Master Audio, Atmos and plain FLAC. It plays surround through Apple's Spatial Audio renderer on AirPods, or across several USB DACs at once as one speaker system (Speaker Groups, in beta), measures your room with a USB microphone and corrects each speaker, shows every step between the file and your DAC, and tells you whether your "hi-res" files really are. It also plays to network players and AirPlay receivers, plays the music on your own server, and takes orders from a phone. Each of those is off until you turn it on.
 
 <p align="center">
-  <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><strong>Download the DMG</strong></a> or <code>brew install --cask szeremeta1/tap/vespertine</code> · macOS 14.4+ · Apple silicon and Intel<br>
+  <a href="https://github.com/vespertineapp/Vespertine/releases/latest"><strong>Download the DMG</strong></a> or <code>brew install --cask szeremeta1/tap/vespertine</code> · macOS 14.4+ · Apple silicon and Intel<br>
   Signed and notarized · no account, no telemetry · <a href="https://vespertineapp.com/">Website</a> · <a href="https://vespertineapp.com/press.html">Press kit</a> · <a href="https://vespertineapp.com/privacy.html">Privacy</a> · <a href="https://github.com/sponsors/szeremeta1">Sponsor</a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/szeremeta1/Vespertine/releases/latest"><img src="https://img.shields.io/github/v/release/szeremeta1/Vespertine?label=download&color=c8a765" alt="Latest release"></a>
-  <a href="https://github.com/szeremeta1/Vespertine/actions/workflows/ci.yml"><img src="https://github.com/szeremeta1/Vespertine/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+  <a href="https://github.com/vespertineapp/Vespertine/releases/latest"><img src="https://img.shields.io/github/v/release/vespertineapp/Vespertine?label=download&color=c8a765" alt="Latest release"></a>
+  <a href="https://github.com/vespertineapp/Vespertine/actions/workflows/ci.yml"><img src="https://github.com/vespertineapp/Vespertine/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-1f1f1f" alt="GPL-3.0"></a>
 </p>
 
@@ -183,11 +183,11 @@ Bit-perfect playback is available in several Mac players. Vespertine focuses on 
 
 ⁵ Music servers: your own server that speaks the open OpenSubsonic API (Navidrome, Gonic, Airsonic and others), tested against Vespertine's own test server, not yet against real ones. Receive from Other Apps: Vespertine has no code for any commercial streaming service. A UPnP control app that signs in to a service itself and hands over an ordinary http address can play through it; protected streams (Apple Music, Spotify, Amazon Music) can't. Tested against Vespertine's own test control point, not yet against real control apps. See [docs/STREAMING.md](docs/STREAMING.md).
 
-[Comparison sources and scope](docs/COMPARISON.md). Corrections welcome: [open an issue](https://github.com/szeremeta1/Vespertine/issues).
+[Comparison sources and scope](docs/COMPARISON.md). Corrections welcome: [open an issue](https://github.com/vespertineapp/Vespertine/issues).
 
 ## Known limitations
 
-PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11 (developer reports). Playback has also been tested on AirPods Max over USB-C and Bluetooth, MacBook Pro speakers, and a Sony TV over HDMI in 5.1 ([details](docs/DEVICES.md)). [Device reports](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml) help extend that.
+PCM playback has been tested up to 768 kHz and DSD256 on a Fosi Audio ZD3, and up to 384 kHz and DSD128 on a FiiO K11 (developer reports). Playback has also been tested on AirPods Max over USB-C and Bluetooth, MacBook Pro speakers, and a Sony TV over HDMI in 5.1 ([details](docs/DEVICES.md)). [Device reports](https://github.com/vespertineapp/Vespertine/issues/new?template=dac_report.yml) help extend that.
 
 - Channel-for-channel output has been reported on one real device, a Sony TV over HDMI (5.1 and a 7.1 to 5.1 downmix, developer report without a capture; see [Tested devices](docs/DEVICES.md)). Multichannel USB DACs and Dolby/DTS bitstream to receivers are untested on real hardware; reports wanted.
 - Intel Macs are untested (the Intel build has run under Rosetta). DoP is reported to work up to DSD256 on the Fosi Audio ZD3 and up to DSD128 on the FiiO K11 (developer reports, no capture); DSD512 over DoP is untested on hardware.

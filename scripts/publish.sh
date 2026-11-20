@@ -11,7 +11,7 @@
 set -euo pipefail
 cd "$(dirname $0)/.."
 
-repo=szeremeta1/Vespertine
+repo=vespertineapp/Vespertine
 out=${VESPERTINE_OUT:-build/Release}
 notes=${1:?usage: scripts/publish.sh <release-notes.md>}
 app="$out/Vespertine.app"

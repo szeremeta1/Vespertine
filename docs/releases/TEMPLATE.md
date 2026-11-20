@@ -10,14 +10,14 @@ Free, open-source Mac player for surround and hi-res music collections.
 
 <Which tests passed, which files and devices were used, and what remains unverified. File decoding tests and Core Audio readback do not establish compatibility with a real receiver or multichannel DAC. Do not claim PCM rates above 768 kHz or DoP above DSD256 as hardware-tested.>
 
-Receiver bitstream and channel-for-channel multichannel DAC output are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted: [device report](https://github.com/szeremeta1/Vespertine/issues/new?template=dac_report.yml).
+Receiver bitstream and channel-for-channel multichannel DAC output are experimental, untested on real receivers and multichannel USB DACs (one Sony TV over HDMI has been tested: see docs/DEVICES.md); reports wanted: [device report](https://github.com/vespertineapp/Vespertine/issues/new?template=dac_report.yml).
 
 SACD images: <any change to SACD ISO playback, and the discs or tests that checked it.>
 
 ## Install
 
-[Download the DMG](https://github.com/szeremeta1/Vespertine/releases/latest) or `brew install --cask szeremeta1/tap/vespertine`. Requires macOS 14.4+.
+[Download the DMG](https://github.com/vespertineapp/Vespertine/releases/latest) or `brew install --cask szeremeta1/tap/vespertine`. Requires macOS 14.4+.
 
-[All features](https://github.com/szeremeta1/Vespertine/blob/main/docs/FEATURES.md) · [Privacy](https://vespertineapp.com/privacy.html)
+[All features](https://github.com/vespertineapp/Vespertine/blob/main/docs/FEATURES.md) · [Privacy](https://vespertineapp.com/privacy.html)
 
 Betas ship at most weekly.

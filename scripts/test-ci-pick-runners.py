@@ -33,7 +33,7 @@ def run(event, **env):
     return {line.split("=", 1)[0]: json.loads(line.split("=", 1)[1]) for line in out.splitlines()}
 
 
-def pull_request(head, base="szeremeta1/Vespertine"):
+def pull_request(head, base="vespertineapp/Vespertine"):
     return {"pull_request": {"head": {"repo": {"full_name": head}}}, "repository": {"full_name": base}}
 
 
@@ -113,7 +113,7 @@ class Script(unittest.TestCase):
 
     def test_a_fork_never_reaches_the_projects_macs(self):
         self.assertEqual(run(pull_request("someone/Vespertine"), **self.fresh), self.hosted)
-        self.assertEqual(run({"pull_request": {"head": {"repo": None}}, "repository": {"full_name": "szeremeta1/Vespertine"}},
+        self.assertEqual(run({"pull_request": {"head": {"repo": None}}, "repository": {"full_name": "vespertineapp/Vespertine"}},
                              **self.fresh), self.hosted)
 
     def test_a_bots_pull_request_never_reaches_the_projects_macs(self):
@@ -128,13 +128,13 @@ class Script(unittest.TestCase):
         self.assertFalse(pick.from_a_bot({"ref": "refs/heads/main"}))
 
     def test_a_pull_request_from_the_repository_uses_them(self):
-        out = run(pull_request("szeremeta1/Vespertine"), **self.fresh)
+        out = run(pull_request("vespertineapp/Vespertine"), **self.fresh)
         self.assertEqual(out["app_runner"], ["self-hosted", "macOS", "vespertine"])
         self.assertEqual(out["packages_runner"], ["self-hosted", "macOS", "vespertine-fast"])
 
     def test_nothing_readable_is_hosted(self):
         self.assertEqual(run({}), self.hosted)
-        self.assertEqual(run(pull_request("szeremeta1/Vespertine")), self.hosted)
+        self.assertEqual(run(pull_request("vespertineapp/Vespertine")), self.hosted)
 
     def test_the_switch_and_the_manual_choice(self):
         self.assertEqual(run({}, CI_OWN_MACS="off", **self.fresh), self.hosted)
@@ -157,7 +157,7 @@ class Script(unittest.TestCase):
 
 class Gate(unittest.TestCase):
     """scripts/ci-runner-job-gate.py: what a Mac itself refuses, whatever the pull request's own workflow asked for."""
-    repo = "szeremeta1/Vespertine"
+    repo = "vespertineapp/Vespertine"
 
     def pull(self, head, login="szeremeta1", kind="User"):
         return {"pull_request": {"head": {"repo": {"full_name": head} if head else None}, "user": {"login": login, "type": kind}}}
@@ -178,7 +178,7 @@ class Gate(unittest.TestCase):
 
     def test_the_repositorys_own_work_runs(self):
         self.assertIsNone(gate.refusal("pull_request", self.pull(self.repo), self.repo))
-        self.assertIsNone(gate.refusal("pull_request", self.pull("Szeremeta1/vespertine"), self.repo))
+        self.assertIsNone(gate.refusal("pull_request", self.pull("Vespertineapp/vespertine"), self.repo))
         self.assertIsNone(gate.refusal("push", {"ref": "refs/heads/main"}, self.repo))
         self.assertIsNone(gate.refusal("workflow_dispatch", {"inputs": {"macs": "own"}}, self.repo))
 
