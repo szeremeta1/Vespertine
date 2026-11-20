@@ -20,8 +20,8 @@ public final class DoPDACListStore: @unchecked Sendable {
 
         /// Release assets of the latest GitHub release, the place the update feed is published (`SUFeedURL`).
         public static let latestRelease = Endpoints(
-            list: URL(string: "https://github.com/szeremeta1/Vespertine/releases/latest/download/dop-dacs.json")!,
-            signature: URL(string: "https://github.com/szeremeta1/Vespertine/releases/latest/download/dop-dacs.json.sig")!)
+            list: URL(string: "https://github.com/vespertineapp/Vespertine/releases/latest/download/dop-dacs.json")!,
+            signature: URL(string: "https://github.com/vespertineapp/Vespertine/releases/latest/download/dop-dacs.json.sig")!)
     }
 
     public enum Outcome: Equatable, Sendable {

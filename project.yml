@@ -18,8 +18,8 @@ packages:
 settings:
   base:
     SWIFT_VERSION: "6.0"
-    MARKETING_VERSION: "1.2.1"
-    CURRENT_PROJECT_VERSION: "74"
+    MARKETING_VERSION: "1.2.2"
+    CURRENT_PROJECT_VERSION: "75"
     DEAD_CODE_STRIPPING: YES
 targets:
   Vespertine:
@@ -105,7 +105,7 @@ targets:
         # this app (it is the helper's responsible process), so this text, not the helper's, is what the prompt shows.
         NSMicrophoneUsageDescription: "Vespertine uses audio input only for what you start: a room measurement records your measurement microphone, the loopback test records a virtual loopback device, and Mac Sound Output receives what your apps play to a speaker group you published, to play it on the group's speakers. Nothing else is recorded."
         # Sparkle: EdDSA-signed appcast attached to the latest GitHub release.
-        SUFeedURL: https://github.com/szeremeta1/Vespertine/releases/latest/download/appcast.xml
+        SUFeedURL: https://github.com/vespertineapp/Vespertine/releases/latest/download/appcast.xml
         SUPublicEDKey: 5KxX9Zdz/fXEO1SpPUjZWxkNWiIzSMzMXava8UpHeNw=
         SUEnableAutomaticChecks: true
         SUScheduledCheckInterval: 86400
