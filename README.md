@@ -9,12 +9,14 @@
   <strong>The free, open-source Mac player for surround and hi-res music collections.</strong>
 </p>
 
-Vespertine plays your stereo and surround music from one library: SACD images, DVD-Video discs, DTS CDs, Dolby TrueHD, DTS-HD Master Audio, Atmos and plain FLAC. It plays surround through Apple's Spatial Audio renderer on AirPods, or across several USB DACs at once as one speaker system (Speaker Groups, in beta), measures your room with a USB microphone and corrects each speaker, shows every step between the file and your DAC, and tells you whether your "hi-res" files really are. It also plays to network players and AirPlay receivers, plays the music on your own server, and takes orders from a phone. Each of those is off until you turn it on.
-
 <p align="center">
   <a href="https://github.com/vespertineapp/Vespertine/releases/latest"><strong>Download the DMG</strong></a> or <code>brew install --cask szeremeta1/tap/vespertine</code> · macOS 14.4+ · Apple silicon and Intel<br>
   Signed and notarized · no account, no telemetry · <a href="https://vespertineapp.com/">Website</a> · <a href="https://vespertineapp.com/press.html">Press kit</a> · <a href="https://vespertineapp.com/privacy.html">Privacy</a> · <a href="https://github.com/sponsors/szeremeta1">Sponsor</a>
 </p>
+
+- **One library for stereo and surround.** FLAC, DSD, SACD and DVD-Video images, DTS CDs, TrueHD, DTS-HD MA and Atmos, listed once.
+- **A signal path you can check.** Every step from the file to your DAC, read back from Core Audio. BIT-PERFECT appears only when the [conditions in code](Packages/VespertineKit/Sources/VespertineAudio/SignalPath.swift) are met.
+- **Surround where you listen.** Spatial Audio on AirPods, several USB DACs as one speaker system (beta), and room correction measured in your room.
 
 <p align="center">
   <a href="https://github.com/vespertineapp/Vespertine/releases/latest"><img src="https://img.shields.io/github/v/release/vespertineapp/Vespertine?label=download&color=c8a765" alt="Latest release"></a>
